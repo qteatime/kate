@@ -69,5 +69,5 @@ See the `hello-world` example cartridge for some practical example of how this a
 
 ## Licence
 
-Copyright (c) 2021 Q.
+Copyright (c) 2023 Q.
 Licensed under the permissive MIT licence.
