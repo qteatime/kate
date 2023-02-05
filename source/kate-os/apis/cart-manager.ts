@@ -1,0 +1,49 @@
+import * as Cart from "../../generated/cartridge";
+import { KateOS } from "../os";
+import * as Db from "./db";
+
+export class CartManager {
+  constructor(readonly os: KateOS) {}
+
+  async list() {
+    return await this.os.db.transaction([Db.cart_meta], "readonly", async (t) => {
+      const meta = t.get_table(Db.cart_meta);
+      const result = await meta.get_all();
+      return result;
+    });
+  }
+
+  async install(cart: Cart.Cartridge) {
+    const result = await this.os.db.transaction([Db.cart_meta, Db.cart_files], "readwrite", async (t) => {
+      const meta = t.get_table(Db.cart_meta);
+      const files = t.get_table(Db.cart_files);
+      const existing = await meta.get_all(cart.id);
+      if (existing.length !== 0) {
+        return false;
+      }
+
+      const encoder = new Cart._Encoder();
+      cart.encode(encoder);
+      const bytes = encoder.to_bytes();
+
+      await meta.write({
+        id: cart.id,
+        title: cart.metadata?.title ?? cart.id,
+        description: cart.metadata?.description ?? "",
+        thumbnail: cart.metadata?.thumbnail ? {
+          mime: cart.metadata!.thumbnail!.mime,
+          bytes: cart.metadata!.thumbnail!.data
+        } : null
+      });
+      await files.write({
+        id: cart.id,
+        bytes: bytes
+      });
+      return true;
+    });
+    if (result) {
+      this.os.events.on_cart_inserted.emit(cart);
+    }
+    return result;
+  }
+}

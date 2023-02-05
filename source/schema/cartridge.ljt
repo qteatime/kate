@@ -1,0 +1,61 @@
+% ljt/0
+
+type Cartridge {
+  field id: Text;
+  field metadata: Metadata;
+  field files: File[];
+  field platform: Platform;
+}
+
+// -- File system
+type File {
+  field path: Text;
+  field mime: Text;
+  field data: Raw-bytes;
+}
+
+// -- Metadata
+type Metadata {
+  field author: Text;
+  field title: Text;
+  field description: Text;
+  field category: Text;
+  field content-warning: Text[];
+  field classification: Content-classification;
+  field release-date: Date;
+  field thumbnail: File;
+}
+
+union Content-classification {
+  type General {}
+  type Teen-and-up {}
+  type Mature {}
+  type Explicit {}
+}
+
+type Date {
+  field year: Uint32;
+  field month: Uint8;
+  field day: Uint8;
+}
+
+// -- Supported platforms
+union Platform {
+  type Web {
+    field url: Text;
+    field width: Uint32;
+    field height: Uint32;
+  }
+
+  type Web-archive {
+    field html: Text;
+    field bridges: Bridge[];
+  }
+}
+
+union Bridge {
+  type RPG-maker-mv {}
+  type Renpy {}
+  type Network-proxy {}
+  type Local-storage-proxy {}
+}

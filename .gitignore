@@ -1,0 +1,16 @@
+node_modules
+color
+design
+experiments
+source/**/*.js
+*.tsbuildinfo
+old-tree
+*.lingua.crochet
+.binary/
+!source/kate-bridges/*.js
+source/kate-bridges/index.js
+source/kate-bridges/index.ts
+www/kate.js
+www/kate-os.js
+www/app.js
+/games

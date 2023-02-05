@@ -1,0 +1,21 @@
+{
+  "id": "me.qteati.kate.hello-world",
+  "metadata": {
+    "author": "Q.",
+    "title": "Hello, from Kate",
+    "category": "Demo",
+    "content_warning": [],
+    "description": "A simple demo to test Kate.",
+    "thumbnail_path": "thumbnail.png"
+  },
+  "files": [
+    "*.css",
+    "*.js",
+    "*.html"
+  ],
+  "platform": {
+    "type": "web-archive",
+    "html": "index.html",
+    "bridges": []
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "name": "kate",
+  "version": "0.0.1",
+  "description": "A fantasy handheld console for Visual Novels, 2d RPGs, and other story-rich games!",
+  "main": "index.js",
+  "bin": {
+    "kart": "./source/kate-packaging/kart.js"
+  },
+  "scripts": {
+    "build-ts": "tsc -p .",
+    "gen-kart": "crochet ljtc -- ts source/schema/cartridge.ljt > source/generated/cartridge.ts",
+    "bundle": "browserify -e source/kate-kernel/kate.js -o www/kate.js -s Kate",
+    "bundle-os": "browserify -e source/kate-os/index.js -o www/kate-os.js -s KateOS",
+    "app": "electron www/app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/qteatime/kate.git"
+  },
+  "author": "Q.",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/qteatime/kate/issues"
+  },
+  "homepage": "https://github.com/qteatime/kate#readme",
+  "dependencies": {
+    "@types/glob": "^8.0.1",
+    "electron": "^20.3.11",
+    "browserify": "^17.0.0",
+    "glob": "^8.1.0",
+    "typescript": "^4.8.2"
+  }
+}
