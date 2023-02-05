@@ -2,8 +2,6 @@ void function () {
   const secret = KATE_SECRET;
   let contents = window.KATE_LOCAL_STORAGE ?? Object.create(null);
   
-  console.log("==>", secret, contents);
-
   let timer = null;
   function persist(contents) {
     clearTimeout(timer);
