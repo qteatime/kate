@@ -40,10 +40,7 @@ Setup things with:
 
 ```shell
 $ npm install
-$ npm run gen-cart
-$ npm run build-ts
-$ npm run bundle-os
-$ npm run bundle
+$ node make build
 ```
 
 After this you should have a working Kate. You can either use `npm run app` to run it as an Electron app, or start a server on the `www` folder and point your favourite webkit* browser there.
