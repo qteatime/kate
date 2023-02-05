@@ -1,269 +1,4 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.KateOS = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
-// shim for using process in browser
-var process = module.exports = {};
-
-// cached from whatever global is present so that test runners that stub it
-// don't break things.  But we need to wrap it in a try catch in case it is
-// wrapped in strict mode code which doesn't define any globals.  It's inside a
-// function because try/catches deoptimize in certain engines.
-
-var cachedSetTimeout;
-var cachedClearTimeout;
-
-function defaultSetTimout() {
-    throw new Error('setTimeout has not been defined');
-}
-function defaultClearTimeout () {
-    throw new Error('clearTimeout has not been defined');
-}
-(function () {
-    try {
-        if (typeof setTimeout === 'function') {
-            cachedSetTimeout = setTimeout;
-        } else {
-            cachedSetTimeout = defaultSetTimout;
-        }
-    } catch (e) {
-        cachedSetTimeout = defaultSetTimout;
-    }
-    try {
-        if (typeof clearTimeout === 'function') {
-            cachedClearTimeout = clearTimeout;
-        } else {
-            cachedClearTimeout = defaultClearTimeout;
-        }
-    } catch (e) {
-        cachedClearTimeout = defaultClearTimeout;
-    }
-} ())
-function runTimeout(fun) {
-    if (cachedSetTimeout === setTimeout) {
-        //normal enviroments in sane situations
-        return setTimeout(fun, 0);
-    }
-    // if setTimeout wasn't available but was latter defined
-    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
-        cachedSetTimeout = setTimeout;
-        return setTimeout(fun, 0);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedSetTimeout(fun, 0);
-    } catch(e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
-            return cachedSetTimeout.call(null, fun, 0);
-        } catch(e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
-            return cachedSetTimeout.call(this, fun, 0);
-        }
-    }
-
-
-}
-function runClearTimeout(marker) {
-    if (cachedClearTimeout === clearTimeout) {
-        //normal enviroments in sane situations
-        return clearTimeout(marker);
-    }
-    // if clearTimeout wasn't available but was latter defined
-    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
-        cachedClearTimeout = clearTimeout;
-        return clearTimeout(marker);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedClearTimeout(marker);
-    } catch (e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
-            return cachedClearTimeout.call(null, marker);
-        } catch (e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
-            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
-            return cachedClearTimeout.call(this, marker);
-        }
-    }
-
-
-
-}
-var queue = [];
-var draining = false;
-var currentQueue;
-var queueIndex = -1;
-
-function cleanUpNextTick() {
-    if (!draining || !currentQueue) {
-        return;
-    }
-    draining = false;
-    if (currentQueue.length) {
-        queue = currentQueue.concat(queue);
-    } else {
-        queueIndex = -1;
-    }
-    if (queue.length) {
-        drainQueue();
-    }
-}
-
-function drainQueue() {
-    if (draining) {
-        return;
-    }
-    var timeout = runTimeout(cleanUpNextTick);
-    draining = true;
-
-    var len = queue.length;
-    while(len) {
-        currentQueue = queue;
-        queue = [];
-        while (++queueIndex < len) {
-            if (currentQueue) {
-                currentQueue[queueIndex].run();
-            }
-        }
-        queueIndex = -1;
-        len = queue.length;
-    }
-    currentQueue = null;
-    draining = false;
-    runClearTimeout(timeout);
-}
-
-process.nextTick = function (fun) {
-    var args = new Array(arguments.length - 1);
-    if (arguments.length > 1) {
-        for (var i = 1; i < arguments.length; i++) {
-            args[i - 1] = arguments[i];
-        }
-    }
-    queue.push(new Item(fun, args));
-    if (queue.length === 1 && !draining) {
-        runTimeout(drainQueue);
-    }
-};
-
-// v8 likes predictible objects
-function Item(fun, array) {
-    this.fun = fun;
-    this.array = array;
-}
-Item.prototype.run = function () {
-    this.fun.apply(null, this.array);
-};
-process.title = 'browser';
-process.browser = true;
-process.env = {};
-process.argv = [];
-process.version = ''; // empty string to avoid regexp issues
-process.versions = {};
-
-function noop() {}
-
-process.on = noop;
-process.addListener = noop;
-process.once = noop;
-process.off = noop;
-process.removeListener = noop;
-process.removeAllListeners = noop;
-process.emit = noop;
-process.prependListener = noop;
-process.prependOnceListener = noop;
-
-process.listeners = function (name) { return [] }
-
-process.binding = function (name) {
-    throw new Error('process.binding is not supported');
-};
-
-process.cwd = function () { return '/' };
-process.chdir = function (dir) {
-    throw new Error('process.chdir is not supported');
-};
-process.umask = function() { return 0; };
-
-},{}],2:[function(require,module,exports){
-(function (setImmediate,clearImmediate){(function (){
-var nextTick = require('process/browser.js').nextTick;
-var apply = Function.prototype.apply;
-var slice = Array.prototype.slice;
-var immediateIds = {};
-var nextImmediateId = 0;
-
-// DOM APIs, for completeness
-
-exports.setTimeout = function() {
-  return new Timeout(apply.call(setTimeout, window, arguments), clearTimeout);
-};
-exports.setInterval = function() {
-  return new Timeout(apply.call(setInterval, window, arguments), clearInterval);
-};
-exports.clearTimeout =
-exports.clearInterval = function(timeout) { timeout.close(); };
-
-function Timeout(id, clearFn) {
-  this._id = id;
-  this._clearFn = clearFn;
-}
-Timeout.prototype.unref = Timeout.prototype.ref = function() {};
-Timeout.prototype.close = function() {
-  this._clearFn.call(window, this._id);
-};
-
-// Does not start the time, just sets up the members needed.
-exports.enroll = function(item, msecs) {
-  clearTimeout(item._idleTimeoutId);
-  item._idleTimeout = msecs;
-};
-
-exports.unenroll = function(item) {
-  clearTimeout(item._idleTimeoutId);
-  item._idleTimeout = -1;
-};
-
-exports._unrefActive = exports.active = function(item) {
-  clearTimeout(item._idleTimeoutId);
-
-  var msecs = item._idleTimeout;
-  if (msecs >= 0) {
-    item._idleTimeoutId = setTimeout(function onTimeout() {
-      if (item._onTimeout)
-        item._onTimeout();
-    }, msecs);
-  }
-};
-
-// That's not how node.js implements it but the exposed api is the same.
-exports.setImmediate = typeof setImmediate === "function" ? setImmediate : function(fn) {
-  var id = nextImmediateId++;
-  var args = arguments.length < 2 ? false : slice.call(arguments, 1);
-
-  immediateIds[id] = true;
-
-  nextTick(function onNextTick() {
-    if (immediateIds[id]) {
-      // fn.call() is faster so we optimize for the common use-case
-      // @see http://jsperf.com/call-apply-segu
-      if (args) {
-        fn.apply(null, args);
-      } else {
-        fn.call(null);
-      }
-      // Prevent ids from leaking
-      exports.clearImmediate(id);
-    }
-  });
-
-  return id;
-};
-
-exports.clearImmediate = typeof clearImmediate === "function" ? clearImmediate : function(id) {
-  delete immediateIds[id];
-};
-}).call(this)}).call(this,require("timers").setImmediate,require("timers").clearImmediate)
-},{"process/browser.js":1,"timers":2}],3:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Table = exports.Transaction = exports.Database = void 0;
@@ -352,7 +87,7 @@ class Table {
 }
 exports.Table = Table;
 
-},{}],4:[function(require,module,exports){
+},{}],2:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -372,7 +107,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./schema"), exports);
 __exportStar(require("./db"), exports);
 
-},{"./db":3,"./schema":5}],5:[function(require,module,exports){
+},{"./db":1,"./schema":3}],3:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.IndexSchema = exports.TableSchema = exports.DatabaseSchema = exports.DBError_UnableToOpen = void 0;
@@ -452,7 +187,7 @@ class IndexSchema {
 }
 exports.IndexSchema = IndexSchema;
 
-},{"./db":3}],6:[function(require,module,exports){
+},{"./db":1}],4:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Bridge = exports.Bridge$Base = exports.Platform = exports.Platform$Base = exports.Date = exports.Content_classification = exports.Content_classification$Base = exports.Metadata = exports.File = exports.Cartridge = exports._Encoder = exports._Decoder = void 0;
@@ -460,6 +195,9 @@ class _Decoder {
     constructor(view) {
         this.view = view;
         this.offset = 0;
+    }
+    get remaining_bytes() {
+        return this.view.byteLength - (this.view.byteOffset + this.offset);
     }
     peek(f) {
         return f(new DataView(this.view.buffer, this.view.byteOffset + this.offset));
@@ -527,12 +265,15 @@ class _Decoder {
     }
     bytes() {
         const size = this.ui32();
-        const result = [];
-        for (let i = 0; i < size; ++i) {
+        if (size > this.remaining_bytes) {
+            throw new Error(`Invalid size ${size}`);
+        }
+        const result = new Uint8Array(size);
+        for (let i = 0; i < result.length; ++i) {
             result[i] = this.view.getUint8(this.offset + i);
         }
         this.offset += size;
-        return new Uint8Array(result);
+        return result;
     }
     array(f) {
         const size = this.ui32();
@@ -1207,7 +948,7 @@ var Bridge;
     Bridge.Local_storage_proxy = Local_storage_proxy;
 })(Bridge = exports.Bridge || (exports.Bridge = {}));
 
-},{}],7:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CartManager = void 0;
@@ -1228,10 +969,6 @@ class CartManager {
         const result = await this.os.db.transaction([Db.cart_meta, Db.cart_files], "readwrite", async (t) => {
             const meta = t.get_table(Db.cart_meta);
             const files = t.get_table(Db.cart_files);
-            const existing = await meta.get_all(cart.id);
-            if (existing.length !== 0) {
-                return false;
-            }
             const encoder = new Cart._Encoder();
             cart.encode(encoder);
             const bytes = encoder.to_bytes();
@@ -1242,7 +979,8 @@ class CartManager {
                 thumbnail: cart.metadata?.thumbnail ? {
                     mime: cart.metadata.thumbnail.mime,
                     bytes: cart.metadata.thumbnail.data
-                } : null
+                } : null,
+                installed_at: new Date()
             });
             await files.write({
                 id: cart.id,
@@ -1258,7 +996,7 @@ class CartManager {
 }
 exports.CartManager = CartManager;
 
-},{"../../generated/cartridge":6,"./db":9}],8:[function(require,module,exports){
+},{"../../generated/cartridge":4,"./db":7}],6:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.HUD_ContextMenu = exports.KateContextMenu = void 0;
@@ -1342,7 +1080,7 @@ class HUD_ContextMenu extends scenes_1.Scene {
 }
 exports.HUD_ContextMenu = HUD_ContextMenu;
 
-},{"../../util/events":23,"../ui":20,"../ui/scenes":21}],9:[function(require,module,exports){
+},{"../../util/events":21,"../ui":18,"../ui/scenes":19}],7:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.cart_kvstore = exports.notifications = exports.cart_files = exports.cart_meta = exports.kate = void 0;
@@ -1353,7 +1091,7 @@ exports.cart_files = exports.kate.table(1, "cart_files", { path: "id", auto_incr
 exports.notifications = exports.kate.table(1, "notifications", { path: "id", auto_increment: true }, []);
 exports.cart_kvstore = exports.kate.table(1, "cart_kvstore", { path: "id", auto_increment: false }, []);
 
-},{"../../db":4}],10:[function(require,module,exports){
+},{"../../db":2}],8:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.HUD_DropInstaller = exports.KateDropInstaller = void 0;
@@ -1431,7 +1169,7 @@ class HUD_DropInstaller extends scenes_1.Scene {
 }
 exports.HUD_DropInstaller = HUD_DropInstaller;
 
-},{"../ui":20,"../ui/scenes":21}],11:[function(require,module,exports){
+},{"../ui":18,"../ui/scenes":19}],9:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.StorageFile = exports.StorageBucket = exports.KateStorage = void 0;
@@ -1512,7 +1250,7 @@ class StorageFile {
 }
 exports.StorageFile = StorageFile;
 
-},{"../../generated/cartridge":6}],12:[function(require,module,exports){
+},{"../../generated/cartridge":4}],10:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.KateFocusHandler = void 0;
@@ -1630,7 +1368,7 @@ class KateFocusHandler {
 }
 exports.KateFocusHandler = KateFocusHandler;
 
-},{}],13:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.KateKVStoragePartition = exports.KateKVStorage = void 0;
@@ -1671,7 +1409,7 @@ class KateKVStoragePartition {
 }
 exports.KateKVStoragePartition = KateKVStoragePartition;
 
-},{"./db":9}],14:[function(require,module,exports){
+},{"./db":7}],12:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.HUD_Toaster = exports.KateNotification = void 0;
@@ -1727,7 +1465,7 @@ class HUD_Toaster extends scenes_1.Scene {
 }
 exports.HUD_Toaster = HUD_Toaster;
 
-},{"../time":19,"../ui":20,"../ui/scenes":21,"./db":9}],15:[function(require,module,exports){
+},{"../time":17,"../ui":18,"../ui/scenes":19,"./db":7}],13:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.KateProcess = exports.HUD_LoadIndicator = exports.KateProcesses = void 0;
@@ -1812,7 +1550,7 @@ class KateProcess {
 }
 exports.KateProcess = KateProcess;
 
-},{"../ui":20,"../ui/scenes":21,"./db":9}],16:[function(require,module,exports){
+},{"../ui":18,"../ui/scenes":19,"./db":7}],14:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.KateStatus = exports.HUD_StatusBar = exports.KateStatusBar = void 0;
@@ -1890,7 +1628,7 @@ class KateStatus {
 }
 exports.KateStatus = KateStatus;
 
-},{"../ui":20,"../ui/scenes":21}],17:[function(require,module,exports){
+},{"../ui":18,"../ui/scenes":19}],15:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -1909,7 +1647,7 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./os"), exports);
 
-},{"./os":18}],18:[function(require,module,exports){
+},{"./os":16}],16:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.KateOS = void 0;
@@ -1996,7 +1734,7 @@ class KateOS {
 }
 exports.KateOS = KateOS;
 
-},{"../util/events":23,"./apis/cart-manager":7,"./apis/context_menu":8,"./apis/db":9,"./apis/drop-installer":10,"./apis/file_storage":11,"./apis/focus-handler":12,"./apis/kv_storage":13,"./apis/notification":14,"./apis/processes":15,"./apis/status-bar":16,"./time":19,"./ui/scenes":21}],19:[function(require,module,exports){
+},{"../util/events":21,"./apis/cart-manager":5,"./apis/context_menu":6,"./apis/db":7,"./apis/drop-installer":8,"./apis/file_storage":9,"./apis/focus-handler":10,"./apis/kv_storage":11,"./apis/notification":12,"./apis/processes":13,"./apis/status-bar":14,"./time":17,"./ui/scenes":19}],17:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.wait = void 0;
@@ -2005,7 +1743,7 @@ async function wait(ms) {
 }
 exports.wait = wait;
 
-},{}],20:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -2027,8 +1765,7 @@ __exportStar(require("./widget"), exports);
 const Scenes = require("./scenes");
 exports.Scenes = Scenes;
 
-},{"./scenes":21,"./widget":22}],21:[function(require,module,exports){
-(function (setImmediate){(function (){
+},{"./scenes":19,"./widget":20}],19:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SceneHome = exports.SceneBoot = exports.Scene = void 0;
@@ -2083,45 +1820,42 @@ class SceneHome extends Scene {
             this.os.processes.run(x.id);
         });
     }
+    async show_carts(list) {
+        try {
+            const carts = (await this.os.cart_manager.list()).sort((a, b) => b.installed_at.getTime() - a.installed_at.getTime());
+            list.textContent = "";
+            for (const x of carts) {
+                list.appendChild(this.render_cart(x).render());
+            }
+            this.os.focus_handler.focus(list.querySelector(".kate-ui-focus-target") ??
+                list.firstElementChild ??
+                null);
+        }
+        catch (error) {
+            console.log(error);
+            this.os.notifications.push("kate:os", "Failed to load games", `An internal error happened while loading.`);
+        }
+    }
     render() {
         const home = (0, widget_1.h)("div", { class: "kate-os-home" }, [
             new UI.Title_bar({
-                left: UI.fragment([
-                    new UI.Section_title(["Library"]),
-                ])
+                left: UI.fragment([new UI.Section_title(["Library"])]),
             }),
             (0, widget_1.h)("div", { class: "kate-os-carts-scroll" }, [
-                (0, widget_1.h)("div", { class: "kate-os-carts" }, [])
+                (0, widget_1.h)("div", { class: "kate-os-carts" }, []),
             ]),
         ]);
         const carts = home.querySelector(".kate-os-carts");
-        setImmediate(async () => {
-            const list = await this.os.cart_manager.list();
-            carts.innerHTML = "";
-            for (const x of list) {
-                carts.appendChild(this.render_cart(x).render());
-            }
-            this.os.focus_handler.focus(carts.querySelector(".kate-ui-focus-target") ?? null);
-        });
+        this.show_carts(carts);
         this.os.events.on_cart_inserted.listen(async (x) => {
-            carts.insertBefore(this.render_cart({
-                id: x.id,
-                title: x.metadata?.title ?? x.id,
-                thumbnail: x.metadata?.thumbnail
-                    ? {
-                        mime: x.metadata.thumbnail.mime,
-                        bytes: x.metadata.thumbnail.data,
-                    }
-                    : null,
-            }).render(), carts.firstChild);
+            this.show_carts(carts);
         });
         return home;
     }
 }
 exports.SceneHome = SceneHome;
 
-}).call(this)}).call(this,require("timers").setImmediate)
-},{"./widget":22,"timers":2}],22:[function(require,module,exports){
+},{"./widget":20}],20:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Icon = exports.Button = exports.If = exports.Menu_list = exports.Section_title = exports.Title_bar = exports.VBox = exports.HBox = exports.WithClass = exports.append = exports.render = exports.svg = exports.h = exports.fragment = exports.Widget = void 0;
@@ -2325,7 +2059,7 @@ class Icon extends Widget {
 }
 exports.Icon = Icon;
 
-},{"../../util/events":23}],23:[function(require,module,exports){
+},{"../../util/events":21}],21:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EventStream = void 0;
@@ -2350,5 +2084,5 @@ class EventStream {
 }
 exports.EventStream = EventStream;
 
-},{}]},{},[17])(17)
+},{}]},{},[15])(15)
 });
