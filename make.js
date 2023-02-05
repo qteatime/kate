@@ -14,6 +14,7 @@ class World {
     if (this._done.has(name)) {
       return;
     }
+    this._done.add(name);
 
     const task = this.tasks.get(name);
     if (!task) {
