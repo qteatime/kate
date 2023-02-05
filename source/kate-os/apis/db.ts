@@ -9,7 +9,8 @@ export const cart_meta = kate.table<{
   thumbnail: {
     mime: string,
     bytes: Uint8Array
-  } | null
+  } | null,
+  installed_at: Date
 }>(1, "cart_meta", {path: "id", auto_increment: false}, []);
 
 export const cart_files = kate.table<{

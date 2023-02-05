@@ -70,41 +70,44 @@ export class SceneHome extends Scene {
     });
   }
 
+  async show_carts(list: HTMLElement) {
+    try {
+      const carts = (await this.os.cart_manager.list()).sort(
+        (a, b) => b.installed_at.getTime() - a.installed_at.getTime()
+      );
+      list.textContent = "";
+      for (const x of carts) {
+        list.appendChild(this.render_cart(x).render());
+      }
+      this.os.focus_handler.focus(
+        list.querySelector(".kate-ui-focus-target") ??
+          (list.firstElementChild as HTMLElement) ??
+          null
+      );
+    } catch (error) {
+      console.log(error);
+      this.os.notifications.push(
+        "kate:os",
+        "Failed to load games",
+        `An internal error happened while loading.`
+      );
+    }
+  }
+
   render() {
     const home = h("div", { class: "kate-os-home" }, [
       new UI.Title_bar({
-        left: UI.fragment([
-          new UI.Section_title(["Library"]),
-        ])
+        left: UI.fragment([new UI.Section_title(["Library"])]),
       }),
-      h("div", {class: "kate-os-carts-scroll"}, [
-        h("div", { class: "kate-os-carts" }, [])
+      h("div", { class: "kate-os-carts-scroll" }, [
+        h("div", { class: "kate-os-carts" }, []),
       ]),
     ]);
 
-    const carts = home.querySelector(".kate-os-carts")!;
-    setImmediate(async () => {
-      const list = await this.os.cart_manager.list();
-      carts.innerHTML = "";
-      for (const x of list) {
-        carts.appendChild(this.render_cart(x).render());
-      }
-      this.os.focus_handler.focus(carts.querySelector(".kate-ui-focus-target") ?? null);
-    });
+    const carts = home.querySelector(".kate-os-carts")! as HTMLElement;
+    this.show_carts(carts);
     this.os.events.on_cart_inserted.listen(async (x) => {
-      carts.insertBefore(
-        this.render_cart({
-          id: x.id,
-          title: x.metadata?.title ?? x.id,
-          thumbnail: x.metadata?.thumbnail
-            ? {
-                mime: x.metadata.thumbnail.mime,
-                bytes: x.metadata.thumbnail.data,
-              }
-            : null,
-        }).render(),
-        carts.firstChild
-      );
+      this.show_carts(carts);
     });
 
     return home;

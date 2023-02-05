@@ -17,10 +17,6 @@ export class CartManager {
     const result = await this.os.db.transaction([Db.cart_meta, Db.cart_files], "readwrite", async (t) => {
       const meta = t.get_table(Db.cart_meta);
       const files = t.get_table(Db.cart_files);
-      const existing = await meta.get_all(cart.id);
-      if (existing.length !== 0) {
-        return false;
-      }
 
       const encoder = new Cart._Encoder();
       cart.encode(encoder);
@@ -33,7 +29,8 @@ export class CartManager {
         thumbnail: cart.metadata?.thumbnail ? {
           mime: cart.metadata!.thumbnail!.mime,
           bytes: cart.metadata!.thumbnail!.data
-        } : null
+        } : null,
+        installed_at: new Date()
       });
       await files.write({
         id: cart.id,
