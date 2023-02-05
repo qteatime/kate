@@ -78,7 +78,7 @@ w.task("generate:schemas", [], () => {
   exec("npm run gen-kart");
 }).with_doc("Generates TS definitions for binary schemas.");
 
-w.task("compile:ts", ["generate:bridges", "generate:schemas"], () => {
+w.task("compile:ts", ["generate:bridges"], () => {
   exec("npm run build-ts");
 }).with_doc("Compiles Kate's source files");
 

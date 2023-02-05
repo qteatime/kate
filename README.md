@@ -36,8 +36,6 @@ You can try Kate directly from your web-browser: go to https://kate.qteati.me/ a
 
 The core of Kate is written in [TypeScript](https://www.typescriptlang.org/), some tools are written in [Crochet](https://crochet.qteati.me/). To build Kate you'll need at least a working [Node.js](https://nodejs.org/en/) environment.
 
-You'll need a more recent version of Crochet than what's published on NPM. Follow the instructions on https://github.com/qteatime/crochet to build it locally, then symlink it with `npm link`.
-
 Setup things with:
 
 ```shell
