@@ -13,6 +13,26 @@ export class CartManager {
     });
   }
 
+  async install_from_file(file: File) {
+    try {
+      const cart = this.os.kernel.loader.load_bytes(await file.arrayBuffer());
+      if (await this.install(cart)) {
+        await this.os.notifications.push(
+          "kate:installer",
+          "New game installed",
+          `${cart.metadata?.title ?? cart.id} is ready to play!`
+        );
+      }
+    } catch (error) {
+      console.error(`Failed to install ${file.name}:`, error);
+      await this.os.notifications.push(
+        "kate:installer",
+        "Installation failed",
+        `${file.name} could not be installed.`
+      );
+    }
+  }
+
   async install(cart: Cart.Cartridge) {
     const result = await this.os.db.transaction([Db.cart_meta, Db.cart_files], "readwrite", async (t) => {
       const meta = t.get_table(Db.cart_meta);

@@ -4,6 +4,14 @@ import { Scene } from "../ui/scenes";
 import * as UI from "../ui"
 import { EventStream } from "../../util/events";
 
+declare global {
+  function showOpenFilePicker(options: {
+    types: {description: string, accept: {[key: string]: string[]}}[],
+    multiple: boolean,
+    excludeAcceptAllOption: boolean
+  }): FileSystemFileHandle[];
+}
+
 export class KateContextMenu {
   private in_context = false;
 
@@ -20,6 +28,10 @@ export class KateContextMenu {
   handle_key_press = (key: ExtendedInputKey) => {
     switch (key) {
       case "long_menu": {
+        this.show_context_menu();
+        break;
+      }
+      case "menu": {
         this.show_context_menu();
         break;
       }
@@ -62,12 +74,33 @@ export class HUD_ContextMenu extends Scene {
           ]),
           else: new UI.Menu_list([
             new UI.Button(["Power off"]).on_clicked(this.on_power_off),
+            new UI.Button(["Install from file"]).on_clicked(this.on_install_from_file),
             new UI.Button(["Return"]).on_clicked(this.on_return)
           ])
         })
       ]),
     ])
   }
+
+  on_install_from_file = async () => {
+    this.os.hide_hud(this);
+    this.on_close.emit();
+
+    const [file_handle] = await window.showOpenFilePicker({
+      types: [
+        {
+          description: "Kate Cartridges",
+          accept: {
+            "application/kart": [".kart"]
+          }
+        }
+      ],
+      excludeAcceptAllOption: true,
+      multiple: false
+    });
+    const file = await file_handle.getFile();
+    await this.os.cart_manager.install_from_file(file);
+  };
 
   on_close_game = async () => {
     await this.os.processes.running?.exit();

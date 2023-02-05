@@ -22,24 +22,7 @@ export class KateDropInstaller {
       }
 
       status.update(`Installing ${file.name}...`);
-
-      try {
-        const cart = this.os.kernel.loader.load_bytes(await file.arrayBuffer());
-        if (await this.os.cart_manager.install(cart)) {
-          await this.os.notifications.push(
-            "kate:installer",
-            "New game installed",
-            `${cart.metadata?.title ?? cart.id} is ready to play!`
-          );
-        }
-      } catch (error) {
-        console.error(`Failed to install ${file.name}:`, error);
-        await this.os.notifications.push(
-          "kate:installer",
-          "Installation failed",
-          `${file.name} could not be installed.`
-        );
-      }
+      await this.os.cart_manager.install_from_file(file);
     }
 
     status.hide();
