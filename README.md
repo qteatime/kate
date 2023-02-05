@@ -2,7 +2,7 @@
 
 > **NOTE:** Kate is an experimental proof-of-concept currently, expect it to randomly break on every new release (or, like, just on a regular usage). Cartridge format is not final and old binaries will not work on version changes.
 
-Kate is a fantasy handheld console designed for simpler story-rich games, like Visual Novels and 2d RPGs. It looks like an old handheld, but runs on Windows, Mac, Linux, or in your browser. That way, you can easily and **safely** share small games as a single file that can run anywhere; and players can install and play it without worrying too much, since it's all sandboxed!
+Kate is a fantasy handheld console designed for simpler story-rich games, like Visual Novels and 2d RPGs. It looks like an old handheld, but runs on Windows, Mac, Linux, or in your browser. That way, you can easily and **safely** share small games as a single file that can run anywhere; and players can install and play it without worrying too much about security, since it's all sandboxed!
 
 You can try Kate directly from your web-browser: go to https://kate.qteati.me/ and install the `hello.kart` file provided in this repository by drag-dropping it over the console.
 
