@@ -86,20 +86,34 @@ export class HUD_ContextMenu extends Scene {
     this.os.hide_hud(this);
     this.on_close.emit();
 
-    const [file_handle] = await window.showOpenFilePicker({
-      types: [
-        {
-          description: "Kate Cartridges",
-          accept: {
-            "application/kart": [".kart"]
-          }
+    return new Promise<void>((resolve, reject) => {
+      const installer = document.querySelector("#kate-installer") as HTMLInputElement;
+      const teardown = () => {
+        installer.onchange = () => {};
+        installer.onerror = () => {};
+        installer.onabort = () => {};
+      }
+      installer.onchange = async (ev) => {
+        try {
+          const file = installer.files!.item(0)!;
+          await this.os.cart_manager.install_from_file(file);
+          teardown();
+          resolve();
+        } catch (error) {
+          teardown();
+          reject(error);
         }
-      ],
-      excludeAcceptAllOption: true,
-      multiple: false
-    });
-    const file = await file_handle.getFile();
-    await this.os.cart_manager.install_from_file(file);
+      };
+      installer.onerror = async () => {
+        teardown();
+        reject(new Error(`failed to install`));
+      }
+      installer.onabort = async () => {
+        teardown();
+        reject(new Error(`failed to install`));
+      }
+      installer.click();
+    })
   };
 
   on_close_game = async () => {
