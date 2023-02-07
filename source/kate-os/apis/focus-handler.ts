@@ -11,7 +11,7 @@ export class KateFocusHandler {
   }
 
   private should_handle(key: ExtendedInputKey) {
-    return ["up", "down", "left", "right", "b"].includes(key);
+    return ["up", "down", "left", "right", "o"].includes(key);
   }
 
   get current_root() {
