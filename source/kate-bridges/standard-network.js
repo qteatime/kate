@@ -1,9 +1,15 @@
 void function () {
   const secret = KATE_SECRET;
 
+  function make_id() {
+    let id = new Uint8Array(16);
+    crypto.getRandomValues(id);
+    return Array.from(id).map(x => x.toString(16).padStart(2, "0")).join("");
+  }
+
   async function read_file(path) {
     return new Promise((resolve, reject) => {
-      const id = crypto.randomUUID();
+      const id = make_id();
       const handler = (ev) => {
         if (ev.data.type === "kate:reply" && ev.data.id === id) {
           window.removeEventListener("message", handler);

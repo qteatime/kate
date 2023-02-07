@@ -3,6 +3,7 @@ import { VirtualConsole } from "./virtual";
 import {bridges} from "../kate-bridges";
 import type { KateOS } from "../kate-os";
 import type { KateKVStoragePartition } from "../kate-os/apis/kv_storage";
+import { make_id } from "../util/random";
 
 const SCREEN_WIDTH = 800;
 const SCREEN_HEIGHT = 480;
@@ -63,7 +64,7 @@ export class CR_Web extends CartRuntime {
     frame.style.transform = `scale(${zoom})`;
     this.console.screen.appendChild(frame);
 
-    return new CRW_Process(this, frame, crypto.randomUUID());
+    return new CRW_Process(this, frame, make_id());
   }
 }
 
@@ -96,7 +97,7 @@ export class CR_Web_archive extends CartRuntime {
   }
 
   run({ storage }: { storage?: KateKVStoragePartition | undefined; }) {
-    const secret = crypto.randomUUID();
+    const secret = make_id();
     const frame = document.createElement("iframe");
     frame.className = "kate-game-frame kate-game-frame-defaults";
     (frame as any).sandbox = "allow-scripts";
