@@ -106,6 +106,14 @@ export class VirtualConsole {
         ev.preventDefault();
         this.update_virtual_key(key, false);
       })
+      button.addEventListener("touchstart", (ev) => {
+        ev.preventDefault();
+        this.update_virtual_key(key, true);
+      });
+      button.addEventListener("touchend", (ev) => {
+        ev.preventDefault();
+        this.update_virtual_key(key, false);
+      })
     }
 
     listen_button(this.up_button, "up");
