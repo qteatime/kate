@@ -765,9 +765,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.bridges = void 0;
 exports.bridges = {
     "local-storage.js": "void function () {\r\n  const secret = KATE_SECRET;\r\n  let contents = window.KATE_LOCAL_STORAGE ?? Object.create(null);\r\n  \r\n  let timer = null;\r\n  function persist(contents) {\r\n    clearTimeout(timer);\r\n    timer = setTimeout(() => {\r\n      window.parent.postMessage({\r\n        type: \"kate:write-kv-storage\",\r\n        secret: secret,\r\n        content: contents\r\n      }, \"*\");\r\n    })\r\n  }\r\n\r\n  class KateStorage {\r\n    constructor(contents, persistent) {\r\n      this.__contents = contents;\r\n      this.__persistent = persistent;\r\n    }\r\n\r\n    _persist() {\r\n      if (this.__persistent) {\r\n        persist(this.__contents);\r\n      }\r\n    }\r\n\r\n    getItem(name) {\r\n      return this.__contents[name] ?? null;\r\n    }\r\n\r\n    setItem(name, value) {\r\n      this.__contents[name] = value;\r\n      this._persist();\r\n    }\r\n\r\n    removeItem(name) {\r\n      delete this.__contents[name];\r\n      this._persist();\r\n    }\r\n\r\n    clear() {\r\n      this.__contents = Object.create(null);\r\n      this._persist();\r\n    }\r\n\r\n    key(index) {\r\n      return this.getItem(Object.keys(this.__contents)[index]) ?? null;\r\n    }\r\n\r\n    get length() {\r\n      return Object.keys(this.__contents).length;\r\n    }\r\n  }\r\n\r\n  function proxy_storage(storage, key) {\r\n    const exposed = [\"getItem\", \"setItem\", \"removeItem\", \"clear\", \"key\"];\r\n\r\n    Object.defineProperty(window, key, {\r\n      value: new Proxy(storage, {\r\n        get(target, prop, receiver) {\r\n          return exposed.contains(prop) ? storage[prop].bind(storage) : storage.getItem(prop);\r\n        },\r\n        has(target, prop) {\r\n          return exposed.contains(prop) || prop in contents;\r\n        },\r\n        set(target, prop, value) {\r\n          return storage.setItem(prop, value);\r\n        },\r\n        deleteProperty(target, prop) {\r\n          return storage.removeItem(prop);\r\n        }\r\n      })\r\n    })\r\n  }\r\n  \r\n  const storage = new KateStorage(contents, true);\r\n  proxy_storage(storage, \"localStorage\");\r\n\r\n  const session_storage = new KateStorage(Object.create(null), false);\r\n  proxy_storage(session_storage, \"sessionStorage\");\r\n\r\n}();",
-    "renpy.js": "void function() {\r\n  let paused = false;\r\n  const add_event_listener = window.addEventListener;\r\n  const key_mapping = {\r\n    up: [\"ArrowUp\", \"ArrowUp\", 38],\r\n    right: [\"ArrowRight\", \"ArrowRight\", 39],\r\n    down: [\"ArrowDown\", \"ArrowDown\", 40],\r\n    left: [\"ArrowLeft\", \"ArrowLeft\", 37],\r\n    a: [\"Escape\", \"Escape\", 27],\r\n    b: [\"Enter\", \"Enter\", 13],\r\n    ltrigger: ['PageUp', 'PageUp', 33],\r\n    rtrigger: ['PageDown', 'PageDown', 34]\r\n  }\r\n\r\n  const down_listeners = [];\r\n  const up_listeners = [];\r\n  \r\n  window.addEventListener(\"message\", (ev) => {\r\n    switch (ev.data.type) {\r\n      case \"kate:paused\": {\r\n        paused = true;\r\n        break;\r\n      }\r\n\r\n      case \"kate:unpaused\": {\r\n        paused = false;\r\n        break;\r\n      }\r\n\r\n      case \"kate:input-changed\": {\r\n        if (!paused) {\r\n          const data = key_mapping[ev.data.key];\r\n          if (data) {\r\n            const listeners = ev.data.is_down ? down_listeners : up_listeners;\r\n            const type = ev.data.is_down ? \"keydown\" : \"keyup\";\r\n            const [key, code, keyCode] = data;\r\n            const key_ev = new KeyboardEvent(type, {key, code, keyCode});\r\n            for (const fn of listeners) {\r\n              fn.call(document, key_ev);\r\n            }\r\n          }\r\n        }\r\n        break;\r\n      }\r\n    }\r\n  })\r\n  \r\n  window.addEventListener = function(type, listener, options) {\r\n    if (type === \"keydown\") {\r\n      down_listeners.push(listener);\r\n    } else if (type === \"keyup\") {\r\n      up_listeners.push(listener);\r\n    } else {\r\n      add_event_listener.call(this, type, listener, options);\r\n    }\r\n  };\r\n}();",
-    "rpgmk-mv.js": "void function() {\r\n  let paused = false;\r\n\r\n  // -- Things that need to be patched still\r\n  Utils.isOptionValid = (name) => {\r\n    return [\"noaudio\"].includes(name);\r\n  }\r\n\r\n  const key_mapping = {\r\n    up: \"up\",\r\n    right: \"right\",\r\n    down: \"down\",\r\n    left: \"left\",\r\n    a: \"cancel\",\r\n    b: \"ok\",\r\n    menu: \"menu\",\r\n    rtrigger: \"shift\"\r\n  };\r\n\r\n  window.addEventListener(\"message\", (ev) => {\r\n    switch (ev.data.type) {\r\n      case \"kate:paused\": {\r\n        for (const key of Object.values(key_mapping)) {\r\n          Input._currentState[key] = false;\r\n        }\r\n        paused = true;\r\n        break;\r\n      }\r\n      case \"kate:unpaused\": {\r\n        paused = false;\r\n        break;\r\n      }\r\n\r\n      case \"kate:input-changed\": {\r\n        if (!paused) {\r\n          const name = key_mapping[ev.data.key];\r\n          if (name) {\r\n            Input._currentState[name] = ev.data.is_down;\r\n          }\r\n        }\r\n        break;\r\n      }\r\n    }\r\n  })\r\n}();",
-    "standard-network.js": "void function () {\r\n  const secret = KATE_SECRET;\r\n\r\n  async function read_file(path) {\r\n    return new Promise((resolve, reject) => {\r\n      const id = crypto.randomUUID();\r\n      const handler = (ev) => {\r\n        if (ev.data.type === \"kate:reply\" && ev.data.id === id) {\r\n          window.removeEventListener(\"message\", handler);\r\n          if (ev.data.ok) {\r\n            resolve(ev.data.result);\r\n          } else {\r\n            reject(new Error(`Request to ${path} failed`));\r\n          }\r\n        }\r\n      };\r\n\r\n      window.addEventListener(\"message\", handler);\r\n      window.parent.postMessage({\r\n        type: \"kate:read-file\",\r\n        secret: secret,\r\n        id: id,\r\n        path: path\r\n      }, \"*\")\r\n    });\r\n  }\r\n\r\n  async function get_url(url) {\r\n    try {\r\n      const file = await read_file(url);\r\n      const blob = new Blob([file.data], {type: file.mime});\r\n      return URL.createObjectURL(blob);\r\n    } catch (e) {\r\n      console.error(\"error ==>\", e);\r\n      throw e;\r\n    }\r\n  }\r\n\r\n  // -- Arbitrary fetching\r\n  const old_fetch = window.fetch;\r\n  window.fetch = async function(request, options) {\r\n    let url;\r\n    let method;\r\n\r\n    if (Object(request) === request && request.url) {\r\n      url = request.url;\r\n      method = request.method;\r\n    } else {\r\n      url = request;\r\n      method = options?.method ?? \"GET\";\r\n    }\r\n\r\n    if (method !== \"GET\") {\r\n      return new Promise((_, reject) => reject(new Error(`Non-GET requests are not supported.`)));\r\n    }\r\n    return new Promise(async (resolve, reject) => {\r\n      try {\r\n        const file = await get_url(String(url));\r\n        const result = await old_fetch(file);\r\n        resolve(result);\r\n      } catch (error) {\r\n        reject(error);\r\n      }\r\n    });\r\n  }\r\n\r\n  const old_xhr_open = XMLHttpRequest.prototype.open;\r\n  const old_xhr_send = XMLHttpRequest.prototype.send;\r\n  XMLHttpRequest.prototype.open = function(method, url) {\r\n    if (method !== \"GET\") {\r\n      throw new Error(`Non-GET requests are not supported.`);\r\n    }\r\n\r\n    this.__waiting_open = true;\r\n\r\n    void (async () => {\r\n      try {\r\n        const real_url = await get_url(String(url));\r\n        old_xhr_open.call(this, \"GET\", real_url);\r\n        this.__maybe_send();\r\n      } catch (error) {\r\n        old_xhr_open.call(this, \"GET\", \"not-found\");\r\n        this.__maybe_send();\r\n      }\r\n    })();\r\n  };\r\n\r\n  XMLHttpRequest.prototype.__maybe_send = function() {\r\n    this.__waiting_open = false;\r\n    if (this.__waiting_send) {\r\n      this.__waiting_send = false;\r\n      this.send();\r\n    }\r\n  };\r\n\r\n  XMLHttpRequest.prototype.send = function() {\r\n    if (this.__waiting_open) {\r\n      this.__waiting_send = true;\r\n      return;\r\n    } else {\r\n      return old_xhr_send.call(this);\r\n    }\r\n  };\r\n\r\n  // -- Image loading\r\n  const old_img_src = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, \"src\");\r\n  Object.defineProperty(HTMLImageElement.prototype, \"src\", {\r\n    enumerable: old_img_src.enumerable,\r\n    configurable: old_img_src.configurable,\r\n    get() {\r\n      return this.__src ?? old_img_src.get.call(this);\r\n    },\r\n    set(url) {\r\n      this.__src = url;\r\n      void (async () => {\r\n        try {\r\n          const real_url = await get_url(String(url));\r\n          old_img_src.set.call(this, real_url);\r\n        } catch (error) {\r\n          old_img_src.set.call(this, \"not-found\");\r\n        }\r\n      })();\r\n    }\r\n  });\r\n\r\n}();"
+    "renpy.js": "void function() {\r\n  let paused = false;\r\n  const add_event_listener = window.addEventListener;\r\n  const key_mapping = {\r\n    up: [\"ArrowUp\", \"ArrowUp\", 38],\r\n    right: [\"ArrowRight\", \"ArrowRight\", 39],\r\n    down: [\"ArrowDown\", \"ArrowDown\", 40],\r\n    left: [\"ArrowLeft\", \"ArrowLeft\", 37],\r\n    x: [\"Escape\", \"Escape\", 27],\r\n    o: [\"Enter\", \"Enter\", 13],\r\n    ltrigger: ['PageUp', 'PageUp', 33],\r\n    rtrigger: ['PageDown', 'PageDown', 34]\r\n  }\r\n\r\n  const down_listeners = [];\r\n  const up_listeners = [];\r\n  \r\n  window.addEventListener(\"message\", (ev) => {\r\n    switch (ev.data.type) {\r\n      case \"kate:paused\": {\r\n        paused = true;\r\n        break;\r\n      }\r\n\r\n      case \"kate:unpaused\": {\r\n        paused = false;\r\n        break;\r\n      }\r\n\r\n      case \"kate:input-changed\": {\r\n        if (!paused) {\r\n          const data = key_mapping[ev.data.key];\r\n          if (data) {\r\n            const listeners = ev.data.is_down ? down_listeners : up_listeners;\r\n            const type = ev.data.is_down ? \"keydown\" : \"keyup\";\r\n            const [key, code, keyCode] = data;\r\n            const key_ev = new KeyboardEvent(type, {key, code, keyCode});\r\n            for (const fn of listeners) {\r\n              fn.call(document, key_ev);\r\n            }\r\n          }\r\n        }\r\n        break;\r\n      }\r\n    }\r\n  })\r\n  \r\n  function listen(type, listener, options) {\r\n    if (type === \"keydown\") {\r\n      down_listeners.push(listener);\r\n    } else if (type === \"keyup\") {\r\n      up_listeners.push(listener);\r\n    } else {\r\n      add_event_listener.call(this, type, listener, options);\r\n    }\r\n  };\r\n  window.addEventListener = listen;\r\n  document.addEventListener = listen;\r\n}();",
+    "rpgmk-mv.js": "void function() {\r\n  let paused = false;\r\n\r\n  // -- Things that need to be patched still\r\n  Utils.isOptionValid = (name) => {\r\n    return [\"noaudio\"].includes(name);\r\n  }\r\n\r\n  const key_mapping = {\r\n    up: \"up\",\r\n    right: \"right\",\r\n    down: \"down\",\r\n    left: \"left\",\r\n    x: \"cancel\",\r\n    o: \"ok\",\r\n    menu: \"menu\",\r\n    rtrigger: \"shift\"\r\n  };\r\n\r\n  window.addEventListener(\"message\", (ev) => {\r\n    switch (ev.data.type) {\r\n      case \"kate:paused\": {\r\n        for (const key of Object.values(key_mapping)) {\r\n          Input._currentState[key] = false;\r\n        }\r\n        paused = true;\r\n        break;\r\n      }\r\n      case \"kate:unpaused\": {\r\n        paused = false;\r\n        break;\r\n      }\r\n\r\n      case \"kate:input-changed\": {\r\n        if (!paused) {\r\n          const name = key_mapping[ev.data.key];\r\n          if (name) {\r\n            Input._currentState[name] = ev.data.is_down;\r\n          }\r\n        }\r\n        break;\r\n      }\r\n    }\r\n  })\r\n}();",
+    "standard-network.js": "void function () {\r\n  const secret = KATE_SECRET;\r\n\r\n  function make_id() {\r\n    let id = new Uint8Array(16);\r\n    crypto.getRandomValues(id);\r\n    return Array.from(id).map(x => x.toString(16).padStart(2, \"0\")).join(\"\");\r\n  }\r\n\r\n  async function read_file(path) {\r\n    return new Promise((resolve, reject) => {\r\n      const id = make_id();\r\n      const handler = (ev) => {\r\n        if (ev.data.type === \"kate:reply\" && ev.data.id === id) {\r\n          window.removeEventListener(\"message\", handler);\r\n          if (ev.data.ok) {\r\n            resolve(ev.data.result);\r\n          } else {\r\n            reject(new Error(`Request to ${path} failed`));\r\n          }\r\n        }\r\n      };\r\n\r\n      window.addEventListener(\"message\", handler);\r\n      window.parent.postMessage({\r\n        type: \"kate:read-file\",\r\n        secret: secret,\r\n        id: id,\r\n        path: path\r\n      }, \"*\")\r\n    });\r\n  }\r\n\r\n  async function get_url(url) {\r\n    try {\r\n      const file = await read_file(url);\r\n      const blob = new Blob([file.data], {type: file.mime});\r\n      return URL.createObjectURL(blob);\r\n    } catch (e) {\r\n      console.error(\"error ==>\", e);\r\n      throw e;\r\n    }\r\n  }\r\n\r\n  // -- Arbitrary fetching\r\n  const old_fetch = window.fetch;\r\n  window.fetch = async function(request, options) {\r\n    let url;\r\n    let method;\r\n\r\n    if (Object(request) === request && request.url) {\r\n      url = request.url;\r\n      method = request.method;\r\n    } else {\r\n      url = request;\r\n      method = options?.method ?? \"GET\";\r\n    }\r\n\r\n    if (method !== \"GET\") {\r\n      return new Promise((_, reject) => reject(new Error(`Non-GET requests are not supported.`)));\r\n    }\r\n    return new Promise(async (resolve, reject) => {\r\n      try {\r\n        const file = await get_url(String(url));\r\n        const result = await old_fetch(file);\r\n        resolve(result);\r\n      } catch (error) {\r\n        reject(error);\r\n      }\r\n    });\r\n  }\r\n\r\n  const old_xhr_open = XMLHttpRequest.prototype.open;\r\n  const old_xhr_send = XMLHttpRequest.prototype.send;\r\n  XMLHttpRequest.prototype.open = function(method, url) {\r\n    if (method !== \"GET\") {\r\n      throw new Error(`Non-GET requests are not supported.`);\r\n    }\r\n\r\n    this.__waiting_open = true;\r\n\r\n    void (async () => {\r\n      try {\r\n        const real_url = await get_url(String(url));\r\n        old_xhr_open.call(this, \"GET\", real_url);\r\n        this.__maybe_send();\r\n      } catch (error) {\r\n        old_xhr_open.call(this, \"GET\", \"not-found\");\r\n        this.__maybe_send();\r\n      }\r\n    })();\r\n  };\r\n\r\n  XMLHttpRequest.prototype.__maybe_send = function() {\r\n    this.__waiting_open = false;\r\n    if (this.__waiting_send) {\r\n      this.__waiting_send = false;\r\n      this.send();\r\n    }\r\n  };\r\n\r\n  XMLHttpRequest.prototype.send = function() {\r\n    if (this.__waiting_open) {\r\n      this.__waiting_send = true;\r\n      return;\r\n    } else {\r\n      return old_xhr_send.call(this);\r\n    }\r\n  };\r\n\r\n  // -- Image loading\r\n  const old_img_src = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, \"src\");\r\n  Object.defineProperty(HTMLImageElement.prototype, \"src\", {\r\n    enumerable: old_img_src.enumerable,\r\n    configurable: old_img_src.configurable,\r\n    get() {\r\n      return this.__src ?? old_img_src.get.call(this);\r\n    },\r\n    set(url) {\r\n      this.__src = url;\r\n      void (async () => {\r\n        try {\r\n          const real_url = await get_url(String(url));\r\n          old_img_src.set.call(this, real_url);\r\n        } catch (error) {\r\n          old_img_src.set.call(this, \"not-found\");\r\n        }\r\n      })();\r\n    }\r\n  });\r\n\r\n}();"
 };
 
 },{}],3:[function(require,module,exports){
@@ -776,6 +776,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CR_Web_archive = exports.CRW_Process = exports.CR_Web = exports.CR_Process = exports.CartRuntime = exports.KateRuntimes = void 0;
 const Cart = require("../generated/cartridge");
 const kate_bridges_1 = require("../kate-bridges");
+const random_1 = require("../util/random");
 const SCREEN_WIDTH = 800;
 const SCREEN_HEIGHT = 480;
 class KateRuntimes {
@@ -828,7 +829,7 @@ class CR_Web extends CartRuntime {
         const zoom = this.cart.width >= this.cart.height ? (SCREEN_WIDTH / this.cart.width) : (SCREEN_HEIGHT / this.cart.height);
         frame.style.transform = `scale(${zoom})`;
         this.console.screen.appendChild(frame);
-        return new CRW_Process(this, frame, crypto.randomUUID());
+        return new CRW_Process(this, frame, (0, random_1.make_id)());
     }
 }
 exports.CR_Web = CR_Web;
@@ -865,7 +866,7 @@ class CR_Web_archive extends CartRuntime {
         this.local_storage = local_storage;
     }
     run({ storage }) {
-        const secret = crypto.randomUUID();
+        const secret = (0, random_1.make_id)();
         const frame = document.createElement("iframe");
         frame.className = "kate-game-frame kate-game-frame-defaults";
         frame.sandbox = "allow-scripts";
@@ -934,6 +935,13 @@ class CR_Web_archive extends CartRuntime {
       var KATE_LOCAL_STORAGE = ${JSON.stringify(this.local_storage ?? {})};
     `;
         dom.head.insertBefore(secret_el, dom.head.firstChild);
+        const zoom_style = document.createElement("style");
+        zoom_style.textContent = `
+    :root {
+      zoom: ${this.console.body.getAttribute("data-zoom") ?? "0"};
+    }
+    `;
+        dom.head.appendChild(zoom_style);
         for (const bridge of this.data.bridges) {
             this.apply_bridge(dom, bridge, secret_el);
         }
@@ -1035,7 +1043,7 @@ class CR_Web_archive extends CartRuntime {
 }
 exports.CR_Web_archive = CR_Web_archive;
 
-},{"../generated/cartridge":1,"../kate-bridges":2}],4:[function(require,module,exports){
+},{"../generated/cartridge":1,"../kate-bridges":2,"../util/random":9}],4:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.KeyboardInput = void 0;
@@ -1049,8 +1057,8 @@ class KeyboardInput {
             left: "ArrowLeft",
             menu: "ShiftLeft",
             capture: "ControlLeft",
-            a: "KeyX",
-            b: "KeyZ",
+            x: "KeyX",
+            o: "KeyZ",
             ltrigger: "KeyA",
             rtrigger: "KeyS"
         };
@@ -1151,8 +1159,8 @@ class VirtualConsole {
         this.left_button = root.querySelector(".kate-dpad-left");
         this.menu_button = root.querySelector(".kate-button-menu");
         this.capture_button = root.querySelector(".kate-button-capture");
-        this.a_button = root.querySelector(".kate-button-a");
-        this.b_button = root.querySelector(".kate-button-b");
+        this.x_button = root.querySelector(".kate-button-x");
+        this.o_button = root.querySelector(".kate-button-o");
         this.ltrigger_button = root.querySelector(".kate-trigger-left");
         this.rtrigger_button = root.querySelector(".kate-trigger-right");
         this.screen = root.querySelector("#kate-game");
@@ -1169,8 +1177,8 @@ class VirtualConsole {
             left: false,
             menu: false,
             capture: false,
-            a: false,
-            b: false,
+            x: false,
+            o: false,
             ltrigger: false,
             rtrigger: false
         };
@@ -1184,8 +1192,8 @@ class VirtualConsole {
         this.left_button.classList.remove("down");
         this.menu_button.classList.remove("down");
         this.capture_button.classList.remove("down");
-        this.a_button.classList.remove("down");
-        this.b_button.classList.remove("down");
+        this.x_button.classList.remove("down");
+        this.o_button.classList.remove("down");
         this.ltrigger_button.classList.remove("down");
         this.rtrigger_button.classList.remove("down");
     }
@@ -1203,6 +1211,14 @@ class VirtualConsole {
                 ev.preventDefault();
                 this.update_virtual_key(key, false);
             });
+            button.addEventListener("touchstart", (ev) => {
+                ev.preventDefault();
+                this.update_virtual_key(key, true);
+            });
+            button.addEventListener("touchend", (ev) => {
+                ev.preventDefault();
+                this.update_virtual_key(key, false);
+            });
         };
         listen_button(this.up_button, "up");
         listen_button(this.right_button, "right");
@@ -1210,8 +1226,8 @@ class VirtualConsole {
         listen_button(this.left_button, "left");
         listen_button(this.menu_button, "menu");
         listen_button(this.capture_button, "capture");
-        listen_button(this.a_button, "a");
-        listen_button(this.b_button, "b");
+        listen_button(this.x_button, "x");
+        listen_button(this.o_button, "o");
     }
     is_special_key(key) {
         return this.special_input_timing.hasOwnProperty(key);
@@ -1260,8 +1276,8 @@ class VirtualConsole {
             left: this.left_button,
             menu: this.menu_button,
             capture: this.capture_button,
-            a: this.a_button,
-            b: this.b_button,
+            x: this.x_button,
+            o: this.o_button,
             ltrigger: this.ltrigger_button,
             rtrigger: this.rtrigger_button
         }[key];
@@ -1299,6 +1315,17 @@ class EventStream {
     }
 }
 exports.EventStream = EventStream;
+
+},{}],9:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.make_id = void 0;
+function make_id() {
+    let id = new Uint8Array(16);
+    crypto.getRandomValues(id);
+    return Array.from(id).map(x => x.toString(16).padStart(2, "0")).join("");
+}
+exports.make_id = make_id;
 
 },{}]},{},[5])(5)
 });

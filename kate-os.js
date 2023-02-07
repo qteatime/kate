@@ -965,6 +965,18 @@ class CartManager {
             return result;
         });
     }
+    async install_from_file(file) {
+        try {
+            const cart = this.os.kernel.loader.load_bytes(await file.arrayBuffer());
+            if (await this.install(cart)) {
+                await this.os.notifications.push("kate:installer", "New game installed", `${cart.metadata?.title ?? cart.id} is ready to play!`);
+            }
+        }
+        catch (error) {
+            console.error(`Failed to install ${file.name}:`, error);
+            await this.os.notifications.push("kate:installer", "Installation failed", `${file.name} could not be installed.`);
+        }
+    }
     async install(cart) {
         const result = await this.os.db.transaction([Db.cart_meta, Db.cart_files], "readwrite", async (t) => {
             const meta = t.get_table(Db.cart_meta);
@@ -1013,6 +1025,10 @@ class KateContextMenu {
                     this.show_context_menu();
                     break;
                 }
+                case "menu": {
+                    this.show_context_menu();
+                    break;
+                }
             }
         };
     }
@@ -1045,6 +1061,39 @@ class HUD_ContextMenu extends scenes_1.Scene {
         super(os);
         this.os = os;
         this.on_close = new events_1.EventStream();
+        this.on_install_from_file = async () => {
+            this.os.hide_hud(this);
+            this.on_close.emit();
+            return new Promise((resolve, reject) => {
+                const installer = document.querySelector("#kate-installer");
+                const teardown = () => {
+                    installer.onchange = () => { };
+                    installer.onerror = () => { };
+                    installer.onabort = () => { };
+                };
+                installer.onchange = async (ev) => {
+                    try {
+                        const file = installer.files.item(0);
+                        await this.os.cart_manager.install_from_file(file);
+                        teardown();
+                        resolve();
+                    }
+                    catch (error) {
+                        teardown();
+                        reject(error);
+                    }
+                };
+                installer.onerror = async () => {
+                    teardown();
+                    reject(new Error(`failed to install`));
+                };
+                installer.onabort = async () => {
+                    teardown();
+                    reject(new Error(`failed to install`));
+                };
+                installer.click();
+            });
+        };
         this.on_close_game = async () => {
             await this.os.processes.running?.exit();
             this.os.hide_hud(this);
@@ -1071,6 +1120,7 @@ class HUD_ContextMenu extends scenes_1.Scene {
                     ]),
                     else: new UI.Menu_list([
                         new UI.Button(["Power off"]).on_clicked(this.on_power_off),
+                        new UI.Button(["Install from file"]).on_clicked(this.on_install_from_file),
                         new UI.Button(["Return"]).on_clicked(this.on_return)
                     ])
                 })
@@ -1113,16 +1163,7 @@ class KateDropInstaller {
                 continue;
             }
             status.update(`Installing ${file.name}...`);
-            try {
-                const cart = this.os.kernel.loader.load_bytes(await file.arrayBuffer());
-                if (await this.os.cart_manager.install(cart)) {
-                    await this.os.notifications.push("kate:installer", "New game installed", `${cart.metadata?.title ?? cart.id} is ready to play!`);
-                }
-            }
-            catch (error) {
-                console.error(`Failed to install ${file.name}:`, error);
-                await this.os.notifications.push("kate:installer", "Installation failed", `${file.name} could not be installed.`);
-            }
+            await this.os.cart_manager.install_from_file(file);
         }
         status.hide();
     }
@@ -1281,7 +1322,7 @@ class KateFocusHandler {
             const right = current?.position.right ?? 0;
             const bottom = current?.position.bottom ?? 0;
             switch (key) {
-                case "b": {
+                case "o": {
                     if (current != null) {
                         current.element.click();
                     }
@@ -1326,7 +1367,7 @@ class KateFocusHandler {
         this.os.kernel.console.on_key_pressed.listen(this.handle_input);
     }
     should_handle(key) {
-        return ["up", "down", "left", "right", "b"].includes(key);
+        return ["up", "down", "left", "right", "o"].includes(key);
     }
     get current_root() {
         return this._current_root;
@@ -2046,11 +2087,11 @@ class Icon extends Widget {
             case "menu":
             case "capture":
                 return h("div", { class: "kate-icon", "data-name": this.type }, []);
-            case "a":
+            case "x":
                 return h("div", { class: "kate-icon", "data-name": this.type }, [
                     h("img", { src: `img/cancel.png` }, [])
                 ]);
-            case "b":
+            case "o":
                 return h("div", { class: "kate-icon", "data-name": this.type }, [
                     h("img", { src: `img/ok.png` }, [])
                 ]);
