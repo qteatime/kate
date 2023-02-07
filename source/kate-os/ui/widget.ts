@@ -186,11 +186,11 @@ export class Icon extends Widget {
       case "menu":
       case "capture":
         return h("div", {class: "kate-icon", "data-name": this.type}, [])
-      case "a":
+      case "x":
         return h("div", {class: "kate-icon", "data-name": this.type}, [
           h("img", {src: `img/cancel.png`}, [])
         ])
-      case "b":
+      case "o":
         return h("div", {class: "kate-icon", "data-name": this.type}, [
           h("img", {src: `img/ok.png`}, [])
         ])

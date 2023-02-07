@@ -1,15 +1,15 @@
 import { InputKey, VirtualConsole } from "./virtual";
 
 export class KeyboardInput {
-  private physical_config = {
+  private physical_config: Record<InputKey, string> = {
     up: "ArrowUp",
     right: "ArrowRight",
     down: "ArrowDown",
     left: "ArrowLeft",
     menu: "ShiftLeft",
     capture: "ControlLeft",
-    a: "KeyX",
-    b: "KeyZ",
+    x: "KeyX",
+    o: "KeyZ",
     ltrigger: "KeyA",
     rtrigger: "KeyS"
   };

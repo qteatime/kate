@@ -72,7 +72,7 @@ export class KateFocusHandler {
     const bottom = current?.position.bottom ?? 0;
 
     switch (key) {
-      case "b": {
+      case "o": {
         if (current != null) {
           current.element.click();
         }

@@ -11,8 +11,8 @@ void function() {
     right: "right",
     down: "down",
     left: "left",
-    a: "cancel",
-    b: "ok",
+    x: "cancel",
+    o: "ok",
     menu: "menu",
     rtrigger: "shift"
   };

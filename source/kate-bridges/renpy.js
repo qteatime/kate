@@ -6,8 +6,8 @@ void function() {
     right: ["ArrowRight", "ArrowRight", 39],
     down: ["ArrowDown", "ArrowDown", 40],
     left: ["ArrowLeft", "ArrowLeft", 37],
-    a: ["Escape", "Escape", 27],
-    b: ["Enter", "Enter", 13],
+    x: ["Escape", "Escape", 27],
+    o: ["Enter", "Enter", 13],
     ltrigger: ['PageUp', 'PageUp', 33],
     rtrigger: ['PageDown', 'PageDown', 34]
   }
@@ -45,7 +45,7 @@ void function() {
     }
   })
   
-  window.addEventListener = function(type, listener, options) {
+  function listen(type, listener, options) {
     if (type === "keydown") {
       down_listeners.push(listener);
     } else if (type === "keyup") {
@@ -54,4 +54,6 @@ void function() {
       add_event_listener.call(this, type, listener, options);
     }
   };
+  window.addEventListener = listen;
+  document.addEventListener = listen;
 }();

@@ -344,8 +344,8 @@
   filter: invert(1);
 }
 
-.kate-icon[data-name="a"],
-.kate-icon[data-name="b"] {
+.kate-icon[data-name="x"],
+.kate-icon[data-name="o"] {
   background: #4f4f4f;
   border-radius: 100%;
   display: flex;
@@ -353,8 +353,8 @@
   align-items: center;
 }
 
-.kate-icon[data-name="a"] img,
-.kate-icon[data-name="b"] img {
+.kate-icon[data-name="x"] img,
+.kate-icon[data-name="o"] img {
   width: 0.8em;
   height: 0.8em;
 }

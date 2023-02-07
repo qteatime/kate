@@ -7,8 +7,8 @@ export type InputKey =
 | "left"
 | "menu"
 | "capture"
-| "a"
-| "b"
+| "x"
+| "o"
 | "ltrigger"
 | "rtrigger";
 
@@ -25,8 +25,8 @@ export class VirtualConsole {
   private left_button: HTMLElement;
   private menu_button: HTMLElement;
   private capture_button: HTMLElement;
-  private a_button: HTMLElement;
-  private b_button: HTMLElement;
+  private x_button: HTMLElement;
+  private o_button: HTMLElement;
   private ltrigger_button: HTMLElement;
   private rtrigger_button: HTMLElement;
   private is_listening = false;
@@ -51,8 +51,8 @@ export class VirtualConsole {
     this.left_button = root.querySelector(".kate-dpad-left")!;
     this.menu_button = root.querySelector(".kate-button-menu")!;
     this.capture_button = root.querySelector(".kate-button-capture")!;
-    this.a_button = root.querySelector(".kate-button-a")!;
-    this.b_button = root.querySelector(".kate-button-b")!;
+    this.x_button = root.querySelector(".kate-button-x")!;
+    this.o_button = root.querySelector(".kate-button-o")!;
     this.ltrigger_button = root.querySelector(".kate-trigger-left")!;
     this.rtrigger_button = root.querySelector(".kate-trigger-right")!;
     this.screen = root.querySelector("#kate-game")!;
@@ -70,8 +70,8 @@ export class VirtualConsole {
       left: false,
       menu: false,
       capture: false,
-      a: false,
-      b: false,
+      x: false,
+      o: false,
       ltrigger: false,
       rtrigger: false
     };
@@ -85,8 +85,8 @@ export class VirtualConsole {
     this.left_button.classList.remove("down");
     this.menu_button.classList.remove("down");
     this.capture_button.classList.remove("down");
-    this.a_button.classList.remove("down");
-    this.b_button.classList.remove("down");
+    this.x_button.classList.remove("down");
+    this.o_button.classList.remove("down");
     this.ltrigger_button.classList.remove("down")
     this.rtrigger_button.classList.remove("down")
   }
@@ -122,8 +122,8 @@ export class VirtualConsole {
     listen_button(this.left_button, "left");
     listen_button(this.menu_button, "menu");
     listen_button(this.capture_button, "capture");
-    listen_button(this.a_button, "a");
-    listen_button(this.b_button, "b");
+    listen_button(this.x_button, "x");
+    listen_button(this.o_button, "o");
   }
 
   private is_special_key(key: InputKey): key is SpecialInputKey {
@@ -175,8 +175,8 @@ export class VirtualConsole {
       left: this.left_button,
       menu: this.menu_button,
       capture: this.capture_button,
-      a: this.a_button,
-      b: this.b_button,
+      x: this.x_button,
+      o: this.o_button,
       ltrigger: this.ltrigger_button,
       rtrigger: this.rtrigger_button
     }[key];
