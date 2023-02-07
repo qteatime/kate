@@ -25,14 +25,13 @@ body {
 }
 
 .kate-body {
-  position: relative;
+  position: fixed;
   background: #faaaaa;
   width: 1310px;
   height: 550px;
   border-radius: 20px;
   box-shadow: -1px -1px 1px rgb(255 255 255 / 50%),
                0px 10px 1px #c99;
-  transform-origin: top left;
   user-select: none;
 }
 
