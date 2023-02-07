@@ -12,6 +12,7 @@ void (async function() {
       zoom = 1;
       kate_body.style.zoom = "1";
     }
+    kate_body.setAttribute("data-zoom", zoom);
     kate_body.style.left = `${Math.round((iw - kate_body.offsetWidth*zoom) / 2)}px`;
     kate_body.style.top = `${Math.round((ih - kate_body.offsetHeight*zoom) / 2)}px`;
     window.scrollTo({ left: 0, top: 0 });

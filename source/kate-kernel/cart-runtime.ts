@@ -170,6 +170,13 @@ export class CR_Web_archive extends CartRuntime {
       var KATE_LOCAL_STORAGE = ${JSON.stringify(this.local_storage ?? {})};
     `;
     dom.head.insertBefore(secret_el, dom.head.firstChild);
+    const zoom_style = document.createElement("style");
+    zoom_style.textContent = `
+    :root {
+      zoom: ${this.console.body.getAttribute("data-zoom") ?? "0"};
+    }
+    `;
+    dom.head.appendChild(zoom_style);
     for (const bridge of this.data.bridges) {
       this.apply_bridge(dom, bridge, secret_el);
     }
