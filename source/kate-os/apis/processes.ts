@@ -34,7 +34,7 @@ export class KateProcesses {
       });
       const storage = this.os.kv_storage.get_store(cart.id);
       const runtime = this.os.kernel.runtimes.from_cartridge(cart, await storage.contents());
-      const process = new KateProcess(this, cart, runtime.run({ storage }));
+      const process = new KateProcess(this, cart, runtime.run(this.os));
       this._running = process;
       this.os.kernel.console.os_root.classList.add("in-background");
       return process;

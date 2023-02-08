@@ -1,46 +1,5 @@
 void function () {
-  const secret = KATE_SECRET;
-
-  function make_id() {
-    let id = new Uint8Array(16);
-    crypto.getRandomValues(id);
-    return Array.from(id).map(x => x.toString(16).padStart(2, "0")).join("");
-  }
-
-  async function read_file(path) {
-    return new Promise((resolve, reject) => {
-      const id = make_id();
-      const handler = (ev) => {
-        if (ev.data.type === "kate:reply" && ev.data.id === id) {
-          window.removeEventListener("message", handler);
-          if (ev.data.ok) {
-            resolve(ev.data.result);
-          } else {
-            reject(new Error(`Request to ${path} failed`));
-          }
-        }
-      };
-
-      window.addEventListener("message", handler);
-      window.parent.postMessage({
-        type: "kate:read-file",
-        secret: secret,
-        id: id,
-        path: path
-      }, "*")
-    });
-  }
-
-  async function get_url(url) {
-    try {
-      const file = await read_file(url);
-      const blob = new Blob([file.data], {type: file.mime});
-      return URL.createObjectURL(blob);
-    } catch (e) {
-      console.error("error ==>", e);
-      throw e;
-    }
-  }
+  const {cart_fs} = KateAPI;
 
   // -- Arbitrary fetching
   const old_fetch = window.fetch;
@@ -61,7 +20,7 @@ void function () {
     }
     return new Promise(async (resolve, reject) => {
       try {
-        const file = await get_url(String(url));
+        const file = await cart_fs.get_file_url(String(url));
         const result = await old_fetch(file);
         resolve(result);
       } catch (error) {
@@ -81,7 +40,7 @@ void function () {
 
     void (async () => {
       try {
-        const real_url = await get_url(String(url));
+        const real_url = await cart_fs.get_file_url(String(url));
         old_xhr_open.call(this, "GET", real_url);
         this.__maybe_send();
       } catch (error) {
@@ -120,7 +79,7 @@ void function () {
       this.__src = url;
       void (async () => {
         try {
-          const real_url = await get_url(String(url));
+          const real_url = await cart_fs.get_file_url(String(url));
           old_img_src.set.call(this, real_url);
         } catch (error) {
           old_img_src.set.call(this, "not-found");

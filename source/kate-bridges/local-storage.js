@@ -1,16 +1,12 @@
 void function () {
-  const secret = KATE_SECRET;
+  const {kv_store} = KateAPI;
   let contents = window.KATE_LOCAL_STORAGE ?? Object.create(null);
   
   let timer = null;
   function persist(contents) {
     clearTimeout(timer);
     timer = setTimeout(() => {
-      window.parent.postMessage({
-        type: "kate:write-kv-storage",
-        secret: secret,
-        content: contents
-      }, "*");
+      kv_store.replace_all(contents);
     })
   }
 

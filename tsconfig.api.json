@@ -3,11 +3,11 @@
     "strict": true,
     "rootDir": "source",
     "module": "commonjs",
-    "target": "ESNext",
+    "target": "ES2020",
     "lib": ["ESNext", "DOM", "ESNext.Intl"],
     "experimentalDecorators": true,
     "incremental": true,
     "jsx": "react"
   },
-  "include": ["source"]
+  "include": ["source/kate-api"]
 }

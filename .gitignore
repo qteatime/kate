@@ -10,7 +10,10 @@ old-tree
 !source/kate-bridges/*.js
 source/kate-bridges/index.js
 source/kate-bridges/index.ts
+source/kate-bridges/kate-api.js
 www/kate.js
 www/kate-os.js
 www/app.js
 /games
+build/
+projects/

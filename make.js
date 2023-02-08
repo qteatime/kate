@@ -67,7 +67,15 @@ function exec(command, opts) {
 
 const w = new World();
 
-w.task("generate:bridges", [], () => {
+w.task("compile:api", [], () => {
+  exec("npm run build-api");
+})
+
+w.task("bundle:api", ["compile:api"], () => {
+  exec("npm run bundle-api");
+})
+
+w.task("generate:bridges", ["bundle:api"], () => {
   const files = glob("source/kate-bridges/*.js", {absolute: true}).filter(x => !x.endsWith("/index.js"));
   const data = Object.fromEntries(files.map(x => [Path.basename(x), FS.readFileSync(x, "utf-8")]));
   const content = `export const bridges = ${JSON.stringify(data, null, 2)};`;

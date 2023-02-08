@@ -14,6 +14,7 @@ import { KateDropInstaller } from "./apis/drop-installer";
 import { KateFocusHandler } from "./apis/focus-handler";
 import { KateStatusBar } from "./apis/status-bar";
 import { KateKVStorage } from "./apis/kv_storage";
+import { KateIPCServer } from "./apis/ipc";
 
 export class KateOS {
   private _scene_stack: Scene[] = [];
@@ -28,6 +29,7 @@ export class KateOS {
   readonly focus_handler: KateFocusHandler;
   readonly status_bar: KateStatusBar;
   readonly kv_storage: KateKVStorage;
+  readonly ipc: KateIPCServer;
   readonly events = {
     on_cart_inserted: new EventStream<Cart.Cartridge>()
   }
@@ -47,6 +49,8 @@ export class KateOS {
     this.focus_handler.setup();
     this.status_bar = new KateStatusBar(this);
     this.status_bar.setup();
+    this.ipc = new KateIPCServer(this);
+    this.ipc.setup();
   }
 
   get display() {

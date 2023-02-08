@@ -4,6 +4,7 @@ import {bridges} from "../kate-bridges";
 import type { KateOS } from "../kate-os";
 import type { KateKVStoragePartition } from "../kate-os/apis/kv_storage";
 import { make_id } from "../util/random";
+import { KateIPCChannel } from "../kate-os/apis/ipc";
 
 const SCREEN_WIDTH = 800;
 const SCREEN_HEIGHT = 480;
@@ -26,9 +27,7 @@ export class KateRuntimes {
 }
 
 export abstract class CartRuntime {
-  abstract run(services: {
-    storage?: KateKVStoragePartition
-  }): CR_Process;
+  abstract run(os: KateOS): CR_Process;
 }
 
 export abstract class CR_Process {
@@ -52,7 +51,7 @@ export class CR_Web extends CartRuntime {
         type: "kate:input-changed",
         key: ev.key,
         is_down: ev.is_down
-      }, this.cart.url);
+      }, "*");
     })
     frame.src = this.cart.url;
     frame.width = String(this.cart.width);
@@ -64,18 +63,19 @@ export class CR_Web extends CartRuntime {
     frame.style.transform = `scale(${zoom})`;
     this.console.screen.appendChild(frame);
 
-    return new CRW_Process(this, frame, make_id());
+    return new CRW_Process(this, frame, make_id(), null);
   }
 }
 
 export class CRW_Process extends CR_Process {
-  constructor(readonly runtime: CR_Web | CR_Web_archive, readonly frame: HTMLIFrameElement, readonly secret: string) {
+  constructor(readonly runtime: CR_Web | CR_Web_archive, readonly frame: HTMLIFrameElement, readonly secret: string, readonly channel: KateIPCChannel | null) {
     super();
   }
 
   async exit() {
     this.frame.src = "about:blank";
     this.frame.remove();
+    this.channel?.dispose();
   }
 
   async pause() {
@@ -96,69 +96,26 @@ export class CR_Web_archive extends CartRuntime {
     super()
   }
 
-  run({ storage }: { storage?: KateKVStoragePartition | undefined; }) {
+  run(os: KateOS) {
     const secret = make_id();
     const frame = document.createElement("iframe");
+    const channel = os.ipc.add_process(secret, this.cart, () => frame.contentWindow);
+
     frame.className = "kate-game-frame kate-game-frame-defaults";
     (frame as any).sandbox = "allow-scripts";
     frame.allow = "";
     this.console.on_input_changed.listen(ev => {
-      frame.contentWindow?.postMessage({
+      channel.send({
         type: "kate:input-changed",
         key: ev.key,
         is_down: ev.is_down
-      }, "*");
+      })
     })
 
-    const send = (type: string, data: {[key: string]: any}) => {
-      frame.contentWindow?.postMessage({
-        type, ...data
-      }, "*")
-    }
-
-    const reply = (ev: MessageEvent<any>, data: {[key: string]: any}) => {
-      send("kate:reply", {
-        id: ev.data.id,
-        ...data
-      });
-    }
-
-    const send_error = (message: string, id: string) => {
-      send("kate:error", { id, message });
-    }
-
-    window.addEventListener("message", async (ev) => {
-      if (ev.data?.secret !== secret) {
-        return;
-      }
-      switch (ev.data.type) {
-        case "kate:write-kv-storage": {
-          const data = ev.data.content;
-          try {
-            await storage!.write(data);
-          } catch (error) {
-            send_error(`Failed to persist localStorage contents`, ev.data.id);
-          }
-          break;
-        }
-
-        case "kate:read-file": {
-          const file = this.get_file(new URL(ev.data.path, "http://no.domain").toString());
-          if (file == null) {
-            reply(ev, {path: ev.data.path, ok: false});
-          } else {
-            reply(ev, {path: ev.data.path, ok: true, result: {
-              mime: file.mime,
-              data: file.data
-            }})
-          }
-        }
-      }
-    })
     frame.src = URL.createObjectURL(new Blob([this.proxy_html(secret)], {type: "text/html"}));
     frame.scrolling = "no";
     this.console.screen.appendChild(frame);
-    return new CRW_Process(this, frame, secret);
+    return new CRW_Process(this, frame, secret, channel);
   }
 
   proxy_html(secret: string) {
@@ -168,6 +125,7 @@ export class CR_Web_archive extends CartRuntime {
     secret_el.textContent = `
       var KATE_SECRET = ${JSON.stringify(secret)};
       var KATE_LOCAL_STORAGE = ${JSON.stringify(this.local_storage ?? {})};
+      ${bridges["kate-api.js"]}
     `;
     dom.head.insertBefore(secret_el, dom.head.firstChild);
     const zoom_style = document.createElement("style");
