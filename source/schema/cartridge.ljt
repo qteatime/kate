@@ -41,12 +41,6 @@ type Date {
 
 // -- Supported platforms
 union Platform {
-  type Web {
-    field url: Text;
-    field width: Uint32;
-    field height: Uint32;
-  }
-
   type Web-archive {
     field html: Text;
     field bridges: Bridge[];

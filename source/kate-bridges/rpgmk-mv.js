@@ -1,5 +1,6 @@
 void function() {
   let paused = false;
+  const {events} = KateAPI;
 
   // -- Things that need to be patched still
   Utils.isOptionValid = (name) => {
@@ -17,29 +18,21 @@ void function() {
     rtrigger: "shift"
   };
 
-  window.addEventListener("message", (ev) => {
-    switch (ev.data.type) {
-      case "kate:paused": {
-        for (const key of Object.values(key_mapping)) {
-          Input._currentState[key] = false;
-        }
-        paused = true;
-        break;
-      }
-      case "kate:unpaused": {
-        paused = false;
-        break;
-      }
-
-      case "kate:input-changed": {
-        if (!paused) {
-          const name = key_mapping[ev.data.key];
-          if (name) {
-            Input._currentState[name] = ev.data.is_down;
-          }
-        }
-        break;
+  events.input_state_changed.listen(({key, is_down}) => {
+    if (!paused) {
+      const name = key_mapping[key];
+      if (name) {
+        Input._currentState[name] = is_down;
       }
     }
-  })
+  });
+
+  events.paused.listen(state => {
+    paused = state;
+    if (state) {
+      for (const key of Object.values(key_mapping)) {
+        Input._currentState[key] = false;
+      }
+    }
+  });
 }();

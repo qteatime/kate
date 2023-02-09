@@ -147,16 +147,6 @@ const meta = metadata(json.metadata);
 const archive = files(json.files);
 
 switch (x.type) {
-  case "web": {
-    save(new Cart.Cartridge(
-      json.id,
-      meta,
-      archive,
-      new Cart.Platform.Web(x.url, x.width, x.height)
-    ));
-    break;
-  }
-
   case "web-archive": {
     save(new Cart.Cartridge(
       json.id,

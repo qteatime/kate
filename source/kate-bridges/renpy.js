@@ -1,5 +1,6 @@
 void function() {
   let paused = false;
+  const {events} = KateAPI;
   const add_event_listener = window.addEventListener;
   const key_mapping = {
     up: ["ArrowUp", "ArrowUp", 38],
@@ -14,36 +15,25 @@ void function() {
 
   const down_listeners = [];
   const up_listeners = [];
-  
-  window.addEventListener("message", (ev) => {
-    switch (ev.data.type) {
-      case "kate:paused": {
-        paused = true;
-        break;
-      }
 
-      case "kate:unpaused": {
-        paused = false;
-        break;
-      }
-
-      case "kate:input-changed": {
-        if (!paused) {
-          const data = key_mapping[ev.data.key];
-          if (data) {
-            const listeners = ev.data.is_down ? down_listeners : up_listeners;
-            const type = ev.data.is_down ? "keydown" : "keyup";
-            const [key, code, keyCode] = data;
-            const key_ev = new KeyboardEvent(type, {key, code, keyCode});
-            for (const fn of listeners) {
-              fn.call(document, key_ev);
-            }
-          }
+  events.input_state_changed.listen(({ key: kate_key, is_down }) => {
+    if (!paused) {
+      const data = key_mapping[kate_key];
+      if (data) {
+        const listeners = is_down ? down_listeners : up_listeners;
+        const type = is_down ? "keydown" : "keyup";
+        const [key, code, keyCode] = data;
+        const key_ev = new KeyboardEvent(type, {key, code, keyCode});
+        for (const fn of listeners) {
+          fn.call(document, key_ev);
         }
-        break;
       }
     }
-  })
+  });
+
+  events.paused.listen(state => {
+    paused = state;
+  });
   
   function listen(type, listener, options) {
     if (type === "keydown") {

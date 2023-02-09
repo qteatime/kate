@@ -320,7 +320,7 @@ export class Cartridge {
  static readonly $tag = 0;
  readonly $tag = 0;
 
- constructor(readonly id: string, readonly metadata: Metadata, readonly files: (File)[], readonly platform: (Platform.Web | Platform.Web_archive)) {}
+ constructor(readonly id: string, readonly metadata: Metadata, readonly files: (File)[], readonly platform: (Platform.Web_archive)) {}
 
  static decode($d: _Decoder): Cartridge {
    const $tag = $d.ui32();
@@ -656,7 +656,7 @@ $e.ui8(this.day);
 
 
 
-export type Platform = Platform.Web | Platform.Web_archive;
+export type Platform = Platform.Web_archive;
 
 export abstract class Platform$Base {
  static decode($d: _Decoder): Platform {
@@ -671,8 +671,7 @@ export abstract class Platform$Base {
    const $tag = $d.peek((v) => v.getUint8(0));
 
    switch ($tag) {
-     case 0: return Platform.Web.decode($d);
-case 1: return Platform.Web_archive.decode($d);
+     case 0: return Platform.Web_archive.decode($d);
 
      default:
        throw new Error(`Unknown tag ${$tag} in union Platform`);
@@ -682,49 +681,10 @@ case 1: return Platform.Web_archive.decode($d);
 
 export namespace Platform {
  export const enum $Tags {
-   Web,Web_archive
+   Web_archive
  }
 
  
-export class Web extends Platform$Base {
- static readonly $tag = $Tags.Web;
- readonly $tag = $Tags.Web;
-
- constructor(readonly url: string, readonly width: UInt32, readonly height: UInt32) {
-   super();
- }
-
- static decode($d: _Decoder): Web {
-   return Web.$do_decode($d);
- }
-
- static $do_decode($d: _Decoder): Web {
-   const $tag = $d.ui8();
-   if ($tag !== 0) {
-     throw new Error(`Invalid tag ${$tag} for Platform.Web: expected 0`);
-   }
-
-   const url = $d.text();
-const width = $d.ui32();
-const height = $d.ui32();
-   return new Web(url, width, height);
- }
-
- encode($e: _Encoder) {
-   $e.ui32(5);
-   this.$do_encode($e);
- }
-
- $do_encode($e: _Encoder) {
-   $e.ui8(0);
-   $e.text(this.url);
-$e.ui32(this.width);
-$e.ui32(this.height);
- }
-}
-
-
-
 export class Web_archive extends Platform$Base {
  static readonly $tag = $Tags.Web_archive;
  readonly $tag = $Tags.Web_archive;
@@ -739,8 +699,8 @@ export class Web_archive extends Platform$Base {
 
  static $do_decode($d: _Decoder): Web_archive {
    const $tag = $d.ui8();
-   if ($tag !== 1) {
-     throw new Error(`Invalid tag ${$tag} for Platform.Web-archive: expected 1`);
+   if ($tag !== 0) {
+     throw new Error(`Invalid tag ${$tag} for Platform.Web-archive: expected 0`);
    }
 
    const html = $d.text();
@@ -759,7 +719,7 @@ const bridges = $d.array(() => {
  }
 
  $do_encode($e: _Encoder) {
-   $e.ui8(1);
+   $e.ui8(0);
    $e.text(this.html);
 $e.array((this.bridges), ($e, v) => {
   (v).$do_encode($e);

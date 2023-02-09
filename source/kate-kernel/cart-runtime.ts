@@ -1,6 +1,6 @@
-import * as Cart from "../generated/cartridge"
+import * as Cart from "../generated/cartridge";
 import { VirtualConsole } from "./virtual";
-import {bridges} from "../kate-bridges";
+import { bridges } from "../kate-bridges";
 import type { KateOS } from "../kate-os";
 import type { KateKVStoragePartition } from "../kate-os/apis/kv_storage";
 import { make_id } from "../util/random";
@@ -12,13 +12,19 @@ const SCREEN_HEIGHT = 480;
 export class KateRuntimes {
   constructor(readonly console: VirtualConsole) {}
 
-  from_cartridge(cart: Cart.Cartridge, local_storage: {[key: string]: string}): CartRuntime {
+  from_cartridge(
+    cart: Cart.Cartridge,
+    local_storage: { [key: string]: string }
+  ): CartRuntime {
     switch (cart.platform.$tag) {
-      case Cart.Platform.$Tags.Web:
-        return new CR_Web(this.console, cart.id, cart.platform);
-
       case Cart.Platform.$Tags.Web_archive:
-        return new CR_Web_archive(this.console, cart.id, cart, cart.platform, local_storage);
+        return new CR_Web_archive(
+          this.console,
+          cart.id,
+          cart,
+          cart.platform,
+          local_storage
+        );
 
       default:
         throw new Error(`Unsupported cartridge`);
@@ -36,39 +42,13 @@ export abstract class CR_Process {
   abstract unpause(): Promise<void>;
 }
 
-export class CR_Web extends CartRuntime {
-  constructor(readonly console: VirtualConsole, readonly id: string, readonly cart: Cart.Platform.Web) {
-    super()
-  }
-
-  run() {
-    const frame = document.createElement("iframe");
-    frame.className = "kate-game-frame";
-    (frame as any).sandbox = "allow-scripts allow-same-origin";
-    frame.allow = "";
-    this.console.on_input_changed.listen(ev => {
-      frame.contentWindow?.postMessage({
-        type: "kate:input-changed",
-        key: ev.key,
-        is_down: ev.is_down
-      }, "*");
-    })
-    frame.src = this.cart.url;
-    frame.width = String(this.cart.width);
-    frame.height = String(this.cart.height);
-    frame.style.width = `${frame.width}px`;
-    frame.style.height = `${frame.height}px`;
-    frame.scrolling = "no";
-    const zoom = this.cart.width >= this.cart.height ? (SCREEN_WIDTH / this.cart.width) : (SCREEN_HEIGHT / this.cart.height);
-    frame.style.transform = `scale(${zoom})`;
-    this.console.screen.appendChild(frame);
-
-    return new CRW_Process(this, frame, make_id(), null);
-  }
-}
-
 export class CRW_Process extends CR_Process {
-  constructor(readonly runtime: CR_Web | CR_Web_archive, readonly frame: HTMLIFrameElement, readonly secret: string, readonly channel: KateIPCChannel | null) {
+  constructor(
+    readonly runtime: CR_Web_archive,
+    readonly frame: HTMLIFrameElement,
+    readonly secret: string,
+    readonly channel: KateIPCChannel | null
+  ) {
     super();
   }
 
@@ -79,40 +59,58 @@ export class CRW_Process extends CR_Process {
   }
 
   async pause() {
-    this.frame.contentWindow?.postMessage({
-      type: "kate:paused"
-    }, "*");
+    this.channel?.send(
+      {
+        type: "kate:paused",
+        state: true
+      }
+    );
   }
 
   async unpause() {
-    this.frame.contentWindow?.postMessage({
-      type: "kate:unpaused"
-    }, "*")
+    this.channel?.send(
+      {
+        type: "kate:paused",
+        state: false
+      }
+    );
   }
 }
 
 export class CR_Web_archive extends CartRuntime {
-  constructor(readonly console: VirtualConsole, readonly id: string, readonly cart: Cart.Cartridge, readonly data: Cart.Platform.Web_archive, readonly local_storage: {[key: string]: string}) {
-    super()
+  constructor(
+    readonly console: VirtualConsole,
+    readonly id: string,
+    readonly cart: Cart.Cartridge,
+    readonly data: Cart.Platform.Web_archive,
+    readonly local_storage: { [key: string]: string }
+  ) {
+    super();
   }
 
   run(os: KateOS) {
     const secret = make_id();
     const frame = document.createElement("iframe");
-    const channel = os.ipc.add_process(secret, this.cart, () => frame.contentWindow);
+    const channel = os.ipc.add_process(
+      secret,
+      this.cart,
+      () => frame.contentWindow
+    );
 
     frame.className = "kate-game-frame kate-game-frame-defaults";
     (frame as any).sandbox = "allow-scripts";
     frame.allow = "";
-    this.console.on_input_changed.listen(ev => {
+    this.console.on_input_changed.listen((ev) => {
       channel.send({
-        type: "kate:input-changed",
+        type: "kate:input-state-changed",
         key: ev.key,
-        is_down: ev.is_down
-      })
-    })
+        is_down: ev.is_down,
+      });
+    });
 
-    frame.src = URL.createObjectURL(new Blob([this.proxy_html(secret)], {type: "text/html"}));
+    frame.src = URL.createObjectURL(
+      new Blob([this.proxy_html(secret)], { type: "text/html" })
+    );
     frame.scrolling = "no";
     this.console.screen.appendChild(frame);
     return new CRW_Process(this, frame, secret, channel);
@@ -154,7 +152,10 @@ export class CR_Web_archive extends CartRuntime {
           const file = this.get_file(link.href);
           if (file != null) {
             const style = dom.createElement("style");
-            style.textContent = this.transform_css_urls(new URL(link.href).pathname, decoder.decode(file.data));
+            style.textContent = this.transform_css_urls(
+              new URL(link.href).pathname,
+              decoder.decode(file.data)
+            );
             link.parentNode?.insertBefore(style, link);
             link.remove();
           }
@@ -169,9 +170,11 @@ export class CR_Web_archive extends CartRuntime {
   private transform_css_urls(base: string, code: string) {
     return code.replace(/\burl\(("[^"]+")\)/g, (_, url_string) => {
       const url = this.resolve_pathname(base, JSON.parse(url_string));
-      const data_url = this.get_data_url(new URL(url, "http://localhost").toString());
+      const data_url = this.get_data_url(
+        new URL(url, "http://localhost").toString()
+      );
       return `url(${JSON.stringify(data_url)})`;
-    })
+    });
   }
 
   private resolve_pathname(base: string, url0: string) {
@@ -188,7 +191,7 @@ export class CR_Web_archive extends CartRuntime {
         const script = dom.createElement("script");
         script.textContent = proxy;
         const scripts = Array.from(dom.querySelectorAll("script"));
-        const main_script = scripts.find(x => x.src.includes("js/main.js"));
+        const main_script = scripts.find((x) => x.src.includes("js/main.js"));
         if (main_script != null) {
           main_script.parentNode!.insertBefore(script, main_script);
         } else {
@@ -226,13 +229,15 @@ export class CR_Web_archive extends CartRuntime {
 
   get_file(url: string) {
     const path = new URL(url).pathname;
-    return this.cart.files.find(x => x.path === path);
+    return this.cart.files.find((x) => x.path === path);
   }
 
   get_data_url(url: string) {
     const file = this.get_file(url);
     if (file != null) {
-      const content = Array.from(file.data).map(x => String.fromCharCode(x)).join("");
+      const content = Array.from(file.data)
+        .map((x) => String.fromCharCode(x))
+        .join("");
       return `data:${file.mime};base64,${btoa(content)}`;
     } else {
       return url;

@@ -1,4 +1,6 @@
+import { EventStream } from "../util/events";
 import { defer, Deferred } from "../util/promise";
+import type { InputKey } from "./input";
 
 type Payload = {[key: string]: any};
 
@@ -7,6 +9,10 @@ export class KateIPC {
   readonly #pending: Map<string, Deferred<any>>;
   #initialised: boolean;
   #server: Window;
+  readonly events = {
+    input_state_changed: new EventStream<{ key: InputKey, is_down: boolean }>(),
+    paused: new EventStream<boolean>()
+  }
 
   constructor(secret: string, server: Window) {
     this.#secret = secret;
@@ -51,15 +57,28 @@ export class KateIPC {
   }
 
   private handle_message = (ev: MessageEvent<any>) => {
-    if (ev.data.type === "kate:reply") {
-      const pending = this.#pending.get(ev.data.id);
-      if (pending != null) {
-        this.#pending.delete(ev.data.id);
-        if (ev.data.ok) {
-          pending.resolve(ev.data.value);
-        } else {
-          pending.reject(ev.data.value);
+    switch (ev.data.type) {
+      case "kate:reply": {
+        const pending = this.#pending.get(ev.data.id);
+        if (pending != null) {
+          this.#pending.delete(ev.data.id);
+          if (ev.data.ok) {
+            pending.resolve(ev.data.value);
+          } else {
+            pending.reject(ev.data.value);
+          }
         }
+        break;
+      }
+
+      case "kate:input-state-changed": {
+        this.events.input_state_changed.emit({ key: ev.data.key, is_down: ev.data.is_down });
+        break;
+      }
+
+      case "kate:paused": {
+        this.events.paused.emit(ev.data.state);
+        break;
       }
     }
   }
