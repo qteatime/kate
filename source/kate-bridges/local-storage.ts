@@ -1,9 +1,14 @@
+import {KateAPI} from "../kate-api";
+type Dict = {[key: string]: string};
+declare var KateAPI: KateAPI;
+declare var KATE_LOCAL_STORAGE: Dict | null;
+
 void function () {
   const {kv_store} = KateAPI;
-  let contents = window.KATE_LOCAL_STORAGE ?? Object.create(null);
+  let contents = KATE_LOCAL_STORAGE ?? Object.create(null);
   
-  let timer = null;
-  function persist(contents) {
+  let timer: any = null;
+  function persist(contents: Dict) {
     clearTimeout(timer);
     timer = setTimeout(() => {
       kv_store.replace_all(contents);
@@ -11,7 +16,10 @@ void function () {
   }
 
   class KateStorage {
-    constructor(contents, persistent) {
+    private __contents: Dict;
+    private __persistent: boolean;
+
+    constructor(contents: Dict, persistent: boolean) {
       this.__contents = contents;
       this.__persistent = persistent;
     }
@@ -22,16 +30,16 @@ void function () {
       }
     }
 
-    getItem(name) {
+    getItem(name: string) {
       return this.__contents[name] ?? null;
     }
 
-    setItem(name, value) {
+    setItem(name: string, value: string) {
       this.__contents[name] = value;
       this._persist();
     }
 
-    removeItem(name) {
+    removeItem(name: string) {
       delete this.__contents[name];
       this._persist();
     }
@@ -41,7 +49,7 @@ void function () {
       this._persist();
     }
 
-    key(index) {
+    key(index: number) {
       return this.getItem(Object.keys(this.__contents)[index]) ?? null;
     }
 
@@ -50,22 +58,24 @@ void function () {
     }
   }
 
-  function proxy_storage(storage, key) {
+  function proxy_storage(storage: KateStorage, key: string) {
     const exposed = ["getItem", "setItem", "removeItem", "clear", "key"];
 
     Object.defineProperty(window, key, {
       value: new Proxy(storage, {
         get(target, prop, receiver) {
-          return exposed.contains(prop) ? storage[prop].bind(storage) : storage.getItem(prop);
+          return exposed.includes(prop as any) ? (storage as any)[prop].bind(storage) : storage.getItem(prop as any);
         },
         has(target, prop) {
-          return exposed.contains(prop) || prop in contents;
+          return exposed.includes(prop as any) || prop in contents;
         },
         set(target, prop, value) {
-          return storage.setItem(prop, value);
+          storage.setItem(prop as any, value);
+          return true;
         },
         deleteProperty(target, prop) {
-          return storage.removeItem(prop);
+          storage.removeItem(prop as any);
+          return true;
         }
       })
     })
@@ -76,5 +86,4 @@ void function () {
 
   const session_storage = new KateStorage(Object.create(null), false);
   proxy_storage(session_storage, "sessionStorage");
-
 }();

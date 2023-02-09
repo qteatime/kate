@@ -1,13 +1,18 @@
+import {KateAPI} from "../kate-api";
+declare var KateAPI: KateAPI;
+declare var Utils: any;
+declare var Input: any;
+
 void function() {
   let paused = false;
   const {events} = KateAPI;
 
   // -- Things that need to be patched still
-  Utils.isOptionValid = (name) => {
+  Utils.isOptionValid = (name: string) => {
     return ["noaudio"].includes(name);
   }
 
-  const key_mapping = {
+  const key_mapping: {[key: string]: string} = {
     up: "up",
     right: "right",
     down: "down",

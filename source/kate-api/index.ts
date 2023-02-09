@@ -16,3 +16,10 @@ export const kv_store = new KateKVStore(channel);
 
 export const input = new KateInput(channel);
 input.setup();
+
+export type KateAPI = {
+  events: typeof events;
+  cart_fs: typeof cart_fs;
+  kv_store: typeof kv_store;
+  input: typeof input;
+}

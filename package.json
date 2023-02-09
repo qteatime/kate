@@ -9,6 +9,7 @@
   "scripts": {
     "build-ts": "tsc -p .",
     "build-api": "tsc -p tsconfig.api.json",
+    "build-bridges": "tsc -p tsconfig.bridges.json",
     "gen-kart": "crochet ljtc -- ts source/schema/cartridge.ljt > source/generated/cartridge.ts",
     "bundle": "browserify -e source/kate-kernel/kate.js -o www/kate.js -s Kate",
     "bundle-os": "browserify -e source/kate-os/index.js -o www/kate-os.js -s KateOS",

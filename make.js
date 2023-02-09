@@ -75,7 +75,11 @@ w.task("bundle:api", ["compile:api"], () => {
   exec("npm run bundle-api");
 })
 
-w.task("generate:bridges", ["bundle:api"], () => {
+w.task("compile:bridges", [], () => {
+  exec("npm run build-bridges");
+})
+
+w.task("generate:bridges", ["bundle:api", "compile:bridges"], () => {
   const files = glob("source/kate-bridges/*.js", {absolute: true}).filter(x => !x.endsWith("/index.js"));
   const data = Object.fromEntries(files.map(x => [Path.basename(x), FS.readFileSync(x, "utf-8")]));
   const content = `export const bridges = ${JSON.stringify(data, null, 2)};`;

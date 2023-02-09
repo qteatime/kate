@@ -185,11 +185,17 @@ export class CR_Web_archive extends CartRuntime {
   }
 
   private apply_bridge(dom: Document, bridge: Cart.Bridge, secret_node: Node) {
+    const wrap = (source: string) => {
+      return `void function(exports) {
+        ${source}
+      }({});`;
+    }
+
     switch (bridge.$tag) {
       case Cart.Bridge.$Tags.RPG_maker_mv: {
-        const proxy = bridges["rpgmk-mv.js"];
+        const proxy = wrap(bridges["rpgmk-mv.js"]);
         const script = dom.createElement("script");
-        script.textContent = proxy;
+        script.textContent = wrap(proxy);
         const scripts = Array.from(dom.querySelectorAll("script"));
         const main_script = scripts.find((x) => x.src.includes("js/main.js"));
         if (main_script != null) {
@@ -218,8 +224,14 @@ export class CR_Web_archive extends CartRuntime {
   }
 
   private append_proxy(proxy: string, dom: Document, ref: Node) {
+    const wrap = (source: string) => {
+      return `void function(exports) {
+        ${source}
+      }({});`;
+    }
+
     const script = dom.createElement("script");
-    script.textContent = proxy;
+    script.textContent = wrap(proxy);
     if (ref.nextSibling != null) {
       ref.parentNode!.insertBefore(script, ref.nextSibling);
     } else {

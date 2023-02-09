@@ -1,8 +1,11 @@
+import {KateAPI} from "../kate-api";
+declare var KateAPI: KateAPI;
+
 void function() {
   let paused = false;
   const {events} = KateAPI;
   const add_event_listener = window.addEventListener;
-  const key_mapping = {
+  const key_mapping: {[key: string]: [string, string, number]} = {
     up: ["ArrowUp", "ArrowUp", 38],
     right: ["ArrowRight", "ArrowRight", 39],
     down: ["ArrowDown", "ArrowDown", 40],
@@ -13,8 +16,8 @@ void function() {
     rtrigger: ['PageDown', 'PageDown', 34]
   }
 
-  const down_listeners = [];
-  const up_listeners = [];
+  const down_listeners: ((_: KeyboardEvent) => void)[] = [];
+  const up_listeners: ((_: KeyboardEvent) => void)[] = [];
 
   events.input_state_changed.listen(({ key: kate_key, is_down }) => {
     if (!paused) {
@@ -35,7 +38,7 @@ void function() {
     paused = state;
   });
   
-  function listen(type, listener, options) {
+  function listen(this: any, type: string, listener: EventListener, options: any) {
     if (type === "keydown") {
       down_listeners.push(listener);
     } else if (type === "keyup") {
@@ -44,6 +47,6 @@ void function() {
       add_event_listener.call(this, type, listener, options);
     }
   };
-  window.addEventListener = listen;
-  document.addEventListener = listen;
+  (window as any).addEventListener = listen;
+  (document as any).addEventListener = listen;
 }();

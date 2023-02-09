@@ -9,5 +9,5 @@
     "incremental": true,
     "jsx": "react"
   },
-  "include": ["source/kate-api"]
+  "include": ["source/kate-bridges"]
 }
