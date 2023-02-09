@@ -50,7 +50,10 @@ type Bridge =
   | { type: "renpy" }
   | { type: "standard-network" }
   | { type: "local-storage" }
-  | { type: "input-proxy"; mapping: { [key: string]: KeyboardKey } };
+  | {
+      type: "input-proxy";
+      mapping: { [key: string]: KeyboardKey } | "defaults";
+    };
 
 const mime_table = Object.assign(Object.create(null), {
   ".png": "image/png",
@@ -152,12 +155,31 @@ function make_bridge(x: Bridge) {
 
     case "input-proxy": {
       return new Cart.Bridge.Input_proxy(
-        new Map(Object.entries(x.mapping).map(make_key_pair))
+        new Map(Object.entries(get_mapping(x.mapping)).map(make_key_pair))
       );
     }
 
     default:
       throw new Error(`Unknown bridge ${(x as any).type}`);
+  }
+}
+
+function get_mapping(x: "defaults" | { [key: string]: KeyboardKey }) {
+  if (x === "defaults") {
+    return {
+      up: { key: "ArrowUp", code: "ArrowUp", key_code: 38 },
+      right: { key: "ArrowRight", code: "ArrowRight", key_code: 39 },
+      down: { key: "ArrowDown", code: "ArrowDown", key_code: 40 },
+      left: { key: "ArrowLeft", code: "ArrowLeft", key_code: 37 },
+      x: { key: "Escape", code: "Escape", key_code: 27 },
+      o: { key: "Enter", code: "Enter", key_code: 13 },
+      menu: { key: "Shift", code: "ShiftLeft", key_code: 16 },
+      capture: { key: "Control", code: "ControlLeft", key_code: 17 },
+      l: { key: "PageUp", code: "PageUp", key_code: 33 },
+      r: { key: "PageDown", code: "PageDown", key_code: 34 },
+    };
+  } else {
+    return x;
   }
 }
 
