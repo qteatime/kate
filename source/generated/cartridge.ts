@@ -316,6 +316,41 @@ export type Float64 = number;
 
 
 
+export class KeyboardKey {
+ static readonly $tag = 8;
+ readonly $tag = 8;
+
+ constructor(readonly key: string, readonly code: string, readonly key_code: bigint) {}
+
+ static decode($d: _Decoder): KeyboardKey {
+   const $tag = $d.ui32();
+   if ($tag !== 8) {
+     throw new Error(`Invalid tag ${$tag} for KeyboardKey: expected 8`);
+   }
+   return KeyboardKey.$do_decode($d);
+ }
+
+ static $do_decode($d: _Decoder): KeyboardKey {
+   const key = $d.text();
+const code = $d.text();
+const key_code = $d.bigint();
+   return new KeyboardKey(key, code, key_code);
+ }
+
+ encode($e: _Encoder) {
+   $e.ui32(8);
+   this.$do_encode($e);
+ }
+
+ $do_encode($e: _Encoder) {
+   $e.text(this.key);
+$e.text(this.code);
+$e.integer(this.key_code);
+ }
+}
+
+
+
 export class Cartridge {
  static readonly $tag = 0;
  readonly $tag = 0;
@@ -689,7 +724,7 @@ export class Web_archive extends Platform$Base {
  static readonly $tag = $Tags.Web_archive;
  readonly $tag = $Tags.Web_archive;
 
- constructor(readonly html: string, readonly bridges: ((Bridge.RPG_maker_mv | Bridge.Renpy | Bridge.Network_proxy | Bridge.Local_storage_proxy))[]) {
+ constructor(readonly html: string, readonly bridges: ((Bridge.RPG_maker_mv | Bridge.Renpy | Bridge.Network_proxy | Bridge.Local_storage_proxy | Bridge.Input_proxy))[]) {
    super();
  }
 
@@ -731,7 +766,7 @@ $e.array((this.bridges), ($e, v) => {
 
 
 
-export type Bridge = Bridge.RPG_maker_mv | Bridge.Renpy | Bridge.Network_proxy | Bridge.Local_storage_proxy;
+export type Bridge = Bridge.RPG_maker_mv | Bridge.Renpy | Bridge.Network_proxy | Bridge.Local_storage_proxy | Bridge.Input_proxy;
 
 export abstract class Bridge$Base {
  static decode($d: _Decoder): Bridge {
@@ -750,6 +785,7 @@ export abstract class Bridge$Base {
 case 1: return Bridge.Renpy.decode($d);
 case 2: return Bridge.Network_proxy.decode($d);
 case 3: return Bridge.Local_storage_proxy.decode($d);
+case 4: return Bridge.Input_proxy.decode($d);
 
      default:
        throw new Error(`Unknown tag ${$tag} in union Bridge`);
@@ -759,7 +795,7 @@ case 3: return Bridge.Local_storage_proxy.decode($d);
 
 export namespace Bridge {
  export const enum $Tags {
-   RPG_maker_mv,Renpy,Network_proxy,Local_storage_proxy
+   RPG_maker_mv,Renpy,Network_proxy,Local_storage_proxy,Input_proxy
  }
 
  
@@ -897,6 +933,445 @@ export class Local_storage_proxy extends Bridge$Base {
 
  $do_encode($e: _Encoder) {
    $e.ui8(3);
+   
+ }
+}
+
+
+
+export class Input_proxy extends Bridge$Base {
+ static readonly $tag = $Tags.Input_proxy;
+ readonly $tag = $Tags.Input_proxy;
+
+ constructor(readonly mapping: Map<(VirtualKey.Up | VirtualKey.Right | VirtualKey.Down | VirtualKey.Left | VirtualKey.Menu | VirtualKey.Capture | VirtualKey.X | VirtualKey.O | VirtualKey.L_trigger | VirtualKey.R_trigger), KeyboardKey>) {
+   super();
+ }
+
+ static decode($d: _Decoder): Input_proxy {
+   return Input_proxy.$do_decode($d);
+ }
+
+ static $do_decode($d: _Decoder): Input_proxy {
+   const $tag = $d.ui8();
+   if ($tag !== 4) {
+     throw new Error(`Invalid tag ${$tag} for Bridge.Input-proxy: expected 4`);
+   }
+
+   
+const mapping = $d.map(
+ () => {
+   const key = VirtualKey$Base.$do_decode($d);;
+   return key;
+ },
+ () => {
+   const value = KeyboardKey.$do_decode($d);;
+   return value;
+ }
+);
+
+   return new Input_proxy(mapping);
+ }
+
+ encode($e: _Encoder) {
+   $e.ui32(6);
+   this.$do_encode($e);
+ }
+
+ $do_encode($e: _Encoder) {
+   $e.ui8(4);
+   $e.map((this.mapping),
+  ($e, k) => { (k).$do_encode($e); },
+  ($e, v) => { (v).$do_encode($e); }
+);
+ }
+}
+
+}
+
+
+
+export type VirtualKey = VirtualKey.Up | VirtualKey.Right | VirtualKey.Down | VirtualKey.Left | VirtualKey.Menu | VirtualKey.Capture | VirtualKey.X | VirtualKey.O | VirtualKey.L_trigger | VirtualKey.R_trigger;
+
+export abstract class VirtualKey$Base {
+ static decode($d: _Decoder): VirtualKey {
+   const $tag = $d.ui32();
+   if ($tag !== 7) {
+     throw new Error(`Invalid tag ${$tag} for VirtualKey: expected 7`);
+   }
+   return VirtualKey$Base.$do_decode($d);
+ }
+
+ static $do_decode($d: _Decoder): VirtualKey {
+   const $tag = $d.peek((v) => v.getUint8(0));
+
+   switch ($tag) {
+     case 0: return VirtualKey.Up.decode($d);
+case 1: return VirtualKey.Right.decode($d);
+case 2: return VirtualKey.Down.decode($d);
+case 3: return VirtualKey.Left.decode($d);
+case 4: return VirtualKey.Menu.decode($d);
+case 5: return VirtualKey.Capture.decode($d);
+case 6: return VirtualKey.X.decode($d);
+case 7: return VirtualKey.O.decode($d);
+case 8: return VirtualKey.L_trigger.decode($d);
+case 9: return VirtualKey.R_trigger.decode($d);
+
+     default:
+       throw new Error(`Unknown tag ${$tag} in union VirtualKey`);
+   }
+ }
+}
+
+export namespace VirtualKey {
+ export const enum $Tags {
+   Up,Right,Down,Left,Menu,Capture,X,O,L_trigger,R_trigger
+ }
+
+ 
+export class Up extends VirtualKey$Base {
+ static readonly $tag = $Tags.Up;
+ readonly $tag = $Tags.Up;
+
+ constructor() {
+   super();
+ }
+
+ static decode($d: _Decoder): Up {
+   return Up.$do_decode($d);
+ }
+
+ static $do_decode($d: _Decoder): Up {
+   const $tag = $d.ui8();
+   if ($tag !== 0) {
+     throw new Error(`Invalid tag ${$tag} for VirtualKey.Up: expected 0`);
+   }
+
+   
+   return new Up();
+ }
+
+ encode($e: _Encoder) {
+   $e.ui32(7);
+   this.$do_encode($e);
+ }
+
+ $do_encode($e: _Encoder) {
+   $e.ui8(0);
+   
+ }
+}
+
+
+
+export class Right extends VirtualKey$Base {
+ static readonly $tag = $Tags.Right;
+ readonly $tag = $Tags.Right;
+
+ constructor() {
+   super();
+ }
+
+ static decode($d: _Decoder): Right {
+   return Right.$do_decode($d);
+ }
+
+ static $do_decode($d: _Decoder): Right {
+   const $tag = $d.ui8();
+   if ($tag !== 1) {
+     throw new Error(`Invalid tag ${$tag} for VirtualKey.Right: expected 1`);
+   }
+
+   
+   return new Right();
+ }
+
+ encode($e: _Encoder) {
+   $e.ui32(7);
+   this.$do_encode($e);
+ }
+
+ $do_encode($e: _Encoder) {
+   $e.ui8(1);
+   
+ }
+}
+
+
+
+export class Down extends VirtualKey$Base {
+ static readonly $tag = $Tags.Down;
+ readonly $tag = $Tags.Down;
+
+ constructor() {
+   super();
+ }
+
+ static decode($d: _Decoder): Down {
+   return Down.$do_decode($d);
+ }
+
+ static $do_decode($d: _Decoder): Down {
+   const $tag = $d.ui8();
+   if ($tag !== 2) {
+     throw new Error(`Invalid tag ${$tag} for VirtualKey.Down: expected 2`);
+   }
+
+   
+   return new Down();
+ }
+
+ encode($e: _Encoder) {
+   $e.ui32(7);
+   this.$do_encode($e);
+ }
+
+ $do_encode($e: _Encoder) {
+   $e.ui8(2);
+   
+ }
+}
+
+
+
+export class Left extends VirtualKey$Base {
+ static readonly $tag = $Tags.Left;
+ readonly $tag = $Tags.Left;
+
+ constructor() {
+   super();
+ }
+
+ static decode($d: _Decoder): Left {
+   return Left.$do_decode($d);
+ }
+
+ static $do_decode($d: _Decoder): Left {
+   const $tag = $d.ui8();
+   if ($tag !== 3) {
+     throw new Error(`Invalid tag ${$tag} for VirtualKey.Left: expected 3`);
+   }
+
+   
+   return new Left();
+ }
+
+ encode($e: _Encoder) {
+   $e.ui32(7);
+   this.$do_encode($e);
+ }
+
+ $do_encode($e: _Encoder) {
+   $e.ui8(3);
+   
+ }
+}
+
+
+
+export class Menu extends VirtualKey$Base {
+ static readonly $tag = $Tags.Menu;
+ readonly $tag = $Tags.Menu;
+
+ constructor() {
+   super();
+ }
+
+ static decode($d: _Decoder): Menu {
+   return Menu.$do_decode($d);
+ }
+
+ static $do_decode($d: _Decoder): Menu {
+   const $tag = $d.ui8();
+   if ($tag !== 4) {
+     throw new Error(`Invalid tag ${$tag} for VirtualKey.Menu: expected 4`);
+   }
+
+   
+   return new Menu();
+ }
+
+ encode($e: _Encoder) {
+   $e.ui32(7);
+   this.$do_encode($e);
+ }
+
+ $do_encode($e: _Encoder) {
+   $e.ui8(4);
+   
+ }
+}
+
+
+
+export class Capture extends VirtualKey$Base {
+ static readonly $tag = $Tags.Capture;
+ readonly $tag = $Tags.Capture;
+
+ constructor() {
+   super();
+ }
+
+ static decode($d: _Decoder): Capture {
+   return Capture.$do_decode($d);
+ }
+
+ static $do_decode($d: _Decoder): Capture {
+   const $tag = $d.ui8();
+   if ($tag !== 5) {
+     throw new Error(`Invalid tag ${$tag} for VirtualKey.Capture: expected 5`);
+   }
+
+   
+   return new Capture();
+ }
+
+ encode($e: _Encoder) {
+   $e.ui32(7);
+   this.$do_encode($e);
+ }
+
+ $do_encode($e: _Encoder) {
+   $e.ui8(5);
+   
+ }
+}
+
+
+
+export class X extends VirtualKey$Base {
+ static readonly $tag = $Tags.X;
+ readonly $tag = $Tags.X;
+
+ constructor() {
+   super();
+ }
+
+ static decode($d: _Decoder): X {
+   return X.$do_decode($d);
+ }
+
+ static $do_decode($d: _Decoder): X {
+   const $tag = $d.ui8();
+   if ($tag !== 6) {
+     throw new Error(`Invalid tag ${$tag} for VirtualKey.X: expected 6`);
+   }
+
+   
+   return new X();
+ }
+
+ encode($e: _Encoder) {
+   $e.ui32(7);
+   this.$do_encode($e);
+ }
+
+ $do_encode($e: _Encoder) {
+   $e.ui8(6);
+   
+ }
+}
+
+
+
+export class O extends VirtualKey$Base {
+ static readonly $tag = $Tags.O;
+ readonly $tag = $Tags.O;
+
+ constructor() {
+   super();
+ }
+
+ static decode($d: _Decoder): O {
+   return O.$do_decode($d);
+ }
+
+ static $do_decode($d: _Decoder): O {
+   const $tag = $d.ui8();
+   if ($tag !== 7) {
+     throw new Error(`Invalid tag ${$tag} for VirtualKey.O: expected 7`);
+   }
+
+   
+   return new O();
+ }
+
+ encode($e: _Encoder) {
+   $e.ui32(7);
+   this.$do_encode($e);
+ }
+
+ $do_encode($e: _Encoder) {
+   $e.ui8(7);
+   
+ }
+}
+
+
+
+export class L_trigger extends VirtualKey$Base {
+ static readonly $tag = $Tags.L_trigger;
+ readonly $tag = $Tags.L_trigger;
+
+ constructor() {
+   super();
+ }
+
+ static decode($d: _Decoder): L_trigger {
+   return L_trigger.$do_decode($d);
+ }
+
+ static $do_decode($d: _Decoder): L_trigger {
+   const $tag = $d.ui8();
+   if ($tag !== 8) {
+     throw new Error(`Invalid tag ${$tag} for VirtualKey.L-trigger: expected 8`);
+   }
+
+   
+   return new L_trigger();
+ }
+
+ encode($e: _Encoder) {
+   $e.ui32(7);
+   this.$do_encode($e);
+ }
+
+ $do_encode($e: _Encoder) {
+   $e.ui8(8);
+   
+ }
+}
+
+
+
+export class R_trigger extends VirtualKey$Base {
+ static readonly $tag = $Tags.R_trigger;
+ readonly $tag = $Tags.R_trigger;
+
+ constructor() {
+   super();
+ }
+
+ static decode($d: _Decoder): R_trigger {
+   return R_trigger.$do_decode($d);
+ }
+
+ static $do_decode($d: _Decoder): R_trigger {
+   const $tag = $d.ui8();
+   if ($tag !== 9) {
+     throw new Error(`Invalid tag ${$tag} for VirtualKey.R-trigger: expected 9`);
+   }
+
+   
+   return new R_trigger();
+ }
+
+ encode($e: _Encoder) {
+   $e.ui32(7);
+   this.$do_encode($e);
+ }
+
+ $do_encode($e: _Encoder) {
+   $e.ui8(9);
    
  }
 }

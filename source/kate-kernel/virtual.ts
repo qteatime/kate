@@ -141,6 +141,8 @@ export class VirtualConsole {
 
       if (this.is_special_key(key)) {
         clearTimeout(this.special_input_timing[key]);
+        this.special_input_timing[key] = null;
+
         if (state === false) {
           this.on_input_changed.emit({ key, is_down: true });
           setTimeout(() => {

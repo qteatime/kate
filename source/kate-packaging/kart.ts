@@ -22,27 +22,35 @@ type Kart = {
   };
   files: string[];
   platform: KartPlatform;
-}
+};
 
-type KartPlatform =
-  | KPWeb;
+type KartPlatform = KPWeb;
 
-type KPWeb = {
-  type: "web";
-  url: string;
-  width: number;
-  height: number;
-} | {
-  type: "web-archive";
-  html: string;
-  bridges: Bridge[];
-}
+type KPWeb =
+  | {
+      type: "web";
+      url: string;
+      width: number;
+      height: number;
+    }
+  | {
+      type: "web-archive";
+      html: string;
+      bridges: Bridge[];
+    };
+
+type KeyboardKey = {
+  key: string;
+  code: string;
+  key_code: number;
+};
 
 type Bridge =
-  {type: "rpgmk-mv"}
-| {type: "renpy"}
-| {type: "standard-network"}
-| {type: "local-storage"};
+  | { type: "rpgmk-mv" }
+  | { type: "renpy" }
+  | { type: "standard-network" }
+  | { type: "local-storage" }
+  | { type: "input-proxy"; mapping: { [key: string]: KeyboardKey } };
 
 const mime_table = Object.assign(Object.create(null), {
   ".png": "image/png",
@@ -69,7 +77,9 @@ if (json.root != null) {
 function assert_base(path: string) {
   const file = FS.realpathSync(path);
   if (!file.startsWith(dir_root)) {
-    throw new Error(`Cannot load file '${file}' because it's outside of the base directory '${base_dir}'`);
+    throw new Error(
+      `Cannot load file '${file}' because it's outside of the base directory '${base_dir}'`
+    );
   }
   return file;
 }
@@ -84,7 +94,7 @@ function load_text_file(path0: string) {
   return FS.readFileSync(assert_base(path), "utf-8");
 }
 
-function metadata(x: Kart['metadata']) {
+function metadata(x: Kart["metadata"]) {
   return new Cart.Metadata(
     x.author,
     x.title,
@@ -94,7 +104,7 @@ function metadata(x: Kart['metadata']) {
     new Cart.Content_classification.General(),
     new Cart.Date(2000, 1, 1),
     new Cart.File("thumbnail.png", "image/png", load_file(x.thumbnail_path))
-  )
+  );
 }
 
 function make_absolute(path: string) {
@@ -105,12 +115,14 @@ function make_absolute(path: string) {
   }
 }
 
-function files(patterns: Kart['files']) {
-  const paths = [...new Set(patterns.flatMap(x => Glob.sync(x, {cwd: base_dir})))];
-  return paths.map(path => {
+function files(patterns: Kart["files"]) {
+  const paths = [
+    ...new Set(patterns.flatMap((x) => Glob.sync(x, { cwd: base_dir }))),
+  ];
+  return paths.map((path) => {
     const ext = Path.extname(path);
     const mime = mime_table[ext] ?? "application/octet-stream";
-    return new Cart.File(make_absolute(path), mime, load_file(path))
+    return new Cart.File(make_absolute(path), mime, load_file(path));
   });
 }
 
@@ -138,8 +150,51 @@ function make_bridge(x: Bridge) {
       return new Cart.Bridge.Renpy();
     }
 
+    case "input-proxy": {
+      return new Cart.Bridge.Input_proxy(
+        new Map(Object.entries(x.mapping).map(make_key_pair))
+      );
+    }
+
     default:
       throw new Error(`Unknown bridge ${(x as any).type}`);
+  }
+}
+
+function make_key_pair([virtual, { key, code, key_code }]: [
+  string,
+  KeyboardKey
+]): [Cart.VirtualKey, Cart.KeyboardKey] {
+  return [
+    make_virtual_key(virtual),
+    new Cart.KeyboardKey(key, code, BigInt(key_code)),
+  ];
+}
+
+function make_virtual_key(key: string) {
+  switch (key) {
+    case "up":
+      return new Cart.VirtualKey.Up();
+    case "right":
+      return new Cart.VirtualKey.Right();
+    case "down":
+      return new Cart.VirtualKey.Down();
+    case "left":
+      return new Cart.VirtualKey.Left();
+    case "menu":
+      return new Cart.VirtualKey.Menu();
+    case "capture":
+      return new Cart.VirtualKey.Capture();
+    case "x":
+      return new Cart.VirtualKey.X();
+    case "o":
+      return new Cart.VirtualKey.O();
+    case "l":
+      return new Cart.VirtualKey.L_trigger();
+    case "r":
+      return new Cart.VirtualKey.R_trigger();
+    default:
+      throw new Error(`Unknown virtual key ${key}`);
   }
 }
 
@@ -148,12 +203,17 @@ const archive = files(json.files);
 
 switch (x.type) {
   case "web-archive": {
-    save(new Cart.Cartridge(
-      json.id,
-      meta,
-      archive,
-      new Cart.Platform.Web_archive(load_text_file(x.html), x.bridges.map(make_bridge))
-    ));
+    save(
+      new Cart.Cartridge(
+        json.id,
+        meta,
+        archive,
+        new Cart.Platform.Web_archive(
+          load_text_file(x.html),
+          x.bridges.map(make_bridge)
+        )
+      )
+    );
     break;
   }
 

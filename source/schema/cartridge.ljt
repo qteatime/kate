@@ -52,4 +52,27 @@ union Bridge {
   type Renpy {}
   type Network-proxy {}
   type Local-storage-proxy {}
+  type Input-proxy {
+    field mapping: VirtualKey -> KeyboardKey;
+  }
+}
+
+union VirtualKey {
+  type Up {}
+  type Right {}
+  type Down {}
+  type Left {}
+  type Menu {}
+  type Capture {}
+  type X {}
+  type O {}
+  type L-trigger {}
+  type R-trigger {}
+}
+
+// The fields here are the same as the ones in DOM's KeyboardEvent
+type KeyboardKey {
+  field key: Text;
+  field code: Text;
+  field key-code: Integer;
 }

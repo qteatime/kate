@@ -1,10 +1,11 @@
 import * as Cart from "../generated/cartridge";
-import { VirtualConsole } from "./virtual";
+import { InputKey, VirtualConsole } from "./virtual";
 import { bridges } from "../kate-bridges";
 import type { KateOS } from "../kate-os";
 import type { KateKVStoragePartition } from "../kate-os/apis/kv_storage";
 import { make_id } from "../util/random";
 import { KateIPCChannel } from "../kate-os/apis/ipc";
+import { unreachable } from "../util/assert";
 
 const SCREEN_WIDTH = 800;
 const SCREEN_HEIGHT = 480;
@@ -59,21 +60,17 @@ export class CRW_Process extends CR_Process {
   }
 
   async pause() {
-    this.channel?.send(
-      {
-        type: "kate:paused",
-        state: true
-      }
-    );
+    this.channel?.send({
+      type: "kate:paused",
+      state: true,
+    });
   }
 
   async unpause() {
-    this.channel?.send(
-      {
-        type: "kate:paused",
-        state: false
-      }
-    );
+    this.channel?.send({
+      type: "kate:paused",
+      state: false,
+    });
   }
 }
 
@@ -189,7 +186,7 @@ export class CR_Web_archive extends CartRuntime {
       return `void function(exports) {
         ${source}
       }({});`;
-    }
+    };
 
     switch (bridge.$tag) {
       case Cart.Bridge.$Tags.RPG_maker_mv: {
@@ -220,6 +217,55 @@ export class CR_Web_archive extends CartRuntime {
         this.append_proxy(bridges["local-storage.js"], dom, secret_node);
         break;
       }
+
+      case Cart.Bridge.$Tags.Input_proxy: {
+        const code = bridges["input.js"];
+        const keys = this.generate_mappings(bridge.mapping);
+        this.append_proxy(
+          `const key_mapping = ${keys};\n${code}`,
+          dom,
+          secret_node
+        );
+        break;
+      }
+
+      default:
+        throw unreachable(bridge, "kate bridge");
+    }
+  }
+
+  private generate_mappings(map: Map<Cart.VirtualKey, Cart.KeyboardKey>) {
+    const pairs = [...map.entries()].map(([k, v]) => [
+      this.virtual_key_to_code(k),
+      [v.key, v.code, Number(v.key_code)],
+    ]);
+    return JSON.stringify(Object.fromEntries(pairs), null, 2);
+  }
+
+  private virtual_key_to_code(key: Cart.VirtualKey): InputKey {
+    switch (key.$tag) {
+      case Cart.VirtualKey.$Tags.Up:
+        return "up";
+      case Cart.VirtualKey.$Tags.Right:
+        return "right";
+      case Cart.VirtualKey.$Tags.Down:
+        return "down";
+      case Cart.VirtualKey.$Tags.Left:
+        return "left";
+      case Cart.VirtualKey.$Tags.O:
+        return "o";
+      case Cart.VirtualKey.$Tags.X:
+        return "x";
+      case Cart.VirtualKey.$Tags.L_trigger:
+        return "ltrigger";
+      case Cart.VirtualKey.$Tags.R_trigger:
+        return "rtrigger";
+      case Cart.VirtualKey.$Tags.Menu:
+        return "menu";
+      case Cart.VirtualKey.$Tags.Capture:
+        return "capture";
+      default:
+        throw unreachable(key, "virtual key");
     }
   }
 
@@ -228,7 +274,7 @@ export class CR_Web_archive extends CartRuntime {
       return `void function(exports) {
         ${source}
       }({});`;
-    }
+    };
 
     const script = dom.createElement("script");
     script.textContent = wrap(proxy);

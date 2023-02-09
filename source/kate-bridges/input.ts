@@ -1,19 +1,10 @@
 import {KateAPI} from "../kate-api";
 declare var KateAPI: KateAPI;
+declare var key_mapping: {[key: string]: [string, string, number]};
 
 let paused = false;
 const {events} = KateAPI;
 const add_event_listener = window.addEventListener;
-const key_mapping: {[key: string]: [string, string, number]} = {
-  up: ["ArrowUp", "ArrowUp", 38],
-  right: ["ArrowRight", "ArrowRight", 39],
-  down: ["ArrowDown", "ArrowDown", 40],
-  left: ["ArrowLeft", "ArrowLeft", 37],
-  x: ["Escape", "Escape", 27],
-  o: ["Enter", "Enter", 13],
-  ltrigger: ['PageUp', 'PageUp', 33],
-  rtrigger: ['PageDown', 'PageDown', 34]
-}
 
 const down_listeners: ((_: KeyboardEvent) => void)[] = [];
 const up_listeners: ((_: KeyboardEvent) => void)[] = [];
