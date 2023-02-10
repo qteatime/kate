@@ -6,6 +6,7 @@ import type { KateKVStoragePartition } from "../kate-os/apis/kv_storage";
 import { make_id } from "../util/random";
 import { KateIPCChannel } from "../kate-os/apis/ipc";
 import { unreachable } from "../util/assert";
+import { KateAudioServer } from "../kate-os/apis/audio";
 
 const SCREEN_WIDTH = 800;
 const SCREEN_HEIGHT = 480;
@@ -48,7 +49,8 @@ export class CRW_Process extends CR_Process {
     readonly runtime: CR_Web_archive,
     readonly frame: HTMLIFrameElement,
     readonly secret: string,
-    readonly channel: KateIPCChannel | null
+    readonly channel: KateIPCChannel,
+    readonly audio: KateAudioServer
   ) {
     super();
   }
@@ -88,10 +90,12 @@ export class CR_Web_archive extends CartRuntime {
   run(os: KateOS) {
     const secret = make_id();
     const frame = document.createElement("iframe");
+    const audio_server = new KateAudioServer(os);
     const channel = os.ipc.add_process(
       secret,
       this.cart,
-      () => frame.contentWindow
+      () => frame.contentWindow,
+      audio_server
     );
 
     frame.className = "kate-game-frame kate-game-frame-defaults";
@@ -110,7 +114,7 @@ export class CR_Web_archive extends CartRuntime {
     );
     frame.scrolling = "no";
     this.console.screen.appendChild(frame);
-    return new CRW_Process(this, frame, secret, channel);
+    return new CRW_Process(this, frame, secret, channel, audio_server);
   }
 
   proxy_html(secret: string) {

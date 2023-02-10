@@ -1,6 +1,6 @@
-import { KateIPC } from "./channel";
+import type { KateIPC } from "./channel";
 
-type kv = {[key: string]: string};
+type kv = { [key: string]: string };
 
 export class KateKVStore {
   #channel: KateIPC;
