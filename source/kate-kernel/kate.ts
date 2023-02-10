@@ -1,4 +1,5 @@
 import { CartRuntime, KateRuntimes } from "./cart-runtime";
+import { GamepadInput } from "./gamepad";
 import { KeyboardInput } from "./input";
 import { KateLoader } from "./loader";
 import { VirtualConsole } from "./virtual";
@@ -9,7 +10,8 @@ export class Kate {
 
   private constructor(
     readonly console: VirtualConsole,
-    readonly keyboard: KeyboardInput
+    readonly keyboard: KeyboardInput,
+    readonly gamepad: GamepadInput
   ) {
     this.runtimes = new KateRuntimes(console);
   }
@@ -17,8 +19,10 @@ export class Kate {
   static from_root(root: HTMLElement) {
     const console = new VirtualConsole(root);
     const keyboard = new KeyboardInput(console);
+    const gamepad = new GamepadInput(console);
     console.listen();
     keyboard.listen(document.body);
-    return new Kate(console, keyboard);
+    gamepad.setup();
+    return new Kate(console, keyboard, gamepad);
   }
 }
