@@ -1,22 +1,20 @@
 import { EventStream } from "../util/events";
 
 export type InputKey =
-  "up"
-| "right"
-| "down"
-| "left"
-| "menu"
-| "capture"
-| "x"
-| "o"
-| "ltrigger"
-| "rtrigger";
+  | "up"
+  | "right"
+  | "down"
+  | "left"
+  | "menu"
+  | "capture"
+  | "x"
+  | "o"
+  | "ltrigger"
+  | "rtrigger";
 
-export type SpecialInputKey =
-  "menu" | "capture";
+export type SpecialInputKey = "menu" | "capture";
 
-export type ExtendedInputKey =
-  InputKey | `long_${SpecialInputKey}`;
+export type ExtendedInputKey = InputKey | `long_${SpecialInputKey}`;
 
 export class VirtualConsole {
   private up_button: HTMLElement;
@@ -34,7 +32,10 @@ export class VirtualConsole {
   readonly screen: HTMLElement;
   readonly hud: HTMLElement;
   readonly os_root: HTMLElement;
-  readonly on_input_changed = new EventStream<{key: InputKey, is_down: boolean}>();
+  readonly on_input_changed = new EventStream<{
+    key: InputKey;
+    is_down: boolean;
+  }>();
   readonly on_key_pressed = new EventStream<ExtendedInputKey>();
 
   readonly LONG_PRESS_TIME_MS = 500;
@@ -73,7 +74,7 @@ export class VirtualConsole {
       x: false,
       o: false,
       ltrigger: false,
-      rtrigger: false
+      rtrigger: false,
     };
     this.special_input_timing = {
       menu: null,
@@ -87,8 +88,8 @@ export class VirtualConsole {
     this.capture_button.classList.remove("down");
     this.x_button.classList.remove("down");
     this.o_button.classList.remove("down");
-    this.ltrigger_button.classList.remove("down")
-    this.rtrigger_button.classList.remove("down")
+    this.ltrigger_button.classList.remove("down");
+    this.rtrigger_button.classList.remove("down");
   }
 
   listen() {
@@ -105,7 +106,7 @@ export class VirtualConsole {
       button.addEventListener("mouseup", (ev) => {
         ev.preventDefault();
         this.update_virtual_key(key, false);
-      })
+      });
       button.addEventListener("touchstart", (ev) => {
         ev.preventDefault();
         this.update_virtual_key(key, true);
@@ -113,8 +114,8 @@ export class VirtualConsole {
       button.addEventListener("touchend", (ev) => {
         ev.preventDefault();
         this.update_virtual_key(key, false);
-      })
-    }
+      });
+    };
 
     listen_button(this.up_button, "up");
     listen_button(this.right_button, "right");
@@ -180,7 +181,7 @@ export class VirtualConsole {
       x: this.x_button,
       o: this.o_button,
       ltrigger: this.ltrigger_button,
-      rtrigger: this.rtrigger_button
+      rtrigger: this.rtrigger_button,
     }[key];
 
     if (state) {

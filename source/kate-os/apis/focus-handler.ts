@@ -21,13 +21,20 @@ export class KateFocusHandler {
   change_root(element: HTMLElement | null) {
     this._current_root = element;
     if (element != null && element.querySelector(".focus") == null) {
-      const candidates0 = Array.from(element.querySelectorAll(".kate-ui-focus-target")) as HTMLElement[];
-      const candidates = candidates0.sort((a, b) => a.offsetLeft - b.offsetLeft);
+      const candidates0 = Array.from(
+        element.querySelectorAll(".kate-ui-focus-target")
+      ) as HTMLElement[];
+      const candidates = candidates0.sort(
+        (a, b) => a.offsetLeft - b.offsetLeft
+      );
       this.focus(candidates[0]);
     }
   }
 
-  compare_and_change_root(element: HTMLElement | null, old: HTMLElement | null) {
+  compare_and_change_root(
+    element: HTMLElement | null,
+    old: HTMLElement | null
+  ) {
     if (this.current_root === old) {
       this.change_root(element);
       return true;
@@ -57,11 +64,11 @@ export class KateFocusHandler {
         width: x.offsetWidth,
         height: x.offsetHeight,
         right: x.offsetLeft + x.offsetWidth,
-        bottom: x.offsetTop + x.offsetHeight
+        bottom: x.offsetTop + x.offsetHeight,
       },
     }));
-    const right_limit = Math.max(...focusable.map(x => x.position.right));
-    const bottom_limit = Math.max(...focusable.map(x => x.position.bottom));
+    const right_limit = Math.max(...focusable.map((x) => x.position.right));
+    const bottom_limit = Math.max(...focusable.map((x) => x.position.bottom));
 
     const current = focusable.find((x) =>
       x.element.classList.contains("focus")
@@ -80,43 +87,62 @@ export class KateFocusHandler {
       }
 
       case "up": {
-        const candidates = focusable.filter(x => x.position.bottom < top).sort((a, b) => b.position.bottom - a.position.bottom);
+        const candidates = focusable
+          .filter((x) => x.position.bottom < top)
+          .sort((a, b) => b.position.bottom - a.position.bottom);
         const closest = candidates.sort((a, b) => {
-          return Math.min(a.position.x - left, a.position.right - right) - Math.min(b.position.x - left, b.position.right - right);
+          return (
+            Math.min(a.position.x - left, a.position.right - right) -
+            Math.min(b.position.x - left, b.position.right - right)
+          );
         });
         this.focus(closest[0]?.element);
         break;
       }
-      
+
       case "down": {
-        const candidates = focusable.filter(x => x.position.y > bottom).sort((a, b) => a.position.y - b.position.y);
+        const candidates = focusable
+          .filter((x) => x.position.y > bottom)
+          .sort((a, b) => a.position.y - b.position.y);
         const closest = candidates.sort((a, b) => {
-          return Math.min(a.position.x - left, a.position.right - right) - Math.min(b.position.x - left, b.position.right - right);
+          return (
+            Math.min(a.position.x - left, a.position.right - right) -
+            Math.min(b.position.x - left, b.position.right - right)
+          );
         });
         this.focus(closest[0]?.element);
         break;
       }
 
       case "left": {
-        const candidates = focusable.filter(x => x.position.right < left).sort((a, b) => b.position.right - a.position.right);
+        const candidates = focusable
+          .filter((x) => x.position.right < left)
+          .sort((a, b) => b.position.right - a.position.right);
         const closest = candidates.sort((a, b) => {
-          return Math.min(a.position.y - top, a.position.bottom - bottom) - Math.min(b.position.y - top, b.position.bottom - bottom);
+          return (
+            Math.min(a.position.y - top, a.position.bottom - bottom) -
+            Math.min(b.position.y - top, b.position.bottom - bottom)
+          );
         });
         this.focus(closest[0]?.element);
         break;
       }
 
-
       case "right": {
-        const candidates = focusable.filter(x => x.position.x > right).sort((a, b) => a.position.x - b.position.x);
+        const candidates = focusable
+          .filter((x) => x.position.x > right)
+          .sort((a, b) => a.position.x - b.position.x);
         const closest = candidates.sort((a, b) => {
-          return Math.min(a.position.y - top, a.position.bottom - bottom) - Math.min(b.position.y - top, b.position.bottom - bottom);
+          return (
+            Math.min(a.position.y - top, a.position.bottom - bottom) -
+            Math.min(b.position.y - top, b.position.bottom - bottom)
+          );
         });
         this.focus(closest[0]?.element);
         break;
       }
     }
-  }
+  };
 
   focus(element: HTMLElement | null) {
     if (element == null || this._current_root == null) {
@@ -130,7 +156,7 @@ export class KateFocusHandler {
     element.classList.add("focus");
     element.scrollIntoView({
       block: "center",
-      inline: "center"
+      inline: "center",
     });
   }
 }

@@ -1,11 +1,11 @@
-import {KateAPI} from "../kate-api";
+import { KateAPI } from "../kate-api";
 declare var KateAPI: KateAPI;
 
-const {cart_fs} = KateAPI;
+const { cart_fs } = KateAPI;
 
 // -- Arbitrary fetching
 const old_fetch = window.fetch;
-window.fetch = async function(request: any, options) {
+window.fetch = async function (request: any, options) {
   let url: any;
   let method: any;
 
@@ -18,7 +18,9 @@ window.fetch = async function(request: any, options) {
   }
 
   if (method !== "GET") {
-    return new Promise((_, reject) => reject(new Error(`Non-GET requests are not supported.`)));
+    return new Promise((_, reject) =>
+      reject(new Error(`Non-GET requests are not supported.`))
+    );
   }
   return new Promise(async (resolve, reject) => {
     try {
@@ -29,17 +31,16 @@ window.fetch = async function(request: any, options) {
       reject(error);
     }
   });
-}
-
+};
 
 type XMLHttpRequestE = XMLHttpRequest & {
   __waiting_open: boolean;
   __waiting_send: boolean;
   __maybe_send: () => void;
-}
+};
 const old_xhr_open = XMLHttpRequest.prototype.open;
 const old_xhr_send = XMLHttpRequest.prototype.send;
-XMLHttpRequest.prototype.open = function(this: XMLHttpRequestE, method, url) {
+XMLHttpRequest.prototype.open = function (this: XMLHttpRequestE, method, url) {
   if (method !== "GET") {
     throw new Error(`Non-GET requests are not supported.`);
   }
@@ -58,7 +59,7 @@ XMLHttpRequest.prototype.open = function(this: XMLHttpRequestE, method, url) {
   })();
 };
 
-(XMLHttpRequest.prototype as XMLHttpRequestE).__maybe_send = function() {
+(XMLHttpRequest.prototype as XMLHttpRequestE).__maybe_send = function () {
   this.__waiting_open = false;
   if (this.__waiting_send) {
     this.__waiting_send = false;
@@ -66,7 +67,7 @@ XMLHttpRequest.prototype.open = function(this: XMLHttpRequestE, method, url) {
   }
 };
 
-XMLHttpRequest.prototype.send = function(this: XMLHttpRequestE) {
+XMLHttpRequest.prototype.send = function (this: XMLHttpRequestE) {
   if (this.__waiting_open) {
     this.__waiting_send = true;
     return;
@@ -76,7 +77,10 @@ XMLHttpRequest.prototype.send = function(this: XMLHttpRequestE) {
 };
 
 // -- Image loading
-const old_img_src = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, "src")!;
+const old_img_src = Object.getOwnPropertyDescriptor(
+  HTMLImageElement.prototype,
+  "src"
+)!;
 Object.defineProperty(HTMLImageElement.prototype, "src", {
   enumerable: old_img_src.enumerable,
   configurable: old_img_src.configurable,
@@ -93,5 +97,5 @@ Object.defineProperty(HTMLImageElement.prototype, "src", {
         old_img_src.set!.call(this, "not-found");
       }
     })();
-  }
+  },
 });

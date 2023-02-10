@@ -1,7 +1,7 @@
 import { Database } from "../db";
-import * as KateDb from "./apis/db"
+import * as KateDb from "./apis/db";
 import * as Cart from "../generated/cartridge";
-import type {Kate} from "../kate-kernel/kate"
+import type { Kate } from "../kate-kernel/kate";
 import { EventStream } from "../util/events";
 import { KateStorage } from "./apis/file_storage";
 import { wait } from "./time";
@@ -31,8 +31,8 @@ export class KateOS {
   readonly kv_storage: KateKVStorage;
   readonly ipc: KateIPCServer;
   readonly events = {
-    on_cart_inserted: new EventStream<Cart.Cartridge>()
-  }
+    on_cart_inserted: new EventStream<Cart.Cartridge>(),
+  };
 
   private constructor(readonly kernel: Kate, readonly db: Database) {
     this.storage = new KateStorage(this);
@@ -71,7 +71,7 @@ export class KateOS {
     }
     this._current_scene = scene;
     scene.attach(this.display);
-    this.focus_handler.change_root(scene.canvas)
+    this.focus_handler.change_root(scene.canvas);
   }
 
   pop_scene() {
@@ -88,7 +88,7 @@ export class KateOS {
   }
 
   hide_hud(scene: Scene) {
-    this._active_hud = this._active_hud.filter(x => x !== scene);
+    this._active_hud = this._active_hud.filter((x) => x !== scene);
     scene.detach();
   }
 

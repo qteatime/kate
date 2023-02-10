@@ -1,11 +1,10 @@
 import { KateOS } from "../os";
 import { Scene } from "../ui/scenes";
 import * as UI from "../ui";
-import * as Db from "./db"
+import * as Db from "./db";
 import { wait } from "../time";
 
-export type NotificationType =
-  "basic";
+export type NotificationType = "basic";
 
 export class KateNotification {
   readonly hud: HUD_Toaster;
@@ -20,7 +19,13 @@ export class KateNotification {
   async push(process_id: string, title: string, message: string) {
     await this.os.db.transaction([Db.notifications], "readwrite", async (t) => {
       const notifications = t.get_table(Db.notifications);
-      await notifications.write({type: "basic", process_id, time: new Date(), title, message});
+      await notifications.write({
+        type: "basic",
+        process_id,
+        time: new Date(),
+        title,
+        message,
+      });
     });
     this.hud.show(title, message);
   }
@@ -32,7 +37,7 @@ export class HUD_Toaster extends Scene {
 
   constructor(readonly manager: KateNotification) {
     super(manager.os);
-    (this as any).canvas = UI.h("div", {class: "kate-hud-notifications"}, []);
+    (this as any).canvas = UI.h("div", { class: "kate-hud-notifications" }, []);
   }
 
   setup() {
@@ -48,9 +53,9 @@ export class HUD_Toaster extends Scene {
   }
 
   async show(title: string, message: string) {
-    const element = UI.h("div", {class: "kate-hud-notification-item"}, [
-      UI.h("div", {class: "kate-hud-notification-title"}, [title]),
-      UI.h("div", {class: "kate-hud-notification-message"}, [message])
+    const element = UI.h("div", { class: "kate-hud-notification-item" }, [
+      UI.h("div", { class: "kate-hud-notification-title" }, [title]),
+      UI.h("div", { class: "kate-hud-notification-message" }, [message]),
     ]);
     this.canvas.appendChild(element);
     await wait(this.NOTIFICATION_WAIT_TIME_MS);

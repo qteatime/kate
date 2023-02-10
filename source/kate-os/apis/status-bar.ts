@@ -23,7 +23,7 @@ export class HUD_StatusBar extends Scene {
 
   constructor(readonly manager: KateStatusBar) {
     super(manager.os);
-    (this as any).canvas = h("div", {class: "kate-hud-status-bar"}, []);
+    (this as any).canvas = h("div", { class: "kate-hud-status-bar" }, []);
   }
 
   render() {
@@ -31,14 +31,19 @@ export class HUD_StatusBar extends Scene {
   }
 
   show(content: Widgetable) {
-    const status = new KateStatus(this, h("div", {class: "kate-hud-status-item"}, [content]));
+    const status = new KateStatus(
+      this,
+      h("div", { class: "kate-hud-status-item" }, [content])
+    );
     this.canvas.appendChild(status.canvas);
     this.tick();
     return status;
   }
 
   refresh() {
-    const items = Array.from(this.canvas.querySelectorAll(".kate-hud-status-item"));
+    const items = Array.from(
+      this.canvas.querySelectorAll(".kate-hud-status-item")
+    );
     if (items.length === 0) {
       this.canvas.classList.remove("active");
     } else {
@@ -48,10 +53,12 @@ export class HUD_StatusBar extends Scene {
 
   private tick() {
     clearTimeout(this._timer);
-    const items = Array.from(this.canvas.querySelectorAll(".kate-hud-status-item"));
+    const items = Array.from(
+      this.canvas.querySelectorAll(".kate-hud-status-item")
+    );
     if (items.length > 0) {
       this.canvas.classList.add("active");
-      const current = items.findIndex(x => x.classList.contains("active"));
+      const current = items.findIndex((x) => x.classList.contains("active"));
       for (const item of items) {
         item.classList.remove("active");
       }

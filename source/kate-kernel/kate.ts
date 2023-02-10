@@ -3,16 +3,15 @@ import { KeyboardInput } from "./input";
 import { KateLoader } from "./loader";
 import { VirtualConsole } from "./virtual";
 
-
 export class Kate {
   readonly loader = new KateLoader();
   readonly runtimes: KateRuntimes;
-  
+
   private constructor(
     readonly console: VirtualConsole,
-    readonly keyboard: KeyboardInput,
+    readonly keyboard: KeyboardInput
   ) {
-    this.runtimes = new KateRuntimes(console)
+    this.runtimes = new KateRuntimes(console);
   }
 
   static from_root(root: HTMLElement) {

@@ -2,7 +2,7 @@ import { EventStream } from "../util/events";
 import { defer, Deferred } from "../util/promise";
 import type { InputKey } from "./input";
 
-type Payload = {[key: string]: any};
+type Payload = { [key: string]: any };
 
 export class KateIPC {
   readonly #secret: string;
@@ -10,9 +10,9 @@ export class KateIPC {
   #initialised: boolean;
   #server: Window;
   readonly events = {
-    input_state_changed: new EventStream<{ key: InputKey, is_down: boolean }>(),
-    paused: new EventStream<boolean>()
-  }
+    input_state_changed: new EventStream<{ key: InputKey; is_down: boolean }>(),
+    paused: new EventStream<boolean>(),
+  };
 
   constructor(secret: string, server: Window) {
     this.#secret = secret;
@@ -24,7 +24,9 @@ export class KateIPC {
   private make_id() {
     let id = new Uint8Array(16);
     crypto.getRandomValues(id);
-    return Array.from(id).map(x => x.toString(16).padStart(2, "0")).join("");
+    return Array.from(id)
+      .map((x) => x.toString(16).padStart(2, "0"))
+      .join("");
   }
 
   setup() {
@@ -36,12 +38,15 @@ export class KateIPC {
   }
 
   private do_send(id: string, type: string, payload: Payload) {
-    this.#server.postMessage({
-      type: type,
-      secret: this.#secret,
-      id: id,
-      payload: payload
-    }, "*");
+    this.#server.postMessage(
+      {
+        type: type,
+        secret: this.#secret,
+        id: id,
+        payload: payload,
+      },
+      "*"
+    );
   }
 
   async call<A>(type: string, payload: Payload) {
@@ -72,7 +77,10 @@ export class KateIPC {
       }
 
       case "kate:input-state-changed": {
-        this.events.input_state_changed.emit({ key: ev.data.key, is_down: ev.data.is_down });
+        this.events.input_state_changed.emit({
+          key: ev.data.key,
+          is_down: ev.data.is_down,
+        });
         break;
       }
 
@@ -81,5 +89,5 @@ export class KateIPC {
         break;
       }
     }
-  }
+  };
 }

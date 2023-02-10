@@ -1,7 +1,7 @@
 import * as Cart from "../../generated/cartridge";
 import type { KateOS } from "../os";
 
-type WritableData =  ArrayBuffer | Uint8Array | DataView | Blob | string;
+type WritableData = ArrayBuffer | Uint8Array | DataView | Blob | string;
 
 declare global {
   interface FileSystemDirectoryHandle {
@@ -16,21 +16,24 @@ declare global {
 
   interface FileSystemWritableFileStream {
     write(data: WritableData): Promise<void>;
-    write(options: {
-      type: "write",
-      data: WritableData,
-      position?: number,
-      size?: number
-    } | {
-      type: "truncate",
-      position?: number,
-      size: number
-    }): Promise<void>;
+    write(
+      options:
+        | {
+            type: "write";
+            data: WritableData;
+            position?: number;
+            size?: number;
+          }
+        | {
+            type: "truncate";
+            position?: number;
+            size: number;
+          }
+    ): Promise<void>;
     seek(position: number): Promise<void>;
     truncate(size: number): Promise<void>;
   }
 }
-  
 
 export class KateStorage {
   constructor(readonly os: KateOS) {}
@@ -43,13 +46,13 @@ export class KateStorage {
     const estimate = await this.backend.estimate();
     return {
       total: estimate.quota ?? 0,
-      used: estimate.usage ?? 0
-    }
+      used: estimate.usage ?? 0,
+    };
   }
 
   private async get_real_bucket(name: string) {
     const root = await this.backend.getDirectory();
-    const dir = await root.getDirectoryHandle(name, {create: true});
+    const dir = await root.getDirectoryHandle(name, { create: true });
     return new StorageBucket(this, dir);
   }
 
@@ -77,7 +80,10 @@ export class KateStorage {
 }
 
 export class StorageBucket {
-  constructor(readonly storage: KateStorage, readonly handle: FileSystemDirectoryHandle) {}
+  constructor(
+    readonly storage: KateStorage,
+    readonly handle: FileSystemDirectoryHandle
+  ) {}
 
   async list() {
     const result = [];
@@ -90,12 +96,18 @@ export class StorageBucket {
   }
 
   async file_at(name: string, create: boolean) {
-    return new StorageFile(this, await this.handle.getFileHandle(name, { create }));
+    return new StorageFile(
+      this,
+      await this.handle.getFileHandle(name, { create })
+    );
   }
 }
 
 export class StorageFile {
-  constructor(readonly bucket: StorageBucket, readonly handle: FileSystemFileHandle) {}
+  constructor(
+    readonly bucket: StorageBucket,
+    readonly handle: FileSystemFileHandle
+  ) {}
 
   async read() {
     return await this.handle.getFile();

@@ -1,9 +1,9 @@
-import {KateAPI} from "../kate-api";
-type Dict = {[key: string]: string};
+import { KateAPI } from "../kate-api";
+type Dict = { [key: string]: string };
 declare var KateAPI: KateAPI;
 declare var KATE_LOCAL_STORAGE: Dict | null;
 
-const {kv_store} = KateAPI;
+const { kv_store } = KateAPI;
 let contents = KATE_LOCAL_STORAGE ?? Object.create(null);
 
 let timer: any = null;
@@ -11,7 +11,7 @@ function persist(contents: Dict) {
   clearTimeout(timer);
   timer = setTimeout(() => {
     kv_store.replace_all(contents);
-  })
+  });
 }
 
 class KateStorage {
@@ -63,7 +63,9 @@ function proxy_storage(storage: KateStorage, key: string) {
   Object.defineProperty(window, key, {
     value: new Proxy(storage, {
       get(target, prop, receiver) {
-        return exposed.includes(prop as any) ? (storage as any)[prop].bind(storage) : storage.getItem(prop as any);
+        return exposed.includes(prop as any)
+          ? (storage as any)[prop].bind(storage)
+          : storage.getItem(prop as any);
       },
       has(target, prop) {
         return exposed.includes(prop as any) || prop in contents;
@@ -75,9 +77,9 @@ function proxy_storage(storage: KateStorage, key: string) {
       deleteProperty(target, prop) {
         storage.removeItem(prop as any);
         return true;
-      }
-    })
-  })
+      },
+    }),
+  });
 }
 
 const storage = new KateStorage(contents, true);

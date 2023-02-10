@@ -19,7 +19,11 @@ export function fragment(children: Widgetable[]) {
   return x;
 }
 
-export function h(tag: string, attrs: {[key: string]: string}, children: Widgetable[]) {
+export function h(
+  tag: string,
+  attrs: { [key: string]: string },
+  children: Widgetable[]
+) {
   const element = document.createElement(tag);
   for (const [key, value] of Object.entries(attrs)) {
     element.setAttribute(key, value);
@@ -30,7 +34,11 @@ export function h(tag: string, attrs: {[key: string]: string}, children: Widgeta
   return element;
 }
 
-export function svg(tag: string, attrs: {[key: string]: string}, children: SVGElement[]) {
+export function svg(
+  tag: string,
+  attrs: { [key: string]: string },
+  children: SVGElement[]
+) {
   const element = document.createElementNS("http://www.w3.org/2000/svg", tag);
   for (const [key, value] of Object.entries(attrs)) {
     element.setAttribute(key, value);
@@ -81,7 +89,11 @@ export class HBox extends Widget {
   }
 
   render() {
-    return h("div", {class: "kate-ui-hbox", style: `gap: ${this.gap}px`}, this.children);
+    return h(
+      "div",
+      { class: "kate-ui-hbox", style: `gap: ${this.gap}px` },
+      this.children
+    );
   }
 }
 
@@ -91,21 +103,37 @@ export class VBox extends Widget {
   }
 
   render() {
-    return h("div", {class: "kate-ui-vbox", style: `gap: ${this.gap}px`}, this.children);
+    return h(
+      "div",
+      { class: "kate-ui-vbox", style: `gap: ${this.gap}px` },
+      this.children
+    );
   }
 }
 
 export class Title_bar extends Widget {
-  constructor(readonly children: {left?: Widgetable, middle?: Widgetable, right?: Widgetable}) {
+  constructor(
+    readonly children: {
+      left?: Widgetable;
+      middle?: Widgetable;
+      right?: Widgetable;
+    }
+  ) {
     super();
   }
 
   render() {
-    return h("div", {class: "kate-ui-title-bar"}, [
-      h("div", {class: "kate-ui-title-bar-child"}, [this.children.left ?? null]),
-      h("div", {class: "kate-ui-title-bar-child"}, [this.children.middle ?? null]),
-      h("div", {class: "kate-ui-title-bar-child"}, [this.children.right ?? null]),
-    ])
+    return h("div", { class: "kate-ui-title-bar" }, [
+      h("div", { class: "kate-ui-title-bar-child" }, [
+        this.children.left ?? null,
+      ]),
+      h("div", { class: "kate-ui-title-bar-child" }, [
+        this.children.middle ?? null,
+      ]),
+      h("div", { class: "kate-ui-title-bar-child" }, [
+        this.children.right ?? null,
+      ]),
+    ]);
   }
 }
 
@@ -115,7 +143,7 @@ export class Section_title extends Widget {
   }
 
   render() {
-    return h("div", {class: "kate-ui-section-title"}, this.children);
+    return h("div", { class: "kate-ui-section-title" }, this.children);
   }
 }
 
@@ -125,12 +153,15 @@ export class Menu_list extends Widget {
   }
 
   render() {
-    return h("div", {class: "kate-ui-menu-list"}, this.children);
+    return h("div", { class: "kate-ui-menu-list" }, this.children);
   }
 }
 
 export class If extends Widget {
-  constructor(readonly condition: () => boolean, readonly child: {then: Widgetable, else: Widgetable}) {
+  constructor(
+    readonly condition: () => boolean,
+    readonly child: { then: Widgetable; else: Widgetable }
+  ) {
     super();
   }
 
@@ -156,13 +187,21 @@ export class Button extends Widget {
   }
 
   render() {
-    const element = h("button", {class: "kate-ui-button kate-ui-focus-target"}, this.children);
+    const element = h(
+      "button",
+      { class: "kate-ui-button kate-ui-focus-target" },
+      this.children
+    );
     element.addEventListener("click", (ev) => {
       ev.preventDefault();
       this._on_clicked.emit();
     });
-    element.addEventListener("mouseenter", () => {element.classList.add("focus")});
-    element.addEventListener("mouseleave", () => {element.classList.remove("focus")});
+    element.addEventListener("mouseenter", () => {
+      element.classList.add("focus");
+    });
+    element.addEventListener("mouseleave", () => {
+      element.classList.remove("focus");
+    });
     return element;
   }
 }
@@ -178,22 +217,24 @@ export class Icon extends Widget {
       case "down":
       case "right":
       case "left":
-        return h("div", {class: "kate-icon kate-icon-light", "data-name": this.type}, [
-          h("img", {src: `img/${this.type}.png`}, [])
-        ]);
+        return h(
+          "div",
+          { class: "kate-icon kate-icon-light", "data-name": this.type },
+          [h("img", { src: `img/${this.type}.png` }, [])]
+        );
       case "ltrigger":
       case "rtrigger":
       case "menu":
       case "capture":
-        return h("div", {class: "kate-icon", "data-name": this.type}, [])
+        return h("div", { class: "kate-icon", "data-name": this.type }, []);
       case "x":
-        return h("div", {class: "kate-icon", "data-name": this.type}, [
-          h("img", {src: `img/cancel.png`}, [])
-        ])
+        return h("div", { class: "kate-icon", "data-name": this.type }, [
+          h("img", { src: `img/cancel.png` }, []),
+        ]);
       case "o":
-        return h("div", {class: "kate-icon", "data-name": this.type}, [
-          h("img", {src: `img/ok.png`}, [])
-        ])
+        return h("div", { class: "kate-icon", "data-name": this.type }, [
+          h("img", { src: `img/ok.png` }, []),
+        ]);
     }
   }
 }

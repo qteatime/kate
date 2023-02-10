@@ -11,12 +11,12 @@ export class KeyboardInput {
     x: "KeyX",
     o: "KeyZ",
     ltrigger: "KeyA",
-    rtrigger: "KeyS"
+    rtrigger: "KeyS",
   };
 
   private ignore_repeat = ["menu", "capture"];
 
-  private physical_map!: {[key: string]: InputKey};
+  private physical_map!: { [key: string]: InputKey };
   private attached = false;
 
   constructor(private console: VirtualConsole) {
@@ -24,7 +24,7 @@ export class KeyboardInput {
   }
 
   private update_physical_map() {
-    const map: {[key: string]: InputKey} = Object.create(null);
+    const map: { [key: string]: InputKey } = Object.create(null);
     for (const [key, value] of Object.entries(this.physical_config)) {
       map[value] = key as InputKey;
     }
@@ -45,13 +45,13 @@ export class KeyboardInput {
           this.console.update_virtual_key(key, true);
         }
       }
-    })
+    });
 
     document.addEventListener("keyup", (ev) => {
       if (ev.code in this.physical_map) {
         ev.preventDefault();
         this.console.update_virtual_key(this.physical_map[ev.code], false);
       }
-    })
+    });
   }
 }

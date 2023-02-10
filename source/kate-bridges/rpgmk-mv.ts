@@ -1,18 +1,17 @@
-import {KateAPI} from "../kate-api";
+import { KateAPI } from "../kate-api";
 declare var KateAPI: KateAPI;
 declare var Utils: any;
 declare var Input: any;
 
-
 let paused = false;
-const {events} = KateAPI;
+const { events } = KateAPI;
 
 // -- Things that need to be patched still
 Utils.isOptionValid = (name: string) => {
   return ["noaudio"].includes(name);
-}
+};
 
-const key_mapping: {[key: string]: string} = {
+const key_mapping: { [key: string]: string } = {
   up: "up",
   right: "right",
   down: "down",
@@ -20,10 +19,10 @@ const key_mapping: {[key: string]: string} = {
   x: "cancel",
   o: "ok",
   menu: "menu",
-  rtrigger: "shift"
+  rtrigger: "shift",
 };
 
-events.input_state_changed.listen(({key, is_down}) => {
+events.input_state_changed.listen(({ key, is_down }) => {
   if (!paused) {
     const name = key_mapping[key];
     if (name) {
@@ -32,7 +31,7 @@ events.input_state_changed.listen(({key, is_down}) => {
   }
 });
 
-events.paused.listen(state => {
+events.paused.listen((state) => {
   paused = state;
   if (state) {
     for (const key of Object.values(key_mapping)) {
