@@ -177,7 +177,7 @@ export class VirtualConsole {
     const x = this.input_state[key];
     if (x.pressed) {
       x.count = (x.count + 1) >>> 0 || 2;
-      if (special && x.count > this.SPECIAL_FRAMES) {
+      if (special && x.count >= this.SPECIAL_FRAMES) {
         x.count = 0;
         x.pressed = false;
         this.on_key_pressed.emit(`long_${key as SpecialInputKey}`);
@@ -186,7 +186,16 @@ export class VirtualConsole {
         this.on_input_changed.emit({ key, is_down: true });
       }
     } else {
-      if (x.count > 0) {
+      if (special) {
+        if (x.count === -1) {
+          this.on_input_changed.emit({ key, is_down: false });
+          this.on_key_pressed.emit(key);
+          x.count = 0;
+        } else if (x.count > 0 && x.count < this.SPECIAL_FRAMES) {
+          this.on_input_changed.emit({ key, is_down: true });
+          x.count = -1;
+        }
+      } else if (x.count > 0) {
         x.count = 0;
         this.on_input_changed.emit({ key, is_down: false });
         this.on_key_pressed.emit(key);
