@@ -1,24 +1,30 @@
-void function() {
+void (function () {
+  const api = KateAPI;
 
   const message = document.querySelector("#message");
-  const pressing = new Set();
+  const keys = [
+    "up",
+    "right",
+    "down",
+    "left",
+    "menu",
+    "capture",
+    "x",
+    "o",
+    "ltrigger",
+    "rtrigger",
+  ];
 
-  window.addEventListener("message", (ev) => {
-    switch (ev.data.type) {
-      case "kate:input-changed": {
-        if (ev.data.is_down) {
-          pressing.add(ev.data.key);
-        } else {
-          pressing.delete(ev.data.key);
-        }
-
-        if (pressing.size === 0) {
-          message.textContent = "You're not pressing anything.";
-        } else {
-          message.textContent = `You're pressing: ${[...pressing].join(", ")}.`;
-        }
-      }
+  function update() {
+    const pressing = keys.filter((x) => api.input.is_down(x));
+    if (pressing.length === 0) {
+      message.textContent = "You're not pressing anything.";
+    } else {
+      message.textContent = `You're pressing: ${pressing.join(", ")}.`;
     }
-  });
 
-}();
+    requestAnimationFrame(update);
+  }
+
+  requestAnimationFrame(update);
+})();
