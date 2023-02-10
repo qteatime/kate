@@ -37,13 +37,27 @@ export class VirtualConsole {
     is_down: boolean;
   }>();
   readonly on_key_pressed = new EventStream<ExtendedInputKey>();
+  readonly on_tick = new EventStream<number>();
 
-  readonly LONG_PRESS_TIME_MS = 500;
+  private timer_id: any = null;
+  private last_time: number | null = null;
+
+  readonly SPECIAL_FRAMES = 15;
   readonly FPS = 30;
   readonly ONE_FRAME = Math.ceil(1000 / 30);
 
-  private input_state!: Record<InputKey, boolean>;
-  private special_input_timing!: Record<SpecialInputKey, any>;
+  private input_state!: Record<InputKey, { pressed: boolean; count: number }>;
+  private keys: InputKey[] = [
+    "up",
+    "right",
+    "down",
+    "left",
+    "x",
+    "o",
+    "ltrigger",
+    "rtrigger",
+  ];
+  private special_keys: InputKey[] = ["menu", "capture"];
 
   constructor(root: HTMLElement) {
     this.up_button = root.querySelector(".kate-dpad-up")!;
@@ -65,20 +79,16 @@ export class VirtualConsole {
 
   private reset_states() {
     this.input_state = {
-      up: false,
-      right: false,
-      down: false,
-      left: false,
-      menu: false,
-      capture: false,
-      x: false,
-      o: false,
-      ltrigger: false,
-      rtrigger: false,
-    };
-    this.special_input_timing = {
-      menu: null,
-      capture: null,
+      up: { pressed: false, count: 0 },
+      right: { pressed: false, count: 0 },
+      down: { pressed: false, count: 0 },
+      left: { pressed: false, count: 0 },
+      menu: { pressed: false, count: 0 },
+      capture: { pressed: false, count: 0 },
+      x: { pressed: false, count: 0 },
+      o: { pressed: false, count: 0 },
+      ltrigger: { pressed: false, count: 0 },
+      rtrigger: { pressed: false, count: 0 },
     };
     this.up_button.classList.remove("down");
     this.right_button.classList.remove("down");
@@ -91,6 +101,30 @@ export class VirtualConsole {
     this.ltrigger_button.classList.remove("down");
     this.rtrigger_button.classList.remove("down");
   }
+
+  private start_ticking() {
+    cancelAnimationFrame(this.timer_id);
+    this.timer_id = requestAnimationFrame(this.tick);
+  }
+
+  private tick = (time: number) => {
+    if (this.last_time == null) {
+      this.last_time = time;
+      this.on_tick.emit(time);
+      this.timer_id = requestAnimationFrame(this.tick);
+      return;
+    }
+
+    const elapsed = time - this.last_time;
+
+    if (elapsed < this.ONE_FRAME) {
+      this.timer_id = requestAnimationFrame(this.tick);
+    } else {
+      this.last_time = time;
+      this.on_tick.emit(time);
+      this.timer_id = requestAnimationFrame(this.tick);
+    }
+  };
 
   listen() {
     if (this.is_listening) {
@@ -125,48 +159,49 @@ export class VirtualConsole {
     listen_button(this.capture_button, "capture");
     listen_button(this.x_button, "x");
     listen_button(this.o_button, "o");
+
+    this.start_ticking();
+    this.on_tick.listen(this.key_update_loop);
   }
 
-  private is_special_key(key: InputKey): key is SpecialInputKey {
-    return this.special_input_timing.hasOwnProperty(key);
-  }
+  private key_update_loop = (time: number) => {
+    for (const key of this.keys) {
+      this.update_single_key(key, false);
+    }
+    for (const key of this.special_keys) {
+      this.update_single_key(key, true);
+    }
+  };
 
-  // Made a bit complicated because we want to avoid forwarding special keys
-  // to game processes before we know if this is a regular press of the key
-  // or a long press of the key. In that sense, all special keys have a 1/30
-  // frame delay inserted.
-  update_virtual_key(key: InputKey, state: boolean) {
-    if (this.input_state[key] !== state) {
-      this.input_state[key] = state;
-      this.render_button_state(key, state);
-
-      if (this.is_special_key(key)) {
-        clearTimeout(this.special_input_timing[key]);
-        this.special_input_timing[key] = null;
-
-        if (state === false) {
-          this.on_input_changed.emit({ key, is_down: true });
-          setTimeout(() => {
-            if (this.input_state[key] === false) {
-              this.on_input_changed.emit({ key, is_down: false });
-            }
-          }, this.ONE_FRAME);
-        } else {
-          this.special_input_timing[key] = setTimeout(() => {
-            if (this.input_state[key] === true) {
-              this.input_state[key] = false;
-              this.render_button_state(key, false);
-              this.on_key_pressed.emit(`long_${key}`);
-            }
-          }, this.LONG_PRESS_TIME_MS);
-        }
-      } else {
-        this.on_input_changed.emit({ key, is_down: state });
+  private update_single_key(key: InputKey, special: boolean) {
+    const x = this.input_state[key];
+    if (x.pressed) {
+      x.count = (x.count + 1) >>> 0 || 2;
+      if (special && x.count > this.SPECIAL_FRAMES) {
+        x.count = 0;
+        x.pressed = false;
+        this.on_key_pressed.emit(`long_${key as SpecialInputKey}`);
+        this.render_button_state(key, false);
+      } else if (!special && x.count === 1) {
+        this.on_input_changed.emit({ key, is_down: true });
       }
-
-      if (state === false) {
+    } else {
+      if (x.count > 0) {
+        x.count = 0;
+        this.on_input_changed.emit({ key, is_down: false });
         this.on_key_pressed.emit(key);
       }
+    }
+  }
+
+  update_virtual_key(key: InputKey, state: boolean) {
+    const x = this.input_state[key];
+    if (x.pressed !== state) {
+      x.pressed = state;
+      if (state) {
+        x.count = 0;
+      }
+      this.render_button_state(key, state);
     }
   }
 

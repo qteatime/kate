@@ -34,10 +34,6 @@ export class KateContextMenu {
         this.show_context_menu();
         break;
       }
-      case "menu": {
-        this.show_context_menu();
-        break;
-      }
     }
   };
 
