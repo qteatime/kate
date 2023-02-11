@@ -22,9 +22,7 @@ void (function () {
     } else {
       message.textContent = `You're pressing: ${pressing.join(", ")}.`;
     }
-
-    requestAnimationFrame(update);
   }
 
-  requestAnimationFrame(update);
+  api.timer.on_tick.listen(update);
 })();
