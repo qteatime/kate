@@ -1,0 +1,17 @@
+{
+  "id": "me.qteati.kate.boon-scrolling",
+  "metadata": {
+    "author": "Q.",
+    "title": "Boon-scrolling",
+    "category": "Demo",
+    "content_warning": [],
+    "description": "A tiny, endless si(lly)mulation.",
+    "thumbnail_path": "thumbnail.png"
+  },
+  "files": ["assets/*.css", "game.js", "index.html"],
+  "platform": {
+    "type": "web-archive",
+    "html": "index.html",
+    "bridges": []
+  }
+}

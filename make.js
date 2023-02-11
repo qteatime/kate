@@ -233,6 +233,29 @@ w.task("www:bundle", ["core:build"], () => {
   ]);
 });
 
+// -- Examples
+w.task("example:hello-world", ["packaging:build"], () => {
+  kart({
+    config: "examples/hello-world/kate.json",
+    output: "examples/hello-world/hello.kart",
+  });
+});
+
+w.task("example:boon-scrolling", ["packaging:build", "domui:build"], () => {
+  tsc("examples/boon-scrolling");
+  browserify([
+    "-e",
+    "examples/boon-scrolling/build/index.js",
+    "-o",
+    "examples/boon-scrolling/game.js",
+  ]);
+  kart({
+    config: "examples/boon-scrolling/kate.json",
+    output: "examples/boon-scrolling/boon-scrolling.kart",
+  });
+});
+
+// -- Main
 w.task("help", [], () => {
   console.log(`Available tasks:\n`);
   for (const task of w.all_tasks) {

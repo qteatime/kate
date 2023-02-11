@@ -1,0 +1,153 @@
+:root {
+  --font-serif: "Lora", serif;
+  --font-sans: "Source Sans Pro", sans-serif;
+  --font-title: "PT Sans Caption", sans-serif;
+  --black: #2f2f2f;
+  --white: #fafafa;
+  --accent: #9bc1bc;
+  --accent-2: #809f9d;
+  --dark: #5d576b;
+  --light: #e6ebe0;
+
+  font-family: var(--font-serif);
+  font-size: 20px;
+  color: var(--black);
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes card-appear {
+  from {
+    transform: translateY(480px);
+  }
+
+  to {
+    transform: translateY(0px);
+  }
+}
+
+.kate-ui-screen {
+  background: var(--light);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  position: relative;
+}
+
+.screen-main {
+  background: var(--white);
+  padding: 70px 150px;
+  width: 800px;
+  height: 480px;
+  animation: fade-in 1s ease-out;
+}
+
+.screen-card {
+  background: var(--white);
+  border-radius: 5px;
+  width: 600px;
+  margin: 0 auto;
+  box-shadow: 0px 0px 5px 1px rgb(0 0 0 / 50%);
+  background: #fafafa;
+  display: flex;
+  flex-direction: column;
+  animation: card-appear 0.25s ease-out;
+  overflow: hidden;
+}
+
+.card-header {
+  font-weight: bold;
+  font-family: var(--font-sans);
+  padding: 1em;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+}
+
+.card-display-name {
+  line-height: 1.5em;
+}
+
+.card-user-name {
+  font-weight: normal;
+  font-size: 0.8em;
+  color: var(--dark);
+}
+
+.card-text {
+  padding: 0 1em 2em 1em;
+}
+
+.card-button {
+  width: 100%;
+  display: flex;
+  height: 48px;
+  align-items: center;
+  justify-content: center;
+  gap: 1em;
+  background: var(--accent-2);
+  font-family: var(--font-sans);
+  font-weight: bold;
+  color: var(--white);
+  text-shadow: -1px -1px 0px rgb(0 0 0 / 20%);
+}
+
+.card-actions {
+  display: flex;
+  flex-direction: row;
+  justify-content: stretch;
+  flex-wrap: nowrap;
+}
+
+.card-button .kate-icon {
+  background: var(--white);
+}
+
+.card-button .kate-icon::before {
+  color: var(--black);
+}
+
+.title {
+  font-size: 2em;
+  font-weight: bold;
+  font-family: var(--font-title);
+}
+
+.subtitle {
+  font-size: 1.25em;
+  font-family: var(--font-sans);
+}
+
+.divider {
+  margin: 2em auto;
+  width: 50%;
+  background: var(--dark);
+  height: 1px;
+}
+
+.paragraph {
+  margin-bottom: 1.5em;
+}
+
+.status-bar {
+  position: absolute;
+  left: 0px;
+  bottom: 0px;
+  width: 100%;
+  height: 48px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 0 15px;
+  font-family: var(--font-sans);
+  font-size: 20px;
+  gap: 0.25em;
+}
