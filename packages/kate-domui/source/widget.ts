@@ -1,6 +1,7 @@
 import type { InputKey } from "../../kate-api/build/input";
 import type { KateUI } from "./ui";
 import { Observable } from "./observable";
+import { LiveNode } from "./transform";
 
 export function h(
   tag: string,
@@ -27,6 +28,14 @@ export abstract class Widget {
   on_detached(): void {}
   on_focus(): void {}
   on_blur(): void {}
+
+  get live_node() {
+    if (this.raw_node instanceof HTMLElement) {
+      return new LiveNode(this.raw_node);
+    } else {
+      throw new Error(`Invalid type: not an HTMLElement`);
+    }
+  }
 
   attach(parent: Node, ui: KateUI) {
     this.ui = ui;
