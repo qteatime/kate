@@ -117,13 +117,17 @@ function ljtc(file, target) {
   FS.writeFileSync(target, result);
 }
 
-function pack_assets({ glob, filter, name, target }) {
-  const files = glob(glob, { absolute: true }).filter((x) => !filter(x));
+function pack_assets({ glob: pattern, filter, name, target }) {
+  const files = glob(pattern, { absolute: true }).filter((x) => filter(x));
   const data = Object.fromEntries(
     files.map((x) => [Path.basename(x), FS.readFileSync(x, "utf-8")])
   );
   const content = `export const ${name} = ${JSON.stringify(data, null, 2)};`;
   FS.writeFileSync(target, content);
+}
+
+function kart({ config, output }) {
+  exec_file("node", ["packages/kate-packaging/build/kart.js", output, config]);
 }
 
 const w = new World();
@@ -215,7 +219,7 @@ w.task("packaging:compile", ["schema:build"], () => {
   tsc("packages/kate-packaging");
 });
 
-w.task("packaging:build", [], () => {});
+w.task("packaging:build", ["packaging:compile"], () => {});
 
 // -- WWW
 w.task("www:bundle", ["core:build"], () => {

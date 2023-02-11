@@ -6,15 +6,23 @@ export class KateUI {
   private focus_target: Set<Widget> = new Set();
   private current_focus: Widget | null = null;
 
-  private constructor(readonly root: HTMLElement) {}
+  private constructor(
+    readonly docroot: HTMLElement,
+    readonly root: HTMLElement
+  ) {}
 
   static from_root(root: HTMLElement) {
-    const css = new Css(assets.domui).render();
-    root.appendChild(css);
+    const ui_root = document.createElement("div");
+    ui_root.className = "kate-ui-root";
+
+    const css = new Css(assets["kate-domui.css"]).render();
+    ui_root.appendChild(css);
     const screen = document.createElement("div");
     screen.className = "kate-ui-screen";
-    root.appendChild(screen);
-    return new KateUI(screen);
+    ui_root.appendChild(screen);
+
+    root.appendChild(ui_root);
+    return new KateUI(ui_root, screen);
   }
 
   clear() {
@@ -31,7 +39,7 @@ export class KateUI {
 
   add_css(code: string) {
     const element = new Css(code).render();
-    document.appendChild(element);
+    this.docroot.appendChild(element);
   }
 
   remove_focusable(widget: Widget) {
