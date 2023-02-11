@@ -1,30 +1,38 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
     <title>Kate</title>
-    <link href="kate.css" rel="stylesheet">
-    <link href="kate-os.css" rel="stylesheet">
+    <link href="kate.css" rel="stylesheet" />
+    <link href="kate-os.css" rel="stylesheet" />
   </head>
   <body>
-    <input id="kate-installer" type="file" style="display: none" accept=".kart">
+    <input
+      id="kate-installer"
+      type="file"
+      style="display: none"
+      accept=".kart"
+    />
     <div class="kate">
       <div class="kate-body">
         <div class="kate-trigger kate-trigger-left"></div>
         <div class="kate-trigger kate-trigger-right"></div>
         <div class="kate-dpad">
           <div class="kate-dpad-button kate-dpad-up">
-            <img src="img/up.png">
+            <img src="img/up.png" />
           </div>
           <div class="kate-dpad-button kate-dpad-right">
-            <img src="img/right.png">
+            <img src="img/right.png" />
           </div>
           <div class="kate-dpad-button kate-dpad-down">
-            <img src="img/down.png">
+            <img src="img/down.png" />
           </div>
           <div class="kate-dpad-button kate-dpad-left">
-            <img src="img/left.png">
+            <img src="img/left.png" />
           </div>
           <div class="kate-dpad-mid"></div>
         </div>
@@ -37,10 +45,10 @@
         <div class="kate-action">
           <div class="kate-button-bg"></div>
           <div class="kate-button kate-button-x">
-            <img src="img/cancel.png">
+            <img src="img/cancel.png" />
           </div>
           <div class="kate-button kate-button-o">
-            <img src="img/ok.png">
+            <img src="img/ok.png" />
           </div>
         </div>
         <div class="kate-special-button kate-special-button-left">
@@ -66,14 +74,15 @@
     </div>
     <script src="kate-resize.js"></script>
     <script src="kate.js"></script>
-    <script src="kate-os.js"></script>
     <script>
-      void async function() {
-        const kate = Kate.Kate.from_root(document.querySelector(".kate"));
-        const kate_os = await KateOS.KateOS.boot(kate);
+      void (async function () {
+        const kate = Kate.kernel.KateKernel.from_root(
+          document.querySelector(".kate")
+        );
+        const kate_os = await Kate.os.KateOS.boot(kate);
         window.kate = kate;
         window.kate_os = kate_os;
-      }();
+      })();
     </script>
   </body>
 </html>

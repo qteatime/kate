@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 const execSync = require("child_process").execSync;
+const execFile = require("child_process").execFileSync;
+const OS = require("os");
 const Path = require("path");
 const FS = require("fs");
 const glob = require("glob").sync;
@@ -65,48 +67,167 @@ function exec(command, opts) {
   execSync(command, { stdio: ["inherit", "inherit", "inherit"], ...opts });
 }
 
+function exec_file(command, args, opts) {
+  console.log("$>", command, ...args);
+  execFile(command, args, {
+    stdio: ["inherit", "inherit", "inherit"],
+    ...opts,
+  });
+}
+
+function exec_file_capture(command, args, opts) {
+  console.log("$>", command, ...args);
+  try {
+    const result = execFile(command, args, {
+      ...opts,
+    });
+    return result.toString("utf-8");
+  } catch (err) {
+    if (err?.stdout) {
+      console.error("-- command failed --");
+      console.error("Output:");
+      console.error(err.stdout.toString("utf-8"));
+      console.error("Error:");
+      console.error(err.stderr.toString("utf-8"));
+    } else {
+      console.error(err);
+    }
+    process.exit(1);
+  }
+}
+
+function browserify(args) {
+  const file = Path.join(__dirname, "node_modules/browserify/bin/cmd.js");
+  exec_file("node", [file, ...args]);
+}
+
+function tsc(project) {
+  const file = Path.join(__dirname, "node_modules/typescript/bin/tsc");
+  exec_file("node", [file, "-p", project]);
+}
+
+function tsc_file(source, target) {
+  const file = Path.join(__dirname, "node_modules/typescript/bin/tsc");
+  exec_file("node", [file, "--declaration", "--outDir", target, source]);
+}
+
+function ljtc(file, target) {
+  const cmd = OS.platform() === "win32" ? "crochet.cmd" : "crochet";
+  const result = exec_file_capture(cmd, ["ljtc", "--", "ts", file]);
+  FS.writeFileSync(target, result);
+}
+
+function pack_assets({ glob, filter, name, target }) {
+  const files = glob(glob, { absolute: true }).filter((x) => !filter(x));
+  const data = Object.fromEntries(
+    files.map((x) => [Path.basename(x), FS.readFileSync(x, "utf-8")])
+  );
+  const content = `export const ${name} = ${JSON.stringify(data, null, 2)};`;
+  FS.writeFileSync(target, content);
+}
+
 const w = new World();
 
-w.task("compile:api", [], () => {
-  exec("npm run build-api");
-})
+// -- Util
+w.task("util:compile", [], () => {
+  tsc("packages/util");
+});
 
-w.task("bundle:api", ["compile:api"], () => {
-  exec("npm run bundle-api");
-})
+w.task("util:build", ["util:compile"], () => {});
 
-w.task("compile:bridges", [], () => {
-  exec("npm run build-bridges");
-})
+// -- Schema
+w.task("schema:generate", [], () => {
+  ljtc(
+    "packages/schema/cartridge.ljt",
+    "packages/schema/generated/cartridge.ts"
+  );
+});
 
-w.task("generate:bridges", ["bundle:api", "compile:bridges"], () => {
-  const files = glob("source/kate-bridges/*.js", {absolute: true}).filter(x => !x.endsWith("/index.js"));
-  const data = Object.fromEntries(files.map(x => [Path.basename(x), FS.readFileSync(x, "utf-8")]));
-  const content = `export const bridges = ${JSON.stringify(data, null, 2)};`;
-  FS.writeFileSync("source/kate-bridges/index.ts", content);
-}).with_doc("Generates TS definitions for all bridges.");
+w.task("schema:compile", [], () => {
+  tsc("packages/schema");
+});
 
-w.task("generate:schemas", [], () => {
-  exec("npm run gen-kart");
-}).with_doc("Generates TS definitions for binary schemas.");
+w.task("schema:build", ["schema:compile"], () => {});
 
-w.task("compile:ts", ["generate:bridges"], () => {
-  exec("npm run build-ts");
-}).with_doc("Compiles Kate's source files");
+// -- DB Schemas
+w.task("db-schema:compile", [], () => {
+  tsc("packages/db-schema");
+});
 
-w.task("bundle:os", ["compile:ts"], () => {
-  exec("npm run bundle-os");
-}).with_doc("Generates JS bundles for Kate's OS.");
+w.task("db-schema:build", ["db-schema:compile"], () => {});
 
-w.task("bundle:vm", ["compile:ts"], () => {
-  exec("npm run bundle");
-}).with_doc("Generates JS bundles for Kate's core VM.");
+// -- API
+w.task("api:compile", ["util:build"], () => {
+  tsc("packages/kate-api");
+});
 
-w.task("bundle", ["bundle:os", "bundle:vm"], () => {})
- .with_doc("Generates JS bundles for all Kate's parts.");
+w.task("api:build", ["api:compile"], () => {});
 
-w.task("build", ["bundle"], () => {})
- .with_doc("Builds a fully-functioning Kate console.");
+// -- Bridges
+w.task("bridges:compile", ["api:build"], () => {
+  tsc("packages/kate-bridges");
+});
+
+w.task("briges:generate", ["bridges:compile"], () => {
+  pack_assets({
+    glob: "packages/kate-bridges/build/*.js",
+    filter: (x) => !x.endsWith("/index.js"),
+    name: "bridges",
+    target: "packages/kate-bridges/source/index.ts",
+  });
+  tsc_file(
+    "packages/kate-bridges/source/index.ts",
+    "packages/kate-bridges/build"
+  );
+});
+
+w.task("bridges:build", ["bridges:generate"], () => {});
+
+// -- Core
+w.task(
+  "core:compile",
+  ["schema:build", "util:build", "db-schema:build"],
+  () => {
+    tsc("packages/kate-core");
+  }
+);
+
+w.task("core:build", ["core:compile"], () => {});
+
+// -- DOM UI
+w.task("domui:generate", [], () => {
+  pack_assets({
+    glob: "packages/kate-domui/assets/*",
+    filter: () => true,
+    name: "assets",
+    target: "packages/kate-domui/source/assets.ts",
+  });
+});
+
+w.task("domui:compile", ["api:build", "util:build", "domui:generate"], () => {
+  tsc("packages/kate-domui");
+});
+
+w.task("domui:build", ["domui:compile"], () => {});
+
+// -- Packaging
+w.task("packaging:compile", ["schema:build"], () => {
+  tsc("packages/kate-packaging");
+});
+
+w.task("packaging:build", [], () => {});
+
+// -- WWW
+w.task("www:bundle", ["core:build"], () => {
+  browserify([
+    "-e",
+    "packages/kate-core/build/index.js",
+    "-o",
+    "www/kate.js",
+    "-s",
+    "Kate",
+  ]);
+});
 
 w.task("help", [], () => {
   console.log(`Available tasks:\n`);

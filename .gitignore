@@ -14,3 +14,6 @@ www/app.js
 /games
 build/
 projects/
+source/kate-domui/assets.ts
+*.d.ts
+!types/kate-api/kate-api.d.ts
