@@ -14,5 +14,5 @@
     { "path": "../../packages/kate-api" },
     { "path": "../../packages/kate-domui" }
   ],
-  "include": ["source", "../../packages/kate-api/index.d.ts"]
+  "include": ["source", "../../packages/kate-api/build/index.d.ts"]
 }

@@ -25,8 +25,15 @@ function dismiss<A>(x: Deferred<A>, value: A) {
 }
 
 async function main() {
+  const like_wav = await KateAPI.cart_fs.read_file("/assets/like.wav");
+  const start_wav = await KateAPI.cart_fs.read_file("/assets/start.wav");
+  const sfx = await KateAPI.audio.create_channel("sfx");
+  const like = await KateAPI.audio.load_audio(like_wav.mime, like_wav.bytes);
+  const start = await KateAPI.audio.load_audio(start_wav.mime, start_wav.bytes);
+
   const [main_widget, main_screen_dismiss] = show(screen_main);
   await main_screen_dismiss;
+  await KateAPI.audio.play(sfx, start, false);
   await main_widget.live_node.animate([{ opacity: 1 }, { opacity: 0 }], 1000);
 
   const data = new Db();
@@ -34,6 +41,7 @@ async function main() {
     const content = data.pick_one();
     const [widget, promise] = show(card(content));
     const result = await promise;
+    await KateAPI.audio.play(sfx, like, false);
     const node = widget.live_node.select(
       result === "like" ? ".button-like" : ".button-share"
     );

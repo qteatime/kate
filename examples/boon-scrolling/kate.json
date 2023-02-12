@@ -8,7 +8,7 @@
     "description": "A tiny, endless si(lly)mulation.",
     "thumbnail_path": "thumbnail.png"
   },
-  "files": ["assets/*.css", "game.js", "index.html"],
+  "files": ["assets/*.css", "assets/*.wav", "game.js", "index.html"],
   "platform": {
     "type": "web-archive",
     "html": "index.html",
