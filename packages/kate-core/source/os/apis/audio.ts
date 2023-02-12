@@ -79,6 +79,7 @@ class AudioChannel {
     node.buffer = sound.buffer;
     node.loop = loop;
     node.connect(this.input);
+    node.start();
   }
 }
 

@@ -156,7 +156,8 @@ export class KateIPCServer {
       // -- Audio
       case "kate:audio.create-channel": {
         const channel = await process.audio.create_channel();
-        return ok({ id: channel.id, volume: channel.volume });
+        await channel.resume();
+        return ok({ id: channel.id, volume: channel.volume.gain.value });
       }
 
       case "kate:audio.resume-channel": {
