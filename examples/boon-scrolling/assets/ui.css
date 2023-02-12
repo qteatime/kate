@@ -84,6 +84,10 @@
 
 .card-text {
   padding: 0 1em 2em 1em;
+  white-space: pre-wrap;
+  color: #bbb;
+  letter-spacing: -0.5;
+  line-height: 1.5em;
 }
 
 .card-button {

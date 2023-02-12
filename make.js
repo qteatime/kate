@@ -247,7 +247,7 @@ w.task("example:boon-scrolling", ["packaging:build", "domui:build"], () => {
     "-e",
     "examples/boon-scrolling/build/index.js",
     "-o",
-    "examples/boon-scrolling/game.js",
+    "examples/boon-scrolling/www/game.js",
   ]);
   kart({
     config: "examples/boon-scrolling/kate.json",

@@ -1,7 +1,8 @@
 import { KateUI, widget } from "../../../packages/kate-domui/build";
 import { Widget } from "../../../packages/kate-domui/source/widget";
 import { defer, Deferred } from "../../../packages/util/build/promise";
-import { Db } from "./db";
+import { gen_name } from "./name_grammar";
+import { gen_text } from "./text_grammar";
 const { Box, Text, Icon, Keymap } = widget;
 
 const root = document.querySelector("#game")! as HTMLElement;
@@ -24,6 +25,12 @@ function dismiss<A>(x: Deferred<A>, value: A) {
   };
 }
 
+function gen_card() {
+  const { user, name } = gen_name();
+  const text = gen_text();
+  return { user, name, text };
+}
+
 async function main() {
   const like_wav = await KateAPI.cart_fs.read_file("/assets/like.wav");
   const start_wav = await KateAPI.cart_fs.read_file("/assets/start.wav");
@@ -36,9 +43,8 @@ async function main() {
   await KateAPI.audio.play(sfx, start, false);
   await main_widget.live_node.animate([{ opacity: 1 }, { opacity: 0 }], 1000);
 
-  const data = new Db();
   while (true) {
-    const content = data.pick_one();
+    const content = gen_card();
     const [widget, promise] = show(card(content));
     const result = await promise;
     await KateAPI.audio.play(sfx, like, false);

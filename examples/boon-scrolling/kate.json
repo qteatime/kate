@@ -8,10 +8,10 @@
     "description": "A tiny, endless si(lly)mulation.",
     "thumbnail_path": "thumbnail.png"
   },
-  "files": ["assets/*.css", "assets/*.wav", "game.js", "index.html"],
+  "files": ["assets/*", "www/*"],
   "platform": {
     "type": "web-archive",
-    "html": "index.html",
+    "html": "www/index.html",
     "bridges": []
   }
 }
