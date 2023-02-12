@@ -255,6 +255,12 @@ w.task("example:boon-scrolling", ["packaging:build", "domui:build"], () => {
   });
 });
 
+w.task(
+  "example:all",
+  ["example:hello-world", "example:boon-scrolling"],
+  () => {}
+);
+
 // -- Main
 w.task("help", [], () => {
   console.log(`Available tasks:\n`);

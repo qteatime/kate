@@ -6,31 +6,27 @@ Kate is a fantasy handheld console designed for simpler story-rich games, like V
 
 You can try Kate directly from your web-browser: go to https://kate.qteati.me/ and install the `hello.kart` file provided in this repository by drag-dropping it over the console.
 
-
 ![](./docs/kate-demo.webp)
-
 
 ## Specifications
 
-  | | |
-  | - | - |
-  | **Display** | 800x480 (normal-mode) or 320x192 (mini-mode) — a 5:3 screen |
-  | **Cartridge size limit** | 512mb |
-  | **Input** | D-pad, O, X, L, R, Menu, and Capture (6 buttons), multi-touch |
-
+|                          |                                                               |
+| ------------------------ | ------------------------------------------------------------- |
+| **Display**              | 800x480 (normal-mode) or 320x192 (mini-mode) — a 5:3 screen   |
+| **Cartridge size limit** | 512mb                                                         |
+| **Input**                | D-pad, O, X, L, R, Menu, and Capture (6 buttons), multi-touch |
 
 ## Default input configuration
 
-  | **Kate** | **Common uses** | **Keyboard** |
-  | -------- | --------------- | ------------ |
-  | D-pad | Navigation, directional input | arrow keys |
-  | O    | Confirm selection, Ok | Z |
-  | X    | Cancel selection, alternate input | X |
-  | L    | Previous page | A |
-  | R    | Next page | S |
-  | Menu | Contextual menu, long-press for OS menu | left Shift |
-  | Capture | Take a screenshot, long-press for recording video | left Ctrl |
-
+| **Kate** | **Common uses**                                   | **Keyboard** |
+| -------- | ------------------------------------------------- | ------------ |
+| D-pad    | Navigation, directional input                     | arrow keys   |
+| O        | Confirm selection, Ok                             | Z            |
+| X        | Cancel selection, alternate input                 | X            |
+| L        | Previous page                                     | A            |
+| R        | Next page                                         | S            |
+| Menu     | Contextual menu, long-press for OS menu           | left Shift   |
+| Capture  | Take a screenshot, long-press for recording video | left Ctrl    |
 
 ## Hacking on Kate
 
@@ -40,15 +36,22 @@ Setup things with:
 
 ```shell
 $ npm install
-$ node make build
+$ node make www:bundle
 ```
 
-After this you should have a working Kate. You can either use `npm run app` to run it as an Electron app, or start a server on the `www` folder and point your favourite webkit* browser there.
+After this you should have a working Kate. You can either use `npm run app` to run it as an Electron app, or start a server on the `www` folder and point your favourite webkit\* browser there.
 
 You should see a screen similar to the screenshot above, but without any cartridges. Drag the `hello.kart` file from the `examples/` folder and drop it over the console to install it. Then either click the game or use the keyboard/virtual buttons to play.
 
 > It's a goal for it to work on non-webkit-based browsers, but I have not tested it there yet.
 
+## Examples
+
+See the `examples/` folder in this repository for some example games. You can build all of them into cartridges by running `node make example:all`.
+
+- [**Hello, from Kate**](examples/hello-world/): A hello-world type demo that shows what keys you're pressing (uses the `input` API).
+
+- [**Boon-scrolling**](examples/boon-scrolling/): A small "doom-scrolling" simulation with procedural generation (uses the `cart_fs`, `audio`, and `input` APIs, as well as the `domui` library for UI).
 
 ## Cartridges and runtime
 
@@ -65,7 +68,6 @@ By doing this, there's also no need for a web-server. Games can be played locall
 You build these `.kart` files using the included `kate-packaging` (`kart`) application, providing it with a JSON configuration file and an output location. For safety the cartridge can only include files that are contained in the directory of the JSON file.
 
 See the `hello-world` example cartridge for some practical example of how this all works.
-
 
 ## Licence
 

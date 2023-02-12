@@ -1,19 +1,12 @@
 {
   "name": "kate",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A fantasy handheld console for Visual Novels, 2d RPGs, and other story-rich games!",
   "main": "index.js",
   "bin": {
-    "kart": "./source/kate-packaging/kart.js"
+    "kart": "./packages/kate-packaging/build/kart.js"
   },
   "scripts": {
-    "build-ts": "tsc -p .",
-    "build-api": "tsc -p tsconfig.api.json",
-    "build-bridges": "tsc -p tsconfig.bridges.json",
-    "gen-kart": "crochet ljtc -- ts source/schema/cartridge.ljt > source/generated/cartridge.ts",
-    "bundle": "browserify -e source/kate-kernel/kate.js -o www/kate.js -s Kate",
-    "bundle-os": "browserify -e source/kate-os/index.js -o www/kate-os.js -s KateOS",
-    "bundle-api": "browserify -e source/kate-api/index.js -o source/kate-bridges/kate-api.js -s KateAPI",
     "app": "electron www/app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
