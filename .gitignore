@@ -2,3 +2,8 @@ source/
 www/
 node_modules/
 tsconfig.tsbuildinfo
+examples/
+packages/
+projects/
+old-tree/
+games/

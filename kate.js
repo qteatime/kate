@@ -1,14 +1,2684 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.Kate = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
+// shim for using process in browser
+var process = module.exports = {};
+
+// cached from whatever global is present so that test runners that stub it
+// don't break things.  But we need to wrap it in a try catch in case it is
+// wrapped in strict mode code which doesn't define any globals.  It's inside a
+// function because try/catches deoptimize in certain engines.
+
+var cachedSetTimeout;
+var cachedClearTimeout;
+
+function defaultSetTimout() {
+    throw new Error('setTimeout has not been defined');
+}
+function defaultClearTimeout () {
+    throw new Error('clearTimeout has not been defined');
+}
+(function () {
+    try {
+        if (typeof setTimeout === 'function') {
+            cachedSetTimeout = setTimeout;
+        } else {
+            cachedSetTimeout = defaultSetTimout;
+        }
+    } catch (e) {
+        cachedSetTimeout = defaultSetTimout;
+    }
+    try {
+        if (typeof clearTimeout === 'function') {
+            cachedClearTimeout = clearTimeout;
+        } else {
+            cachedClearTimeout = defaultClearTimeout;
+        }
+    } catch (e) {
+        cachedClearTimeout = defaultClearTimeout;
+    }
+} ())
+function runTimeout(fun) {
+    if (cachedSetTimeout === setTimeout) {
+        //normal enviroments in sane situations
+        return setTimeout(fun, 0);
+    }
+    // if setTimeout wasn't available but was latter defined
+    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+        cachedSetTimeout = setTimeout;
+        return setTimeout(fun, 0);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedSetTimeout(fun, 0);
+    } catch(e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+            return cachedSetTimeout.call(null, fun, 0);
+        } catch(e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+            return cachedSetTimeout.call(this, fun, 0);
+        }
+    }
+
+
+}
+function runClearTimeout(marker) {
+    if (cachedClearTimeout === clearTimeout) {
+        //normal enviroments in sane situations
+        return clearTimeout(marker);
+    }
+    // if clearTimeout wasn't available but was latter defined
+    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+        cachedClearTimeout = clearTimeout;
+        return clearTimeout(marker);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedClearTimeout(marker);
+    } catch (e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+            return cachedClearTimeout.call(null, marker);
+        } catch (e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+            return cachedClearTimeout.call(this, marker);
+        }
+    }
+
+
+
+}
+var queue = [];
+var draining = false;
+var currentQueue;
+var queueIndex = -1;
+
+function cleanUpNextTick() {
+    if (!draining || !currentQueue) {
+        return;
+    }
+    draining = false;
+    if (currentQueue.length) {
+        queue = currentQueue.concat(queue);
+    } else {
+        queueIndex = -1;
+    }
+    if (queue.length) {
+        drainQueue();
+    }
+}
+
+function drainQueue() {
+    if (draining) {
+        return;
+    }
+    var timeout = runTimeout(cleanUpNextTick);
+    draining = true;
+
+    var len = queue.length;
+    while(len) {
+        currentQueue = queue;
+        queue = [];
+        while (++queueIndex < len) {
+            if (currentQueue) {
+                currentQueue[queueIndex].run();
+            }
+        }
+        queueIndex = -1;
+        len = queue.length;
+    }
+    currentQueue = null;
+    draining = false;
+    runClearTimeout(timeout);
+}
+
+process.nextTick = function (fun) {
+    var args = new Array(arguments.length - 1);
+    if (arguments.length > 1) {
+        for (var i = 1; i < arguments.length; i++) {
+            args[i - 1] = arguments[i];
+        }
+    }
+    queue.push(new Item(fun, args));
+    if (queue.length === 1 && !draining) {
+        runTimeout(drainQueue);
+    }
+};
+
+// v8 likes predictible objects
+function Item(fun, array) {
+    this.fun = fun;
+    this.array = array;
+}
+Item.prototype.run = function () {
+    this.fun.apply(null, this.array);
+};
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+process.version = ''; // empty string to avoid regexp issues
+process.versions = {};
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+process.prependListener = noop;
+process.prependOnceListener = noop;
+
+process.listeners = function (name) { return [] }
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+process.umask = function() { return 0; };
+
+},{}],2:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Bridge = exports.Bridge$Base = exports.Platform = exports.Platform$Base = exports.Date = exports.Content_classification = exports.Content_classification$Base = exports.Metadata = exports.File = exports.Cartridge = exports._Encoder = exports._Decoder = void 0;
+exports.Table = exports.Transaction = exports.Database = void 0;
+function lift_request(req) {
+    return new Promise((resolve, reject) => {
+        req.onerror = (_) => reject(new Error(`failed`));
+        req.onsuccess = (_) => resolve(req.result);
+    });
+}
+class Database {
+    db;
+    constructor(db) {
+        this.db = db;
+    }
+    async transaction(tables, mode, fn) {
+        return new Promise(async (resolve, reject) => {
+            const request = this.db.transaction(tables.map((x) => x.name), mode);
+            let result;
+            request.onerror = (ev) => {
+                reject(new Error(`cannot start transaction`));
+            };
+            request.onabort = (ev) => {
+                reject(new Error(`transaction aborted`));
+            };
+            request.oncomplete = (ev) => {
+                resolve(result);
+            };
+            const trans = new Transaction(request);
+            try {
+                result = await fn(trans);
+                trans.commit();
+            }
+            catch (error) {
+                trans.abort();
+                reject(error);
+            }
+        });
+    }
+}
+exports.Database = Database;
+class Transaction {
+    trans;
+    constructor(trans) {
+        this.trans = trans;
+    }
+    commit() {
+        this.trans.commit();
+    }
+    abort() {
+        this.trans.abort();
+    }
+    get_table(table) {
+        return new Table(this.trans.objectStore(table.name));
+    }
+}
+exports.Transaction = Transaction;
+class Table {
+    store;
+    constructor(store) {
+        this.store = store;
+    }
+    async write(value) {
+        return await lift_request(this.store.put(value));
+    }
+    async clear() {
+        return await lift_request(this.store.clear());
+    }
+    async count(query) {
+        return await lift_request(this.store.count(query));
+    }
+    async delete(query) {
+        return await lift_request(this.store.delete(query));
+    }
+    async get(query) {
+        return await lift_request(this.store.get(query));
+    }
+    async try_get(query) {
+        const results = await this.get_all(query);
+        if (results.length === 1) {
+            return results[0];
+        }
+        else {
+            return null;
+        }
+    }
+    async get_all(query, count) {
+        return await lift_request(this.store.getAll(query, count));
+    }
+}
+exports.Table = Table;
+
+},{}],3:[function(require,module,exports){
+"use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __exportStar = (this && this.__exportStar) || function(m, exports) {
+    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+__exportStar(require("./schema"), exports);
+__exportStar(require("./db"), exports);
+
+},{"./db":2,"./schema":4}],4:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.IndexSchema = exports.TableSchema = exports.DatabaseSchema = exports.DBError_UnableToOpen = void 0;
+const db_1 = require("./db");
+class DBError_UnableToOpen extends Error {
+    db;
+    constructor(db) {
+        super(`Unable to open ${db.name}`);
+        this.db = db;
+    }
+}
+exports.DBError_UnableToOpen = DBError_UnableToOpen;
+class DatabaseSchema {
+    name;
+    version;
+    tables = [];
+    constructor(name, version) {
+        this.name = name;
+        this.version = version;
+    }
+    table(since, name, options, indexes) {
+        const table = new TableSchema(since, name, options, indexes);
+        this.tables.push(table);
+        return table;
+    }
+    async open() {
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.open(this.name, this.version);
+            request.onerror = (ev) => {
+                reject(new DBError_UnableToOpen(this));
+            };
+            request.onsuccess = (ev) => {
+                resolve(new db_1.Database(request.result));
+            };
+            request.onupgradeneeded = (ev) => {
+                const old_version = ev.oldVersion;
+                const db = ev.target.result;
+                for (const table of this.tables) {
+                    if (table.version > old_version) {
+                        table.upgrade(db);
+                    }
+                }
+            };
+        });
+    }
+}
+exports.DatabaseSchema = DatabaseSchema;
+class TableSchema {
+    version;
+    name;
+    key;
+    indexes;
+    __schema;
+    constructor(version, name, key, indexes) {
+        this.version = version;
+        this.name = name;
+        this.key = key;
+        this.indexes = indexes;
+    }
+    get key_path() {
+        return this.key.path;
+    }
+    upgrade(db) {
+        const store = db.createObjectStore(this.name, {
+            keyPath: this.key.path,
+            autoIncrement: this.key.auto_increment,
+        });
+        for (const index of this.indexes) {
+            index.upgrade(store);
+        }
+    }
+}
+exports.TableSchema = TableSchema;
+class IndexSchema {
+    name;
+    key_path;
+    options;
+    constructor(name, key_path, options) {
+        this.name = name;
+        this.key_path = key_path;
+        this.options = options;
+    }
+    upgrade(store) {
+        store.createIndex(this.name, this.key_path, {
+            unique: this.options.unique,
+        });
+    }
+}
+exports.IndexSchema = IndexSchema;
+
+},{"./db":2}],5:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.bridges = void 0;
+exports.bridges = {
+    "input.js": "\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nlet paused = false;\r\nconst { events } = KateAPI;\r\nconst add_event_listener = window.addEventListener;\r\nconst down_listeners = [];\r\nconst up_listeners = [];\r\nevents.input_state_changed.listen(({ key: kate_key, is_down }) => {\r\n    if (!paused) {\r\n        const data = key_mapping[kate_key];\r\n        if (data) {\r\n            const listeners = is_down ? down_listeners : up_listeners;\r\n            const type = is_down ? \"keydown\" : \"keyup\";\r\n            const [key, code, keyCode] = data;\r\n            const key_ev = new KeyboardEvent(type, { key, code, keyCode });\r\n            for (const fn of listeners) {\r\n                fn.call(document, key_ev);\r\n            }\r\n        }\r\n    }\r\n});\r\nevents.paused.listen((state) => {\r\n    paused = state;\r\n});\r\nfunction listen(type, listener, options) {\r\n    if (type === \"keydown\") {\r\n        down_listeners.push(listener);\r\n    }\r\n    else if (type === \"keyup\") {\r\n        up_listeners.push(listener);\r\n    }\r\n    else {\r\n        add_event_listener.call(this, type, listener, options);\r\n    }\r\n}\r\nwindow.addEventListener = listen;\r\ndocument.addEventListener = listen;\r\n",
+    "kate-api.js": "(function(f){if(typeof exports===\"object\"&&typeof module!==\"undefined\"){module.exports=f()}else if(typeof define===\"function\"&&define.amd){define([],f)}else{var g;if(typeof window!==\"undefined\"){g=window}else if(typeof global!==\"undefined\"){g=global}else if(typeof self!==\"undefined\"){g=self}else{g=this}g.KateAPI = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c=\"function\"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error(\"Cannot find module '\"+i+\"'\");throw a.code=\"MODULE_NOT_FOUND\",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u=\"function\"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){\n\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.KateAudioChannel = exports.KateAudioSource = exports.KateAudio = void 0;\r\nclass KateAudio {\r\n    #channel;\r\n    constructor(channel) {\r\n        this.#channel = channel;\r\n    }\r\n    async create_channel(name) {\r\n        const { id, volume } = await this.#channel.call(\"kate:audio.create-channel\", {});\r\n        return new KateAudioChannel(this, name, id, volume);\r\n    }\r\n    async resume_channel(channel) {\r\n        await this.#channel.call(\"kate:audio.resume-channel\", { id: channel.id });\r\n    }\r\n    async pause_channel(channel) {\r\n        await this.#channel.call(\"kate:audio.pause-channel\", { id: channel.id });\r\n    }\r\n    async change_channel_volume(channel, value) {\r\n        await this.#channel.call(\"kate:audio.change-volume\", {\r\n            id: channel.id,\r\n            volume: value,\r\n        });\r\n    }\r\n    async load_audio(mime, bytes) {\r\n        const audio = await this.#channel.call(\"kate:audio.load\", {\r\n            mime,\r\n            bytes,\r\n        });\r\n        return new KateAudioSource(this, audio);\r\n    }\r\n    async play(channel, audio, loop) {\r\n        await this.#channel.call(\"kate:audio.play\", {\r\n            channel: channel.id,\r\n            source: audio.id,\r\n            loop: loop,\r\n        });\r\n    }\r\n}\r\nexports.KateAudio = KateAudio;\r\nclass KateAudioSource {\r\n    audio;\r\n    id;\r\n    constructor(audio, id) {\r\n        this.audio = audio;\r\n        this.id = id;\r\n    }\r\n}\r\nexports.KateAudioSource = KateAudioSource;\r\nclass KateAudioChannel {\r\n    audio;\r\n    name;\r\n    id;\r\n    _volume;\r\n    constructor(audio, name, id, _volume) {\r\n        this.audio = audio;\r\n        this.name = name;\r\n        this.id = id;\r\n        this._volume = _volume;\r\n    }\r\n    get volume() {\r\n        return this._volume;\r\n    }\r\n    async set_volume(value) {\r\n        if (value < 0 || value > 1) {\r\n            throw new Error(`Invalid volume value ${value}`);\r\n        }\r\n        this._volume = value;\r\n        this.audio.change_channel_volume(this, value);\r\n    }\r\n    async resume() {\r\n        return this.audio.resume_channel(this);\r\n    }\r\n    async pause() {\r\n        return this.audio.pause_channel(this);\r\n    }\r\n    async play(source, loop) {\r\n        return this.audio.play(this, source, loop);\r\n    }\r\n}\r\nexports.KateAudioChannel = KateAudioChannel;\r\n\n},{}],2:[function(require,module,exports){\n\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.KateCartFS = void 0;\r\nclass KateCartFS {\r\n    #channel;\r\n    constructor(channel) {\r\n        this.#channel = channel;\r\n    }\r\n    read_file(path0) {\r\n        const path = new URL(path0, \"http://localhost\").pathname;\r\n        return this.#channel.call(\"kate:cart.read-file\", { path });\r\n    }\r\n    async get_file_url(path) {\r\n        const file = await this.read_file(path);\r\n        const blob = new Blob([file.bytes], { type: file.mime });\r\n        return URL.createObjectURL(blob);\r\n    }\r\n}\r\nexports.KateCartFS = KateCartFS;\r\n\n},{}],3:[function(require,module,exports){\n\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.KateIPC = void 0;\r\nconst events_1 = require(\"../util/events\");\r\nconst promise_1 = require(\"../util/promise\");\r\nclass KateIPC {\r\n    #secret;\r\n    #pending;\r\n    #initialised;\r\n    #server;\r\n    events = {\r\n        input_state_changed: new events_1.EventStream(),\r\n        paused: new events_1.EventStream(),\r\n    };\r\n    constructor(secret, server) {\r\n        this.#secret = secret;\r\n        this.#pending = new Map();\r\n        this.#initialised = false;\r\n        this.#server = server;\r\n    }\r\n    make_id() {\r\n        let id = new Uint8Array(16);\r\n        crypto.getRandomValues(id);\r\n        return Array.from(id)\r\n            .map((x) => x.toString(16).padStart(2, \"0\"))\r\n            .join(\"\");\r\n    }\r\n    setup() {\r\n        if (this.#initialised) {\r\n            throw new Error(`setup() called twice`);\r\n        }\r\n        this.#initialised = true;\r\n        window.addEventListener(\"message\", this.handle_message);\r\n    }\r\n    do_send(id, type, payload) {\r\n        this.#server.postMessage({\r\n            type: type,\r\n            secret: this.#secret,\r\n            id: id,\r\n            payload: payload,\r\n        }, \"*\");\r\n    }\r\n    async call(type, payload) {\r\n        const deferred = (0, promise_1.defer)();\r\n        const id = this.make_id();\r\n        this.#pending.set(id, deferred);\r\n        this.do_send(id, type, payload);\r\n        return deferred.promise;\r\n    }\r\n    async send_and_ignore_result(type, payload) {\r\n        this.do_send(this.make_id(), type, payload);\r\n    }\r\n    handle_message = (ev) => {\r\n        switch (ev.data.type) {\r\n            case \"kate:reply\": {\r\n                const pending = this.#pending.get(ev.data.id);\r\n                if (pending != null) {\r\n                    this.#pending.delete(ev.data.id);\r\n                    if (ev.data.ok) {\r\n                        pending.resolve(ev.data.value);\r\n                    }\r\n                    else {\r\n                        pending.reject(ev.data.value);\r\n                    }\r\n                }\r\n                break;\r\n            }\r\n            case \"kate:input-state-changed\": {\r\n                this.events.input_state_changed.emit({\r\n                    key: ev.data.key,\r\n                    is_down: ev.data.is_down,\r\n                });\r\n                break;\r\n            }\r\n            case \"kate:paused\": {\r\n                this.events.paused.emit(ev.data.state);\r\n                break;\r\n            }\r\n        }\r\n    };\r\n}\r\nexports.KateIPC = KateIPC;\r\n\n},{\"../util/events\":8,\"../util/promise\":9}],4:[function(require,module,exports){\n\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.timer = exports.audio = exports.input = exports.kv_store = exports.cart_fs = exports.events = void 0;\r\nconst audio_1 = require(\"./audio\");\r\nconst cart_fs_1 = require(\"./cart-fs\");\r\nconst channel_1 = require(\"./channel\");\r\nconst input_1 = require(\"./input\");\r\nconst kv_store_1 = require(\"./kv-store\");\r\nconst timer_1 = require(\"./timer\");\r\nconst channel = new channel_1.KateIPC(KATE_SECRET, window.parent);\r\nchannel.setup();\r\nexports.events = channel.events;\r\nexports.cart_fs = new cart_fs_1.KateCartFS(channel);\r\nexports.kv_store = new kv_store_1.KateKVStore(channel);\r\nexports.input = new input_1.KateInput(channel);\r\nexports.input.setup();\r\nexports.audio = new audio_1.KateAudio(channel);\r\nexports.timer = new timer_1.KateTimer();\r\nexports.timer.setup();\r\n\n},{\"./audio\":1,\"./cart-fs\":2,\"./channel\":3,\"./input\":5,\"./kv-store\":6,\"./timer\":7}],5:[function(require,module,exports){\n\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.KateInput = void 0;\r\nclass KateInput {\r\n    #channel;\r\n    _state = Object.assign(Object.create(null), {\r\n        up: false,\r\n        right: false,\r\n        down: false,\r\n        left: false,\r\n        menu: false,\r\n        capture: false,\r\n        x: false,\r\n        o: false,\r\n        ltrigger: false,\r\n        rtrigger: false,\r\n    });\r\n    constructor(channel) {\r\n        this.#channel = channel;\r\n    }\r\n    setup() {\r\n        this.#channel.events.input_state_changed.listen(({ key, is_down }) => {\r\n            this._state[key] = is_down;\r\n        });\r\n    }\r\n    is_down(key) {\r\n        return this._state[key];\r\n    }\r\n}\r\nexports.KateInput = KateInput;\r\n\n},{}],6:[function(require,module,exports){\n\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.KateKVStore = void 0;\r\nclass KateKVStore {\r\n    #channel;\r\n    constructor(channel) {\r\n        this.#channel = channel;\r\n    }\r\n    async read_all() {\r\n        return await this.#channel.call(\"kate:kv-store.read-all\", {});\r\n    }\r\n    async replace_all(value) {\r\n        await this.#channel.call(\"kate:kv-store.update-all\", { value });\r\n    }\r\n    async get(key) {\r\n        return await this.#channel.call(\"kate:kv-store.get\", { key });\r\n    }\r\n    async set(key, value) {\r\n        await this.#channel.call(\"kate:kv-store.set\", { key, value });\r\n    }\r\n    async delete(key) {\r\n        await this.#channel.call(\"kate:kv-store.delete\", { key });\r\n    }\r\n    async delete_all() {\r\n        await this.replace_all({});\r\n    }\r\n}\r\nexports.KateKVStore = KateKVStore;\r\n\n},{}],7:[function(require,module,exports){\n\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.KateTimer = void 0;\r\nconst events_1 = require(\"../util/events\");\r\nclass KateTimer {\r\n    on_tick = new events_1.EventStream();\r\n    _last_time = null;\r\n    _timer_id = null;\r\n    MAX_FPS = 30;\r\n    ONE_FRAME = Math.ceil(1000 / 30);\r\n    _fps = 30;\r\n    setup() {\r\n        cancelAnimationFrame(this._timer_id);\r\n        this._last_time = null;\r\n        this._timer_id = requestAnimationFrame(this.tick);\r\n    }\r\n    get fps() {\r\n        return this._fps;\r\n    }\r\n    tick = (time) => {\r\n        if (this._last_time == null) {\r\n            this._last_time = time;\r\n            this._fps = this.MAX_FPS;\r\n            this.on_tick.emit(time);\r\n            this._timer_id = requestAnimationFrame(this.tick);\r\n        }\r\n        else {\r\n            const elapsed = time - this._last_time;\r\n            if (elapsed < this.ONE_FRAME) {\r\n                this._timer_id = requestAnimationFrame(this.tick);\r\n            }\r\n            else {\r\n                this._last_time = time;\r\n                this._fps = (1000 / elapsed) | 0;\r\n                this.on_tick.emit(time);\r\n                this._timer_id = requestAnimationFrame(this.tick);\r\n            }\r\n        }\r\n    };\r\n}\r\nexports.KateTimer = KateTimer;\r\n\n},{\"../util/events\":8}],8:[function(require,module,exports){\n\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.EventStream = void 0;\r\nclass EventStream {\r\n    subscribers = [];\r\n    on_dispose = () => { };\r\n    listen(fn) {\r\n        this.remove(fn);\r\n        this.subscribers.push(fn);\r\n        return fn;\r\n    }\r\n    remove(fn) {\r\n        this.subscribers = this.subscribers.filter((x) => x !== fn);\r\n        return this;\r\n    }\r\n    emit(ev) {\r\n        for (const fn of this.subscribers) {\r\n            fn(ev);\r\n        }\r\n    }\r\n    dispose() {\r\n        this.on_dispose();\r\n    }\r\n    filter(fn) {\r\n        const stream = new EventStream();\r\n        const subscriber = this.listen((ev) => {\r\n            if (fn(ev)) {\r\n                stream.emit(ev);\r\n            }\r\n        });\r\n        stream.on_dispose = () => {\r\n            this.remove(subscriber);\r\n        };\r\n        return stream;\r\n    }\r\n    map(fn) {\r\n        const stream = new EventStream();\r\n        const subscriber = this.listen((ev) => {\r\n            stream.emit(fn(ev));\r\n        });\r\n        stream.on_dispose = () => {\r\n            this.remove(subscriber);\r\n        };\r\n        return stream;\r\n    }\r\n}\r\nexports.EventStream = EventStream;\r\n\n},{}],9:[function(require,module,exports){\n\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.defer = void 0;\r\nfunction defer() {\r\n    const p = Object.create(null);\r\n    p.promise = new Promise((resolve, reject) => {\r\n        p.resolve = resolve;\r\n        p.reject = reject;\r\n    });\r\n    return p;\r\n}\r\nexports.defer = defer;\r\n\n},{}]},{},[4])(4)\n});\n",
+    "local-storage.js": "\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nconst { kv_store } = KateAPI;\r\nlet contents = KATE_LOCAL_STORAGE ?? Object.create(null);\r\nlet timer = null;\r\nfunction persist(contents) {\r\n    clearTimeout(timer);\r\n    timer = setTimeout(() => {\r\n        kv_store.replace_all(contents);\r\n    });\r\n}\r\nclass KateStorage {\r\n    __contents;\r\n    __persistent;\r\n    constructor(contents, persistent) {\r\n        this.__contents = contents;\r\n        this.__persistent = persistent;\r\n    }\r\n    _persist() {\r\n        if (this.__persistent) {\r\n            persist(this.__contents);\r\n        }\r\n    }\r\n    getItem(name) {\r\n        return this.__contents[name] ?? null;\r\n    }\r\n    setItem(name, value) {\r\n        this.__contents[name] = value;\r\n        this._persist();\r\n    }\r\n    removeItem(name) {\r\n        delete this.__contents[name];\r\n        this._persist();\r\n    }\r\n    clear() {\r\n        this.__contents = Object.create(null);\r\n        this._persist();\r\n    }\r\n    key(index) {\r\n        return this.getItem(Object.keys(this.__contents)[index]) ?? null;\r\n    }\r\n    get length() {\r\n        return Object.keys(this.__contents).length;\r\n    }\r\n}\r\nfunction proxy_storage(storage, key) {\r\n    const exposed = [\"getItem\", \"setItem\", \"removeItem\", \"clear\", \"key\"];\r\n    Object.defineProperty(window, key, {\r\n        value: new Proxy(storage, {\r\n            get(target, prop, receiver) {\r\n                return exposed.includes(prop)\r\n                    ? storage[prop].bind(storage)\r\n                    : storage.getItem(prop);\r\n            },\r\n            has(target, prop) {\r\n                return exposed.includes(prop) || prop in contents;\r\n            },\r\n            set(target, prop, value) {\r\n                storage.setItem(prop, value);\r\n                return true;\r\n            },\r\n            deleteProperty(target, prop) {\r\n                storage.removeItem(prop);\r\n                return true;\r\n            },\r\n        }),\r\n    });\r\n}\r\nconst storage = new KateStorage(contents, true);\r\nproxy_storage(storage, \"localStorage\");\r\nconst session_storage = new KateStorage(Object.create(null), false);\r\nproxy_storage(session_storage, \"sessionStorage\");\r\n",
+    "renpy.js": "\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nlet paused = false;\r\nconst { events } = KateAPI;\r\nconst add_event_listener = window.addEventListener;\r\nconst key_mapping = {\r\n    up: [\"ArrowUp\", \"ArrowUp\", 38],\r\n    right: [\"ArrowRight\", \"ArrowRight\", 39],\r\n    down: [\"ArrowDown\", \"ArrowDown\", 40],\r\n    left: [\"ArrowLeft\", \"ArrowLeft\", 37],\r\n    x: [\"Escape\", \"Escape\", 27],\r\n    o: [\"Enter\", \"Enter\", 13],\r\n    ltrigger: [\"PageUp\", \"PageUp\", 33],\r\n    rtrigger: [\"PageDown\", \"PageDown\", 34],\r\n};\r\nconst down_listeners = [];\r\nconst up_listeners = [];\r\nevents.input_state_changed.listen(({ key: kate_key, is_down }) => {\r\n    if (!paused) {\r\n        const data = key_mapping[kate_key];\r\n        if (data) {\r\n            const listeners = is_down ? down_listeners : up_listeners;\r\n            const type = is_down ? \"keydown\" : \"keyup\";\r\n            const [key, code, keyCode] = data;\r\n            const key_ev = new KeyboardEvent(type, { key, code, keyCode });\r\n            for (const fn of listeners) {\r\n                fn.call(document, key_ev);\r\n            }\r\n        }\r\n    }\r\n});\r\nevents.paused.listen((state) => {\r\n    paused = state;\r\n});\r\nfunction listen(type, listener, options) {\r\n    if (type === \"keydown\") {\r\n        down_listeners.push(listener);\r\n    }\r\n    else if (type === \"keyup\") {\r\n        up_listeners.push(listener);\r\n    }\r\n    else {\r\n        add_event_listener.call(this, type, listener, options);\r\n    }\r\n}\r\nwindow.addEventListener = listen;\r\ndocument.addEventListener = listen;\r\n",
+    "rpgmk-mv.js": "\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nlet paused = false;\r\nconst { events } = KateAPI;\r\n// -- Things that need to be patched still\r\nUtils.isOptionValid = (name) => {\r\n    return [\"noaudio\"].includes(name);\r\n};\r\nconst key_mapping = {\r\n    up: \"up\",\r\n    right: \"right\",\r\n    down: \"down\",\r\n    left: \"left\",\r\n    x: \"cancel\",\r\n    o: \"ok\",\r\n    menu: \"menu\",\r\n    rtrigger: \"shift\",\r\n};\r\nevents.input_state_changed.listen(({ key, is_down }) => {\r\n    if (!paused) {\r\n        const name = key_mapping[key];\r\n        if (name) {\r\n            Input._currentState[name] = is_down;\r\n        }\r\n    }\r\n});\r\nevents.paused.listen((state) => {\r\n    paused = state;\r\n    if (state) {\r\n        for (const key of Object.values(key_mapping)) {\r\n            Input._currentState[key] = false;\r\n        }\r\n    }\r\n});\r\n",
+    "standard-network.js": "\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nconst { cart_fs } = KateAPI;\r\n// -- Arbitrary fetching\r\nconst old_fetch = window.fetch;\r\nwindow.fetch = async function (request, options) {\r\n    let url;\r\n    let method;\r\n    if (Object(request) === request && request.url) {\r\n        url = request.url;\r\n        method = request.method;\r\n    }\r\n    else {\r\n        url = request;\r\n        method = options?.method ?? \"GET\";\r\n    }\r\n    if (method !== \"GET\") {\r\n        return new Promise((_, reject) => reject(new Error(`Non-GET requests are not supported.`)));\r\n    }\r\n    return new Promise(async (resolve, reject) => {\r\n        try {\r\n            const file = await cart_fs.get_file_url(String(url));\r\n            const result = await old_fetch(file);\r\n            resolve(result);\r\n        }\r\n        catch (error) {\r\n            reject(error);\r\n        }\r\n    });\r\n};\r\nconst old_xhr_open = XMLHttpRequest.prototype.open;\r\nconst old_xhr_send = XMLHttpRequest.prototype.send;\r\nXMLHttpRequest.prototype.open = function (method, url) {\r\n    if (method !== \"GET\") {\r\n        throw new Error(`Non-GET requests are not supported.`);\r\n    }\r\n    this.__waiting_open = true;\r\n    void (async () => {\r\n        try {\r\n            const real_url = await cart_fs.get_file_url(String(url));\r\n            old_xhr_open.call(this, \"GET\", real_url, true);\r\n            this.__maybe_send();\r\n        }\r\n        catch (error) {\r\n            old_xhr_open.call(this, \"GET\", \"not-found\", true);\r\n            this.__maybe_send();\r\n        }\r\n    })();\r\n};\r\nXMLHttpRequest.prototype.__maybe_send = function () {\r\n    this.__waiting_open = false;\r\n    if (this.__waiting_send) {\r\n        this.__waiting_send = false;\r\n        this.send();\r\n    }\r\n};\r\nXMLHttpRequest.prototype.send = function () {\r\n    if (this.__waiting_open) {\r\n        this.__waiting_send = true;\r\n        return;\r\n    }\r\n    else {\r\n        return old_xhr_send.call(this);\r\n    }\r\n};\r\n// -- Image loading\r\nconst old_img_src = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, \"src\");\r\nObject.defineProperty(HTMLImageElement.prototype, \"src\", {\r\n    enumerable: old_img_src.enumerable,\r\n    configurable: old_img_src.configurable,\r\n    get() {\r\n        return this.__src ?? old_img_src.get.call(this);\r\n    },\r\n    set(url) {\r\n        this.__src = url;\r\n        void (async () => {\r\n            try {\r\n                const real_url = await cart_fs.get_file_url(String(url));\r\n                old_img_src.set.call(this, real_url);\r\n            }\r\n            catch (error) {\r\n                old_img_src.set.call(this, \"not-found\");\r\n            }\r\n        })();\r\n    },\r\n});\r\n"
+};
+
+},{}],6:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.os = exports.kernel = void 0;
+exports.kernel = require("./kernel");
+exports.os = require("./os");
+
+},{"./kernel":9,"./os":27}],7:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.CR_Web_archive = exports.CRW_Process = exports.CR_Process = exports.CartRuntime = exports.KateRuntimes = void 0;
+const Cart = require("../../../schema/generated/cartridge");
+const build_1 = require("../../../kate-bridges/build");
+const build_2 = require("../../../util/build");
+class KateRuntimes {
+    console;
+    constructor(console) {
+        this.console = console;
+    }
+    from_cartridge(cart, local_storage) {
+        switch (cart.platform.$tag) {
+            case 0 /* Cart.Platform.$Tags.Web_archive */:
+                return new CR_Web_archive(this.console, cart.id, cart, cart.platform, local_storage);
+            default:
+                throw new Error(`Unsupported cartridge`);
+        }
+    }
+}
+exports.KateRuntimes = KateRuntimes;
+class CartRuntime {
+}
+exports.CartRuntime = CartRuntime;
+class CR_Process {
+}
+exports.CR_Process = CR_Process;
+class CRW_Process extends CR_Process {
+    runtime;
+    frame;
+    secret;
+    channel;
+    audio;
+    constructor(runtime, frame, secret, channel, audio) {
+        super();
+        this.runtime = runtime;
+        this.frame = frame;
+        this.secret = secret;
+        this.channel = channel;
+        this.audio = audio;
+    }
+    async exit() {
+        this.frame.src = "about:blank";
+        this.frame.remove();
+        this.channel?.dispose();
+    }
+    async pause() {
+        this.channel?.send({
+            type: "kate:paused",
+            state: true,
+        });
+    }
+    async unpause() {
+        this.channel?.send({
+            type: "kate:paused",
+            state: false,
+        });
+    }
+}
+exports.CRW_Process = CRW_Process;
+class CR_Web_archive extends CartRuntime {
+    console;
+    id;
+    cart;
+    data;
+    local_storage;
+    constructor(console, id, cart, data, local_storage) {
+        super();
+        this.console = console;
+        this.id = id;
+        this.cart = cart;
+        this.data = data;
+        this.local_storage = local_storage;
+    }
+    run(os) {
+        const secret = (0, build_2.make_id)();
+        const frame = document.createElement("iframe");
+        const audio_server = os.make_audio_server();
+        const channel = os.ipc.add_process(secret, this.cart, () => frame.contentWindow, audio_server);
+        frame.className = "kate-game-frame kate-game-frame-defaults";
+        frame.sandbox = "allow-scripts";
+        frame.allow = "";
+        this.console.on_input_changed.listen((ev) => {
+            channel.send({
+                type: "kate:input-state-changed",
+                key: ev.key,
+                is_down: ev.is_down,
+            });
+        });
+        frame.src = URL.createObjectURL(new Blob([this.proxy_html(secret)], { type: "text/html" }));
+        frame.scrolling = "no";
+        this.console.screen.appendChild(frame);
+        return new CRW_Process(this, frame, secret, channel, audio_server);
+    }
+    proxy_html(secret) {
+        const decoder = new TextDecoder("utf-8");
+        const dom = new DOMParser().parseFromString(this.data.html, "text/html");
+        const secret_el = document.createElement("script");
+        secret_el.textContent = `
+      var KATE_SECRET = ${JSON.stringify(secret)};
+      var KATE_LOCAL_STORAGE = ${JSON.stringify(this.local_storage ?? {})};
+      ${build_1.bridges["kate-api.js"]}
+    `;
+        dom.head.insertBefore(secret_el, dom.head.firstChild);
+        const zoom_style = document.createElement("style");
+        zoom_style.textContent = `
+    :root {
+      zoom: ${this.console.body.getAttribute("data-zoom") ?? "0"};
+    }
+    `;
+        dom.head.appendChild(zoom_style);
+        for (const bridge of this.data.bridges) {
+            this.apply_bridge(dom, bridge, secret_el);
+        }
+        for (const script of Array.from(dom.querySelectorAll("script"))) {
+            if (script.src) {
+                const file = this.get_file(script.src);
+                if (file != null) {
+                    script.removeAttribute("src");
+                    script.removeAttribute("type");
+                    script.textContent = decoder.decode(file.data);
+                }
+            }
+        }
+        for (const link of Array.from(dom.querySelectorAll("link"))) {
+            if (link.href) {
+                if (link.rel === "stylesheet") {
+                    const file = this.get_file(link.href);
+                    if (file != null) {
+                        const style = dom.createElement("style");
+                        style.textContent = this.transform_css_urls(new URL(link.href).pathname, decoder.decode(file.data));
+                        link.parentNode?.insertBefore(style, link);
+                        link.remove();
+                    }
+                }
+                else {
+                    link.href = this.get_data_url(link.href);
+                }
+            }
+        }
+        return dom.documentElement.outerHTML;
+    }
+    transform_css_urls(base, code) {
+        return code.replace(/\burl\(("[^"]+")\)/g, (_, url_string) => {
+            const url = this.resolve_pathname(base, JSON.parse(url_string));
+            const data_url = this.get_data_url(new URL(url, "http://localhost").toString());
+            return `url(${JSON.stringify(data_url)})`;
+        });
+    }
+    resolve_pathname(base, url0) {
+        const x0 = base.endsWith("/") ? base : base + "/";
+        const x1 = x0.startsWith("/") ? base : "/" + base;
+        const x2 = x1.endsWith(".css") ? x1.split("/").slice(0, -1).join("/") : x1;
+        return x2 + "/" + url0;
+    }
+    apply_bridge(dom, bridge, secret_node) {
+        const wrap = (source) => {
+            return `void function(exports) {
+        ${source}
+      }({});`;
+        };
+        switch (bridge.$tag) {
+            case 0 /* Cart.Bridge.$Tags.RPG_maker_mv */: {
+                const proxy = wrap(build_1.bridges["rpgmk-mv.js"]);
+                const script = dom.createElement("script");
+                script.textContent = wrap(proxy);
+                const scripts = Array.from(dom.querySelectorAll("script"));
+                const main_script = scripts.find((x) => x.src.includes("js/main.js"));
+                if (main_script != null) {
+                    main_script.parentNode.insertBefore(script, main_script);
+                }
+                else {
+                    dom.body.appendChild(script);
+                }
+                break;
+            }
+            case 1 /* Cart.Bridge.$Tags.Renpy */: {
+                this.append_proxy(build_1.bridges["renpy.js"], dom, secret_node);
+                break;
+            }
+            case 2 /* Cart.Bridge.$Tags.Network_proxy */: {
+                this.append_proxy(build_1.bridges["standard-network.js"], dom, secret_node);
+                break;
+            }
+            case 3 /* Cart.Bridge.$Tags.Local_storage_proxy */: {
+                this.append_proxy(build_1.bridges["local-storage.js"], dom, secret_node);
+                break;
+            }
+            case 4 /* Cart.Bridge.$Tags.Input_proxy */: {
+                const code = build_1.bridges["input.js"];
+                const keys = this.generate_mappings(bridge.mapping);
+                this.append_proxy(`const key_mapping = ${keys};\n${code}`, dom, secret_node);
+                break;
+            }
+            default:
+                throw (0, build_2.unreachable)(bridge, "kate bridge");
+        }
+    }
+    generate_mappings(map) {
+        const pairs = [...map.entries()].map(([k, v]) => [
+            this.virtual_key_to_code(k),
+            [v.key, v.code, Number(v.key_code)],
+        ]);
+        return JSON.stringify(Object.fromEntries(pairs), null, 2);
+    }
+    virtual_key_to_code(key) {
+        switch (key.$tag) {
+            case 0 /* Cart.VirtualKey.$Tags.Up */:
+                return "up";
+            case 1 /* Cart.VirtualKey.$Tags.Right */:
+                return "right";
+            case 2 /* Cart.VirtualKey.$Tags.Down */:
+                return "down";
+            case 3 /* Cart.VirtualKey.$Tags.Left */:
+                return "left";
+            case 7 /* Cart.VirtualKey.$Tags.O */:
+                return "o";
+            case 6 /* Cart.VirtualKey.$Tags.X */:
+                return "x";
+            case 8 /* Cart.VirtualKey.$Tags.L_trigger */:
+                return "ltrigger";
+            case 9 /* Cart.VirtualKey.$Tags.R_trigger */:
+                return "rtrigger";
+            case 4 /* Cart.VirtualKey.$Tags.Menu */:
+                return "menu";
+            case 5 /* Cart.VirtualKey.$Tags.Capture */:
+                return "capture";
+            default:
+                throw (0, build_2.unreachable)(key, "virtual key");
+        }
+    }
+    append_proxy(proxy, dom, ref) {
+        const wrap = (source) => {
+            return `void function(exports) {
+        ${source}
+      }({});`;
+        };
+        const script = dom.createElement("script");
+        script.textContent = wrap(proxy);
+        if (ref.nextSibling != null) {
+            ref.parentNode.insertBefore(script, ref.nextSibling);
+        }
+        else {
+            dom.head.appendChild(script);
+        }
+    }
+    get_file(url) {
+        const path = new URL(url).pathname;
+        return this.cart.files.find((x) => x.path === path);
+    }
+    get_data_url(url) {
+        const file = this.get_file(url);
+        if (file != null) {
+            const content = Array.from(file.data)
+                .map((x) => String.fromCharCode(x))
+                .join("");
+            return `data:${file.mime};base64,${btoa(content)}`;
+        }
+        else {
+            return url;
+        }
+    }
+}
+exports.CR_Web_archive = CR_Web_archive;
+
+},{"../../../kate-bridges/build":5,"../../../schema/generated/cartridge":33,"../../../util/build":36}],8:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.GamepadInput = void 0;
+class GamepadInput {
+    console;
+    attached = false;
+    gamepad = null;
+    layouts = [new StandardGamepad()];
+    timer_id = null;
+    constructor(console) {
+        this.console = console;
+    }
+    setup() {
+        if (this.attached) {
+            throw new Error(`setup() called twice`);
+        }
+        this.attached = true;
+        window.addEventListener("gamepadconnected", (ev) => {
+            this.update_gamepad(ev.gamepad, true);
+        });
+        window.addEventListener("gamepaddisconnected", (ev) => {
+            this.update_gamepad(ev.gamepad, false);
+        });
+    }
+    update_gamepad(gamepad, connected) {
+        if (this.gamepad == null && connected) {
+            this.gamepad = this.get_layout(gamepad);
+        }
+        else if (this.gamepad?.is_same(gamepad) && !connected) {
+            this.gamepad = null;
+        }
+        if (this.gamepad != null) {
+            cancelAnimationFrame(this.timer_id);
+            this.timer_id = requestAnimationFrame(this.update_virtual_state);
+        }
+    }
+    get_layout(gamepad) {
+        const layout = this.layouts.find((x) => x.accepts(gamepad));
+        if (layout != null) {
+            return new LayoutedGamepad(gamepad, layout, this.console);
+        }
+        else {
+            return null;
+        }
+    }
+    update_virtual_state = (time) => {
+        this.gamepad?.update_virtual_state(time);
+        this.timer_id = requestAnimationFrame(this.update_virtual_state);
+    };
+}
+exports.GamepadInput = GamepadInput;
+class LayoutedGamepad {
+    raw_gamepad;
+    layout;
+    console;
+    last_update = null;
+    constructor(raw_gamepad, layout, console) {
+        this.raw_gamepad = raw_gamepad;
+        this.layout = layout;
+        this.console = console;
+    }
+    is_same(gamepad) {
+        return this.raw_gamepad.id === gamepad.id;
+    }
+    resolve_gamepad() {
+        const gamepad = navigator.getGamepads()[this.raw_gamepad.index] ?? null;
+        if (gamepad?.id !== this.raw_gamepad.id) {
+            return null;
+        }
+        else {
+            return gamepad;
+        }
+    }
+    update_virtual_state(time) {
+        const g = this.resolve_gamepad();
+        if (g == null) {
+            return;
+        }
+        if (this.last_update != null && this.last_update > g.timestamp) {
+            return;
+        }
+        this.last_update = time;
+        this.layout.update(this.console, g);
+    }
+}
+class StandardGamepad {
+    accepts(gamepad) {
+        return gamepad.mapping === "standard";
+    }
+    update(console, g) {
+        console.update_virtual_key("up", g.buttons[12 /* Std.UP */].pressed || g.axes[1] < -0.5);
+        console.update_virtual_key("right", g.buttons[15 /* Std.RIGHT */].pressed || g.axes[0] > 0.5);
+        console.update_virtual_key("down", g.buttons[13 /* Std.DOWN */].pressed || g.axes[1] > 0.5);
+        console.update_virtual_key("left", g.buttons[14 /* Std.LEFT */].pressed || g.axes[0] < -0.5);
+        console.update_virtual_key("x", g.buttons[0 /* Std.X */].pressed);
+        console.update_virtual_key("o", g.buttons[1 /* Std.O */].pressed);
+        console.update_virtual_key("ltrigger", g.buttons[4 /* Std.L */].pressed);
+        console.update_virtual_key("rtrigger", g.buttons[5 /* Std.R */].pressed);
+        console.update_virtual_key("menu", g.buttons[8 /* Std.MENU */].pressed);
+        console.update_virtual_key("capture", g.buttons[9 /* Std.CAPTURE */].pressed);
+    }
+}
+
+},{}],9:[function(require,module,exports){
+"use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __exportStar = (this && this.__exportStar) || function(m, exports) {
+    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+__exportStar(require("./kate"), exports);
+__exportStar(require("./cart-runtime"), exports);
+__exportStar(require("./gamepad"), exports);
+__exportStar(require("./input"), exports);
+__exportStar(require("./loader"), exports);
+__exportStar(require("./virtual"), exports);
+
+},{"./cart-runtime":7,"./gamepad":8,"./input":10,"./kate":11,"./loader":12,"./virtual":13}],10:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.KeyboardInput = void 0;
+class KeyboardInput {
+    console;
+    physical_config = {
+        up: "ArrowUp",
+        right: "ArrowRight",
+        down: "ArrowDown",
+        left: "ArrowLeft",
+        menu: "ShiftLeft",
+        capture: "ControlLeft",
+        x: "KeyX",
+        o: "KeyZ",
+        ltrigger: "KeyA",
+        rtrigger: "KeyS",
+    };
+    ignore_repeat = ["menu", "capture"];
+    physical_map;
+    attached = false;
+    constructor(console) {
+        this.console = console;
+        this.update_physical_map();
+    }
+    update_physical_map() {
+        const map = Object.create(null);
+        for (const [key, value] of Object.entries(this.physical_config)) {
+            map[value] = key;
+        }
+        this.physical_map = map;
+    }
+    listen(root) {
+        if (this.attached) {
+            throw new Error(`listen called twice`);
+        }
+        this.attached = true;
+        document.addEventListener("keydown", (ev) => {
+            if (ev.code in this.physical_map) {
+                ev.preventDefault();
+                const key = this.physical_map[ev.code];
+                if (!this.ignore_repeat.includes(key) || !ev.repeat) {
+                    this.console.update_virtual_key(key, true);
+                }
+            }
+        });
+        document.addEventListener("keyup", (ev) => {
+            if (ev.code in this.physical_map) {
+                ev.preventDefault();
+                this.console.update_virtual_key(this.physical_map[ev.code], false);
+            }
+        });
+    }
+}
+exports.KeyboardInput = KeyboardInput;
+
+},{}],11:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.KateKernel = void 0;
+const cart_runtime_1 = require("./cart-runtime");
+const gamepad_1 = require("./gamepad");
+const input_1 = require("./input");
+const loader_1 = require("./loader");
+const virtual_1 = require("./virtual");
+class KateKernel {
+    console;
+    keyboard;
+    gamepad;
+    loader = new loader_1.KateLoader();
+    runtimes;
+    constructor(console, keyboard, gamepad) {
+        this.console = console;
+        this.keyboard = keyboard;
+        this.gamepad = gamepad;
+        this.runtimes = new cart_runtime_1.KateRuntimes(console);
+    }
+    static from_root(root) {
+        const console = new virtual_1.VirtualConsole(root);
+        const keyboard = new input_1.KeyboardInput(console);
+        const gamepad = new gamepad_1.GamepadInput(console);
+        console.listen();
+        keyboard.listen(document.body);
+        gamepad.setup();
+        return new KateKernel(console, keyboard, gamepad);
+    }
+}
+exports.KateKernel = KateKernel;
+
+},{"./cart-runtime":7,"./gamepad":8,"./input":10,"./loader":12,"./virtual":13}],12:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.KateLoader = void 0;
+const Cart = require("../../../schema/generated/cartridge");
+class KateLoader {
+    load_bytes(bytes) {
+        const view = new DataView(bytes);
+        const decoder = new Cart._Decoder(view);
+        return Cart.Cartridge.decode(decoder);
+    }
+    async load_from_url(url) {
+        const bytes = await (await fetch(url)).arrayBuffer();
+        return this.load_bytes(bytes);
+    }
+}
+exports.KateLoader = KateLoader;
+
+},{"../../../schema/generated/cartridge":33}],13:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.VirtualConsole = void 0;
+const events_1 = require("../../../util/build/events");
+class VirtualConsole {
+    up_button;
+    right_button;
+    down_button;
+    left_button;
+    menu_button;
+    capture_button;
+    x_button;
+    o_button;
+    ltrigger_button;
+    rtrigger_button;
+    is_listening = false;
+    body;
+    screen;
+    hud;
+    os_root;
+    on_input_changed = new events_1.EventStream();
+    on_key_pressed = new events_1.EventStream();
+    on_tick = new events_1.EventStream();
+    timer_id = null;
+    last_time = null;
+    SPECIAL_FRAMES = 15;
+    FPS = 30;
+    ONE_FRAME = Math.ceil(1000 / 30);
+    input_state;
+    keys = [
+        "up",
+        "right",
+        "down",
+        "left",
+        "x",
+        "o",
+        "ltrigger",
+        "rtrigger",
+    ];
+    special_keys = ["menu", "capture"];
+    constructor(root) {
+        this.up_button = root.querySelector(".kate-dpad-up");
+        this.right_button = root.querySelector(".kate-dpad-right");
+        this.down_button = root.querySelector(".kate-dpad-down");
+        this.left_button = root.querySelector(".kate-dpad-left");
+        this.menu_button = root.querySelector(".kate-button-menu");
+        this.capture_button = root.querySelector(".kate-button-capture");
+        this.x_button = root.querySelector(".kate-button-x");
+        this.o_button = root.querySelector(".kate-button-o");
+        this.ltrigger_button = root.querySelector(".kate-trigger-left");
+        this.rtrigger_button = root.querySelector(".kate-trigger-right");
+        this.screen = root.querySelector("#kate-game");
+        this.os_root = root.querySelector("#kate-os-root");
+        this.hud = root.querySelector("#kate-hud");
+        this.body = root.querySelector(".kate-body");
+        this.reset_states();
+    }
+    reset_states() {
+        this.input_state = {
+            up: { pressed: false, count: 0 },
+            right: { pressed: false, count: 0 },
+            down: { pressed: false, count: 0 },
+            left: { pressed: false, count: 0 },
+            menu: { pressed: false, count: 0 },
+            capture: { pressed: false, count: 0 },
+            x: { pressed: false, count: 0 },
+            o: { pressed: false, count: 0 },
+            ltrigger: { pressed: false, count: 0 },
+            rtrigger: { pressed: false, count: 0 },
+        };
+        this.up_button.classList.remove("down");
+        this.right_button.classList.remove("down");
+        this.down_button.classList.remove("down");
+        this.left_button.classList.remove("down");
+        this.menu_button.classList.remove("down");
+        this.capture_button.classList.remove("down");
+        this.x_button.classList.remove("down");
+        this.o_button.classList.remove("down");
+        this.ltrigger_button.classList.remove("down");
+        this.rtrigger_button.classList.remove("down");
+    }
+    start_ticking() {
+        cancelAnimationFrame(this.timer_id);
+        this.timer_id = requestAnimationFrame(this.tick);
+    }
+    tick = (time) => {
+        if (this.last_time == null) {
+            this.last_time = time;
+            this.on_tick.emit(time);
+            this.timer_id = requestAnimationFrame(this.tick);
+            return;
+        }
+        const elapsed = time - this.last_time;
+        if (elapsed < this.ONE_FRAME) {
+            this.timer_id = requestAnimationFrame(this.tick);
+        }
+        else {
+            this.last_time = time;
+            this.on_tick.emit(time);
+            this.timer_id = requestAnimationFrame(this.tick);
+        }
+    };
+    listen() {
+        if (this.is_listening) {
+            throw new Error(`listen called twice`);
+        }
+        this.is_listening = true;
+        const listen_button = (button, key) => {
+            button.addEventListener("mousedown", (ev) => {
+                ev.preventDefault();
+                this.update_virtual_key(key, true);
+            });
+            button.addEventListener("mouseup", (ev) => {
+                ev.preventDefault();
+                this.update_virtual_key(key, false);
+            });
+            button.addEventListener("touchstart", (ev) => {
+                ev.preventDefault();
+                this.update_virtual_key(key, true);
+            });
+            button.addEventListener("touchend", (ev) => {
+                ev.preventDefault();
+                this.update_virtual_key(key, false);
+            });
+        };
+        listen_button(this.up_button, "up");
+        listen_button(this.right_button, "right");
+        listen_button(this.down_button, "down");
+        listen_button(this.left_button, "left");
+        listen_button(this.menu_button, "menu");
+        listen_button(this.capture_button, "capture");
+        listen_button(this.x_button, "x");
+        listen_button(this.o_button, "o");
+        this.start_ticking();
+        this.on_tick.listen(this.key_update_loop);
+    }
+    key_update_loop = (time) => {
+        for (const key of this.keys) {
+            this.update_single_key(key, false);
+        }
+        for (const key of this.special_keys) {
+            this.update_single_key(key, true);
+        }
+    };
+    update_single_key(key, special) {
+        const x = this.input_state[key];
+        if (x.pressed) {
+            x.count = (x.count + 1) >>> 0 || 2;
+            if (special && x.count >= this.SPECIAL_FRAMES) {
+                x.count = 0;
+                x.pressed = false;
+                this.on_key_pressed.emit(`long_${key}`);
+                this.render_button_state(key, false);
+            }
+            else if (!special && x.count === 1) {
+                this.on_input_changed.emit({ key, is_down: true });
+            }
+        }
+        else {
+            if (special) {
+                if (x.count === -1) {
+                    this.on_input_changed.emit({ key, is_down: false });
+                    this.on_key_pressed.emit(key);
+                    x.count = 0;
+                }
+                else if (x.count > 0 && x.count < this.SPECIAL_FRAMES) {
+                    this.on_input_changed.emit({ key, is_down: true });
+                    x.count = -1;
+                }
+            }
+            else if (x.count > 0) {
+                x.count = 0;
+                this.on_input_changed.emit({ key, is_down: false });
+                this.on_key_pressed.emit(key);
+            }
+        }
+    }
+    update_virtual_key(key, state) {
+        const x = this.input_state[key];
+        if (x.pressed !== state) {
+            x.pressed = state;
+            if (state) {
+                x.count = 0;
+            }
+            this.render_button_state(key, state);
+        }
+    }
+    render_button_state(key, state) {
+        const button = {
+            up: this.up_button,
+            right: this.right_button,
+            down: this.down_button,
+            left: this.left_button,
+            menu: this.menu_button,
+            capture: this.capture_button,
+            x: this.x_button,
+            o: this.o_button,
+            ltrigger: this.ltrigger_button,
+            rtrigger: this.rtrigger_button,
+        }[key];
+        if (state) {
+            button.classList.add("down");
+        }
+        else {
+            button.classList.remove("down");
+        }
+    }
+}
+exports.VirtualConsole = VirtualConsole;
+
+},{"../../../util/build/events":35}],14:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.KateAudioServer = void 0;
+const random_1 = require("../../../../util/build/random");
+class KateAudioServer {
+    os;
+    channels = new Map();
+    sources = new Map();
+    constructor(os) {
+        this.os = os;
+    }
+    async create_channel() {
+        const id = (0, random_1.make_id)();
+        const channel = new AudioChannel(id);
+        this.channels.set(id, channel);
+        return channel;
+    }
+    async load_sound(bytes) {
+        const id = (0, random_1.make_id)();
+        const source = await AudioSource.from_bytes(id, bytes);
+        this.sources.set(id, source);
+        return source;
+    }
+    get_channel(id) {
+        const channel = this.channels.get(id);
+        if (channel == null) {
+            throw new Error(`Unknown channel ${id}`);
+        }
+        return channel;
+    }
+    get_source(id) {
+        const source = this.sources.get(id);
+        if (source == null) {
+            throw new Error(`Unknown source ${id}`);
+        }
+        return source;
+    }
+}
+exports.KateAudioServer = KateAudioServer;
+class AudioChannel {
+    id;
+    volume;
+    output;
+    context;
+    source = null;
+    constructor(id) {
+        this.id = id;
+        this.context = new AudioContext();
+        this.output = this.context.destination;
+        this.volume = this.context.createGain();
+        this.volume.connect(this.output);
+    }
+    get input() {
+        return this.volume;
+    }
+    async get_volume() {
+        return this.volume.gain.value;
+    }
+    async set_volume(value) {
+        this.volume.gain.value = value;
+    }
+    async resume() {
+        await this.context.resume();
+    }
+    async suspend() {
+        await this.context.suspend();
+    }
+    async play(sound, loop) {
+        if (this.source) {
+            this.source.disconnect();
+        }
+        const node = this.context.createBufferSource();
+        node.buffer = sound.buffer;
+        node.loop = loop;
+        node.connect(this.input);
+        node.start();
+    }
+}
+class AudioSource {
+    id;
+    buffer;
+    constructor(id, buffer) {
+        this.id = id;
+        this.buffer = buffer;
+    }
+    static async from_bytes(id, bytes) {
+        const context = new AudioContext();
+        const buffer = await context.decodeAudioData(bytes.buffer);
+        return new AudioSource(id, buffer);
+    }
+}
+
+},{"../../../../util/build/random":38}],15:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.CartManager = void 0;
+const Cart = require("../../../../schema/generated/cartridge");
+const Db = require("./db");
+class CartManager {
+    os;
+    constructor(os) {
+        this.os = os;
+    }
+    async list() {
+        return await this.os.db.transaction([Db.cart_meta], "readonly", async (t) => {
+            const meta = t.get_table(Db.cart_meta);
+            const result = await meta.get_all();
+            return result;
+        });
+    }
+    async install_from_file(file) {
+        try {
+            const cart = this.os.kernel.loader.load_bytes(await file.arrayBuffer());
+            if (await this.install(cart)) {
+                await this.os.notifications.push("kate:installer", "New game installed", `${cart.metadata?.title ?? cart.id} is ready to play!`);
+            }
+        }
+        catch (error) {
+            console.error(`Failed to install ${file.name}:`, error);
+            await this.os.notifications.push("kate:installer", "Installation failed", `${file.name} could not be installed.`);
+        }
+    }
+    async install(cart) {
+        const result = await this.os.db.transaction([Db.cart_meta, Db.cart_files], "readwrite", async (t) => {
+            const meta = t.get_table(Db.cart_meta);
+            const files = t.get_table(Db.cart_files);
+            const encoder = new Cart._Encoder();
+            cart.encode(encoder);
+            const bytes = encoder.to_bytes();
+            await meta.write({
+                id: cart.id,
+                title: cart.metadata?.title ?? cart.id,
+                description: cart.metadata?.description ?? "",
+                thumbnail: cart.metadata?.thumbnail
+                    ? {
+                        mime: cart.metadata.thumbnail.mime,
+                        bytes: cart.metadata.thumbnail.data,
+                    }
+                    : null,
+                installed_at: new Date(),
+            });
+            await files.write({
+                id: cart.id,
+                bytes: bytes,
+            });
+            return true;
+        });
+        if (result) {
+            this.os.events.on_cart_inserted.emit(cart);
+        }
+        return result;
+    }
+}
+exports.CartManager = CartManager;
+
+},{"../../../../schema/generated/cartridge":33,"./db":17}],16:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.HUD_ContextMenu = exports.KateContextMenu = void 0;
+const scenes_1 = require("../ui/scenes");
+const UI = require("../ui");
+const events_1 = require("../../../../util/build/events");
+class KateContextMenu {
+    os;
+    in_context = false;
+    constructor(os) {
+        this.os = os;
+    }
+    setup() {
+        this.os.kernel.console.on_key_pressed.listen(this.handle_key_press);
+    }
+    teardown() {
+        this.os.kernel.console.on_key_pressed.remove(this.handle_key_press);
+    }
+    handle_key_press = (key) => {
+        switch (key) {
+            case "long_menu": {
+                this.show_context_menu();
+                break;
+            }
+        }
+    };
+    show_context_menu() {
+        if (this.in_context) {
+            return;
+        }
+        this.in_context = true;
+        this.os.processes.running?.pause();
+        const old_context = this.os.focus_handler.current_root;
+        const menu = new HUD_ContextMenu(this.os);
+        menu.on_close.listen(() => {
+            this.in_context = false;
+            this.os.processes.running?.unpause();
+            this.os.focus_handler.compare_and_change_root(old_context, menu.canvas);
+        });
+        this.os.show_hud(menu);
+        this.os.focus_handler.change_root(menu.canvas);
+    }
+}
+exports.KateContextMenu = KateContextMenu;
+class HUD_ContextMenu extends scenes_1.Scene {
+    os;
+    on_close = new events_1.EventStream();
+    constructor(os) {
+        super(os);
+        this.os = os;
+    }
+    render() {
+        return UI.h("div", { class: "kate-os-hud-context-menu" }, [
+            UI.h("div", { class: "kate-os-hud-context-menu-backdrop" }, []),
+            UI.h("div", { class: "kate-os-hud-context-menu-content" }, [
+                new UI.If(() => this.os.processes.running != null, {
+                    then: new UI.Menu_list([
+                        new UI.Button(["Close game"]).on_clicked(this.on_close_game),
+                        new UI.Button(["Return"]).on_clicked(this.on_return),
+                    ]),
+                    else: new UI.Menu_list([
+                        new UI.Button(["Power off"]).on_clicked(this.on_power_off),
+                        new UI.Button(["Install from file"]).on_clicked(this.on_install_from_file),
+                        new UI.Button(["Return"]).on_clicked(this.on_return),
+                    ]),
+                }),
+            ]),
+        ]);
+    }
+    on_install_from_file = async () => {
+        this.os.hide_hud(this);
+        this.on_close.emit();
+        return new Promise((resolve, reject) => {
+            const installer = document.querySelector("#kate-installer");
+            const teardown = () => {
+                installer.onchange = () => { };
+                installer.onerror = () => { };
+                installer.onabort = () => { };
+            };
+            installer.onchange = async (ev) => {
+                try {
+                    const file = installer.files.item(0);
+                    await this.os.cart_manager.install_from_file(file);
+                    teardown();
+                    resolve();
+                }
+                catch (error) {
+                    teardown();
+                    reject(error);
+                }
+            };
+            installer.onerror = async () => {
+                teardown();
+                reject(new Error(`failed to install`));
+            };
+            installer.onabort = async () => {
+                teardown();
+                reject(new Error(`failed to install`));
+            };
+            installer.click();
+        });
+    };
+    on_close_game = async () => {
+        await this.os.processes.running?.exit();
+        this.os.hide_hud(this);
+        this.on_close.emit();
+    };
+    on_return = async () => {
+        this.os.hide_hud(this);
+        this.on_close.emit();
+    };
+    on_power_off = async () => {
+        window.close();
+        this.os.hide_hud(this);
+        this.on_close.emit();
+    };
+}
+exports.HUD_ContextMenu = HUD_ContextMenu;
+
+},{"../../../../util/build/events":35,"../ui":30,"../ui/scenes":31}],17:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.cart_kvstore = exports.notifications = exports.cart_files = exports.cart_meta = exports.kate = void 0;
+const Db = require("../../../../db-schema/build");
+exports.kate = new Db.DatabaseSchema("kate", 1);
+exports.cart_meta = exports.kate.table(1, "cart_meta", { path: "id", auto_increment: false }, []);
+exports.cart_files = exports.kate.table(1, "cart_files", { path: "id", auto_increment: false }, []);
+exports.notifications = exports.kate.table(1, "notifications", { path: "id", auto_increment: true }, []);
+exports.cart_kvstore = exports.kate.table(1, "cart_kvstore", { path: "id", auto_increment: false }, []);
+
+},{"../../../../db-schema/build":3}],18:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.HUD_DropInstaller = exports.KateDropInstaller = void 0;
+const scenes_1 = require("../ui/scenes");
+const UI = require("../ui");
+class KateDropInstaller {
+    os;
+    hud;
+    constructor(os) {
+        this.os = os;
+        this.hud = new HUD_DropInstaller(this);
+    }
+    setup() {
+        this.hud.setup();
+    }
+    async install(files) {
+        const valid = files.filter((x) => x.name.endsWith(".kart"));
+        const status = this.os.status_bar.show(`Installing ${files.length} carts...`);
+        for (const file of valid) {
+            if (!file.name.endsWith(".kart")) {
+                continue;
+            }
+            status.update(`Installing ${file.name}...`);
+            await this.os.cart_manager.install_from_file(file);
+        }
+        status.hide();
+    }
+}
+exports.KateDropInstaller = KateDropInstaller;
+class HUD_DropInstaller extends scenes_1.Scene {
+    manager;
+    constructor(manager) {
+        super(manager.os);
+        this.manager = manager;
+        this.canvas = UI.h("div", { class: "kate-hud-drop-installer" }, []);
+    }
+    setup() {
+        this.manager.os.show_hud(this);
+        const screen = this.manager.os.kernel.console.body;
+        screen.addEventListener("dragenter", (ev) => {
+            this.canvas.classList.add("active");
+            screen.classList.add("drag");
+        });
+        screen.addEventListener("dragleave", (ev) => {
+            this.canvas.classList.remove("active");
+            screen.classList.remove("drag");
+        });
+        screen.addEventListener("dragover", (ev) => {
+            ev.preventDefault();
+            ev.dataTransfer.dropEffect = "copy";
+        });
+        screen.addEventListener("drop", (ev) => {
+            ev.preventDefault();
+            this.canvas.classList.remove("active");
+            screen.classList.remove("drag");
+            this.manager.install([...ev.dataTransfer.files]);
+        });
+    }
+    render() {
+        return UI.fragment([
+            UI.h("div", { class: "kate-hud-drop-installer-icon" }, []),
+            UI.h("div", { class: "kate-hud-drop-installer-description" }, [
+                "Drop ",
+                UI.h("tt", {}, [".kart"]),
+                " files here to install them",
+            ]),
+        ]);
+    }
+}
+exports.HUD_DropInstaller = HUD_DropInstaller;
+
+},{"../ui":30,"../ui/scenes":31}],19:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.StorageFile = exports.StorageBucket = exports.KateStorage = void 0;
+const Cart = require("../../../../schema/generated/cartridge");
+class KateStorage {
+    os;
+    constructor(os) {
+        this.os = os;
+    }
+    get backend() {
+        return navigator.storage;
+    }
+    async usage() {
+        const estimate = await this.backend.estimate();
+        return {
+            total: estimate.quota ?? 0,
+            used: estimate.usage ?? 0,
+        };
+    }
+    async get_real_bucket(name) {
+        const root = await this.backend.getDirectory();
+        const dir = await root.getDirectoryHandle(name, { create: true });
+        return new StorageBucket(this, dir);
+    }
+    async get_bucket(name) {
+        return this.get_real_bucket(`user.${name}`);
+    }
+    async get_carts() {
+        return this.get_real_bucket("kate.carts");
+    }
+    async get_cart_bucket(cart) {
+        return this.get_real_bucket(`cart.${cart.id}`);
+    }
+    async install_cart(cart) {
+        const encoder = new Cart._Encoder();
+        cart.encode(encoder);
+        const bytes = encoder.to_bytes();
+        const bucket = await this.get_carts();
+        const file = await bucket.file_at(cart.id, true);
+        await file.write(bytes.buffer);
+        this.os.events.on_cart_inserted.emit(cart);
+    }
+}
+exports.KateStorage = KateStorage;
+class StorageBucket {
+    storage;
+    handle;
+    constructor(storage, handle) {
+        this.storage = storage;
+        this.handle = handle;
+    }
+    async list() {
+        const result = [];
+        for await (const file of this.handle.values()) {
+            if (file.kind === "file" && !file.name.endsWith(".crswap")) {
+                result.push(file);
+            }
+        }
+        return result;
+    }
+    async file_at(name, create) {
+        return new StorageFile(this, await this.handle.getFileHandle(name, { create }));
+    }
+}
+exports.StorageBucket = StorageBucket;
+class StorageFile {
+    bucket;
+    handle;
+    constructor(bucket, handle) {
+        this.bucket = bucket;
+        this.handle = handle;
+    }
+    async read() {
+        return await this.handle.getFile();
+    }
+    async write(data) {
+        const stream = await this.handle.createWritable();
+        stream.write(data);
+    }
+    async get_write_stream() {
+        return await this.handle.createWritable();
+    }
+}
+exports.StorageFile = StorageFile;
+
+},{"../../../../schema/generated/cartridge":33}],20:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.KateFocusHandler = void 0;
+class KateFocusHandler {
+    os;
+    _current_root = null;
+    constructor(os) {
+        this.os = os;
+    }
+    setup() {
+        this.os.kernel.console.on_key_pressed.listen(this.handle_input);
+    }
+    should_handle(key) {
+        return ["up", "down", "left", "right", "o"].includes(key);
+    }
+    get current_root() {
+        return this._current_root;
+    }
+    change_root(element) {
+        this._current_root = element;
+        if (element != null && element.querySelector(".focus") == null) {
+            const candidates0 = Array.from(element.querySelectorAll(".kate-ui-focus-target"));
+            const candidates = candidates0.sort((a, b) => a.offsetLeft - b.offsetLeft);
+            this.focus(candidates[0]);
+        }
+    }
+    compare_and_change_root(element, old) {
+        if (this.current_root === old) {
+            this.change_root(element);
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    focus_current_scene() {
+        this.change_root(this.os.current_scene?.canvas ?? null);
+    }
+    handle_input = (key) => {
+        if (this._current_root == null || !this.should_handle(key)) {
+            return;
+        }
+        const focusable = Array.from(this._current_root.querySelectorAll(".kate-ui-focus-target")).map((x) => ({
+            element: x,
+            position: {
+                x: x.offsetLeft,
+                y: x.offsetTop,
+                width: x.offsetWidth,
+                height: x.offsetHeight,
+                right: x.offsetLeft + x.offsetWidth,
+                bottom: x.offsetTop + x.offsetHeight,
+            },
+        }));
+        const right_limit = Math.max(...focusable.map((x) => x.position.right));
+        const bottom_limit = Math.max(...focusable.map((x) => x.position.bottom));
+        const current = focusable.find((x) => x.element.classList.contains("focus"));
+        const left = current?.position.x ?? right_limit;
+        const top = current?.position.y ?? bottom_limit;
+        const right = current?.position.right ?? 0;
+        const bottom = current?.position.bottom ?? 0;
+        switch (key) {
+            case "o": {
+                if (current != null) {
+                    current.element.click();
+                }
+                break;
+            }
+            case "up": {
+                const candidates = focusable
+                    .filter((x) => x.position.bottom < top)
+                    .sort((a, b) => b.position.bottom - a.position.bottom);
+                const closest = candidates.sort((a, b) => {
+                    return (Math.min(a.position.x - left, a.position.right - right) -
+                        Math.min(b.position.x - left, b.position.right - right));
+                });
+                this.focus(closest[0]?.element);
+                break;
+            }
+            case "down": {
+                const candidates = focusable
+                    .filter((x) => x.position.y > bottom)
+                    .sort((a, b) => a.position.y - b.position.y);
+                const closest = candidates.sort((a, b) => {
+                    return (Math.min(a.position.x - left, a.position.right - right) -
+                        Math.min(b.position.x - left, b.position.right - right));
+                });
+                this.focus(closest[0]?.element);
+                break;
+            }
+            case "left": {
+                const candidates = focusable
+                    .filter((x) => x.position.right < left)
+                    .sort((a, b) => b.position.right - a.position.right);
+                const closest = candidates.sort((a, b) => {
+                    return (Math.min(a.position.y - top, a.position.bottom - bottom) -
+                        Math.min(b.position.y - top, b.position.bottom - bottom));
+                });
+                this.focus(closest[0]?.element);
+                break;
+            }
+            case "right": {
+                const candidates = focusable
+                    .filter((x) => x.position.x > right)
+                    .sort((a, b) => a.position.x - b.position.x);
+                const closest = candidates.sort((a, b) => {
+                    return (Math.min(a.position.y - top, a.position.bottom - bottom) -
+                        Math.min(b.position.y - top, b.position.bottom - bottom));
+                });
+                this.focus(closest[0]?.element);
+                break;
+            }
+        }
+    };
+    focus(element) {
+        if (element == null || this._current_root == null) {
+            return;
+        }
+        for (const x of Array.from(this._current_root.querySelectorAll(".focus"))) {
+            x.classList.remove("focus");
+        }
+        element.focus();
+        element.classList.add("focus");
+        element.scrollIntoView({
+            block: "center",
+            inline: "center",
+        });
+    }
+}
+exports.KateFocusHandler = KateFocusHandler;
+
+},{}],21:[function(require,module,exports){
+"use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __exportStar = (this && this.__exportStar) || function(m, exports) {
+    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+__exportStar(require("./audio"), exports);
+__exportStar(require("./cart-manager"), exports);
+__exportStar(require("./context_menu"), exports);
+__exportStar(require("./db"), exports);
+__exportStar(require("./drop-installer"), exports);
+__exportStar(require("./file_storage"), exports);
+__exportStar(require("./focus-handler"), exports);
+__exportStar(require("./ipc"), exports);
+__exportStar(require("./kv_storage"), exports);
+__exportStar(require("./notification"), exports);
+__exportStar(require("./processes"), exports);
+__exportStar(require("./status-bar"), exports);
+
+},{"./audio":14,"./cart-manager":15,"./context_menu":16,"./db":17,"./drop-installer":18,"./file_storage":19,"./focus-handler":20,"./ipc":22,"./kv_storage":23,"./notification":24,"./processes":25,"./status-bar":26}],22:[function(require,module,exports){
+(function (process){(function (){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.KateIPCChannel = exports.KateIPCServer = void 0;
+class KateIPCServer {
+    os;
+    _handlers = new Map();
+    _initialised = false;
+    constructor(os) {
+        this.os = os;
+    }
+    setup() {
+        if (this._initialised) {
+            throw new Error(`setup() called twice`);
+        }
+        this._initialised = true;
+        window.addEventListener("message", this.handle_message);
+    }
+    add_process(secret, cart, window, audio) {
+        if (this._handlers.has(secret)) {
+            throw new Error(`Duplicated secret when constructing IPC channel`);
+        }
+        const process = { secret, cart, window, audio };
+        this._handlers.set(secret, process);
+        return new KateIPCChannel(this, process);
+    }
+    remove_process(process) {
+        this._handlers.delete(process.secret);
+    }
+    send(process, message) {
+        process.window()?.postMessage(message, "*");
+    }
+    handle_message = async (ev) => {
+        const secret = ev.data.secret;
+        const type = ev.data.type;
+        const id = ev.data.id;
+        const payload = ev.data.payload;
+        if (typeof secret === "string" &&
+            typeof type === "string" &&
+            typeof id === "string" &&
+            typeof payload === "object") {
+            console.log("kate-ipc <==", { type, id, payload });
+            const handler = this._handlers.get(secret);
+            if (handler != null) {
+                const { ok, value } = await this.process_message(handler, {
+                    type: type,
+                    payload,
+                });
+                console.log("kate-ipc ==>", { id, ok, value });
+                handler.window()?.postMessage({
+                    type: "kate:reply",
+                    id: id,
+                    ok: ok,
+                    value: value,
+                }, "*");
+            }
+        }
+    };
+    async process_message(process, message) {
+        const err = (code) => ({ ok: false, value: { code } });
+        const ok = (value) => ({ ok: true, value });
+        switch (message.type) {
+            // -- Cart FS
+            case "kate:cart.read-file": {
+                const file = process.cart.files.find((x) => x.path === message.payload.path);
+                if (file != null) {
+                    return ok({ mime: file.mime, bytes: file.data });
+                }
+                else {
+                    return err("kate.cart-fs.file-not-found");
+                }
+            }
+            // -- KV store
+            case "kate:kv-store.read-all": {
+                const storage = this.os.kv_storage.get_store(process.cart.id);
+                return ok(storage.contents());
+            }
+            case "kate:kv-store.update-all": {
+                const storage = this.os.kv_storage.get_store(process.cart.id);
+                try {
+                    await storage.write(message.payload.value);
+                    return ok(null);
+                }
+                catch (_) {
+                    return err("kate.kv-store.write-failed");
+                }
+            }
+            case "kate:kv-store.get": {
+                const storage = this.os.kv_storage.get_store(process.cart.id);
+                const value = (await storage.contents())[message.payload.key] ?? null;
+                return ok(value);
+            }
+            case "kate:kv-store.set": {
+                const storage = this.os.kv_storage.get_store(process.cart.id);
+                try {
+                    await storage.set_pair(message.payload.key, message.payload.value);
+                    return ok(null);
+                }
+                catch (_) {
+                    return err("kate:kv-store.write-failed");
+                }
+            }
+            // -- Audio
+            case "kate:audio.create-channel": {
+                const channel = await process.audio.create_channel();
+                await channel.resume();
+                return ok({ id: channel.id, volume: channel.volume.gain.value });
+            }
+            case "kate:audio.resume-channel": {
+                try {
+                    const channel = process.audio.get_channel(message.payload.id);
+                    await channel.resume();
+                    return ok(null);
+                }
+                catch (_) {
+                    return err("kate:audio.cannot-resume");
+                }
+            }
+            case "kate:audio.pause-channel": {
+                try {
+                    const channel = process.audio.get_channel(message.payload.id);
+                    await channel.suspend();
+                    return ok(null);
+                }
+                catch (_) {
+                    return err("kate:audio.cannot-pause");
+                }
+            }
+            case "kate:audio.change-volume": {
+                try {
+                    const channel = process.audio.get_channel(message.payload.id);
+                    await channel.set_volume(message.payload.volume);
+                    return ok(null);
+                }
+                catch (_) {
+                    return err("kate:audio.cannot-change-volume");
+                }
+            }
+            case "kate:audio.load": {
+                try {
+                    const source = await process.audio.load_sound(message.payload.bytes);
+                    return ok(source.id);
+                }
+                catch (_) {
+                    return err("kate:audio.cannot-load");
+                }
+            }
+            case "kate:audio.play": {
+                try {
+                    const channel = process.audio.get_channel(message.payload.channel);
+                    const source = process.audio.get_source(message.payload.source);
+                    await channel.play(source, message.payload.loop);
+                    return ok(null);
+                }
+                catch (_) {
+                    return err("kate:audio.cannot-play");
+                }
+            }
+            default:
+                return { ok: false, value: { code: "kate:ipc.unknown-message" } };
+        }
+    }
+}
+exports.KateIPCServer = KateIPCServer;
+class KateIPCChannel {
+    server;
+    process;
+    constructor(server, process) {
+        this.server = server;
+        this.process = process;
+    }
+    send(message) {
+        this.server.send(this.process, message);
+    }
+    dispose() {
+        this.server.remove_process(this.process);
+    }
+}
+exports.KateIPCChannel = KateIPCChannel;
+
+}).call(this)}).call(this,require('_process'))
+},{"_process":1}],23:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.KateKVStoragePartition = exports.KateKVStorage = void 0;
+const Db = require("./db");
+class KateKVStorage {
+    os;
+    constructor(os) {
+        this.os = os;
+    }
+    get_store(id) {
+        return new KateKVStoragePartition(this, id);
+    }
+}
+exports.KateKVStorage = KateKVStorage;
+class KateKVStoragePartition {
+    manager;
+    id;
+    constructor(manager, id) {
+        this.manager = manager;
+        this.id = id;
+    }
+    get db() {
+        return this.manager.os.db;
+    }
+    async contents() {
+        return this.db.transaction([Db.cart_kvstore], "readonly", async (t) => {
+            const store = t.get_table(Db.cart_kvstore);
+            return (await store.try_get(this.id))?.content ?? Object.create(null);
+        });
+    }
+    async write(from) {
+        const data = Object.create(null);
+        for (const [key, value] of Object.entries(from)) {
+            data[key] = String(value);
+        }
+        return this.db.transaction([Db.cart_kvstore], "readwrite", async (t) => {
+            const store = t.get_table(Db.cart_kvstore);
+            await store.write({ id: this.id, content: data });
+        });
+    }
+    async set_pair(key, value) {
+        return this.db.transaction([Db.cart_kvstore], "readwrite", async (t) => {
+            const store = t.get_table(Db.cart_kvstore);
+            const value = (await store.try_get(this.id))?.content ?? Object.create(null);
+            value[key] = value;
+            await store.write({ id: this.id, content: value });
+        });
+    }
+}
+exports.KateKVStoragePartition = KateKVStoragePartition;
+
+},{"./db":17}],24:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.HUD_Toaster = exports.KateNotification = void 0;
+const scenes_1 = require("../ui/scenes");
+const UI = require("../ui");
+const Db = require("./db");
+const time_1 = require("../time");
+class KateNotification {
+    os;
+    hud;
+    constructor(os) {
+        this.os = os;
+        this.hud = new HUD_Toaster(this);
+    }
+    setup() {
+        this.hud.setup();
+    }
+    async push(process_id, title, message) {
+        await this.os.db.transaction([Db.notifications], "readwrite", async (t) => {
+            const notifications = t.get_table(Db.notifications);
+            await notifications.write({
+                type: "basic",
+                process_id,
+                time: new Date(),
+                title,
+                message,
+            });
+        });
+        this.hud.show(title, message);
+    }
+}
+exports.KateNotification = KateNotification;
+class HUD_Toaster extends scenes_1.Scene {
+    manager;
+    NOTIFICATION_WAIT_TIME_MS = 5000;
+    FADE_OUT_TIME_MS = 250;
+    constructor(manager) {
+        super(manager.os);
+        this.manager = manager;
+        this.canvas = UI.h("div", { class: "kate-hud-notifications" }, []);
+    }
+    setup() {
+        this.manager.os.show_hud(this);
+    }
+    teardown() {
+        this.manager.os.hide_hud(this);
+    }
+    render() {
+        return null;
+    }
+    async show(title, message) {
+        const element = UI.h("div", { class: "kate-hud-notification-item" }, [
+            UI.h("div", { class: "kate-hud-notification-title" }, [title]),
+            UI.h("div", { class: "kate-hud-notification-message" }, [message]),
+        ]);
+        this.canvas.appendChild(element);
+        await (0, time_1.wait)(this.NOTIFICATION_WAIT_TIME_MS);
+        element.classList.add("leaving");
+        await (0, time_1.wait)(this.FADE_OUT_TIME_MS);
+        element.remove();
+    }
+}
+exports.HUD_Toaster = HUD_Toaster;
+
+},{"../time":29,"../ui":30,"../ui/scenes":31,"./db":17}],25:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.KateProcess = exports.HUD_LoadIndicator = exports.KateProcesses = void 0;
+const ui_1 = require("../ui");
+const scenes_1 = require("../ui/scenes");
+const Db = require("./db");
+class KateProcesses {
+    os;
+    _running = null;
+    constructor(os) {
+        this.os = os;
+    }
+    get is_busy() {
+        return this._running != null;
+    }
+    get running() {
+        return this._running;
+    }
+    async run(id) {
+        if (this.is_busy) {
+            throw new Error(`process already running`);
+        }
+        const loading = new HUD_LoadIndicator(this.os);
+        this.os.show_hud(loading);
+        this.os.focus_handler.change_root(null);
+        try {
+            const cart = await this.os.db.transaction([Db.cart_files], "readonly", async (t) => {
+                const files = t.get_table(Db.cart_files);
+                const file = await files.get(id);
+                return this.os.kernel.loader.load_bytes(file.bytes.buffer);
+            });
+            const storage = this.os.kv_storage.get_store(cart.id);
+            const runtime = this.os.kernel.runtimes.from_cartridge(cart, await storage.contents());
+            const process = new KateProcess(this, cart, runtime.run(this.os));
+            this._running = process;
+            this.os.kernel.console.os_root.classList.add("in-background");
+            return process;
+        }
+        finally {
+            this.os.hide_hud(loading);
+        }
+    }
+    notify_exit(process) {
+        if (process === this._running) {
+            this._running = null;
+            this.os.focus_handler.focus_current_scene();
+            this.os.kernel.console.os_root.classList.remove("in-background");
+        }
+    }
+}
+exports.KateProcesses = KateProcesses;
+class HUD_LoadIndicator extends scenes_1.Scene {
+    render() {
+        return (0, ui_1.h)("div", { class: "kate-hud-load-screen" }, ["Loading..."]);
+    }
+}
+exports.HUD_LoadIndicator = HUD_LoadIndicator;
+class KateProcess {
+    manager;
+    cart;
+    runtime;
+    _paused = false;
+    constructor(manager, cart, runtime) {
+        this.manager = manager;
+        this.cart = cart;
+        this.runtime = runtime;
+    }
+    async pause() {
+        if (this._paused)
+            return;
+        this._paused = true;
+        await this.runtime.pause();
+    }
+    async unpause() {
+        if (!this._paused)
+            return;
+        this._paused = false;
+        await this.runtime.unpause();
+    }
+    async exit() {
+        await this.runtime.exit();
+        this.manager.notify_exit(this);
+    }
+}
+exports.KateProcess = KateProcess;
+
+},{"../ui":30,"../ui/scenes":31,"./db":17}],26:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.KateStatus = exports.HUD_StatusBar = exports.KateStatusBar = void 0;
+const ui_1 = require("../ui");
+const scenes_1 = require("../ui/scenes");
+class KateStatusBar {
+    os;
+    hud;
+    constructor(os) {
+        this.os = os;
+        this.hud = new HUD_StatusBar(this);
+    }
+    setup() {
+        this.os.show_hud(this.hud);
+    }
+    show(content) {
+        return this.hud.show(content);
+    }
+}
+exports.KateStatusBar = KateStatusBar;
+class HUD_StatusBar extends scenes_1.Scene {
+    manager;
+    _timer = null;
+    STATUS_LINE_TIME_MS = 5000;
+    constructor(manager) {
+        super(manager.os);
+        this.manager = manager;
+        this.canvas = (0, ui_1.h)("div", { class: "kate-hud-status-bar" }, []);
+    }
+    render() {
+        return null;
+    }
+    show(content) {
+        const status = new KateStatus(this, (0, ui_1.h)("div", { class: "kate-hud-status-item" }, [content]));
+        this.canvas.appendChild(status.canvas);
+        this.tick();
+        return status;
+    }
+    refresh() {
+        const items = Array.from(this.canvas.querySelectorAll(".kate-hud-status-item"));
+        if (items.length === 0) {
+            this.canvas.classList.remove("active");
+        }
+        else {
+            this.canvas.classList.add("active");
+        }
+    }
+    tick() {
+        clearTimeout(this._timer);
+        const items = Array.from(this.canvas.querySelectorAll(".kate-hud-status-item"));
+        if (items.length > 0) {
+            this.canvas.classList.add("active");
+            const current = items.findIndex((x) => x.classList.contains("active"));
+            for (const item of items) {
+                item.classList.remove("active");
+            }
+            items[(current + 1) % items.length]?.classList.add("active");
+        }
+        if (items.length > 1) {
+            this._timer = setTimeout(() => this.tick(), this.STATUS_LINE_TIME_MS);
+        }
+    }
+}
+exports.HUD_StatusBar = HUD_StatusBar;
+class KateStatus {
+    display;
+    canvas;
+    constructor(display, canvas) {
+        this.display = display;
+        this.canvas = canvas;
+    }
+    hide() {
+        this.canvas.remove();
+        this.display.refresh();
+    }
+    update(content) {
+        this.canvas.textContent = "";
+        (0, ui_1.append)(content, this.canvas);
+    }
+}
+exports.KateStatus = KateStatus;
+
+},{"../ui":30,"../ui/scenes":31}],27:[function(require,module,exports){
+"use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __exportStar = (this && this.__exportStar) || function(m, exports) {
+    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+__exportStar(require("./os"), exports);
+__exportStar(require("./time"), exports);
+__exportStar(require("./ui"), exports);
+__exportStar(require("./apis"), exports);
+
+},{"./apis":21,"./os":28,"./time":29,"./ui":30}],28:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.KateOS = void 0;
+const KateDb = require("./apis/db");
+const events_1 = require("../../../util/build/events");
+const file_storage_1 = require("./apis/file_storage");
+const time_1 = require("./time");
+const scenes_1 = require("./ui/scenes");
+const cart_manager_1 = require("./apis/cart-manager");
+const processes_1 = require("./apis/processes");
+const context_menu_1 = require("./apis/context_menu");
+const notification_1 = require("./apis/notification");
+const drop_installer_1 = require("./apis/drop-installer");
+const focus_handler_1 = require("./apis/focus-handler");
+const status_bar_1 = require("./apis/status-bar");
+const kv_storage_1 = require("./apis/kv_storage");
+const ipc_1 = require("./apis/ipc");
+const apis_1 = require("./apis");
+class KateOS {
+    kernel;
+    db;
+    _scene_stack = [];
+    _active_hud = [];
+    _current_scene = null;
+    storage;
+    cart_manager;
+    processes;
+    context_menu;
+    notifications;
+    installer;
+    focus_handler;
+    status_bar;
+    kv_storage;
+    ipc;
+    events = {
+        on_cart_inserted: new events_1.EventStream(),
+    };
+    constructor(kernel, db) {
+        this.kernel = kernel;
+        this.db = db;
+        this.storage = new file_storage_1.KateStorage(this);
+        this.cart_manager = new cart_manager_1.CartManager(this);
+        this.processes = new processes_1.KateProcesses(this);
+        this.kv_storage = new kv_storage_1.KateKVStorage(this);
+        this.context_menu = new context_menu_1.KateContextMenu(this);
+        this.context_menu.setup();
+        this.notifications = new notification_1.KateNotification(this);
+        this.notifications.setup();
+        this.installer = new drop_installer_1.KateDropInstaller(this);
+        this.installer.setup();
+        this.focus_handler = new focus_handler_1.KateFocusHandler(this);
+        this.focus_handler.setup();
+        this.status_bar = new status_bar_1.KateStatusBar(this);
+        this.status_bar.setup();
+        this.ipc = new ipc_1.KateIPCServer(this);
+        this.ipc.setup();
+    }
+    get display() {
+        return this.kernel.console.os_root;
+    }
+    get hud_display() {
+        return this.kernel.console.hud;
+    }
+    get current_scene() {
+        return this._current_scene;
+    }
+    push_scene(scene) {
+        if (this._current_scene != null) {
+            this._scene_stack.push(this._current_scene);
+        }
+        this._current_scene = scene;
+        scene.attach(this.display);
+        this.focus_handler.change_root(scene.canvas);
+    }
+    pop_scene() {
+        if (this._current_scene != null) {
+            this._current_scene.detach();
+        }
+        this._current_scene = this._scene_stack.pop() ?? null;
+        this.focus_handler.change_root(this._current_scene?.canvas ?? null);
+    }
+    show_hud(scene) {
+        this._active_hud.push(scene);
+        scene.attach(this.hud_display);
+    }
+    hide_hud(scene) {
+        this._active_hud = this._active_hud.filter((x) => x !== scene);
+        scene.detach();
+    }
+    make_audio_server() {
+        return new apis_1.KateAudioServer(this);
+    }
+    static async boot(kernel) {
+        const db = await KateDb.kate.open();
+        const os = new KateOS(kernel, db);
+        const boot_screen = new scenes_1.SceneBoot(os);
+        os.push_scene(boot_screen);
+        await (0, time_1.wait)(2100);
+        os.pop_scene();
+        os.push_scene(new scenes_1.SceneHome(os));
+        return os;
+    }
+}
+exports.KateOS = KateOS;
+
+},{"../../../util/build/events":35,"./apis":21,"./apis/cart-manager":15,"./apis/context_menu":16,"./apis/db":17,"./apis/drop-installer":18,"./apis/file_storage":19,"./apis/focus-handler":20,"./apis/ipc":22,"./apis/kv_storage":23,"./apis/notification":24,"./apis/processes":25,"./apis/status-bar":26,"./time":29,"./ui/scenes":31}],29:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.wait = void 0;
+async function wait(ms) {
+    return new Promise((resolve) => setTimeout(() => resolve(), ms));
+}
+exports.wait = wait;
+
+},{}],30:[function(require,module,exports){
+"use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __exportStar = (this && this.__exportStar) || function(m, exports) {
+    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Scenes = void 0;
+__exportStar(require("./widget"), exports);
+const Scenes = require("./scenes");
+exports.Scenes = Scenes;
+
+},{"./scenes":31,"./widget":32}],31:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.SceneHome = exports.SceneBoot = exports.Scene = void 0;
+const widget_1 = require("./widget");
+const UI = require("./widget");
+class Scene {
+    os;
+    canvas;
+    constructor(os) {
+        this.os = os;
+        this.canvas = (0, widget_1.h)("div", { class: "kate-os-screen" }, []);
+    }
+    async attach(to) {
+        to.appendChild(this.canvas);
+        this.canvas.innerHTML = "";
+        (0, widget_1.append)(this.render(), this.canvas);
+    }
+    async detach() {
+        this.canvas.remove();
+    }
+}
+exports.Scene = Scene;
+class SceneBoot extends Scene {
+    render() {
+        return (0, widget_1.h)("div", { class: "kate-os-logo" }, [
+            (0, widget_1.h)("div", { class: "kate-os-logo-image" }, [
+                (0, widget_1.h)("div", { class: "kate-os-logo-paw" }, [
+                    (0, widget_1.h)("i", {}, []),
+                    (0, widget_1.h)("i", {}, []),
+                    (0, widget_1.h)("i", {}, []),
+                ]),
+                (0, widget_1.h)("div", { class: "kate-os-logo-name" }, ["Kate"]),
+            ]),
+        ]);
+    }
+}
+exports.SceneBoot = SceneBoot;
+class SceneHome extends Scene {
+    render_cart(x) {
+        return new UI.Button([
+            (0, widget_1.h)("div", { class: "kate-os-carts-box" }, [
+                (0, widget_1.h)("div", { class: "kate-os-carts-image" }, x.thumbnail
+                    ? [
+                        (0, widget_1.h)("img", {
+                            src: URL.createObjectURL(new Blob([x.thumbnail.bytes], {
+                                type: x.thumbnail.mime,
+                            })),
+                        }, []),
+                    ]
+                    : []),
+                (0, widget_1.h)("div", { class: "kate-os-carts-title" }, [x.title]),
+            ]),
+        ]).on_clicked(() => {
+            this.os.processes.run(x.id);
+        });
+    }
+    async show_carts(list) {
+        try {
+            const carts = (await this.os.cart_manager.list()).sort((a, b) => b.installed_at.getTime() - a.installed_at.getTime());
+            list.textContent = "";
+            for (const x of carts) {
+                list.appendChild(this.render_cart(x).render());
+            }
+            this.os.focus_handler.focus(list.querySelector(".kate-ui-focus-target") ??
+                list.firstElementChild ??
+                null);
+        }
+        catch (error) {
+            console.log(error);
+            this.os.notifications.push("kate:os", "Failed to load games", `An internal error happened while loading.`);
+        }
+    }
+    render() {
+        const home = (0, widget_1.h)("div", { class: "kate-os-home" }, [
+            new UI.Title_bar({
+                left: UI.fragment([new UI.Section_title(["Library"])]),
+            }),
+            (0, widget_1.h)("div", { class: "kate-os-carts-scroll" }, [
+                (0, widget_1.h)("div", { class: "kate-os-carts" }, []),
+            ]),
+        ]);
+        const carts = home.querySelector(".kate-os-carts");
+        this.show_carts(carts);
+        this.os.events.on_cart_inserted.listen(async (x) => {
+            this.show_carts(carts);
+        });
+        return home;
+    }
+}
+exports.SceneHome = SceneHome;
+
+},{"./widget":32}],32:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Icon = exports.Button = exports.If = exports.Menu_list = exports.Section_title = exports.Title_bar = exports.VBox = exports.HBox = exports.WithClass = exports.append = exports.render = exports.svg = exports.h = exports.fragment = exports.Widget = void 0;
+const events_1 = require("../../../../util/build/events");
+class Widget {
+    with_classes(names) {
+        return new WithClass(names, this);
+    }
+}
+exports.Widget = Widget;
+function fragment(children) {
+    const x = document.createDocumentFragment();
+    for (const child of children) {
+        append(child, x);
+    }
+    return x;
+}
+exports.fragment = fragment;
+function h(tag, attrs, children) {
+    const element = document.createElement(tag);
+    for (const [key, value] of Object.entries(attrs)) {
+        element.setAttribute(key, value);
+    }
+    for (const child of children) {
+        append(child, element);
+    }
+    return element;
+}
+exports.h = h;
+function svg(tag, attrs, children) {
+    const element = document.createElementNS("http://www.w3.org/2000/svg", tag);
+    for (const [key, value] of Object.entries(attrs)) {
+        element.setAttribute(key, value);
+    }
+    for (const child of children) {
+        element.appendChild(child);
+    }
+    return element;
+}
+exports.svg = svg;
+function render(x) {
+    const element = x.render();
+    if (element instanceof Widget) {
+        return render(element);
+    }
+    else {
+        return element;
+    }
+}
+exports.render = render;
+function append(child, to) {
+    let content = child instanceof Widget ? render(child) : child;
+    if (typeof content === "string") {
+        to.appendChild(document.createTextNode(content));
+    }
+    else if (content != null) {
+        to.appendChild(content);
+    }
+}
+exports.append = append;
+class WithClass extends Widget {
+    classes;
+    child;
+    constructor(classes, child) {
+        super();
+        this.classes = classes;
+        this.child = child;
+    }
+    render() {
+        const element = render(this.child);
+        if (element instanceof HTMLElement) {
+            for (const k of this.classes) {
+                element.classList.add(k);
+            }
+        }
+        return element;
+    }
+}
+exports.WithClass = WithClass;
+class HBox extends Widget {
+    gap;
+    children;
+    constructor(gap, children) {
+        super();
+        this.gap = gap;
+        this.children = children;
+    }
+    render() {
+        return h("div", { class: "kate-ui-hbox", style: `gap: ${this.gap}px` }, this.children);
+    }
+}
+exports.HBox = HBox;
+class VBox extends Widget {
+    gap;
+    children;
+    constructor(gap, children) {
+        super();
+        this.gap = gap;
+        this.children = children;
+    }
+    render() {
+        return h("div", { class: "kate-ui-vbox", style: `gap: ${this.gap}px` }, this.children);
+    }
+}
+exports.VBox = VBox;
+class Title_bar extends Widget {
+    children;
+    constructor(children) {
+        super();
+        this.children = children;
+    }
+    render() {
+        return h("div", { class: "kate-ui-title-bar" }, [
+            h("div", { class: "kate-ui-title-bar-child" }, [
+                this.children.left ?? null,
+            ]),
+            h("div", { class: "kate-ui-title-bar-child" }, [
+                this.children.middle ?? null,
+            ]),
+            h("div", { class: "kate-ui-title-bar-child" }, [
+                this.children.right ?? null,
+            ]),
+        ]);
+    }
+}
+exports.Title_bar = Title_bar;
+class Section_title extends Widget {
+    children;
+    constructor(children) {
+        super();
+        this.children = children;
+    }
+    render() {
+        return h("div", { class: "kate-ui-section-title" }, this.children);
+    }
+}
+exports.Section_title = Section_title;
+class Menu_list extends Widget {
+    children;
+    constructor(children) {
+        super();
+        this.children = children;
+    }
+    render() {
+        return h("div", { class: "kate-ui-menu-list" }, this.children);
+    }
+}
+exports.Menu_list = Menu_list;
+class If extends Widget {
+    condition;
+    child;
+    constructor(condition, child) {
+        super();
+        this.condition = condition;
+        this.child = child;
+    }
+    render() {
+        if (this.condition()) {
+            return this.child.then;
+        }
+        else {
+            return this.child.else;
+        }
+    }
+}
+exports.If = If;
+class Button extends Widget {
+    children;
+    _on_clicked = new events_1.EventStream();
+    constructor(children) {
+        super();
+        this.children = children;
+    }
+    on_clicked(fn) {
+        this._on_clicked.listen(fn);
+        return this;
+    }
+    render() {
+        const element = h("button", { class: "kate-ui-button kate-ui-focus-target" }, this.children);
+        element.addEventListener("click", (ev) => {
+            ev.preventDefault();
+            this._on_clicked.emit();
+        });
+        element.addEventListener("mouseenter", () => {
+            element.classList.add("focus");
+        });
+        element.addEventListener("mouseleave", () => {
+            element.classList.remove("focus");
+        });
+        return element;
+    }
+}
+exports.Button = Button;
+class Icon extends Widget {
+    type;
+    constructor(type) {
+        super();
+        this.type = type;
+    }
+    render() {
+        switch (this.type) {
+            case "up":
+            case "down":
+            case "right":
+            case "left":
+                return h("div", { class: "kate-icon kate-icon-light", "data-name": this.type }, [h("img", { src: `img/${this.type}.png` }, [])]);
+            case "ltrigger":
+            case "rtrigger":
+            case "menu":
+            case "capture":
+                return h("div", { class: "kate-icon", "data-name": this.type }, []);
+            case "x":
+                return h("div", { class: "kate-icon", "data-name": this.type }, [
+                    h("img", { src: `img/cancel.png` }, []),
+                ]);
+            case "o":
+                return h("div", { class: "kate-icon", "data-name": this.type }, [
+                    h("img", { src: `img/ok.png` }, []),
+                ]);
+        }
+    }
+}
+exports.Icon = Icon;
+
+},{"../../../../util/build/events":35}],33:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.VirtualKey = exports.VirtualKey$Base = exports.Bridge = exports.Bridge$Base = exports.Platform = exports.Platform$Base = exports.Date = exports.Content_classification = exports.Content_classification$Base = exports.Metadata = exports.File = exports.Cartridge = exports.KeyboardKey = exports._Encoder = exports._Decoder = void 0;
 class _Decoder {
+    view;
+    offset = 0;
     constructor(view) {
         this.view = view;
-        this.offset = 0;
-    }
-    get remaining_bytes() {
-        return this.view.byteLength - (this.view.byteOffset + this.offset);
     }
     peek(f) {
         return f(new DataView(this.view.buffer, this.view.byteOffset + this.offset));
@@ -76,15 +2746,12 @@ class _Decoder {
     }
     bytes() {
         const size = this.ui32();
-        if (size > this.remaining_bytes) {
-            throw new Error(`Invalid size ${size}`);
-        }
-        const result = new Uint8Array(size);
-        for (let i = 0; i < result.length; ++i) {
+        const result = [];
+        for (let i = 0; i < size; ++i) {
             result[i] = this.view.getUint8(this.offset + i);
         }
         this.offset += size;
-        return result;
+        return new Uint8Array(result);
     }
     array(f) {
         const size = this.ui32();
@@ -119,9 +2786,7 @@ class _Decoder {
 }
 exports._Decoder = _Decoder;
 class _Encoder {
-    constructor() {
-        this.buffers = [];
-    }
+    buffers = [];
     bool(x) {
         this.buffers.push(new Uint8Array([x ? 0x01 : 0x00]));
         return this;
@@ -259,13 +2924,53 @@ class _Encoder {
     }
 }
 exports._Encoder = _Encoder;
+class KeyboardKey {
+    key;
+    code;
+    key_code;
+    static $tag = 8;
+    $tag = 8;
+    constructor(key, code, key_code) {
+        this.key = key;
+        this.code = code;
+        this.key_code = key_code;
+    }
+    static decode($d) {
+        const $tag = $d.ui32();
+        if ($tag !== 8) {
+            throw new Error(`Invalid tag ${$tag} for KeyboardKey: expected 8`);
+        }
+        return KeyboardKey.$do_decode($d);
+    }
+    static $do_decode($d) {
+        const key = $d.text();
+        const code = $d.text();
+        const key_code = $d.bigint();
+        return new KeyboardKey(key, code, key_code);
+    }
+    encode($e) {
+        $e.ui32(8);
+        this.$do_encode($e);
+    }
+    $do_encode($e) {
+        $e.text(this.key);
+        $e.text(this.code);
+        $e.integer(this.key_code);
+    }
+}
+exports.KeyboardKey = KeyboardKey;
 class Cartridge {
+    id;
+    metadata;
+    files;
+    platform;
+    static $tag = 0;
+    $tag = 0;
     constructor(id, metadata, files, platform) {
         this.id = id;
         this.metadata = metadata;
         this.files = files;
         this.platform = platform;
-        this.$tag = 0;
     }
     static decode($d) {
         const $tag = $d.ui32();
@@ -299,13 +3004,16 @@ class Cartridge {
     }
 }
 exports.Cartridge = Cartridge;
-Cartridge.$tag = 0;
 class File {
+    path;
+    mime;
+    data;
+    static $tag = 1;
+    $tag = 1;
     constructor(path, mime, data) {
         this.path = path;
         this.mime = mime;
         this.data = data;
-        this.$tag = 1;
     }
     static decode($d) {
         const $tag = $d.ui32();
@@ -331,8 +3039,17 @@ class File {
     }
 }
 exports.File = File;
-File.$tag = 1;
 class Metadata {
+    author;
+    title;
+    description;
+    category;
+    content_warning;
+    classification;
+    release_date;
+    thumbnail;
+    static $tag = 2;
+    $tag = 2;
     constructor(author, title, description, category, content_warning, classification, release_date, thumbnail) {
         this.author = author;
         this.title = title;
@@ -342,7 +3059,6 @@ class Metadata {
         this.classification = classification;
         this.release_date = release_date;
         this.thumbnail = thumbnail;
-        this.$tag = 2;
     }
     static decode($d) {
         const $tag = $d.ui32();
@@ -384,7 +3100,6 @@ class Metadata {
     }
 }
 exports.Metadata = Metadata;
-Metadata.$tag = 2;
 class Content_classification$Base {
     static decode($d) {
         const $tag = $d.ui32();
@@ -409,9 +3124,10 @@ exports.Content_classification$Base = Content_classification$Base;
 var Content_classification;
 (function (Content_classification) {
     class General extends Content_classification$Base {
+        static $tag = 0 /* $Tags.General */;
+        $tag = 0 /* $Tags.General */;
         constructor() {
             super();
-            this.$tag = 0 /* $Tags.General */;
         }
         static decode($d) {
             return General.$do_decode($d);
@@ -431,12 +3147,12 @@ var Content_classification;
             $e.ui8(0);
         }
     }
-    General.$tag = 0 /* $Tags.General */;
     Content_classification.General = General;
     class Teen_and_up extends Content_classification$Base {
+        static $tag = 1 /* $Tags.Teen_and_up */;
+        $tag = 1 /* $Tags.Teen_and_up */;
         constructor() {
             super();
-            this.$tag = 1 /* $Tags.Teen_and_up */;
         }
         static decode($d) {
             return Teen_and_up.$do_decode($d);
@@ -456,12 +3172,12 @@ var Content_classification;
             $e.ui8(1);
         }
     }
-    Teen_and_up.$tag = 1 /* $Tags.Teen_and_up */;
     Content_classification.Teen_and_up = Teen_and_up;
     class Mature extends Content_classification$Base {
+        static $tag = 2 /* $Tags.Mature */;
+        $tag = 2 /* $Tags.Mature */;
         constructor() {
             super();
-            this.$tag = 2 /* $Tags.Mature */;
         }
         static decode($d) {
             return Mature.$do_decode($d);
@@ -481,12 +3197,12 @@ var Content_classification;
             $e.ui8(2);
         }
     }
-    Mature.$tag = 2 /* $Tags.Mature */;
     Content_classification.Mature = Mature;
     class Explicit extends Content_classification$Base {
+        static $tag = 3 /* $Tags.Explicit */;
+        $tag = 3 /* $Tags.Explicit */;
         constructor() {
             super();
-            this.$tag = 3 /* $Tags.Explicit */;
         }
         static decode($d) {
             return Explicit.$do_decode($d);
@@ -506,15 +3222,18 @@ var Content_classification;
             $e.ui8(3);
         }
     }
-    Explicit.$tag = 3 /* $Tags.Explicit */;
     Content_classification.Explicit = Explicit;
 })(Content_classification = exports.Content_classification || (exports.Content_classification = {}));
 class Date {
+    year;
+    month;
+    day;
+    static $tag = 4;
+    $tag = 4;
     constructor(year, month, day) {
         this.year = year;
         this.month = month;
         this.day = day;
-        this.$tag = 4;
     }
     static decode($d) {
         const $tag = $d.ui32();
@@ -540,7 +3259,6 @@ class Date {
     }
 }
 exports.Date = Date;
-Date.$tag = 4;
 class Platform$Base {
     static decode($d) {
         const $tag = $d.ui32();
@@ -552,8 +3270,7 @@ class Platform$Base {
     static $do_decode($d) {
         const $tag = $d.peek((v) => v.getUint8(0));
         switch ($tag) {
-            case 0: return Platform.Web.decode($d);
-            case 1: return Platform.Web_archive.decode($d);
+            case 0: return Platform.Web_archive.decode($d);
             default:
                 throw new Error(`Unknown tag ${$tag} in union Platform`);
         }
@@ -562,54 +3279,23 @@ class Platform$Base {
 exports.Platform$Base = Platform$Base;
 var Platform;
 (function (Platform) {
-    class Web extends Platform$Base {
-        constructor(url, width, height) {
-            super();
-            this.url = url;
-            this.width = width;
-            this.height = height;
-            this.$tag = 0 /* $Tags.Web */;
-        }
-        static decode($d) {
-            return Web.$do_decode($d);
-        }
-        static $do_decode($d) {
-            const $tag = $d.ui8();
-            if ($tag !== 0) {
-                throw new Error(`Invalid tag ${$tag} for Platform.Web: expected 0`);
-            }
-            const url = $d.text();
-            const width = $d.ui32();
-            const height = $d.ui32();
-            return new Web(url, width, height);
-        }
-        encode($e) {
-            $e.ui32(5);
-            this.$do_encode($e);
-        }
-        $do_encode($e) {
-            $e.ui8(0);
-            $e.text(this.url);
-            $e.ui32(this.width);
-            $e.ui32(this.height);
-        }
-    }
-    Web.$tag = 0 /* $Tags.Web */;
-    Platform.Web = Web;
     class Web_archive extends Platform$Base {
+        html;
+        bridges;
+        static $tag = 0 /* $Tags.Web_archive */;
+        $tag = 0 /* $Tags.Web_archive */;
         constructor(html, bridges) {
             super();
             this.html = html;
             this.bridges = bridges;
-            this.$tag = 1 /* $Tags.Web_archive */;
         }
         static decode($d) {
             return Web_archive.$do_decode($d);
         }
         static $do_decode($d) {
             const $tag = $d.ui8();
-            if ($tag !== 1) {
-                throw new Error(`Invalid tag ${$tag} for Platform.Web-archive: expected 1`);
+            if ($tag !== 0) {
+                throw new Error(`Invalid tag ${$tag} for Platform.Web-archive: expected 0`);
             }
             const html = $d.text();
             const bridges = $d.array(() => {
@@ -624,14 +3310,13 @@ var Platform;
             this.$do_encode($e);
         }
         $do_encode($e) {
-            $e.ui8(1);
+            $e.ui8(0);
             $e.text(this.html);
             $e.array((this.bridges), ($e, v) => {
                 (v).$do_encode($e);
             });
         }
     }
-    Web_archive.$tag = 1 /* $Tags.Web_archive */;
     Platform.Web_archive = Web_archive;
 })(Platform = exports.Platform || (exports.Platform = {}));
 class Bridge$Base {
@@ -649,6 +3334,7 @@ class Bridge$Base {
             case 1: return Bridge.Renpy.decode($d);
             case 2: return Bridge.Network_proxy.decode($d);
             case 3: return Bridge.Local_storage_proxy.decode($d);
+            case 4: return Bridge.Input_proxy.decode($d);
             default:
                 throw new Error(`Unknown tag ${$tag} in union Bridge`);
         }
@@ -658,9 +3344,10 @@ exports.Bridge$Base = Bridge$Base;
 var Bridge;
 (function (Bridge) {
     class RPG_maker_mv extends Bridge$Base {
+        static $tag = 0 /* $Tags.RPG_maker_mv */;
+        $tag = 0 /* $Tags.RPG_maker_mv */;
         constructor() {
             super();
-            this.$tag = 0 /* $Tags.RPG_maker_mv */;
         }
         static decode($d) {
             return RPG_maker_mv.$do_decode($d);
@@ -680,12 +3367,12 @@ var Bridge;
             $e.ui8(0);
         }
     }
-    RPG_maker_mv.$tag = 0 /* $Tags.RPG_maker_mv */;
     Bridge.RPG_maker_mv = RPG_maker_mv;
     class Renpy extends Bridge$Base {
+        static $tag = 1 /* $Tags.Renpy */;
+        $tag = 1 /* $Tags.Renpy */;
         constructor() {
             super();
-            this.$tag = 1 /* $Tags.Renpy */;
         }
         static decode($d) {
             return Renpy.$do_decode($d);
@@ -705,12 +3392,12 @@ var Bridge;
             $e.ui8(1);
         }
     }
-    Renpy.$tag = 1 /* $Tags.Renpy */;
     Bridge.Renpy = Renpy;
     class Network_proxy extends Bridge$Base {
+        static $tag = 2 /* $Tags.Network_proxy */;
+        $tag = 2 /* $Tags.Network_proxy */;
         constructor() {
             super();
-            this.$tag = 2 /* $Tags.Network_proxy */;
         }
         static decode($d) {
             return Network_proxy.$do_decode($d);
@@ -730,12 +3417,12 @@ var Bridge;
             $e.ui8(2);
         }
     }
-    Network_proxy.$tag = 2 /* $Tags.Network_proxy */;
     Bridge.Network_proxy = Network_proxy;
     class Local_storage_proxy extends Bridge$Base {
+        static $tag = 3 /* $Tags.Local_storage_proxy */;
+        $tag = 3 /* $Tags.Local_storage_proxy */;
         constructor() {
             super();
-            this.$tag = 3 /* $Tags.Local_storage_proxy */;
         }
         static decode($d) {
             return Local_storage_proxy.$do_decode($d);
@@ -755,557 +3442,349 @@ var Bridge;
             $e.ui8(3);
         }
     }
-    Local_storage_proxy.$tag = 3 /* $Tags.Local_storage_proxy */;
     Bridge.Local_storage_proxy = Local_storage_proxy;
+    class Input_proxy extends Bridge$Base {
+        mapping;
+        static $tag = 4 /* $Tags.Input_proxy */;
+        $tag = 4 /* $Tags.Input_proxy */;
+        constructor(mapping) {
+            super();
+            this.mapping = mapping;
+        }
+        static decode($d) {
+            return Input_proxy.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 4) {
+                throw new Error(`Invalid tag ${$tag} for Bridge.Input-proxy: expected 4`);
+            }
+            const mapping = $d.map(() => {
+                const key = VirtualKey$Base.$do_decode($d);
+                ;
+                return key;
+            }, () => {
+                const value = KeyboardKey.$do_decode($d);
+                ;
+                return value;
+            });
+            return new Input_proxy(mapping);
+        }
+        encode($e) {
+            $e.ui32(6);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(4);
+            $e.map((this.mapping), ($e, k) => { (k).$do_encode($e); }, ($e, v) => { (v).$do_encode($e); });
+        }
+    }
+    Bridge.Input_proxy = Input_proxy;
 })(Bridge = exports.Bridge || (exports.Bridge = {}));
-
-},{}],2:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.bridges = void 0;
-exports.bridges = {
-    "local-storage.js": "void function () {\r\n  const secret = KATE_SECRET;\r\n  let contents = window.KATE_LOCAL_STORAGE ?? Object.create(null);\r\n  \r\n  let timer = null;\r\n  function persist(contents) {\r\n    clearTimeout(timer);\r\n    timer = setTimeout(() => {\r\n      window.parent.postMessage({\r\n        type: \"kate:write-kv-storage\",\r\n        secret: secret,\r\n        content: contents\r\n      }, \"*\");\r\n    })\r\n  }\r\n\r\n  class KateStorage {\r\n    constructor(contents, persistent) {\r\n      this.__contents = contents;\r\n      this.__persistent = persistent;\r\n    }\r\n\r\n    _persist() {\r\n      if (this.__persistent) {\r\n        persist(this.__contents);\r\n      }\r\n    }\r\n\r\n    getItem(name) {\r\n      return this.__contents[name] ?? null;\r\n    }\r\n\r\n    setItem(name, value) {\r\n      this.__contents[name] = value;\r\n      this._persist();\r\n    }\r\n\r\n    removeItem(name) {\r\n      delete this.__contents[name];\r\n      this._persist();\r\n    }\r\n\r\n    clear() {\r\n      this.__contents = Object.create(null);\r\n      this._persist();\r\n    }\r\n\r\n    key(index) {\r\n      return this.getItem(Object.keys(this.__contents)[index]) ?? null;\r\n    }\r\n\r\n    get length() {\r\n      return Object.keys(this.__contents).length;\r\n    }\r\n  }\r\n\r\n  function proxy_storage(storage, key) {\r\n    const exposed = [\"getItem\", \"setItem\", \"removeItem\", \"clear\", \"key\"];\r\n\r\n    Object.defineProperty(window, key, {\r\n      value: new Proxy(storage, {\r\n        get(target, prop, receiver) {\r\n          return exposed.contains(prop) ? storage[prop].bind(storage) : storage.getItem(prop);\r\n        },\r\n        has(target, prop) {\r\n          return exposed.contains(prop) || prop in contents;\r\n        },\r\n        set(target, prop, value) {\r\n          return storage.setItem(prop, value);\r\n        },\r\n        deleteProperty(target, prop) {\r\n          return storage.removeItem(prop);\r\n        }\r\n      })\r\n    })\r\n  }\r\n  \r\n  const storage = new KateStorage(contents, true);\r\n  proxy_storage(storage, \"localStorage\");\r\n\r\n  const session_storage = new KateStorage(Object.create(null), false);\r\n  proxy_storage(session_storage, \"sessionStorage\");\r\n\r\n}();",
-    "renpy.js": "void function() {\r\n  let paused = false;\r\n  const add_event_listener = window.addEventListener;\r\n  const key_mapping = {\r\n    up: [\"ArrowUp\", \"ArrowUp\", 38],\r\n    right: [\"ArrowRight\", \"ArrowRight\", 39],\r\n    down: [\"ArrowDown\", \"ArrowDown\", 40],\r\n    left: [\"ArrowLeft\", \"ArrowLeft\", 37],\r\n    x: [\"Escape\", \"Escape\", 27],\r\n    o: [\"Enter\", \"Enter\", 13],\r\n    ltrigger: ['PageUp', 'PageUp', 33],\r\n    rtrigger: ['PageDown', 'PageDown', 34]\r\n  }\r\n\r\n  const down_listeners = [];\r\n  const up_listeners = [];\r\n  \r\n  window.addEventListener(\"message\", (ev) => {\r\n    switch (ev.data.type) {\r\n      case \"kate:paused\": {\r\n        paused = true;\r\n        break;\r\n      }\r\n\r\n      case \"kate:unpaused\": {\r\n        paused = false;\r\n        break;\r\n      }\r\n\r\n      case \"kate:input-changed\": {\r\n        if (!paused) {\r\n          const data = key_mapping[ev.data.key];\r\n          if (data) {\r\n            const listeners = ev.data.is_down ? down_listeners : up_listeners;\r\n            const type = ev.data.is_down ? \"keydown\" : \"keyup\";\r\n            const [key, code, keyCode] = data;\r\n            const key_ev = new KeyboardEvent(type, {key, code, keyCode});\r\n            for (const fn of listeners) {\r\n              fn.call(document, key_ev);\r\n            }\r\n          }\r\n        }\r\n        break;\r\n      }\r\n    }\r\n  })\r\n  \r\n  function listen(type, listener, options) {\r\n    if (type === \"keydown\") {\r\n      down_listeners.push(listener);\r\n    } else if (type === \"keyup\") {\r\n      up_listeners.push(listener);\r\n    } else {\r\n      add_event_listener.call(this, type, listener, options);\r\n    }\r\n  };\r\n  window.addEventListener = listen;\r\n  document.addEventListener = listen;\r\n}();",
-    "rpgmk-mv.js": "void function() {\r\n  let paused = false;\r\n\r\n  // -- Things that need to be patched still\r\n  Utils.isOptionValid = (name) => {\r\n    return [\"noaudio\"].includes(name);\r\n  }\r\n\r\n  const key_mapping = {\r\n    up: \"up\",\r\n    right: \"right\",\r\n    down: \"down\",\r\n    left: \"left\",\r\n    x: \"cancel\",\r\n    o: \"ok\",\r\n    menu: \"menu\",\r\n    rtrigger: \"shift\"\r\n  };\r\n\r\n  window.addEventListener(\"message\", (ev) => {\r\n    switch (ev.data.type) {\r\n      case \"kate:paused\": {\r\n        for (const key of Object.values(key_mapping)) {\r\n          Input._currentState[key] = false;\r\n        }\r\n        paused = true;\r\n        break;\r\n      }\r\n      case \"kate:unpaused\": {\r\n        paused = false;\r\n        break;\r\n      }\r\n\r\n      case \"kate:input-changed\": {\r\n        if (!paused) {\r\n          const name = key_mapping[ev.data.key];\r\n          if (name) {\r\n            Input._currentState[name] = ev.data.is_down;\r\n          }\r\n        }\r\n        break;\r\n      }\r\n    }\r\n  })\r\n}();",
-    "standard-network.js": "void function () {\r\n  const secret = KATE_SECRET;\r\n\r\n  function make_id() {\r\n    let id = new Uint8Array(16);\r\n    crypto.getRandomValues(id);\r\n    return Array.from(id).map(x => x.toString(16).padStart(2, \"0\")).join(\"\");\r\n  }\r\n\r\n  async function read_file(path) {\r\n    return new Promise((resolve, reject) => {\r\n      const id = make_id();\r\n      const handler = (ev) => {\r\n        if (ev.data.type === \"kate:reply\" && ev.data.id === id) {\r\n          window.removeEventListener(\"message\", handler);\r\n          if (ev.data.ok) {\r\n            resolve(ev.data.result);\r\n          } else {\r\n            reject(new Error(`Request to ${path} failed`));\r\n          }\r\n        }\r\n      };\r\n\r\n      window.addEventListener(\"message\", handler);\r\n      window.parent.postMessage({\r\n        type: \"kate:read-file\",\r\n        secret: secret,\r\n        id: id,\r\n        path: path\r\n      }, \"*\")\r\n    });\r\n  }\r\n\r\n  async function get_url(url) {\r\n    try {\r\n      const file = await read_file(url);\r\n      const blob = new Blob([file.data], {type: file.mime});\r\n      return URL.createObjectURL(blob);\r\n    } catch (e) {\r\n      console.error(\"error ==>\", e);\r\n      throw e;\r\n    }\r\n  }\r\n\r\n  // -- Arbitrary fetching\r\n  const old_fetch = window.fetch;\r\n  window.fetch = async function(request, options) {\r\n    let url;\r\n    let method;\r\n\r\n    if (Object(request) === request && request.url) {\r\n      url = request.url;\r\n      method = request.method;\r\n    } else {\r\n      url = request;\r\n      method = options?.method ?? \"GET\";\r\n    }\r\n\r\n    if (method !== \"GET\") {\r\n      return new Promise((_, reject) => reject(new Error(`Non-GET requests are not supported.`)));\r\n    }\r\n    return new Promise(async (resolve, reject) => {\r\n      try {\r\n        const file = await get_url(String(url));\r\n        const result = await old_fetch(file);\r\n        resolve(result);\r\n      } catch (error) {\r\n        reject(error);\r\n      }\r\n    });\r\n  }\r\n\r\n  const old_xhr_open = XMLHttpRequest.prototype.open;\r\n  const old_xhr_send = XMLHttpRequest.prototype.send;\r\n  XMLHttpRequest.prototype.open = function(method, url) {\r\n    if (method !== \"GET\") {\r\n      throw new Error(`Non-GET requests are not supported.`);\r\n    }\r\n\r\n    this.__waiting_open = true;\r\n\r\n    void (async () => {\r\n      try {\r\n        const real_url = await get_url(String(url));\r\n        old_xhr_open.call(this, \"GET\", real_url);\r\n        this.__maybe_send();\r\n      } catch (error) {\r\n        old_xhr_open.call(this, \"GET\", \"not-found\");\r\n        this.__maybe_send();\r\n      }\r\n    })();\r\n  };\r\n\r\n  XMLHttpRequest.prototype.__maybe_send = function() {\r\n    this.__waiting_open = false;\r\n    if (this.__waiting_send) {\r\n      this.__waiting_send = false;\r\n      this.send();\r\n    }\r\n  };\r\n\r\n  XMLHttpRequest.prototype.send = function() {\r\n    if (this.__waiting_open) {\r\n      this.__waiting_send = true;\r\n      return;\r\n    } else {\r\n      return old_xhr_send.call(this);\r\n    }\r\n  };\r\n\r\n  // -- Image loading\r\n  const old_img_src = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, \"src\");\r\n  Object.defineProperty(HTMLImageElement.prototype, \"src\", {\r\n    enumerable: old_img_src.enumerable,\r\n    configurable: old_img_src.configurable,\r\n    get() {\r\n      return this.__src ?? old_img_src.get.call(this);\r\n    },\r\n    set(url) {\r\n      this.__src = url;\r\n      void (async () => {\r\n        try {\r\n          const real_url = await get_url(String(url));\r\n          old_img_src.set.call(this, real_url);\r\n        } catch (error) {\r\n          old_img_src.set.call(this, \"not-found\");\r\n        }\r\n      })();\r\n    }\r\n  });\r\n\r\n}();"
-};
-
-},{}],3:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.CR_Web_archive = exports.CRW_Process = exports.CR_Web = exports.CR_Process = exports.CartRuntime = exports.KateRuntimes = void 0;
-const Cart = require("../generated/cartridge");
-const kate_bridges_1 = require("../kate-bridges");
-const random_1 = require("../util/random");
-const SCREEN_WIDTH = 800;
-const SCREEN_HEIGHT = 480;
-class KateRuntimes {
-    constructor(console) {
-        this.console = console;
+class VirtualKey$Base {
+    static decode($d) {
+        const $tag = $d.ui32();
+        if ($tag !== 7) {
+            throw new Error(`Invalid tag ${$tag} for VirtualKey: expected 7`);
+        }
+        return VirtualKey$Base.$do_decode($d);
     }
-    from_cartridge(cart, local_storage) {
-        switch (cart.platform.$tag) {
-            case 0 /* Cart.Platform.$Tags.Web */:
-                return new CR_Web(this.console, cart.id, cart.platform);
-            case 1 /* Cart.Platform.$Tags.Web_archive */:
-                return new CR_Web_archive(this.console, cart.id, cart, cart.platform, local_storage);
+    static $do_decode($d) {
+        const $tag = $d.peek((v) => v.getUint8(0));
+        switch ($tag) {
+            case 0: return VirtualKey.Up.decode($d);
+            case 1: return VirtualKey.Right.decode($d);
+            case 2: return VirtualKey.Down.decode($d);
+            case 3: return VirtualKey.Left.decode($d);
+            case 4: return VirtualKey.Menu.decode($d);
+            case 5: return VirtualKey.Capture.decode($d);
+            case 6: return VirtualKey.X.decode($d);
+            case 7: return VirtualKey.O.decode($d);
+            case 8: return VirtualKey.L_trigger.decode($d);
+            case 9: return VirtualKey.R_trigger.decode($d);
             default:
-                throw new Error(`Unsupported cartridge`);
+                throw new Error(`Unknown tag ${$tag} in union VirtualKey`);
         }
     }
 }
-exports.KateRuntimes = KateRuntimes;
-class CartRuntime {
-}
-exports.CartRuntime = CartRuntime;
-class CR_Process {
-}
-exports.CR_Process = CR_Process;
-class CR_Web extends CartRuntime {
-    constructor(console, id, cart) {
-        super();
-        this.console = console;
-        this.id = id;
-        this.cart = cart;
-    }
-    run() {
-        const frame = document.createElement("iframe");
-        frame.className = "kate-game-frame";
-        frame.sandbox = "allow-scripts allow-same-origin";
-        frame.allow = "";
-        this.console.on_input_changed.listen(ev => {
-            frame.contentWindow?.postMessage({
-                type: "kate:input-changed",
-                key: ev.key,
-                is_down: ev.is_down
-            }, this.cart.url);
-        });
-        frame.src = this.cart.url;
-        frame.width = String(this.cart.width);
-        frame.height = String(this.cart.height);
-        frame.style.width = `${frame.width}px`;
-        frame.style.height = `${frame.height}px`;
-        frame.scrolling = "no";
-        const zoom = this.cart.width >= this.cart.height ? (SCREEN_WIDTH / this.cart.width) : (SCREEN_HEIGHT / this.cart.height);
-        frame.style.transform = `scale(${zoom})`;
-        this.console.screen.appendChild(frame);
-        return new CRW_Process(this, frame, (0, random_1.make_id)());
-    }
-}
-exports.CR_Web = CR_Web;
-class CRW_Process extends CR_Process {
-    constructor(runtime, frame, secret) {
-        super();
-        this.runtime = runtime;
-        this.frame = frame;
-        this.secret = secret;
-    }
-    async exit() {
-        this.frame.src = "about:blank";
-        this.frame.remove();
-    }
-    async pause() {
-        this.frame.contentWindow?.postMessage({
-            type: "kate:paused"
-        }, "*");
-    }
-    async unpause() {
-        this.frame.contentWindow?.postMessage({
-            type: "kate:unpaused"
-        }, "*");
-    }
-}
-exports.CRW_Process = CRW_Process;
-class CR_Web_archive extends CartRuntime {
-    constructor(console, id, cart, data, local_storage) {
-        super();
-        this.console = console;
-        this.id = id;
-        this.cart = cart;
-        this.data = data;
-        this.local_storage = local_storage;
-    }
-    run({ storage }) {
-        const secret = (0, random_1.make_id)();
-        const frame = document.createElement("iframe");
-        frame.className = "kate-game-frame kate-game-frame-defaults";
-        frame.sandbox = "allow-scripts";
-        frame.allow = "";
-        this.console.on_input_changed.listen(ev => {
-            frame.contentWindow?.postMessage({
-                type: "kate:input-changed",
-                key: ev.key,
-                is_down: ev.is_down
-            }, "*");
-        });
-        const send = (type, data) => {
-            frame.contentWindow?.postMessage({
-                type, ...data
-            }, "*");
-        };
-        const reply = (ev, data) => {
-            send("kate:reply", {
-                id: ev.data.id,
-                ...data
-            });
-        };
-        const send_error = (message, id) => {
-            send("kate:error", { id, message });
-        };
-        window.addEventListener("message", async (ev) => {
-            if (ev.data?.secret !== secret) {
-                return;
-            }
-            switch (ev.data.type) {
-                case "kate:write-kv-storage": {
-                    const data = ev.data.content;
-                    try {
-                        await storage.write(data);
-                    }
-                    catch (error) {
-                        send_error(`Failed to persist localStorage contents`, ev.data.id);
-                    }
-                    break;
-                }
-                case "kate:read-file": {
-                    const file = this.get_file(new URL(ev.data.path, "http://no.domain").toString());
-                    if (file == null) {
-                        reply(ev, { path: ev.data.path, ok: false });
-                    }
-                    else {
-                        reply(ev, { path: ev.data.path, ok: true, result: {
-                                mime: file.mime,
-                                data: file.data
-                            } });
-                    }
-                }
-            }
-        });
-        frame.src = URL.createObjectURL(new Blob([this.proxy_html(secret)], { type: "text/html" }));
-        frame.scrolling = "no";
-        this.console.screen.appendChild(frame);
-        return new CRW_Process(this, frame, secret);
-    }
-    proxy_html(secret) {
-        const decoder = new TextDecoder("utf-8");
-        const dom = new DOMParser().parseFromString(this.data.html, "text/html");
-        const secret_el = document.createElement("script");
-        secret_el.textContent = `
-      var KATE_SECRET = ${JSON.stringify(secret)};
-      var KATE_LOCAL_STORAGE = ${JSON.stringify(this.local_storage ?? {})};
-    `;
-        dom.head.insertBefore(secret_el, dom.head.firstChild);
-        const zoom_style = document.createElement("style");
-        zoom_style.textContent = `
-    :root {
-      zoom: ${this.console.body.getAttribute("data-zoom") ?? "0"};
-    }
-    `;
-        dom.head.appendChild(zoom_style);
-        for (const bridge of this.data.bridges) {
-            this.apply_bridge(dom, bridge, secret_el);
+exports.VirtualKey$Base = VirtualKey$Base;
+var VirtualKey;
+(function (VirtualKey) {
+    class Up extends VirtualKey$Base {
+        static $tag = 0 /* $Tags.Up */;
+        $tag = 0 /* $Tags.Up */;
+        constructor() {
+            super();
         }
-        for (const script of Array.from(dom.querySelectorAll("script"))) {
-            if (script.src) {
-                const file = this.get_file(script.src);
-                if (file != null) {
-                    script.removeAttribute("src");
-                    script.removeAttribute("type");
-                    script.textContent = decoder.decode(file.data);
-                }
-            }
+        static decode($d) {
+            return Up.$do_decode($d);
         }
-        for (const link of Array.from(dom.querySelectorAll("link"))) {
-            if (link.href) {
-                if (link.rel === "stylesheet") {
-                    const file = this.get_file(link.href);
-                    if (file != null) {
-                        const style = dom.createElement("style");
-                        style.textContent = this.transform_css_urls(new URL(link.href).pathname, decoder.decode(file.data));
-                        link.parentNode?.insertBefore(style, link);
-                        link.remove();
-                    }
-                }
-                else {
-                    link.href = this.get_data_url(link.href);
-                }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 0) {
+                throw new Error(`Invalid tag ${$tag} for VirtualKey.Up: expected 0`);
             }
+            return new Up();
         }
-        return dom.documentElement.outerHTML;
-    }
-    transform_css_urls(base, code) {
-        return code.replace(/\burl\(("[^"]+")\)/g, (_, url_string) => {
-            const url = this.resolve_pathname(base, JSON.parse(url_string));
-            const data_url = this.get_data_url(new URL(url, "http://localhost").toString());
-            return `url(${JSON.stringify(data_url)})`;
-        });
-    }
-    resolve_pathname(base, url0) {
-        const x0 = base.endsWith("/") ? base : base + "/";
-        const x1 = x0.startsWith("/") ? base : "/" + base;
-        const x2 = x1.endsWith(".css") ? x1.split("/").slice(0, -1).join("/") : x1;
-        return x2 + "/" + url0;
-    }
-    apply_bridge(dom, bridge, secret_node) {
-        switch (bridge.$tag) {
-            case 0 /* Cart.Bridge.$Tags.RPG_maker_mv */: {
-                const proxy = kate_bridges_1.bridges["rpgmk-mv.js"];
-                const script = dom.createElement("script");
-                script.textContent = proxy;
-                const scripts = Array.from(dom.querySelectorAll("script"));
-                const main_script = scripts.find(x => x.src.includes("js/main.js"));
-                if (main_script != null) {
-                    main_script.parentNode.insertBefore(script, main_script);
-                }
-                else {
-                    dom.body.appendChild(script);
-                }
-                break;
-            }
-            case 1 /* Cart.Bridge.$Tags.Renpy */: {
-                this.append_proxy(kate_bridges_1.bridges["renpy.js"], dom, secret_node);
-                break;
-            }
-            case 2 /* Cart.Bridge.$Tags.Network_proxy */: {
-                this.append_proxy(kate_bridges_1.bridges["standard-network.js"], dom, secret_node);
-                break;
-            }
-            case 3 /* Cart.Bridge.$Tags.Local_storage_proxy */: {
-                this.append_proxy(kate_bridges_1.bridges["local-storage.js"], dom, secret_node);
-                break;
-            }
+        encode($e) {
+            $e.ui32(7);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(0);
         }
     }
-    append_proxy(proxy, dom, ref) {
-        const script = dom.createElement("script");
-        script.textContent = proxy;
-        if (ref.nextSibling != null) {
-            ref.parentNode.insertBefore(script, ref.nextSibling);
+    VirtualKey.Up = Up;
+    class Right extends VirtualKey$Base {
+        static $tag = 1 /* $Tags.Right */;
+        $tag = 1 /* $Tags.Right */;
+        constructor() {
+            super();
         }
-        else {
-            dom.head.appendChild(script);
+        static decode($d) {
+            return Right.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 1) {
+                throw new Error(`Invalid tag ${$tag} for VirtualKey.Right: expected 1`);
+            }
+            return new Right();
+        }
+        encode($e) {
+            $e.ui32(7);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(1);
         }
     }
-    get_file(url) {
-        const path = new URL(url).pathname;
-        return this.cart.files.find(x => x.path === path);
-    }
-    get_data_url(url) {
-        const file = this.get_file(url);
-        if (file != null) {
-            const content = Array.from(file.data).map(x => String.fromCharCode(x)).join("");
-            return `data:${file.mime};base64,${btoa(content)}`;
+    VirtualKey.Right = Right;
+    class Down extends VirtualKey$Base {
+        static $tag = 2 /* $Tags.Down */;
+        $tag = 2 /* $Tags.Down */;
+        constructor() {
+            super();
         }
-        else {
-            return url;
+        static decode($d) {
+            return Down.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 2) {
+                throw new Error(`Invalid tag ${$tag} for VirtualKey.Down: expected 2`);
+            }
+            return new Down();
+        }
+        encode($e) {
+            $e.ui32(7);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(2);
         }
     }
-}
-exports.CR_Web_archive = CR_Web_archive;
+    VirtualKey.Down = Down;
+    class Left extends VirtualKey$Base {
+        static $tag = 3 /* $Tags.Left */;
+        $tag = 3 /* $Tags.Left */;
+        constructor() {
+            super();
+        }
+        static decode($d) {
+            return Left.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 3) {
+                throw new Error(`Invalid tag ${$tag} for VirtualKey.Left: expected 3`);
+            }
+            return new Left();
+        }
+        encode($e) {
+            $e.ui32(7);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(3);
+        }
+    }
+    VirtualKey.Left = Left;
+    class Menu extends VirtualKey$Base {
+        static $tag = 4 /* $Tags.Menu */;
+        $tag = 4 /* $Tags.Menu */;
+        constructor() {
+            super();
+        }
+        static decode($d) {
+            return Menu.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 4) {
+                throw new Error(`Invalid tag ${$tag} for VirtualKey.Menu: expected 4`);
+            }
+            return new Menu();
+        }
+        encode($e) {
+            $e.ui32(7);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(4);
+        }
+    }
+    VirtualKey.Menu = Menu;
+    class Capture extends VirtualKey$Base {
+        static $tag = 5 /* $Tags.Capture */;
+        $tag = 5 /* $Tags.Capture */;
+        constructor() {
+            super();
+        }
+        static decode($d) {
+            return Capture.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 5) {
+                throw new Error(`Invalid tag ${$tag} for VirtualKey.Capture: expected 5`);
+            }
+            return new Capture();
+        }
+        encode($e) {
+            $e.ui32(7);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(5);
+        }
+    }
+    VirtualKey.Capture = Capture;
+    class X extends VirtualKey$Base {
+        static $tag = 6 /* $Tags.X */;
+        $tag = 6 /* $Tags.X */;
+        constructor() {
+            super();
+        }
+        static decode($d) {
+            return X.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 6) {
+                throw new Error(`Invalid tag ${$tag} for VirtualKey.X: expected 6`);
+            }
+            return new X();
+        }
+        encode($e) {
+            $e.ui32(7);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(6);
+        }
+    }
+    VirtualKey.X = X;
+    class O extends VirtualKey$Base {
+        static $tag = 7 /* $Tags.O */;
+        $tag = 7 /* $Tags.O */;
+        constructor() {
+            super();
+        }
+        static decode($d) {
+            return O.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 7) {
+                throw new Error(`Invalid tag ${$tag} for VirtualKey.O: expected 7`);
+            }
+            return new O();
+        }
+        encode($e) {
+            $e.ui32(7);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(7);
+        }
+    }
+    VirtualKey.O = O;
+    class L_trigger extends VirtualKey$Base {
+        static $tag = 8 /* $Tags.L_trigger */;
+        $tag = 8 /* $Tags.L_trigger */;
+        constructor() {
+            super();
+        }
+        static decode($d) {
+            return L_trigger.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 8) {
+                throw new Error(`Invalid tag ${$tag} for VirtualKey.L-trigger: expected 8`);
+            }
+            return new L_trigger();
+        }
+        encode($e) {
+            $e.ui32(7);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(8);
+        }
+    }
+    VirtualKey.L_trigger = L_trigger;
+    class R_trigger extends VirtualKey$Base {
+        static $tag = 9 /* $Tags.R_trigger */;
+        $tag = 9 /* $Tags.R_trigger */;
+        constructor() {
+            super();
+        }
+        static decode($d) {
+            return R_trigger.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 9) {
+                throw new Error(`Invalid tag ${$tag} for VirtualKey.R-trigger: expected 9`);
+            }
+            return new R_trigger();
+        }
+        encode($e) {
+            $e.ui32(7);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(9);
+        }
+    }
+    VirtualKey.R_trigger = R_trigger;
+})(VirtualKey = exports.VirtualKey || (exports.VirtualKey = {}));
 
-},{"../generated/cartridge":1,"../kate-bridges":2,"../util/random":9}],4:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.KeyboardInput = void 0;
-class KeyboardInput {
-    constructor(console) {
-        this.console = console;
-        this.physical_config = {
-            up: "ArrowUp",
-            right: "ArrowRight",
-            down: "ArrowDown",
-            left: "ArrowLeft",
-            menu: "ShiftLeft",
-            capture: "ControlLeft",
-            x: "KeyX",
-            o: "KeyZ",
-            ltrigger: "KeyA",
-            rtrigger: "KeyS"
-        };
-        this.ignore_repeat = ["menu", "capture"];
-        this.attached = false;
-        this.update_physical_map();
-    }
-    update_physical_map() {
-        const map = Object.create(null);
-        for (const [key, value] of Object.entries(this.physical_config)) {
-            map[value] = key;
-        }
-        this.physical_map = map;
-    }
-    listen(root) {
-        if (this.attached) {
-            throw new Error(`listen called twice`);
-        }
-        this.attached = true;
-        document.addEventListener("keydown", (ev) => {
-            if (ev.code in this.physical_map) {
-                ev.preventDefault();
-                const key = this.physical_map[ev.code];
-                if (!this.ignore_repeat.includes(key) || !ev.repeat) {
-                    this.console.update_virtual_key(key, true);
-                }
-            }
-        });
-        document.addEventListener("keyup", (ev) => {
-            if (ev.code in this.physical_map) {
-                ev.preventDefault();
-                this.console.update_virtual_key(this.physical_map[ev.code], false);
-            }
-        });
-    }
+exports.unreachable = void 0;
+function unreachable(x, message = "") {
+    throw new Error(`Unhandled value(${message}): ${x}`);
 }
-exports.KeyboardInput = KeyboardInput;
+exports.unreachable = unreachable;
 
-},{}],5:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Kate = void 0;
-const cart_runtime_1 = require("./cart-runtime");
-const input_1 = require("./input");
-const loader_1 = require("./loader");
-const virtual_1 = require("./virtual");
-class Kate {
-    constructor(console, keyboard) {
-        this.console = console;
-        this.keyboard = keyboard;
-        this.loader = new loader_1.KateLoader();
-        this.runtimes = new cart_runtime_1.KateRuntimes(console);
-    }
-    static from_root(root) {
-        const console = new virtual_1.VirtualConsole(root);
-        const keyboard = new input_1.KeyboardInput(console);
-        console.listen();
-        keyboard.listen(document.body);
-        return new Kate(console, keyboard);
-    }
-}
-exports.Kate = Kate;
-
-},{"./cart-runtime":3,"./input":4,"./loader":6,"./virtual":7}],6:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.KateLoader = void 0;
-const Cart = require("../generated/cartridge");
-class KateLoader {
-    load_bytes(bytes) {
-        const view = new DataView(bytes);
-        const decoder = new Cart._Decoder(view);
-        return Cart.Cartridge.decode(decoder);
-    }
-    async load_from_url(url) {
-        const bytes = await (await fetch(url)).arrayBuffer();
-        return this.load_bytes(bytes);
-    }
-}
-exports.KateLoader = KateLoader;
-
-},{"../generated/cartridge":1}],7:[function(require,module,exports){
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.VirtualConsole = void 0;
-const events_1 = require("../util/events");
-class VirtualConsole {
-    constructor(root) {
-        this.is_listening = false;
-        this.on_input_changed = new events_1.EventStream();
-        this.on_key_pressed = new events_1.EventStream();
-        this.LONG_PRESS_TIME_MS = 500;
-        this.FPS = 30;
-        this.ONE_FRAME = Math.ceil(1000 / 30);
-        this.up_button = root.querySelector(".kate-dpad-up");
-        this.right_button = root.querySelector(".kate-dpad-right");
-        this.down_button = root.querySelector(".kate-dpad-down");
-        this.left_button = root.querySelector(".kate-dpad-left");
-        this.menu_button = root.querySelector(".kate-button-menu");
-        this.capture_button = root.querySelector(".kate-button-capture");
-        this.x_button = root.querySelector(".kate-button-x");
-        this.o_button = root.querySelector(".kate-button-o");
-        this.ltrigger_button = root.querySelector(".kate-trigger-left");
-        this.rtrigger_button = root.querySelector(".kate-trigger-right");
-        this.screen = root.querySelector("#kate-game");
-        this.os_root = root.querySelector("#kate-os-root");
-        this.hud = root.querySelector("#kate-hud");
-        this.body = root.querySelector(".kate-body");
-        this.reset_states();
-    }
-    reset_states() {
-        this.input_state = {
-            up: false,
-            right: false,
-            down: false,
-            left: false,
-            menu: false,
-            capture: false,
-            x: false,
-            o: false,
-            ltrigger: false,
-            rtrigger: false
-        };
-        this.special_input_timing = {
-            menu: null,
-            capture: null,
-        };
-        this.up_button.classList.remove("down");
-        this.right_button.classList.remove("down");
-        this.down_button.classList.remove("down");
-        this.left_button.classList.remove("down");
-        this.menu_button.classList.remove("down");
-        this.capture_button.classList.remove("down");
-        this.x_button.classList.remove("down");
-        this.o_button.classList.remove("down");
-        this.ltrigger_button.classList.remove("down");
-        this.rtrigger_button.classList.remove("down");
-    }
-    listen() {
-        if (this.is_listening) {
-            throw new Error(`listen called twice`);
-        }
-        this.is_listening = true;
-        const listen_button = (button, key) => {
-            button.addEventListener("mousedown", (ev) => {
-                ev.preventDefault();
-                this.update_virtual_key(key, true);
-            });
-            button.addEventListener("mouseup", (ev) => {
-                ev.preventDefault();
-                this.update_virtual_key(key, false);
-            });
-            button.addEventListener("touchstart", (ev) => {
-                ev.preventDefault();
-                this.update_virtual_key(key, true);
-            });
-            button.addEventListener("touchend", (ev) => {
-                ev.preventDefault();
-                this.update_virtual_key(key, false);
-            });
-        };
-        listen_button(this.up_button, "up");
-        listen_button(this.right_button, "right");
-        listen_button(this.down_button, "down");
-        listen_button(this.left_button, "left");
-        listen_button(this.menu_button, "menu");
-        listen_button(this.capture_button, "capture");
-        listen_button(this.x_button, "x");
-        listen_button(this.o_button, "o");
-    }
-    is_special_key(key) {
-        return this.special_input_timing.hasOwnProperty(key);
-    }
-    // Made a bit complicated because we want to avoid forwarding special keys
-    // to game processes before we know if this is a regular press of the key
-    // or a long press of the key. In that sense, all special keys have a 1/30
-    // frame delay inserted.
-    update_virtual_key(key, state) {
-        if (this.input_state[key] !== state) {
-            this.input_state[key] = state;
-            this.render_button_state(key, state);
-            if (this.is_special_key(key)) {
-                clearTimeout(this.special_input_timing[key]);
-                if (state === false) {
-                    this.on_input_changed.emit({ key, is_down: true });
-                    setTimeout(() => {
-                        if (this.input_state[key] === false) {
-                            this.on_input_changed.emit({ key, is_down: false });
-                        }
-                    }, this.ONE_FRAME);
-                }
-                else {
-                    this.special_input_timing[key] = setTimeout(() => {
-                        if (this.input_state[key] === true) {
-                            this.input_state[key] = false;
-                            this.render_button_state(key, false);
-                            this.on_key_pressed.emit(`long_${key}`);
-                        }
-                    }, this.LONG_PRESS_TIME_MS);
-                }
-            }
-            else {
-                this.on_input_changed.emit({ key, is_down: state });
-            }
-            if (state === false) {
-                this.on_key_pressed.emit(key);
-            }
-        }
-    }
-    render_button_state(key, state) {
-        const button = {
-            up: this.up_button,
-            right: this.right_button,
-            down: this.down_button,
-            left: this.left_button,
-            menu: this.menu_button,
-            capture: this.capture_button,
-            x: this.x_button,
-            o: this.o_button,
-            ltrigger: this.ltrigger_button,
-            rtrigger: this.rtrigger_button
-        }[key];
-        if (state) {
-            button.classList.add("down");
-        }
-        else {
-            button.classList.remove("down");
-        }
-    }
-}
-exports.VirtualConsole = VirtualConsole;
-
-},{"../util/events":8}],8:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EventStream = void 0;
 class EventStream {
-    constructor() {
-        this.subscribers = [];
-    }
+    subscribers = [];
+    on_dispose = () => { };
     listen(fn) {
         this.remove(fn);
         this.subscribers.push(fn);
-        return this;
+        return fn;
     }
     remove(fn) {
-        this.subscribers = this.subscribers.filter(x => x !== fn);
+        this.subscribers = this.subscribers.filter((x) => x !== fn);
         return this;
     }
     emit(ev) {
@@ -1313,19 +3792,82 @@ class EventStream {
             fn(ev);
         }
     }
+    dispose() {
+        this.on_dispose();
+    }
+    filter(fn) {
+        const stream = new EventStream();
+        const subscriber = this.listen((ev) => {
+            if (fn(ev)) {
+                stream.emit(ev);
+            }
+        });
+        stream.on_dispose = () => {
+            this.remove(subscriber);
+        };
+        return stream;
+    }
+    map(fn) {
+        const stream = new EventStream();
+        const subscriber = this.listen((ev) => {
+            stream.emit(fn(ev));
+        });
+        stream.on_dispose = () => {
+            this.remove(subscriber);
+        };
+        return stream;
+    }
 }
 exports.EventStream = EventStream;
 
-},{}],9:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
+"use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __exportStar = (this && this.__exportStar) || function(m, exports) {
+    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+__exportStar(require("./assert"), exports);
+__exportStar(require("./events"), exports);
+__exportStar(require("./promise"), exports);
+__exportStar(require("./random"), exports);
+
+},{"./assert":34,"./events":35,"./promise":37,"./random":38}],37:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.defer = void 0;
+function defer() {
+    const p = Object.create(null);
+    p.promise = new Promise((resolve, reject) => {
+        p.resolve = resolve;
+        p.reject = reject;
+    });
+    return p;
+}
+exports.defer = defer;
+
+},{}],38:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.make_id = void 0;
 function make_id() {
     let id = new Uint8Array(16);
     crypto.getRandomValues(id);
-    return Array.from(id).map(x => x.toString(16).padStart(2, "0")).join("");
+    return Array.from(id)
+        .map((x) => x.toString(16).padStart(2, "0"))
+        .join("");
 }
 exports.make_id = make_id;
 
-},{}]},{},[5])(5)
+},{}]},{},[6])(6)
 });
