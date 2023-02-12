@@ -15,10 +15,10 @@
 
 @keyframes kate-os-fade-in {
   from {
-    opacity: 0
+    opacity: 0;
   }
   to {
-    opacity: 1
+    opacity: 1;
   }
 }
 
@@ -129,6 +129,7 @@
   margin-top: -5px;
   scroll-behavior: smooth;
   scroll-padding: 30px;
+  padding-right: 250px;
 }
 
 .kate-os-carts {
@@ -137,6 +138,7 @@
   flex-direction: row;
   flex-wrap: nowrap;
   gap: 10px;
+  padding-right: 800px;
 }
 
 .kate-os-carts-box {
@@ -156,12 +158,13 @@
   align-items: center;
   outline: 0px solid transparent;
   transition: all 0.1s ease-out;
+  border: 1px solid #ececea;
 }
 
 .focus .kate-os-carts-box .kate-os-carts-image {
   outline: 5px solid #69c;
-  outline-offset: 2px;
-  transform: scale(1.01);
+  border: 2px solid #fafafa;
+  transform: scale(1.04);
 }
 
 .kate-os-carts-image img {
@@ -249,7 +252,6 @@
   font-size: 20px;
   line-height: 1.5em;
 }
-
 
 .kate-hud-drop-installer {
   position: absolute;
@@ -359,7 +361,8 @@
   height: 0.8em;
 }
 
-.kate-icon[data-name="ltrigger"], .kate-icon[data-name="rtrigger"] {
+.kate-icon[data-name="ltrigger"],
+.kate-icon[data-name="rtrigger"] {
   background: #4f4f4f;
   width: 1.5em;
   display: flex;
@@ -367,7 +370,8 @@
   justify-content: center;
 }
 
-.kate-icon[data-name="ltrigger"]::before, .kate-icon[data-name="rtrigger"]::before {
+.kate-icon[data-name="ltrigger"]::before,
+.kate-icon[data-name="rtrigger"]::before {
   font-size: 0.6em;
   font-weight: bold;
   font-family: var(--font-family-sans);
