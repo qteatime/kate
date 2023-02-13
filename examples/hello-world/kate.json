@@ -1,18 +1,55 @@
 {
   "id": "me.qteati.kate.hello-world",
   "metadata": {
-    "author": "Q.",
-    "title": "Hello, from Kate",
-    "category": "Demo",
-    "content_warning": [],
-    "description": "A simple demo to test Kate.",
-    "thumbnail_path": "thumbnail.png"
+    "game": {
+      "author": "Q.",
+      "title": "Hello, from Kate",
+      "description": "A simple demo to test Kate.",
+      "genre": ["tool"],
+      "tags": ["kate-sample"],
+      "thumbnail_path": "thumbnail.png"
+    },
+    "release": {
+      "kind": "demo",
+      "date": {
+        "year": 2023,
+        "month": 2,
+        "day": 13
+      },
+      "version": {
+        "major": 0,
+        "minor": 1
+      },
+      "legal_notices_path": null,
+      "licence_name": "MIT",
+      "allow_derivative": true,
+      "allow_commercial": true
+    },
+    "rating": {
+      "rating": "general",
+      "warnings": []
+    },
+    "play_style": {
+      "input_methods": ["kate-buttons"],
+      "local_multiplayer": null,
+      "online_multiplayer": null,
+      "languages": [
+        {
+          "iso_code": "en",
+          "interface": true,
+          "audio": false,
+          "text": true
+        }
+      ],
+      "accessibility": [],
+      "average_duration": "seconds"
+    },
+    "booklet": {
+      "pages": [],
+      "custom_css_path": null
+    }
   },
-  "files": [
-    "*.css",
-    "*.js",
-    "*.html"
-  ],
+  "files": ["*.css", "*.js", "*.html"],
   "platform": {
     "type": "web-archive",
     "html": "index.html",

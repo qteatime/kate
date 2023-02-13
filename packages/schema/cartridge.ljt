@@ -16,17 +16,83 @@ type File {
 
 // -- Metadata
 type Metadata {
+  field title: Meta-title;
+  field release: Meta-release;
+  field rating: Meta-rating;
+  field play: Meta-play;
+  field booklet: Meta-booklet;
+}
+
+type Meta-title {
   field author: Text;
   field title: Text;
   field description: Text;
-  field category: Text;
-  field content-warning: Text[];
-  field classification: Content-classification;
-  field release-date: Date;
+  field genre: Genre[];
+  field tags: Text[];
   field thumbnail: File;
 }
 
-union Content-classification {
+type Meta-release {
+  field release-type: Release-type;
+  field release-date: Date;
+  field version: Version;
+  field legal-notices: Text;
+  field licence-name: Text;
+  field allow-derivative: Boolean;
+  field allow-commercial: Boolean;
+}
+
+type Meta-rating {
+  field rating: Content-rating;
+  field warnings: Text[];
+}
+
+type Meta-play {
+  field input-methods: Input-method[];
+  field local-multiplayer: Player-range?;
+  field online-multiplayer: Player-range?;
+  field languages: Language[];
+  field accessibility: Accessibility[];
+  field average-duration: Duration;
+}
+
+type Meta-booklet {
+  field pages: Booklet-expr[];
+  field custom-css: Text;
+}
+
+union Genre {
+  type Not-specified {}
+  type Action {}
+  type Figthing {}
+  type Interactive-fiction {}
+  type Platformer {}
+  type Puzzle {}
+  type Racing {}
+  type Rhythm {}
+  type RPG {}
+  type Simulation {}
+  type Shooter {}
+  type Sports {}
+  type Strategy {}
+  type Tool {}
+  type Other {}
+}
+
+union Release-type {
+  type Prototype {}
+  type Early-access {}
+  type Beta {}
+  type Demo {}
+  type Full {}
+}
+
+type Version {
+  field major: Uint32;
+  field minor: Uint32;
+}
+
+union Content-rating {
   type General {}
   type Teen-and-up {}
   type Mature {}
@@ -37,6 +103,88 @@ type Date {
   field year: Uint32;
   field month: Uint8;
   field day: Uint8;
+}
+
+union Duration {
+  type Seconds {}
+  type Few-minutes {}
+  type Half-hour {}
+  type One-hour {}
+  type Few-hours {}
+  type Several-hours {}
+  type Unknown {}
+}
+
+union Input-method {
+  type Kate-buttons {}
+  type Touch {}
+}
+
+type Player-range {
+  field minimum: Uint32;
+  field maximum: Uint32;
+}
+
+type Language {
+  field iso-code: Text;
+  field interface: Boolean;
+  field audio: Boolean;
+  field text: Boolean;
+}
+
+union Accessibility {
+  type High-contrast {}
+  type Subtitles {}
+  type Image-captions {}
+  type Voiced-text {}
+  type Configurable-difficulty {}
+  type Skippable-content {}
+}
+
+// -- Booklet
+union Booklet-expr {
+  // Primitives
+  type BE-text { field value: Text; }
+  type BE-image { field path: Text; } // must be in cart_fs
+  
+  // Formatting
+  type BE-bold { field value: Booklet-expr; }
+  type BE-italic { field value: Booklet-expr; }
+  type BE-title { field value: Booklet-expr; }
+  type BE-subtitle { field value: Booklet-expr; }
+  type BE-subtitle2 { field value: Booklet-expr; }
+  type BE-font { field family: Text; field size: Uint32; field value: Booklet-expr; } // in px
+  type BE-color { field r: Uint8; field g: Uint8; field b: Uint8; field value: Booklet-expr; }
+  type BE-background { field r: Uint8; field g: Uint8; field b: Uint8; field value: Booklet-expr; }
+  type BE-columns { field columns: Uint8; field value: Booklet-expr; }
+
+  // Layouting
+  type BE-fixed { field x: Uint32; field y: Uint32; field value: Booklet-expr; }
+  type BE-row { field gap: Uint32; field align: Booklet-align; field value: Booklet-expr; }
+  type BE-column { field gap: Uint32; field align: Booklet-align; field value: Booklet-expr; }
+  type BE-stack { field values: Booklet-expr[]; }
+  type BE-table { field headers: Booklet-expr[]; field rows: Booklet-row; }
+  
+  // Styling
+  type BE-class { field name: Text; field value: Booklet-expr; }
+}
+
+type Booklet-row {
+  field row-span: Uint32;
+  field cells: Booklet-cell[];
+}
+
+type Booklet-cell {
+  field cell-span: Uint32;
+  field value: Booklet-expr;
+}
+
+union Booklet-align {
+  type Start {}
+  type Center {}
+  type End {}
+  type Justify {}
+  type Space-evenly {}
 }
 
 // -- Supported platforms

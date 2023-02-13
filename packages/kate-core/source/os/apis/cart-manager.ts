@@ -25,7 +25,7 @@ export class CartManager {
         await this.os.notifications.push(
           "kate:installer",
           "New game installed",
-          `${cart.metadata?.title ?? cart.id} is ready to play!`
+          `${cart.metadata.title.title} is ready to play!`
         );
       }
     } catch (error) {
@@ -52,14 +52,12 @@ export class CartManager {
 
         await meta.write({
           id: cart.id,
-          title: cart.metadata?.title ?? cart.id,
-          description: cart.metadata?.description ?? "",
-          thumbnail: cart.metadata?.thumbnail
-            ? {
-                mime: cart.metadata!.thumbnail!.mime,
-                bytes: cart.metadata!.thumbnail!.data,
-              }
-            : null,
+          title: cart.metadata.title.title,
+          description: cart.metadata.title.description,
+          thumbnail: {
+            mime: cart.metadata.title.thumbnail.mime,
+            bytes: cart.metadata.title.thumbnail.data,
+          },
           installed_at: new Date(),
         });
         await files.write({
