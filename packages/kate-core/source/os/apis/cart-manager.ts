@@ -1,4 +1,5 @@
 import * as Cart from "../../../../schema/generated/cartridge";
+import { add_fingerprint } from "../../../../schema/lib/fingerprint";
 import type { KateOS } from "../os";
 import * as Db from "./db";
 
@@ -47,7 +48,7 @@ export class CartManager {
 
         const encoder = new Cart._Encoder();
         cart.encode(encoder);
-        const bytes = encoder.to_bytes();
+        const bytes = add_fingerprint(encoder.to_bytes());
 
         await meta.write({
           id: cart.id,

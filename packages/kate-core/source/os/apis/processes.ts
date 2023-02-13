@@ -45,6 +45,13 @@ export class KateProcesses {
       this._running = process;
       this.os.kernel.console.os_root.classList.add("in-background");
       return process;
+    } catch (error) {
+      console.error(`Failed to run cartridge ${id}:`, error);
+      await this.os.notifications.push(
+        "kate:os",
+        `Failed to run`,
+        `Cartridge may be corrupted or not compatible with this version.`
+      );
     } finally {
       this.os.hide_hud(loading);
     }

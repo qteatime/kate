@@ -1,6 +1,7 @@
 import * as Path from "path";
 import * as FS from "fs";
 import * as Cart from "../../schema/generated/cartridge";
+import { add_fingerprint } from "../../schema/lib/fingerprint";
 import * as Glob from "glob";
 const [out, json_file] = process.argv.slice(2);
 
@@ -132,7 +133,7 @@ function files(patterns: Kart["files"]) {
 function save(cart: Cart.Cartridge) {
   const encoder = new Cart._Encoder();
   cart.encode(encoder);
-  FS.writeFileSync(out, encoder.to_bytes());
+  FS.writeFileSync(out, add_fingerprint(encoder.to_bytes()));
 }
 
 function make_bridge(x: Bridge) {

@@ -8,14 +8,20 @@ interface _EncodeMethod {
 }
 
 export class _Decoder {
-  private offset: number = 0;
+  private _offset: number = 0;
 
   constructor(readonly view: DataView) {}
 
+  get remaining_bytes() {
+    return this.view.byteLength - this.offset;
+  }
+
   peek<A>(f: (view: DataView) => A) {
-    return f(
-      new DataView(this.view.buffer, this.view.byteOffset + this.offset)
-    );
+    return f(new DataView(this.view.buffer, this.offset));
+  }
+
+  get offset() {
+    return this._offset + this.view.byteOffset;
   }
 
   bool() {
@@ -24,49 +30,49 @@ export class _Decoder {
 
   i8() {
     const value = this.view.getInt8(this.offset);
-    this.offset += 1;
+    this._offset += 1;
     return value;
   }
 
   i16() {
     const value = this.view.getInt16(this.offset, true);
-    this.offset += 2;
+    this._offset += 2;
     return value;
   }
 
   i32() {
     const value = this.view.getInt32(this.offset, true);
-    this.offset += 4;
+    this._offset += 4;
     return value;
   }
 
   ui8() {
     const value = this.view.getUint8(this.offset);
-    this.offset += 1;
+    this._offset += 1;
     return value;
   }
 
   ui16() {
     const value = this.view.getUint16(this.offset, true);
-    this.offset += 2;
+    this._offset += 2;
     return value;
   }
 
   ui32() {
     const value = this.view.getUint32(this.offset, true);
-    this.offset += 4;
+    this._offset += 4;
     return value;
   }
 
   f32() {
     const value = this.view.getFloat32(this.offset, true);
-    this.offset += 4;
+    this._offset += 4;
     return value;
   }
 
   f64() {
     const value = this.view.getFloat64(this.offset, true);
-    this.offset += 8;
+    this._offset += 8;
     return value;
   }
 
@@ -86,18 +92,21 @@ export class _Decoder {
     const decoder = new TextDecoder("utf-8");
     const text_view = new DataView(this.view.buffer, this.offset, size);
     const result = decoder.decode(text_view);
-    this.offset += size;
+    this._offset += size;
     return result;
   }
 
   bytes() {
     const size = this.ui32();
-    const result = [];
-    for (let i = 0; i < size; ++i) {
+    if (size > this.remaining_bytes) {
+      throw new Error(`Invalid size ${size}`);
+    }
+    const result = new Uint8Array(size);
+    for (let i = 0; i < result.length; ++i) {
       result[i] = this.view.getUint8(this.offset + i);
     }
-    this.offset += size;
-    return new Uint8Array(result);
+    this._offset += size;
+    return result;
   }
 
   array<T>(f: () => T): T[] {

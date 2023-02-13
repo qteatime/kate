@@ -2,7 +2,7 @@
   "compilerOptions": {
     "composite": true,
     "strict": true,
-    "rootDir": "generated",
+    "rootDir": ".",
     "module": "commonjs",
     "target": "ESNext",
     "lib": ["ESNext", "DOM", "ESNext.Intl"],
@@ -11,5 +11,5 @@
     "jsx": "react",
     "declaration": true
   },
-  "include": ["generated"]
+  "include": ["generated", "lib/fingerprint.ts"]
 }

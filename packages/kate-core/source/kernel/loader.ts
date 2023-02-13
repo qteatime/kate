@@ -1,8 +1,9 @@
 import * as Cart from "../../../schema/generated/cartridge";
+import { remove_fingerprint } from "../../../schema/lib/fingerprint";
 
 export class KateLoader {
   load_bytes(bytes: ArrayBuffer) {
-    const view = new DataView(bytes);
+    const view = remove_fingerprint(new DataView(bytes));
     const decoder = new Cart._Decoder(view);
     return Cart.Cartridge.decode(decoder);
   }
