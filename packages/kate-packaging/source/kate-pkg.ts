@@ -2,13 +2,14 @@ import * as Path from "path";
 import * as FS from "fs";
 import * as Glob from "glob";
 
-const [kind, out0, cart] = process.argv.slice(2);
+const [kind, out0, cart, overwrite0] = process.argv.slice(2);
 
 if (!kind || !out0 || !cart) {
-  console.log("Usage: kate-pkg web <out-dir> <game.kart>");
+  console.log("Usage: kate-pkg web <out-dir> <game.kart> [--overwrite]");
   process.exit(1);
 }
 
+const overwrite = overwrite0 === "--overwrite";
 const out = Path.resolve(out0);
 const www_root = Path.join(__dirname, "../../../www");
 const asset_root = Path.join(__dirname, "../assets");
@@ -23,7 +24,7 @@ async function main() {
   switch (kind) {
     case "web": {
       const files = Glob.sync("**/*", { cwd: www_root, nodir: true });
-      if (FS.existsSync(out)) {
+      if (FS.existsSync(out) && !overwrite) {
         console.log("Output directory already exists. Aborting");
         return;
       }
