@@ -4,7 +4,8 @@
   "description": "A fantasy handheld console for Visual Novels, 2d RPGs, and other story-rich games!",
   "main": "index.js",
   "bin": {
-    "kart": "./packages/kate-packaging/build/kart.js"
+    "kart": "./packages/kate-packaging/build/kart.js",
+    "kate-pkg": "./packages/kate-packaging/build/kate-pkg.js"
   },
   "scripts": {
     "app": "electron www/app.js",

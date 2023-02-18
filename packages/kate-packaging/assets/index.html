@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <title>Kate</title>
+    <link href="kate.css" rel="stylesheet" />
+    <link href="kate-os.css" rel="stylesheet" />
+  </head>
+  <body>
+    <input
+      id="kate-installer"
+      type="file"
+      style="display: none"
+      accept=".kart"
+    />
+    <div class="kate">
+      <div class="kate-body">
+        <div class="kate-trigger kate-trigger-left"></div>
+        <div class="kate-trigger kate-trigger-right"></div>
+        <div class="kate-dpad">
+          <div class="kate-dpad-button kate-dpad-up">
+            <img src="img/up.png" />
+          </div>
+          <div class="kate-dpad-button kate-dpad-right">
+            <img src="img/right.png" />
+          </div>
+          <div class="kate-dpad-button kate-dpad-down">
+            <img src="img/down.png" />
+          </div>
+          <div class="kate-dpad-button kate-dpad-left">
+            <img src="img/left.png" />
+          </div>
+          <div class="kate-dpad-mid"></div>
+        </div>
+        <div class="kate-screen">
+          <div id="kate-game"></div>
+          <div class="kate-game-cover"></div>
+          <div id="kate-os-root"></div>
+          <div id="kate-hud"></div>
+        </div>
+        <div class="kate-action">
+          <div class="kate-button-bg"></div>
+          <div class="kate-button kate-button-x">
+            <img src="img/cancel.png" />
+          </div>
+          <div class="kate-button kate-button-o">
+            <img src="img/ok.png" />
+          </div>
+        </div>
+        <div class="kate-special-button kate-special-button-left">
+          <div class="kate-bean-button kate-button-menu"></div>
+          <div class="kate-bean-button-label">Menu</div>
+        </div>
+        <div class="kate-special-button kate-special-button-right">
+          <div class="kate-bean-button kate-button-capture"></div>
+          <div class="kate-bean-button-label">Capture</div>
+        </div>
+        <div class="kate-whiskers kate-whiskers-left">
+          <div class="kate-whisker-item"></div>
+          <div class="kate-whisker-item"></div>
+          <div class="kate-whisker-item"></div>
+        </div>
+        <div class="kate-whiskers kate-whiskers-right">
+          <div class="kate-whisker-item"></div>
+          <div class="kate-whisker-item"></div>
+          <div class="kate-whisker-item"></div>
+        </div>
+        <div class="kate-engraving">=KATE=</div>
+      </div>
+    </div>
+    <script src="kate-resize.js"></script>
+    <script src="kate.js"></script>
+    <script>
+      void (async function () {
+        try {
+          const kate = Kate.kernel.KateKernel.from_root(
+            document.querySelector(".kate")
+          );
+          const kate_os = await Kate.os.KateOS.boot(kate);
+          const loading = new Kate.os.HUD_LoadIndicator();
+          kate_os.show_hud(loading);
+          kate_os.focus_handler.change_root(null);
+          const game = await (await fetch("game.kart")).arrayBuffer();
+          const cart = kate.loader.load_bytes(game);
+
+          document.querySelector(".kate-hud-load-screen").textContent =
+            "Click, touch, or press a key to start...";
+
+          async function start() {
+            window.removeEventListener("click", start);
+            window.removeEventListener("keydown", start);
+
+            const storage = kate_os.kv_storage.get_store(cart.id);
+            const runtime = kate.runtimes.from_cartridge(
+              cart,
+              await storage.contents()
+            );
+            const process = new Kate.os.KateProcess(
+              this,
+              cart,
+              runtime.run(kate_os)
+            );
+            kate_os.processes._running = process;
+            kate.console.os_root.classList.add("in-background");
+            kate_os.hide_hud(loading);
+          }
+          window.addEventListener("click", start);
+          window.addEventListener("keydown", start);
+
+          window.kate = kate;
+          window.kate_os = kate_os;
+        } catch (error) {
+          alert(`Kate failed to start: ${error}`);
+          console.error(error);
+        }
+      })();
+    </script>
+  </body>
+</html>
