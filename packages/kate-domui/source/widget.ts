@@ -178,6 +178,23 @@ export class Fragment extends Widget {
   }
 }
 
+export class Space extends Widget {
+  constructor(readonly size_px: number) {
+    super();
+  }
+
+  render() {
+    return h(
+      "div",
+      {
+        class: "kate-ui-space",
+        style: `width: ${this.size_px}px; height: ${this.size_px}px`,
+      },
+      []
+    );
+  }
+}
+
 export class FocusTarget extends Widget {
   private is_focused = false;
 
