@@ -172,10 +172,15 @@ export class CR_Web_archive extends CartRuntime {
   }
 
   private resolve_pathname(base: string, url0: string) {
-    const x0 = base.endsWith("/") ? base : base + "/";
-    const x1 = x0.startsWith("/") ? base : "/" + base;
-    const x2 = x1.endsWith(".css") ? x1.split("/").slice(0, -1).join("/") : x1;
-    return x2 + "/" + url0;
+    if (url0.startsWith("/")) {
+      return url0;
+    } else {
+      const x0 = base.endsWith("/") ? base : base + "/";
+      const x1 = x0.endsWith(".css")
+        ? x0.split("/").slice(0, -1).join("/")
+        : x0;
+      return x1 + "/" + url0;
+    }
   }
 
   private apply_bridge(dom: Document, bridge: Cart.Bridge, secret_node: Node) {
