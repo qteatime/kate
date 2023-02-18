@@ -12,3 +12,9 @@ export function defer<A>() {
   });
   return p;
 }
+
+export function sleep(ms: number) {
+  return new Promise<void>((resolve, reject) => {
+    setTimeout(() => resolve(), ms);
+  });
+}
