@@ -112,6 +112,42 @@ export class Box extends Widget {
   }
 }
 
+export class WithAttrs extends Widget {
+  private subscribers: [Observable<string>, any][] = [];
+  constructor(
+    readonly attrs: { [key: string]: string | Observable<string> },
+    readonly child: Widget
+  ) {
+    super();
+  }
+
+  attach(parent: Node, ui: KateUI): void {
+    super.attach(parent, ui);
+    this.child.attach(this.raw_node!, ui);
+    const node = () => this.child.raw_node as HTMLElement;
+    for (const [key, value] of Object.entries(this.attrs)) {
+      if (typeof value === "string") {
+        node().setAttribute(key, value);
+      } else {
+        const sub = value.stream.listen((x) => node().setAttribute(key, x));
+        this.subscribers.push([value, sub]);
+      }
+    }
+  }
+
+  detach() {
+    for (const [obs, sub] of this.subscribers) {
+      obs.stream.remove(sub);
+    }
+    this.child.detach();
+    super.detach();
+  }
+
+  render() {
+    return h("div", { class: "kate-ui-attrs" }, []);
+  }
+}
+
 export class Image extends Widget {
   constructor(readonly url: string) {
     super();
