@@ -1,7 +1,7 @@
-import { KateAudio } from "./audio";
+import { KateAudio, KateAudioChannel, KateAudioSource } from "./audio";
 import { KateCartFS } from "./cart-fs";
 import { KateIPC } from "./channel";
-import { KateInput } from "./input";
+import { InputKey, KateInput } from "./input";
 import { KateKVStore } from "./kv-store";
 import { KateTimer } from "./timer";
 
@@ -35,4 +35,15 @@ export type KateAPI = {
 
 declare global {
   var KateAPI: KateAPI;
+  namespace KateTypes {
+    export {
+      KateAudio,
+      KateAudioSource,
+      KateAudioChannel,
+      InputKey,
+      KateInput,
+      KateTimer,
+      KateKVStore,
+    };
+  }
 }
