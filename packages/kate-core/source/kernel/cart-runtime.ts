@@ -101,6 +101,12 @@ export class CR_Web_archive extends CartRuntime {
         is_down: ev.is_down,
       });
     });
+    this.console.on_key_pressed.listen((key) => {
+      channel.send({
+        type: "kate:input-key-pressed",
+        key: key,
+      });
+    });
 
     frame.src = URL.createObjectURL(
       new Blob([this.proxy_html(secret)], { type: "text/html" })

@@ -1,7 +1,7 @@
 import { KateAudio, KateAudioChannel, KateAudioSource } from "./audio";
 import { KateCartFS } from "./cart-fs";
 import { KateIPC } from "./channel";
-import { InputKey, KateInput } from "./input";
+import { InputKey, ExtendedInputKey, KateInput } from "./input";
 import { KateKVStore } from "./kv-store";
 import { KateTimer } from "./timer";
 
@@ -41,6 +41,7 @@ declare global {
       KateAudioSource,
       KateAudioChannel,
       InputKey,
+      ExtendedInputKey,
       KateInput,
       KateTimer,
       KateKVStore,

@@ -1,4 +1,4 @@
-import type { InputKey } from "../../kate-api/build/input";
+import type { ExtendedInputKey, InputKey } from "../../kate-api/build/input";
 import type { KateUI } from "./ui";
 import { Observable } from "./observable";
 import { LiveNode } from "./transform";
@@ -283,6 +283,40 @@ export class Keymap extends Widget {
         this.active = await handler();
         break;
       }
+    }
+  };
+}
+
+export class KeyEventMap extends Widget {
+  private active: boolean = true;
+
+  constructor(
+    readonly mapping: Partial<Record<ExtendedInputKey, () => Promise<boolean>>>
+  ) {
+    super();
+  }
+
+  render() {
+    return null;
+  }
+
+  on_attached(): void {
+    KateAPI.input.on_key_pressed.listen(this.handle_input);
+  }
+
+  on_detached(): void {
+    KateAPI.input.on_key_pressed.remove(this.handle_input);
+  }
+
+  handle_input = async (key: ExtendedInputKey) => {
+    if (!this.active) {
+      return;
+    }
+
+    const handler = this.mapping[key];
+    if (handler != null) {
+      this.active = false;
+      this.active = await handler();
     }
   };
 }

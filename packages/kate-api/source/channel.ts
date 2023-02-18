@@ -11,6 +11,7 @@ export class KateIPC {
   #server: Window;
   readonly events = {
     input_state_changed: new EventStream<{ key: InputKey; is_down: boolean }>(),
+    key_pressed: new EventStream<InputKey>(),
     paused: new EventStream<boolean>(),
   };
 
@@ -81,6 +82,11 @@ export class KateIPC {
           key: ev.data.key,
           is_down: ev.data.is_down,
         });
+        break;
+      }
+
+      case "kate:input-key-pressed": {
+        this.events.key_pressed.emit(ev.data.key);
         break;
       }
 

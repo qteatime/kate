@@ -172,7 +172,18 @@ w.task("bridges:compile", ["api:build"], () => {
   tsc("packages/kate-bridges");
 });
 
-w.task("briges:generate", ["bridges:compile"], () => {
+w.task("bridges:bundle-api", ["api:build"], () => {
+  browserify([
+    "-e",
+    "packages/kate-api/build/index.js",
+    "-o",
+    "packages/kate-bridges/build/kate-api.js",
+    "-s",
+    "KateAPI",
+  ]);
+});
+
+w.task("bridges:generate", ["bridges:compile", "bridges:bundle-api"], () => {
   pack_assets({
     glob: "packages/kate-bridges/build/*.js",
     filter: (x) => !x.endsWith("/index.js"),
@@ -190,7 +201,7 @@ w.task("bridges:build", ["bridges:generate"], () => {});
 // -- Core
 w.task(
   "core:compile",
-  ["schema:build", "util:build", "db-schema:build"],
+  ["schema:build", "bridges:build", "util:build", "db-schema:build"],
   () => {
     tsc("packages/kate-core");
   }
@@ -260,6 +271,17 @@ w.task(
   ["example:hello-world", "example:boon-scrolling"],
   () => {}
 );
+
+// -- Workspace maintenance
+w.task("chore:clean-tsc-cache", [], () => {
+  const files = glob("**/tsconfig.tsbuildinfo", {
+    absolute: true,
+    cwd: __dirname,
+  });
+  for (const file of files) {
+    FS.unlinkSync(file);
+  }
+});
 
 // -- Main
 w.task("help", [], () => {
