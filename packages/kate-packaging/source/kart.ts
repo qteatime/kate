@@ -506,10 +506,14 @@ function files(patterns: Kart["files"]) {
   const paths = [
     ...new Set(patterns.flatMap((x) => Glob.sync(x, { cwd: base_dir }))),
   ];
-  return paths.map((path) => {
-    const ext = Path.extname(path);
-    const mime = mime_table[ext] ?? "application/octet-stream";
-    return new Cart.File(make_absolute(path), mime, load_file(path));
+  return paths.flatMap((path) => {
+    if (FS.statSync(Path.resolve(base_dir, path)).isFile()) {
+      const ext = Path.extname(path);
+      const mime = mime_table[ext] ?? "application/octet-stream";
+      return [new Cart.File(make_absolute(path), mime, load_file(path))];
+    } else {
+      return [];
+    }
   });
 }
 
