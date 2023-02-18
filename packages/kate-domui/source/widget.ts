@@ -94,13 +94,13 @@ export class Box extends Widget {
   attach(parent: Node, ui: KateUI): void {
     super.attach(parent, ui);
     for (const child of this.children) {
-      child.on_attached();
+      child.attach(this.raw_node!, ui);
     }
   }
 
   detach(): void {
     for (const child of this.children) {
-      child.on_detached();
+      child.detach();
     }
     super.detach();
   }
@@ -108,12 +108,6 @@ export class Box extends Widget {
   render() {
     const element = document.createElement(this.tag);
     element.className = this.class_names;
-    for (const child of this.children) {
-      const node = child.render();
-      if (node != null) {
-        element.appendChild(node);
-      }
-    }
     return element;
   }
 }
@@ -167,25 +161,19 @@ export class Fragment extends Widget {
   attach(parent: Node, ui: KateUI): void {
     super.attach(parent, ui);
     for (const child of this.children) {
-      child.on_attached();
+      child.attach(this.raw_node!, ui);
     }
   }
 
   detach(): void {
     for (const child of this.children) {
-      child.on_detached();
+      child.detach();
     }
     super.detach();
   }
 
   render() {
     const fragment = document.createDocumentFragment();
-    for (const child of this.children) {
-      const node = child.render();
-      if (node != null) {
-        fragment.appendChild(node);
-      }
-    }
     return fragment;
   }
 }
@@ -220,7 +208,7 @@ export class FocusTarget extends Widget {
   }
 
   render() {
-    return new Box("div", "kate-focus-target", [this.child]).render();
+    return h("div", { class: "kate-focus-target" }, []);
   }
 
   update_focus = (value: boolean) => {
@@ -291,11 +279,11 @@ export class Dynamic extends Widget {
 
   attach(parent: Node, ui: KateUI): void {
     super.attach(parent, ui);
-    this.current?.on_attached();
+    this.current?.attach(this.raw_node!, ui);
   }
 
   detach(): void {
-    this.current?.on_detached();
+    this.current?.detach();
     super.detach();
   }
 
@@ -318,13 +306,9 @@ export class Dynamic extends Widget {
   }
 
   on_update = (value: Widget) => {
-    this.current?.on_detached();
+    this.current?.detach();
     this.canvas.textContent = "";
-    const node = value.render();
-    if (node != null) {
-      this.canvas.appendChild(node);
-    }
-    value.on_attached();
+    value.attach(this.canvas, this.ui!);
     this.current = value;
   };
 }

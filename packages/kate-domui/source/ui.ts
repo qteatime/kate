@@ -37,6 +37,11 @@ export class KateUI {
     widget.attach(this.root, this);
   }
 
+  remove(widget: Widget) {
+    this.children = this.children.filter((x) => x !== widget);
+    widget.detach();
+  }
+
   add_css(code: string) {
     const element = new Css(code).render();
     this.docroot.appendChild(element);
