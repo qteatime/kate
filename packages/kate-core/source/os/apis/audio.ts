@@ -7,9 +7,9 @@ export class KateAudioServer {
 
   constructor(readonly os: KateOS) {}
 
-  async create_channel() {
+  async create_channel(max_tracks: number) {
     const id = make_id();
-    const channel = new AudioChannel(id);
+    const channel = new AudioChannel(id, max_tracks);
     this.channels.set(id, channel);
     return channel;
   }
@@ -42,9 +42,9 @@ class AudioChannel {
   readonly volume: GainNode;
   readonly output: AudioDestinationNode;
   readonly context: AudioContext;
-  private source: AudioNode | null = null;
+  private sources: AudioBufferSourceNode[] = [];
 
-  constructor(readonly id: string) {
+  constructor(readonly id: string, readonly max_tracks: number = 1) {
     this.context = new AudioContext();
     this.output = this.context.destination;
     this.volume = this.context.createGain();
@@ -71,13 +71,24 @@ class AudioChannel {
     await this.context.suspend();
   }
 
-  async play(sound: AudioSource, loop: boolean) {
-    if (this.source) {
-      this.source.disconnect();
+  async stop_all_sources() {
+    for (const source of this.sources) {
+      source.stop();
+      source.disconnect();
     }
+    this.sources = [];
+  }
+
+  async play(sound: AudioSource, loop: boolean) {
     const node = this.context.createBufferSource();
     node.buffer = sound.buffer;
     node.loop = loop;
+    this.sources.push(node);
+    while (this.sources.length > this.max_tracks) {
+      const source = this.sources.shift()!;
+      source.stop();
+      source.disconnect();
+    }
     node.connect(this.input);
     node.start();
   }

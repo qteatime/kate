@@ -7,12 +7,15 @@ export class KateAudio {
     this.#channel = channel;
   }
 
-  async create_channel(name: string): Promise<KateAudioChannel> {
+  async create_channel(
+    name: string,
+    max_tracks: number = 1
+  ): Promise<KateAudioChannel> {
     const { id, volume } = await this.#channel.call<any>(
       "kate:audio.create-channel",
-      {}
+      { max_tracks }
     );
-    return new KateAudioChannel(this, name, id, volume);
+    return new KateAudioChannel(this, name, id, max_tracks, volume);
   }
 
   async resume_channel(channel: KateAudioChannel) {
@@ -21,6 +24,10 @@ export class KateAudio {
 
   async pause_channel(channel: KateAudioChannel) {
     await this.#channel.call("kate:audio.pause-channel", { id: channel.id });
+  }
+
+  async stop_all_sources(channel: KateAudioChannel) {
+    await this.#channel.call("kate:audio.stop-all-sources", { id: channel.id });
   }
 
   async change_channel_volume(channel: KateAudioChannel, value: number) {
@@ -56,6 +63,7 @@ export class KateAudioChannel {
     readonly audio: KateAudio,
     readonly name: string,
     readonly id: string,
+    readonly max_tracks: number,
     private _volume: number
   ) {}
 
@@ -78,6 +86,10 @@ export class KateAudioChannel {
 
   async pause() {
     return this.audio.pause_channel(this);
+  }
+
+  async stop_all_sources() {
+    return this.audio.stop_all_sources(this);
   }
 
   async play(source: KateAudioSource, loop: boolean) {

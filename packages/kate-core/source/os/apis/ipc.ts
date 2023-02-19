@@ -18,9 +18,10 @@ type Message =
     }
   | { type: "kate:kv-store.get"; payload: { key: string } }
   | { type: "kate:kv-store.set"; payload: { key: string; value: string } }
-  | { type: "kate:audio.create-channel"; payload: {} }
+  | { type: "kate:audio.create-channel"; payload: { max_tracks?: number } }
   | { type: "kate:audio.resume-channel"; payload: { id: string } }
   | { type: "kate:audio.pause-channel"; payload: { id: string } }
+  | { type: "kate:audio.stop-all-sources"; payload: { id: string } }
   | {
       type: "kate:audio.change-volume";
       payload: { id: string; volume: number };
@@ -155,7 +156,9 @@ export class KateIPCServer {
 
       // -- Audio
       case "kate:audio.create-channel": {
-        const channel = await process.audio.create_channel();
+        const channel = await process.audio.create_channel(
+          message.payload.max_tracks ?? 1
+        );
         await channel.resume();
         return ok({ id: channel.id, volume: channel.volume.gain.value });
       }
@@ -177,6 +180,16 @@ export class KateIPCServer {
           return ok(null);
         } catch (_) {
           return err("kate:audio.cannot-pause");
+        }
+      }
+
+      case "kate:audio.stop-all-sources": {
+        try {
+          const channel = process.audio.get_channel(message.payload.id);
+          await channel.stop_all_sources();
+          return ok(null);
+        } catch (_) {
+          return err("kate:audio.cannot-stop-sources");
         }
       }
 
