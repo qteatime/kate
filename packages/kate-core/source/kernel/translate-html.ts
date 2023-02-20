@@ -181,8 +181,9 @@ function inline_css(
 }
 
 function transform_css_urls(base: Pathname, source: string, context: Context) {
-  return source.replace(/\burl\(("[^"]+")\)/g, (_, url_string) => {
-    const path = base.join(url_string).as_string();
+  return source.replace(/\burl\(("[^"]+")\)/g, (_, url_string: string) => {
+    const url_path = Pathname.from_string(JSON.parse(url_string));
+    const path = base.join(url_path).as_string();
     const data_url = get_data_url(path, context.cart);
     return `url(${JSON.stringify(data_url)})`;
   });
