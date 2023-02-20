@@ -30,8 +30,7 @@ body {
   width: 1310px;
   height: 550px;
   border-radius: 20px;
-  box-shadow: -1px -1px 1px rgb(255 255 255 / 50%),
-               0px 10px 1px #c99;
+  box-shadow: -1px -1px 1px rgb(255 255 255 / 50%), 0px 10px 1px #c99;
   user-select: none;
 }
 
@@ -107,6 +106,10 @@ body {
   user-select: text;
 }
 
+.trusted-mode .kate-screen {
+  border-color: #933;
+}
+
 #kate-game {
   position: absolute;
   top: 0px;
@@ -165,13 +168,14 @@ body {
   left: 30px;
 }
 
-.kate-dpad-button, .kate-dpad-mid {
+.kate-dpad-button,
+.kate-dpad-mid {
   position: absolute;
   width: 50px;
   height: 50px;
   background: #ececea;
   box-shadow: -1px -1px 1px rgba(255, 255, 255, 0.5),
-               1px  1px 1px rgba(0, 0, 0, 0.3);
+    1px 1px 1px rgba(0, 0, 0, 0.3);
 }
 
 .kate-dpad-button {
@@ -248,7 +252,7 @@ body {
   border-radius: 8px;
   height: 15px;
   box-shadow: -1px -1px 1px rgba(0, 0, 0, 0.4),
-               1px  1px 1px rgba(255, 255, 255, 0.5);
+    1px 1px 1px rgba(255, 255, 255, 0.5);
 }
 
 .kate-special-button {
@@ -317,7 +321,19 @@ body {
   text-align: center;
   color: #932;
   opacity: 0.75;
-  text-shadow: -1px -1px 0px rgb(0 0 0 / 20%), 1px 1px 0px rgb(255 255 255 / 20%);
+  text-shadow: -1px -1px 0px rgb(0 0 0 / 20%),
+    1px 1px 0px rgb(255 255 255 / 20%);
+}
+
+.kate-version {
+  font-family: sans-serif;
+  font-size: 14px;
+  font-weight: bold;
+  color: #fafafa;
+  position: absolute;
+  bottom: 15px;
+  right: 20px;
+  text-shadow: -1px -1px 0px rgba(0, 0, 0, 0.2);
 }
 
 /* Screen */
@@ -347,6 +363,10 @@ body {
   -webkit-app-region: drag;
 }
 
-.kate-trigger, .kate-dpad-button, .kate-screen, .kate-button, .kate-bean-button {
+.kate-trigger,
+.kate-dpad-button,
+.kate-screen,
+.kate-button,
+.kate-bean-button {
   -webkit-app-region: no-drag;
 }
