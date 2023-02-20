@@ -6,9 +6,12 @@
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     />
     <meta name="apple-mobile-web-app-capable" content="yes" />
+    <link rel="manifest" href="manifest.json" />
     <title>Kate</title>
     <link href="kate.css" rel="stylesheet" />
     <link href="kate-os.css" rel="stylesheet" />
+    <link href="icons/icon256.png" rel="icon" />
+    <link href="icons/icon256.png" rel="apple-touch-icon" />
   </head>
   <body>
     <input
@@ -83,6 +86,10 @@
         const kate_os = await Kate.os.KateOS.boot(kate);
         window.kate = kate;
         window.kate_os = kate_os;
+
+        if ("serviceWorker" in navigator) {
+          navigator.serviceWorker.register("worker.js");
+        }
       })();
     </script>
   </body>
