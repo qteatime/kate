@@ -1,11 +1,5 @@
 node_modules/
-color/
-design/
-experiments/
 build/
-old-tree/
-/games
-projects/
 *.tsbuildinfo
 *.d.ts
 *.kart
