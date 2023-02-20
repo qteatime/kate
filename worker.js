@@ -1,4 +1,4 @@
-const cache_name = "kate-cache-v1";
+const cache_name = "kate-cache-v2";
 const app_files = [
   "/",
   "/manifest.json",
@@ -15,12 +15,12 @@ const app_files = [
   "/icons/icon32.png",
   "/icons/icon64.png",
   "/icons/icon128.png",
-  "/icons/icon256.png"
+  "/icons/icon256.png",
 ];
 
 self.addEventListener("install", (ev) => {
   ev.waitUntil(async () => {
     const cache = await caches.open(cache_name);
     await cache.addAll(app_files);
-  })
-})
+  });
+});

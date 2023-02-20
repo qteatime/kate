@@ -907,7 +907,8 @@ function inline_css(link, root, dom, context) {
 }
 function transform_css_urls(base, source, context) {
     return source.replace(/\burl\(("[^"]+")\)/g, (_, url_string) => {
-        const path = base.join(url_string).as_string();
+        const url_path = pathname_1.Pathname.from_string(JSON.parse(url_string));
+        const path = base.join(url_path).as_string();
         const data_url = get_data_url(path, context.cart);
         return `url(${JSON.stringify(data_url)})`;
     });
