@@ -13,3 +13,4 @@ packages/kate-bridges/source/index.ts
 examples/boon-scrolling/**/*.js
 packages/kate-domui/source/assets.ts
 packages/schema/**/*.js
+design/

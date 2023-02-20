@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json.schemastore.org/web-manifest-combined.json",
+  "name": "Kate",
+  "short_name": "Kate",
+  "start_url": ".",
+  "display": "fullscreen",
+  "display_override": ["window-controls-overlay"],
+  "background_color": "#000",
+  "description": "A fantasy handheld console for Visual Novels, 2d RPGs, and other story-rich games!",
+  "categories": ["games"],
+  "orientation": "landscape",
+  "icons": [
+    {
+      "src": "icons/icon32.png",
+      "sizes": "16x16 32x32"
+    },
+    {
+      "src": "icons/icon64.png",
+      "sizes": "48x48 64x64"
+    },
+    {
+      "src": "icons/icon128.png",
+      "sizes": "72x72 96x96 128x128"
+    },
+    {
+      "src": "icons/icon256.png",
+      "sizes": "256x256"
+    }
+  ]
+}
