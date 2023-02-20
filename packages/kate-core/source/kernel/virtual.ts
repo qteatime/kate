@@ -29,6 +29,7 @@ export class VirtualConsole {
   private rtrigger_button: HTMLElement;
   private is_listening = false;
   readonly body: HTMLElement;
+  readonly device_display: HTMLElement;
   readonly screen: HTMLElement;
   readonly hud: HTMLElement;
   readonly os_root: HTMLElement;
@@ -73,6 +74,7 @@ export class VirtualConsole {
     this.screen = root.querySelector("#kate-game")!;
     this.os_root = root.querySelector("#kate-os-root")!;
     this.hud = root.querySelector("#kate-hud")!;
+    this.device_display = root.querySelector(".kate-screen")!;
     this.body = root.querySelector(".kate-body")!;
     this.reset_states();
   }

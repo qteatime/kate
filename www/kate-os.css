@@ -22,6 +22,15 @@
   }
 }
 
+@keyframes kate-os-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
 @keyframes kate-slide-in-left {
   from {
     left: -300px;
@@ -468,6 +477,11 @@
   justify-content: center;
   background: rgba(255, 255, 255, 0.5);
   backdrop-filter: blur(5px);
+  animation: kate-os-fade-in 0.25s ease-out forwards;
+}
+
+.kate-hud-dialog-message.leaving {
+  animation: kate-os-fade-out 0.25s ease-out forwards;
 }
 
 .kate-hud-dialog-container {
