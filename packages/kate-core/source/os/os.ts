@@ -35,6 +35,7 @@ export class KateOS {
   readonly dialog: KateDialog;
   readonly events = {
     on_cart_inserted: new EventStream<Cart.Cartridge>(),
+    on_cart_removed: new EventStream<{ id: string; title: string }>(),
   };
 
   private constructor(readonly kernel: KateKernel, readonly db: Database) {

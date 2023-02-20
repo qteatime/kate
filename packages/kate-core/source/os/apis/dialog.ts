@@ -39,6 +39,14 @@ export class KateDialog {
       },
     ]);
   }
+
+  async pop_menu<A>(
+    id: string,
+    heading: string,
+    buttons: { label: string; value: A }[]
+  ) {
+    return await this.hud.pop_menu(id, heading, buttons);
+  }
 }
 
 export class HUD_Dialog extends Scene {
@@ -93,6 +101,62 @@ export class HUD_Dialog extends Scene {
                 {
                   class: "kate-hud-dialog-action",
                   "data-kind": x.kind ?? "cancel",
+                },
+                [
+                  new UI.Button([x.label]).on_clicked(() =>
+                    result.resolve(x.value)
+                  ),
+                ]
+              );
+            }),
+          ]),
+        ]),
+      ]
+    );
+
+    let return_value;
+    if (this.is_trusted(id)) {
+      this.os.kernel.console.body.classList.add("trusted-mode");
+    }
+    try {
+      this.canvas.textContent = "";
+      this.canvas.appendChild(element);
+      const old_root = this.os.focus_handler.current_root;
+      this.os.focus_handler.change_root(this.canvas);
+      return_value = await result.promise;
+      this.os.focus_handler.compare_and_change_root(old_root, this.canvas);
+      setTimeout(async () => {
+        element.classList.add("leaving");
+        await wait(this.FADE_OUT_TIME_MS);
+        element.remove();
+      });
+    } finally {
+      this.os.kernel.console.body.classList.remove("trusted-mode");
+    }
+    return return_value;
+  }
+
+  async pop_menu<A>(
+    id: string,
+    heading: string,
+    buttons: { label: string; value: A }[]
+  ) {
+    const result = defer<A>();
+    const element = UI.h(
+      "div",
+      {
+        class: "kate-hud-dialog-pop-menu",
+        "data-trusted": String(this.is_trusted(id)),
+      },
+      [
+        UI.h("div", { class: "kate-hud-dialog-pop-menu-container" }, [
+          UI.h("div", { class: "kate-hud-dialog-pop-menu-title" }, [heading]),
+          UI.h("div", { class: "kate-hud-dialog-pop-menu-actions" }, [
+            ...buttons.map((x) => {
+              return UI.h(
+                "div",
+                {
+                  class: "kate-hud-dialog-pop-menu-action",
                 },
                 [
                   new UI.Button([x.label]).on_clicked(() =>

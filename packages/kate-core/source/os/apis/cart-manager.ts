@@ -21,21 +21,34 @@ export class CartManager {
   async install_from_file(file: File) {
     try {
       const cart = this.os.kernel.loader.load_bytes(await file.arrayBuffer());
-      if (await this.install(cart)) {
-        await this.os.notifications.push(
-          "kate:installer",
-          "New game installed",
-          `${cart.metadata.title.title} is ready to play!`
-        );
-      }
+      await this.install(cart);
     } catch (error) {
       console.error(`Failed to install ${file.name}:`, error);
       await this.os.notifications.push(
-        "kate:installer",
+        "kate:cart-manager",
         "Installation failed",
         `${file.name} could not be installed.`
       );
     }
+  }
+
+  async uninstall(cart: { id: string; title: string }) {
+    await this.os.db.transaction(
+      [Db.cart_meta, Db.cart_files],
+      "readwrite",
+      async (t) => {
+        const meta = t.get_table(Db.cart_meta);
+        const files = t.get_table(Db.cart_files);
+        await meta.delete(cart.id);
+        await files.delete(cart.id);
+      }
+    );
+    await this.os.notifications.push(
+      "kate:cart-manager",
+      `Game uninstalled`,
+      `${cart.title} ${cart.id} and its data was removed.`
+    );
+    await this.os.events.on_cart_removed.emit(cart);
   }
 
   async install(cart: Cart.Cartridge) {
@@ -91,6 +104,11 @@ export class CartManager {
       }
     );
     if (result) {
+      await this.os.notifications.push(
+        "kate:cart-manager",
+        `New game installed`,
+        `${cart.metadata.title.title} is ready to play!`
+      );
       this.os.events.on_cart_inserted.emit(cart);
     }
     return result;
