@@ -69,6 +69,48 @@ You build these `.kart` files using the included `kate-packaging` (`kart`) appli
 
 See the `hello-world` example cartridge for some practical example of how this all works.
 
+## Roadmap
+
+The first public release of Kate is planned for this year with the following features:
+
+- [x] Running web-based games;
+- [x] Gamepad support;
+- [ ] In-cartridge digital game booklets & box art for that nostalgia feel;
+- [ ] Uninstalling cartridges;
+- [ ] Screen capture;
+- [ ] Media gallery (screenshots only);
+- [ ] Cartridge permissions;
+- [ ] Electron-based executable;
+
+Future planned features:
+
+- **Additional APIs**:
+  - [ ] Touch-input support;
+  - [ ] Keyboard/Virtual keyboard input for text;
+  - [ ] Haptic feedback/vibration;
+  - [ ] Object store API (flat, tag-based file system);
+  - [ ] Object database API (IndexedDB-like);
+  - [ ] Badges/achievements API;
+  - [ ] Networking API;
+  - [ ] Improved audio API (effects, graphs, etc);
+  - [ ] Screen recording/capture API;
+- **KateOS UI improvements**:
+  - [ ] Reconfiguring keybindings;
+  - [ ] Tracking play times locally;
+  - [ ] Game collections and filtering;
+  - [ ] Browsing cartridges' object store/key-value store;
+  - [ ] Extending media gallery to videos;
+  - [ ] OST player for cartridges;
+  - [ ] "Store", for finding games in connected distributed repositories;
+  - [ ] Audit, for auditing security logs/actions in the console;
+- **Supporting games not designed for Kate**:
+  - [ ] Proxying HTML Audio/Web Audio APIs;
+  - [ ] Proxying IndexedDB API;
+  - [ ] Full support for RPG Maker MV games;
+  - [ ] Full support for Ren'Py games;
+- **Supporting tooling**:
+  - [ ] Kate IDE, a fully integrated way of building Kate games;
+
 ## Licence
 
 Copyright (c) 2023 Q.
