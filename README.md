@@ -71,7 +71,7 @@ See the `hello-world` example cartridge for some practical example of how this a
 
 ## Roadmap
 
-The first public release of Kate is planned for this year with the following features:
+The first public release of Kate is planned for this year, targeting webkit/Electron, and with the following features:
 
 - [x] Running web-based games;
 - [x] Gamepad support;
@@ -110,6 +110,11 @@ Future planned features:
   - [ ] Full support for Ren'Py games;
 - **Supporting tooling**:
   - [ ] Kate IDE, a fully integrated way of building Kate games;
+- **Additional platforms**:
+  - [ ] Android (partial support currently);
+  - [ ] iPhone (bad partial support currently);
+  - [ ] iPad (unknown support);
+  - [ ] Non-webkit browsers (unknown support);
 
 ## Licence
 
