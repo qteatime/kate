@@ -76,7 +76,7 @@ The first public release of Kate is planned for this year with the following fea
 - [x] Running web-based games;
 - [x] Gamepad support;
 - [ ] In-cartridge digital game booklets & box art for that nostalgia feel;
-- [ ] Uninstalling cartridges;
+- [x] Uninstalling cartridges;
 - [ ] Screen capture;
 - [ ] Media gallery (screenshots only);
 - [ ] Cartridge permissions;
