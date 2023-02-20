@@ -13,6 +13,14 @@ export class EventStream<A> {
     return this;
   }
 
+  once(fn: (_: A) => void) {
+    const handler = this.listen((x) => {
+      this.remove(handler);
+      fn(x);
+    });
+    return handler;
+  }
+
   emit(ev: A) {
     for (const fn of this.subscribers) {
       fn(ev);

@@ -18,6 +18,7 @@ export type ExtendedInputKey = InputKey | "long_menu" | "long_capture";
 export class KateInput {
   #channel: KateIPC;
   readonly on_key_pressed = new EventStream<ExtendedInputKey>();
+  private _paused = false;
   private _state: Record<InputKey, boolean> = Object.assign(
     Object.create(null),
     {
@@ -40,10 +41,20 @@ export class KateInput {
 
   setup() {
     this.#channel.events.input_state_changed.listen(({ key, is_down }) => {
-      this._state[key] = is_down;
+      if (!this._paused) {
+        this._state[key] = is_down;
+      }
     });
     this.#channel.events.key_pressed.listen((key) => {
-      this.on_key_pressed.emit(key);
+      if (!this._paused) {
+        this.on_key_pressed.emit(key);
+      }
+    });
+    this.#channel.events.paused.listen((state) => {
+      this._paused = state;
+      for (const key of Object.keys(this._state)) {
+        this._state[key as InputKey] = false;
+      }
     });
   }
 

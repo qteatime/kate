@@ -44,7 +44,10 @@ export class KateContextMenu {
     const menu = new HUD_ContextMenu(this.os);
     menu.on_close.listen(() => {
       this.in_context = false;
-      this.os.processes.running?.unpause();
+      // We want to avoid key presses being propagated on this tick
+      this.os.kernel.console.on_tick.once(() => {
+        this.os.processes.running?.unpause();
+      });
       this.os.focus_handler.compare_and_change_root(old_context, menu.canvas);
     });
     this.os.show_hud(menu);
