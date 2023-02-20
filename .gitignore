@@ -19,4 +19,4 @@ source/kate-domui/assets.ts
 !types/kate-api/kate-api.d.ts
 *.kart
 examples/boon-scrolling/**/*.js
-schema/**/*.js
+packages/schema/**/*.js
