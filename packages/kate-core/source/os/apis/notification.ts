@@ -1,4 +1,4 @@
-import { KateOS } from "../os";
+import type { KateOS } from "../os";
 import { Scene } from "../ui/scenes";
 import * as UI from "../ui";
 import * as Db from "./db";

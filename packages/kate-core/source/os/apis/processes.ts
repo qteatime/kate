@@ -1,6 +1,6 @@
 import * as Cart from "../../../../schema/generated/cartridge";
 import type { CR_Process } from "../../kernel/cart-runtime";
-import { KateOS } from "../os";
+import type { KateOS } from "../os";
 import { h } from "../ui";
 import { Scene } from "../ui/scenes";
 import * as Db from "./db";

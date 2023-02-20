@@ -1,4 +1,4 @@
-import { KateOS } from "../os";
+import type { KateOS } from "../os";
 import { append, h, render, Widgetable } from "../ui";
 import { Scene } from "../ui/scenes";
 

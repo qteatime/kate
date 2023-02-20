@@ -39,6 +39,29 @@ export class CartManager {
   }
 
   async install(cart: Cart.Cartridge) {
+    const old_cart = await this.os.db.transaction(
+      [Db.cart_meta],
+      "readonly",
+      async (t) => {
+        const meta = t.get_table(Db.cart_meta);
+        return await meta.try_get(cart.id);
+      }
+    );
+    if (old_cart != null) {
+      const v = cart.metadata.release.version;
+      const title = cart.metadata.title.title;
+      const should_update = await this.os.dialog.confirm("kate:installer", {
+        title: `Update ${old_cart.title}?`,
+        message: `A cartridge already exists for ${cart.id}. Update it to ${title} v${v.major}.${v.minor}?`,
+        ok: "Update",
+        cancel: "Keep old version",
+        dangerous: true,
+      });
+      if (!should_update) {
+        return false;
+      }
+    }
+
     const result = await this.os.db.transaction(
       [Db.cart_meta, Db.cart_files],
       "readwrite",

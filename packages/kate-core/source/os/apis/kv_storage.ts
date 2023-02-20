@@ -1,5 +1,5 @@
 import * as Db from "./db";
-import { KateOS } from "../os";
+import type { KateOS } from "../os";
 
 export class KateKVStorage {
   constructor(readonly os: KateOS) {}

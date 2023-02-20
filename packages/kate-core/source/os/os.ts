@@ -16,6 +16,7 @@ import { KateStatusBar } from "./apis/status-bar";
 import { KateKVStorage } from "./apis/kv_storage";
 import { KateIPCServer } from "./apis/ipc";
 import { KateAudioServer } from "./apis";
+import { KateDialog } from "./apis/dialog";
 
 export class KateOS {
   private _scene_stack: Scene[] = [];
@@ -31,6 +32,7 @@ export class KateOS {
   readonly status_bar: KateStatusBar;
   readonly kv_storage: KateKVStorage;
   readonly ipc: KateIPCServer;
+  readonly dialog: KateDialog;
   readonly events = {
     on_cart_inserted: new EventStream<Cart.Cartridge>(),
   };
@@ -52,6 +54,8 @@ export class KateOS {
     this.status_bar.setup();
     this.ipc = new KateIPCServer(this);
     this.ipc.setup();
+    this.dialog = new KateDialog(this);
+    this.dialog.setup();
   }
 
   get display() {
