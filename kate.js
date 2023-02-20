@@ -389,12 +389,13 @@ exports.IndexSchema = IndexSchema;
 
 },{"./db":2}],5:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
+exports.__esModule = true;
 exports.bridges = void 0;
 exports.bridges = {
-    "input.js": "\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nlet paused = false;\r\nconst { events } = KateAPI;\r\nconst add_event_listener = window.addEventListener;\r\nconst down_listeners = [];\r\nconst up_listeners = [];\r\nevents.input_state_changed.listen(({ key: kate_key, is_down }) => {\r\n    if (!paused) {\r\n        const data = key_mapping[kate_key];\r\n        if (data) {\r\n            const listeners = is_down ? down_listeners : up_listeners;\r\n            const type = is_down ? \"keydown\" : \"keyup\";\r\n            const [key, code, keyCode] = data;\r\n            const key_ev = new KeyboardEvent(type, { key, code, keyCode });\r\n            for (const fn of listeners) {\r\n                fn.call(document, key_ev);\r\n            }\r\n        }\r\n    }\r\n});\r\nevents.paused.listen((state) => {\r\n    paused = state;\r\n});\r\nfunction listen(type, listener, options) {\r\n    if (type === \"keydown\") {\r\n        down_listeners.push(listener);\r\n    }\r\n    else if (type === \"keyup\") {\r\n        up_listeners.push(listener);\r\n    }\r\n    else {\r\n        add_event_listener.call(this, type, listener, options);\r\n    }\r\n}\r\nwindow.addEventListener = listen;\r\ndocument.addEventListener = listen;\r\n",
-    "kate-api.js": "(function(f){if(typeof exports===\"object\"&&typeof module!==\"undefined\"){module.exports=f()}else if(typeof define===\"function\"&&define.amd){define([],f)}else{var g;if(typeof window!==\"undefined\"){g=window}else if(typeof global!==\"undefined\"){g=global}else if(typeof self!==\"undefined\"){g=self}else{g=this}g.KateAPI = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c=\"function\"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error(\"Cannot find module '\"+i+\"'\");throw a.code=\"MODULE_NOT_FOUND\",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u=\"function\"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){\n\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.KateAudioChannel = exports.KateAudioSource = exports.KateAudio = void 0;\r\nclass KateAudio {\r\n    #channel;\r\n    constructor(channel) {\r\n        this.#channel = channel;\r\n    }\r\n    async create_channel(name) {\r\n        const { id, volume } = await this.#channel.call(\"kate:audio.create-channel\", {});\r\n        return new KateAudioChannel(this, name, id, volume);\r\n    }\r\n    async resume_channel(channel) {\r\n        await this.#channel.call(\"kate:audio.resume-channel\", { id: channel.id });\r\n    }\r\n    async pause_channel(channel) {\r\n        await this.#channel.call(\"kate:audio.pause-channel\", { id: channel.id });\r\n    }\r\n    async change_channel_volume(channel, value) {\r\n        await this.#channel.call(\"kate:audio.change-volume\", {\r\n            id: channel.id,\r\n            volume: value,\r\n        });\r\n    }\r\n    async load_audio(mime, bytes) {\r\n        const audio = await this.#channel.call(\"kate:audio.load\", {\r\n            mime,\r\n            bytes,\r\n        });\r\n        return new KateAudioSource(this, audio);\r\n    }\r\n    async play(channel, audio, loop) {\r\n        await this.#channel.call(\"kate:audio.play\", {\r\n            channel: channel.id,\r\n            source: audio.id,\r\n            loop: loop,\r\n        });\r\n    }\r\n}\r\nexports.KateAudio = KateAudio;\r\nclass KateAudioSource {\r\n    audio;\r\n    id;\r\n    constructor(audio, id) {\r\n        this.audio = audio;\r\n        this.id = id;\r\n    }\r\n}\r\nexports.KateAudioSource = KateAudioSource;\r\nclass KateAudioChannel {\r\n    audio;\r\n    name;\r\n    id;\r\n    _volume;\r\n    constructor(audio, name, id, _volume) {\r\n        this.audio = audio;\r\n        this.name = name;\r\n        this.id = id;\r\n        this._volume = _volume;\r\n    }\r\n    get volume() {\r\n        return this._volume;\r\n    }\r\n    async set_volume(value) {\r\n        if (value < 0 || value > 1) {\r\n            throw new Error(`Invalid volume value ${value}`);\r\n        }\r\n        this._volume = value;\r\n        this.audio.change_channel_volume(this, value);\r\n    }\r\n    async resume() {\r\n        return this.audio.resume_channel(this);\r\n    }\r\n    async pause() {\r\n        return this.audio.pause_channel(this);\r\n    }\r\n    async play(source, loop) {\r\n        return this.audio.play(this, source, loop);\r\n    }\r\n}\r\nexports.KateAudioChannel = KateAudioChannel;\r\n\n},{}],2:[function(require,module,exports){\n\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.KateCartFS = void 0;\r\nclass KateCartFS {\r\n    #channel;\r\n    constructor(channel) {\r\n        this.#channel = channel;\r\n    }\r\n    read_file(path0) {\r\n        const path = new URL(path0, \"http://localhost\").pathname;\r\n        return this.#channel.call(\"kate:cart.read-file\", { path });\r\n    }\r\n    async get_file_url(path) {\r\n        const file = await this.read_file(path);\r\n        const blob = new Blob([file.bytes], { type: file.mime });\r\n        return URL.createObjectURL(blob);\r\n    }\r\n}\r\nexports.KateCartFS = KateCartFS;\r\n\n},{}],3:[function(require,module,exports){\n\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.KateIPC = void 0;\r\nconst events_1 = require(\"../util/events\");\r\nconst promise_1 = require(\"../util/promise\");\r\nclass KateIPC {\r\n    #secret;\r\n    #pending;\r\n    #initialised;\r\n    #server;\r\n    events = {\r\n        input_state_changed: new events_1.EventStream(),\r\n        paused: new events_1.EventStream(),\r\n    };\r\n    constructor(secret, server) {\r\n        this.#secret = secret;\r\n        this.#pending = new Map();\r\n        this.#initialised = false;\r\n        this.#server = server;\r\n    }\r\n    make_id() {\r\n        let id = new Uint8Array(16);\r\n        crypto.getRandomValues(id);\r\n        return Array.from(id)\r\n            .map((x) => x.toString(16).padStart(2, \"0\"))\r\n            .join(\"\");\r\n    }\r\n    setup() {\r\n        if (this.#initialised) {\r\n            throw new Error(`setup() called twice`);\r\n        }\r\n        this.#initialised = true;\r\n        window.addEventListener(\"message\", this.handle_message);\r\n    }\r\n    do_send(id, type, payload) {\r\n        this.#server.postMessage({\r\n            type: type,\r\n            secret: this.#secret,\r\n            id: id,\r\n            payload: payload,\r\n        }, \"*\");\r\n    }\r\n    async call(type, payload) {\r\n        const deferred = (0, promise_1.defer)();\r\n        const id = this.make_id();\r\n        this.#pending.set(id, deferred);\r\n        this.do_send(id, type, payload);\r\n        return deferred.promise;\r\n    }\r\n    async send_and_ignore_result(type, payload) {\r\n        this.do_send(this.make_id(), type, payload);\r\n    }\r\n    handle_message = (ev) => {\r\n        switch (ev.data.type) {\r\n            case \"kate:reply\": {\r\n                const pending = this.#pending.get(ev.data.id);\r\n                if (pending != null) {\r\n                    this.#pending.delete(ev.data.id);\r\n                    if (ev.data.ok) {\r\n                        pending.resolve(ev.data.value);\r\n                    }\r\n                    else {\r\n                        pending.reject(ev.data.value);\r\n                    }\r\n                }\r\n                break;\r\n            }\r\n            case \"kate:input-state-changed\": {\r\n                this.events.input_state_changed.emit({\r\n                    key: ev.data.key,\r\n                    is_down: ev.data.is_down,\r\n                });\r\n                break;\r\n            }\r\n            case \"kate:paused\": {\r\n                this.events.paused.emit(ev.data.state);\r\n                break;\r\n            }\r\n        }\r\n    };\r\n}\r\nexports.KateIPC = KateIPC;\r\n\n},{\"../util/events\":8,\"../util/promise\":9}],4:[function(require,module,exports){\n\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.timer = exports.audio = exports.input = exports.kv_store = exports.cart_fs = exports.events = void 0;\r\nconst audio_1 = require(\"./audio\");\r\nconst cart_fs_1 = require(\"./cart-fs\");\r\nconst channel_1 = require(\"./channel\");\r\nconst input_1 = require(\"./input\");\r\nconst kv_store_1 = require(\"./kv-store\");\r\nconst timer_1 = require(\"./timer\");\r\nconst channel = new channel_1.KateIPC(KATE_SECRET, window.parent);\r\nchannel.setup();\r\nexports.events = channel.events;\r\nexports.cart_fs = new cart_fs_1.KateCartFS(channel);\r\nexports.kv_store = new kv_store_1.KateKVStore(channel);\r\nexports.input = new input_1.KateInput(channel);\r\nexports.input.setup();\r\nexports.audio = new audio_1.KateAudio(channel);\r\nexports.timer = new timer_1.KateTimer();\r\nexports.timer.setup();\r\n\n},{\"./audio\":1,\"./cart-fs\":2,\"./channel\":3,\"./input\":5,\"./kv-store\":6,\"./timer\":7}],5:[function(require,module,exports){\n\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.KateInput = void 0;\r\nclass KateInput {\r\n    #channel;\r\n    _state = Object.assign(Object.create(null), {\r\n        up: false,\r\n        right: false,\r\n        down: false,\r\n        left: false,\r\n        menu: false,\r\n        capture: false,\r\n        x: false,\r\n        o: false,\r\n        ltrigger: false,\r\n        rtrigger: false,\r\n    });\r\n    constructor(channel) {\r\n        this.#channel = channel;\r\n    }\r\n    setup() {\r\n        this.#channel.events.input_state_changed.listen(({ key, is_down }) => {\r\n            this._state[key] = is_down;\r\n        });\r\n    }\r\n    is_down(key) {\r\n        return this._state[key];\r\n    }\r\n}\r\nexports.KateInput = KateInput;\r\n\n},{}],6:[function(require,module,exports){\n\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.KateKVStore = void 0;\r\nclass KateKVStore {\r\n    #channel;\r\n    constructor(channel) {\r\n        this.#channel = channel;\r\n    }\r\n    async read_all() {\r\n        return await this.#channel.call(\"kate:kv-store.read-all\", {});\r\n    }\r\n    async replace_all(value) {\r\n        await this.#channel.call(\"kate:kv-store.update-all\", { value });\r\n    }\r\n    async get(key) {\r\n        return await this.#channel.call(\"kate:kv-store.get\", { key });\r\n    }\r\n    async set(key, value) {\r\n        await this.#channel.call(\"kate:kv-store.set\", { key, value });\r\n    }\r\n    async delete(key) {\r\n        await this.#channel.call(\"kate:kv-store.delete\", { key });\r\n    }\r\n    async delete_all() {\r\n        await this.replace_all({});\r\n    }\r\n}\r\nexports.KateKVStore = KateKVStore;\r\n\n},{}],7:[function(require,module,exports){\n\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.KateTimer = void 0;\r\nconst events_1 = require(\"../util/events\");\r\nclass KateTimer {\r\n    on_tick = new events_1.EventStream();\r\n    _last_time = null;\r\n    _timer_id = null;\r\n    MAX_FPS = 30;\r\n    ONE_FRAME = Math.ceil(1000 / 30);\r\n    _fps = 30;\r\n    setup() {\r\n        cancelAnimationFrame(this._timer_id);\r\n        this._last_time = null;\r\n        this._timer_id = requestAnimationFrame(this.tick);\r\n    }\r\n    get fps() {\r\n        return this._fps;\r\n    }\r\n    tick = (time) => {\r\n        if (this._last_time == null) {\r\n            this._last_time = time;\r\n            this._fps = this.MAX_FPS;\r\n            this.on_tick.emit(time);\r\n            this._timer_id = requestAnimationFrame(this.tick);\r\n        }\r\n        else {\r\n            const elapsed = time - this._last_time;\r\n            if (elapsed < this.ONE_FRAME) {\r\n                this._timer_id = requestAnimationFrame(this.tick);\r\n            }\r\n            else {\r\n                this._last_time = time;\r\n                this._fps = (1000 / elapsed) | 0;\r\n                this.on_tick.emit(time);\r\n                this._timer_id = requestAnimationFrame(this.tick);\r\n            }\r\n        }\r\n    };\r\n}\r\nexports.KateTimer = KateTimer;\r\n\n},{\"../util/events\":8}],8:[function(require,module,exports){\n\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.EventStream = void 0;\r\nclass EventStream {\r\n    subscribers = [];\r\n    on_dispose = () => { };\r\n    listen(fn) {\r\n        this.remove(fn);\r\n        this.subscribers.push(fn);\r\n        return fn;\r\n    }\r\n    remove(fn) {\r\n        this.subscribers = this.subscribers.filter((x) => x !== fn);\r\n        return this;\r\n    }\r\n    emit(ev) {\r\n        for (const fn of this.subscribers) {\r\n            fn(ev);\r\n        }\r\n    }\r\n    dispose() {\r\n        this.on_dispose();\r\n    }\r\n    filter(fn) {\r\n        const stream = new EventStream();\r\n        const subscriber = this.listen((ev) => {\r\n            if (fn(ev)) {\r\n                stream.emit(ev);\r\n            }\r\n        });\r\n        stream.on_dispose = () => {\r\n            this.remove(subscriber);\r\n        };\r\n        return stream;\r\n    }\r\n    map(fn) {\r\n        const stream = new EventStream();\r\n        const subscriber = this.listen((ev) => {\r\n            stream.emit(fn(ev));\r\n        });\r\n        stream.on_dispose = () => {\r\n            this.remove(subscriber);\r\n        };\r\n        return stream;\r\n    }\r\n}\r\nexports.EventStream = EventStream;\r\n\n},{}],9:[function(require,module,exports){\n\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.defer = void 0;\r\nfunction defer() {\r\n    const p = Object.create(null);\r\n    p.promise = new Promise((resolve, reject) => {\r\n        p.resolve = resolve;\r\n        p.reject = reject;\r\n    });\r\n    return p;\r\n}\r\nexports.defer = defer;\r\n\n},{}]},{},[4])(4)\n});\n",
-    "local-storage.js": "\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nconst { kv_store } = KateAPI;\r\nlet contents = KATE_LOCAL_STORAGE ?? Object.create(null);\r\nlet timer = null;\r\nfunction persist(contents) {\r\n    clearTimeout(timer);\r\n    timer = setTimeout(() => {\r\n        kv_store.replace_all(contents);\r\n    });\r\n}\r\nclass KateStorage {\r\n    __contents;\r\n    __persistent;\r\n    constructor(contents, persistent) {\r\n        this.__contents = contents;\r\n        this.__persistent = persistent;\r\n    }\r\n    _persist() {\r\n        if (this.__persistent) {\r\n            persist(this.__contents);\r\n        }\r\n    }\r\n    getItem(name) {\r\n        return this.__contents[name] ?? null;\r\n    }\r\n    setItem(name, value) {\r\n        this.__contents[name] = value;\r\n        this._persist();\r\n    }\r\n    removeItem(name) {\r\n        delete this.__contents[name];\r\n        this._persist();\r\n    }\r\n    clear() {\r\n        this.__contents = Object.create(null);\r\n        this._persist();\r\n    }\r\n    key(index) {\r\n        return this.getItem(Object.keys(this.__contents)[index]) ?? null;\r\n    }\r\n    get length() {\r\n        return Object.keys(this.__contents).length;\r\n    }\r\n}\r\nfunction proxy_storage(storage, key) {\r\n    const exposed = [\"getItem\", \"setItem\", \"removeItem\", \"clear\", \"key\"];\r\n    Object.defineProperty(window, key, {\r\n        value: new Proxy(storage, {\r\n            get(target, prop, receiver) {\r\n                return exposed.includes(prop)\r\n                    ? storage[prop].bind(storage)\r\n                    : storage.getItem(prop);\r\n            },\r\n            has(target, prop) {\r\n                return exposed.includes(prop) || prop in contents;\r\n            },\r\n            set(target, prop, value) {\r\n                storage.setItem(prop, value);\r\n                return true;\r\n            },\r\n            deleteProperty(target, prop) {\r\n                storage.removeItem(prop);\r\n                return true;\r\n            },\r\n        }),\r\n    });\r\n}\r\nconst storage = new KateStorage(contents, true);\r\nproxy_storage(storage, \"localStorage\");\r\nconst session_storage = new KateStorage(Object.create(null), false);\r\nproxy_storage(session_storage, \"sessionStorage\");\r\n",
+    "input.js": "\"use strict\";\r\nlet paused = false;\r\nconst { events } = KateAPI;\r\nconst add_event_listener = window.addEventListener;\r\nconst down_listeners = [];\r\nconst up_listeners = [];\r\nevents.input_state_changed.listen(({ key: kate_key, is_down }) => {\r\n    if (!paused) {\r\n        const data = key_mapping[kate_key];\r\n        if (data) {\r\n            const listeners = is_down ? down_listeners : up_listeners;\r\n            const type = is_down ? \"keydown\" : \"keyup\";\r\n            const [key, code, keyCode] = data;\r\n            const key_ev = new KeyboardEvent(type, { key, code, keyCode });\r\n            for (const fn of listeners) {\r\n                fn.call(document, key_ev);\r\n            }\r\n        }\r\n    }\r\n});\r\nevents.paused.listen((state) => {\r\n    paused = state;\r\n});\r\nfunction listen(type, listener, options) {\r\n    if (type === \"keydown\") {\r\n        down_listeners.push(listener);\r\n    }\r\n    else if (type === \"keyup\") {\r\n        up_listeners.push(listener);\r\n    }\r\n    else {\r\n        add_event_listener.call(this, type, listener, options);\r\n    }\r\n}\r\nwindow.addEventListener = listen;\r\ndocument.addEventListener = listen;\r\n",
+    "kate-api.js": "(function(f){if(typeof exports===\"object\"&&typeof module!==\"undefined\"){module.exports=f()}else if(typeof define===\"function\"&&define.amd){define([],f)}else{var g;if(typeof window!==\"undefined\"){g=window}else if(typeof global!==\"undefined\"){g=global}else if(typeof self!==\"undefined\"){g=self}else{g=this}g.KateAPI = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c=\"function\"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error(\"Cannot find module '\"+i+\"'\");throw a.code=\"MODULE_NOT_FOUND\",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u=\"function\"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){\n\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.KateAudioChannel = exports.KateAudioSource = exports.KateAudio = void 0;\r\nclass KateAudio {\r\n    #channel;\r\n    constructor(channel) {\r\n        this.#channel = channel;\r\n    }\r\n    async create_channel(name, max_tracks = 1) {\r\n        const { id, volume } = await this.#channel.call(\"kate:audio.create-channel\", { max_tracks });\r\n        return new KateAudioChannel(this, name, id, volume);\r\n    }\r\n    async resume_channel(channel) {\r\n        await this.#channel.call(\"kate:audio.resume-channel\", { id: channel.id });\r\n    }\r\n    async pause_channel(channel) {\r\n        await this.#channel.call(\"kate:audio.pause-channel\", { id: channel.id });\r\n    }\r\n    async stop_all_sources(channel) {\r\n        await this.#channel.call(\"kate:audio.stop-all-sources\", { id: channel.id });\r\n    }\r\n    async change_channel_volume(channel, value) {\r\n        await this.#channel.call(\"kate:audio.change-volume\", {\r\n            id: channel.id,\r\n            volume: value,\r\n        });\r\n    }\r\n    async load_audio(mime, bytes) {\r\n        const audio = await this.#channel.call(\"kate:audio.load\", {\r\n            mime,\r\n            bytes,\r\n        });\r\n        return new KateAudioSource(this, audio);\r\n    }\r\n    async play(channel, audio, loop) {\r\n        await this.#channel.call(\"kate:audio.play\", {\r\n            channel: channel.id,\r\n            source: audio.id,\r\n            loop: loop,\r\n        });\r\n    }\r\n}\r\nexports.KateAudio = KateAudio;\r\nclass KateAudioSource {\r\n    audio;\r\n    id;\r\n    constructor(audio, id) {\r\n        this.audio = audio;\r\n        this.id = id;\r\n    }\r\n}\r\nexports.KateAudioSource = KateAudioSource;\r\nclass KateAudioChannel {\r\n    audio;\r\n    name;\r\n    id;\r\n    _volume;\r\n    constructor(audio, name, id, _volume) {\r\n        this.audio = audio;\r\n        this.name = name;\r\n        this.id = id;\r\n        this._volume = _volume;\r\n    }\r\n    get volume() {\r\n        return this._volume;\r\n    }\r\n    async set_volume(value) {\r\n        if (value < 0 || value > 1) {\r\n            throw new Error(`Invalid volume value ${value}`);\r\n        }\r\n        this._volume = value;\r\n        this.audio.change_channel_volume(this, value);\r\n    }\r\n    async resume() {\r\n        return this.audio.resume_channel(this);\r\n    }\r\n    async pause() {\r\n        return this.audio.pause_channel(this);\r\n    }\r\n    async stop_all_sources() {\r\n        return this.audio.stop_all_sources(this);\r\n    }\r\n    async play(source, loop) {\r\n        return this.audio.play(this, source, loop);\r\n    }\r\n}\r\nexports.KateAudioChannel = KateAudioChannel;\r\n\n},{}],2:[function(require,module,exports){\n\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.KateCartFS = void 0;\r\nclass KateCartFS {\r\n    #channel;\r\n    constructor(channel) {\r\n        this.#channel = channel;\r\n    }\r\n    read_file(path0) {\r\n        const path = new URL(path0, \"http://localhost\").pathname;\r\n        return this.#channel.call(\"kate:cart.read-file\", { path });\r\n    }\r\n    async get_file_url(path) {\r\n        const file = await this.read_file(path);\r\n        const blob = new Blob([file.bytes], { type: file.mime });\r\n        return URL.createObjectURL(blob);\r\n    }\r\n}\r\nexports.KateCartFS = KateCartFS;\r\n\n},{}],3:[function(require,module,exports){\n\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.KateIPC = void 0;\r\nconst events_1 = require(\"../../util/build/events\");\r\nconst promise_1 = require(\"../../util/build/promise\");\r\nclass KateIPC {\r\n    #secret;\r\n    #pending;\r\n    #initialised;\r\n    #server;\r\n    events = {\r\n        input_state_changed: new events_1.EventStream(),\r\n        key_pressed: new events_1.EventStream(),\r\n        paused: new events_1.EventStream(),\r\n    };\r\n    constructor(secret, server) {\r\n        this.#secret = secret;\r\n        this.#pending = new Map();\r\n        this.#initialised = false;\r\n        this.#server = server;\r\n    }\r\n    make_id() {\r\n        let id = new Uint8Array(16);\r\n        crypto.getRandomValues(id);\r\n        return Array.from(id)\r\n            .map((x) => x.toString(16).padStart(2, \"0\"))\r\n            .join(\"\");\r\n    }\r\n    setup() {\r\n        if (this.#initialised) {\r\n            throw new Error(`setup() called twice`);\r\n        }\r\n        this.#initialised = true;\r\n        window.addEventListener(\"message\", this.handle_message);\r\n    }\r\n    do_send(id, type, payload) {\r\n        this.#server.postMessage({\r\n            type: type,\r\n            secret: this.#secret,\r\n            id: id,\r\n            payload: payload,\r\n        }, \"*\");\r\n    }\r\n    async call(type, payload) {\r\n        const deferred = (0, promise_1.defer)();\r\n        const id = this.make_id();\r\n        this.#pending.set(id, deferred);\r\n        this.do_send(id, type, payload);\r\n        return deferred.promise;\r\n    }\r\n    async send_and_ignore_result(type, payload) {\r\n        this.do_send(this.make_id(), type, payload);\r\n    }\r\n    handle_message = (ev) => {\r\n        switch (ev.data.type) {\r\n            case \"kate:reply\": {\r\n                const pending = this.#pending.get(ev.data.id);\r\n                if (pending != null) {\r\n                    this.#pending.delete(ev.data.id);\r\n                    if (ev.data.ok) {\r\n                        pending.resolve(ev.data.value);\r\n                    }\r\n                    else {\r\n                        pending.reject(ev.data.value);\r\n                    }\r\n                }\r\n                break;\r\n            }\r\n            case \"kate:input-state-changed\": {\r\n                this.events.input_state_changed.emit({\r\n                    key: ev.data.key,\r\n                    is_down: ev.data.is_down,\r\n                });\r\n                break;\r\n            }\r\n            case \"kate:input-key-pressed\": {\r\n                this.events.key_pressed.emit(ev.data.key);\r\n                break;\r\n            }\r\n            case \"kate:paused\": {\r\n                this.events.paused.emit(ev.data.state);\r\n                break;\r\n            }\r\n        }\r\n    };\r\n}\r\nexports.KateIPC = KateIPC;\r\n\n},{\"../../util/build/events\":8,\"../../util/build/promise\":9}],4:[function(require,module,exports){\n\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.timer = exports.audio = exports.input = exports.kv_store = exports.cart_fs = exports.events = void 0;\r\nconst audio_1 = require(\"./audio\");\r\nconst cart_fs_1 = require(\"./cart-fs\");\r\nconst channel_1 = require(\"./channel\");\r\nconst input_1 = require(\"./input\");\r\nconst kv_store_1 = require(\"./kv-store\");\r\nconst timer_1 = require(\"./timer\");\r\nconst channel = new channel_1.KateIPC(KATE_SECRET, window.parent);\r\nchannel.setup();\r\nexports.events = channel.events;\r\nexports.cart_fs = new cart_fs_1.KateCartFS(channel);\r\nexports.kv_store = new kv_store_1.KateKVStore(channel);\r\nexports.input = new input_1.KateInput(channel);\r\nexports.input.setup();\r\nexports.audio = new audio_1.KateAudio(channel);\r\nexports.timer = new timer_1.KateTimer();\r\nexports.timer.setup();\r\n\n},{\"./audio\":1,\"./cart-fs\":2,\"./channel\":3,\"./input\":5,\"./kv-store\":6,\"./timer\":7}],5:[function(require,module,exports){\n\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.KateInput = void 0;\r\nconst events_1 = require(\"../../util/build/events\");\r\nclass KateInput {\r\n    #channel;\r\n    on_key_pressed = new events_1.EventStream();\r\n    _state = Object.assign(Object.create(null), {\r\n        up: false,\r\n        right: false,\r\n        down: false,\r\n        left: false,\r\n        menu: false,\r\n        capture: false,\r\n        x: false,\r\n        o: false,\r\n        ltrigger: false,\r\n        rtrigger: false,\r\n    });\r\n    constructor(channel) {\r\n        this.#channel = channel;\r\n    }\r\n    setup() {\r\n        this.#channel.events.input_state_changed.listen(({ key, is_down }) => {\r\n            this._state[key] = is_down;\r\n        });\r\n        this.#channel.events.key_pressed.listen((key) => {\r\n            this.on_key_pressed.emit(key);\r\n        });\r\n    }\r\n    is_down(key) {\r\n        return this._state[key];\r\n    }\r\n}\r\nexports.KateInput = KateInput;\r\n\n},{\"../../util/build/events\":8}],6:[function(require,module,exports){\n\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.KateKVStore = void 0;\r\nclass KateKVStore {\r\n    #channel;\r\n    constructor(channel) {\r\n        this.#channel = channel;\r\n    }\r\n    async read_all() {\r\n        return await this.#channel.call(\"kate:kv-store.read-all\", {});\r\n    }\r\n    async replace_all(value) {\r\n        await this.#channel.call(\"kate:kv-store.update-all\", { value });\r\n    }\r\n    async get(key) {\r\n        return await this.#channel.call(\"kate:kv-store.get\", { key });\r\n    }\r\n    async set(key, value) {\r\n        await this.#channel.call(\"kate:kv-store.set\", { key, value });\r\n    }\r\n    async delete(key) {\r\n        await this.#channel.call(\"kate:kv-store.delete\", { key });\r\n    }\r\n    async delete_all() {\r\n        await this.replace_all({});\r\n    }\r\n}\r\nexports.KateKVStore = KateKVStore;\r\n\n},{}],7:[function(require,module,exports){\n\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.KateTimer = void 0;\r\nconst events_1 = require(\"../../util/build/events\");\r\nclass KateTimer {\r\n    on_tick = new events_1.EventStream();\r\n    _last_time = null;\r\n    _timer_id = null;\r\n    MAX_FPS = 30;\r\n    ONE_FRAME = Math.ceil(1000 / 30);\r\n    _fps = 30;\r\n    setup() {\r\n        cancelAnimationFrame(this._timer_id);\r\n        this._last_time = null;\r\n        this._timer_id = requestAnimationFrame(this.tick);\r\n    }\r\n    get fps() {\r\n        return this._fps;\r\n    }\r\n    tick = (time) => {\r\n        if (this._last_time == null) {\r\n            this._last_time = time;\r\n            this._fps = this.MAX_FPS;\r\n            this.on_tick.emit(time);\r\n            this._timer_id = requestAnimationFrame(this.tick);\r\n        }\r\n        else {\r\n            const elapsed = time - this._last_time;\r\n            if (elapsed < this.ONE_FRAME) {\r\n                this._timer_id = requestAnimationFrame(this.tick);\r\n            }\r\n            else {\r\n                this._last_time = time;\r\n                this._fps = (1000 / elapsed) | 0;\r\n                this.on_tick.emit(time);\r\n                this._timer_id = requestAnimationFrame(this.tick);\r\n            }\r\n        }\r\n    };\r\n}\r\nexports.KateTimer = KateTimer;\r\n\n},{\"../../util/build/events\":8}],8:[function(require,module,exports){\n\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.EventStream = void 0;\r\nclass EventStream {\r\n    subscribers = [];\r\n    on_dispose = () => { };\r\n    listen(fn) {\r\n        this.remove(fn);\r\n        this.subscribers.push(fn);\r\n        return fn;\r\n    }\r\n    remove(fn) {\r\n        this.subscribers = this.subscribers.filter((x) => x !== fn);\r\n        return this;\r\n    }\r\n    emit(ev) {\r\n        for (const fn of this.subscribers) {\r\n            fn(ev);\r\n        }\r\n    }\r\n    dispose() {\r\n        this.on_dispose();\r\n    }\r\n    filter(fn) {\r\n        const stream = new EventStream();\r\n        const subscriber = this.listen((ev) => {\r\n            if (fn(ev)) {\r\n                stream.emit(ev);\r\n            }\r\n        });\r\n        stream.on_dispose = () => {\r\n            this.remove(subscriber);\r\n        };\r\n        return stream;\r\n    }\r\n    map(fn) {\r\n        const stream = new EventStream();\r\n        const subscriber = this.listen((ev) => {\r\n            stream.emit(fn(ev));\r\n        });\r\n        stream.on_dispose = () => {\r\n            this.remove(subscriber);\r\n        };\r\n        return stream;\r\n    }\r\n}\r\nexports.EventStream = EventStream;\r\n\n},{}],9:[function(require,module,exports){\n\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.sleep = exports.defer = void 0;\r\nfunction defer() {\r\n    const p = Object.create(null);\r\n    p.promise = new Promise((resolve, reject) => {\r\n        p.resolve = resolve;\r\n        p.reject = reject;\r\n    });\r\n    return p;\r\n}\r\nexports.defer = defer;\r\nfunction sleep(ms) {\r\n    return new Promise((resolve, reject) => {\r\n        setTimeout(() => resolve(), ms);\r\n    });\r\n}\r\nexports.sleep = sleep;\r\n\n},{}]},{},[4])(4)\n});\n",
+    "kate-bridge.js": "(function(f){if(typeof exports===\"object\"&&typeof module!==\"undefined\"){module.exports=f()}else if(typeof define===\"function\"&&define.amd){define([],f)}else{var g;if(typeof window!==\"undefined\"){g=window}else if(typeof global!==\"undefined\"){g=global}else if(typeof self!==\"undefined\"){g=self}else{g=this}g.KateAPI = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c=\"function\"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error(\"Cannot find module '\"+i+\"'\");throw a.code=\"MODULE_NOT_FOUND\",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u=\"function\"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){\n\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.KateAudioChannel = exports.KateAudioSource = exports.KateAudio = void 0;\r\nclass KateAudio {\r\n    #channel;\r\n    constructor(channel) {\r\n        this.#channel = channel;\r\n    }\r\n    async create_channel(name) {\r\n        const { id, volume } = await this.#channel.call(\"kate:audio.create-channel\", {});\r\n        return new KateAudioChannel(this, name, id, volume);\r\n    }\r\n    async resume_channel(channel) {\r\n        await this.#channel.call(\"kate:audio.resume-channel\", { id: channel.id });\r\n    }\r\n    async pause_channel(channel) {\r\n        await this.#channel.call(\"kate:audio.pause-channel\", { id: channel.id });\r\n    }\r\n    async change_channel_volume(channel, value) {\r\n        await this.#channel.call(\"kate:audio.change-volume\", {\r\n            id: channel.id,\r\n            volume: value,\r\n        });\r\n    }\r\n    async load_audio(mime, bytes) {\r\n        const audio = await this.#channel.call(\"kate:audio.load\", {\r\n            mime,\r\n            bytes,\r\n        });\r\n        return new KateAudioSource(this, audio);\r\n    }\r\n    async play(channel, audio, loop) {\r\n        await this.#channel.call(\"kate:audio.play\", {\r\n            channel: channel.id,\r\n            source: audio.id,\r\n            loop: loop,\r\n        });\r\n    }\r\n}\r\nexports.KateAudio = KateAudio;\r\nclass KateAudioSource {\r\n    audio;\r\n    id;\r\n    constructor(audio, id) {\r\n        this.audio = audio;\r\n        this.id = id;\r\n    }\r\n}\r\nexports.KateAudioSource = KateAudioSource;\r\nclass KateAudioChannel {\r\n    audio;\r\n    name;\r\n    id;\r\n    _volume;\r\n    constructor(audio, name, id, _volume) {\r\n        this.audio = audio;\r\n        this.name = name;\r\n        this.id = id;\r\n        this._volume = _volume;\r\n    }\r\n    get volume() {\r\n        return this._volume;\r\n    }\r\n    async set_volume(value) {\r\n        if (value < 0 || value > 1) {\r\n            throw new Error(`Invalid volume value ${value}`);\r\n        }\r\n        this._volume = value;\r\n        this.audio.change_channel_volume(this, value);\r\n    }\r\n    async resume() {\r\n        return this.audio.resume_channel(this);\r\n    }\r\n    async pause() {\r\n        return this.audio.pause_channel(this);\r\n    }\r\n    async play(source, loop) {\r\n        return this.audio.play(this, source, loop);\r\n    }\r\n}\r\nexports.KateAudioChannel = KateAudioChannel;\r\n\n},{}],2:[function(require,module,exports){\n\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.KateCartFS = void 0;\r\nclass KateCartFS {\r\n    #channel;\r\n    constructor(channel) {\r\n        this.#channel = channel;\r\n    }\r\n    read_file(path0) {\r\n        const path = new URL(path0, \"http://localhost\").pathname;\r\n        return this.#channel.call(\"kate:cart.read-file\", { path });\r\n    }\r\n    async get_file_url(path) {\r\n        const file = await this.read_file(path);\r\n        const blob = new Blob([file.bytes], { type: file.mime });\r\n        return URL.createObjectURL(blob);\r\n    }\r\n}\r\nexports.KateCartFS = KateCartFS;\r\n\n},{}],3:[function(require,module,exports){\n\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.KateIPC = void 0;\r\nconst events_1 = require(\"../../util/build/events\");\r\nconst promise_1 = require(\"../../util/build/promise\");\r\nclass KateIPC {\r\n    #secret;\r\n    #pending;\r\n    #initialised;\r\n    #server;\r\n    events = {\r\n        input_state_changed: new events_1.EventStream(),\r\n        key_pressed: new events_1.EventStream(),\r\n        paused: new events_1.EventStream(),\r\n    };\r\n    constructor(secret, server) {\r\n        this.#secret = secret;\r\n        this.#pending = new Map();\r\n        this.#initialised = false;\r\n        this.#server = server;\r\n    }\r\n    make_id() {\r\n        let id = new Uint8Array(16);\r\n        crypto.getRandomValues(id);\r\n        return Array.from(id)\r\n            .map((x) => x.toString(16).padStart(2, \"0\"))\r\n            .join(\"\");\r\n    }\r\n    setup() {\r\n        if (this.#initialised) {\r\n            throw new Error(`setup() called twice`);\r\n        }\r\n        this.#initialised = true;\r\n        window.addEventListener(\"message\", this.handle_message);\r\n    }\r\n    do_send(id, type, payload) {\r\n        this.#server.postMessage({\r\n            type: type,\r\n            secret: this.#secret,\r\n            id: id,\r\n            payload: payload,\r\n        }, \"*\");\r\n    }\r\n    async call(type, payload) {\r\n        const deferred = (0, promise_1.defer)();\r\n        const id = this.make_id();\r\n        this.#pending.set(id, deferred);\r\n        this.do_send(id, type, payload);\r\n        return deferred.promise;\r\n    }\r\n    async send_and_ignore_result(type, payload) {\r\n        this.do_send(this.make_id(), type, payload);\r\n    }\r\n    handle_message = (ev) => {\r\n        switch (ev.data.type) {\r\n            case \"kate:reply\": {\r\n                const pending = this.#pending.get(ev.data.id);\r\n                if (pending != null) {\r\n                    this.#pending.delete(ev.data.id);\r\n                    if (ev.data.ok) {\r\n                        pending.resolve(ev.data.value);\r\n                    }\r\n                    else {\r\n                        pending.reject(ev.data.value);\r\n                    }\r\n                }\r\n                break;\r\n            }\r\n            case \"kate:input-state-changed\": {\r\n                this.events.input_state_changed.emit({\r\n                    key: ev.data.key,\r\n                    is_down: ev.data.is_down,\r\n                });\r\n                break;\r\n            }\r\n            case \"kate:input-key-pressed\": {\r\n                this.events.key_pressed.emit(ev.data.key);\r\n                break;\r\n            }\r\n            case \"kate:paused\": {\r\n                this.events.paused.emit(ev.data.state);\r\n                break;\r\n            }\r\n        }\r\n    };\r\n}\r\nexports.KateIPC = KateIPC;\r\n\n},{\"../../util/build/events\":8,\"../../util/build/promise\":9}],4:[function(require,module,exports){\n\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.timer = exports.audio = exports.input = exports.kv_store = exports.cart_fs = exports.events = void 0;\r\nconst audio_1 = require(\"./audio\");\r\nconst cart_fs_1 = require(\"./cart-fs\");\r\nconst channel_1 = require(\"./channel\");\r\nconst input_1 = require(\"./input\");\r\nconst kv_store_1 = require(\"./kv-store\");\r\nconst timer_1 = require(\"./timer\");\r\nconst channel = new channel_1.KateIPC(KATE_SECRET, window.parent);\r\nchannel.setup();\r\nexports.events = channel.events;\r\nexports.cart_fs = new cart_fs_1.KateCartFS(channel);\r\nexports.kv_store = new kv_store_1.KateKVStore(channel);\r\nexports.input = new input_1.KateInput(channel);\r\nexports.input.setup();\r\nexports.audio = new audio_1.KateAudio(channel);\r\nexports.timer = new timer_1.KateTimer();\r\nexports.timer.setup();\r\n\n},{\"./audio\":1,\"./cart-fs\":2,\"./channel\":3,\"./input\":5,\"./kv-store\":6,\"./timer\":7}],5:[function(require,module,exports){\n\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.KateInput = void 0;\r\nconst events_1 = require(\"../../util/build/events\");\r\nclass KateInput {\r\n    #channel;\r\n    on_key_pressed = new events_1.EventStream();\r\n    _state = Object.assign(Object.create(null), {\r\n        up: false,\r\n        right: false,\r\n        down: false,\r\n        left: false,\r\n        menu: false,\r\n        capture: false,\r\n        x: false,\r\n        o: false,\r\n        ltrigger: false,\r\n        rtrigger: false,\r\n    });\r\n    constructor(channel) {\r\n        this.#channel = channel;\r\n    }\r\n    setup() {\r\n        this.#channel.events.input_state_changed.listen(({ key, is_down }) => {\r\n            this._state[key] = is_down;\r\n        });\r\n        this.#channel.events.key_pressed.listen((key) => {\r\n            this.on_key_pressed.emit(key);\r\n        });\r\n    }\r\n    is_down(key) {\r\n        return this._state[key];\r\n    }\r\n}\r\nexports.KateInput = KateInput;\r\n\n},{\"../../util/build/events\":8}],6:[function(require,module,exports){\n\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.KateKVStore = void 0;\r\nclass KateKVStore {\r\n    #channel;\r\n    constructor(channel) {\r\n        this.#channel = channel;\r\n    }\r\n    async read_all() {\r\n        return await this.#channel.call(\"kate:kv-store.read-all\", {});\r\n    }\r\n    async replace_all(value) {\r\n        await this.#channel.call(\"kate:kv-store.update-all\", { value });\r\n    }\r\n    async get(key) {\r\n        return await this.#channel.call(\"kate:kv-store.get\", { key });\r\n    }\r\n    async set(key, value) {\r\n        await this.#channel.call(\"kate:kv-store.set\", { key, value });\r\n    }\r\n    async delete(key) {\r\n        await this.#channel.call(\"kate:kv-store.delete\", { key });\r\n    }\r\n    async delete_all() {\r\n        await this.replace_all({});\r\n    }\r\n}\r\nexports.KateKVStore = KateKVStore;\r\n\n},{}],7:[function(require,module,exports){\n\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.KateTimer = void 0;\r\nconst events_1 = require(\"../../util/build/events\");\r\nclass KateTimer {\r\n    on_tick = new events_1.EventStream();\r\n    _last_time = null;\r\n    _timer_id = null;\r\n    MAX_FPS = 30;\r\n    ONE_FRAME = Math.ceil(1000 / 30);\r\n    _fps = 30;\r\n    setup() {\r\n        cancelAnimationFrame(this._timer_id);\r\n        this._last_time = null;\r\n        this._timer_id = requestAnimationFrame(this.tick);\r\n    }\r\n    get fps() {\r\n        return this._fps;\r\n    }\r\n    tick = (time) => {\r\n        if (this._last_time == null) {\r\n            this._last_time = time;\r\n            this._fps = this.MAX_FPS;\r\n            this.on_tick.emit(time);\r\n            this._timer_id = requestAnimationFrame(this.tick);\r\n        }\r\n        else {\r\n            const elapsed = time - this._last_time;\r\n            if (elapsed < this.ONE_FRAME) {\r\n                this._timer_id = requestAnimationFrame(this.tick);\r\n            }\r\n            else {\r\n                this._last_time = time;\r\n                this._fps = (1000 / elapsed) | 0;\r\n                this.on_tick.emit(time);\r\n                this._timer_id = requestAnimationFrame(this.tick);\r\n            }\r\n        }\r\n    };\r\n}\r\nexports.KateTimer = KateTimer;\r\n\n},{\"../../util/build/events\":8}],8:[function(require,module,exports){\n\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.EventStream = void 0;\r\nclass EventStream {\r\n    subscribers = [];\r\n    on_dispose = () => { };\r\n    listen(fn) {\r\n        this.remove(fn);\r\n        this.subscribers.push(fn);\r\n        return fn;\r\n    }\r\n    remove(fn) {\r\n        this.subscribers = this.subscribers.filter((x) => x !== fn);\r\n        return this;\r\n    }\r\n    emit(ev) {\r\n        for (const fn of this.subscribers) {\r\n            fn(ev);\r\n        }\r\n    }\r\n    dispose() {\r\n        this.on_dispose();\r\n    }\r\n    filter(fn) {\r\n        const stream = new EventStream();\r\n        const subscriber = this.listen((ev) => {\r\n            if (fn(ev)) {\r\n                stream.emit(ev);\r\n            }\r\n        });\r\n        stream.on_dispose = () => {\r\n            this.remove(subscriber);\r\n        };\r\n        return stream;\r\n    }\r\n    map(fn) {\r\n        const stream = new EventStream();\r\n        const subscriber = this.listen((ev) => {\r\n            stream.emit(fn(ev));\r\n        });\r\n        stream.on_dispose = () => {\r\n            this.remove(subscriber);\r\n        };\r\n        return stream;\r\n    }\r\n}\r\nexports.EventStream = EventStream;\r\n\n},{}],9:[function(require,module,exports){\n\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.sleep = exports.defer = void 0;\r\nfunction defer() {\r\n    const p = Object.create(null);\r\n    p.promise = new Promise((resolve, reject) => {\r\n        p.resolve = resolve;\r\n        p.reject = reject;\r\n    });\r\n    return p;\r\n}\r\nexports.defer = defer;\r\nfunction sleep(ms) {\r\n    return new Promise((resolve, reject) => {\r\n        setTimeout(() => resolve(), ms);\r\n    });\r\n}\r\nexports.sleep = sleep;\r\n\n},{}]},{},[4])(4)\n});\n",
+    "local-storage.js": "\"use strict\";\r\nconst { kv_store } = KateAPI;\r\nlet contents = KATE_LOCAL_STORAGE ?? Object.create(null);\r\nlet timer = null;\r\nfunction persist(contents) {\r\n    clearTimeout(timer);\r\n    timer = setTimeout(() => {\r\n        kv_store.replace_all(contents);\r\n    });\r\n}\r\nclass KateStorage {\r\n    __contents;\r\n    __persistent;\r\n    constructor(contents, persistent) {\r\n        this.__contents = contents;\r\n        this.__persistent = persistent;\r\n    }\r\n    _persist() {\r\n        if (this.__persistent) {\r\n            persist(this.__contents);\r\n        }\r\n    }\r\n    getItem(name) {\r\n        return this.__contents[name] ?? null;\r\n    }\r\n    setItem(name, value) {\r\n        this.__contents[name] = value;\r\n        this._persist();\r\n    }\r\n    removeItem(name) {\r\n        delete this.__contents[name];\r\n        this._persist();\r\n    }\r\n    clear() {\r\n        this.__contents = Object.create(null);\r\n        this._persist();\r\n    }\r\n    key(index) {\r\n        return this.getItem(Object.keys(this.__contents)[index]) ?? null;\r\n    }\r\n    get length() {\r\n        return Object.keys(this.__contents).length;\r\n    }\r\n}\r\nfunction proxy_storage(storage, key) {\r\n    const exposed = [\"getItem\", \"setItem\", \"removeItem\", \"clear\", \"key\"];\r\n    Object.defineProperty(window, key, {\r\n        value: new Proxy(storage, {\r\n            get(target, prop, receiver) {\r\n                return exposed.includes(prop)\r\n                    ? storage[prop].bind(storage)\r\n                    : storage.getItem(prop);\r\n            },\r\n            has(target, prop) {\r\n                return exposed.includes(prop) || prop in contents;\r\n            },\r\n            set(target, prop, value) {\r\n                storage.setItem(prop, value);\r\n                return true;\r\n            },\r\n            deleteProperty(target, prop) {\r\n                storage.removeItem(prop);\r\n                return true;\r\n            },\r\n        }),\r\n    });\r\n}\r\nconst storage = new KateStorage(contents, true);\r\nproxy_storage(storage, \"localStorage\");\r\nconst session_storage = new KateStorage(Object.create(null), false);\r\nproxy_storage(session_storage, \"sessionStorage\");\r\n",
     "renpy.js": "\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nlet paused = false;\r\nconst { events } = KateAPI;\r\nconst add_event_listener = window.addEventListener;\r\nconst key_mapping = {\r\n    up: [\"ArrowUp\", \"ArrowUp\", 38],\r\n    right: [\"ArrowRight\", \"ArrowRight\", 39],\r\n    down: [\"ArrowDown\", \"ArrowDown\", 40],\r\n    left: [\"ArrowLeft\", \"ArrowLeft\", 37],\r\n    x: [\"Escape\", \"Escape\", 27],\r\n    o: [\"Enter\", \"Enter\", 13],\r\n    ltrigger: [\"PageUp\", \"PageUp\", 33],\r\n    rtrigger: [\"PageDown\", \"PageDown\", 34],\r\n};\r\nconst down_listeners = [];\r\nconst up_listeners = [];\r\nevents.input_state_changed.listen(({ key: kate_key, is_down }) => {\r\n    if (!paused) {\r\n        const data = key_mapping[kate_key];\r\n        if (data) {\r\n            const listeners = is_down ? down_listeners : up_listeners;\r\n            const type = is_down ? \"keydown\" : \"keyup\";\r\n            const [key, code, keyCode] = data;\r\n            const key_ev = new KeyboardEvent(type, { key, code, keyCode });\r\n            for (const fn of listeners) {\r\n                fn.call(document, key_ev);\r\n            }\r\n        }\r\n    }\r\n});\r\nevents.paused.listen((state) => {\r\n    paused = state;\r\n});\r\nfunction listen(type, listener, options) {\r\n    if (type === \"keydown\") {\r\n        down_listeners.push(listener);\r\n    }\r\n    else if (type === \"keyup\") {\r\n        up_listeners.push(listener);\r\n    }\r\n    else {\r\n        add_event_listener.call(this, type, listener, options);\r\n    }\r\n}\r\nwindow.addEventListener = listen;\r\ndocument.addEventListener = listen;\r\n",
     "rpgmk-mv.js": "\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nlet paused = false;\r\nconst { events } = KateAPI;\r\n// -- Things that need to be patched still\r\nUtils.isOptionValid = (name) => {\r\n    return [\"noaudio\"].includes(name);\r\n};\r\nconst key_mapping = {\r\n    up: \"up\",\r\n    right: \"right\",\r\n    down: \"down\",\r\n    left: \"left\",\r\n    x: \"cancel\",\r\n    o: \"ok\",\r\n    menu: \"menu\",\r\n    rtrigger: \"shift\",\r\n};\r\nevents.input_state_changed.listen(({ key, is_down }) => {\r\n    if (!paused) {\r\n        const name = key_mapping[key];\r\n        if (name) {\r\n            Input._currentState[name] = is_down;\r\n        }\r\n    }\r\n});\r\nevents.paused.listen((state) => {\r\n    paused = state;\r\n    if (state) {\r\n        for (const key of Object.values(key_mapping)) {\r\n            Input._currentState[key] = false;\r\n        }\r\n    }\r\n});\r\n",
     "standard-network.js": "\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nconst { cart_fs } = KateAPI;\r\n// -- Arbitrary fetching\r\nconst old_fetch = window.fetch;\r\nwindow.fetch = async function (request, options) {\r\n    let url;\r\n    let method;\r\n    if (Object(request) === request && request.url) {\r\n        url = request.url;\r\n        method = request.method;\r\n    }\r\n    else {\r\n        url = request;\r\n        method = options?.method ?? \"GET\";\r\n    }\r\n    if (method !== \"GET\") {\r\n        return new Promise((_, reject) => reject(new Error(`Non-GET requests are not supported.`)));\r\n    }\r\n    return new Promise(async (resolve, reject) => {\r\n        try {\r\n            const file = await cart_fs.get_file_url(String(url));\r\n            const result = await old_fetch(file);\r\n            resolve(result);\r\n        }\r\n        catch (error) {\r\n            reject(error);\r\n        }\r\n    });\r\n};\r\nconst old_xhr_open = XMLHttpRequest.prototype.open;\r\nconst old_xhr_send = XMLHttpRequest.prototype.send;\r\nXMLHttpRequest.prototype.open = function (method, url) {\r\n    if (method !== \"GET\") {\r\n        throw new Error(`Non-GET requests are not supported.`);\r\n    }\r\n    this.__waiting_open = true;\r\n    void (async () => {\r\n        try {\r\n            const real_url = await cart_fs.get_file_url(String(url));\r\n            old_xhr_open.call(this, \"GET\", real_url, true);\r\n            this.__maybe_send();\r\n        }\r\n        catch (error) {\r\n            old_xhr_open.call(this, \"GET\", \"not-found\", true);\r\n            this.__maybe_send();\r\n        }\r\n    })();\r\n};\r\nXMLHttpRequest.prototype.__maybe_send = function () {\r\n    this.__waiting_open = false;\r\n    if (this.__waiting_send) {\r\n        this.__waiting_send = false;\r\n        this.send();\r\n    }\r\n};\r\nXMLHttpRequest.prototype.send = function () {\r\n    if (this.__waiting_open) {\r\n        this.__waiting_send = true;\r\n        return;\r\n    }\r\n    else {\r\n        return old_xhr_send.call(this);\r\n    }\r\n};\r\n// -- Image loading\r\nconst old_img_src = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, \"src\");\r\nObject.defineProperty(HTMLImageElement.prototype, \"src\", {\r\n    enumerable: old_img_src.enumerable,\r\n    configurable: old_img_src.configurable,\r\n    get() {\r\n        return this.__src ?? old_img_src.get.call(this);\r\n    },\r\n    set(url) {\r\n        this.__src = url;\r\n        void (async () => {\r\n            try {\r\n                const real_url = await cart_fs.get_file_url(String(url));\r\n                old_img_src.set.call(this, real_url);\r\n            }\r\n            catch (error) {\r\n                old_img_src.set.call(this, \"not-found\");\r\n            }\r\n        })();\r\n    },\r\n});\r\n"
@@ -497,6 +498,12 @@ class CR_Web_archive extends CartRuntime {
                 is_down: ev.is_down,
             });
         });
+        this.console.on_key_pressed.listen((key) => {
+            channel.send({
+                type: "kate:input-key-pressed",
+                key: key,
+            });
+        });
         frame.src = URL.createObjectURL(new Blob([this.proxy_html(secret)], { type: "text/html" }));
         frame.scrolling = "no";
         this.console.screen.appendChild(frame);
@@ -558,10 +565,16 @@ class CR_Web_archive extends CartRuntime {
         });
     }
     resolve_pathname(base, url0) {
-        const x0 = base.endsWith("/") ? base : base + "/";
-        const x1 = x0.startsWith("/") ? base : "/" + base;
-        const x2 = x1.endsWith(".css") ? x1.split("/").slice(0, -1).join("/") : x1;
-        return x2 + "/" + url0;
+        if (url0.startsWith("/")) {
+            return url0;
+        }
+        else {
+            const x0 = base.endsWith("/") ? base : base + "/";
+            const x1 = x0.endsWith(".css")
+                ? x0.split("/").slice(0, -1).join("/")
+                : x0;
+            return x1 + "/" + url0;
+        }
     }
     apply_bridge(dom, bridge, secret_node) {
         const wrap = (source) => {
@@ -673,7 +686,7 @@ class CR_Web_archive extends CartRuntime {
 }
 exports.CR_Web_archive = CR_Web_archive;
 
-},{"../../../kate-bridges/build":5,"../../../schema/generated/cartridge":33,"../../../util/build":36}],8:[function(require,module,exports){
+},{"../../../kate-bridges/build":5,"../../../schema/generated/cartridge":33,"../../../util/build":37}],8:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GamepadInput = void 0;
@@ -895,9 +908,10 @@ exports.KateKernel = KateKernel;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.KateLoader = void 0;
 const Cart = require("../../../schema/generated/cartridge");
+const fingerprint_1 = require("../../../schema/lib/fingerprint");
 class KateLoader {
     load_bytes(bytes) {
-        const view = new DataView(bytes);
+        const view = (0, fingerprint_1.remove_fingerprint)(new DataView(bytes));
         const decoder = new Cart._Decoder(view);
         return Cart.Cartridge.decode(decoder);
     }
@@ -908,7 +922,7 @@ class KateLoader {
 }
 exports.KateLoader = KateLoader;
 
-},{"../../../schema/generated/cartridge":33}],13:[function(require,module,exports){
+},{"../../../schema/generated/cartridge":33,"../../../schema/lib/fingerprint":34}],13:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.VirtualConsole = void 0;
@@ -1119,7 +1133,7 @@ class VirtualConsole {
 }
 exports.VirtualConsole = VirtualConsole;
 
-},{"../../../util/build/events":35}],14:[function(require,module,exports){
+},{"../../../util/build/events":36}],14:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.KateAudioServer = void 0;
@@ -1131,9 +1145,9 @@ class KateAudioServer {
     constructor(os) {
         this.os = os;
     }
-    async create_channel() {
+    async create_channel(max_tracks) {
         const id = (0, random_1.make_id)();
-        const channel = new AudioChannel(id);
+        const channel = new AudioChannel(id, max_tracks);
         this.channels.set(id, channel);
         return channel;
     }
@@ -1161,12 +1175,14 @@ class KateAudioServer {
 exports.KateAudioServer = KateAudioServer;
 class AudioChannel {
     id;
+    max_tracks;
     volume;
     output;
     context;
-    source = null;
-    constructor(id) {
+    sources = [];
+    constructor(id, max_tracks = 1) {
         this.id = id;
+        this.max_tracks = max_tracks;
         this.context = new AudioContext();
         this.output = this.context.destination;
         this.volume = this.context.createGain();
@@ -1187,13 +1203,23 @@ class AudioChannel {
     async suspend() {
         await this.context.suspend();
     }
-    async play(sound, loop) {
-        if (this.source) {
-            this.source.disconnect();
+    async stop_all_sources() {
+        for (const source of this.sources) {
+            source.stop();
+            source.disconnect();
         }
+        this.sources = [];
+    }
+    async play(sound, loop) {
         const node = this.context.createBufferSource();
         node.buffer = sound.buffer;
         node.loop = loop;
+        this.sources.push(node);
+        while (this.sources.length > this.max_tracks) {
+            const source = this.sources.shift();
+            source.stop();
+            source.disconnect();
+        }
         node.connect(this.input);
         node.start();
     }
@@ -1212,11 +1238,12 @@ class AudioSource {
     }
 }
 
-},{"../../../../util/build/random":38}],15:[function(require,module,exports){
+},{"../../../../util/build/random":39}],15:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CartManager = void 0;
 const Cart = require("../../../../schema/generated/cartridge");
+const fingerprint_1 = require("../../../../schema/lib/fingerprint");
 const Db = require("./db");
 class CartManager {
     os;
@@ -1234,7 +1261,7 @@ class CartManager {
         try {
             const cart = this.os.kernel.loader.load_bytes(await file.arrayBuffer());
             if (await this.install(cart)) {
-                await this.os.notifications.push("kate:installer", "New game installed", `${cart.metadata?.title ?? cart.id} is ready to play!`);
+                await this.os.notifications.push("kate:installer", "New game installed", `${cart.metadata.title.title} is ready to play!`);
             }
         }
         catch (error) {
@@ -1248,17 +1275,15 @@ class CartManager {
             const files = t.get_table(Db.cart_files);
             const encoder = new Cart._Encoder();
             cart.encode(encoder);
-            const bytes = encoder.to_bytes();
+            const bytes = (0, fingerprint_1.add_fingerprint)(encoder.to_bytes());
             await meta.write({
                 id: cart.id,
-                title: cart.metadata?.title ?? cart.id,
-                description: cart.metadata?.description ?? "",
-                thumbnail: cart.metadata?.thumbnail
-                    ? {
-                        mime: cart.metadata.thumbnail.mime,
-                        bytes: cart.metadata.thumbnail.data,
-                    }
-                    : null,
+                title: cart.metadata.title.title,
+                description: cart.metadata.title.description,
+                thumbnail: {
+                    mime: cart.metadata.title.thumbnail.mime,
+                    bytes: cart.metadata.title.thumbnail.data,
+                },
                 installed_at: new Date(),
             });
             await files.write({
@@ -1275,7 +1300,7 @@ class CartManager {
 }
 exports.CartManager = CartManager;
 
-},{"../../../../schema/generated/cartridge":33,"./db":17}],16:[function(require,module,exports){
+},{"../../../../schema/generated/cartridge":33,"../../../../schema/lib/fingerprint":34,"./db":17}],16:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.HUD_ContextMenu = exports.KateContextMenu = void 0;
@@ -1395,7 +1420,7 @@ class HUD_ContextMenu extends scenes_1.Scene {
 }
 exports.HUD_ContextMenu = HUD_ContextMenu;
 
-},{"../../../../util/build/events":35,"../ui":30,"../ui/scenes":31}],17:[function(require,module,exports){
+},{"../../../../util/build/events":36,"../ui":30,"../ui/scenes":31}],17:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.cart_kvstore = exports.notifications = exports.cart_files = exports.cart_meta = exports.kate = void 0;
@@ -1830,7 +1855,7 @@ class KateIPCServer {
             }
             // -- Audio
             case "kate:audio.create-channel": {
-                const channel = await process.audio.create_channel();
+                const channel = await process.audio.create_channel(message.payload.max_tracks ?? 1);
                 await channel.resume();
                 return ok({ id: channel.id, volume: channel.volume.gain.value });
             }
@@ -1852,6 +1877,16 @@ class KateIPCServer {
                 }
                 catch (_) {
                     return err("kate:audio.cannot-pause");
+                }
+            }
+            case "kate:audio.stop-all-sources": {
+                try {
+                    const channel = process.audio.get_channel(message.payload.id);
+                    await channel.stop_all_sources();
+                    return ok(null);
+                }
+                catch (_) {
+                    return err("kate:audio.cannot-stop-sources");
                 }
             }
             case "kate:audio.change-volume": {
@@ -2062,6 +2097,10 @@ class KateProcesses {
             this._running = process;
             this.os.kernel.console.os_root.classList.add("in-background");
             return process;
+        }
+        catch (error) {
+            console.error(`Failed to run cartridge ${id}:`, error);
+            await this.os.notifications.push("kate:os", `Failed to run`, `Cartridge may be corrupted or not compatible with this version.`);
         }
         finally {
             this.os.hide_hud(loading);
@@ -2322,7 +2361,7 @@ class KateOS {
 }
 exports.KateOS = KateOS;
 
-},{"../../../util/build/events":35,"./apis":21,"./apis/cart-manager":15,"./apis/context_menu":16,"./apis/db":17,"./apis/drop-installer":18,"./apis/file_storage":19,"./apis/focus-handler":20,"./apis/ipc":22,"./apis/kv_storage":23,"./apis/notification":24,"./apis/processes":25,"./apis/status-bar":26,"./time":29,"./ui/scenes":31}],29:[function(require,module,exports){
+},{"../../../util/build/events":36,"./apis":21,"./apis/cart-manager":15,"./apis/context_menu":16,"./apis/db":17,"./apis/drop-installer":18,"./apis/file_storage":19,"./apis/focus-handler":20,"./apis/ipc":22,"./apis/kv_storage":23,"./apis/notification":24,"./apis/processes":25,"./apis/status-bar":26,"./time":29,"./ui/scenes":31}],29:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.wait = void 0;
@@ -2670,15 +2709,18 @@ class Icon extends Widget {
 }
 exports.Icon = Icon;
 
-},{"../../../../util/build/events":35}],33:[function(require,module,exports){
+},{"../../../../util/build/events":36}],33:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.VirtualKey = exports.VirtualKey$Base = exports.Bridge = exports.Bridge$Base = exports.Platform = exports.Platform$Base = exports.Date = exports.Content_classification = exports.Content_classification$Base = exports.Metadata = exports.File = exports.Cartridge = exports.KeyboardKey = exports._Encoder = exports._Decoder = void 0;
+exports.KeyboardKey = exports.VirtualKey = exports.VirtualKey$Base = exports.Bridge = exports.Bridge$Base = exports.Platform = exports.Platform$Base = exports.Booklet_align = exports.Booklet_align$Base = exports.Booklet_cell = exports.Booklet_row = exports.Booklet_expr = exports.Booklet_expr$Base = exports.Accessibility = exports.Accessibility$Base = exports.Language = exports.Player_range = exports.Input_method = exports.Input_method$Base = exports.Duration = exports.Duration$Base = exports.Date = exports.Content_rating = exports.Content_rating$Base = exports.Version = exports.Release_type = exports.Release_type$Base = exports.Meta_booklet = exports.Meta_play = exports.Meta_rating = exports.Meta_release = exports.Meta_title = exports.Metadata = exports.File = exports.Cartridge = exports.Genre = exports.Genre$Base = exports._Encoder = exports._Decoder = void 0;
 class _Decoder {
     view;
     offset = 0;
     constructor(view) {
         this.view = view;
+    }
+    get remaining_bytes() {
+        return this.view.byteLength - (this.view.byteOffset + this.offset);
     }
     peek(f) {
         return f(new DataView(this.view.buffer, this.view.byteOffset + this.offset));
@@ -2746,12 +2788,15 @@ class _Decoder {
     }
     bytes() {
         const size = this.ui32();
-        const result = [];
-        for (let i = 0; i < size; ++i) {
+        if (size > this.remaining_bytes) {
+            throw new Error(`Invalid size ${size}`);
+        }
+        const result = new Uint8Array(size);
+        for (let i = 0; i < result.length; ++i) {
             result[i] = this.view.getUint8(this.offset + i);
         }
         this.offset += size;
-        return new Uint8Array(result);
+        return result;
     }
     array(f) {
         const size = this.ui32();
@@ -2924,41 +2969,416 @@ class _Encoder {
     }
 }
 exports._Encoder = _Encoder;
-class KeyboardKey {
-    key;
-    code;
-    key_code;
-    static $tag = 8;
-    $tag = 8;
-    constructor(key, code, key_code) {
-        this.key = key;
-        this.code = code;
-        this.key_code = key_code;
-    }
+class Genre$Base {
     static decode($d) {
         const $tag = $d.ui32();
         if ($tag !== 8) {
-            throw new Error(`Invalid tag ${$tag} for KeyboardKey: expected 8`);
+            throw new Error(`Invalid tag ${$tag} for Genre: expected 8`);
         }
-        return KeyboardKey.$do_decode($d);
+        return Genre$Base.$do_decode($d);
     }
     static $do_decode($d) {
-        const key = $d.text();
-        const code = $d.text();
-        const key_code = $d.bigint();
-        return new KeyboardKey(key, code, key_code);
-    }
-    encode($e) {
-        $e.ui32(8);
-        this.$do_encode($e);
-    }
-    $do_encode($e) {
-        $e.text(this.key);
-        $e.text(this.code);
-        $e.integer(this.key_code);
+        const $tag = $d.peek((v) => v.getUint8(0));
+        switch ($tag) {
+            case 0: return Genre.Not_specified.decode($d);
+            case 1: return Genre.Action.decode($d);
+            case 2: return Genre.Figthing.decode($d);
+            case 3: return Genre.Interactive_fiction.decode($d);
+            case 4: return Genre.Platformer.decode($d);
+            case 5: return Genre.Puzzle.decode($d);
+            case 6: return Genre.Racing.decode($d);
+            case 7: return Genre.Rhythm.decode($d);
+            case 8: return Genre.RPG.decode($d);
+            case 9: return Genre.Simulation.decode($d);
+            case 10: return Genre.Shooter.decode($d);
+            case 11: return Genre.Sports.decode($d);
+            case 12: return Genre.Strategy.decode($d);
+            case 13: return Genre.Tool.decode($d);
+            case 14: return Genre.Other.decode($d);
+            default:
+                throw new Error(`Unknown tag ${$tag} in union Genre`);
+        }
     }
 }
-exports.KeyboardKey = KeyboardKey;
+exports.Genre$Base = Genre$Base;
+var Genre;
+(function (Genre) {
+    class Not_specified extends Genre$Base {
+        static $tag = 0 /* $Tags.Not_specified */;
+        $tag = 0 /* $Tags.Not_specified */;
+        constructor() {
+            super();
+        }
+        static decode($d) {
+            return Not_specified.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 0) {
+                throw new Error(`Invalid tag ${$tag} for Genre.Not-specified: expected 0`);
+            }
+            return new Not_specified();
+        }
+        encode($e) {
+            $e.ui32(8);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(0);
+        }
+    }
+    Genre.Not_specified = Not_specified;
+    class Action extends Genre$Base {
+        static $tag = 1 /* $Tags.Action */;
+        $tag = 1 /* $Tags.Action */;
+        constructor() {
+            super();
+        }
+        static decode($d) {
+            return Action.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 1) {
+                throw new Error(`Invalid tag ${$tag} for Genre.Action: expected 1`);
+            }
+            return new Action();
+        }
+        encode($e) {
+            $e.ui32(8);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(1);
+        }
+    }
+    Genre.Action = Action;
+    class Figthing extends Genre$Base {
+        static $tag = 2 /* $Tags.Figthing */;
+        $tag = 2 /* $Tags.Figthing */;
+        constructor() {
+            super();
+        }
+        static decode($d) {
+            return Figthing.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 2) {
+                throw new Error(`Invalid tag ${$tag} for Genre.Figthing: expected 2`);
+            }
+            return new Figthing();
+        }
+        encode($e) {
+            $e.ui32(8);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(2);
+        }
+    }
+    Genre.Figthing = Figthing;
+    class Interactive_fiction extends Genre$Base {
+        static $tag = 3 /* $Tags.Interactive_fiction */;
+        $tag = 3 /* $Tags.Interactive_fiction */;
+        constructor() {
+            super();
+        }
+        static decode($d) {
+            return Interactive_fiction.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 3) {
+                throw new Error(`Invalid tag ${$tag} for Genre.Interactive-fiction: expected 3`);
+            }
+            return new Interactive_fiction();
+        }
+        encode($e) {
+            $e.ui32(8);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(3);
+        }
+    }
+    Genre.Interactive_fiction = Interactive_fiction;
+    class Platformer extends Genre$Base {
+        static $tag = 4 /* $Tags.Platformer */;
+        $tag = 4 /* $Tags.Platformer */;
+        constructor() {
+            super();
+        }
+        static decode($d) {
+            return Platformer.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 4) {
+                throw new Error(`Invalid tag ${$tag} for Genre.Platformer: expected 4`);
+            }
+            return new Platformer();
+        }
+        encode($e) {
+            $e.ui32(8);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(4);
+        }
+    }
+    Genre.Platformer = Platformer;
+    class Puzzle extends Genre$Base {
+        static $tag = 5 /* $Tags.Puzzle */;
+        $tag = 5 /* $Tags.Puzzle */;
+        constructor() {
+            super();
+        }
+        static decode($d) {
+            return Puzzle.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 5) {
+                throw new Error(`Invalid tag ${$tag} for Genre.Puzzle: expected 5`);
+            }
+            return new Puzzle();
+        }
+        encode($e) {
+            $e.ui32(8);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(5);
+        }
+    }
+    Genre.Puzzle = Puzzle;
+    class Racing extends Genre$Base {
+        static $tag = 6 /* $Tags.Racing */;
+        $tag = 6 /* $Tags.Racing */;
+        constructor() {
+            super();
+        }
+        static decode($d) {
+            return Racing.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 6) {
+                throw new Error(`Invalid tag ${$tag} for Genre.Racing: expected 6`);
+            }
+            return new Racing();
+        }
+        encode($e) {
+            $e.ui32(8);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(6);
+        }
+    }
+    Genre.Racing = Racing;
+    class Rhythm extends Genre$Base {
+        static $tag = 7 /* $Tags.Rhythm */;
+        $tag = 7 /* $Tags.Rhythm */;
+        constructor() {
+            super();
+        }
+        static decode($d) {
+            return Rhythm.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 7) {
+                throw new Error(`Invalid tag ${$tag} for Genre.Rhythm: expected 7`);
+            }
+            return new Rhythm();
+        }
+        encode($e) {
+            $e.ui32(8);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(7);
+        }
+    }
+    Genre.Rhythm = Rhythm;
+    class RPG extends Genre$Base {
+        static $tag = 8 /* $Tags.RPG */;
+        $tag = 8 /* $Tags.RPG */;
+        constructor() {
+            super();
+        }
+        static decode($d) {
+            return RPG.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 8) {
+                throw new Error(`Invalid tag ${$tag} for Genre.RPG: expected 8`);
+            }
+            return new RPG();
+        }
+        encode($e) {
+            $e.ui32(8);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(8);
+        }
+    }
+    Genre.RPG = RPG;
+    class Simulation extends Genre$Base {
+        static $tag = 9 /* $Tags.Simulation */;
+        $tag = 9 /* $Tags.Simulation */;
+        constructor() {
+            super();
+        }
+        static decode($d) {
+            return Simulation.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 9) {
+                throw new Error(`Invalid tag ${$tag} for Genre.Simulation: expected 9`);
+            }
+            return new Simulation();
+        }
+        encode($e) {
+            $e.ui32(8);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(9);
+        }
+    }
+    Genre.Simulation = Simulation;
+    class Shooter extends Genre$Base {
+        static $tag = 10 /* $Tags.Shooter */;
+        $tag = 10 /* $Tags.Shooter */;
+        constructor() {
+            super();
+        }
+        static decode($d) {
+            return Shooter.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 10) {
+                throw new Error(`Invalid tag ${$tag} for Genre.Shooter: expected 10`);
+            }
+            return new Shooter();
+        }
+        encode($e) {
+            $e.ui32(8);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(10);
+        }
+    }
+    Genre.Shooter = Shooter;
+    class Sports extends Genre$Base {
+        static $tag = 11 /* $Tags.Sports */;
+        $tag = 11 /* $Tags.Sports */;
+        constructor() {
+            super();
+        }
+        static decode($d) {
+            return Sports.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 11) {
+                throw new Error(`Invalid tag ${$tag} for Genre.Sports: expected 11`);
+            }
+            return new Sports();
+        }
+        encode($e) {
+            $e.ui32(8);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(11);
+        }
+    }
+    Genre.Sports = Sports;
+    class Strategy extends Genre$Base {
+        static $tag = 12 /* $Tags.Strategy */;
+        $tag = 12 /* $Tags.Strategy */;
+        constructor() {
+            super();
+        }
+        static decode($d) {
+            return Strategy.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 12) {
+                throw new Error(`Invalid tag ${$tag} for Genre.Strategy: expected 12`);
+            }
+            return new Strategy();
+        }
+        encode($e) {
+            $e.ui32(8);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(12);
+        }
+    }
+    Genre.Strategy = Strategy;
+    class Tool extends Genre$Base {
+        static $tag = 13 /* $Tags.Tool */;
+        $tag = 13 /* $Tags.Tool */;
+        constructor() {
+            super();
+        }
+        static decode($d) {
+            return Tool.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 13) {
+                throw new Error(`Invalid tag ${$tag} for Genre.Tool: expected 13`);
+            }
+            return new Tool();
+        }
+        encode($e) {
+            $e.ui32(8);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(13);
+        }
+    }
+    Genre.Tool = Tool;
+    class Other extends Genre$Base {
+        static $tag = 14 /* $Tags.Other */;
+        $tag = 14 /* $Tags.Other */;
+        constructor() {
+            super();
+        }
+        static decode($d) {
+            return Other.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 14) {
+                throw new Error(`Invalid tag ${$tag} for Genre.Other: expected 14`);
+            }
+            return new Other();
+        }
+        encode($e) {
+            $e.ui32(8);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(14);
+        }
+    }
+    Genre.Other = Other;
+})(Genre = exports.Genre || (exports.Genre = {}));
 class Cartridge {
     id;
     metadata;
@@ -3040,25 +3460,19 @@ class File {
 }
 exports.File = File;
 class Metadata {
-    author;
     title;
-    description;
-    category;
-    content_warning;
-    classification;
-    release_date;
-    thumbnail;
+    release;
+    rating;
+    play;
+    booklet;
     static $tag = 2;
     $tag = 2;
-    constructor(author, title, description, category, content_warning, classification, release_date, thumbnail) {
-        this.author = author;
+    constructor(title, release, rating, play, booklet) {
         this.title = title;
-        this.description = description;
-        this.category = category;
-        this.content_warning = content_warning;
-        this.classification = classification;
-        this.release_date = release_date;
-        this.thumbnail = thumbnail;
+        this.release = release;
+        this.rating = rating;
+        this.play = play;
+        this.booklet = booklet;
     }
     static decode($d) {
         const $tag = $d.ui32();
@@ -3068,62 +3482,488 @@ class Metadata {
         return Metadata.$do_decode($d);
     }
     static $do_decode($d) {
-        const author = $d.text();
-        const title = $d.text();
-        const description = $d.text();
-        const category = $d.text();
-        const content_warning = $d.array(() => {
-            const item = $d.text();
-            ;
-            return item;
-        });
-        const classification = Content_classification$Base.$do_decode($d);
-        const release_date = Date.$do_decode($d);
-        const thumbnail = File.$do_decode($d);
-        return new Metadata(author, title, description, category, content_warning, classification, release_date, thumbnail);
+        const title = Meta_title.$do_decode($d);
+        const release = Meta_release.$do_decode($d);
+        const rating = Meta_rating.$do_decode($d);
+        const play = Meta_play.$do_decode($d);
+        const booklet = Meta_booklet.$do_decode($d);
+        return new Metadata(title, release, rating, play, booklet);
     }
     encode($e) {
         $e.ui32(2);
         this.$do_encode($e);
     }
     $do_encode($e) {
-        $e.text(this.author);
-        $e.text(this.title);
-        $e.text(this.description);
-        $e.text(this.category);
-        $e.array((this.content_warning), ($e, v) => {
-            $e.text(v);
-        });
-        (this.classification).$do_encode($e);
-        (this.release_date).$do_encode($e);
-        (this.thumbnail).$do_encode($e);
+        (this.title).$do_encode($e);
+        (this.release).$do_encode($e);
+        (this.rating).$do_encode($e);
+        (this.play).$do_encode($e);
+        (this.booklet).$do_encode($e);
     }
 }
 exports.Metadata = Metadata;
-class Content_classification$Base {
+class Meta_title {
+    author;
+    title;
+    description;
+    genre;
+    tags;
+    thumbnail;
+    static $tag = 3;
+    $tag = 3;
+    constructor(author, title, description, genre, tags, thumbnail) {
+        this.author = author;
+        this.title = title;
+        this.description = description;
+        this.genre = genre;
+        this.tags = tags;
+        this.thumbnail = thumbnail;
+    }
     static decode($d) {
         const $tag = $d.ui32();
         if ($tag !== 3) {
-            throw new Error(`Invalid tag ${$tag} for Content-classification: expected 3`);
+            throw new Error(`Invalid tag ${$tag} for Meta-title: expected 3`);
         }
-        return Content_classification$Base.$do_decode($d);
+        return Meta_title.$do_decode($d);
+    }
+    static $do_decode($d) {
+        const author = $d.text();
+        const title = $d.text();
+        const description = $d.text();
+        const genre = $d.array(() => {
+            const item = Genre$Base.$do_decode($d);
+            ;
+            return item;
+        });
+        const tags = $d.array(() => {
+            const item = $d.text();
+            ;
+            return item;
+        });
+        const thumbnail = File.$do_decode($d);
+        return new Meta_title(author, title, description, genre, tags, thumbnail);
+    }
+    encode($e) {
+        $e.ui32(3);
+        this.$do_encode($e);
+    }
+    $do_encode($e) {
+        $e.text(this.author);
+        $e.text(this.title);
+        $e.text(this.description);
+        $e.array((this.genre), ($e, v) => {
+            (v).$do_encode($e);
+        });
+        $e.array((this.tags), ($e, v) => {
+            $e.text(v);
+        });
+        (this.thumbnail).$do_encode($e);
+    }
+}
+exports.Meta_title = Meta_title;
+class Meta_release {
+    release_type;
+    release_date;
+    version;
+    legal_notices;
+    licence_name;
+    allow_derivative;
+    allow_commercial;
+    static $tag = 4;
+    $tag = 4;
+    constructor(release_type, release_date, version, legal_notices, licence_name, allow_derivative, allow_commercial) {
+        this.release_type = release_type;
+        this.release_date = release_date;
+        this.version = version;
+        this.legal_notices = legal_notices;
+        this.licence_name = licence_name;
+        this.allow_derivative = allow_derivative;
+        this.allow_commercial = allow_commercial;
+    }
+    static decode($d) {
+        const $tag = $d.ui32();
+        if ($tag !== 4) {
+            throw new Error(`Invalid tag ${$tag} for Meta-release: expected 4`);
+        }
+        return Meta_release.$do_decode($d);
+    }
+    static $do_decode($d) {
+        const release_type = Release_type$Base.$do_decode($d);
+        const release_date = Date.$do_decode($d);
+        const version = Version.$do_decode($d);
+        const legal_notices = $d.text();
+        const licence_name = $d.text();
+        const allow_derivative = $d.bool();
+        const allow_commercial = $d.bool();
+        return new Meta_release(release_type, release_date, version, legal_notices, licence_name, allow_derivative, allow_commercial);
+    }
+    encode($e) {
+        $e.ui32(4);
+        this.$do_encode($e);
+    }
+    $do_encode($e) {
+        (this.release_type).$do_encode($e);
+        (this.release_date).$do_encode($e);
+        (this.version).$do_encode($e);
+        $e.text(this.legal_notices);
+        $e.text(this.licence_name);
+        $e.bool(this.allow_derivative);
+        $e.bool(this.allow_commercial);
+    }
+}
+exports.Meta_release = Meta_release;
+class Meta_rating {
+    rating;
+    warnings;
+    static $tag = 5;
+    $tag = 5;
+    constructor(rating, warnings) {
+        this.rating = rating;
+        this.warnings = warnings;
+    }
+    static decode($d) {
+        const $tag = $d.ui32();
+        if ($tag !== 5) {
+            throw new Error(`Invalid tag ${$tag} for Meta-rating: expected 5`);
+        }
+        return Meta_rating.$do_decode($d);
+    }
+    static $do_decode($d) {
+        const rating = Content_rating$Base.$do_decode($d);
+        const warnings = $d.array(() => {
+            const item = $d.text();
+            ;
+            return item;
+        });
+        return new Meta_rating(rating, warnings);
+    }
+    encode($e) {
+        $e.ui32(5);
+        this.$do_encode($e);
+    }
+    $do_encode($e) {
+        (this.rating).$do_encode($e);
+        $e.array((this.warnings), ($e, v) => {
+            $e.text(v);
+        });
+    }
+}
+exports.Meta_rating = Meta_rating;
+class Meta_play {
+    input_methods;
+    local_multiplayer;
+    online_multiplayer;
+    languages;
+    accessibility;
+    average_duration;
+    static $tag = 6;
+    $tag = 6;
+    constructor(input_methods, local_multiplayer, online_multiplayer, languages, accessibility, average_duration) {
+        this.input_methods = input_methods;
+        this.local_multiplayer = local_multiplayer;
+        this.online_multiplayer = online_multiplayer;
+        this.languages = languages;
+        this.accessibility = accessibility;
+        this.average_duration = average_duration;
+    }
+    static decode($d) {
+        const $tag = $d.ui32();
+        if ($tag !== 6) {
+            throw new Error(`Invalid tag ${$tag} for Meta-play: expected 6`);
+        }
+        return Meta_play.$do_decode($d);
+    }
+    static $do_decode($d) {
+        const input_methods = $d.array(() => {
+            const item = Input_method$Base.$do_decode($d);
+            ;
+            return item;
+        });
+        const local_multiplayer = $d.optional(() => {
+            const item = Player_range.$do_decode($d);
+            ;
+            return item;
+        });
+        const online_multiplayer = $d.optional(() => {
+            const item = Player_range.$do_decode($d);
+            ;
+            return item;
+        });
+        const languages = $d.array(() => {
+            const item = Language.$do_decode($d);
+            ;
+            return item;
+        });
+        const accessibility = $d.array(() => {
+            const item = Accessibility$Base.$do_decode($d);
+            ;
+            return item;
+        });
+        const average_duration = Duration$Base.$do_decode($d);
+        return new Meta_play(input_methods, local_multiplayer, online_multiplayer, languages, accessibility, average_duration);
+    }
+    encode($e) {
+        $e.ui32(6);
+        this.$do_encode($e);
+    }
+    $do_encode($e) {
+        $e.array((this.input_methods), ($e, v) => {
+            (v).$do_encode($e);
+        });
+        $e.optional((this.local_multiplayer), ($e, v) => { (v).$do_encode($e); });
+        $e.optional((this.online_multiplayer), ($e, v) => { (v).$do_encode($e); });
+        $e.array((this.languages), ($e, v) => {
+            (v).$do_encode($e);
+        });
+        $e.array((this.accessibility), ($e, v) => {
+            (v).$do_encode($e);
+        });
+        (this.average_duration).$do_encode($e);
+    }
+}
+exports.Meta_play = Meta_play;
+class Meta_booklet {
+    pages;
+    custom_css;
+    static $tag = 7;
+    $tag = 7;
+    constructor(pages, custom_css) {
+        this.pages = pages;
+        this.custom_css = custom_css;
+    }
+    static decode($d) {
+        const $tag = $d.ui32();
+        if ($tag !== 7) {
+            throw new Error(`Invalid tag ${$tag} for Meta-booklet: expected 7`);
+        }
+        return Meta_booklet.$do_decode($d);
+    }
+    static $do_decode($d) {
+        const pages = $d.array(() => {
+            const item = Booklet_expr$Base.$do_decode($d);
+            ;
+            return item;
+        });
+        const custom_css = $d.text();
+        return new Meta_booklet(pages, custom_css);
+    }
+    encode($e) {
+        $e.ui32(7);
+        this.$do_encode($e);
+    }
+    $do_encode($e) {
+        $e.array((this.pages), ($e, v) => {
+            (v).$do_encode($e);
+        });
+        $e.text(this.custom_css);
+    }
+}
+exports.Meta_booklet = Meta_booklet;
+class Release_type$Base {
+    static decode($d) {
+        const $tag = $d.ui32();
+        if ($tag !== 9) {
+            throw new Error(`Invalid tag ${$tag} for Release-type: expected 9`);
+        }
+        return Release_type$Base.$do_decode($d);
     }
     static $do_decode($d) {
         const $tag = $d.peek((v) => v.getUint8(0));
         switch ($tag) {
-            case 0: return Content_classification.General.decode($d);
-            case 1: return Content_classification.Teen_and_up.decode($d);
-            case 2: return Content_classification.Mature.decode($d);
-            case 3: return Content_classification.Explicit.decode($d);
+            case 0: return Release_type.Prototype.decode($d);
+            case 1: return Release_type.Early_access.decode($d);
+            case 2: return Release_type.Beta.decode($d);
+            case 3: return Release_type.Demo.decode($d);
+            case 4: return Release_type.Full.decode($d);
             default:
-                throw new Error(`Unknown tag ${$tag} in union Content-classification`);
+                throw new Error(`Unknown tag ${$tag} in union Release-type`);
         }
     }
 }
-exports.Content_classification$Base = Content_classification$Base;
-var Content_classification;
-(function (Content_classification) {
-    class General extends Content_classification$Base {
+exports.Release_type$Base = Release_type$Base;
+var Release_type;
+(function (Release_type) {
+    class Prototype extends Release_type$Base {
+        static $tag = 0 /* $Tags.Prototype */;
+        $tag = 0 /* $Tags.Prototype */;
+        constructor() {
+            super();
+        }
+        static decode($d) {
+            return Prototype.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 0) {
+                throw new Error(`Invalid tag ${$tag} for Release-type.Prototype: expected 0`);
+            }
+            return new Prototype();
+        }
+        encode($e) {
+            $e.ui32(9);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(0);
+        }
+    }
+    Release_type.Prototype = Prototype;
+    class Early_access extends Release_type$Base {
+        static $tag = 1 /* $Tags.Early_access */;
+        $tag = 1 /* $Tags.Early_access */;
+        constructor() {
+            super();
+        }
+        static decode($d) {
+            return Early_access.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 1) {
+                throw new Error(`Invalid tag ${$tag} for Release-type.Early-access: expected 1`);
+            }
+            return new Early_access();
+        }
+        encode($e) {
+            $e.ui32(9);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(1);
+        }
+    }
+    Release_type.Early_access = Early_access;
+    class Beta extends Release_type$Base {
+        static $tag = 2 /* $Tags.Beta */;
+        $tag = 2 /* $Tags.Beta */;
+        constructor() {
+            super();
+        }
+        static decode($d) {
+            return Beta.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 2) {
+                throw new Error(`Invalid tag ${$tag} for Release-type.Beta: expected 2`);
+            }
+            return new Beta();
+        }
+        encode($e) {
+            $e.ui32(9);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(2);
+        }
+    }
+    Release_type.Beta = Beta;
+    class Demo extends Release_type$Base {
+        static $tag = 3 /* $Tags.Demo */;
+        $tag = 3 /* $Tags.Demo */;
+        constructor() {
+            super();
+        }
+        static decode($d) {
+            return Demo.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 3) {
+                throw new Error(`Invalid tag ${$tag} for Release-type.Demo: expected 3`);
+            }
+            return new Demo();
+        }
+        encode($e) {
+            $e.ui32(9);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(3);
+        }
+    }
+    Release_type.Demo = Demo;
+    class Full extends Release_type$Base {
+        static $tag = 4 /* $Tags.Full */;
+        $tag = 4 /* $Tags.Full */;
+        constructor() {
+            super();
+        }
+        static decode($d) {
+            return Full.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 4) {
+                throw new Error(`Invalid tag ${$tag} for Release-type.Full: expected 4`);
+            }
+            return new Full();
+        }
+        encode($e) {
+            $e.ui32(9);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(4);
+        }
+    }
+    Release_type.Full = Full;
+})(Release_type = exports.Release_type || (exports.Release_type = {}));
+class Version {
+    major;
+    minor;
+    static $tag = 10;
+    $tag = 10;
+    constructor(major, minor) {
+        this.major = major;
+        this.minor = minor;
+    }
+    static decode($d) {
+        const $tag = $d.ui32();
+        if ($tag !== 10) {
+            throw new Error(`Invalid tag ${$tag} for Version: expected 10`);
+        }
+        return Version.$do_decode($d);
+    }
+    static $do_decode($d) {
+        const major = $d.ui32();
+        const minor = $d.ui32();
+        return new Version(major, minor);
+    }
+    encode($e) {
+        $e.ui32(10);
+        this.$do_encode($e);
+    }
+    $do_encode($e) {
+        $e.ui32(this.major);
+        $e.ui32(this.minor);
+    }
+}
+exports.Version = Version;
+class Content_rating$Base {
+    static decode($d) {
+        const $tag = $d.ui32();
+        if ($tag !== 11) {
+            throw new Error(`Invalid tag ${$tag} for Content-rating: expected 11`);
+        }
+        return Content_rating$Base.$do_decode($d);
+    }
+    static $do_decode($d) {
+        const $tag = $d.peek((v) => v.getUint8(0));
+        switch ($tag) {
+            case 0: return Content_rating.General.decode($d);
+            case 1: return Content_rating.Teen_and_up.decode($d);
+            case 2: return Content_rating.Mature.decode($d);
+            case 3: return Content_rating.Explicit.decode($d);
+            default:
+                throw new Error(`Unknown tag ${$tag} in union Content-rating`);
+        }
+    }
+}
+exports.Content_rating$Base = Content_rating$Base;
+var Content_rating;
+(function (Content_rating) {
+    class General extends Content_rating$Base {
         static $tag = 0 /* $Tags.General */;
         $tag = 0 /* $Tags.General */;
         constructor() {
@@ -3135,20 +3975,20 @@ var Content_classification;
         static $do_decode($d) {
             const $tag = $d.ui8();
             if ($tag !== 0) {
-                throw new Error(`Invalid tag ${$tag} for Content-classification.General: expected 0`);
+                throw new Error(`Invalid tag ${$tag} for Content-rating.General: expected 0`);
             }
             return new General();
         }
         encode($e) {
-            $e.ui32(3);
+            $e.ui32(11);
             this.$do_encode($e);
         }
         $do_encode($e) {
             $e.ui8(0);
         }
     }
-    Content_classification.General = General;
-    class Teen_and_up extends Content_classification$Base {
+    Content_rating.General = General;
+    class Teen_and_up extends Content_rating$Base {
         static $tag = 1 /* $Tags.Teen_and_up */;
         $tag = 1 /* $Tags.Teen_and_up */;
         constructor() {
@@ -3160,20 +4000,20 @@ var Content_classification;
         static $do_decode($d) {
             const $tag = $d.ui8();
             if ($tag !== 1) {
-                throw new Error(`Invalid tag ${$tag} for Content-classification.Teen-and-up: expected 1`);
+                throw new Error(`Invalid tag ${$tag} for Content-rating.Teen-and-up: expected 1`);
             }
             return new Teen_and_up();
         }
         encode($e) {
-            $e.ui32(3);
+            $e.ui32(11);
             this.$do_encode($e);
         }
         $do_encode($e) {
             $e.ui8(1);
         }
     }
-    Content_classification.Teen_and_up = Teen_and_up;
-    class Mature extends Content_classification$Base {
+    Content_rating.Teen_and_up = Teen_and_up;
+    class Mature extends Content_rating$Base {
         static $tag = 2 /* $Tags.Mature */;
         $tag = 2 /* $Tags.Mature */;
         constructor() {
@@ -3185,20 +4025,20 @@ var Content_classification;
         static $do_decode($d) {
             const $tag = $d.ui8();
             if ($tag !== 2) {
-                throw new Error(`Invalid tag ${$tag} for Content-classification.Mature: expected 2`);
+                throw new Error(`Invalid tag ${$tag} for Content-rating.Mature: expected 2`);
             }
             return new Mature();
         }
         encode($e) {
-            $e.ui32(3);
+            $e.ui32(11);
             this.$do_encode($e);
         }
         $do_encode($e) {
             $e.ui8(2);
         }
     }
-    Content_classification.Mature = Mature;
-    class Explicit extends Content_classification$Base {
+    Content_rating.Mature = Mature;
+    class Explicit extends Content_rating$Base {
         static $tag = 3 /* $Tags.Explicit */;
         $tag = 3 /* $Tags.Explicit */;
         constructor() {
@@ -3210,26 +4050,26 @@ var Content_classification;
         static $do_decode($d) {
             const $tag = $d.ui8();
             if ($tag !== 3) {
-                throw new Error(`Invalid tag ${$tag} for Content-classification.Explicit: expected 3`);
+                throw new Error(`Invalid tag ${$tag} for Content-rating.Explicit: expected 3`);
             }
             return new Explicit();
         }
         encode($e) {
-            $e.ui32(3);
+            $e.ui32(11);
             this.$do_encode($e);
         }
         $do_encode($e) {
             $e.ui8(3);
         }
     }
-    Content_classification.Explicit = Explicit;
-})(Content_classification = exports.Content_classification || (exports.Content_classification = {}));
+    Content_rating.Explicit = Explicit;
+})(Content_rating = exports.Content_rating || (exports.Content_rating = {}));
 class Date {
     year;
     month;
     day;
-    static $tag = 4;
-    $tag = 4;
+    static $tag = 12;
+    $tag = 12;
     constructor(year, month, day) {
         this.year = year;
         this.month = month;
@@ -3237,8 +4077,8 @@ class Date {
     }
     static decode($d) {
         const $tag = $d.ui32();
-        if ($tag !== 4) {
-            throw new Error(`Invalid tag ${$tag} for Date: expected 4`);
+        if ($tag !== 12) {
+            throw new Error(`Invalid tag ${$tag} for Date: expected 12`);
         }
         return Date.$do_decode($d);
     }
@@ -3249,7 +4089,7 @@ class Date {
         return new Date(year, month, day);
     }
     encode($e) {
-        $e.ui32(4);
+        $e.ui32(12);
         this.$do_encode($e);
     }
     $do_encode($e) {
@@ -3259,11 +4099,1359 @@ class Date {
     }
 }
 exports.Date = Date;
+class Duration$Base {
+    static decode($d) {
+        const $tag = $d.ui32();
+        if ($tag !== 13) {
+            throw new Error(`Invalid tag ${$tag} for Duration: expected 13`);
+        }
+        return Duration$Base.$do_decode($d);
+    }
+    static $do_decode($d) {
+        const $tag = $d.peek((v) => v.getUint8(0));
+        switch ($tag) {
+            case 0: return Duration.Seconds.decode($d);
+            case 1: return Duration.Few_minutes.decode($d);
+            case 2: return Duration.Half_hour.decode($d);
+            case 3: return Duration.One_hour.decode($d);
+            case 4: return Duration.Few_hours.decode($d);
+            case 5: return Duration.Several_hours.decode($d);
+            case 6: return Duration.Unknown.decode($d);
+            default:
+                throw new Error(`Unknown tag ${$tag} in union Duration`);
+        }
+    }
+}
+exports.Duration$Base = Duration$Base;
+var Duration;
+(function (Duration) {
+    class Seconds extends Duration$Base {
+        static $tag = 0 /* $Tags.Seconds */;
+        $tag = 0 /* $Tags.Seconds */;
+        constructor() {
+            super();
+        }
+        static decode($d) {
+            return Seconds.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 0) {
+                throw new Error(`Invalid tag ${$tag} for Duration.Seconds: expected 0`);
+            }
+            return new Seconds();
+        }
+        encode($e) {
+            $e.ui32(13);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(0);
+        }
+    }
+    Duration.Seconds = Seconds;
+    class Few_minutes extends Duration$Base {
+        static $tag = 1 /* $Tags.Few_minutes */;
+        $tag = 1 /* $Tags.Few_minutes */;
+        constructor() {
+            super();
+        }
+        static decode($d) {
+            return Few_minutes.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 1) {
+                throw new Error(`Invalid tag ${$tag} for Duration.Few-minutes: expected 1`);
+            }
+            return new Few_minutes();
+        }
+        encode($e) {
+            $e.ui32(13);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(1);
+        }
+    }
+    Duration.Few_minutes = Few_minutes;
+    class Half_hour extends Duration$Base {
+        static $tag = 2 /* $Tags.Half_hour */;
+        $tag = 2 /* $Tags.Half_hour */;
+        constructor() {
+            super();
+        }
+        static decode($d) {
+            return Half_hour.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 2) {
+                throw new Error(`Invalid tag ${$tag} for Duration.Half-hour: expected 2`);
+            }
+            return new Half_hour();
+        }
+        encode($e) {
+            $e.ui32(13);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(2);
+        }
+    }
+    Duration.Half_hour = Half_hour;
+    class One_hour extends Duration$Base {
+        static $tag = 3 /* $Tags.One_hour */;
+        $tag = 3 /* $Tags.One_hour */;
+        constructor() {
+            super();
+        }
+        static decode($d) {
+            return One_hour.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 3) {
+                throw new Error(`Invalid tag ${$tag} for Duration.One-hour: expected 3`);
+            }
+            return new One_hour();
+        }
+        encode($e) {
+            $e.ui32(13);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(3);
+        }
+    }
+    Duration.One_hour = One_hour;
+    class Few_hours extends Duration$Base {
+        static $tag = 4 /* $Tags.Few_hours */;
+        $tag = 4 /* $Tags.Few_hours */;
+        constructor() {
+            super();
+        }
+        static decode($d) {
+            return Few_hours.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 4) {
+                throw new Error(`Invalid tag ${$tag} for Duration.Few-hours: expected 4`);
+            }
+            return new Few_hours();
+        }
+        encode($e) {
+            $e.ui32(13);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(4);
+        }
+    }
+    Duration.Few_hours = Few_hours;
+    class Several_hours extends Duration$Base {
+        static $tag = 5 /* $Tags.Several_hours */;
+        $tag = 5 /* $Tags.Several_hours */;
+        constructor() {
+            super();
+        }
+        static decode($d) {
+            return Several_hours.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 5) {
+                throw new Error(`Invalid tag ${$tag} for Duration.Several-hours: expected 5`);
+            }
+            return new Several_hours();
+        }
+        encode($e) {
+            $e.ui32(13);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(5);
+        }
+    }
+    Duration.Several_hours = Several_hours;
+    class Unknown extends Duration$Base {
+        static $tag = 6 /* $Tags.Unknown */;
+        $tag = 6 /* $Tags.Unknown */;
+        constructor() {
+            super();
+        }
+        static decode($d) {
+            return Unknown.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 6) {
+                throw new Error(`Invalid tag ${$tag} for Duration.Unknown: expected 6`);
+            }
+            return new Unknown();
+        }
+        encode($e) {
+            $e.ui32(13);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(6);
+        }
+    }
+    Duration.Unknown = Unknown;
+})(Duration = exports.Duration || (exports.Duration = {}));
+class Input_method$Base {
+    static decode($d) {
+        const $tag = $d.ui32();
+        if ($tag !== 14) {
+            throw new Error(`Invalid tag ${$tag} for Input-method: expected 14`);
+        }
+        return Input_method$Base.$do_decode($d);
+    }
+    static $do_decode($d) {
+        const $tag = $d.peek((v) => v.getUint8(0));
+        switch ($tag) {
+            case 0: return Input_method.Kate_buttons.decode($d);
+            case 1: return Input_method.Touch.decode($d);
+            default:
+                throw new Error(`Unknown tag ${$tag} in union Input-method`);
+        }
+    }
+}
+exports.Input_method$Base = Input_method$Base;
+var Input_method;
+(function (Input_method) {
+    class Kate_buttons extends Input_method$Base {
+        static $tag = 0 /* $Tags.Kate_buttons */;
+        $tag = 0 /* $Tags.Kate_buttons */;
+        constructor() {
+            super();
+        }
+        static decode($d) {
+            return Kate_buttons.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 0) {
+                throw new Error(`Invalid tag ${$tag} for Input-method.Kate-buttons: expected 0`);
+            }
+            return new Kate_buttons();
+        }
+        encode($e) {
+            $e.ui32(14);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(0);
+        }
+    }
+    Input_method.Kate_buttons = Kate_buttons;
+    class Touch extends Input_method$Base {
+        static $tag = 1 /* $Tags.Touch */;
+        $tag = 1 /* $Tags.Touch */;
+        constructor() {
+            super();
+        }
+        static decode($d) {
+            return Touch.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 1) {
+                throw new Error(`Invalid tag ${$tag} for Input-method.Touch: expected 1`);
+            }
+            return new Touch();
+        }
+        encode($e) {
+            $e.ui32(14);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(1);
+        }
+    }
+    Input_method.Touch = Touch;
+})(Input_method = exports.Input_method || (exports.Input_method = {}));
+class Player_range {
+    minimum;
+    maximum;
+    static $tag = 15;
+    $tag = 15;
+    constructor(minimum, maximum) {
+        this.minimum = minimum;
+        this.maximum = maximum;
+    }
+    static decode($d) {
+        const $tag = $d.ui32();
+        if ($tag !== 15) {
+            throw new Error(`Invalid tag ${$tag} for Player-range: expected 15`);
+        }
+        return Player_range.$do_decode($d);
+    }
+    static $do_decode($d) {
+        const minimum = $d.ui32();
+        const maximum = $d.ui32();
+        return new Player_range(minimum, maximum);
+    }
+    encode($e) {
+        $e.ui32(15);
+        this.$do_encode($e);
+    }
+    $do_encode($e) {
+        $e.ui32(this.minimum);
+        $e.ui32(this.maximum);
+    }
+}
+exports.Player_range = Player_range;
+class Language {
+    iso_code;
+    _interface;
+    audio;
+    text;
+    static $tag = 16;
+    $tag = 16;
+    constructor(iso_code, _interface, audio, text) {
+        this.iso_code = iso_code;
+        this._interface = _interface;
+        this.audio = audio;
+        this.text = text;
+    }
+    static decode($d) {
+        const $tag = $d.ui32();
+        if ($tag !== 16) {
+            throw new Error(`Invalid tag ${$tag} for Language: expected 16`);
+        }
+        return Language.$do_decode($d);
+    }
+    static $do_decode($d) {
+        const iso_code = $d.text();
+        const _interface = $d.bool();
+        const audio = $d.bool();
+        const text = $d.bool();
+        return new Language(iso_code, _interface, audio, text);
+    }
+    encode($e) {
+        $e.ui32(16);
+        this.$do_encode($e);
+    }
+    $do_encode($e) {
+        $e.text(this.iso_code);
+        $e.bool(this._interface);
+        $e.bool(this.audio);
+        $e.bool(this.text);
+    }
+}
+exports.Language = Language;
+class Accessibility$Base {
+    static decode($d) {
+        const $tag = $d.ui32();
+        if ($tag !== 17) {
+            throw new Error(`Invalid tag ${$tag} for Accessibility: expected 17`);
+        }
+        return Accessibility$Base.$do_decode($d);
+    }
+    static $do_decode($d) {
+        const $tag = $d.peek((v) => v.getUint8(0));
+        switch ($tag) {
+            case 0: return Accessibility.High_contrast.decode($d);
+            case 1: return Accessibility.Subtitles.decode($d);
+            case 2: return Accessibility.Image_captions.decode($d);
+            case 3: return Accessibility.Voiced_text.decode($d);
+            case 4: return Accessibility.Configurable_difficulty.decode($d);
+            case 5: return Accessibility.Skippable_content.decode($d);
+            default:
+                throw new Error(`Unknown tag ${$tag} in union Accessibility`);
+        }
+    }
+}
+exports.Accessibility$Base = Accessibility$Base;
+var Accessibility;
+(function (Accessibility) {
+    class High_contrast extends Accessibility$Base {
+        static $tag = 0 /* $Tags.High_contrast */;
+        $tag = 0 /* $Tags.High_contrast */;
+        constructor() {
+            super();
+        }
+        static decode($d) {
+            return High_contrast.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 0) {
+                throw new Error(`Invalid tag ${$tag} for Accessibility.High-contrast: expected 0`);
+            }
+            return new High_contrast();
+        }
+        encode($e) {
+            $e.ui32(17);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(0);
+        }
+    }
+    Accessibility.High_contrast = High_contrast;
+    class Subtitles extends Accessibility$Base {
+        static $tag = 1 /* $Tags.Subtitles */;
+        $tag = 1 /* $Tags.Subtitles */;
+        constructor() {
+            super();
+        }
+        static decode($d) {
+            return Subtitles.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 1) {
+                throw new Error(`Invalid tag ${$tag} for Accessibility.Subtitles: expected 1`);
+            }
+            return new Subtitles();
+        }
+        encode($e) {
+            $e.ui32(17);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(1);
+        }
+    }
+    Accessibility.Subtitles = Subtitles;
+    class Image_captions extends Accessibility$Base {
+        static $tag = 2 /* $Tags.Image_captions */;
+        $tag = 2 /* $Tags.Image_captions */;
+        constructor() {
+            super();
+        }
+        static decode($d) {
+            return Image_captions.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 2) {
+                throw new Error(`Invalid tag ${$tag} for Accessibility.Image-captions: expected 2`);
+            }
+            return new Image_captions();
+        }
+        encode($e) {
+            $e.ui32(17);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(2);
+        }
+    }
+    Accessibility.Image_captions = Image_captions;
+    class Voiced_text extends Accessibility$Base {
+        static $tag = 3 /* $Tags.Voiced_text */;
+        $tag = 3 /* $Tags.Voiced_text */;
+        constructor() {
+            super();
+        }
+        static decode($d) {
+            return Voiced_text.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 3) {
+                throw new Error(`Invalid tag ${$tag} for Accessibility.Voiced-text: expected 3`);
+            }
+            return new Voiced_text();
+        }
+        encode($e) {
+            $e.ui32(17);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(3);
+        }
+    }
+    Accessibility.Voiced_text = Voiced_text;
+    class Configurable_difficulty extends Accessibility$Base {
+        static $tag = 4 /* $Tags.Configurable_difficulty */;
+        $tag = 4 /* $Tags.Configurable_difficulty */;
+        constructor() {
+            super();
+        }
+        static decode($d) {
+            return Configurable_difficulty.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 4) {
+                throw new Error(`Invalid tag ${$tag} for Accessibility.Configurable-difficulty: expected 4`);
+            }
+            return new Configurable_difficulty();
+        }
+        encode($e) {
+            $e.ui32(17);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(4);
+        }
+    }
+    Accessibility.Configurable_difficulty = Configurable_difficulty;
+    class Skippable_content extends Accessibility$Base {
+        static $tag = 5 /* $Tags.Skippable_content */;
+        $tag = 5 /* $Tags.Skippable_content */;
+        constructor() {
+            super();
+        }
+        static decode($d) {
+            return Skippable_content.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 5) {
+                throw new Error(`Invalid tag ${$tag} for Accessibility.Skippable-content: expected 5`);
+            }
+            return new Skippable_content();
+        }
+        encode($e) {
+            $e.ui32(17);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(5);
+        }
+    }
+    Accessibility.Skippable_content = Skippable_content;
+})(Accessibility = exports.Accessibility || (exports.Accessibility = {}));
+class Booklet_expr$Base {
+    static decode($d) {
+        const $tag = $d.ui32();
+        if ($tag !== 18) {
+            throw new Error(`Invalid tag ${$tag} for Booklet-expr: expected 18`);
+        }
+        return Booklet_expr$Base.$do_decode($d);
+    }
+    static $do_decode($d) {
+        const $tag = $d.peek((v) => v.getUint8(0));
+        switch ($tag) {
+            case 0: return Booklet_expr.BE_text.decode($d);
+            case 1: return Booklet_expr.BE_image.decode($d);
+            case 2: return Booklet_expr.BE_bold.decode($d);
+            case 3: return Booklet_expr.BE_italic.decode($d);
+            case 4: return Booklet_expr.BE_title.decode($d);
+            case 5: return Booklet_expr.BE_subtitle.decode($d);
+            case 6: return Booklet_expr.BE_subtitle2.decode($d);
+            case 7: return Booklet_expr.BE_font.decode($d);
+            case 8: return Booklet_expr.BE_color.decode($d);
+            case 9: return Booklet_expr.BE_background.decode($d);
+            case 10: return Booklet_expr.BE_columns.decode($d);
+            case 11: return Booklet_expr.BE_fixed.decode($d);
+            case 12: return Booklet_expr.BE_row.decode($d);
+            case 13: return Booklet_expr.BE_column.decode($d);
+            case 14: return Booklet_expr.BE_stack.decode($d);
+            case 15: return Booklet_expr.BE_table.decode($d);
+            case 16: return Booklet_expr.BE_class.decode($d);
+            default:
+                throw new Error(`Unknown tag ${$tag} in union Booklet-expr`);
+        }
+    }
+}
+exports.Booklet_expr$Base = Booklet_expr$Base;
+var Booklet_expr;
+(function (Booklet_expr) {
+    class BE_text extends Booklet_expr$Base {
+        value;
+        static $tag = 0 /* $Tags.BE_text */;
+        $tag = 0 /* $Tags.BE_text */;
+        constructor(value) {
+            super();
+            this.value = value;
+        }
+        static decode($d) {
+            return BE_text.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 0) {
+                throw new Error(`Invalid tag ${$tag} for Booklet-expr.BE-text: expected 0`);
+            }
+            const value = $d.text();
+            return new BE_text(value);
+        }
+        encode($e) {
+            $e.ui32(18);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(0);
+            $e.text(this.value);
+        }
+    }
+    Booklet_expr.BE_text = BE_text;
+    class BE_image extends Booklet_expr$Base {
+        path;
+        static $tag = 1 /* $Tags.BE_image */;
+        $tag = 1 /* $Tags.BE_image */;
+        constructor(path) {
+            super();
+            this.path = path;
+        }
+        static decode($d) {
+            return BE_image.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 1) {
+                throw new Error(`Invalid tag ${$tag} for Booklet-expr.BE-image: expected 1`);
+            }
+            const path = $d.text();
+            return new BE_image(path);
+        }
+        encode($e) {
+            $e.ui32(18);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(1);
+            $e.text(this.path);
+        }
+    }
+    Booklet_expr.BE_image = BE_image;
+    class BE_bold extends Booklet_expr$Base {
+        value;
+        static $tag = 2 /* $Tags.BE_bold */;
+        $tag = 2 /* $Tags.BE_bold */;
+        constructor(value) {
+            super();
+            this.value = value;
+        }
+        static decode($d) {
+            return BE_bold.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 2) {
+                throw new Error(`Invalid tag ${$tag} for Booklet-expr.BE-bold: expected 2`);
+            }
+            const value = Booklet_expr$Base.$do_decode($d);
+            return new BE_bold(value);
+        }
+        encode($e) {
+            $e.ui32(18);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(2);
+            (this.value).$do_encode($e);
+        }
+    }
+    Booklet_expr.BE_bold = BE_bold;
+    class BE_italic extends Booklet_expr$Base {
+        value;
+        static $tag = 3 /* $Tags.BE_italic */;
+        $tag = 3 /* $Tags.BE_italic */;
+        constructor(value) {
+            super();
+            this.value = value;
+        }
+        static decode($d) {
+            return BE_italic.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 3) {
+                throw new Error(`Invalid tag ${$tag} for Booklet-expr.BE-italic: expected 3`);
+            }
+            const value = Booklet_expr$Base.$do_decode($d);
+            return new BE_italic(value);
+        }
+        encode($e) {
+            $e.ui32(18);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(3);
+            (this.value).$do_encode($e);
+        }
+    }
+    Booklet_expr.BE_italic = BE_italic;
+    class BE_title extends Booklet_expr$Base {
+        value;
+        static $tag = 4 /* $Tags.BE_title */;
+        $tag = 4 /* $Tags.BE_title */;
+        constructor(value) {
+            super();
+            this.value = value;
+        }
+        static decode($d) {
+            return BE_title.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 4) {
+                throw new Error(`Invalid tag ${$tag} for Booklet-expr.BE-title: expected 4`);
+            }
+            const value = Booklet_expr$Base.$do_decode($d);
+            return new BE_title(value);
+        }
+        encode($e) {
+            $e.ui32(18);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(4);
+            (this.value).$do_encode($e);
+        }
+    }
+    Booklet_expr.BE_title = BE_title;
+    class BE_subtitle extends Booklet_expr$Base {
+        value;
+        static $tag = 5 /* $Tags.BE_subtitle */;
+        $tag = 5 /* $Tags.BE_subtitle */;
+        constructor(value) {
+            super();
+            this.value = value;
+        }
+        static decode($d) {
+            return BE_subtitle.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 5) {
+                throw new Error(`Invalid tag ${$tag} for Booklet-expr.BE-subtitle: expected 5`);
+            }
+            const value = Booklet_expr$Base.$do_decode($d);
+            return new BE_subtitle(value);
+        }
+        encode($e) {
+            $e.ui32(18);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(5);
+            (this.value).$do_encode($e);
+        }
+    }
+    Booklet_expr.BE_subtitle = BE_subtitle;
+    class BE_subtitle2 extends Booklet_expr$Base {
+        value;
+        static $tag = 6 /* $Tags.BE_subtitle2 */;
+        $tag = 6 /* $Tags.BE_subtitle2 */;
+        constructor(value) {
+            super();
+            this.value = value;
+        }
+        static decode($d) {
+            return BE_subtitle2.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 6) {
+                throw new Error(`Invalid tag ${$tag} for Booklet-expr.BE-subtitle2: expected 6`);
+            }
+            const value = Booklet_expr$Base.$do_decode($d);
+            return new BE_subtitle2(value);
+        }
+        encode($e) {
+            $e.ui32(18);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(6);
+            (this.value).$do_encode($e);
+        }
+    }
+    Booklet_expr.BE_subtitle2 = BE_subtitle2;
+    class BE_font extends Booklet_expr$Base {
+        family;
+        size;
+        value;
+        static $tag = 7 /* $Tags.BE_font */;
+        $tag = 7 /* $Tags.BE_font */;
+        constructor(family, size, value) {
+            super();
+            this.family = family;
+            this.size = size;
+            this.value = value;
+        }
+        static decode($d) {
+            return BE_font.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 7) {
+                throw new Error(`Invalid tag ${$tag} for Booklet-expr.BE-font: expected 7`);
+            }
+            const family = $d.text();
+            const size = $d.ui32();
+            const value = Booklet_expr$Base.$do_decode($d);
+            return new BE_font(family, size, value);
+        }
+        encode($e) {
+            $e.ui32(18);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(7);
+            $e.text(this.family);
+            $e.ui32(this.size);
+            (this.value).$do_encode($e);
+        }
+    }
+    Booklet_expr.BE_font = BE_font;
+    class BE_color extends Booklet_expr$Base {
+        r;
+        g;
+        b;
+        value;
+        static $tag = 8 /* $Tags.BE_color */;
+        $tag = 8 /* $Tags.BE_color */;
+        constructor(r, g, b, value) {
+            super();
+            this.r = r;
+            this.g = g;
+            this.b = b;
+            this.value = value;
+        }
+        static decode($d) {
+            return BE_color.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 8) {
+                throw new Error(`Invalid tag ${$tag} for Booklet-expr.BE-color: expected 8`);
+            }
+            const r = $d.ui8();
+            const g = $d.ui8();
+            const b = $d.ui8();
+            const value = Booklet_expr$Base.$do_decode($d);
+            return new BE_color(r, g, b, value);
+        }
+        encode($e) {
+            $e.ui32(18);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(8);
+            $e.ui8(this.r);
+            $e.ui8(this.g);
+            $e.ui8(this.b);
+            (this.value).$do_encode($e);
+        }
+    }
+    Booklet_expr.BE_color = BE_color;
+    class BE_background extends Booklet_expr$Base {
+        r;
+        g;
+        b;
+        value;
+        static $tag = 9 /* $Tags.BE_background */;
+        $tag = 9 /* $Tags.BE_background */;
+        constructor(r, g, b, value) {
+            super();
+            this.r = r;
+            this.g = g;
+            this.b = b;
+            this.value = value;
+        }
+        static decode($d) {
+            return BE_background.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 9) {
+                throw new Error(`Invalid tag ${$tag} for Booklet-expr.BE-background: expected 9`);
+            }
+            const r = $d.ui8();
+            const g = $d.ui8();
+            const b = $d.ui8();
+            const value = Booklet_expr$Base.$do_decode($d);
+            return new BE_background(r, g, b, value);
+        }
+        encode($e) {
+            $e.ui32(18);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(9);
+            $e.ui8(this.r);
+            $e.ui8(this.g);
+            $e.ui8(this.b);
+            (this.value).$do_encode($e);
+        }
+    }
+    Booklet_expr.BE_background = BE_background;
+    class BE_columns extends Booklet_expr$Base {
+        columns;
+        value;
+        static $tag = 10 /* $Tags.BE_columns */;
+        $tag = 10 /* $Tags.BE_columns */;
+        constructor(columns, value) {
+            super();
+            this.columns = columns;
+            this.value = value;
+        }
+        static decode($d) {
+            return BE_columns.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 10) {
+                throw new Error(`Invalid tag ${$tag} for Booklet-expr.BE-columns: expected 10`);
+            }
+            const columns = $d.ui8();
+            const value = Booklet_expr$Base.$do_decode($d);
+            return new BE_columns(columns, value);
+        }
+        encode($e) {
+            $e.ui32(18);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(10);
+            $e.ui8(this.columns);
+            (this.value).$do_encode($e);
+        }
+    }
+    Booklet_expr.BE_columns = BE_columns;
+    class BE_fixed extends Booklet_expr$Base {
+        x;
+        y;
+        value;
+        static $tag = 11 /* $Tags.BE_fixed */;
+        $tag = 11 /* $Tags.BE_fixed */;
+        constructor(x, y, value) {
+            super();
+            this.x = x;
+            this.y = y;
+            this.value = value;
+        }
+        static decode($d) {
+            return BE_fixed.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 11) {
+                throw new Error(`Invalid tag ${$tag} for Booklet-expr.BE-fixed: expected 11`);
+            }
+            const x = $d.ui32();
+            const y = $d.ui32();
+            const value = Booklet_expr$Base.$do_decode($d);
+            return new BE_fixed(x, y, value);
+        }
+        encode($e) {
+            $e.ui32(18);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(11);
+            $e.ui32(this.x);
+            $e.ui32(this.y);
+            (this.value).$do_encode($e);
+        }
+    }
+    Booklet_expr.BE_fixed = BE_fixed;
+    class BE_row extends Booklet_expr$Base {
+        gap;
+        align;
+        value;
+        static $tag = 12 /* $Tags.BE_row */;
+        $tag = 12 /* $Tags.BE_row */;
+        constructor(gap, align, value) {
+            super();
+            this.gap = gap;
+            this.align = align;
+            this.value = value;
+        }
+        static decode($d) {
+            return BE_row.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 12) {
+                throw new Error(`Invalid tag ${$tag} for Booklet-expr.BE-row: expected 12`);
+            }
+            const gap = $d.ui32();
+            const align = Booklet_align$Base.$do_decode($d);
+            const value = Booklet_expr$Base.$do_decode($d);
+            return new BE_row(gap, align, value);
+        }
+        encode($e) {
+            $e.ui32(18);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(12);
+            $e.ui32(this.gap);
+            (this.align).$do_encode($e);
+            (this.value).$do_encode($e);
+        }
+    }
+    Booklet_expr.BE_row = BE_row;
+    class BE_column extends Booklet_expr$Base {
+        gap;
+        align;
+        value;
+        static $tag = 13 /* $Tags.BE_column */;
+        $tag = 13 /* $Tags.BE_column */;
+        constructor(gap, align, value) {
+            super();
+            this.gap = gap;
+            this.align = align;
+            this.value = value;
+        }
+        static decode($d) {
+            return BE_column.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 13) {
+                throw new Error(`Invalid tag ${$tag} for Booklet-expr.BE-column: expected 13`);
+            }
+            const gap = $d.ui32();
+            const align = Booklet_align$Base.$do_decode($d);
+            const value = Booklet_expr$Base.$do_decode($d);
+            return new BE_column(gap, align, value);
+        }
+        encode($e) {
+            $e.ui32(18);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(13);
+            $e.ui32(this.gap);
+            (this.align).$do_encode($e);
+            (this.value).$do_encode($e);
+        }
+    }
+    Booklet_expr.BE_column = BE_column;
+    class BE_stack extends Booklet_expr$Base {
+        values;
+        static $tag = 14 /* $Tags.BE_stack */;
+        $tag = 14 /* $Tags.BE_stack */;
+        constructor(values) {
+            super();
+            this.values = values;
+        }
+        static decode($d) {
+            return BE_stack.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 14) {
+                throw new Error(`Invalid tag ${$tag} for Booklet-expr.BE-stack: expected 14`);
+            }
+            const values = $d.array(() => {
+                const item = Booklet_expr$Base.$do_decode($d);
+                ;
+                return item;
+            });
+            return new BE_stack(values);
+        }
+        encode($e) {
+            $e.ui32(18);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(14);
+            $e.array((this.values), ($e, v) => {
+                (v).$do_encode($e);
+            });
+        }
+    }
+    Booklet_expr.BE_stack = BE_stack;
+    class BE_table extends Booklet_expr$Base {
+        headers;
+        rows;
+        static $tag = 15 /* $Tags.BE_table */;
+        $tag = 15 /* $Tags.BE_table */;
+        constructor(headers, rows) {
+            super();
+            this.headers = headers;
+            this.rows = rows;
+        }
+        static decode($d) {
+            return BE_table.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 15) {
+                throw new Error(`Invalid tag ${$tag} for Booklet-expr.BE-table: expected 15`);
+            }
+            const headers = $d.array(() => {
+                const item = Booklet_expr$Base.$do_decode($d);
+                ;
+                return item;
+            });
+            const rows = Booklet_row.$do_decode($d);
+            return new BE_table(headers, rows);
+        }
+        encode($e) {
+            $e.ui32(18);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(15);
+            $e.array((this.headers), ($e, v) => {
+                (v).$do_encode($e);
+            });
+            (this.rows).$do_encode($e);
+        }
+    }
+    Booklet_expr.BE_table = BE_table;
+    class BE_class extends Booklet_expr$Base {
+        name;
+        value;
+        static $tag = 16 /* $Tags.BE_class */;
+        $tag = 16 /* $Tags.BE_class */;
+        constructor(name, value) {
+            super();
+            this.name = name;
+            this.value = value;
+        }
+        static decode($d) {
+            return BE_class.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 16) {
+                throw new Error(`Invalid tag ${$tag} for Booklet-expr.BE-class: expected 16`);
+            }
+            const name = $d.text();
+            const value = Booklet_expr$Base.$do_decode($d);
+            return new BE_class(name, value);
+        }
+        encode($e) {
+            $e.ui32(18);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(16);
+            $e.text(this.name);
+            (this.value).$do_encode($e);
+        }
+    }
+    Booklet_expr.BE_class = BE_class;
+})(Booklet_expr = exports.Booklet_expr || (exports.Booklet_expr = {}));
+class Booklet_row {
+    row_span;
+    cells;
+    static $tag = 19;
+    $tag = 19;
+    constructor(row_span, cells) {
+        this.row_span = row_span;
+        this.cells = cells;
+    }
+    static decode($d) {
+        const $tag = $d.ui32();
+        if ($tag !== 19) {
+            throw new Error(`Invalid tag ${$tag} for Booklet-row: expected 19`);
+        }
+        return Booklet_row.$do_decode($d);
+    }
+    static $do_decode($d) {
+        const row_span = $d.ui32();
+        const cells = $d.array(() => {
+            const item = Booklet_cell.$do_decode($d);
+            ;
+            return item;
+        });
+        return new Booklet_row(row_span, cells);
+    }
+    encode($e) {
+        $e.ui32(19);
+        this.$do_encode($e);
+    }
+    $do_encode($e) {
+        $e.ui32(this.row_span);
+        $e.array((this.cells), ($e, v) => {
+            (v).$do_encode($e);
+        });
+    }
+}
+exports.Booklet_row = Booklet_row;
+class Booklet_cell {
+    cell_span;
+    value;
+    static $tag = 20;
+    $tag = 20;
+    constructor(cell_span, value) {
+        this.cell_span = cell_span;
+        this.value = value;
+    }
+    static decode($d) {
+        const $tag = $d.ui32();
+        if ($tag !== 20) {
+            throw new Error(`Invalid tag ${$tag} for Booklet-cell: expected 20`);
+        }
+        return Booklet_cell.$do_decode($d);
+    }
+    static $do_decode($d) {
+        const cell_span = $d.ui32();
+        const value = Booklet_expr$Base.$do_decode($d);
+        return new Booklet_cell(cell_span, value);
+    }
+    encode($e) {
+        $e.ui32(20);
+        this.$do_encode($e);
+    }
+    $do_encode($e) {
+        $e.ui32(this.cell_span);
+        (this.value).$do_encode($e);
+    }
+}
+exports.Booklet_cell = Booklet_cell;
+class Booklet_align$Base {
+    static decode($d) {
+        const $tag = $d.ui32();
+        if ($tag !== 21) {
+            throw new Error(`Invalid tag ${$tag} for Booklet-align: expected 21`);
+        }
+        return Booklet_align$Base.$do_decode($d);
+    }
+    static $do_decode($d) {
+        const $tag = $d.peek((v) => v.getUint8(0));
+        switch ($tag) {
+            case 0: return Booklet_align.Start.decode($d);
+            case 1: return Booklet_align.Center.decode($d);
+            case 2: return Booklet_align.End.decode($d);
+            case 3: return Booklet_align.Justify.decode($d);
+            case 4: return Booklet_align.Space_evenly.decode($d);
+            default:
+                throw new Error(`Unknown tag ${$tag} in union Booklet-align`);
+        }
+    }
+}
+exports.Booklet_align$Base = Booklet_align$Base;
+var Booklet_align;
+(function (Booklet_align) {
+    class Start extends Booklet_align$Base {
+        static $tag = 0 /* $Tags.Start */;
+        $tag = 0 /* $Tags.Start */;
+        constructor() {
+            super();
+        }
+        static decode($d) {
+            return Start.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 0) {
+                throw new Error(`Invalid tag ${$tag} for Booklet-align.Start: expected 0`);
+            }
+            return new Start();
+        }
+        encode($e) {
+            $e.ui32(21);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(0);
+        }
+    }
+    Booklet_align.Start = Start;
+    class Center extends Booklet_align$Base {
+        static $tag = 1 /* $Tags.Center */;
+        $tag = 1 /* $Tags.Center */;
+        constructor() {
+            super();
+        }
+        static decode($d) {
+            return Center.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 1) {
+                throw new Error(`Invalid tag ${$tag} for Booklet-align.Center: expected 1`);
+            }
+            return new Center();
+        }
+        encode($e) {
+            $e.ui32(21);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(1);
+        }
+    }
+    Booklet_align.Center = Center;
+    class End extends Booklet_align$Base {
+        static $tag = 2 /* $Tags.End */;
+        $tag = 2 /* $Tags.End */;
+        constructor() {
+            super();
+        }
+        static decode($d) {
+            return End.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 2) {
+                throw new Error(`Invalid tag ${$tag} for Booklet-align.End: expected 2`);
+            }
+            return new End();
+        }
+        encode($e) {
+            $e.ui32(21);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(2);
+        }
+    }
+    Booklet_align.End = End;
+    class Justify extends Booklet_align$Base {
+        static $tag = 3 /* $Tags.Justify */;
+        $tag = 3 /* $Tags.Justify */;
+        constructor() {
+            super();
+        }
+        static decode($d) {
+            return Justify.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 3) {
+                throw new Error(`Invalid tag ${$tag} for Booklet-align.Justify: expected 3`);
+            }
+            return new Justify();
+        }
+        encode($e) {
+            $e.ui32(21);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(3);
+        }
+    }
+    Booklet_align.Justify = Justify;
+    class Space_evenly extends Booklet_align$Base {
+        static $tag = 4 /* $Tags.Space_evenly */;
+        $tag = 4 /* $Tags.Space_evenly */;
+        constructor() {
+            super();
+        }
+        static decode($d) {
+            return Space_evenly.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 4) {
+                throw new Error(`Invalid tag ${$tag} for Booklet-align.Space-evenly: expected 4`);
+            }
+            return new Space_evenly();
+        }
+        encode($e) {
+            $e.ui32(21);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(4);
+        }
+    }
+    Booklet_align.Space_evenly = Space_evenly;
+})(Booklet_align = exports.Booklet_align || (exports.Booklet_align = {}));
 class Platform$Base {
     static decode($d) {
         const $tag = $d.ui32();
-        if ($tag !== 5) {
-            throw new Error(`Invalid tag ${$tag} for Platform: expected 5`);
+        if ($tag !== 22) {
+            throw new Error(`Invalid tag ${$tag} for Platform: expected 22`);
         }
         return Platform$Base.$do_decode($d);
     }
@@ -3306,7 +5494,7 @@ var Platform;
             return new Web_archive(html, bridges);
         }
         encode($e) {
-            $e.ui32(5);
+            $e.ui32(22);
             this.$do_encode($e);
         }
         $do_encode($e) {
@@ -3322,8 +5510,8 @@ var Platform;
 class Bridge$Base {
     static decode($d) {
         const $tag = $d.ui32();
-        if ($tag !== 6) {
-            throw new Error(`Invalid tag ${$tag} for Bridge: expected 6`);
+        if ($tag !== 23) {
+            throw new Error(`Invalid tag ${$tag} for Bridge: expected 23`);
         }
         return Bridge$Base.$do_decode($d);
     }
@@ -3360,7 +5548,7 @@ var Bridge;
             return new RPG_maker_mv();
         }
         encode($e) {
-            $e.ui32(6);
+            $e.ui32(23);
             this.$do_encode($e);
         }
         $do_encode($e) {
@@ -3385,7 +5573,7 @@ var Bridge;
             return new Renpy();
         }
         encode($e) {
-            $e.ui32(6);
+            $e.ui32(23);
             this.$do_encode($e);
         }
         $do_encode($e) {
@@ -3410,7 +5598,7 @@ var Bridge;
             return new Network_proxy();
         }
         encode($e) {
-            $e.ui32(6);
+            $e.ui32(23);
             this.$do_encode($e);
         }
         $do_encode($e) {
@@ -3435,7 +5623,7 @@ var Bridge;
             return new Local_storage_proxy();
         }
         encode($e) {
-            $e.ui32(6);
+            $e.ui32(23);
             this.$do_encode($e);
         }
         $do_encode($e) {
@@ -3471,7 +5659,7 @@ var Bridge;
             return new Input_proxy(mapping);
         }
         encode($e) {
-            $e.ui32(6);
+            $e.ui32(23);
             this.$do_encode($e);
         }
         $do_encode($e) {
@@ -3484,8 +5672,8 @@ var Bridge;
 class VirtualKey$Base {
     static decode($d) {
         const $tag = $d.ui32();
-        if ($tag !== 7) {
-            throw new Error(`Invalid tag ${$tag} for VirtualKey: expected 7`);
+        if ($tag !== 24) {
+            throw new Error(`Invalid tag ${$tag} for VirtualKey: expected 24`);
         }
         return VirtualKey$Base.$do_decode($d);
     }
@@ -3527,7 +5715,7 @@ var VirtualKey;
             return new Up();
         }
         encode($e) {
-            $e.ui32(7);
+            $e.ui32(24);
             this.$do_encode($e);
         }
         $do_encode($e) {
@@ -3552,7 +5740,7 @@ var VirtualKey;
             return new Right();
         }
         encode($e) {
-            $e.ui32(7);
+            $e.ui32(24);
             this.$do_encode($e);
         }
         $do_encode($e) {
@@ -3577,7 +5765,7 @@ var VirtualKey;
             return new Down();
         }
         encode($e) {
-            $e.ui32(7);
+            $e.ui32(24);
             this.$do_encode($e);
         }
         $do_encode($e) {
@@ -3602,7 +5790,7 @@ var VirtualKey;
             return new Left();
         }
         encode($e) {
-            $e.ui32(7);
+            $e.ui32(24);
             this.$do_encode($e);
         }
         $do_encode($e) {
@@ -3627,7 +5815,7 @@ var VirtualKey;
             return new Menu();
         }
         encode($e) {
-            $e.ui32(7);
+            $e.ui32(24);
             this.$do_encode($e);
         }
         $do_encode($e) {
@@ -3652,7 +5840,7 @@ var VirtualKey;
             return new Capture();
         }
         encode($e) {
-            $e.ui32(7);
+            $e.ui32(24);
             this.$do_encode($e);
         }
         $do_encode($e) {
@@ -3677,7 +5865,7 @@ var VirtualKey;
             return new X();
         }
         encode($e) {
-            $e.ui32(7);
+            $e.ui32(24);
             this.$do_encode($e);
         }
         $do_encode($e) {
@@ -3702,7 +5890,7 @@ var VirtualKey;
             return new O();
         }
         encode($e) {
-            $e.ui32(7);
+            $e.ui32(24);
             this.$do_encode($e);
         }
         $do_encode($e) {
@@ -3727,7 +5915,7 @@ var VirtualKey;
             return new L_trigger();
         }
         encode($e) {
-            $e.ui32(7);
+            $e.ui32(24);
             this.$do_encode($e);
         }
         $do_encode($e) {
@@ -3752,7 +5940,7 @@ var VirtualKey;
             return new R_trigger();
         }
         encode($e) {
-            $e.ui32(7);
+            $e.ui32(24);
             this.$do_encode($e);
         }
         $do_encode($e) {
@@ -3761,8 +5949,72 @@ var VirtualKey;
     }
     VirtualKey.R_trigger = R_trigger;
 })(VirtualKey = exports.VirtualKey || (exports.VirtualKey = {}));
+class KeyboardKey {
+    key;
+    code;
+    key_code;
+    static $tag = 25;
+    $tag = 25;
+    constructor(key, code, key_code) {
+        this.key = key;
+        this.code = code;
+        this.key_code = key_code;
+    }
+    static decode($d) {
+        const $tag = $d.ui32();
+        if ($tag !== 25) {
+            throw new Error(`Invalid tag ${$tag} for KeyboardKey: expected 25`);
+        }
+        return KeyboardKey.$do_decode($d);
+    }
+    static $do_decode($d) {
+        const key = $d.text();
+        const code = $d.text();
+        const key_code = $d.bigint();
+        return new KeyboardKey(key, code, key_code);
+    }
+    encode($e) {
+        $e.ui32(25);
+        this.$do_encode($e);
+    }
+    $do_encode($e) {
+        $e.text(this.key);
+        $e.text(this.code);
+        $e.integer(this.key_code);
+    }
+}
+exports.KeyboardKey = KeyboardKey;
 
 },{}],34:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.remove_fingerprint = exports.add_fingerprint = exports.check_fingerprint = exports.fingerprint = void 0;
+exports.fingerprint = new Uint8Array("KATE/0v0".split("").map((x) => x.charCodeAt(0)));
+function check_fingerprint(data) {
+    if (data.byteLength - data.byteOffset < exports.fingerprint.length) {
+        throw new Error(`Invalid cartridge: unmatched fingerprint`);
+    }
+    for (let i = 0; i < exports.fingerprint.length; ++i) {
+        if (exports.fingerprint[i] !== data.getUint8(i)) {
+            throw new Error(`Invalid cartridge: unmatched fingerprint`);
+        }
+    }
+}
+exports.check_fingerprint = check_fingerprint;
+function add_fingerprint(data) {
+    const result = new Uint8Array(exports.fingerprint.length + data.length);
+    result.set(exports.fingerprint, 0);
+    result.set(data, exports.fingerprint.length);
+    return result;
+}
+exports.add_fingerprint = add_fingerprint;
+function remove_fingerprint(data) {
+    check_fingerprint(data);
+    return new DataView(data.buffer.slice(exports.fingerprint.length));
+}
+exports.remove_fingerprint = remove_fingerprint;
+
+},{}],35:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.unreachable = void 0;
@@ -3771,7 +6023,7 @@ function unreachable(x, message = "") {
 }
 exports.unreachable = unreachable;
 
-},{}],35:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EventStream = void 0;
@@ -3820,7 +6072,7 @@ class EventStream {
 }
 exports.EventStream = EventStream;
 
-},{}],36:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -3842,10 +6094,10 @@ __exportStar(require("./events"), exports);
 __exportStar(require("./promise"), exports);
 __exportStar(require("./random"), exports);
 
-},{"./assert":34,"./events":35,"./promise":37,"./random":38}],37:[function(require,module,exports){
+},{"./assert":35,"./events":36,"./promise":38,"./random":39}],38:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.defer = void 0;
+exports.sleep = exports.defer = void 0;
 function defer() {
     const p = Object.create(null);
     p.promise = new Promise((resolve, reject) => {
@@ -3855,8 +6107,14 @@ function defer() {
     return p;
 }
 exports.defer = defer;
+function sleep(ms) {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => resolve(), ms);
+    });
+}
+exports.sleep = sleep;
 
-},{}],38:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.make_id = void 0;
