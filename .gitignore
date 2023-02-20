@@ -7,7 +7,7 @@ source/**/*.js
 old-tree
 *.lingua.crochet
 .binary/
-source/kate-bridges/index.ts
+packages/kate-bridges/source/index.ts
 www/kate.js
 www/kate-os.js
 www/app.js
