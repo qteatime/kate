@@ -36,7 +36,7 @@ Setup things with:
 
 ```shell
 $ npm install
-$ node make www:bundle
+$ node make all
 ```
 
 After this you should have a working Kate. You can either use `node make desktop:run` to run it as an Electron app, or start a server on the `www` folder and point your favourite webkit\* browser there.

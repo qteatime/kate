@@ -308,6 +308,25 @@ w.task("chore:clean-tsc-cache", [], () => {
   }
 });
 
+// -- Multi-project convenience
+w.task(
+  "all",
+  [
+    "util:build",
+    "schema:build",
+    "db-schema:build",
+    "api:build",
+    "bridges:build",
+    "core:build",
+    "domui:build",
+    "packaging:build",
+    "www:bundle",
+    "example:all",
+    "desktop:build",
+  ],
+  () => {}
+);
+
 // -- Main
 w.task("help", [], () => {
   console.log(`Available tasks:\n`);
