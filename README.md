@@ -6,7 +6,7 @@ Kate is a fantasy handheld console designed for simpler story-rich games, like V
 
 You can try Kate directly from your web-browser: go to https://kate.qteati.me/ and install the `hello.kart` file provided in this repository by drag-dropping it over the console.
 
-![](./docs/kate-demo.webp)
+![](./docs/kate.png)
 
 ## Specifications
 
