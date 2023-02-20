@@ -76,27 +76,6 @@ function apply_bridge(
   };
 
   switch (bridge.$tag) {
-    case Cart.Bridge.$Tags.RPG_maker_mv: {
-      apply_bridge(
-        new Cart.Bridge.Local_storage_proxy(),
-        reference,
-        dom,
-        context
-      );
-      apply_bridge(new Cart.Bridge.Network_proxy(), reference, dom, context);
-      const rpgmk_main = Array.from(dom.querySelectorAll("script")).find((x) =>
-        x.getAttribute("src")?.endsWith("js/main.js")
-      );
-      append_proxy(bridges["rpgmk-mv.js"], rpgmk_main);
-      break;
-    }
-
-    case Cart.Bridge.$Tags.Renpy: {
-      apply_bridge(new Cart.Bridge.Network_proxy(), reference, dom, context);
-      append_proxy(bridges["renpy.js"]);
-      break;
-    }
-
     case Cart.Bridge.$Tags.Network_proxy: {
       append_proxy(bridges["standard-network.js"]);
       break;

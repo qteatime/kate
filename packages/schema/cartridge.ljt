@@ -196,8 +196,6 @@ union Platform {
 }
 
 union Bridge {
-  type RPG-maker-mv {}
-  type Renpy {}
   type Network-proxy {}
   type Local-storage-proxy {}
   type Input-proxy {

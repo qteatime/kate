@@ -2,6 +2,7 @@ import * as Path from "path";
 import * as FS from "fs";
 import * as Cart from "../../schema/generated/cartridge";
 import { add_fingerprint } from "../../schema/lib/fingerprint";
+import { unreachable } from "../../util/build/assert";
 import * as Glob from "glob";
 const [out, json_file] = process.argv.slice(2);
 
@@ -129,8 +130,6 @@ type KeyboardKey = {
 };
 
 type Bridge =
-  | { type: "rpgmk-mv" }
-  | { type: "renpy" }
   | { type: "standard-network" }
   | { type: "local-storage" }
   | {
@@ -380,13 +379,15 @@ function make_genre(x: Genre, j: J<any>, i: number): Cart.Genre {
       case "tool":
         return new Cart.Genre.Tool();
       default:
-        throw j.fail(String(i), `not a genre: ${x}`);
+        j.fail(String(i), `not a genre: ${x}`);
+        throw unreachable(x);
     }
   }
 }
 
 function make_release_type(j: J<{ x: ReleaseType }>): Cart.Release_type {
-  switch (j.get("x")) {
+  const x = j.get("x");
+  switch (x) {
     case "prototype":
       return new Cart.Release_type.Prototype();
     case "early-access":
@@ -398,7 +399,8 @@ function make_release_type(j: J<{ x: ReleaseType }>): Cart.Release_type {
     case "full":
       return new Cart.Release_type.Full();
     default:
-      throw j.fail(null, "not a valid release type");
+      j.fail(null, "not a valid release type");
+      throw unreachable(x);
   }
 }
 
@@ -410,8 +412,9 @@ function make_version(x: J<Version>) {
   return new Cart.Version(x.int("major"), x.int("minor"));
 }
 
-function make_rating(x: J<{ x: ContentRating }>) {
-  switch (x.get("x")) {
+function make_rating(j: J<{ x: ContentRating }>) {
+  const x = j.get("x");
+  switch (x) {
     case "general":
       return new Cart.Content_rating.General();
     case "teen-and-up":
@@ -421,7 +424,8 @@ function make_rating(x: J<{ x: ContentRating }>) {
     case "explicit":
       return new Cart.Content_rating.Explicit();
     default:
-      throw x.fail(null, "not a valid rating");
+      j.fail(null, "not a valid rating");
+      throw unreachable(x);
   }
 }
 
@@ -432,7 +436,8 @@ function make_input_method(x: InputMethod, j: J<any>, i: number) {
     case "touch":
       return new Cart.Input_method.Touch();
     default:
-      throw j.fail(String(i), "not a valid input method");
+      j.fail(String(i), "not a valid input method");
+      throw unreachable(x);
   }
 }
 
@@ -469,12 +474,14 @@ function make_accessibility(x: Accessibility, jj: J<any>, i: number) {
     case "voiced-text":
       return new Cart.Accessibility.Voiced_text();
     default:
-      throw jj.fail(String(i), "not a valid accessibility feature");
+      jj.fail(String(i), "not a valid accessibility feature");
+      throw unreachable(x);
   }
 }
 
-function make_duration(x: J<{ x: Duration }>) {
-  switch (x.get("x")) {
+function make_duration(j: J<{ x: Duration }>) {
+  const x = j.get("x");
+  switch (x) {
     case "seconds":
       return new Cart.Duration.Seconds();
     case "few-minutes":
@@ -490,7 +497,8 @@ function make_duration(x: J<{ x: Duration }>) {
     case "unknown":
       return new Cart.Duration.Unknown();
     default:
-      throw x.fail(null, "not a valid duration");
+      j.fail(null, "not a valid duration");
+      throw unreachable(x);
   }
 }
 
@@ -525,20 +533,12 @@ function save(cart: Cart.Cartridge) {
 
 function make_bridge(x: Bridge) {
   switch (x.type) {
-    case "rpgmk-mv": {
-      return new Cart.Bridge.RPG_maker_mv();
-    }
-
     case "standard-network": {
       return new Cart.Bridge.Network_proxy();
     }
 
     case "local-storage": {
       return new Cart.Bridge.Local_storage_proxy();
-    }
-
-    case "renpy": {
-      return new Cart.Bridge.Renpy();
     }
 
     case "input-proxy": {
@@ -548,7 +548,7 @@ function make_bridge(x: Bridge) {
     }
 
     default:
-      throw new Error(`Unknown bridge ${(x as any).type}`);
+      throw unreachable(x, `Unknown bridge: ${(x as any).type}`);
   }
 }
 

@@ -3416,7 +3416,7 @@ export class Web_archive extends Platform$Base {
  static readonly $tag = $Tags.Web_archive;
  readonly $tag = $Tags.Web_archive;
 
- constructor(readonly html: string, readonly bridges: ((Bridge.RPG_maker_mv | Bridge.Renpy | Bridge.Network_proxy | Bridge.Local_storage_proxy | Bridge.Input_proxy))[]) {
+ constructor(readonly html: string, readonly bridges: ((Bridge.Network_proxy | Bridge.Local_storage_proxy | Bridge.Input_proxy))[]) {
    super();
  }
 
@@ -3458,7 +3458,7 @@ $e.array((this.bridges), ($e, v) => {
 
 
 
-export type Bridge = Bridge.RPG_maker_mv | Bridge.Renpy | Bridge.Network_proxy | Bridge.Local_storage_proxy | Bridge.Input_proxy;
+export type Bridge = Bridge.Network_proxy | Bridge.Local_storage_proxy | Bridge.Input_proxy;
 
 export abstract class Bridge$Base {
  static decode($d: _Decoder): Bridge {
@@ -3473,11 +3473,9 @@ export abstract class Bridge$Base {
    const $tag = $d.peek((v) => v.getUint8(0));
 
    switch ($tag) {
-     case 0: return Bridge.RPG_maker_mv.decode($d);
-case 1: return Bridge.Renpy.decode($d);
-case 2: return Bridge.Network_proxy.decode($d);
-case 3: return Bridge.Local_storage_proxy.decode($d);
-case 4: return Bridge.Input_proxy.decode($d);
+     case 0: return Bridge.Network_proxy.decode($d);
+case 1: return Bridge.Local_storage_proxy.decode($d);
+case 2: return Bridge.Input_proxy.decode($d);
 
      default:
        throw new Error(`Unknown tag ${$tag} in union Bridge`);
@@ -3487,80 +3485,10 @@ case 4: return Bridge.Input_proxy.decode($d);
 
 export namespace Bridge {
  export const enum $Tags {
-   RPG_maker_mv,Renpy,Network_proxy,Local_storage_proxy,Input_proxy
+   Network_proxy,Local_storage_proxy,Input_proxy
  }
 
  
-export class RPG_maker_mv extends Bridge$Base {
- static readonly $tag = $Tags.RPG_maker_mv;
- readonly $tag = $Tags.RPG_maker_mv;
-
- constructor() {
-   super();
- }
-
- static decode($d: _Decoder): RPG_maker_mv {
-   return RPG_maker_mv.$do_decode($d);
- }
-
- static $do_decode($d: _Decoder): RPG_maker_mv {
-   const $tag = $d.ui8();
-   if ($tag !== 0) {
-     throw new Error(`Invalid tag ${$tag} for Bridge.RPG-maker-mv: expected 0`);
-   }
-
-   
-   return new RPG_maker_mv();
- }
-
- encode($e: _Encoder) {
-   $e.ui32(23);
-   this.$do_encode($e);
- }
-
- $do_encode($e: _Encoder) {
-   $e.ui8(0);
-   
- }
-}
-
-
-
-export class Renpy extends Bridge$Base {
- static readonly $tag = $Tags.Renpy;
- readonly $tag = $Tags.Renpy;
-
- constructor() {
-   super();
- }
-
- static decode($d: _Decoder): Renpy {
-   return Renpy.$do_decode($d);
- }
-
- static $do_decode($d: _Decoder): Renpy {
-   const $tag = $d.ui8();
-   if ($tag !== 1) {
-     throw new Error(`Invalid tag ${$tag} for Bridge.Renpy: expected 1`);
-   }
-
-   
-   return new Renpy();
- }
-
- encode($e: _Encoder) {
-   $e.ui32(23);
-   this.$do_encode($e);
- }
-
- $do_encode($e: _Encoder) {
-   $e.ui8(1);
-   
- }
-}
-
-
-
 export class Network_proxy extends Bridge$Base {
  static readonly $tag = $Tags.Network_proxy;
  readonly $tag = $Tags.Network_proxy;
@@ -3575,8 +3503,8 @@ export class Network_proxy extends Bridge$Base {
 
  static $do_decode($d: _Decoder): Network_proxy {
    const $tag = $d.ui8();
-   if ($tag !== 2) {
-     throw new Error(`Invalid tag ${$tag} for Bridge.Network-proxy: expected 2`);
+   if ($tag !== 0) {
+     throw new Error(`Invalid tag ${$tag} for Bridge.Network-proxy: expected 0`);
    }
 
    
@@ -3589,7 +3517,7 @@ export class Network_proxy extends Bridge$Base {
  }
 
  $do_encode($e: _Encoder) {
-   $e.ui8(2);
+   $e.ui8(0);
    
  }
 }
@@ -3610,8 +3538,8 @@ export class Local_storage_proxy extends Bridge$Base {
 
  static $do_decode($d: _Decoder): Local_storage_proxy {
    const $tag = $d.ui8();
-   if ($tag !== 3) {
-     throw new Error(`Invalid tag ${$tag} for Bridge.Local-storage-proxy: expected 3`);
+   if ($tag !== 1) {
+     throw new Error(`Invalid tag ${$tag} for Bridge.Local-storage-proxy: expected 1`);
    }
 
    
@@ -3624,7 +3552,7 @@ export class Local_storage_proxy extends Bridge$Base {
  }
 
  $do_encode($e: _Encoder) {
-   $e.ui8(3);
+   $e.ui8(1);
    
  }
 }
@@ -3645,8 +3573,8 @@ export class Input_proxy extends Bridge$Base {
 
  static $do_decode($d: _Decoder): Input_proxy {
    const $tag = $d.ui8();
-   if ($tag !== 4) {
-     throw new Error(`Invalid tag ${$tag} for Bridge.Input-proxy: expected 4`);
+   if ($tag !== 2) {
+     throw new Error(`Invalid tag ${$tag} for Bridge.Input-proxy: expected 2`);
    }
 
    
@@ -3670,7 +3598,7 @@ const mapping = $d.map(
  }
 
  $do_encode($e: _Encoder) {
-   $e.ui8(4);
+   $e.ui8(2);
    $e.map((this.mapping),
   ($e, k) => { (k).$do_encode($e); },
   ($e, v) => { (v).$do_encode($e); }
