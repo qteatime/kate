@@ -130,6 +130,12 @@ function kart({ config, output }) {
   exec_file("node", ["packages/kate-packaging/build/kart.js", output, config]);
 }
 
+function copy(from, to) {
+  console.log("-> Copy", from, "->", to);
+  FS.mkdirSync(Path.dirname(to), { recursive: true });
+  FS.copyFileSync(from, to);
+}
+
 const w = new World();
 
 // -- Util
@@ -271,6 +277,25 @@ w.task(
   ["example:hello-world", "example:boon-scrolling"],
   () => {}
 );
+
+// -- Desktop app
+w.task("desktop:compile", [], () => {
+  tsc("packages/kate-desktop");
+});
+
+w.task("desktop:generate", ["desktop:compile"], () => {
+  copy("packages/kate-desktop/build/app.js", "www/app.js");
+});
+
+w.task("desktop:build", ["desktop:generate"], () => {});
+
+w.task("desktop:run", ["www:bundle", "desktop:build"], () => {
+  const Electron = require("electron");
+  const child = exec_file(Electron, [Path.join(__dirname, "www/app.js")]);
+  child.on("exit", (code) => {
+    process.exit(code ?? 0);
+  });
+});
 
 // -- Workspace maintenance
 w.task("chore:clean-tsc-cache", [], () => {

@@ -1,0 +1,15 @@
+{
+  "name": "@qteatime/kate-desktop",
+  "version": "0.1.0",
+  "description": "Electron-based desktop application for the fantasy handheld console Kate.",
+  "author": "Q.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/qteatime/kate.git"
+  },
+  "bugs": {
+    "url": "https://github.com/qteatime/kate/issues"
+  },
+  "homepage": "https://github.com/qteatime/kate#readme"
+}
