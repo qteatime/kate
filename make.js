@@ -231,6 +231,13 @@ w.task("domui:compile", ["api:build", "util:build", "domui:generate"], () => {
 
 w.task("domui:build", ["domui:compile"], () => {});
 
+// -- Kate ADV
+w.task("adv:compile", ["domui:build"], () => {
+  tsc("packages/kate-adv");
+});
+
+w.task("adv:build", ["adv:compile"], () => {});
+
 // -- Packaging
 w.task("packaging:compile", ["schema:build"], () => {
   tsc("packages/kate-packaging");

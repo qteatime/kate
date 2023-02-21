@@ -1,0 +1,8 @@
+{
+  "name": "@qteatime/kate-adv",
+  "version": "0.0.1",
+  "description": "A framework for building Visual Novels/Adventure games in Kate",
+  "main": "build/index.js",
+  "author": "Q.",
+  "license": "MIT"
+}
