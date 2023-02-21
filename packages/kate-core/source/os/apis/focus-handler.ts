@@ -88,7 +88,7 @@ export class KateFocusHandler {
 
       case "up": {
         const candidates = focusable
-          .filter((x) => x.position.bottom <= top)
+          .filter((x) => x.position.bottom < bottom)
           .sort((a, b) => b.position.bottom - a.position.bottom);
         const closest = candidates.sort((a, b) => {
           return (
@@ -102,7 +102,7 @@ export class KateFocusHandler {
 
       case "down": {
         const candidates = focusable
-          .filter((x) => x.position.y >= bottom)
+          .filter((x) => x.position.y > top)
           .sort((a, b) => a.position.y - b.position.y);
         const closest = candidates.sort((a, b) => {
           return (
@@ -116,7 +116,7 @@ export class KateFocusHandler {
 
       case "left": {
         const candidates = focusable
-          .filter((x) => x.position.right <= left)
+          .filter((x) => x.position.right < right)
           .sort((a, b) => b.position.right - a.position.right);
         const closest = candidates.sort((a, b) => {
           return (
@@ -130,7 +130,7 @@ export class KateFocusHandler {
 
       case "right": {
         const candidates = focusable
-          .filter((x) => x.position.x >= right)
+          .filter((x) => x.position.x > left)
           .sort((a, b) => a.position.x - b.position.x);
         const closest = candidates.sort((a, b) => {
           return (
