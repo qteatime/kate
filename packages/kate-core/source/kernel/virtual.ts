@@ -65,8 +65,8 @@ export class VirtualConsole {
     this.right_button = root.querySelector(".kate-dpad-right")!;
     this.down_button = root.querySelector(".kate-dpad-down")!;
     this.left_button = root.querySelector(".kate-dpad-left")!;
-    this.menu_button = root.querySelector(".kate-button-menu")!;
-    this.capture_button = root.querySelector(".kate-button-capture")!;
+    this.menu_button = root.querySelector(".kate-area-menu")!;
+    this.capture_button = root.querySelector(".kate-area-capture")!;
     this.x_button = root.querySelector(".kate-button-x")!;
     this.o_button = root.querySelector(".kate-button-o")!;
     this.ltrigger_button = root.querySelector(".kate-trigger-left")!;

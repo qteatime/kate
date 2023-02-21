@@ -284,7 +284,7 @@ body {
   cursor: pointer;
 }
 
-.kate-bean-button.down {
+.down .kate-bean-button {
   background: #ddd;
 }
 
