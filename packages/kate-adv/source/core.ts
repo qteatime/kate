@@ -197,7 +197,7 @@ export class Audio {
   }
 
   get_channel(name: string) {
-    return this._channels.get(name);
+    return new AudioChannel(this.adv, this._channels.get(name));
   }
 }
 
@@ -264,11 +264,11 @@ export class Loader {
     }
   }
 
-  async get_image_url(name: string) {
+  get_image_url(name: string) {
     return this._images.get(name);
   }
 
-  async get_sound_source(name: string) {
+  get_sound_source(name: string) {
     return this._sounds.get(name);
   }
 }
