@@ -161,6 +161,8 @@ export class VirtualConsole {
     listen_button(this.capture_button, "capture");
     listen_button(this.x_button, "x");
     listen_button(this.o_button, "o");
+    listen_button(this.ltrigger_button, "ltrigger");
+    listen_button(this.rtrigger_button, "rtrigger");
 
     this.start_ticking();
     this.on_tick.listen(this.key_update_loop);
