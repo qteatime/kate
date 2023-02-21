@@ -73,10 +73,10 @@ export class KateFocusHandler {
     const current = focusable.find((x) =>
       x.element.classList.contains("focus")
     );
-    const left = current?.position.x ?? right_limit;
-    const top = current?.position.y ?? bottom_limit;
-    const right = current?.position.right ?? 0;
-    const bottom = current?.position.bottom ?? 0;
+    const left = current?.position.x ?? -1;
+    const top = current?.position.y ?? -1;
+    const right = current?.position.right ?? right_limit + 1;
+    const bottom = current?.position.bottom ?? bottom_limit + 1;
 
     switch (key) {
       case "o": {
