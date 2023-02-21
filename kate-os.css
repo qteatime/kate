@@ -542,6 +542,7 @@
 
 .kate-hud-dialog-action .kate-ui-button {
   border: none;
+  outline: none;
   background: none;
   font-family: var(--font-sans-serif);
   font-size: 0.9rem;
@@ -626,6 +627,7 @@
 
 .kate-hud-dialog-pop-menu-action .kate-ui-button {
   border: none;
+  outline: none;
   background: none;
   font-family: var(--font-sans-serif);
   font-size: 0.9rem;
