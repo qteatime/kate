@@ -20,6 +20,7 @@ type Metadata {
   field release: Meta-release;
   field rating: Meta-rating;
   field play: Meta-play;
+  field security: Meta-security;
   field booklet: Meta-booklet;
 }
 
@@ -59,6 +60,16 @@ type Meta-play {
 type Meta-booklet {
   field pages: Booklet-expr[];
   field custom-css: Text;
+}
+
+type Meta-security {
+  field capabilities: Capability[];
+}
+
+union Capability {
+  type Network {
+    field allow: Text[]; // a set of glob filters for domains
+  }
 }
 
 union Genre {

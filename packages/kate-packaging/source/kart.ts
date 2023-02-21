@@ -342,7 +342,9 @@ function metadata(x: J<Kart["metadata"]>) {
     maybe_load_text_file(xb.str_opt("custom_css_path"))
   );
 
-  return new Cart.Metadata(game, release, rating, play, booklet);
+  const security = new Cart.Meta_security([]);
+
+  return new Cart.Metadata(game, release, rating, play, security, booklet);
 }
 
 function make_genre(x: Genre, j: J<any>, i: number): Cart.Genre {

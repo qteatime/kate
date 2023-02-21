@@ -316,69 +316,28 @@ export type Float64 = number;
 
 
 
-export type Genre = Genre.Not_specified | Genre.Action | Genre.Figthing | Genre.Interactive_fiction | Genre.Platformer | Genre.Puzzle | Genre.Racing | Genre.Rhythm | Genre.RPG | Genre.Simulation | Genre.Shooter | Genre.Sports | Genre.Strategy | Genre.Tool | Genre.Other;
+export class Meta_security {
+ static readonly $tag = 8;
+ readonly $tag = 8;
 
-export abstract class Genre$Base {
- static decode($d: _Decoder): Genre {
+ constructor(readonly capabilities: ((Capability.Network))[]) {}
+
+ static decode($d: _Decoder): Meta_security {
    const $tag = $d.ui32();
    if ($tag !== 8) {
-     throw new Error(`Invalid tag ${$tag} for Genre: expected 8`);
+     throw new Error(`Invalid tag ${$tag} for Meta-security: expected 8`);
    }
-   return Genre$Base.$do_decode($d);
+   return Meta_security.$do_decode($d);
  }
 
- static $do_decode($d: _Decoder): Genre {
-   const $tag = $d.peek((v) => v.getUint8(0));
-
-   switch ($tag) {
-     case 0: return Genre.Not_specified.decode($d);
-case 1: return Genre.Action.decode($d);
-case 2: return Genre.Figthing.decode($d);
-case 3: return Genre.Interactive_fiction.decode($d);
-case 4: return Genre.Platformer.decode($d);
-case 5: return Genre.Puzzle.decode($d);
-case 6: return Genre.Racing.decode($d);
-case 7: return Genre.Rhythm.decode($d);
-case 8: return Genre.RPG.decode($d);
-case 9: return Genre.Simulation.decode($d);
-case 10: return Genre.Shooter.decode($d);
-case 11: return Genre.Sports.decode($d);
-case 12: return Genre.Strategy.decode($d);
-case 13: return Genre.Tool.decode($d);
-case 14: return Genre.Other.decode($d);
-
-     default:
-       throw new Error(`Unknown tag ${$tag} in union Genre`);
-   }
- }
-}
-
-export namespace Genre {
- export const enum $Tags {
-   Not_specified,Action,Figthing,Interactive_fiction,Platformer,Puzzle,Racing,Rhythm,RPG,Simulation,Shooter,Sports,Strategy,Tool,Other
- }
-
- 
-export class Not_specified extends Genre$Base {
- static readonly $tag = $Tags.Not_specified;
- readonly $tag = $Tags.Not_specified;
-
- constructor() {
-   super();
- }
-
- static decode($d: _Decoder): Not_specified {
-   return Not_specified.$do_decode($d);
- }
-
- static $do_decode($d: _Decoder): Not_specified {
-   const $tag = $d.ui8();
-   if ($tag !== 0) {
-     throw new Error(`Invalid tag ${$tag} for Genre.Not-specified: expected 0`);
-   }
-
+ static $do_decode($d: _Decoder): Meta_security {
    
-   return new Not_specified();
+const capabilities = $d.array(() => {
+ const item = Capability$Base.$do_decode($d);;
+ return item;
+});
+
+   return new Meta_security(capabilities);
  }
 
  encode($e: _Encoder) {
@@ -387,501 +346,10 @@ export class Not_specified extends Genre$Base {
  }
 
  $do_encode($e: _Encoder) {
-   $e.ui8(0);
-   
+   $e.array((this.capabilities), ($e, v) => {
+  (v).$do_encode($e);
+});
  }
-}
-
-
-
-export class Action extends Genre$Base {
- static readonly $tag = $Tags.Action;
- readonly $tag = $Tags.Action;
-
- constructor() {
-   super();
- }
-
- static decode($d: _Decoder): Action {
-   return Action.$do_decode($d);
- }
-
- static $do_decode($d: _Decoder): Action {
-   const $tag = $d.ui8();
-   if ($tag !== 1) {
-     throw new Error(`Invalid tag ${$tag} for Genre.Action: expected 1`);
-   }
-
-   
-   return new Action();
- }
-
- encode($e: _Encoder) {
-   $e.ui32(8);
-   this.$do_encode($e);
- }
-
- $do_encode($e: _Encoder) {
-   $e.ui8(1);
-   
- }
-}
-
-
-
-export class Figthing extends Genre$Base {
- static readonly $tag = $Tags.Figthing;
- readonly $tag = $Tags.Figthing;
-
- constructor() {
-   super();
- }
-
- static decode($d: _Decoder): Figthing {
-   return Figthing.$do_decode($d);
- }
-
- static $do_decode($d: _Decoder): Figthing {
-   const $tag = $d.ui8();
-   if ($tag !== 2) {
-     throw new Error(`Invalid tag ${$tag} for Genre.Figthing: expected 2`);
-   }
-
-   
-   return new Figthing();
- }
-
- encode($e: _Encoder) {
-   $e.ui32(8);
-   this.$do_encode($e);
- }
-
- $do_encode($e: _Encoder) {
-   $e.ui8(2);
-   
- }
-}
-
-
-
-export class Interactive_fiction extends Genre$Base {
- static readonly $tag = $Tags.Interactive_fiction;
- readonly $tag = $Tags.Interactive_fiction;
-
- constructor() {
-   super();
- }
-
- static decode($d: _Decoder): Interactive_fiction {
-   return Interactive_fiction.$do_decode($d);
- }
-
- static $do_decode($d: _Decoder): Interactive_fiction {
-   const $tag = $d.ui8();
-   if ($tag !== 3) {
-     throw new Error(`Invalid tag ${$tag} for Genre.Interactive-fiction: expected 3`);
-   }
-
-   
-   return new Interactive_fiction();
- }
-
- encode($e: _Encoder) {
-   $e.ui32(8);
-   this.$do_encode($e);
- }
-
- $do_encode($e: _Encoder) {
-   $e.ui8(3);
-   
- }
-}
-
-
-
-export class Platformer extends Genre$Base {
- static readonly $tag = $Tags.Platformer;
- readonly $tag = $Tags.Platformer;
-
- constructor() {
-   super();
- }
-
- static decode($d: _Decoder): Platformer {
-   return Platformer.$do_decode($d);
- }
-
- static $do_decode($d: _Decoder): Platformer {
-   const $tag = $d.ui8();
-   if ($tag !== 4) {
-     throw new Error(`Invalid tag ${$tag} for Genre.Platformer: expected 4`);
-   }
-
-   
-   return new Platformer();
- }
-
- encode($e: _Encoder) {
-   $e.ui32(8);
-   this.$do_encode($e);
- }
-
- $do_encode($e: _Encoder) {
-   $e.ui8(4);
-   
- }
-}
-
-
-
-export class Puzzle extends Genre$Base {
- static readonly $tag = $Tags.Puzzle;
- readonly $tag = $Tags.Puzzle;
-
- constructor() {
-   super();
- }
-
- static decode($d: _Decoder): Puzzle {
-   return Puzzle.$do_decode($d);
- }
-
- static $do_decode($d: _Decoder): Puzzle {
-   const $tag = $d.ui8();
-   if ($tag !== 5) {
-     throw new Error(`Invalid tag ${$tag} for Genre.Puzzle: expected 5`);
-   }
-
-   
-   return new Puzzle();
- }
-
- encode($e: _Encoder) {
-   $e.ui32(8);
-   this.$do_encode($e);
- }
-
- $do_encode($e: _Encoder) {
-   $e.ui8(5);
-   
- }
-}
-
-
-
-export class Racing extends Genre$Base {
- static readonly $tag = $Tags.Racing;
- readonly $tag = $Tags.Racing;
-
- constructor() {
-   super();
- }
-
- static decode($d: _Decoder): Racing {
-   return Racing.$do_decode($d);
- }
-
- static $do_decode($d: _Decoder): Racing {
-   const $tag = $d.ui8();
-   if ($tag !== 6) {
-     throw new Error(`Invalid tag ${$tag} for Genre.Racing: expected 6`);
-   }
-
-   
-   return new Racing();
- }
-
- encode($e: _Encoder) {
-   $e.ui32(8);
-   this.$do_encode($e);
- }
-
- $do_encode($e: _Encoder) {
-   $e.ui8(6);
-   
- }
-}
-
-
-
-export class Rhythm extends Genre$Base {
- static readonly $tag = $Tags.Rhythm;
- readonly $tag = $Tags.Rhythm;
-
- constructor() {
-   super();
- }
-
- static decode($d: _Decoder): Rhythm {
-   return Rhythm.$do_decode($d);
- }
-
- static $do_decode($d: _Decoder): Rhythm {
-   const $tag = $d.ui8();
-   if ($tag !== 7) {
-     throw new Error(`Invalid tag ${$tag} for Genre.Rhythm: expected 7`);
-   }
-
-   
-   return new Rhythm();
- }
-
- encode($e: _Encoder) {
-   $e.ui32(8);
-   this.$do_encode($e);
- }
-
- $do_encode($e: _Encoder) {
-   $e.ui8(7);
-   
- }
-}
-
-
-
-export class RPG extends Genre$Base {
- static readonly $tag = $Tags.RPG;
- readonly $tag = $Tags.RPG;
-
- constructor() {
-   super();
- }
-
- static decode($d: _Decoder): RPG {
-   return RPG.$do_decode($d);
- }
-
- static $do_decode($d: _Decoder): RPG {
-   const $tag = $d.ui8();
-   if ($tag !== 8) {
-     throw new Error(`Invalid tag ${$tag} for Genre.RPG: expected 8`);
-   }
-
-   
-   return new RPG();
- }
-
- encode($e: _Encoder) {
-   $e.ui32(8);
-   this.$do_encode($e);
- }
-
- $do_encode($e: _Encoder) {
-   $e.ui8(8);
-   
- }
-}
-
-
-
-export class Simulation extends Genre$Base {
- static readonly $tag = $Tags.Simulation;
- readonly $tag = $Tags.Simulation;
-
- constructor() {
-   super();
- }
-
- static decode($d: _Decoder): Simulation {
-   return Simulation.$do_decode($d);
- }
-
- static $do_decode($d: _Decoder): Simulation {
-   const $tag = $d.ui8();
-   if ($tag !== 9) {
-     throw new Error(`Invalid tag ${$tag} for Genre.Simulation: expected 9`);
-   }
-
-   
-   return new Simulation();
- }
-
- encode($e: _Encoder) {
-   $e.ui32(8);
-   this.$do_encode($e);
- }
-
- $do_encode($e: _Encoder) {
-   $e.ui8(9);
-   
- }
-}
-
-
-
-export class Shooter extends Genre$Base {
- static readonly $tag = $Tags.Shooter;
- readonly $tag = $Tags.Shooter;
-
- constructor() {
-   super();
- }
-
- static decode($d: _Decoder): Shooter {
-   return Shooter.$do_decode($d);
- }
-
- static $do_decode($d: _Decoder): Shooter {
-   const $tag = $d.ui8();
-   if ($tag !== 10) {
-     throw new Error(`Invalid tag ${$tag} for Genre.Shooter: expected 10`);
-   }
-
-   
-   return new Shooter();
- }
-
- encode($e: _Encoder) {
-   $e.ui32(8);
-   this.$do_encode($e);
- }
-
- $do_encode($e: _Encoder) {
-   $e.ui8(10);
-   
- }
-}
-
-
-
-export class Sports extends Genre$Base {
- static readonly $tag = $Tags.Sports;
- readonly $tag = $Tags.Sports;
-
- constructor() {
-   super();
- }
-
- static decode($d: _Decoder): Sports {
-   return Sports.$do_decode($d);
- }
-
- static $do_decode($d: _Decoder): Sports {
-   const $tag = $d.ui8();
-   if ($tag !== 11) {
-     throw new Error(`Invalid tag ${$tag} for Genre.Sports: expected 11`);
-   }
-
-   
-   return new Sports();
- }
-
- encode($e: _Encoder) {
-   $e.ui32(8);
-   this.$do_encode($e);
- }
-
- $do_encode($e: _Encoder) {
-   $e.ui8(11);
-   
- }
-}
-
-
-
-export class Strategy extends Genre$Base {
- static readonly $tag = $Tags.Strategy;
- readonly $tag = $Tags.Strategy;
-
- constructor() {
-   super();
- }
-
- static decode($d: _Decoder): Strategy {
-   return Strategy.$do_decode($d);
- }
-
- static $do_decode($d: _Decoder): Strategy {
-   const $tag = $d.ui8();
-   if ($tag !== 12) {
-     throw new Error(`Invalid tag ${$tag} for Genre.Strategy: expected 12`);
-   }
-
-   
-   return new Strategy();
- }
-
- encode($e: _Encoder) {
-   $e.ui32(8);
-   this.$do_encode($e);
- }
-
- $do_encode($e: _Encoder) {
-   $e.ui8(12);
-   
- }
-}
-
-
-
-export class Tool extends Genre$Base {
- static readonly $tag = $Tags.Tool;
- readonly $tag = $Tags.Tool;
-
- constructor() {
-   super();
- }
-
- static decode($d: _Decoder): Tool {
-   return Tool.$do_decode($d);
- }
-
- static $do_decode($d: _Decoder): Tool {
-   const $tag = $d.ui8();
-   if ($tag !== 13) {
-     throw new Error(`Invalid tag ${$tag} for Genre.Tool: expected 13`);
-   }
-
-   
-   return new Tool();
- }
-
- encode($e: _Encoder) {
-   $e.ui32(8);
-   this.$do_encode($e);
- }
-
- $do_encode($e: _Encoder) {
-   $e.ui8(13);
-   
- }
-}
-
-
-
-export class Other extends Genre$Base {
- static readonly $tag = $Tags.Other;
- readonly $tag = $Tags.Other;
-
- constructor() {
-   super();
- }
-
- static decode($d: _Decoder): Other {
-   return Other.$do_decode($d);
- }
-
- static $do_decode($d: _Decoder): Other {
-   const $tag = $d.ui8();
-   if ($tag !== 14) {
-     throw new Error(`Invalid tag ${$tag} for Genre.Other: expected 14`);
-   }
-
-   
-   return new Other();
- }
-
- encode($e: _Encoder) {
-   $e.ui32(8);
-   this.$do_encode($e);
- }
-
- $do_encode($e: _Encoder) {
-   $e.ui8(14);
-   
- }
-}
-
 }
 
 
@@ -969,7 +437,7 @@ export class Metadata {
  static readonly $tag = 2;
  readonly $tag = 2;
 
- constructor(readonly title: Meta_title, readonly release: Meta_release, readonly rating: Meta_rating, readonly play: Meta_play, readonly booklet: Meta_booklet) {}
+ constructor(readonly title: Meta_title, readonly release: Meta_release, readonly rating: Meta_rating, readonly play: Meta_play, readonly security: Meta_security, readonly booklet: Meta_booklet) {}
 
  static decode($d: _Decoder): Metadata {
    const $tag = $d.ui32();
@@ -984,8 +452,9 @@ export class Metadata {
 const release = Meta_release.$do_decode($d);
 const rating = Meta_rating.$do_decode($d);
 const play = Meta_play.$do_decode($d);
+const security = Meta_security.$do_decode($d);
 const booklet = Meta_booklet.$do_decode($d);
-   return new Metadata(title, release, rating, play, booklet);
+   return new Metadata(title, release, rating, play, security, booklet);
  }
 
  encode($e: _Encoder) {
@@ -998,6 +467,7 @@ const booklet = Meta_booklet.$do_decode($d);
 (this.release).$do_encode($e);
 (this.rating).$do_encode($e);
 (this.play).$do_encode($e);
+(this.security).$do_encode($e);
 (this.booklet).$do_encode($e);
  }
 }
@@ -1258,13 +728,656 @@ $e.text(this.custom_css);
 
 
 
+export type Capability = Capability.Network;
+
+export abstract class Capability$Base {
+ static decode($d: _Decoder): Capability {
+   const $tag = $d.ui32();
+   if ($tag !== 9) {
+     throw new Error(`Invalid tag ${$tag} for Capability: expected 9`);
+   }
+   return Capability$Base.$do_decode($d);
+ }
+
+ static $do_decode($d: _Decoder): Capability {
+   const $tag = $d.peek((v) => v.getUint8(0));
+
+   switch ($tag) {
+     case 0: return Capability.Network.decode($d);
+
+     default:
+       throw new Error(`Unknown tag ${$tag} in union Capability`);
+   }
+ }
+}
+
+export namespace Capability {
+ export const enum $Tags {
+   Network
+ }
+
+ 
+export class Network extends Capability$Base {
+ static readonly $tag = $Tags.Network;
+ readonly $tag = $Tags.Network;
+
+ constructor(readonly allow: (string)[]) {
+   super();
+ }
+
+ static decode($d: _Decoder): Network {
+   return Network.$do_decode($d);
+ }
+
+ static $do_decode($d: _Decoder): Network {
+   const $tag = $d.ui8();
+   if ($tag !== 0) {
+     throw new Error(`Invalid tag ${$tag} for Capability.Network: expected 0`);
+   }
+
+   
+const allow = $d.array(() => {
+ const item = $d.text();;
+ return item;
+});
+
+   return new Network(allow);
+ }
+
+ encode($e: _Encoder) {
+   $e.ui32(9);
+   this.$do_encode($e);
+ }
+
+ $do_encode($e: _Encoder) {
+   $e.ui8(0);
+   $e.array((this.allow), ($e, v) => {
+  $e.text(v);
+});
+ }
+}
+
+}
+
+
+
+export type Genre = Genre.Not_specified | Genre.Action | Genre.Figthing | Genre.Interactive_fiction | Genre.Platformer | Genre.Puzzle | Genre.Racing | Genre.Rhythm | Genre.RPG | Genre.Simulation | Genre.Shooter | Genre.Sports | Genre.Strategy | Genre.Tool | Genre.Other;
+
+export abstract class Genre$Base {
+ static decode($d: _Decoder): Genre {
+   const $tag = $d.ui32();
+   if ($tag !== 10) {
+     throw new Error(`Invalid tag ${$tag} for Genre: expected 10`);
+   }
+   return Genre$Base.$do_decode($d);
+ }
+
+ static $do_decode($d: _Decoder): Genre {
+   const $tag = $d.peek((v) => v.getUint8(0));
+
+   switch ($tag) {
+     case 0: return Genre.Not_specified.decode($d);
+case 1: return Genre.Action.decode($d);
+case 2: return Genre.Figthing.decode($d);
+case 3: return Genre.Interactive_fiction.decode($d);
+case 4: return Genre.Platformer.decode($d);
+case 5: return Genre.Puzzle.decode($d);
+case 6: return Genre.Racing.decode($d);
+case 7: return Genre.Rhythm.decode($d);
+case 8: return Genre.RPG.decode($d);
+case 9: return Genre.Simulation.decode($d);
+case 10: return Genre.Shooter.decode($d);
+case 11: return Genre.Sports.decode($d);
+case 12: return Genre.Strategy.decode($d);
+case 13: return Genre.Tool.decode($d);
+case 14: return Genre.Other.decode($d);
+
+     default:
+       throw new Error(`Unknown tag ${$tag} in union Genre`);
+   }
+ }
+}
+
+export namespace Genre {
+ export const enum $Tags {
+   Not_specified,Action,Figthing,Interactive_fiction,Platformer,Puzzle,Racing,Rhythm,RPG,Simulation,Shooter,Sports,Strategy,Tool,Other
+ }
+
+ 
+export class Not_specified extends Genre$Base {
+ static readonly $tag = $Tags.Not_specified;
+ readonly $tag = $Tags.Not_specified;
+
+ constructor() {
+   super();
+ }
+
+ static decode($d: _Decoder): Not_specified {
+   return Not_specified.$do_decode($d);
+ }
+
+ static $do_decode($d: _Decoder): Not_specified {
+   const $tag = $d.ui8();
+   if ($tag !== 0) {
+     throw new Error(`Invalid tag ${$tag} for Genre.Not-specified: expected 0`);
+   }
+
+   
+   return new Not_specified();
+ }
+
+ encode($e: _Encoder) {
+   $e.ui32(10);
+   this.$do_encode($e);
+ }
+
+ $do_encode($e: _Encoder) {
+   $e.ui8(0);
+   
+ }
+}
+
+
+
+export class Action extends Genre$Base {
+ static readonly $tag = $Tags.Action;
+ readonly $tag = $Tags.Action;
+
+ constructor() {
+   super();
+ }
+
+ static decode($d: _Decoder): Action {
+   return Action.$do_decode($d);
+ }
+
+ static $do_decode($d: _Decoder): Action {
+   const $tag = $d.ui8();
+   if ($tag !== 1) {
+     throw new Error(`Invalid tag ${$tag} for Genre.Action: expected 1`);
+   }
+
+   
+   return new Action();
+ }
+
+ encode($e: _Encoder) {
+   $e.ui32(10);
+   this.$do_encode($e);
+ }
+
+ $do_encode($e: _Encoder) {
+   $e.ui8(1);
+   
+ }
+}
+
+
+
+export class Figthing extends Genre$Base {
+ static readonly $tag = $Tags.Figthing;
+ readonly $tag = $Tags.Figthing;
+
+ constructor() {
+   super();
+ }
+
+ static decode($d: _Decoder): Figthing {
+   return Figthing.$do_decode($d);
+ }
+
+ static $do_decode($d: _Decoder): Figthing {
+   const $tag = $d.ui8();
+   if ($tag !== 2) {
+     throw new Error(`Invalid tag ${$tag} for Genre.Figthing: expected 2`);
+   }
+
+   
+   return new Figthing();
+ }
+
+ encode($e: _Encoder) {
+   $e.ui32(10);
+   this.$do_encode($e);
+ }
+
+ $do_encode($e: _Encoder) {
+   $e.ui8(2);
+   
+ }
+}
+
+
+
+export class Interactive_fiction extends Genre$Base {
+ static readonly $tag = $Tags.Interactive_fiction;
+ readonly $tag = $Tags.Interactive_fiction;
+
+ constructor() {
+   super();
+ }
+
+ static decode($d: _Decoder): Interactive_fiction {
+   return Interactive_fiction.$do_decode($d);
+ }
+
+ static $do_decode($d: _Decoder): Interactive_fiction {
+   const $tag = $d.ui8();
+   if ($tag !== 3) {
+     throw new Error(`Invalid tag ${$tag} for Genre.Interactive-fiction: expected 3`);
+   }
+
+   
+   return new Interactive_fiction();
+ }
+
+ encode($e: _Encoder) {
+   $e.ui32(10);
+   this.$do_encode($e);
+ }
+
+ $do_encode($e: _Encoder) {
+   $e.ui8(3);
+   
+ }
+}
+
+
+
+export class Platformer extends Genre$Base {
+ static readonly $tag = $Tags.Platformer;
+ readonly $tag = $Tags.Platformer;
+
+ constructor() {
+   super();
+ }
+
+ static decode($d: _Decoder): Platformer {
+   return Platformer.$do_decode($d);
+ }
+
+ static $do_decode($d: _Decoder): Platformer {
+   const $tag = $d.ui8();
+   if ($tag !== 4) {
+     throw new Error(`Invalid tag ${$tag} for Genre.Platformer: expected 4`);
+   }
+
+   
+   return new Platformer();
+ }
+
+ encode($e: _Encoder) {
+   $e.ui32(10);
+   this.$do_encode($e);
+ }
+
+ $do_encode($e: _Encoder) {
+   $e.ui8(4);
+   
+ }
+}
+
+
+
+export class Puzzle extends Genre$Base {
+ static readonly $tag = $Tags.Puzzle;
+ readonly $tag = $Tags.Puzzle;
+
+ constructor() {
+   super();
+ }
+
+ static decode($d: _Decoder): Puzzle {
+   return Puzzle.$do_decode($d);
+ }
+
+ static $do_decode($d: _Decoder): Puzzle {
+   const $tag = $d.ui8();
+   if ($tag !== 5) {
+     throw new Error(`Invalid tag ${$tag} for Genre.Puzzle: expected 5`);
+   }
+
+   
+   return new Puzzle();
+ }
+
+ encode($e: _Encoder) {
+   $e.ui32(10);
+   this.$do_encode($e);
+ }
+
+ $do_encode($e: _Encoder) {
+   $e.ui8(5);
+   
+ }
+}
+
+
+
+export class Racing extends Genre$Base {
+ static readonly $tag = $Tags.Racing;
+ readonly $tag = $Tags.Racing;
+
+ constructor() {
+   super();
+ }
+
+ static decode($d: _Decoder): Racing {
+   return Racing.$do_decode($d);
+ }
+
+ static $do_decode($d: _Decoder): Racing {
+   const $tag = $d.ui8();
+   if ($tag !== 6) {
+     throw new Error(`Invalid tag ${$tag} for Genre.Racing: expected 6`);
+   }
+
+   
+   return new Racing();
+ }
+
+ encode($e: _Encoder) {
+   $e.ui32(10);
+   this.$do_encode($e);
+ }
+
+ $do_encode($e: _Encoder) {
+   $e.ui8(6);
+   
+ }
+}
+
+
+
+export class Rhythm extends Genre$Base {
+ static readonly $tag = $Tags.Rhythm;
+ readonly $tag = $Tags.Rhythm;
+
+ constructor() {
+   super();
+ }
+
+ static decode($d: _Decoder): Rhythm {
+   return Rhythm.$do_decode($d);
+ }
+
+ static $do_decode($d: _Decoder): Rhythm {
+   const $tag = $d.ui8();
+   if ($tag !== 7) {
+     throw new Error(`Invalid tag ${$tag} for Genre.Rhythm: expected 7`);
+   }
+
+   
+   return new Rhythm();
+ }
+
+ encode($e: _Encoder) {
+   $e.ui32(10);
+   this.$do_encode($e);
+ }
+
+ $do_encode($e: _Encoder) {
+   $e.ui8(7);
+   
+ }
+}
+
+
+
+export class RPG extends Genre$Base {
+ static readonly $tag = $Tags.RPG;
+ readonly $tag = $Tags.RPG;
+
+ constructor() {
+   super();
+ }
+
+ static decode($d: _Decoder): RPG {
+   return RPG.$do_decode($d);
+ }
+
+ static $do_decode($d: _Decoder): RPG {
+   const $tag = $d.ui8();
+   if ($tag !== 8) {
+     throw new Error(`Invalid tag ${$tag} for Genre.RPG: expected 8`);
+   }
+
+   
+   return new RPG();
+ }
+
+ encode($e: _Encoder) {
+   $e.ui32(10);
+   this.$do_encode($e);
+ }
+
+ $do_encode($e: _Encoder) {
+   $e.ui8(8);
+   
+ }
+}
+
+
+
+export class Simulation extends Genre$Base {
+ static readonly $tag = $Tags.Simulation;
+ readonly $tag = $Tags.Simulation;
+
+ constructor() {
+   super();
+ }
+
+ static decode($d: _Decoder): Simulation {
+   return Simulation.$do_decode($d);
+ }
+
+ static $do_decode($d: _Decoder): Simulation {
+   const $tag = $d.ui8();
+   if ($tag !== 9) {
+     throw new Error(`Invalid tag ${$tag} for Genre.Simulation: expected 9`);
+   }
+
+   
+   return new Simulation();
+ }
+
+ encode($e: _Encoder) {
+   $e.ui32(10);
+   this.$do_encode($e);
+ }
+
+ $do_encode($e: _Encoder) {
+   $e.ui8(9);
+   
+ }
+}
+
+
+
+export class Shooter extends Genre$Base {
+ static readonly $tag = $Tags.Shooter;
+ readonly $tag = $Tags.Shooter;
+
+ constructor() {
+   super();
+ }
+
+ static decode($d: _Decoder): Shooter {
+   return Shooter.$do_decode($d);
+ }
+
+ static $do_decode($d: _Decoder): Shooter {
+   const $tag = $d.ui8();
+   if ($tag !== 10) {
+     throw new Error(`Invalid tag ${$tag} for Genre.Shooter: expected 10`);
+   }
+
+   
+   return new Shooter();
+ }
+
+ encode($e: _Encoder) {
+   $e.ui32(10);
+   this.$do_encode($e);
+ }
+
+ $do_encode($e: _Encoder) {
+   $e.ui8(10);
+   
+ }
+}
+
+
+
+export class Sports extends Genre$Base {
+ static readonly $tag = $Tags.Sports;
+ readonly $tag = $Tags.Sports;
+
+ constructor() {
+   super();
+ }
+
+ static decode($d: _Decoder): Sports {
+   return Sports.$do_decode($d);
+ }
+
+ static $do_decode($d: _Decoder): Sports {
+   const $tag = $d.ui8();
+   if ($tag !== 11) {
+     throw new Error(`Invalid tag ${$tag} for Genre.Sports: expected 11`);
+   }
+
+   
+   return new Sports();
+ }
+
+ encode($e: _Encoder) {
+   $e.ui32(10);
+   this.$do_encode($e);
+ }
+
+ $do_encode($e: _Encoder) {
+   $e.ui8(11);
+   
+ }
+}
+
+
+
+export class Strategy extends Genre$Base {
+ static readonly $tag = $Tags.Strategy;
+ readonly $tag = $Tags.Strategy;
+
+ constructor() {
+   super();
+ }
+
+ static decode($d: _Decoder): Strategy {
+   return Strategy.$do_decode($d);
+ }
+
+ static $do_decode($d: _Decoder): Strategy {
+   const $tag = $d.ui8();
+   if ($tag !== 12) {
+     throw new Error(`Invalid tag ${$tag} for Genre.Strategy: expected 12`);
+   }
+
+   
+   return new Strategy();
+ }
+
+ encode($e: _Encoder) {
+   $e.ui32(10);
+   this.$do_encode($e);
+ }
+
+ $do_encode($e: _Encoder) {
+   $e.ui8(12);
+   
+ }
+}
+
+
+
+export class Tool extends Genre$Base {
+ static readonly $tag = $Tags.Tool;
+ readonly $tag = $Tags.Tool;
+
+ constructor() {
+   super();
+ }
+
+ static decode($d: _Decoder): Tool {
+   return Tool.$do_decode($d);
+ }
+
+ static $do_decode($d: _Decoder): Tool {
+   const $tag = $d.ui8();
+   if ($tag !== 13) {
+     throw new Error(`Invalid tag ${$tag} for Genre.Tool: expected 13`);
+   }
+
+   
+   return new Tool();
+ }
+
+ encode($e: _Encoder) {
+   $e.ui32(10);
+   this.$do_encode($e);
+ }
+
+ $do_encode($e: _Encoder) {
+   $e.ui8(13);
+   
+ }
+}
+
+
+
+export class Other extends Genre$Base {
+ static readonly $tag = $Tags.Other;
+ readonly $tag = $Tags.Other;
+
+ constructor() {
+   super();
+ }
+
+ static decode($d: _Decoder): Other {
+   return Other.$do_decode($d);
+ }
+
+ static $do_decode($d: _Decoder): Other {
+   const $tag = $d.ui8();
+   if ($tag !== 14) {
+     throw new Error(`Invalid tag ${$tag} for Genre.Other: expected 14`);
+   }
+
+   
+   return new Other();
+ }
+
+ encode($e: _Encoder) {
+   $e.ui32(10);
+   this.$do_encode($e);
+ }
+
+ $do_encode($e: _Encoder) {
+   $e.ui8(14);
+   
+ }
+}
+
+}
+
+
+
 export type Release_type = Release_type.Prototype | Release_type.Early_access | Release_type.Beta | Release_type.Demo | Release_type.Full;
 
 export abstract class Release_type$Base {
  static decode($d: _Decoder): Release_type {
    const $tag = $d.ui32();
-   if ($tag !== 9) {
-     throw new Error(`Invalid tag ${$tag} for Release-type: expected 9`);
+   if ($tag !== 11) {
+     throw new Error(`Invalid tag ${$tag} for Release-type: expected 11`);
    }
    return Release_type$Base.$do_decode($d);
  }
@@ -1314,7 +1427,7 @@ export class Prototype extends Release_type$Base {
  }
 
  encode($e: _Encoder) {
-   $e.ui32(9);
+   $e.ui32(11);
    this.$do_encode($e);
  }
 
@@ -1349,7 +1462,7 @@ export class Early_access extends Release_type$Base {
  }
 
  encode($e: _Encoder) {
-   $e.ui32(9);
+   $e.ui32(11);
    this.$do_encode($e);
  }
 
@@ -1384,7 +1497,7 @@ export class Beta extends Release_type$Base {
  }
 
  encode($e: _Encoder) {
-   $e.ui32(9);
+   $e.ui32(11);
    this.$do_encode($e);
  }
 
@@ -1419,7 +1532,7 @@ export class Demo extends Release_type$Base {
  }
 
  encode($e: _Encoder) {
-   $e.ui32(9);
+   $e.ui32(11);
    this.$do_encode($e);
  }
 
@@ -1454,7 +1567,7 @@ export class Full extends Release_type$Base {
  }
 
  encode($e: _Encoder) {
-   $e.ui32(9);
+   $e.ui32(11);
    this.$do_encode($e);
  }
 
@@ -1469,15 +1582,15 @@ export class Full extends Release_type$Base {
 
 
 export class Version {
- static readonly $tag = 10;
- readonly $tag = 10;
+ static readonly $tag = 12;
+ readonly $tag = 12;
 
  constructor(readonly major: UInt32, readonly minor: UInt32) {}
 
  static decode($d: _Decoder): Version {
    const $tag = $d.ui32();
-   if ($tag !== 10) {
-     throw new Error(`Invalid tag ${$tag} for Version: expected 10`);
+   if ($tag !== 12) {
+     throw new Error(`Invalid tag ${$tag} for Version: expected 12`);
    }
    return Version.$do_decode($d);
  }
@@ -1489,7 +1602,7 @@ const minor = $d.ui32();
  }
 
  encode($e: _Encoder) {
-   $e.ui32(10);
+   $e.ui32(12);
    this.$do_encode($e);
  }
 
@@ -1506,8 +1619,8 @@ export type Content_rating = Content_rating.General | Content_rating.Teen_and_up
 export abstract class Content_rating$Base {
  static decode($d: _Decoder): Content_rating {
    const $tag = $d.ui32();
-   if ($tag !== 11) {
-     throw new Error(`Invalid tag ${$tag} for Content-rating: expected 11`);
+   if ($tag !== 13) {
+     throw new Error(`Invalid tag ${$tag} for Content-rating: expected 13`);
    }
    return Content_rating$Base.$do_decode($d);
  }
@@ -1556,7 +1669,7 @@ export class General extends Content_rating$Base {
  }
 
  encode($e: _Encoder) {
-   $e.ui32(11);
+   $e.ui32(13);
    this.$do_encode($e);
  }
 
@@ -1591,7 +1704,7 @@ export class Teen_and_up extends Content_rating$Base {
  }
 
  encode($e: _Encoder) {
-   $e.ui32(11);
+   $e.ui32(13);
    this.$do_encode($e);
  }
 
@@ -1626,7 +1739,7 @@ export class Mature extends Content_rating$Base {
  }
 
  encode($e: _Encoder) {
-   $e.ui32(11);
+   $e.ui32(13);
    this.$do_encode($e);
  }
 
@@ -1661,7 +1774,7 @@ export class Explicit extends Content_rating$Base {
  }
 
  encode($e: _Encoder) {
-   $e.ui32(11);
+   $e.ui32(13);
    this.$do_encode($e);
  }
 
@@ -1676,15 +1789,15 @@ export class Explicit extends Content_rating$Base {
 
 
 export class Date {
- static readonly $tag = 12;
- readonly $tag = 12;
+ static readonly $tag = 14;
+ readonly $tag = 14;
 
  constructor(readonly year: UInt32, readonly month: UInt8, readonly day: UInt8) {}
 
  static decode($d: _Decoder): Date {
    const $tag = $d.ui32();
-   if ($tag !== 12) {
-     throw new Error(`Invalid tag ${$tag} for Date: expected 12`);
+   if ($tag !== 14) {
+     throw new Error(`Invalid tag ${$tag} for Date: expected 14`);
    }
    return Date.$do_decode($d);
  }
@@ -1697,7 +1810,7 @@ const day = $d.ui8();
  }
 
  encode($e: _Encoder) {
-   $e.ui32(12);
+   $e.ui32(14);
    this.$do_encode($e);
  }
 
@@ -1715,8 +1828,8 @@ export type Duration = Duration.Seconds | Duration.Few_minutes | Duration.Half_h
 export abstract class Duration$Base {
  static decode($d: _Decoder): Duration {
    const $tag = $d.ui32();
-   if ($tag !== 13) {
-     throw new Error(`Invalid tag ${$tag} for Duration: expected 13`);
+   if ($tag !== 15) {
+     throw new Error(`Invalid tag ${$tag} for Duration: expected 15`);
    }
    return Duration$Base.$do_decode($d);
  }
@@ -1768,7 +1881,7 @@ export class Seconds extends Duration$Base {
  }
 
  encode($e: _Encoder) {
-   $e.ui32(13);
+   $e.ui32(15);
    this.$do_encode($e);
  }
 
@@ -1803,7 +1916,7 @@ export class Few_minutes extends Duration$Base {
  }
 
  encode($e: _Encoder) {
-   $e.ui32(13);
+   $e.ui32(15);
    this.$do_encode($e);
  }
 
@@ -1838,7 +1951,7 @@ export class Half_hour extends Duration$Base {
  }
 
  encode($e: _Encoder) {
-   $e.ui32(13);
+   $e.ui32(15);
    this.$do_encode($e);
  }
 
@@ -1873,7 +1986,7 @@ export class One_hour extends Duration$Base {
  }
 
  encode($e: _Encoder) {
-   $e.ui32(13);
+   $e.ui32(15);
    this.$do_encode($e);
  }
 
@@ -1908,7 +2021,7 @@ export class Few_hours extends Duration$Base {
  }
 
  encode($e: _Encoder) {
-   $e.ui32(13);
+   $e.ui32(15);
    this.$do_encode($e);
  }
 
@@ -1943,7 +2056,7 @@ export class Several_hours extends Duration$Base {
  }
 
  encode($e: _Encoder) {
-   $e.ui32(13);
+   $e.ui32(15);
    this.$do_encode($e);
  }
 
@@ -1978,7 +2091,7 @@ export class Unknown extends Duration$Base {
  }
 
  encode($e: _Encoder) {
-   $e.ui32(13);
+   $e.ui32(15);
    this.$do_encode($e);
  }
 
@@ -1997,8 +2110,8 @@ export type Input_method = Input_method.Kate_buttons | Input_method.Touch;
 export abstract class Input_method$Base {
  static decode($d: _Decoder): Input_method {
    const $tag = $d.ui32();
-   if ($tag !== 14) {
-     throw new Error(`Invalid tag ${$tag} for Input-method: expected 14`);
+   if ($tag !== 16) {
+     throw new Error(`Invalid tag ${$tag} for Input-method: expected 16`);
    }
    return Input_method$Base.$do_decode($d);
  }
@@ -2045,7 +2158,7 @@ export class Kate_buttons extends Input_method$Base {
  }
 
  encode($e: _Encoder) {
-   $e.ui32(14);
+   $e.ui32(16);
    this.$do_encode($e);
  }
 
@@ -2080,7 +2193,7 @@ export class Touch extends Input_method$Base {
  }
 
  encode($e: _Encoder) {
-   $e.ui32(14);
+   $e.ui32(16);
    this.$do_encode($e);
  }
 
@@ -2095,15 +2208,15 @@ export class Touch extends Input_method$Base {
 
 
 export class Player_range {
- static readonly $tag = 15;
- readonly $tag = 15;
+ static readonly $tag = 17;
+ readonly $tag = 17;
 
  constructor(readonly minimum: UInt32, readonly maximum: UInt32) {}
 
  static decode($d: _Decoder): Player_range {
    const $tag = $d.ui32();
-   if ($tag !== 15) {
-     throw new Error(`Invalid tag ${$tag} for Player-range: expected 15`);
+   if ($tag !== 17) {
+     throw new Error(`Invalid tag ${$tag} for Player-range: expected 17`);
    }
    return Player_range.$do_decode($d);
  }
@@ -2115,7 +2228,7 @@ const maximum = $d.ui32();
  }
 
  encode($e: _Encoder) {
-   $e.ui32(15);
+   $e.ui32(17);
    this.$do_encode($e);
  }
 
@@ -2128,15 +2241,15 @@ $e.ui32(this.maximum);
 
 
 export class Language {
- static readonly $tag = 16;
- readonly $tag = 16;
+ static readonly $tag = 18;
+ readonly $tag = 18;
 
  constructor(readonly iso_code: string, readonly _interface: boolean, readonly audio: boolean, readonly text: boolean) {}
 
  static decode($d: _Decoder): Language {
    const $tag = $d.ui32();
-   if ($tag !== 16) {
-     throw new Error(`Invalid tag ${$tag} for Language: expected 16`);
+   if ($tag !== 18) {
+     throw new Error(`Invalid tag ${$tag} for Language: expected 18`);
    }
    return Language.$do_decode($d);
  }
@@ -2150,7 +2263,7 @@ const text = $d.bool();
  }
 
  encode($e: _Encoder) {
-   $e.ui32(16);
+   $e.ui32(18);
    this.$do_encode($e);
  }
 
@@ -2169,8 +2282,8 @@ export type Accessibility = Accessibility.High_contrast | Accessibility.Subtitle
 export abstract class Accessibility$Base {
  static decode($d: _Decoder): Accessibility {
    const $tag = $d.ui32();
-   if ($tag !== 17) {
-     throw new Error(`Invalid tag ${$tag} for Accessibility: expected 17`);
+   if ($tag !== 19) {
+     throw new Error(`Invalid tag ${$tag} for Accessibility: expected 19`);
    }
    return Accessibility$Base.$do_decode($d);
  }
@@ -2221,7 +2334,7 @@ export class High_contrast extends Accessibility$Base {
  }
 
  encode($e: _Encoder) {
-   $e.ui32(17);
+   $e.ui32(19);
    this.$do_encode($e);
  }
 
@@ -2256,7 +2369,7 @@ export class Subtitles extends Accessibility$Base {
  }
 
  encode($e: _Encoder) {
-   $e.ui32(17);
+   $e.ui32(19);
    this.$do_encode($e);
  }
 
@@ -2291,7 +2404,7 @@ export class Image_captions extends Accessibility$Base {
  }
 
  encode($e: _Encoder) {
-   $e.ui32(17);
+   $e.ui32(19);
    this.$do_encode($e);
  }
 
@@ -2326,7 +2439,7 @@ export class Voiced_text extends Accessibility$Base {
  }
 
  encode($e: _Encoder) {
-   $e.ui32(17);
+   $e.ui32(19);
    this.$do_encode($e);
  }
 
@@ -2361,7 +2474,7 @@ export class Configurable_difficulty extends Accessibility$Base {
  }
 
  encode($e: _Encoder) {
-   $e.ui32(17);
+   $e.ui32(19);
    this.$do_encode($e);
  }
 
@@ -2396,7 +2509,7 @@ export class Skippable_content extends Accessibility$Base {
  }
 
  encode($e: _Encoder) {
-   $e.ui32(17);
+   $e.ui32(19);
    this.$do_encode($e);
  }
 
@@ -2415,8 +2528,8 @@ export type Booklet_expr = Booklet_expr.BE_text | Booklet_expr.BE_image | Bookle
 export abstract class Booklet_expr$Base {
  static decode($d: _Decoder): Booklet_expr {
    const $tag = $d.ui32();
-   if ($tag !== 18) {
-     throw new Error(`Invalid tag ${$tag} for Booklet-expr: expected 18`);
+   if ($tag !== 20) {
+     throw new Error(`Invalid tag ${$tag} for Booklet-expr: expected 20`);
    }
    return Booklet_expr$Base.$do_decode($d);
  }
@@ -2478,7 +2591,7 @@ export class BE_text extends Booklet_expr$Base {
  }
 
  encode($e: _Encoder) {
-   $e.ui32(18);
+   $e.ui32(20);
    this.$do_encode($e);
  }
 
@@ -2513,7 +2626,7 @@ export class BE_image extends Booklet_expr$Base {
  }
 
  encode($e: _Encoder) {
-   $e.ui32(18);
+   $e.ui32(20);
    this.$do_encode($e);
  }
 
@@ -2548,7 +2661,7 @@ export class BE_bold extends Booklet_expr$Base {
  }
 
  encode($e: _Encoder) {
-   $e.ui32(18);
+   $e.ui32(20);
    this.$do_encode($e);
  }
 
@@ -2583,7 +2696,7 @@ export class BE_italic extends Booklet_expr$Base {
  }
 
  encode($e: _Encoder) {
-   $e.ui32(18);
+   $e.ui32(20);
    this.$do_encode($e);
  }
 
@@ -2618,7 +2731,7 @@ export class BE_title extends Booklet_expr$Base {
  }
 
  encode($e: _Encoder) {
-   $e.ui32(18);
+   $e.ui32(20);
    this.$do_encode($e);
  }
 
@@ -2653,7 +2766,7 @@ export class BE_subtitle extends Booklet_expr$Base {
  }
 
  encode($e: _Encoder) {
-   $e.ui32(18);
+   $e.ui32(20);
    this.$do_encode($e);
  }
 
@@ -2688,7 +2801,7 @@ export class BE_subtitle2 extends Booklet_expr$Base {
  }
 
  encode($e: _Encoder) {
-   $e.ui32(18);
+   $e.ui32(20);
    this.$do_encode($e);
  }
 
@@ -2725,7 +2838,7 @@ const value = Booklet_expr$Base.$do_decode($d);
  }
 
  encode($e: _Encoder) {
-   $e.ui32(18);
+   $e.ui32(20);
    this.$do_encode($e);
  }
 
@@ -2765,7 +2878,7 @@ const value = Booklet_expr$Base.$do_decode($d);
  }
 
  encode($e: _Encoder) {
-   $e.ui32(18);
+   $e.ui32(20);
    this.$do_encode($e);
  }
 
@@ -2806,7 +2919,7 @@ const value = Booklet_expr$Base.$do_decode($d);
  }
 
  encode($e: _Encoder) {
-   $e.ui32(18);
+   $e.ui32(20);
    this.$do_encode($e);
  }
 
@@ -2845,7 +2958,7 @@ const value = Booklet_expr$Base.$do_decode($d);
  }
 
  encode($e: _Encoder) {
-   $e.ui32(18);
+   $e.ui32(20);
    this.$do_encode($e);
  }
 
@@ -2883,7 +2996,7 @@ const value = Booklet_expr$Base.$do_decode($d);
  }
 
  encode($e: _Encoder) {
-   $e.ui32(18);
+   $e.ui32(20);
    this.$do_encode($e);
  }
 
@@ -2922,7 +3035,7 @@ const value = Booklet_expr$Base.$do_decode($d);
  }
 
  encode($e: _Encoder) {
-   $e.ui32(18);
+   $e.ui32(20);
    this.$do_encode($e);
  }
 
@@ -2961,7 +3074,7 @@ const value = Booklet_expr$Base.$do_decode($d);
  }
 
  encode($e: _Encoder) {
-   $e.ui32(18);
+   $e.ui32(20);
    this.$do_encode($e);
  }
 
@@ -3003,7 +3116,7 @@ const values = $d.array(() => {
  }
 
  encode($e: _Encoder) {
-   $e.ui32(18);
+   $e.ui32(20);
    this.$do_encode($e);
  }
 
@@ -3046,7 +3159,7 @@ const rows = Booklet_row.$do_decode($d);
  }
 
  encode($e: _Encoder) {
-   $e.ui32(18);
+   $e.ui32(20);
    this.$do_encode($e);
  }
 
@@ -3085,7 +3198,7 @@ const value = Booklet_expr$Base.$do_decode($d);
  }
 
  encode($e: _Encoder) {
-   $e.ui32(18);
+   $e.ui32(20);
    this.$do_encode($e);
  }
 
@@ -3101,15 +3214,15 @@ const value = Booklet_expr$Base.$do_decode($d);
 
 
 export class Booklet_row {
- static readonly $tag = 19;
- readonly $tag = 19;
+ static readonly $tag = 21;
+ readonly $tag = 21;
 
  constructor(readonly row_span: UInt32, readonly cells: (Booklet_cell)[]) {}
 
  static decode($d: _Decoder): Booklet_row {
    const $tag = $d.ui32();
-   if ($tag !== 19) {
-     throw new Error(`Invalid tag ${$tag} for Booklet-row: expected 19`);
+   if ($tag !== 21) {
+     throw new Error(`Invalid tag ${$tag} for Booklet-row: expected 21`);
    }
    return Booklet_row.$do_decode($d);
  }
@@ -3126,7 +3239,7 @@ const cells = $d.array(() => {
  }
 
  encode($e: _Encoder) {
-   $e.ui32(19);
+   $e.ui32(21);
    this.$do_encode($e);
  }
 
@@ -3141,15 +3254,15 @@ $e.array((this.cells), ($e, v) => {
 
 
 export class Booklet_cell {
- static readonly $tag = 20;
- readonly $tag = 20;
+ static readonly $tag = 22;
+ readonly $tag = 22;
 
  constructor(readonly cell_span: UInt32, readonly value: (Booklet_expr.BE_text | Booklet_expr.BE_image | Booklet_expr.BE_bold | Booklet_expr.BE_italic | Booklet_expr.BE_title | Booklet_expr.BE_subtitle | Booklet_expr.BE_subtitle2 | Booklet_expr.BE_font | Booklet_expr.BE_color | Booklet_expr.BE_background | Booklet_expr.BE_columns | Booklet_expr.BE_fixed | Booklet_expr.BE_row | Booklet_expr.BE_column | Booklet_expr.BE_stack | Booklet_expr.BE_table | Booklet_expr.BE_class)) {}
 
  static decode($d: _Decoder): Booklet_cell {
    const $tag = $d.ui32();
-   if ($tag !== 20) {
-     throw new Error(`Invalid tag ${$tag} for Booklet-cell: expected 20`);
+   if ($tag !== 22) {
+     throw new Error(`Invalid tag ${$tag} for Booklet-cell: expected 22`);
    }
    return Booklet_cell.$do_decode($d);
  }
@@ -3161,7 +3274,7 @@ const value = Booklet_expr$Base.$do_decode($d);
  }
 
  encode($e: _Encoder) {
-   $e.ui32(20);
+   $e.ui32(22);
    this.$do_encode($e);
  }
 
@@ -3178,8 +3291,8 @@ export type Booklet_align = Booklet_align.Start | Booklet_align.Center | Booklet
 export abstract class Booklet_align$Base {
  static decode($d: _Decoder): Booklet_align {
    const $tag = $d.ui32();
-   if ($tag !== 21) {
-     throw new Error(`Invalid tag ${$tag} for Booklet-align: expected 21`);
+   if ($tag !== 23) {
+     throw new Error(`Invalid tag ${$tag} for Booklet-align: expected 23`);
    }
    return Booklet_align$Base.$do_decode($d);
  }
@@ -3229,7 +3342,7 @@ export class Start extends Booklet_align$Base {
  }
 
  encode($e: _Encoder) {
-   $e.ui32(21);
+   $e.ui32(23);
    this.$do_encode($e);
  }
 
@@ -3264,7 +3377,7 @@ export class Center extends Booklet_align$Base {
  }
 
  encode($e: _Encoder) {
-   $e.ui32(21);
+   $e.ui32(23);
    this.$do_encode($e);
  }
 
@@ -3299,7 +3412,7 @@ export class End extends Booklet_align$Base {
  }
 
  encode($e: _Encoder) {
-   $e.ui32(21);
+   $e.ui32(23);
    this.$do_encode($e);
  }
 
@@ -3334,7 +3447,7 @@ export class Justify extends Booklet_align$Base {
  }
 
  encode($e: _Encoder) {
-   $e.ui32(21);
+   $e.ui32(23);
    this.$do_encode($e);
  }
 
@@ -3369,7 +3482,7 @@ export class Space_evenly extends Booklet_align$Base {
  }
 
  encode($e: _Encoder) {
-   $e.ui32(21);
+   $e.ui32(23);
    this.$do_encode($e);
  }
 
@@ -3388,8 +3501,8 @@ export type Platform = Platform.Web_archive;
 export abstract class Platform$Base {
  static decode($d: _Decoder): Platform {
    const $tag = $d.ui32();
-   if ($tag !== 22) {
-     throw new Error(`Invalid tag ${$tag} for Platform: expected 22`);
+   if ($tag !== 24) {
+     throw new Error(`Invalid tag ${$tag} for Platform: expected 24`);
    }
    return Platform$Base.$do_decode($d);
  }
@@ -3441,7 +3554,7 @@ const bridges = $d.array(() => {
  }
 
  encode($e: _Encoder) {
-   $e.ui32(22);
+   $e.ui32(24);
    this.$do_encode($e);
  }
 
@@ -3463,8 +3576,8 @@ export type Bridge = Bridge.Network_proxy | Bridge.Local_storage_proxy | Bridge.
 export abstract class Bridge$Base {
  static decode($d: _Decoder): Bridge {
    const $tag = $d.ui32();
-   if ($tag !== 23) {
-     throw new Error(`Invalid tag ${$tag} for Bridge: expected 23`);
+   if ($tag !== 25) {
+     throw new Error(`Invalid tag ${$tag} for Bridge: expected 25`);
    }
    return Bridge$Base.$do_decode($d);
  }
@@ -3512,7 +3625,7 @@ export class Network_proxy extends Bridge$Base {
  }
 
  encode($e: _Encoder) {
-   $e.ui32(23);
+   $e.ui32(25);
    this.$do_encode($e);
  }
 
@@ -3547,7 +3660,7 @@ export class Local_storage_proxy extends Bridge$Base {
  }
 
  encode($e: _Encoder) {
-   $e.ui32(23);
+   $e.ui32(25);
    this.$do_encode($e);
  }
 
@@ -3593,7 +3706,7 @@ const mapping = $d.map(
  }
 
  encode($e: _Encoder) {
-   $e.ui32(23);
+   $e.ui32(25);
    this.$do_encode($e);
  }
 
@@ -3615,8 +3728,8 @@ export type VirtualKey = VirtualKey.Up | VirtualKey.Right | VirtualKey.Down | Vi
 export abstract class VirtualKey$Base {
  static decode($d: _Decoder): VirtualKey {
    const $tag = $d.ui32();
-   if ($tag !== 24) {
-     throw new Error(`Invalid tag ${$tag} for VirtualKey: expected 24`);
+   if ($tag !== 26) {
+     throw new Error(`Invalid tag ${$tag} for VirtualKey: expected 26`);
    }
    return VirtualKey$Base.$do_decode($d);
  }
@@ -3671,7 +3784,7 @@ export class Up extends VirtualKey$Base {
  }
 
  encode($e: _Encoder) {
-   $e.ui32(24);
+   $e.ui32(26);
    this.$do_encode($e);
  }
 
@@ -3706,7 +3819,7 @@ export class Right extends VirtualKey$Base {
  }
 
  encode($e: _Encoder) {
-   $e.ui32(24);
+   $e.ui32(26);
    this.$do_encode($e);
  }
 
@@ -3741,7 +3854,7 @@ export class Down extends VirtualKey$Base {
  }
 
  encode($e: _Encoder) {
-   $e.ui32(24);
+   $e.ui32(26);
    this.$do_encode($e);
  }
 
@@ -3776,7 +3889,7 @@ export class Left extends VirtualKey$Base {
  }
 
  encode($e: _Encoder) {
-   $e.ui32(24);
+   $e.ui32(26);
    this.$do_encode($e);
  }
 
@@ -3811,7 +3924,7 @@ export class Menu extends VirtualKey$Base {
  }
 
  encode($e: _Encoder) {
-   $e.ui32(24);
+   $e.ui32(26);
    this.$do_encode($e);
  }
 
@@ -3846,7 +3959,7 @@ export class Capture extends VirtualKey$Base {
  }
 
  encode($e: _Encoder) {
-   $e.ui32(24);
+   $e.ui32(26);
    this.$do_encode($e);
  }
 
@@ -3881,7 +3994,7 @@ export class X extends VirtualKey$Base {
  }
 
  encode($e: _Encoder) {
-   $e.ui32(24);
+   $e.ui32(26);
    this.$do_encode($e);
  }
 
@@ -3916,7 +4029,7 @@ export class O extends VirtualKey$Base {
  }
 
  encode($e: _Encoder) {
-   $e.ui32(24);
+   $e.ui32(26);
    this.$do_encode($e);
  }
 
@@ -3951,7 +4064,7 @@ export class L_trigger extends VirtualKey$Base {
  }
 
  encode($e: _Encoder) {
-   $e.ui32(24);
+   $e.ui32(26);
    this.$do_encode($e);
  }
 
@@ -3986,7 +4099,7 @@ export class R_trigger extends VirtualKey$Base {
  }
 
  encode($e: _Encoder) {
-   $e.ui32(24);
+   $e.ui32(26);
    this.$do_encode($e);
  }
 
@@ -4001,15 +4114,15 @@ export class R_trigger extends VirtualKey$Base {
 
 
 export class KeyboardKey {
- static readonly $tag = 25;
- readonly $tag = 25;
+ static readonly $tag = 27;
+ readonly $tag = 27;
 
  constructor(readonly key: string, readonly code: string, readonly key_code: bigint) {}
 
  static decode($d: _Decoder): KeyboardKey {
    const $tag = $d.ui32();
-   if ($tag !== 25) {
-     throw new Error(`Invalid tag ${$tag} for KeyboardKey: expected 25`);
+   if ($tag !== 27) {
+     throw new Error(`Invalid tag ${$tag} for KeyboardKey: expected 27`);
    }
    return KeyboardKey.$do_decode($d);
  }
@@ -4022,7 +4135,7 @@ const key_code = $d.bigint();
  }
 
  encode($e: _Encoder) {
-   $e.ui32(25);
+   $e.ui32(27);
    this.$do_encode($e);
  }
 

@@ -1,5 +1,5 @@
 export const fingerprint = new Uint8Array(
-  "KATE/v00".split("").map((x) => x.charCodeAt(0))
+  "KATE/v01".split("").map((x) => x.charCodeAt(0))
 );
 
 export function check_fingerprint(data: DataView) {
