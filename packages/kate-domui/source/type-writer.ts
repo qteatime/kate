@@ -131,13 +131,8 @@ export class MT_Text extends MarkedText {
   }
 
   async advance() {
-    if (this._node == null) {
-      console.log("=> not rendered");
-      return "continue";
-    }
-
     this._position += 1;
-    this._node.textContent = this.characters.slice(0, this._position).join("");
+    this._node!.textContent = this.characters.slice(0, this._position).join("");
     if (this._position >= this.characters.length) {
       return "done";
     } else {
