@@ -126,15 +126,7 @@ export class MT_Text extends MarkedText {
   render(node: HTMLElement) {
     const canvas = document.createElement("span");
     canvas.className = "kate-type-writer-text-node";
-
-    const ghost_text = document.createElement("span");
-    ghost_text.textContent = this.full_content;
-    ghost_text.style.visibility = "hidden";
     node.appendChild(canvas);
-    canvas.style.width = `${canvas.clientWidth}px`;
-    canvas.style.height = `${canvas.clientHeight}px`;
-    ghost_text.remove();
-
     this._node = canvas;
   }
 
