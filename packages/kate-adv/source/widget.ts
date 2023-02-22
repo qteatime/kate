@@ -1,5 +1,6 @@
 import { Observable, widget } from "../../../packages/kate-domui/build";
 import { Widget } from "../../../packages/kate-domui/build/widget";
+import { MarkedText, TypeWriterText } from "../../kate-domui/build/type-writer";
 const {
   Box,
   Text,
@@ -95,4 +96,8 @@ export function with_attrs(
   child: ToWidget
 ) {
   return new WithAttrs(attrs, to_widget(child));
+}
+
+export function type_text(text: MarkedText[], speed_ms: number) {
+  return new TypeWriterText(text, speed_ms);
 }
