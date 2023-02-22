@@ -12,7 +12,7 @@ You can try Kate directly from your web-browser: go to https://kate.qteati.me/ a
 
 |                          |                                                               |
 | ------------------------ | ------------------------------------------------------------- |
-| **Display**              | 800x480 (normal-mode) or 320x192 (mini-mode) — a 5:3 screen   |
+| **Display**              | 800x480 — a 5:3 screen                                        |
 | **Cartridge size limit** | 512mb                                                         |
 | **Input**                | D-pad, O, X, L, R, Menu, and Capture (6 buttons), multi-touch |
 
