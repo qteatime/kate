@@ -7,9 +7,10 @@ const createWindow = () => {
     height: 600,
     frame: false,
     transparent: true,
+    icon: Path.join(__dirname, "icons/icon256.png"),
   });
 
-  win.loadFile("index.html");
+  win.loadFile(Path.join(__dirname, "index.html"));
 };
 
 app.whenReady().then(() => {
