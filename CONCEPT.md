@@ -113,3 +113,11 @@ Finally, Kate itself can be modified by anyone. OS Mods are a capability-based e
 OS extensions are very dangerous, and therefore require a far more grounded security model than games would; thankfully the capability model used by Kate's default sandboxing works just as well for this use case, so making extensions for the console itself is not that different from making a video game, you just request a different set of APIs and data access to the user, who can then decide if they're okay with taking that risk.
 
 Mods are essential for accessibility. As much as Kate wants to be a console that can be used by as many people as possible, inevitably there will be players whose circumstances and needs for access are not covered by the standard distribution—mods meet these people's needs directly, by allowing them to just adapt the console to their needs, rather than having to adapt themselves to the console. And Kate's capability-based model makes this as safe as possible even if they end up downloading their mods from someone else instead of making one themselves.
+
+## Making one's own physical console
+
+Kate's specification is based off electronic components that can be purchased from shops, allowing players who do wish to have a physical console to just build one.
+
+To support this Kate provides build specifications, as well as models for 3d-printing the casing and buttons. Players are, of course, more than welcome to make their own modifications to all of these, and put their own little spins and customisations on their physical devices.
+
+There will not be any official hardware sold from the Kate developers, but that doesn't mean the hardware cannot be made real!
