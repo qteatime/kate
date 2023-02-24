@@ -2,13 +2,26 @@ import { unreachable } from "../../util/build/assert";
 import { defer, sleep } from "../../util/build/promise";
 import { Widget } from "./widget";
 
+const default_word_re = /\S+\s*|\s+/g;
+export const break_strategy = {
+  words: (word_re: RegExp = default_word_re) => {
+    return (text: string) => [...text.matchAll(word_re)].map((x) => x[0]);
+  },
+};
+
+export type BreakStrategy = (text: string) => string[];
+
 export class TypeWriterText extends Widget {
   private _timer: any = null;
   private _state: "idle" | "playing" | "waiting" | "done" = "idle";
   private _next: MarkedText[] = [];
   private _current: MarkedText | null = null;
 
-  constructor(readonly text: MarkedText[], readonly speed_ms: number) {
+  constructor(
+    readonly text: MarkedText[],
+    readonly speed_ms: number,
+    readonly word_break_strategy: BreakStrategy = break_strategy.words()
+  ) {
     super();
     this._next = this.text.slice();
     this._current = null;
@@ -79,7 +92,7 @@ export class TypeWriterText extends Widget {
     }
     const next = this._next.shift();
     if (next != null) {
-      next.render(this.raw_node as HTMLElement);
+      next.render(this.raw_node as HTMLElement, this.word_break_strategy);
       this._current = next;
     }
   }
@@ -138,24 +151,44 @@ export class TypeWriterText extends Widget {
 export abstract class MarkedText {
   abstract advance(): Promise<"continue" | "wait" | "done">;
   abstract advance_all(): "wait" | "continue";
-  abstract render(parent: HTMLElement): void;
+  abstract render(parent: HTMLElement, break_strategy: BreakStrategy): void;
 }
 
 export class MT_Text extends MarkedText {
   private _position: number = 0;
   private _node: HTMLElement | null = null;
-  // TODO: handle full graphemes, or leave slicing to user
-  readonly characters: string[];
+  private characters: string[];
 
   constructor(readonly full_content: string) {
     super();
-    this.characters = [...full_content];
+    this.characters = [];
   }
 
-  render(node: HTMLElement) {
+  render(node: HTMLElement, break_strategy: BreakStrategy) {
     const canvas = document.createElement("span");
     canvas.className = "kate-type-writer-text-node";
     node.appendChild(canvas);
+    const ghost_text = document.createElement("span");
+    ghost_text.style.visibility = "hidden";
+    canvas.appendChild(ghost_text);
+    const words = break_strategy(this.full_content);
+    const lines = [];
+    let content = "";
+    let width = ghost_text.offsetWidth;
+    for (const word of words) {
+      ghost_text.textContent = content + word;
+      if (ghost_text.offsetWidth > width) {
+        content += word;
+        width = ghost_text.offsetWidth;
+      } else {
+        lines.push(content);
+        content = "\n" + word;
+        width = 0;
+      }
+    }
+    lines.push(content);
+    this.characters = [...lines.join("")];
+    ghost_text.remove();
     this._node = canvas;
   }
 
@@ -181,10 +214,10 @@ export class MT_Emphasis extends MarkedText {
     super();
   }
 
-  render(node: HTMLElement) {
+  render(node: HTMLElement, break_strategy: BreakStrategy) {
     const canvas = document.createElement("span");
     canvas.className = "kate-type-writer-text-emphasis";
-    this.child.render(canvas);
+    this.child.render(canvas, break_strategy);
     node.appendChild(canvas);
   }
 
