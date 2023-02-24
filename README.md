@@ -4,7 +4,7 @@
 
 Kate is a fantasy handheld console designed for simpler story-rich games, like Visual Novels and 2d RPGs. It looks like an old handheld, but runs on Windows, Mac, Linux, or in your browser. That way, you can easily and **safely** share small games as a single file that can run anywhere; and players can install and play it without worrying too much about security, since it's all sandboxed!
 
-You dive into more details about the concept and technical specifications on [Kate's Concept Paper](./CONCEPT.md).
+You can dive into more details about the concept and technical specifications on [Kate's Concept Paper](./CONCEPT.md).
 
 You can try Kate directly from your web-browser: go to https://kate.qteati.me/ and install the `hello.kart` file provided in this repository by drag-dropping it over the console.
 
@@ -59,7 +59,7 @@ See the `examples/` folder in this repository for some example games. You can bu
 
 Kate games are packaged as a single `.kart` binary file. This file contains something that can run in a webbrowser, a specification of which runtime it needs to use, some meta-data, and a set of arbitrary files in a read-only file-system. In that sense, it's much like a `.tar` or `.zip` file, just without compression and with some additional meta-data for the console.
 
-Currently the only supported runtime is `Web Archive`, which means you provide an HTML entry point and Kate will display that page in the console in a [fully sandboxed IFrame](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#attr-sandbox) and JavaScript support.
+Currently the only supported runtime is `Web Archive`, which means you provide an HTML entry point and Kate will display that page in the console in a [fully sandboxed IFrame](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#attr-sandbox) with JavaScript support.
 
 This means no access to things like `fetch` or even loading images. In order to remediate that, Kate provides an IPC layer that allows this sandboxed process to do things—by posting messages to the parent window, and handling messages sent by the parent window.
 
