@@ -294,9 +294,9 @@ w.task("desktop:generate", ["desktop:compile"], () => {
   copy("packages/kate-desktop/build/app.js", "www/app.js");
 });
 
-w.task("desktop:build", ["desktop:generate"], () => {});
+w.task("desktop:build", ["www:bundle", "desktop:generate"], () => {});
 
-w.task("desktop:run", ["www:bundle", "desktop:build"], () => {
+w.task("desktop:run", [], () => {
   const Electron = require("electron");
   const child = exec_file(Electron, [Path.join(__dirname, "www/app.js")]);
   child.on("exit", (code) => {
