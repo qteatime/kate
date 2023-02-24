@@ -22,12 +22,14 @@ export class TypeWriterText extends Widget {
     if (this.state !== "done") {
       this.play();
     }
+    KateAPI.input.on_key_pressed.listen(this.handle_key_pressed);
   }
 
   on_detached(): void {
     this._state = "idle";
     clearTimeout(this._timer);
     this._timer = null;
+    KateAPI.input.on_key_pressed.remove(this.handle_key_pressed);
   }
 
   on_done() {}
@@ -52,17 +54,43 @@ export class TypeWriterText extends Widget {
     return element;
   }
 
+  handle_key_pressed = async (key: KateTypes.ExtendedInputKey) => {
+    if (key !== "o") {
+      return;
+    }
+
+    if (this.state === "playing") {
+      while (this._current != null) {
+        const wait = this._current.advance_all();
+        this.advance();
+        if (wait) {
+          this._state = "waiting";
+          break;
+        }
+      }
+    } else if (this.state === "waiting") {
+      this._state = "playing";
+    }
+  };
+
+  advance() {
+    if (this._current != null) {
+      throw new Error(`advance() called with a current render`);
+    }
+    const next = this._next.shift();
+    if (next != null) {
+      next.render(this.raw_node as HTMLElement);
+      this._current = next;
+    }
+  }
+
   handle_update = async () => {
     if (this.state === "waiting" || this.state === "idle") {
       this._timer = setTimeout(this.handle_update, this.speed_ms);
       return;
     }
     if (this._state === "playing" && this._current == null) {
-      const next = this._next.shift();
-      if (next != null) {
-        next.render(this.raw_node as HTMLElement);
-        this._current = next;
-      }
+      this.advance();
     }
     if (this._current != null) {
       this._state = "waiting";
@@ -74,7 +102,7 @@ export class TypeWriterText extends Widget {
         }
         case "done": {
           this._state = "playing";
-          this._current = this._next.shift() ?? null;
+          this._current = null;
           break;
         }
         case "wait": {
@@ -109,6 +137,7 @@ export class TypeWriterText extends Widget {
 
 export abstract class MarkedText {
   abstract advance(): Promise<"continue" | "wait" | "done">;
+  abstract advance_all(): "wait" | "continue";
   abstract render(parent: HTMLElement): void;
 }
 
@@ -128,6 +157,12 @@ export class MT_Text extends MarkedText {
     canvas.className = "kate-type-writer-text-node";
     node.appendChild(canvas);
     this._node = canvas;
+  }
+
+  advance_all() {
+    this._position = this.characters.length;
+    this._node!.textContent = this.full_content;
+    return "continue" as const;
   }
 
   async advance() {
@@ -153,6 +188,10 @@ export class MT_Emphasis extends MarkedText {
     node.appendChild(canvas);
   }
 
+  advance_all() {
+    return this.child.advance_all();
+  }
+
   async advance() {
     return await this.child.advance();
   }
@@ -165,6 +204,10 @@ export class MT_Sleep extends MarkedText {
 
   render(parent: HTMLElement): void {}
 
+  advance_all() {
+    return "continue" as const;
+  }
+
   async advance() {
     await sleep(this.time_ms);
     return "done" as const;
@@ -175,6 +218,14 @@ export class MT_Wait extends MarkedText {
   private _state: "wait" | "done" = "wait";
 
   render(parent: HTMLElement) {}
+
+  advance_all() {
+    if (this._state === "wait") {
+      return "wait";
+    } else {
+      return "continue";
+    }
+  }
 
   async advance() {
     switch (this._state) {
