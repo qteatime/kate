@@ -75,6 +75,7 @@ export class TypeWriterText extends Widget {
     if (this.state === "playing") {
       while (this._current != null) {
         const wait = this._current.advance_all();
+        this._current = null;
         this.advance();
         if (wait) {
           this._state = "waiting";
