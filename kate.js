@@ -2060,14 +2060,19 @@ class KateIPCServer {
             }
             // -- Audio
             case "kate:audio.create-channel": {
-                const channel = await process.audio.create_channel(message.payload.max_tracks ?? 1);
-                await channel.resume();
-                return ok({ id: channel.id, volume: channel.volume.gain.value });
+                try {
+                    const channel = await process.audio.create_channel(message.payload.max_tracks ?? 1);
+                    channel.resume().catch(() => { });
+                    return ok({ id: channel.id, volume: channel.volume.gain.value });
+                }
+                catch (error) {
+                    return err(`kate:audio.cannot-create-channel`);
+                }
             }
             case "kate:audio.resume-channel": {
                 try {
                     const channel = process.audio.get_channel(message.payload.id);
-                    await channel.resume();
+                    channel.resume().catch(() => { });
                     return ok(null);
                 }
                 catch (_) {
@@ -2673,6 +2678,9 @@ class SceneHome extends Scene {
                 list.firstElementChild ??
                 null);
             this.handle_key_pressed = async (key) => {
+                if (this.os.processes.is_busy) {
+                    return;
+                }
                 switch (key) {
                     case "menu": {
                         for (const [button, cart] of cart_map) {
@@ -2968,7 +2976,7 @@ exports.Icon = Icon;
 },{"../../../../util/build/events":38}],35:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.KeyboardKey = exports.VirtualKey = exports.VirtualKey$Base = exports.Bridge = exports.Bridge$Base = exports.Platform = exports.Platform$Base = exports.Booklet_align = exports.Booklet_align$Base = exports.Booklet_cell = exports.Booklet_row = exports.Booklet_expr = exports.Booklet_expr$Base = exports.Accessibility = exports.Accessibility$Base = exports.Language = exports.Player_range = exports.Input_method = exports.Input_method$Base = exports.Duration = exports.Duration$Base = exports.Date = exports.Content_rating = exports.Content_rating$Base = exports.Version = exports.Release_type = exports.Release_type$Base = exports.Genre = exports.Genre$Base = exports.Capability = exports.Capability$Base = exports.Meta_booklet = exports.Meta_play = exports.Meta_rating = exports.Meta_release = exports.Meta_title = exports.Metadata = exports.File = exports.Cartridge = exports.Meta_security = exports._Encoder = exports._Decoder = void 0;
+exports.KeyboardKey = exports.VirtualKey = exports.VirtualKey$Base = exports.Bridge = exports.Bridge$Base = exports.Platform = exports.Platform$Base = exports.Booklet_align = exports.Booklet_align$Base = exports.Booklet_cell = exports.Booklet_row = exports.Booklet_expr = exports.Booklet_expr$Base = exports.Accessibility = exports.Accessibility$Base = exports.Language = exports.Player_range = exports.Input_method = exports.Input_method$Base = exports.Duration = exports.Duration$Base = exports.Date = exports.Content_rating = exports.Content_rating$Base = exports.Version = exports.Release_type = exports.Release_type$Base = exports.Genre = exports.Genre$Base = exports.Capability = exports.Capability$Base = exports.Extra = exports.Extra$Base = exports.Meta_play = exports.Meta_rating = exports.Meta_release = exports.Meta_title = exports.Metadata = exports.File = exports.Cartridge = exports.Meta_security = exports._Encoder = exports._Decoder = void 0;
 class _Decoder {
     view;
     offset = 0;
@@ -3344,16 +3352,16 @@ class Metadata {
     rating;
     play;
     security;
-    booklet;
+    extras;
     static $tag = 2;
     $tag = 2;
-    constructor(title, release, rating, play, security, booklet) {
+    constructor(title, release, rating, play, security, extras) {
         this.title = title;
         this.release = release;
         this.rating = rating;
         this.play = play;
         this.security = security;
-        this.booklet = booklet;
+        this.extras = extras;
     }
     static decode($d) {
         const $tag = $d.ui32();
@@ -3368,8 +3376,12 @@ class Metadata {
         const rating = Meta_rating.$do_decode($d);
         const play = Meta_play.$do_decode($d);
         const security = Meta_security.$do_decode($d);
-        const booklet = Meta_booklet.$do_decode($d);
-        return new Metadata(title, release, rating, play, security, booklet);
+        const extras = $d.array(() => {
+            const item = Extra$Base.$do_decode($d);
+            ;
+            return item;
+        });
+        return new Metadata(title, release, rating, play, security, extras);
     }
     encode($e) {
         $e.ui32(2);
@@ -3381,7 +3393,9 @@ class Metadata {
         (this.rating).$do_encode($e);
         (this.play).$do_encode($e);
         (this.security).$do_encode($e);
-        (this.booklet).$do_encode($e);
+        $e.array((this.extras), ($e, v) => {
+            (v).$do_encode($e);
+        });
     }
 }
 exports.Metadata = Metadata;
@@ -3605,43 +3619,70 @@ class Meta_play {
     }
 }
 exports.Meta_play = Meta_play;
-class Meta_booklet {
-    pages;
-    custom_css;
-    static $tag = 7;
-    $tag = 7;
-    constructor(pages, custom_css) {
-        this.pages = pages;
-        this.custom_css = custom_css;
-    }
+class Extra$Base {
     static decode($d) {
         const $tag = $d.ui32();
         if ($tag !== 7) {
-            throw new Error(`Invalid tag ${$tag} for Meta-booklet: expected 7`);
+            throw new Error(`Invalid tag ${$tag} for Extra: expected 7`);
         }
-        return Meta_booklet.$do_decode($d);
+        return Extra$Base.$do_decode($d);
     }
     static $do_decode($d) {
-        const pages = $d.array(() => {
-            const item = Booklet_expr$Base.$do_decode($d);
-            ;
-            return item;
-        });
-        const custom_css = $d.text();
-        return new Meta_booklet(pages, custom_css);
-    }
-    encode($e) {
-        $e.ui32(7);
-        this.$do_encode($e);
-    }
-    $do_encode($e) {
-        $e.array((this.pages), ($e, v) => {
-            (v).$do_encode($e);
-        });
-        $e.text(this.custom_css);
+        const $tag = $d.peek((v) => v.getUint8(0));
+        switch ($tag) {
+            case 0: return Extra.Booklet.decode($d);
+            default:
+                throw new Error(`Unknown tag ${$tag} in union Extra`);
+        }
     }
 }
-exports.Meta_booklet = Meta_booklet;
+exports.Extra$Base = Extra$Base;
+var Extra;
+(function (Extra) {
+    class Booklet extends Extra$Base {
+        pages;
+        custom_css;
+        language;
+        static $tag = 0 /* $Tags.Booklet */;
+        $tag = 0 /* $Tags.Booklet */;
+        constructor(pages, custom_css, language) {
+            super();
+            this.pages = pages;
+            this.custom_css = custom_css;
+            this.language = language;
+        }
+        static decode($d) {
+            return Booklet.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 0) {
+                throw new Error(`Invalid tag ${$tag} for Extra.Booklet: expected 0`);
+            }
+            const pages = $d.array(() => {
+                const item = Booklet_expr$Base.$do_decode($d);
+                ;
+                return item;
+            });
+            const custom_css = $d.text();
+            const language = $d.text();
+            return new Booklet(pages, custom_css, language);
+        }
+        encode($e) {
+            $e.ui32(7);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(0);
+            $e.array((this.pages), ($e, v) => {
+                (v).$do_encode($e);
+            });
+            $e.text(this.custom_css);
+            $e.text(this.language);
+        }
+    }
+    Extra.Booklet = Booklet;
+})(Extra = exports.Extra || (exports.Extra = {}));
 class Capability$Base {
     static decode($d) {
         const $tag = $d.ui32();
@@ -6286,7 +6327,7 @@ exports.KeyboardKey = KeyboardKey;
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.remove_fingerprint = exports.add_fingerprint = exports.check_fingerprint = exports.fingerprint = void 0;
-exports.fingerprint = new Uint8Array("KATE/v01".split("").map((x) => x.charCodeAt(0)));
+exports.fingerprint = new Uint8Array("KATE/v02".split("").map((x) => x.charCodeAt(0)));
 function check_fingerprint(data) {
     if (data.byteLength - data.byteOffset < exports.fingerprint.length) {
         throw new Error(`Invalid cartridge: unmatched fingerprint`);

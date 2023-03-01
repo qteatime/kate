@@ -1,4 +1,4 @@
-const cache_name = "kate-cache-v2";
+const cache_name = "kate-cache-v3";
 const app_files = [
   "/",
   "/manifest.json",
