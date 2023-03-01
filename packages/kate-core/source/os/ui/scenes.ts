@@ -90,6 +90,9 @@ export class SceneHome extends Scene {
           null
       );
       this.handle_key_pressed = async (key: ExtendedInputKey) => {
+        if (this.os.processes.is_busy) {
+          return;
+        }
         switch (key) {
           case "menu": {
             for (const [button, cart] of cart_map) {
