@@ -156,17 +156,21 @@ export class KateIPCServer {
 
       // -- Audio
       case "kate:audio.create-channel": {
-        const channel = await process.audio.create_channel(
-          message.payload.max_tracks ?? 1
-        );
-        await channel.resume();
-        return ok({ id: channel.id, volume: channel.volume.gain.value });
+        try {
+          const channel = await process.audio.create_channel(
+            message.payload.max_tracks ?? 1
+          );
+          channel.resume().catch(() => {});
+          return ok({ id: channel.id, volume: channel.volume.gain.value });
+        } catch (error) {
+          return err(`kate:audio.cannot-create-channel`);
+        }
       }
 
       case "kate:audio.resume-channel": {
         try {
           const channel = process.audio.get_channel(message.payload.id);
-          await channel.resume();
+          channel.resume().catch(() => {});
           return ok(null);
         } catch (_) {
           return err("kate:audio.cannot-resume");
