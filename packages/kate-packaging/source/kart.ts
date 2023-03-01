@@ -44,10 +44,7 @@ type Kart = {
       accessibility: Accessibility[];
       average_duration: Duration;
     };
-    booklet: {
-      pages: BookletExpr[];
-      custom_css_path: string | null;
-    };
+    extras: never[];
   };
   files: string[];
   platform: KartPlatform;
@@ -336,15 +333,11 @@ function metadata(x: J<Kart["metadata"]>) {
     make_duration(xp.leaf("average_duration"))
   );
 
-  const xb = x.at("booklet");
-  const booklet = new Cart.Meta_booklet(
-    [], // todo: booklet pages
-    maybe_load_text_file(xb.str_opt("custom_css_path"))
-  );
+  const extras: any[] = [];
 
   const security = new Cart.Meta_security([]);
 
-  return new Cart.Metadata(game, release, rating, play, security, booklet);
+  return new Cart.Metadata(game, release, rating, play, security, extras);
 }
 
 function make_genre(x: Genre, j: J<any>, i: number): Cart.Genre {

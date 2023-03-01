@@ -21,7 +21,7 @@ type Metadata {
   field rating: Meta-rating;
   field play: Meta-play;
   field security: Meta-security;
-  field booklet: Meta-booklet;
+  field extras: Extra[];
 }
 
 type Meta-title {
@@ -57,9 +57,12 @@ type Meta-play {
   field average-duration: Duration;
 }
 
-type Meta-booklet {
-  field pages: Booklet-expr[];
-  field custom-css: Text;
+union Extra {
+  type Booklet {
+    field pages: Booklet-expr[];
+    field custom-css: Text;
+    field language: Text; // ISO code
+  }
 }
 
 type Meta-security {

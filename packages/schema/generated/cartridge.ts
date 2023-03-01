@@ -437,7 +437,7 @@ export class Metadata {
  static readonly $tag = 2;
  readonly $tag = 2;
 
- constructor(readonly title: Meta_title, readonly release: Meta_release, readonly rating: Meta_rating, readonly play: Meta_play, readonly security: Meta_security, readonly booklet: Meta_booklet) {}
+ constructor(readonly title: Meta_title, readonly release: Meta_release, readonly rating: Meta_rating, readonly play: Meta_play, readonly security: Meta_security, readonly extras: ((Extra.Booklet))[]) {}
 
  static decode($d: _Decoder): Metadata {
    const $tag = $d.ui32();
@@ -453,8 +453,13 @@ const release = Meta_release.$do_decode($d);
 const rating = Meta_rating.$do_decode($d);
 const play = Meta_play.$do_decode($d);
 const security = Meta_security.$do_decode($d);
-const booklet = Meta_booklet.$do_decode($d);
-   return new Metadata(title, release, rating, play, security, booklet);
+
+const extras = $d.array(() => {
+ const item = Extra$Base.$do_decode($d);;
+ return item;
+});
+
+   return new Metadata(title, release, rating, play, security, extras);
  }
 
  encode($e: _Encoder) {
@@ -468,7 +473,9 @@ const booklet = Meta_booklet.$do_decode($d);
 (this.rating).$do_encode($e);
 (this.play).$do_encode($e);
 (this.security).$do_encode($e);
-(this.booklet).$do_encode($e);
+$e.array((this.extras), ($e, v) => {
+  (v).$do_encode($e);
+});
  }
 }
 
@@ -688,21 +695,53 @@ $e.array((this.accessibility), ($e, v) => {
 
 
 
-export class Meta_booklet {
- static readonly $tag = 7;
- readonly $tag = 7;
+export type Extra = Extra.Booklet;
 
- constructor(readonly pages: ((Booklet_expr.BE_text | Booklet_expr.BE_image | Booklet_expr.BE_bold | Booklet_expr.BE_italic | Booklet_expr.BE_title | Booklet_expr.BE_subtitle | Booklet_expr.BE_subtitle2 | Booklet_expr.BE_font | Booklet_expr.BE_color | Booklet_expr.BE_background | Booklet_expr.BE_columns | Booklet_expr.BE_fixed | Booklet_expr.BE_row | Booklet_expr.BE_column | Booklet_expr.BE_stack | Booklet_expr.BE_table | Booklet_expr.BE_class))[], readonly custom_css: string) {}
-
- static decode($d: _Decoder): Meta_booklet {
+export abstract class Extra$Base {
+ static decode($d: _Decoder): Extra {
    const $tag = $d.ui32();
    if ($tag !== 7) {
-     throw new Error(`Invalid tag ${$tag} for Meta-booklet: expected 7`);
+     throw new Error(`Invalid tag ${$tag} for Extra: expected 7`);
    }
-   return Meta_booklet.$do_decode($d);
+   return Extra$Base.$do_decode($d);
  }
 
- static $do_decode($d: _Decoder): Meta_booklet {
+ static $do_decode($d: _Decoder): Extra {
+   const $tag = $d.peek((v) => v.getUint8(0));
+
+   switch ($tag) {
+     case 0: return Extra.Booklet.decode($d);
+
+     default:
+       throw new Error(`Unknown tag ${$tag} in union Extra`);
+   }
+ }
+}
+
+export namespace Extra {
+ export const enum $Tags {
+   Booklet
+ }
+
+ 
+export class Booklet extends Extra$Base {
+ static readonly $tag = $Tags.Booklet;
+ readonly $tag = $Tags.Booklet;
+
+ constructor(readonly pages: ((Booklet_expr.BE_text | Booklet_expr.BE_image | Booklet_expr.BE_bold | Booklet_expr.BE_italic | Booklet_expr.BE_title | Booklet_expr.BE_subtitle | Booklet_expr.BE_subtitle2 | Booklet_expr.BE_font | Booklet_expr.BE_color | Booklet_expr.BE_background | Booklet_expr.BE_columns | Booklet_expr.BE_fixed | Booklet_expr.BE_row | Booklet_expr.BE_column | Booklet_expr.BE_stack | Booklet_expr.BE_table | Booklet_expr.BE_class))[], readonly custom_css: string, readonly language: string) {
+   super();
+ }
+
+ static decode($d: _Decoder): Booklet {
+   return Booklet.$do_decode($d);
+ }
+
+ static $do_decode($d: _Decoder): Booklet {
+   const $tag = $d.ui8();
+   if ($tag !== 0) {
+     throw new Error(`Invalid tag ${$tag} for Extra.Booklet: expected 0`);
+   }
+
    
 const pages = $d.array(() => {
  const item = Booklet_expr$Base.$do_decode($d);;
@@ -710,7 +749,8 @@ const pages = $d.array(() => {
 });
 
 const custom_css = $d.text();
-   return new Meta_booklet(pages, custom_css);
+const language = $d.text();
+   return new Booklet(pages, custom_css, language);
  }
 
  encode($e: _Encoder) {
@@ -719,11 +759,15 @@ const custom_css = $d.text();
  }
 
  $do_encode($e: _Encoder) {
+   $e.ui8(0);
    $e.array((this.pages), ($e, v) => {
   (v).$do_encode($e);
 });
 $e.text(this.custom_css);
+$e.text(this.language);
  }
+}
+
 }
 
 
