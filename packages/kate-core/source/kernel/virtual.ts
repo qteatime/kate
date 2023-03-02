@@ -1,4 +1,5 @@
 import { EventStream } from "../../../util/build/events";
+const pkg = require("../../package.json");
 
 export type InputKey =
   | "up"
@@ -33,6 +34,7 @@ export class VirtualConsole {
   readonly screen: HTMLElement;
   readonly hud: HTMLElement;
   readonly os_root: HTMLElement;
+  readonly version_container: HTMLElement | null;
   readonly on_input_changed = new EventStream<{
     key: InputKey;
     is_down: boolean;
@@ -76,6 +78,10 @@ export class VirtualConsole {
     this.hud = root.querySelector("#kate-hud")!;
     this.device_display = root.querySelector(".kate-screen")!;
     this.body = root.querySelector(".kate-body")!;
+    this.version_container = root.querySelector(".kate-version");
+    if (this.version_container != null && pkg.version != null) {
+      this.version_container.textContent = `v${pkg.version}`;
+    }
     this.reset_states();
   }
 
