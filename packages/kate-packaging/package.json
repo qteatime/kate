@@ -1,8 +1,12 @@
 {
-  "name": "@qteatime/kate-domui",
-  "version": "0.1.0",
-  "description": "A simple DOM-based UI library for Kate games.",
+  "name": "@qteatime/kate-packaging",
+  "version": "0.2.0",
+  "description": "Tools for packaging games as Kate cartridges.",
   "main": "build/index.js",
+  "bin": {
+    "kart": "./cli/kart.js",
+    "kate-dist": "./cli/kate-dist.js"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/qteatime/kate.git"

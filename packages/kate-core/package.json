@@ -1,7 +1,7 @@
 {
-  "name": "@qteatime/kate-domui",
-  "version": "0.1.0",
-  "description": "A simple DOM-based UI library for Kate games.",
+  "name": "@qteatime/kate-core",
+  "version": "0.2.0",
+  "description": "The Kate emulator --- a fantasy console for 2d story games.",
   "main": "build/index.js",
   "repository": {
     "type": "git",

@@ -1,26 +1,5 @@
 {
-  "name": "kate",
-  "version": "0.2.0",
-  "description": "A fantasy handheld console for Visual Novels, 2d RPGs, and other story-rich games!",
-  "main": "index.js",
-  "bin": {
-    "kart": "./packages/kate-packaging/build/kart.js",
-    "kate-pkg": "./packages/kate-packaging/build/kate-pkg.js"
-  },
-  "scripts": {
-    "app": "electron www/app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/qteatime/kate.git"
-  },
-  "author": "Q.",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/qteatime/kate/issues"
-  },
-  "homepage": "https://github.com/qteatime/kate#readme",
+  "private": true,
   "dependencies": {
     "@types/glob": "^8.0.1",
     "electron": "^20.3.11",

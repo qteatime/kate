@@ -1,8 +1,8 @@
 {
-  "name": "@qteatime/kate-domui",
-  "version": "0.1.0",
-  "description": "A simple DOM-based UI library for Kate games.",
-  "main": "build/index.js",
+  "name": "@qteatime/kate-schemas",
+  "version": "0.2.0",
+  "description": "Binary schemas for parsing Kate cartridges and similar files.",
+  "main": "lib/index.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/qteatime/kate.git"

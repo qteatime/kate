@@ -1,8 +1,16 @@
 {
   "name": "@qteatime/kate-adv",
-  "version": "0.0.1",
-  "description": "A framework for building Visual Novels/Adventure games in Kate",
+  "version": "0.2.0",
+  "description": "A framework for building Visual Novels/Adventure games for Kate.",
   "main": "build/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/qteatime/kate.git"
+  },
   "author": "Q.",
-  "license": "MIT"
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/qteatime/kate/issues"
+  },
+  "homepage": "https://github.com/qteatime/kate#readme"
 }

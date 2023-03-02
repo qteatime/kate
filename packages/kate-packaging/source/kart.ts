@@ -4,12 +4,6 @@ import * as Cart from "../../schema/generated/cartridge";
 import { add_fingerprint } from "../../schema/lib/fingerprint";
 import { unreachable } from "../../util/build/assert";
 import * as Glob from "glob";
-const [out, json_file] = process.argv.slice(2);
-
-if (!out || !json_file) {
-  console.log("Usage: kart <out.kart> <json>");
-  process.exit(1);
-}
 
 type Kart = {
   id: string;
@@ -254,45 +248,39 @@ const mime_table = Object.assign(Object.create(null), {
   ".wasm": "application/wasm",
 });
 
-let base_dir = Path.dirname(Path.resolve(json_file));
-const dir_root = base_dir;
-const json: Kart = JSON.parse(FS.readFileSync(json_file, "utf-8"));
-const x = json.platform;
-if (json.root != null) {
-  const new_base_dir = Path.resolve(base_dir, json.root);
-  assert_base(new_base_dir);
-  base_dir = new_base_dir;
-}
-
-function assert_base(path: string) {
+function assert_base(path: string, root: string) {
   const file = FS.realpathSync(path);
-  if (!file.startsWith(dir_root)) {
+  if (!file.startsWith(root)) {
     throw new Error(
-      `Cannot load file '${file}' because it's outside of the base directory '${base_dir}'`
+      `Cannot load file '${file}' because it's outside of the base directory '${root}'`
     );
   }
   return file;
 }
 
-function load_file(path0: string) {
+function load_file(path0: string, root: string, base_dir: string) {
   const path = Path.resolve(base_dir, path0);
-  return new Uint8Array(FS.readFileSync(assert_base(path)));
+  return new Uint8Array(FS.readFileSync(assert_base(path, root)));
 }
 
-function load_text_file(path0: string) {
+function load_text_file(path0: string, root: string, base_dir: string) {
   const path = Path.resolve(base_dir, path0);
-  return FS.readFileSync(assert_base(path), "utf-8");
+  return FS.readFileSync(assert_base(path, root), "utf-8");
 }
 
-function maybe_load_text_file(path: string | null) {
+function maybe_load_text_file(
+  path: string | null,
+  root: string,
+  base_dir: string
+) {
   if (path == null) {
     return "";
   } else {
-    return load_text_file(path);
+    return load_text_file(path, root, base_dir);
   }
 }
 
-function metadata(x: J<Kart["metadata"]>) {
+function metadata(x: J<Kart["metadata"]>, root: string, base_dir: string) {
   const xgame = x.at("game");
   const game = new Cart.Meta_title(
     xgame.str("author"),
@@ -303,7 +291,7 @@ function metadata(x: J<Kart["metadata"]>) {
     new Cart.File(
       "thumbnail.png",
       "image/png",
-      load_file(xgame.str("thumbnail_path"))
+      load_file(xgame.str("thumbnail_path"), root, base_dir)
     )
   );
   const xrel = x.at("release");
@@ -311,7 +299,7 @@ function metadata(x: J<Kart["metadata"]>) {
     make_release_type(xrel.leaf("kind")),
     make_date(xrel.at("date")),
     make_version(xrel.at("version")),
-    maybe_load_text_file(xrel.str_opt("legal_notices_path")),
+    maybe_load_text_file(xrel.str_opt("legal_notices_path"), root, base_dir),
     xrel.str("licence_name"),
     xrel.bool("allow_derivative"),
     xrel.bool("allow_commercial")
@@ -505,7 +493,7 @@ function make_absolute(path: string) {
   }
 }
 
-function files(patterns: Kart["files"]) {
+function files(patterns: Kart["files"], root: string, base_dir: string) {
   const paths = [
     ...new Set(patterns.flatMap((x) => Glob.sync(x, { cwd: base_dir }))),
   ];
@@ -513,17 +501,23 @@ function files(patterns: Kart["files"]) {
     if (FS.statSync(Path.resolve(base_dir, path)).isFile()) {
       const ext = Path.extname(path);
       const mime = mime_table[ext] ?? "application/octet-stream";
-      return [new Cart.File(make_absolute(path), mime, load_file(path))];
+      return [
+        new Cart.File(
+          make_absolute(path),
+          mime,
+          load_file(path, root, base_dir)
+        ),
+      ];
     } else {
       return [];
     }
   });
 }
 
-function save(cart: Cart.Cartridge) {
+function save(cart: Cart.Cartridge, output: string) {
   const encoder = new Cart._Encoder();
   cart.encode(encoder);
-  FS.writeFileSync(out, add_fingerprint(encoder.to_bytes()));
+  FS.writeFileSync(output, add_fingerprint(encoder.to_bytes()));
 }
 
 function make_bridge(x: Bridge) {
@@ -603,25 +597,38 @@ function make_virtual_key(key: string) {
   }
 }
 
-const meta = metadata(J.from(json).at("metadata"));
-const archive = files(json.files);
-
-switch (x.type) {
-  case "web-archive": {
-    save(
-      new Cart.Cartridge(
-        json.id,
-        meta,
-        archive,
-        new Cart.Platform.Web_archive(
-          load_text_file(x.html),
-          x.bridges.map(make_bridge)
-        )
-      )
-    );
-    break;
+export function make_cartridge(path: string, output: string) {
+  let base_dir = Path.dirname(Path.resolve(path));
+  const dir_root = base_dir;
+  const json: Kart = JSON.parse(FS.readFileSync(path, "utf-8"));
+  const x = json.platform;
+  if (json.root != null) {
+    const new_base_dir = Path.resolve(base_dir, json.root);
+    assert_base(new_base_dir, dir_root);
+    base_dir = new_base_dir;
   }
 
-  default:
-    throw new Error(`Unsupported type ${(x as any).type}`);
+  const meta = metadata(J.from(json).at("metadata"), dir_root, base_dir);
+  const archive = files(json.files, dir_root, base_dir);
+
+  switch (x.type) {
+    case "web-archive": {
+      save(
+        new Cart.Cartridge(
+          json.id,
+          meta,
+          archive,
+          new Cart.Platform.Web_archive(
+            load_text_file(x.html, dir_root, base_dir),
+            x.bridges.map(make_bridge)
+          )
+        ),
+        output
+      );
+      break;
+    }
+
+    default:
+      throw new Error(`Unsupported type ${(x as any).type}`);
+  }
 }

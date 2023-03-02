@@ -1,8 +1,7 @@
 {
-  "name": "@qteatime/kate-domui",
-  "version": "0.1.0",
-  "description": "A simple DOM-based UI library for Kate games.",
-  "main": "build/index.js",
+  "name": "@qteatime/kate-api-types",
+  "version": "0.2.0",
+  "description": "Typescript definitions for the injected Kate API.",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/qteatime/kate.git"

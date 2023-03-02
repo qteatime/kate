@@ -127,7 +127,12 @@ function pack_assets({ glob: pattern, filter, name, target }) {
 }
 
 function kart({ config, output }) {
-  exec_file("node", ["packages/kate-packaging/build/kart.js", output, config]);
+  exec_file("node", [
+    "packages/kate-packaging/cli/kart.js",
+    "--output",
+    output,
+    config,
+  ]);
 }
 
 function copy(from, to) {
