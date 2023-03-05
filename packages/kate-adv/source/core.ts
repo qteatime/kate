@@ -126,6 +126,10 @@ export class Layer {
     return this._widgets.try_get(name);
   }
 
+  keys() {
+    return this._widgets.keys();
+  }
+
   *find_all(predicate: (name: string) => boolean) {
     for (const [key, value] of this._widgets.entries()) {
       if (predicate(key)) {
