@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 const { parseArgs } = require("util");
 const Kart = require("../build/kart");
 

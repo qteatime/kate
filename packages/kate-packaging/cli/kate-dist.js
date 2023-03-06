@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 const { parseArgs } = require("util");
 const Dist = require("../build/kate-dist");
 
