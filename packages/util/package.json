@@ -1,0 +1,16 @@
+{
+  "name": "@qteatime/kate-util",
+  "version": "0.1.0",
+  "description": "Assorted utility functions used by many Kate packages.",
+  "main": "build/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/qteatime/kate.git"
+  },
+  "author": "Q.",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/qteatime/kate/issues"
+  },
+  "homepage": "https://github.com/qteatime/kate#readme"
+}
