@@ -40,6 +40,12 @@ export class KateAudioServer {
     }
     return source;
   }
+
+  async stop() {
+    for (const channel of this.channels.values()) {
+      await channel.stop_all_sources();
+    }
+  }
 }
 
 class AudioChannel {

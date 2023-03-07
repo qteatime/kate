@@ -52,6 +52,7 @@ export class CRW_Process extends CR_Process {
     this.frame.src = "about:blank";
     this.frame.remove();
     this.channel?.dispose();
+    await this.audio.stop();
   }
 
   async pause() {
