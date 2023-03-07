@@ -89,7 +89,7 @@ Kate provides fallbacks for some of these. The experience of playing the game ma
 - [Drag and Drop](https://caniuse.com/dragndrop) — used for installing cartridges by dropping them on the console (mobile devices have a button for this instead);
 - [Offline web applications](https://caniuse.com/offline-apps) — used to allow https://kate.qteati.me to run without internet connection;
 - [Add to home screen](https://caniuse.com/web-app-manifest) — used to allow installing https://kate.qteati.me as a native-like app;
-- [Media Capture from DOM](https://caniuse.com/mediacapture-fromelement) — used for screenshots and gameplay recording;
+- [Media Capture from DOM](https://caniuse.com/mediacapture-fromelement) and [Media Recorder API](https://caniuse.com/mediarecorder) — used for screenshots and gameplay video recording;
 - [Full Screen API](https://caniuse.com/fullscreen) — used for running the console in fullscreen;
 - [Service Workers](https://caniuse.com/serviceworkers) — used for running Kate offline;
 
@@ -98,7 +98,6 @@ Kate provides fallbacks for some of these. The experience of playing the game ma
 Features added in the future might use the APIs below:
 
 - [Media Capture API](https://caniuse.com/html-media-capture) — Using microphone or camera as input, but much work needs to be done in making the privacy implications of this understandable and reasonable for players;
-- [Media Recorder API](https://caniuse.com/mediarecorder) — ?;
 - [Custom protocol handling](https://caniuse.com/registerprotocolhandler) — better supporting users to share content from games as URLs that can open directly in their respective games;
 - [Video tracks](https://caniuse.com/videotracks) and [audio tracks](https://caniuse.com/audiotracks) — providing accessibility features (subtitles, sign-language, etc) on videos, support is currently very spotty however;
 - [Streams](https://caniuse.com/streams) — for improving memory usage in Kate (currently the entire cartridge is loaded in memory, requiring at least double the amount of RAM);
