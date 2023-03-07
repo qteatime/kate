@@ -104,6 +104,7 @@
           async function start() {
             window.removeEventListener("click", start);
             window.removeEventListener("keydown", start);
+            window.removeEventListener("touchstart", start);
 
             const storage = kate_os.kv_storage.get_store(cart.id);
             const runtime = kate.runtimes.from_cartridge(
@@ -119,6 +120,7 @@
             kate.console.os_root.classList.add("in-background");
             kate_os.hide_hud(loading);
           }
+          window.addEventListener("touchstart", start);
           window.addEventListener("click", start);
           window.addEventListener("keydown", start);
 
