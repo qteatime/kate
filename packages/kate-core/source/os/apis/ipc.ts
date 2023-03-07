@@ -160,30 +160,9 @@ export class KateIPCServer {
           const channel = await process.audio.create_channel(
             message.payload.max_tracks ?? 1
           );
-          channel.resume().catch(() => {});
           return ok({ id: channel.id, volume: channel.volume.gain.value });
         } catch (error) {
           return err(`kate:audio.cannot-create-channel`);
-        }
-      }
-
-      case "kate:audio.resume-channel": {
-        try {
-          const channel = process.audio.get_channel(message.payload.id);
-          channel.resume().catch(() => {});
-          return ok(null);
-        } catch (_) {
-          return err("kate:audio.cannot-resume");
-        }
-      }
-
-      case "kate:audio.pause-channel": {
-        try {
-          const channel = process.audio.get_channel(message.payload.id);
-          await channel.suspend();
-          return ok(null);
-        } catch (_) {
-          return err("kate:audio.cannot-pause");
         }
       }
 

@@ -41,6 +41,7 @@ export class VirtualConsole {
   }>();
   readonly on_key_pressed = new EventStream<ExtendedInputKey>();
   readonly on_tick = new EventStream<number>();
+  readonly audio_context = new AudioContext();
 
   private timer_id: any = null;
   private last_time: number | null = null;
@@ -82,6 +83,7 @@ export class VirtualConsole {
     if (this.version_container != null && pkg.version != null) {
       this.version_container.textContent = `v${pkg.version}`;
     }
+    this.open_audio_output();
     this.reset_states();
   }
 
@@ -113,6 +115,21 @@ export class VirtualConsole {
   private start_ticking() {
     cancelAnimationFrame(this.timer_id);
     this.timer_id = requestAnimationFrame(this.tick);
+  }
+
+  private open_audio_output() {
+    this.audio_context.resume().catch((e) => {});
+    if (this.audio_context.state !== "running") {
+      const open_audio_output = () => {
+        this.audio_context.resume().catch((e) => {});
+        window.removeEventListener("touchstart", open_audio_output);
+        window.removeEventListener("click", open_audio_output);
+        window.removeEventListener("keydown", open_audio_output);
+      };
+      window.addEventListener("touchstart", open_audio_output);
+      window.addEventListener("click", open_audio_output);
+      window.addEventListener("keydown", open_audio_output);
+    }
   }
 
   private tick = (time: number) => {

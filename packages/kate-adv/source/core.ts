@@ -218,7 +218,6 @@ export class AudioChannel {
   async play(name: string, loop: boolean) {
     const source = await this.adv.loader.get_sound_source(name);
     await KateAPI.audio.play(this.channel, source, loop);
-    await this.channel.resume();
   }
 
   async stop_all() {

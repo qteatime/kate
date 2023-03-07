@@ -5,18 +5,22 @@ export class KateAudioServer {
   private channels = new Map<string, AudioChannel>();
   private sources = new Map<string, AudioSource>();
 
+  get audio_context() {
+    return this.os.kernel.console.audio_context;
+  }
+
   constructor(readonly os: KateOS) {}
 
   async create_channel(max_tracks: number) {
     const id = make_id();
-    const channel = new AudioChannel(id, max_tracks);
+    const channel = new AudioChannel(this, id, max_tracks);
     this.channels.set(id, channel);
     return channel;
   }
 
   async load_sound(bytes: Uint8Array) {
     const id = make_id();
-    const source = await AudioSource.from_bytes(id, bytes);
+    const source = await AudioSource.from_bytes(this, id, bytes);
     this.sources.set(id, source);
     return source;
   }
@@ -40,15 +44,15 @@ export class KateAudioServer {
 
 class AudioChannel {
   readonly volume: GainNode;
-  readonly output: AudioDestinationNode;
-  readonly context: AudioContext;
   private sources: AudioBufferSourceNode[] = [];
 
-  constructor(readonly id: string, readonly max_tracks: number = 1) {
-    this.context = new AudioContext();
-    this.output = this.context.destination;
-    this.volume = this.context.createGain();
-    this.volume.connect(this.output);
+  constructor(
+    readonly server: KateAudioServer,
+    readonly id: string,
+    readonly max_tracks: number = 1
+  ) {
+    this.volume = server.audio_context.createGain();
+    this.volume.connect(server.audio_context.destination);
   }
 
   get input() {
@@ -63,14 +67,6 @@ class AudioChannel {
     this.volume.gain.value = value;
   }
 
-  async resume() {
-    await this.context.resume();
-  }
-
-  async suspend() {
-    await this.context.suspend();
-  }
-
   async stop_all_sources() {
     for (const source of this.sources) {
       source.stop();
@@ -80,7 +76,7 @@ class AudioChannel {
   }
 
   async play(sound: AudioSource, loop: boolean) {
-    const node = this.context.createBufferSource();
+    const node = this.server.audio_context.createBufferSource();
     node.buffer = sound.buffer;
     node.loop = loop;
     this.sources.push(node);
@@ -97,9 +93,12 @@ class AudioChannel {
 class AudioSource {
   constructor(readonly id: string, readonly buffer: AudioBuffer) {}
 
-  static async from_bytes(id: string, bytes: Uint8Array) {
-    const context = new AudioContext();
-    const buffer = await context.decodeAudioData(bytes.buffer);
+  static async from_bytes(
+    server: KateAudioServer,
+    id: string,
+    bytes: Uint8Array
+  ) {
+    const buffer = await server.audio_context.decodeAudioData(bytes.buffer);
     return new AudioSource(id, buffer);
   }
 }

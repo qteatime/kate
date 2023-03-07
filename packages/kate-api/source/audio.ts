@@ -18,14 +18,6 @@ export class KateAudio {
     return new KateAudioChannel(this, name, id, max_tracks, volume);
   }
 
-  async resume_channel(channel: KateAudioChannel) {
-    await this.#channel.call("kate:audio.resume-channel", { id: channel.id });
-  }
-
-  async pause_channel(channel: KateAudioChannel) {
-    await this.#channel.call("kate:audio.pause-channel", { id: channel.id });
-  }
-
   async stop_all_sources(channel: KateAudioChannel) {
     await this.#channel.call("kate:audio.stop-all-sources", { id: channel.id });
   }
@@ -78,14 +70,6 @@ export class KateAudioChannel {
 
     this._volume = value;
     this.audio.change_channel_volume(this, value);
-  }
-
-  async resume() {
-    return this.audio.resume_channel(this);
-  }
-
-  async pause() {
-    return this.audio.pause_channel(this);
   }
 
   async stop_all_sources() {
