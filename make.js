@@ -331,6 +331,7 @@ w.task(
     "bridges:build",
     "core:build",
     "domui:build",
+    "adv:build",
     "packaging:build",
     "www:bundle",
     "example:all",
