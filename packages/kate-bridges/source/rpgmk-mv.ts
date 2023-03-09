@@ -1,16 +1,21 @@
 export {};
 
-declare var Utils: any;
 declare var Input: any;
+declare var WebAudio: any;
+declare var AudioManager: any;
 
 let paused = false;
 const { events } = KateAPI;
 
-// -- Things that need to be patched still
-Utils.isOptionValid = (name: string) => {
-  return ["noaudio"].includes(name);
-};
+// Disable RPGMkMV's handling of gamepads to avoid double-input handling.
+Input._updateGamepadState = () => {};
 
+// Ensure RPGMkMV uses ogg files (Kate will handle the decoding).
+WebAudio.canPlayOgg = () => true;
+WebAudio.canPlayM4a = () => false;
+AudioManager.audioFileExt = () => ".ogg";
+
+// Patch RPGMkMV's keyboard input handling directly
 const key_mapping: { [key: string]: string } = {
   up: "up",
   right: "right",

@@ -126,7 +126,8 @@ type Bridge =
   | {
       type: "input-proxy";
       mapping: { [key: string]: KeyboardKey } | "defaults";
-    };
+    }
+  | { type: "rpgmaker-mv" };
 
 class J<T extends { [key: string]: any }> {
   constructor(readonly value: T, readonly path: string[]) {}
@@ -534,6 +535,10 @@ function make_bridge(x: Bridge) {
       return new Cart.Bridge.Input_proxy(
         new Map(Object.entries(get_mapping(x.mapping)).map(make_key_pair))
       );
+    }
+
+    case "rpgmaker-mv": {
+      return new Cart.Bridge.RPGMaker_MV();
     }
 
     default:

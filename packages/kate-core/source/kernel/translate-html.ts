@@ -27,7 +27,6 @@ function add_preamble(dom: Document, context: Context) {
   script.textContent = `
   void function() {
     var KATE_SECRET = ${JSON.stringify(context.secret)};
-    var KATE_LOCAL_STORAGE = ${JSON.stringify(context.local_storage ?? {})};
     ${bridges["kate-api.js"]};
   }();
   `;
@@ -94,7 +93,27 @@ function apply_bridge(
     }
 
     case Cart.Bridge.$Tags.Local_storage_proxy: {
-      append_proxy(bridges["local-storage.js"]);
+      const full_source = `
+        var KATE_LOCAL_STORAGE = ${JSON.stringify(context.local_storage ?? {})};
+        ${bridges["local-storage.js"]}
+      `;
+      append_proxy(full_source);
+      break;
+    }
+
+    case Cart.Bridge.$Tags.RPGMaker_MV: {
+      apply_bridge(
+        new Cart.Bridge.Local_storage_proxy(),
+        reference,
+        dom,
+        context
+      );
+      apply_bridge(new Cart.Bridge.Network_proxy(), reference, dom, context);
+      const main = dom.querySelector(`body script[src="js/main.js"]`);
+      if (main == null) {
+        throw new Error(`Unexpected structure for RPGMaker MV HTML.`);
+      }
+      append_proxy(bridges["rpgmk-mv.js"], main);
       break;
     }
 

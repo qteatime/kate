@@ -215,6 +215,7 @@ union Bridge {
   type Input-proxy {
     field mapping: VirtualKey -> KeyboardKey;
   }
+  type RPGMaker-MV {}
 }
 
 union VirtualKey {
