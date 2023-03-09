@@ -121,10 +121,9 @@ export class HUD_Dialog extends Scene {
     try {
       this.canvas.textContent = "";
       this.canvas.appendChild(element);
-      const old_root = this.os.focus_handler.current_root;
-      this.os.focus_handler.change_root(this.canvas);
+      this.os.focus_handler.push_root(this.canvas);
       return_value = await result.promise;
-      this.os.focus_handler.compare_and_change_root(old_root, this.canvas);
+      this.os.focus_handler.pop_root(this.canvas);
       setTimeout(async () => {
         element.classList.add("leaving");
         await wait(this.FADE_OUT_TIME_MS);
@@ -177,10 +176,9 @@ export class HUD_Dialog extends Scene {
     try {
       this.canvas.textContent = "";
       this.canvas.appendChild(element);
-      const old_root = this.os.focus_handler.current_root;
-      this.os.focus_handler.change_root(this.canvas);
+      this.os.focus_handler.push_root(this.canvas);
       return_value = await result.promise;
-      this.os.focus_handler.compare_and_change_root(old_root, this.canvas);
+      this.os.focus_handler.pop_root(this.canvas);
       setTimeout(async () => {
         element.classList.add("leaving");
         await wait(this.FADE_OUT_TIME_MS);

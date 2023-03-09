@@ -2,6 +2,7 @@ import { ExtendedInputKey } from "../../kernel/virtual";
 import type { KateOS } from "../os";
 
 export class KateFocusHandler {
+  private _stack: (HTMLElement | null)[] = [];
   private _current_root: HTMLElement | null = null;
 
   constructor(readonly os: KateOS) {}
@@ -18,7 +19,8 @@ export class KateFocusHandler {
     return this._current_root;
   }
 
-  change_root(element: HTMLElement | null) {
+  push_root(element: HTMLElement | null) {
+    this._stack.push(this._current_root);
     this._current_root = element;
     if (element != null && element.querySelector(".focus") == null) {
       const candidates0 = Array.from(
@@ -31,20 +33,19 @@ export class KateFocusHandler {
     }
   }
 
-  compare_and_change_root(
-    element: HTMLElement | null,
-    old: HTMLElement | null
-  ) {
-    if (this.current_root === old) {
-      this.change_root(element);
-      return true;
-    } else {
-      return false;
+  pop_root(expected: HTMLElement | null) {
+    if (expected != this._current_root) {
+      console.warn(`pop_root() with unexpected root`, {
+        expected,
+        current: this._current_root,
+      });
+      return;
     }
-  }
-
-  focus_current_scene() {
-    this.change_root(this.os.current_scene?.canvas ?? null);
+    if (this._stack.length > 0) {
+      this._current_root = this._stack.pop()!;
+    } else {
+      throw new Error(`pop_root() on an empty focus stack`);
+    }
   }
 
   handle_input = (key: ExtendedInputKey) => {

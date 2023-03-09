@@ -77,15 +77,16 @@ export class KateOS {
     }
     this._current_scene = scene;
     scene.attach(this.display);
-    this.focus_handler.change_root(scene.canvas);
+    this.focus_handler.push_root(scene.canvas);
   }
 
   pop_scene() {
     if (this._current_scene != null) {
+      this.focus_handler.pop_root(this._current_scene.canvas);
       this._current_scene.detach();
     }
     this._current_scene = this._scene_stack.pop() ?? null;
-    this.focus_handler.change_root(this._current_scene?.canvas ?? null);
+    this.focus_handler.push_root(this._current_scene?.canvas ?? null);
   }
 
   show_hud(scene: Scene) {

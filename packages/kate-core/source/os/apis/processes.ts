@@ -25,7 +25,7 @@ export class KateProcesses {
 
     const loading = new HUD_LoadIndicator(this.os);
     this.os.show_hud(loading);
-    this.os.focus_handler.change_root(null);
+    this.os.focus_handler.push_root(null);
     try {
       const cart = await this.os.db.transaction(
         [Db.cart_files],
@@ -60,7 +60,7 @@ export class KateProcesses {
   notify_exit(process: KateProcess) {
     if (process === this._running) {
       this._running = null;
-      this.os.focus_handler.focus_current_scene();
+      this.os.focus_handler.pop_root(null);
       this.os.kernel.console.os_root.classList.remove("in-background");
     }
   }

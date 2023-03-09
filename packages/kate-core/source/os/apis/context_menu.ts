@@ -40,7 +40,6 @@ export class KateContextMenu {
     }
     this.in_context = true;
     this.os.processes.running?.pause();
-    const old_context = this.os.focus_handler.current_root;
     const menu = new HUD_ContextMenu(this.os);
     menu.on_close.listen(() => {
       this.in_context = false;
@@ -48,10 +47,10 @@ export class KateContextMenu {
       this.os.kernel.console.on_tick.once(() => {
         this.os.processes.running?.unpause();
       });
-      this.os.focus_handler.compare_and_change_root(old_context, menu.canvas);
+      this.os.focus_handler.pop_root(menu.canvas);
     });
     this.os.show_hud(menu);
-    this.os.focus_handler.change_root(menu.canvas);
+    this.os.focus_handler.push_root(menu.canvas);
   }
 }
 
@@ -120,9 +119,9 @@ export class HUD_ContextMenu extends Scene {
   };
 
   on_close_game = async () => {
-    await this.os.processes.running?.exit();
     this.os.hide_hud(this);
     this.on_close.emit();
+    await this.os.processes.running?.exit();
   };
 
   on_return = async () => {
