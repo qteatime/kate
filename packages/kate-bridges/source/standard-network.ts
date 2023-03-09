@@ -43,7 +43,6 @@ XMLHttpRequest.prototype.open = function (this: XMLHttpRequestE, method, url) {
   if (method !== "GET") {
     throw new Error(`Non-GET requests are not supported.`);
   }
-
   this.__waiting_open = true;
 
   void (async () => {
@@ -94,6 +93,30 @@ Object.defineProperty(HTMLImageElement.prototype, "src", {
         old_img_src.set!.call(this, real_url);
       } catch (error) {
         old_img_src.set!.call(this, "not-found");
+      }
+    })();
+  },
+});
+
+// -- Media loading
+const old_media_src = Object.getOwnPropertyDescriptor(
+  HTMLMediaElement.prototype,
+  "src"
+)!;
+Object.defineProperty(HTMLMediaElement.prototype, "src", {
+  enumerable: old_media_src.enumerable,
+  configurable: old_media_src.configurable,
+  get() {
+    return this.__src ?? old_media_src.get!.call(this);
+  },
+  set(url) {
+    this.__src = url;
+    void (async () => {
+      try {
+        const real_url = await cart_fs.get_file_url(String(url));
+        old_media_src.set!.call(this, real_url);
+      } catch (error) {
+        old_media_src.set!.call(this, "not-found");
       }
     })();
   },
