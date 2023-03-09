@@ -95,6 +95,8 @@ export class CR_Web_archive extends CartRuntime {
     frame.className = "kate-game-frame kate-game-frame-defaults";
     (frame as any).sandbox = "allow-scripts";
     frame.allow = "";
+    (frame as any).csp =
+      "default-src data: blob: 'unsafe-inline' 'unsafe-eval' 'unsafe-inline' 'wasm-unsafe-eval'; navigate-to 'none'";
     this.console.on_input_changed.listen((ev) => {
       channel.send({
         type: "kate:input-state-changed",
