@@ -41,11 +41,9 @@ $ npm install
 $ node make all
 ```
 
-After this you should have a working Kate. You can either use `node make desktop:run` to run it as an Electron app, or start a server on the `www` folder and point your favourite webkit\* browser there.
+After this you should have a working Kate. You can either use `node make desktop:run` to run it as an Electron app, or start a server on the `www` folder and point a modern browser there.
 
 You should see a screen similar to the screenshot above, but without any cartridges. Drag the `hello.kart` file from the `examples/` folder and drop it over the console to install it. Then either click the game or use the keyboard/virtual buttons to play.
-
-> It's a goal for it to work on non-webkit-based browsers, but I have not tested it there yet.
 
 ## Examples
 
