@@ -109,11 +109,40 @@ function apply_bridge(
         context
       );
       apply_bridge(new Cart.Bridge.Network_proxy(), reference, dom, context);
-      const main = dom.querySelector(`body script[src="js/main.js"]`);
-      if (main == null) {
-        throw new Error(`Unexpected structure for RPGMaker MV HTML.`);
-      }
-      append_proxy(bridges["rpgmk-mv.js"], main);
+      const key_map = new Map<Cart.VirtualKey, Cart.KeyboardKey>([
+        [
+          new Cart.VirtualKey.Up(),
+          new Cart.KeyboardKey("ArrowUp", "ArrowUp", 38n),
+        ],
+        [
+          new Cart.VirtualKey.Right(),
+          new Cart.KeyboardKey("ArrowRight", "ArrowRight", 39n),
+        ],
+        [
+          new Cart.VirtualKey.Down(),
+          new Cart.KeyboardKey("ArrowDown", "ArrowDown", 40n),
+        ],
+        [
+          new Cart.VirtualKey.Left(),
+          new Cart.KeyboardKey("ArrowLeft", "ArrowLeft", 37n),
+        ],
+        [new Cart.VirtualKey.O(), new Cart.KeyboardKey("z", "KeyZ", 90n)],
+        [new Cart.VirtualKey.X(), new Cart.KeyboardKey("x", "KeyX", 88n)],
+        [
+          new Cart.VirtualKey.L_trigger(),
+          new Cart.KeyboardKey("PageUp", "PageUp", 33n),
+        ],
+        [
+          new Cart.VirtualKey.R_trigger(),
+          new Cart.KeyboardKey("PageDown", "PageDown", 34n),
+        ],
+      ]);
+      apply_bridge(
+        new Cart.Bridge.Input_proxy(key_map),
+        reference,
+        dom,
+        context
+      );
       break;
     }
 
