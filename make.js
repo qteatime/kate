@@ -316,7 +316,9 @@ w.task("chore:clean-tsc-cache", [], () => {
     cwd: __dirname,
   });
   for (const file of files) {
-    FS.unlinkSync(file);
+    if (!file.includes("node_modules")) {
+      FS.unlinkSync(file);
+    }
   }
 });
 
