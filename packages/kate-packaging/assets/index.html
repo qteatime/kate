@@ -94,7 +94,7 @@
           const kate_os = await Kate.os.KateOS.boot(kate);
           const loading = new Kate.os.HUD_LoadIndicator();
           kate_os.show_hud(loading);
-          kate_os.focus_handler.change_root(null);
+          kate_os.focus_handler.push_root(null);
           const game = await (await fetch("game.kart")).arrayBuffer();
           const cart = kate.loader.load_bytes(game);
 
