@@ -392,13 +392,13 @@ exports.IndexSchema = IndexSchema;
 exports.__esModule = true;
 exports.bridges = void 0;
 exports.bridges = {
-    "input.js": "\"use strict\";\r\nlet paused = false;\r\nconst { events } = KateAPI;\r\nconst add_event_listener = window.addEventListener;\r\nconst down_listeners = [];\r\nconst up_listeners = [];\r\nevents.input_state_changed.listen(({ key: kate_key, is_down }) => {\r\n    if (!paused) {\r\n        const data = key_mapping[kate_key];\r\n        if (data) {\r\n            const listeners = is_down ? down_listeners : up_listeners;\r\n            const type = is_down ? \"keydown\" : \"keyup\";\r\n            const [key, code, keyCode] = data;\r\n            const key_ev = new KeyboardEvent(type, { key, code, keyCode });\r\n            for (const fn of listeners) {\r\n                fn.call(document, key_ev);\r\n            }\r\n        }\r\n    }\r\n});\r\nevents.paused.listen((state) => {\r\n    paused = state;\r\n});\r\nfunction listen(type, listener, options) {\r\n    if (type === \"keydown\") {\r\n        down_listeners.push(listener);\r\n    }\r\n    else if (type === \"keyup\") {\r\n        up_listeners.push(listener);\r\n    }\r\n    else {\r\n        add_event_listener.call(this, type, listener, options);\r\n    }\r\n}\r\nwindow.addEventListener = listen;\r\ndocument.addEventListener = listen;\r\n",
-    "kate-api.js": "(function(f){if(typeof exports===\"object\"&&typeof module!==\"undefined\"){module.exports=f()}else if(typeof define===\"function\"&&define.amd){define([],f)}else{var g;if(typeof window!==\"undefined\"){g=window}else if(typeof global!==\"undefined\"){g=global}else if(typeof self!==\"undefined\"){g=self}else{g=this}g.KateAPI = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c=\"function\"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error(\"Cannot find module '\"+i+\"'\");throw a.code=\"MODULE_NOT_FOUND\",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u=\"function\"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){\n\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.KateAudioChannel = exports.KateAudioSource = exports.KateAudio = void 0;\r\nclass KateAudio {\r\n    #channel;\r\n    constructor(channel) {\r\n        this.#channel = channel;\r\n    }\r\n    async create_channel(name, max_tracks = 1) {\r\n        const { id, volume } = await this.#channel.call(\"kate:audio.create-channel\", { max_tracks });\r\n        return new KateAudioChannel(this, name, id, max_tracks, volume);\r\n    }\r\n    async resume_channel(channel) {\r\n        await this.#channel.call(\"kate:audio.resume-channel\", { id: channel.id });\r\n    }\r\n    async pause_channel(channel) {\r\n        await this.#channel.call(\"kate:audio.pause-channel\", { id: channel.id });\r\n    }\r\n    async stop_all_sources(channel) {\r\n        await this.#channel.call(\"kate:audio.stop-all-sources\", { id: channel.id });\r\n    }\r\n    async change_channel_volume(channel, value) {\r\n        await this.#channel.call(\"kate:audio.change-volume\", {\r\n            id: channel.id,\r\n            volume: value,\r\n        });\r\n    }\r\n    async load_audio(mime, bytes) {\r\n        const audio = await this.#channel.call(\"kate:audio.load\", {\r\n            mime,\r\n            bytes,\r\n        });\r\n        return new KateAudioSource(this, audio);\r\n    }\r\n    async play(channel, audio, loop) {\r\n        await this.#channel.call(\"kate:audio.play\", {\r\n            channel: channel.id,\r\n            source: audio.id,\r\n            loop: loop,\r\n        });\r\n    }\r\n}\r\nexports.KateAudio = KateAudio;\r\nclass KateAudioSource {\r\n    audio;\r\n    id;\r\n    constructor(audio, id) {\r\n        this.audio = audio;\r\n        this.id = id;\r\n    }\r\n}\r\nexports.KateAudioSource = KateAudioSource;\r\nclass KateAudioChannel {\r\n    audio;\r\n    name;\r\n    id;\r\n    max_tracks;\r\n    _volume;\r\n    constructor(audio, name, id, max_tracks, _volume) {\r\n        this.audio = audio;\r\n        this.name = name;\r\n        this.id = id;\r\n        this.max_tracks = max_tracks;\r\n        this._volume = _volume;\r\n    }\r\n    get volume() {\r\n        return this._volume;\r\n    }\r\n    async set_volume(value) {\r\n        if (value < 0 || value > 1) {\r\n            throw new Error(`Invalid volume value ${value}`);\r\n        }\r\n        this._volume = value;\r\n        this.audio.change_channel_volume(this, value);\r\n    }\r\n    async resume() {\r\n        return this.audio.resume_channel(this);\r\n    }\r\n    async pause() {\r\n        return this.audio.pause_channel(this);\r\n    }\r\n    async stop_all_sources() {\r\n        return this.audio.stop_all_sources(this);\r\n    }\r\n    async play(source, loop) {\r\n        return this.audio.play(this, source, loop);\r\n    }\r\n}\r\nexports.KateAudioChannel = KateAudioChannel;\r\n\n},{}],2:[function(require,module,exports){\n\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.KateCartFS = void 0;\r\nclass KateCartFS {\r\n    #channel;\r\n    constructor(channel) {\r\n        this.#channel = channel;\r\n    }\r\n    read_file(path0) {\r\n        const path = new URL(path0, \"http://localhost\").pathname;\r\n        return this.#channel.call(\"kate:cart.read-file\", { path });\r\n    }\r\n    async get_file_url(path) {\r\n        const file = await this.read_file(path);\r\n        const blob = new Blob([file.bytes], { type: file.mime });\r\n        return URL.createObjectURL(blob);\r\n    }\r\n}\r\nexports.KateCartFS = KateCartFS;\r\n\n},{}],3:[function(require,module,exports){\n\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.KateIPC = void 0;\r\nconst events_1 = require(\"../../util/build/events\");\r\nconst promise_1 = require(\"../../util/build/promise\");\r\nclass KateIPC {\r\n    #secret;\r\n    #pending;\r\n    #initialised;\r\n    #server;\r\n    events = {\r\n        input_state_changed: new events_1.EventStream(),\r\n        key_pressed: new events_1.EventStream(),\r\n        paused: new events_1.EventStream(),\r\n    };\r\n    constructor(secret, server) {\r\n        this.#secret = secret;\r\n        this.#pending = new Map();\r\n        this.#initialised = false;\r\n        this.#server = server;\r\n    }\r\n    make_id() {\r\n        let id = new Uint8Array(16);\r\n        crypto.getRandomValues(id);\r\n        return Array.from(id)\r\n            .map((x) => x.toString(16).padStart(2, \"0\"))\r\n            .join(\"\");\r\n    }\r\n    setup() {\r\n        if (this.#initialised) {\r\n            throw new Error(`setup() called twice`);\r\n        }\r\n        this.#initialised = true;\r\n        window.addEventListener(\"message\", this.handle_message);\r\n    }\r\n    do_send(id, type, payload) {\r\n        this.#server.postMessage({\r\n            type: type,\r\n            secret: this.#secret,\r\n            id: id,\r\n            payload: payload,\r\n        }, \"*\");\r\n    }\r\n    async call(type, payload) {\r\n        const deferred = (0, promise_1.defer)();\r\n        const id = this.make_id();\r\n        this.#pending.set(id, deferred);\r\n        this.do_send(id, type, payload);\r\n        return deferred.promise;\r\n    }\r\n    async send_and_ignore_result(type, payload) {\r\n        this.do_send(this.make_id(), type, payload);\r\n    }\r\n    handle_message = (ev) => {\r\n        switch (ev.data.type) {\r\n            case \"kate:reply\": {\r\n                const pending = this.#pending.get(ev.data.id);\r\n                if (pending != null) {\r\n                    this.#pending.delete(ev.data.id);\r\n                    if (ev.data.ok) {\r\n                        pending.resolve(ev.data.value);\r\n                    }\r\n                    else {\r\n                        pending.reject(ev.data.value);\r\n                    }\r\n                }\r\n                break;\r\n            }\r\n            case \"kate:input-state-changed\": {\r\n                this.events.input_state_changed.emit({\r\n                    key: ev.data.key,\r\n                    is_down: ev.data.is_down,\r\n                });\r\n                break;\r\n            }\r\n            case \"kate:input-key-pressed\": {\r\n                this.events.key_pressed.emit(ev.data.key);\r\n                break;\r\n            }\r\n            case \"kate:paused\": {\r\n                this.events.paused.emit(ev.data.state);\r\n                break;\r\n            }\r\n        }\r\n    };\r\n}\r\nexports.KateIPC = KateIPC;\r\n\n},{\"../../util/build/events\":8,\"../../util/build/promise\":9}],4:[function(require,module,exports){\n\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.timer = exports.audio = exports.input = exports.kv_store = exports.cart_fs = exports.events = void 0;\r\nconst audio_1 = require(\"./audio\");\r\nconst cart_fs_1 = require(\"./cart-fs\");\r\nconst channel_1 = require(\"./channel\");\r\nconst input_1 = require(\"./input\");\r\nconst kv_store_1 = require(\"./kv-store\");\r\nconst timer_1 = require(\"./timer\");\r\nconst channel = new channel_1.KateIPC(KATE_SECRET, window.parent);\r\nchannel.setup();\r\nexports.events = channel.events;\r\nexports.cart_fs = new cart_fs_1.KateCartFS(channel);\r\nexports.kv_store = new kv_store_1.KateKVStore(channel);\r\nexports.input = new input_1.KateInput(channel);\r\nexports.input.setup();\r\nexports.audio = new audio_1.KateAudio(channel);\r\nexports.timer = new timer_1.KateTimer();\r\nexports.timer.setup();\r\n\n},{\"./audio\":1,\"./cart-fs\":2,\"./channel\":3,\"./input\":5,\"./kv-store\":6,\"./timer\":7}],5:[function(require,module,exports){\n\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.KateInput = void 0;\r\nconst events_1 = require(\"../../util/build/events\");\r\nclass KateInput {\r\n    #channel;\r\n    on_key_pressed = new events_1.EventStream();\r\n    _paused = false;\r\n    _state = Object.assign(Object.create(null), {\r\n        up: false,\r\n        right: false,\r\n        down: false,\r\n        left: false,\r\n        menu: false,\r\n        capture: false,\r\n        x: false,\r\n        o: false,\r\n        ltrigger: false,\r\n        rtrigger: false,\r\n    });\r\n    constructor(channel) {\r\n        this.#channel = channel;\r\n    }\r\n    setup() {\r\n        this.#channel.events.input_state_changed.listen(({ key, is_down }) => {\r\n            if (!this._paused) {\r\n                this._state[key] = is_down;\r\n            }\r\n        });\r\n        this.#channel.events.key_pressed.listen((key) => {\r\n            if (!this._paused) {\r\n                this.on_key_pressed.emit(key);\r\n            }\r\n        });\r\n        this.#channel.events.paused.listen((state) => {\r\n            this._paused = state;\r\n            for (const key of Object.keys(this._state)) {\r\n                this._state[key] = false;\r\n            }\r\n        });\r\n    }\r\n    is_down(key) {\r\n        return this._state[key];\r\n    }\r\n}\r\nexports.KateInput = KateInput;\r\n\n},{\"../../util/build/events\":8}],6:[function(require,module,exports){\n\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.KateKVStore = void 0;\r\nclass KateKVStore {\r\n    #channel;\r\n    constructor(channel) {\r\n        this.#channel = channel;\r\n    }\r\n    async read_all() {\r\n        return await this.#channel.call(\"kate:kv-store.read-all\", {});\r\n    }\r\n    async replace_all(value) {\r\n        await this.#channel.call(\"kate:kv-store.update-all\", { value });\r\n    }\r\n    async get(key) {\r\n        return await this.#channel.call(\"kate:kv-store.get\", { key });\r\n    }\r\n    async set(key, value) {\r\n        await this.#channel.call(\"kate:kv-store.set\", { key, value });\r\n    }\r\n    async delete(key) {\r\n        await this.#channel.call(\"kate:kv-store.delete\", { key });\r\n    }\r\n    async delete_all() {\r\n        await this.replace_all({});\r\n    }\r\n}\r\nexports.KateKVStore = KateKVStore;\r\n\n},{}],7:[function(require,module,exports){\n\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.KateTimer = void 0;\r\nconst events_1 = require(\"../../util/build/events\");\r\nclass KateTimer {\r\n    on_tick = new events_1.EventStream();\r\n    _last_time = null;\r\n    _timer_id = null;\r\n    MAX_FPS = 30;\r\n    ONE_FRAME = Math.ceil(1000 / 30);\r\n    _fps = 30;\r\n    setup() {\r\n        cancelAnimationFrame(this._timer_id);\r\n        this._last_time = null;\r\n        this._timer_id = requestAnimationFrame(this.tick);\r\n    }\r\n    get fps() {\r\n        return this._fps;\r\n    }\r\n    tick = (time) => {\r\n        if (this._last_time == null) {\r\n            this._last_time = time;\r\n            this._fps = this.MAX_FPS;\r\n            this.on_tick.emit(time);\r\n            this._timer_id = requestAnimationFrame(this.tick);\r\n        }\r\n        else {\r\n            const elapsed = time - this._last_time;\r\n            if (elapsed < this.ONE_FRAME) {\r\n                this._timer_id = requestAnimationFrame(this.tick);\r\n            }\r\n            else {\r\n                this._last_time = time;\r\n                this._fps = (1000 / elapsed) | 0;\r\n                this.on_tick.emit(time);\r\n                this._timer_id = requestAnimationFrame(this.tick);\r\n            }\r\n        }\r\n    };\r\n}\r\nexports.KateTimer = KateTimer;\r\n\n},{\"../../util/build/events\":8}],8:[function(require,module,exports){\n\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.EventStream = void 0;\r\nclass EventStream {\r\n    subscribers = [];\r\n    on_dispose = () => { };\r\n    listen(fn) {\r\n        this.remove(fn);\r\n        this.subscribers.push(fn);\r\n        return fn;\r\n    }\r\n    remove(fn) {\r\n        this.subscribers = this.subscribers.filter((x) => x !== fn);\r\n        return this;\r\n    }\r\n    once(fn) {\r\n        const handler = this.listen((x) => {\r\n            this.remove(handler);\r\n            fn(x);\r\n        });\r\n        return handler;\r\n    }\r\n    emit(ev) {\r\n        for (const fn of this.subscribers) {\r\n            fn(ev);\r\n        }\r\n    }\r\n    dispose() {\r\n        this.on_dispose();\r\n    }\r\n    filter(fn) {\r\n        const stream = new EventStream();\r\n        const subscriber = this.listen((ev) => {\r\n            if (fn(ev)) {\r\n                stream.emit(ev);\r\n            }\r\n        });\r\n        stream.on_dispose = () => {\r\n            this.remove(subscriber);\r\n        };\r\n        return stream;\r\n    }\r\n    map(fn) {\r\n        const stream = new EventStream();\r\n        const subscriber = this.listen((ev) => {\r\n            stream.emit(fn(ev));\r\n        });\r\n        stream.on_dispose = () => {\r\n            this.remove(subscriber);\r\n        };\r\n        return stream;\r\n    }\r\n}\r\nexports.EventStream = EventStream;\r\n\n},{}],9:[function(require,module,exports){\n\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.sleep = exports.defer = void 0;\r\nfunction defer() {\r\n    const p = Object.create(null);\r\n    p.promise = new Promise((resolve, reject) => {\r\n        p.resolve = resolve;\r\n        p.reject = reject;\r\n    });\r\n    return p;\r\n}\r\nexports.defer = defer;\r\nfunction sleep(ms) {\r\n    return new Promise((resolve, reject) => {\r\n        setTimeout(() => resolve(), ms);\r\n    });\r\n}\r\nexports.sleep = sleep;\r\n\n},{}]},{},[4])(4)\n});\n",
+    "input.js": "\"use strict\";\r\nlet paused = false;\r\nconst { events } = KateAPI;\r\nconst add_event_listener = window.addEventListener;\r\nconst down_listeners = [];\r\nconst up_listeners = [];\r\nconst down = new Set();\r\nconst on_key_update = ({ key: kate_key, is_down, }) => {\r\n    if (!paused) {\r\n        const data = key_mapping[kate_key];\r\n        if (data) {\r\n            if (is_down) {\r\n                down.add(kate_key);\r\n            }\r\n            else {\r\n                down.delete(kate_key);\r\n            }\r\n            const listeners = is_down ? down_listeners : up_listeners;\r\n            const type = is_down ? \"keydown\" : \"keyup\";\r\n            const [key, code, keyCode] = data;\r\n            const key_ev = new KeyboardEvent(type, { key, code, keyCode });\r\n            for (const fn of listeners) {\r\n                fn.call(document, key_ev);\r\n            }\r\n        }\r\n    }\r\n};\r\nevents.input_state_changed.listen(on_key_update);\r\nevents.paused.listen((state) => {\r\n    if (state === true) {\r\n        for (const key of down) {\r\n            on_key_update({ key, is_down: false });\r\n        }\r\n    }\r\n    paused = state;\r\n});\r\nfunction listen(type, listener, options) {\r\n    if (type === \"keydown\") {\r\n        down_listeners.push(listener);\r\n    }\r\n    else if (type === \"keyup\") {\r\n        up_listeners.push(listener);\r\n    }\r\n    else if (type === \"gamepadconnected\" || type === \"gamepaddisconnected\") {\r\n        // do nothing\r\n    }\r\n    else {\r\n        add_event_listener.call(this, type, listener, options);\r\n    }\r\n}\r\nwindow.addEventListener = listen;\r\ndocument.addEventListener = listen;\r\n// Disable gamepad input\r\nObject.defineProperty(navigator, \"getGamepads\", {\r\n    enumerable: false,\r\n    configurable: false,\r\n    value: () => [null, null, null, null],\r\n});\r\n",
+    "kate-api.js": "(function(f){if(typeof exports===\"object\"&&typeof module!==\"undefined\"){module.exports=f()}else if(typeof define===\"function\"&&define.amd){define([],f)}else{var g;if(typeof window!==\"undefined\"){g=window}else if(typeof global!==\"undefined\"){g=global}else if(typeof self!==\"undefined\"){g=self}else{g=this}g.KateAPI = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c=\"function\"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error(\"Cannot find module '\"+i+\"'\");throw a.code=\"MODULE_NOT_FOUND\",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u=\"function\"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){\n\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.KateAudioChannel = exports.KateAudioSource = exports.KateAudio = void 0;\r\nclass KateAudio {\r\n    #channel;\r\n    constructor(channel) {\r\n        this.#channel = channel;\r\n    }\r\n    async create_channel(name, max_tracks = 1) {\r\n        const { id, volume } = await this.#channel.call(\"kate:audio.create-channel\", { max_tracks });\r\n        return new KateAudioChannel(this, name, id, max_tracks, volume);\r\n    }\r\n    async stop_all_sources(channel) {\r\n        await this.#channel.call(\"kate:audio.stop-all-sources\", { id: channel.id });\r\n    }\r\n    async change_channel_volume(channel, value) {\r\n        await this.#channel.call(\"kate:audio.change-volume\", {\r\n            id: channel.id,\r\n            volume: value,\r\n        });\r\n    }\r\n    async load_audio(mime, bytes) {\r\n        const audio = await this.#channel.call(\"kate:audio.load\", {\r\n            mime,\r\n            bytes,\r\n        });\r\n        return new KateAudioSource(this, audio);\r\n    }\r\n    async play(channel, audio, loop) {\r\n        await this.#channel.call(\"kate:audio.play\", {\r\n            channel: channel.id,\r\n            source: audio.id,\r\n            loop: loop,\r\n        });\r\n    }\r\n}\r\nexports.KateAudio = KateAudio;\r\nclass KateAudioSource {\r\n    audio;\r\n    id;\r\n    constructor(audio, id) {\r\n        this.audio = audio;\r\n        this.id = id;\r\n    }\r\n}\r\nexports.KateAudioSource = KateAudioSource;\r\nclass KateAudioChannel {\r\n    audio;\r\n    name;\r\n    id;\r\n    max_tracks;\r\n    _volume;\r\n    constructor(audio, name, id, max_tracks, _volume) {\r\n        this.audio = audio;\r\n        this.name = name;\r\n        this.id = id;\r\n        this.max_tracks = max_tracks;\r\n        this._volume = _volume;\r\n    }\r\n    get volume() {\r\n        return this._volume;\r\n    }\r\n    async set_volume(value) {\r\n        if (value < 0 || value > 1) {\r\n            throw new Error(`Invalid volume value ${value}`);\r\n        }\r\n        this._volume = value;\r\n        this.audio.change_channel_volume(this, value);\r\n    }\r\n    async stop_all_sources() {\r\n        return this.audio.stop_all_sources(this);\r\n    }\r\n    async play(source, loop) {\r\n        return this.audio.play(this, source, loop);\r\n    }\r\n}\r\nexports.KateAudioChannel = KateAudioChannel;\r\n\n},{}],2:[function(require,module,exports){\n\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.KateCartFS = void 0;\r\nclass KateCartFS {\r\n    #channel;\r\n    constructor(channel) {\r\n        this.#channel = channel;\r\n    }\r\n    read_file(path0) {\r\n        const path = new URL(path0, \"http://localhost\").pathname;\r\n        return this.#channel.call(\"kate:cart.read-file\", { path });\r\n    }\r\n    async get_file_url(path) {\r\n        const file = await this.read_file(path);\r\n        const blob = new Blob([file.bytes], { type: file.mime });\r\n        return URL.createObjectURL(blob);\r\n    }\r\n}\r\nexports.KateCartFS = KateCartFS;\r\n\n},{}],3:[function(require,module,exports){\n\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.KateIPC = void 0;\r\nconst events_1 = require(\"../../util/build/events\");\r\nconst promise_1 = require(\"../../util/build/promise\");\r\nclass KateIPC {\r\n    #secret;\r\n    #pending;\r\n    #initialised;\r\n    #server;\r\n    events = {\r\n        input_state_changed: new events_1.EventStream(),\r\n        key_pressed: new events_1.EventStream(),\r\n        paused: new events_1.EventStream(),\r\n    };\r\n    constructor(secret, server) {\r\n        this.#secret = secret;\r\n        this.#pending = new Map();\r\n        this.#initialised = false;\r\n        this.#server = server;\r\n    }\r\n    make_id() {\r\n        let id = new Uint8Array(16);\r\n        crypto.getRandomValues(id);\r\n        return Array.from(id)\r\n            .map((x) => x.toString(16).padStart(2, \"0\"))\r\n            .join(\"\");\r\n    }\r\n    setup() {\r\n        if (this.#initialised) {\r\n            throw new Error(`setup() called twice`);\r\n        }\r\n        this.#initialised = true;\r\n        window.addEventListener(\"message\", this.handle_message);\r\n    }\r\n    do_send(id, type, payload) {\r\n        this.#server.postMessage({\r\n            type: type,\r\n            secret: this.#secret,\r\n            id: id,\r\n            payload: payload,\r\n        }, \"*\");\r\n    }\r\n    async call(type, payload) {\r\n        const deferred = (0, promise_1.defer)();\r\n        const id = this.make_id();\r\n        this.#pending.set(id, deferred);\r\n        this.do_send(id, type, payload);\r\n        return deferred.promise;\r\n    }\r\n    async send_and_ignore_result(type, payload) {\r\n        this.do_send(this.make_id(), type, payload);\r\n    }\r\n    handle_message = (ev) => {\r\n        switch (ev.data.type) {\r\n            case \"kate:reply\": {\r\n                const pending = this.#pending.get(ev.data.id);\r\n                if (pending != null) {\r\n                    this.#pending.delete(ev.data.id);\r\n                    if (ev.data.ok) {\r\n                        pending.resolve(ev.data.value);\r\n                    }\r\n                    else {\r\n                        pending.reject(ev.data.value);\r\n                    }\r\n                }\r\n                break;\r\n            }\r\n            case \"kate:input-state-changed\": {\r\n                this.events.input_state_changed.emit({\r\n                    key: ev.data.key,\r\n                    is_down: ev.data.is_down,\r\n                });\r\n                break;\r\n            }\r\n            case \"kate:input-key-pressed\": {\r\n                this.events.key_pressed.emit(ev.data.key);\r\n                break;\r\n            }\r\n            case \"kate:paused\": {\r\n                this.events.paused.emit(ev.data.state);\r\n                break;\r\n            }\r\n        }\r\n    };\r\n}\r\nexports.KateIPC = KateIPC;\r\n\n},{\"../../util/build/events\":8,\"../../util/build/promise\":9}],4:[function(require,module,exports){\n\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.focus = exports.timer = exports.audio = exports.input = exports.kv_store = exports.cart_fs = exports.events = void 0;\r\nconst audio_1 = require(\"./audio\");\r\nconst cart_fs_1 = require(\"./cart-fs\");\r\nconst channel_1 = require(\"./channel\");\r\nconst input_1 = require(\"./input\");\r\nconst kv_store_1 = require(\"./kv-store\");\r\nconst timer_1 = require(\"./timer\");\r\nconst channel = new channel_1.KateIPC(KATE_SECRET, window.parent);\r\nchannel.setup();\r\nexports.events = channel.events;\r\nexports.cart_fs = new cart_fs_1.KateCartFS(channel);\r\nexports.kv_store = new kv_store_1.KateKVStore(channel);\r\nexports.input = new input_1.KateInput(channel);\r\nexports.input.setup();\r\nexports.audio = new audio_1.KateAudio(channel);\r\nexports.timer = new timer_1.KateTimer();\r\nexports.timer.setup();\r\nconst focus = () => {\r\n    channel.send_and_ignore_result(\"kate:special.focus\", {});\r\n};\r\nexports.focus = focus;\r\n\n},{\"./audio\":1,\"./cart-fs\":2,\"./channel\":3,\"./input\":5,\"./kv-store\":6,\"./timer\":7}],5:[function(require,module,exports){\n\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.KateInput = void 0;\r\nconst events_1 = require(\"../../util/build/events\");\r\nclass KateInput {\r\n    #channel;\r\n    on_key_pressed = new events_1.EventStream();\r\n    _paused = false;\r\n    _state = Object.assign(Object.create(null), {\r\n        up: false,\r\n        right: false,\r\n        down: false,\r\n        left: false,\r\n        menu: false,\r\n        capture: false,\r\n        x: false,\r\n        o: false,\r\n        ltrigger: false,\r\n        rtrigger: false,\r\n    });\r\n    constructor(channel) {\r\n        this.#channel = channel;\r\n    }\r\n    setup() {\r\n        this.#channel.events.input_state_changed.listen(({ key, is_down }) => {\r\n            if (!this._paused) {\r\n                this._state[key] = is_down;\r\n            }\r\n        });\r\n        this.#channel.events.key_pressed.listen((key) => {\r\n            if (!this._paused) {\r\n                this.on_key_pressed.emit(key);\r\n            }\r\n        });\r\n        this.#channel.events.paused.listen((state) => {\r\n            this._paused = state;\r\n            for (const key of Object.keys(this._state)) {\r\n                this._state[key] = false;\r\n            }\r\n        });\r\n    }\r\n    is_down(key) {\r\n        return this._state[key];\r\n    }\r\n}\r\nexports.KateInput = KateInput;\r\n\n},{\"../../util/build/events\":8}],6:[function(require,module,exports){\n\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.KateKVStore = void 0;\r\nclass KateKVStore {\r\n    #channel;\r\n    constructor(channel) {\r\n        this.#channel = channel;\r\n    }\r\n    async read_all() {\r\n        return await this.#channel.call(\"kate:kv-store.read-all\", {});\r\n    }\r\n    async replace_all(value) {\r\n        await this.#channel.call(\"kate:kv-store.update-all\", { value });\r\n    }\r\n    async get(key) {\r\n        return await this.#channel.call(\"kate:kv-store.get\", { key });\r\n    }\r\n    async set(key, value) {\r\n        await this.#channel.call(\"kate:kv-store.set\", { key, value });\r\n    }\r\n    async delete(key) {\r\n        await this.#channel.call(\"kate:kv-store.delete\", { key });\r\n    }\r\n    async delete_all() {\r\n        await this.replace_all({});\r\n    }\r\n}\r\nexports.KateKVStore = KateKVStore;\r\n\n},{}],7:[function(require,module,exports){\n\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.KateTimer = void 0;\r\nconst events_1 = require(\"../../util/build/events\");\r\nclass KateTimer {\r\n    on_tick = new events_1.EventStream();\r\n    _last_time = null;\r\n    _timer_id = null;\r\n    MAX_FPS = 30;\r\n    ONE_FRAME = Math.ceil(1000 / 30);\r\n    _fps = 30;\r\n    setup() {\r\n        cancelAnimationFrame(this._timer_id);\r\n        this._last_time = null;\r\n        this._timer_id = requestAnimationFrame(this.tick);\r\n    }\r\n    get fps() {\r\n        return this._fps;\r\n    }\r\n    tick = (time) => {\r\n        if (this._last_time == null) {\r\n            this._last_time = time;\r\n            this._fps = this.MAX_FPS;\r\n            this.on_tick.emit(time);\r\n            this._timer_id = requestAnimationFrame(this.tick);\r\n        }\r\n        else {\r\n            const elapsed = time - this._last_time;\r\n            if (elapsed < this.ONE_FRAME) {\r\n                this._timer_id = requestAnimationFrame(this.tick);\r\n            }\r\n            else {\r\n                this._last_time = time;\r\n                this._fps = (1000 / elapsed) | 0;\r\n                this.on_tick.emit(time);\r\n                this._timer_id = requestAnimationFrame(this.tick);\r\n            }\r\n        }\r\n    };\r\n}\r\nexports.KateTimer = KateTimer;\r\n\n},{\"../../util/build/events\":8}],8:[function(require,module,exports){\n\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.EventStream = void 0;\r\nclass EventStream {\r\n    subscribers = [];\r\n    on_dispose = () => { };\r\n    listen(fn) {\r\n        this.remove(fn);\r\n        this.subscribers.push(fn);\r\n        return fn;\r\n    }\r\n    remove(fn) {\r\n        this.subscribers = this.subscribers.filter((x) => x !== fn);\r\n        return this;\r\n    }\r\n    once(fn) {\r\n        const handler = this.listen((x) => {\r\n            this.remove(handler);\r\n            fn(x);\r\n        });\r\n        return handler;\r\n    }\r\n    emit(ev) {\r\n        for (const fn of this.subscribers) {\r\n            fn(ev);\r\n        }\r\n    }\r\n    dispose() {\r\n        this.on_dispose();\r\n    }\r\n    filter(fn) {\r\n        const stream = new EventStream();\r\n        const subscriber = this.listen((ev) => {\r\n            if (fn(ev)) {\r\n                stream.emit(ev);\r\n            }\r\n        });\r\n        stream.on_dispose = () => {\r\n            this.remove(subscriber);\r\n        };\r\n        return stream;\r\n    }\r\n    map(fn) {\r\n        const stream = new EventStream();\r\n        const subscriber = this.listen((ev) => {\r\n            stream.emit(fn(ev));\r\n        });\r\n        stream.on_dispose = () => {\r\n            this.remove(subscriber);\r\n        };\r\n        return stream;\r\n    }\r\n}\r\nexports.EventStream = EventStream;\r\n\n},{}],9:[function(require,module,exports){\n\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.sleep = exports.defer = void 0;\r\nfunction defer() {\r\n    const p = Object.create(null);\r\n    p.promise = new Promise((resolve, reject) => {\r\n        p.resolve = resolve;\r\n        p.reject = reject;\r\n    });\r\n    return p;\r\n}\r\nexports.defer = defer;\r\nfunction sleep(ms) {\r\n    return new Promise((resolve, reject) => {\r\n        setTimeout(() => resolve(), ms);\r\n    });\r\n}\r\nexports.sleep = sleep;\r\n\n},{}]},{},[4])(4)\n});\n",
     "kate-bridge.js": "(function(f){if(typeof exports===\"object\"&&typeof module!==\"undefined\"){module.exports=f()}else if(typeof define===\"function\"&&define.amd){define([],f)}else{var g;if(typeof window!==\"undefined\"){g=window}else if(typeof global!==\"undefined\"){g=global}else if(typeof self!==\"undefined\"){g=self}else{g=this}g.KateAPI = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c=\"function\"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error(\"Cannot find module '\"+i+\"'\");throw a.code=\"MODULE_NOT_FOUND\",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u=\"function\"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){\n\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.KateAudioChannel = exports.KateAudioSource = exports.KateAudio = void 0;\r\nclass KateAudio {\r\n    #channel;\r\n    constructor(channel) {\r\n        this.#channel = channel;\r\n    }\r\n    async create_channel(name) {\r\n        const { id, volume } = await this.#channel.call(\"kate:audio.create-channel\", {});\r\n        return new KateAudioChannel(this, name, id, volume);\r\n    }\r\n    async resume_channel(channel) {\r\n        await this.#channel.call(\"kate:audio.resume-channel\", { id: channel.id });\r\n    }\r\n    async pause_channel(channel) {\r\n        await this.#channel.call(\"kate:audio.pause-channel\", { id: channel.id });\r\n    }\r\n    async change_channel_volume(channel, value) {\r\n        await this.#channel.call(\"kate:audio.change-volume\", {\r\n            id: channel.id,\r\n            volume: value,\r\n        });\r\n    }\r\n    async load_audio(mime, bytes) {\r\n        const audio = await this.#channel.call(\"kate:audio.load\", {\r\n            mime,\r\n            bytes,\r\n        });\r\n        return new KateAudioSource(this, audio);\r\n    }\r\n    async play(channel, audio, loop) {\r\n        await this.#channel.call(\"kate:audio.play\", {\r\n            channel: channel.id,\r\n            source: audio.id,\r\n            loop: loop,\r\n        });\r\n    }\r\n}\r\nexports.KateAudio = KateAudio;\r\nclass KateAudioSource {\r\n    audio;\r\n    id;\r\n    constructor(audio, id) {\r\n        this.audio = audio;\r\n        this.id = id;\r\n    }\r\n}\r\nexports.KateAudioSource = KateAudioSource;\r\nclass KateAudioChannel {\r\n    audio;\r\n    name;\r\n    id;\r\n    _volume;\r\n    constructor(audio, name, id, _volume) {\r\n        this.audio = audio;\r\n        this.name = name;\r\n        this.id = id;\r\n        this._volume = _volume;\r\n    }\r\n    get volume() {\r\n        return this._volume;\r\n    }\r\n    async set_volume(value) {\r\n        if (value < 0 || value > 1) {\r\n            throw new Error(`Invalid volume value ${value}`);\r\n        }\r\n        this._volume = value;\r\n        this.audio.change_channel_volume(this, value);\r\n    }\r\n    async resume() {\r\n        return this.audio.resume_channel(this);\r\n    }\r\n    async pause() {\r\n        return this.audio.pause_channel(this);\r\n    }\r\n    async play(source, loop) {\r\n        return this.audio.play(this, source, loop);\r\n    }\r\n}\r\nexports.KateAudioChannel = KateAudioChannel;\r\n\n},{}],2:[function(require,module,exports){\n\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.KateCartFS = void 0;\r\nclass KateCartFS {\r\n    #channel;\r\n    constructor(channel) {\r\n        this.#channel = channel;\r\n    }\r\n    read_file(path0) {\r\n        const path = new URL(path0, \"http://localhost\").pathname;\r\n        return this.#channel.call(\"kate:cart.read-file\", { path });\r\n    }\r\n    async get_file_url(path) {\r\n        const file = await this.read_file(path);\r\n        const blob = new Blob([file.bytes], { type: file.mime });\r\n        return URL.createObjectURL(blob);\r\n    }\r\n}\r\nexports.KateCartFS = KateCartFS;\r\n\n},{}],3:[function(require,module,exports){\n\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.KateIPC = void 0;\r\nconst events_1 = require(\"../../util/build/events\");\r\nconst promise_1 = require(\"../../util/build/promise\");\r\nclass KateIPC {\r\n    #secret;\r\n    #pending;\r\n    #initialised;\r\n    #server;\r\n    events = {\r\n        input_state_changed: new events_1.EventStream(),\r\n        key_pressed: new events_1.EventStream(),\r\n        paused: new events_1.EventStream(),\r\n    };\r\n    constructor(secret, server) {\r\n        this.#secret = secret;\r\n        this.#pending = new Map();\r\n        this.#initialised = false;\r\n        this.#server = server;\r\n    }\r\n    make_id() {\r\n        let id = new Uint8Array(16);\r\n        crypto.getRandomValues(id);\r\n        return Array.from(id)\r\n            .map((x) => x.toString(16).padStart(2, \"0\"))\r\n            .join(\"\");\r\n    }\r\n    setup() {\r\n        if (this.#initialised) {\r\n            throw new Error(`setup() called twice`);\r\n        }\r\n        this.#initialised = true;\r\n        window.addEventListener(\"message\", this.handle_message);\r\n    }\r\n    do_send(id, type, payload) {\r\n        this.#server.postMessage({\r\n            type: type,\r\n            secret: this.#secret,\r\n            id: id,\r\n            payload: payload,\r\n        }, \"*\");\r\n    }\r\n    async call(type, payload) {\r\n        const deferred = (0, promise_1.defer)();\r\n        const id = this.make_id();\r\n        this.#pending.set(id, deferred);\r\n        this.do_send(id, type, payload);\r\n        return deferred.promise;\r\n    }\r\n    async send_and_ignore_result(type, payload) {\r\n        this.do_send(this.make_id(), type, payload);\r\n    }\r\n    handle_message = (ev) => {\r\n        switch (ev.data.type) {\r\n            case \"kate:reply\": {\r\n                const pending = this.#pending.get(ev.data.id);\r\n                if (pending != null) {\r\n                    this.#pending.delete(ev.data.id);\r\n                    if (ev.data.ok) {\r\n                        pending.resolve(ev.data.value);\r\n                    }\r\n                    else {\r\n                        pending.reject(ev.data.value);\r\n                    }\r\n                }\r\n                break;\r\n            }\r\n            case \"kate:input-state-changed\": {\r\n                this.events.input_state_changed.emit({\r\n                    key: ev.data.key,\r\n                    is_down: ev.data.is_down,\r\n                });\r\n                break;\r\n            }\r\n            case \"kate:input-key-pressed\": {\r\n                this.events.key_pressed.emit(ev.data.key);\r\n                break;\r\n            }\r\n            case \"kate:paused\": {\r\n                this.events.paused.emit(ev.data.state);\r\n                break;\r\n            }\r\n        }\r\n    };\r\n}\r\nexports.KateIPC = KateIPC;\r\n\n},{\"../../util/build/events\":8,\"../../util/build/promise\":9}],4:[function(require,module,exports){\n\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.timer = exports.audio = exports.input = exports.kv_store = exports.cart_fs = exports.events = void 0;\r\nconst audio_1 = require(\"./audio\");\r\nconst cart_fs_1 = require(\"./cart-fs\");\r\nconst channel_1 = require(\"./channel\");\r\nconst input_1 = require(\"./input\");\r\nconst kv_store_1 = require(\"./kv-store\");\r\nconst timer_1 = require(\"./timer\");\r\nconst channel = new channel_1.KateIPC(KATE_SECRET, window.parent);\r\nchannel.setup();\r\nexports.events = channel.events;\r\nexports.cart_fs = new cart_fs_1.KateCartFS(channel);\r\nexports.kv_store = new kv_store_1.KateKVStore(channel);\r\nexports.input = new input_1.KateInput(channel);\r\nexports.input.setup();\r\nexports.audio = new audio_1.KateAudio(channel);\r\nexports.timer = new timer_1.KateTimer();\r\nexports.timer.setup();\r\n\n},{\"./audio\":1,\"./cart-fs\":2,\"./channel\":3,\"./input\":5,\"./kv-store\":6,\"./timer\":7}],5:[function(require,module,exports){\n\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.KateInput = void 0;\r\nconst events_1 = require(\"../../util/build/events\");\r\nclass KateInput {\r\n    #channel;\r\n    on_key_pressed = new events_1.EventStream();\r\n    _state = Object.assign(Object.create(null), {\r\n        up: false,\r\n        right: false,\r\n        down: false,\r\n        left: false,\r\n        menu: false,\r\n        capture: false,\r\n        x: false,\r\n        o: false,\r\n        ltrigger: false,\r\n        rtrigger: false,\r\n    });\r\n    constructor(channel) {\r\n        this.#channel = channel;\r\n    }\r\n    setup() {\r\n        this.#channel.events.input_state_changed.listen(({ key, is_down }) => {\r\n            this._state[key] = is_down;\r\n        });\r\n        this.#channel.events.key_pressed.listen((key) => {\r\n            this.on_key_pressed.emit(key);\r\n        });\r\n    }\r\n    is_down(key) {\r\n        return this._state[key];\r\n    }\r\n}\r\nexports.KateInput = KateInput;\r\n\n},{\"../../util/build/events\":8}],6:[function(require,module,exports){\n\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.KateKVStore = void 0;\r\nclass KateKVStore {\r\n    #channel;\r\n    constructor(channel) {\r\n        this.#channel = channel;\r\n    }\r\n    async read_all() {\r\n        return await this.#channel.call(\"kate:kv-store.read-all\", {});\r\n    }\r\n    async replace_all(value) {\r\n        await this.#channel.call(\"kate:kv-store.update-all\", { value });\r\n    }\r\n    async get(key) {\r\n        return await this.#channel.call(\"kate:kv-store.get\", { key });\r\n    }\r\n    async set(key, value) {\r\n        await this.#channel.call(\"kate:kv-store.set\", { key, value });\r\n    }\r\n    async delete(key) {\r\n        await this.#channel.call(\"kate:kv-store.delete\", { key });\r\n    }\r\n    async delete_all() {\r\n        await this.replace_all({});\r\n    }\r\n}\r\nexports.KateKVStore = KateKVStore;\r\n\n},{}],7:[function(require,module,exports){\n\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.KateTimer = void 0;\r\nconst events_1 = require(\"../../util/build/events\");\r\nclass KateTimer {\r\n    on_tick = new events_1.EventStream();\r\n    _last_time = null;\r\n    _timer_id = null;\r\n    MAX_FPS = 30;\r\n    ONE_FRAME = Math.ceil(1000 / 30);\r\n    _fps = 30;\r\n    setup() {\r\n        cancelAnimationFrame(this._timer_id);\r\n        this._last_time = null;\r\n        this._timer_id = requestAnimationFrame(this.tick);\r\n    }\r\n    get fps() {\r\n        return this._fps;\r\n    }\r\n    tick = (time) => {\r\n        if (this._last_time == null) {\r\n            this._last_time = time;\r\n            this._fps = this.MAX_FPS;\r\n            this.on_tick.emit(time);\r\n            this._timer_id = requestAnimationFrame(this.tick);\r\n        }\r\n        else {\r\n            const elapsed = time - this._last_time;\r\n            if (elapsed < this.ONE_FRAME) {\r\n                this._timer_id = requestAnimationFrame(this.tick);\r\n            }\r\n            else {\r\n                this._last_time = time;\r\n                this._fps = (1000 / elapsed) | 0;\r\n                this.on_tick.emit(time);\r\n                this._timer_id = requestAnimationFrame(this.tick);\r\n            }\r\n        }\r\n    };\r\n}\r\nexports.KateTimer = KateTimer;\r\n\n},{\"../../util/build/events\":8}],8:[function(require,module,exports){\n\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.EventStream = void 0;\r\nclass EventStream {\r\n    subscribers = [];\r\n    on_dispose = () => { };\r\n    listen(fn) {\r\n        this.remove(fn);\r\n        this.subscribers.push(fn);\r\n        return fn;\r\n    }\r\n    remove(fn) {\r\n        this.subscribers = this.subscribers.filter((x) => x !== fn);\r\n        return this;\r\n    }\r\n    emit(ev) {\r\n        for (const fn of this.subscribers) {\r\n            fn(ev);\r\n        }\r\n    }\r\n    dispose() {\r\n        this.on_dispose();\r\n    }\r\n    filter(fn) {\r\n        const stream = new EventStream();\r\n        const subscriber = this.listen((ev) => {\r\n            if (fn(ev)) {\r\n                stream.emit(ev);\r\n            }\r\n        });\r\n        stream.on_dispose = () => {\r\n            this.remove(subscriber);\r\n        };\r\n        return stream;\r\n    }\r\n    map(fn) {\r\n        const stream = new EventStream();\r\n        const subscriber = this.listen((ev) => {\r\n            stream.emit(fn(ev));\r\n        });\r\n        stream.on_dispose = () => {\r\n            this.remove(subscriber);\r\n        };\r\n        return stream;\r\n    }\r\n}\r\nexports.EventStream = EventStream;\r\n\n},{}],9:[function(require,module,exports){\n\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.sleep = exports.defer = void 0;\r\nfunction defer() {\r\n    const p = Object.create(null);\r\n    p.promise = new Promise((resolve, reject) => {\r\n        p.resolve = resolve;\r\n        p.reject = reject;\r\n    });\r\n    return p;\r\n}\r\nexports.defer = defer;\r\nfunction sleep(ms) {\r\n    return new Promise((resolve, reject) => {\r\n        setTimeout(() => resolve(), ms);\r\n    });\r\n}\r\nexports.sleep = sleep;\r\n\n},{}]},{},[4])(4)\n});\n",
     "local-storage.js": "\"use strict\";\r\nconst { kv_store } = KateAPI;\r\nlet contents = KATE_LOCAL_STORAGE ?? Object.create(null);\r\nlet timer = null;\r\nfunction persist(contents) {\r\n    clearTimeout(timer);\r\n    timer = setTimeout(() => {\r\n        kv_store.replace_all(contents);\r\n    });\r\n}\r\nclass KateStorage {\r\n    __contents;\r\n    __persistent;\r\n    constructor(contents, persistent) {\r\n        this.__contents = contents;\r\n        this.__persistent = persistent;\r\n    }\r\n    _persist() {\r\n        if (this.__persistent) {\r\n            persist(this.__contents);\r\n        }\r\n    }\r\n    getItem(name) {\r\n        return this.__contents[name] ?? null;\r\n    }\r\n    setItem(name, value) {\r\n        this.__contents[name] = value;\r\n        this._persist();\r\n    }\r\n    removeItem(name) {\r\n        delete this.__contents[name];\r\n        this._persist();\r\n    }\r\n    clear() {\r\n        this.__contents = Object.create(null);\r\n        this._persist();\r\n    }\r\n    key(index) {\r\n        return this.getItem(Object.keys(this.__contents)[index]) ?? null;\r\n    }\r\n    get length() {\r\n        return Object.keys(this.__contents).length;\r\n    }\r\n}\r\nfunction proxy_storage(storage, key) {\r\n    const exposed = [\"getItem\", \"setItem\", \"removeItem\", \"clear\", \"key\"];\r\n    Object.defineProperty(window, key, {\r\n        value: new Proxy(storage, {\r\n            get(target, prop, receiver) {\r\n                return exposed.includes(prop)\r\n                    ? storage[prop].bind(storage)\r\n                    : storage.getItem(prop);\r\n            },\r\n            has(target, prop) {\r\n                return exposed.includes(prop) || prop in contents;\r\n            },\r\n            set(target, prop, value) {\r\n                storage.setItem(prop, value);\r\n                return true;\r\n            },\r\n            deleteProperty(target, prop) {\r\n                storage.removeItem(prop);\r\n                return true;\r\n            },\r\n        }),\r\n    });\r\n}\r\nconst storage = new KateStorage(contents, true);\r\nproxy_storage(storage, \"localStorage\");\r\nconst session_storage = new KateStorage(Object.create(null), false);\r\nproxy_storage(session_storage, \"sessionStorage\");\r\n",
     "renpy.js": "\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nlet paused = false;\r\nconst { events } = KateAPI;\r\nconst add_event_listener = window.addEventListener;\r\nconst key_mapping = {\r\n    up: [\"ArrowUp\", \"ArrowUp\", 38],\r\n    right: [\"ArrowRight\", \"ArrowRight\", 39],\r\n    down: [\"ArrowDown\", \"ArrowDown\", 40],\r\n    left: [\"ArrowLeft\", \"ArrowLeft\", 37],\r\n    x: [\"Escape\", \"Escape\", 27],\r\n    o: [\"Enter\", \"Enter\", 13],\r\n    ltrigger: [\"PageUp\", \"PageUp\", 33],\r\n    rtrigger: [\"PageDown\", \"PageDown\", 34],\r\n};\r\nconst down_listeners = [];\r\nconst up_listeners = [];\r\nevents.input_state_changed.listen(({ key: kate_key, is_down }) => {\r\n    if (!paused) {\r\n        const data = key_mapping[kate_key];\r\n        if (data) {\r\n            const listeners = is_down ? down_listeners : up_listeners;\r\n            const type = is_down ? \"keydown\" : \"keyup\";\r\n            const [key, code, keyCode] = data;\r\n            const key_ev = new KeyboardEvent(type, { key, code, keyCode });\r\n            for (const fn of listeners) {\r\n                fn.call(document, key_ev);\r\n            }\r\n        }\r\n    }\r\n});\r\nevents.paused.listen((state) => {\r\n    paused = state;\r\n});\r\nfunction listen(type, listener, options) {\r\n    if (type === \"keydown\") {\r\n        down_listeners.push(listener);\r\n    }\r\n    else if (type === \"keyup\") {\r\n        up_listeners.push(listener);\r\n    }\r\n    else {\r\n        add_event_listener.call(this, type, listener, options);\r\n    }\r\n}\r\nwindow.addEventListener = listen;\r\ndocument.addEventListener = listen;\r\n",
-    "rpgmk-mv.js": "\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nlet paused = false;\r\nconst { events } = KateAPI;\r\n// -- Things that need to be patched still\r\nUtils.isOptionValid = (name) => {\r\n    return [\"noaudio\"].includes(name);\r\n};\r\nconst key_mapping = {\r\n    up: \"up\",\r\n    right: \"right\",\r\n    down: \"down\",\r\n    left: \"left\",\r\n    x: \"cancel\",\r\n    o: \"ok\",\r\n    menu: \"menu\",\r\n    rtrigger: \"shift\",\r\n};\r\nevents.input_state_changed.listen(({ key, is_down }) => {\r\n    if (!paused) {\r\n        const name = key_mapping[key];\r\n        if (name) {\r\n            Input._currentState[name] = is_down;\r\n        }\r\n    }\r\n});\r\nevents.paused.listen((state) => {\r\n    paused = state;\r\n    if (state) {\r\n        for (const key of Object.values(key_mapping)) {\r\n            Input._currentState[key] = false;\r\n        }\r\n    }\r\n});\r\n",
-    "standard-network.js": "\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nconst { cart_fs } = KateAPI;\r\n// -- Arbitrary fetching\r\nconst old_fetch = window.fetch;\r\nwindow.fetch = async function (request, options) {\r\n    let url;\r\n    let method;\r\n    if (Object(request) === request && request.url) {\r\n        url = request.url;\r\n        method = request.method;\r\n    }\r\n    else {\r\n        url = request;\r\n        method = options?.method ?? \"GET\";\r\n    }\r\n    if (method !== \"GET\") {\r\n        return new Promise((_, reject) => reject(new Error(`Non-GET requests are not supported.`)));\r\n    }\r\n    return new Promise(async (resolve, reject) => {\r\n        try {\r\n            const file = await cart_fs.get_file_url(String(url));\r\n            const result = await old_fetch(file);\r\n            resolve(result);\r\n        }\r\n        catch (error) {\r\n            reject(error);\r\n        }\r\n    });\r\n};\r\nconst old_xhr_open = XMLHttpRequest.prototype.open;\r\nconst old_xhr_send = XMLHttpRequest.prototype.send;\r\nXMLHttpRequest.prototype.open = function (method, url) {\r\n    if (method !== \"GET\") {\r\n        throw new Error(`Non-GET requests are not supported.`);\r\n    }\r\n    this.__waiting_open = true;\r\n    void (async () => {\r\n        try {\r\n            const real_url = await cart_fs.get_file_url(String(url));\r\n            old_xhr_open.call(this, \"GET\", real_url, true);\r\n            this.__maybe_send();\r\n        }\r\n        catch (error) {\r\n            old_xhr_open.call(this, \"GET\", \"not-found\", true);\r\n            this.__maybe_send();\r\n        }\r\n    })();\r\n};\r\nXMLHttpRequest.prototype.__maybe_send = function () {\r\n    this.__waiting_open = false;\r\n    if (this.__waiting_send) {\r\n        this.__waiting_send = false;\r\n        this.send();\r\n    }\r\n};\r\nXMLHttpRequest.prototype.send = function () {\r\n    if (this.__waiting_open) {\r\n        this.__waiting_send = true;\r\n        return;\r\n    }\r\n    else {\r\n        return old_xhr_send.call(this);\r\n    }\r\n};\r\n// -- Image loading\r\nconst old_img_src = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, \"src\");\r\nObject.defineProperty(HTMLImageElement.prototype, \"src\", {\r\n    enumerable: old_img_src.enumerable,\r\n    configurable: old_img_src.configurable,\r\n    get() {\r\n        return this.__src ?? old_img_src.get.call(this);\r\n    },\r\n    set(url) {\r\n        this.__src = url;\r\n        void (async () => {\r\n            try {\r\n                const real_url = await cart_fs.get_file_url(String(url));\r\n                old_img_src.set.call(this, real_url);\r\n            }\r\n            catch (error) {\r\n                old_img_src.set.call(this, \"not-found\");\r\n            }\r\n        })();\r\n    },\r\n});\r\n"
+    "rpgmk-mv.js": "\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nlet paused = false;\r\nconst { events } = KateAPI;\r\n// Disable RPGMkMV's handling of gamepads to avoid double-input handling.\r\nInput._updateGamepadState = () => { };\r\n// Ensure RPGMkMV uses ogg files (Kate will handle the decoding).\r\nWebAudio.canPlayOgg = () => true;\r\nWebAudio.canPlayM4a = () => false;\r\nAudioManager.audioFileExt = () => \".ogg\";\r\n// Patch RPGMkMV's keyboard input handling directly\r\nconst key_mapping = {\r\n    up: \"up\",\r\n    right: \"right\",\r\n    down: \"down\",\r\n    left: \"left\",\r\n    x: \"cancel\",\r\n    o: \"ok\",\r\n    menu: \"menu\",\r\n    rtrigger: \"shift\",\r\n};\r\nevents.input_state_changed.listen(({ key, is_down }) => {\r\n    if (!paused) {\r\n        const name = key_mapping[key];\r\n        if (name) {\r\n            Input._currentState[name] = is_down;\r\n        }\r\n    }\r\n});\r\nevents.paused.listen((state) => {\r\n    paused = state;\r\n    if (state) {\r\n        for (const key of Object.values(key_mapping)) {\r\n            Input._currentState[key] = false;\r\n        }\r\n    }\r\n});\r\n",
+    "standard-network.js": "\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nconst { cart_fs } = KateAPI;\r\n// -- Arbitrary fetching\r\nconst old_fetch = window.fetch;\r\nwindow.fetch = async function (request, options) {\r\n    let url;\r\n    let method;\r\n    if (Object(request) === request && request.url) {\r\n        url = request.url;\r\n        method = request.method;\r\n    }\r\n    else {\r\n        url = request;\r\n        method = options?.method ?? \"GET\";\r\n    }\r\n    if (method !== \"GET\") {\r\n        return new Promise((_, reject) => reject(new Error(`Non-GET requests are not supported.`)));\r\n    }\r\n    return new Promise(async (resolve, reject) => {\r\n        try {\r\n            const file = await cart_fs.get_file_url(String(url));\r\n            const result = await old_fetch(file);\r\n            resolve(result);\r\n        }\r\n        catch (error) {\r\n            reject(error);\r\n        }\r\n    });\r\n};\r\nconst old_xhr_open = XMLHttpRequest.prototype.open;\r\nconst old_xhr_send = XMLHttpRequest.prototype.send;\r\nXMLHttpRequest.prototype.open = function (method, url) {\r\n    if (method !== \"GET\") {\r\n        throw new Error(`Non-GET requests are not supported.`);\r\n    }\r\n    this.__waiting_open = true;\r\n    void (async () => {\r\n        try {\r\n            const real_url = await cart_fs.get_file_url(String(url));\r\n            old_xhr_open.call(this, \"GET\", real_url, true);\r\n            this.__maybe_send();\r\n        }\r\n        catch (error) {\r\n            old_xhr_open.call(this, \"GET\", \"not-found\", true);\r\n            this.__maybe_send();\r\n        }\r\n    })();\r\n};\r\nXMLHttpRequest.prototype.__maybe_send = function () {\r\n    this.__waiting_open = false;\r\n    if (this.__waiting_send) {\r\n        this.__waiting_send = false;\r\n        this.send();\r\n    }\r\n};\r\nXMLHttpRequest.prototype.send = function () {\r\n    if (this.__waiting_open) {\r\n        this.__waiting_send = true;\r\n        return;\r\n    }\r\n    else {\r\n        return old_xhr_send.call(this);\r\n    }\r\n};\r\n// -- Image loading\r\nconst old_img_src = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, \"src\");\r\nObject.defineProperty(HTMLImageElement.prototype, \"src\", {\r\n    enumerable: old_img_src.enumerable,\r\n    configurable: old_img_src.configurable,\r\n    get() {\r\n        return this.__src ?? old_img_src.get.call(this);\r\n    },\r\n    set(url) {\r\n        this.__src = url;\r\n        void (async () => {\r\n            try {\r\n                const real_url = await cart_fs.get_file_url(String(url));\r\n                old_img_src.set.call(this, real_url);\r\n            }\r\n            catch (error) {\r\n                old_img_src.set.call(this, \"not-found\");\r\n            }\r\n        })();\r\n    },\r\n});\r\n// -- Media loading\r\nconst old_media_src = Object.getOwnPropertyDescriptor(HTMLMediaElement.prototype, \"src\");\r\nObject.defineProperty(HTMLMediaElement.prototype, \"src\", {\r\n    enumerable: old_media_src.enumerable,\r\n    configurable: old_media_src.configurable,\r\n    get() {\r\n        return this.__src ?? old_media_src.get.call(this);\r\n    },\r\n    set(url) {\r\n        this.__src = url;\r\n        void (async () => {\r\n            try {\r\n                const real_url = await cart_fs.get_file_url(String(url));\r\n                old_media_src.set.call(this, real_url);\r\n            }\r\n            catch (error) {\r\n                old_media_src.set.call(this, \"not-found\");\r\n            }\r\n        })();\r\n    },\r\n});\r\n"
 };
 
 },{}],6:[function(require,module,exports){
@@ -454,6 +454,7 @@ class CRW_Process extends CR_Process {
         this.frame.src = "about:blank";
         this.frame.remove();
         this.channel?.dispose();
+        await this.audio.stop();
     }
     async pause() {
         this.channel?.send({
@@ -491,6 +492,8 @@ class CR_Web_archive extends CartRuntime {
         frame.className = "kate-game-frame kate-game-frame-defaults";
         frame.sandbox = "allow-scripts";
         frame.allow = "";
+        frame.csp =
+            "default-src data: blob: 'unsafe-inline' 'unsafe-eval' 'unsafe-inline' 'wasm-unsafe-eval'; navigate-to 'none'";
         this.console.on_input_changed.listen((ev) => {
             channel.send({
                 type: "kate:input-state-changed",
@@ -521,7 +524,7 @@ class CR_Web_archive extends CartRuntime {
 }
 exports.CR_Web_archive = CR_Web_archive;
 
-},{"../../../schema/generated/cartridge":35,"../../../util/build":39,"./translate-html":13}],8:[function(require,module,exports){
+},{"../../../schema/generated/cartridge":36,"../../../util/build":40,"./translate-html":13}],8:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GamepadInput = void 0;
@@ -757,10 +760,10 @@ class KateLoader {
 }
 exports.KateLoader = KateLoader;
 
-},{"../../../schema/generated/cartridge":35,"../../../schema/lib/fingerprint":36}],13:[function(require,module,exports){
+},{"../../../schema/generated/cartridge":36,"../../../schema/lib/fingerprint":37}],13:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.translate_html = void 0;
+exports.add_cover = exports.translate_html = void 0;
 const build_1 = require("../../../kate-bridges/build");
 const Cart = require("../../../schema/generated/cartridge");
 const build_2 = require("../../../util/build");
@@ -772,15 +775,32 @@ function translate_html(html, context) {
     add_bridges(preamble, dom, context);
     inline_all_scripts(dom, context);
     inline_all_links(dom, context);
+    add_cover(dom, context);
     return dom.documentElement.outerHTML;
 }
 exports.translate_html = translate_html;
+function add_cover(dom, context) {
+    const element = dom.createElement("div");
+    const id = `kate_${(0, build_2.make_id)().replace(/\-/g, "_")}`;
+    element.id = id;
+    element.style.position = "fixed";
+    element.style.top = "0px";
+    element.style.left = "0px";
+    element.style.width = "100%";
+    element.style.height = "100%";
+    element.style.zIndex = "99999";
+    element.setAttribute("onclick", `
+    event.preventDefault();
+    KateAPI.focus();
+    `);
+    dom.body.appendChild(element);
+}
+exports.add_cover = add_cover;
 function add_preamble(dom, context) {
     const script = dom.createElement("script");
     script.textContent = `
   void function() {
     var KATE_SECRET = ${JSON.stringify(context.secret)};
-    var KATE_LOCAL_STORAGE = ${JSON.stringify(context.local_storage ?? {})};
     ${build_1.bridges["kate-api.js"]};
   }();
   `;
@@ -832,7 +852,45 @@ function apply_bridge(bridge, reference, dom, context) {
             break;
         }
         case 1 /* Cart.Bridge.$Tags.Local_storage_proxy */: {
-            append_proxy(build_1.bridges["local-storage.js"]);
+            const full_source = `
+        var KATE_LOCAL_STORAGE = ${JSON.stringify(context.local_storage ?? {})};
+        ${build_1.bridges["local-storage.js"]}
+      `;
+            append_proxy(full_source);
+            break;
+        }
+        case 3 /* Cart.Bridge.$Tags.RPGMaker_MV */: {
+            apply_bridge(new Cart.Bridge.Local_storage_proxy(), reference, dom, context);
+            apply_bridge(new Cart.Bridge.Network_proxy(), reference, dom, context);
+            const key_map = new Map([
+                [
+                    new Cart.VirtualKey.Up(),
+                    new Cart.KeyboardKey("ArrowUp", "ArrowUp", 38n),
+                ],
+                [
+                    new Cart.VirtualKey.Right(),
+                    new Cart.KeyboardKey("ArrowRight", "ArrowRight", 39n),
+                ],
+                [
+                    new Cart.VirtualKey.Down(),
+                    new Cart.KeyboardKey("ArrowDown", "ArrowDown", 40n),
+                ],
+                [
+                    new Cart.VirtualKey.Left(),
+                    new Cart.KeyboardKey("ArrowLeft", "ArrowLeft", 37n),
+                ],
+                [new Cart.VirtualKey.O(), new Cart.KeyboardKey("z", "KeyZ", 90n)],
+                [new Cart.VirtualKey.X(), new Cart.KeyboardKey("x", "KeyX", 88n)],
+                [
+                    new Cart.VirtualKey.L_trigger(),
+                    new Cart.KeyboardKey("PageUp", "PageUp", 33n),
+                ],
+                [
+                    new Cart.VirtualKey.R_trigger(),
+                    new Cart.KeyboardKey("PageDown", "PageDown", 34n),
+                ],
+            ]);
+            apply_bridge(new Cart.Bridge.Input_proxy(key_map), reference, dom, context);
             break;
         }
         default:
@@ -948,11 +1006,12 @@ function get_data_url(real_path, cart) {
     }
 }
 
-},{"../../../kate-bridges/build":5,"../../../schema/generated/cartridge":35,"../../../util/build":39,"../../../util/build/pathname":40}],14:[function(require,module,exports){
+},{"../../../kate-bridges/build":5,"../../../schema/generated/cartridge":36,"../../../util/build":40,"../../../util/build/pathname":41}],14:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.VirtualConsole = void 0;
 const events_1 = require("../../../util/build/events");
+const pkg = require("../../package.json");
 class VirtualConsole {
     up_button;
     right_button;
@@ -970,9 +1029,11 @@ class VirtualConsole {
     screen;
     hud;
     os_root;
+    version_container;
     on_input_changed = new events_1.EventStream();
     on_key_pressed = new events_1.EventStream();
     on_tick = new events_1.EventStream();
+    audio_context = new AudioContext();
     timer_id = null;
     last_time = null;
     SPECIAL_FRAMES = 15;
@@ -1006,6 +1067,11 @@ class VirtualConsole {
         this.hud = root.querySelector("#kate-hud");
         this.device_display = root.querySelector(".kate-screen");
         this.body = root.querySelector(".kate-body");
+        this.version_container = root.querySelector(".kate-version");
+        if (this.version_container != null && pkg.version != null) {
+            this.version_container.textContent = `v${pkg.version}`;
+        }
+        this.open_audio_output();
         this.reset_states();
     }
     reset_states() {
@@ -1035,6 +1101,20 @@ class VirtualConsole {
     start_ticking() {
         cancelAnimationFrame(this.timer_id);
         this.timer_id = requestAnimationFrame(this.tick);
+    }
+    open_audio_output() {
+        this.audio_context.resume().catch((e) => { });
+        if (this.audio_context.state !== "running") {
+            const open_audio_output = () => {
+                this.audio_context.resume().catch((e) => { });
+                window.removeEventListener("touchstart", open_audio_output);
+                window.removeEventListener("click", open_audio_output);
+                window.removeEventListener("keydown", open_audio_output);
+            };
+            window.addEventListener("touchstart", open_audio_output);
+            window.addEventListener("click", open_audio_output);
+            window.addEventListener("keydown", open_audio_output);
+        }
     }
     tick = (time) => {
         if (this.last_time == null) {
@@ -1163,7 +1243,7 @@ class VirtualConsole {
 }
 exports.VirtualConsole = VirtualConsole;
 
-},{"../../../util/build/events":38}],15:[function(require,module,exports){
+},{"../../../util/build/events":39,"../../package.json":35}],15:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.KateAudioServer = void 0;
@@ -1172,18 +1252,21 @@ class KateAudioServer {
     os;
     channels = new Map();
     sources = new Map();
+    get audio_context() {
+        return this.os.kernel.console.audio_context;
+    }
     constructor(os) {
         this.os = os;
     }
     async create_channel(max_tracks) {
         const id = (0, random_1.make_id)();
-        const channel = new AudioChannel(id, max_tracks);
+        const channel = new AudioChannel(this, id, max_tracks);
         this.channels.set(id, channel);
         return channel;
     }
     async load_sound(bytes) {
         const id = (0, random_1.make_id)();
-        const source = await AudioSource.from_bytes(id, bytes);
+        const source = await AudioSource.from_bytes(this, id, bytes);
         this.sources.set(id, source);
         return source;
     }
@@ -1201,22 +1284,25 @@ class KateAudioServer {
         }
         return source;
     }
+    async stop() {
+        for (const channel of this.channels.values()) {
+            await channel.stop_all_sources();
+        }
+    }
 }
 exports.KateAudioServer = KateAudioServer;
 class AudioChannel {
+    server;
     id;
     max_tracks;
     volume;
-    output;
-    context;
     sources = [];
-    constructor(id, max_tracks = 1) {
+    constructor(server, id, max_tracks = 1) {
+        this.server = server;
         this.id = id;
         this.max_tracks = max_tracks;
-        this.context = new AudioContext();
-        this.output = this.context.destination;
-        this.volume = this.context.createGain();
-        this.volume.connect(this.output);
+        this.volume = server.audio_context.createGain();
+        this.volume.connect(server.audio_context.destination);
     }
     get input() {
         return this.volume;
@@ -1227,12 +1313,6 @@ class AudioChannel {
     async set_volume(value) {
         this.volume.gain.value = value;
     }
-    async resume() {
-        await this.context.resume();
-    }
-    async suspend() {
-        await this.context.suspend();
-    }
     async stop_all_sources() {
         for (const source of this.sources) {
             source.stop();
@@ -1241,7 +1321,7 @@ class AudioChannel {
         this.sources = [];
     }
     async play(sound, loop) {
-        const node = this.context.createBufferSource();
+        const node = this.server.audio_context.createBufferSource();
         node.buffer = sound.buffer;
         node.loop = loop;
         this.sources.push(node);
@@ -1261,14 +1341,13 @@ class AudioSource {
         this.id = id;
         this.buffer = buffer;
     }
-    static async from_bytes(id, bytes) {
-        const context = new AudioContext();
-        const buffer = await context.decodeAudioData(bytes.buffer);
+    static async from_bytes(server, id, bytes) {
+        const buffer = await server.audio_context.decodeAudioData(bytes.buffer);
         return new AudioSource(id, buffer);
     }
 }
 
-},{"../../../../util/build/random":42}],16:[function(require,module,exports){
+},{"../../../../util/build/random":43}],16:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CartManager = void 0;
@@ -1357,7 +1436,7 @@ class CartManager {
 }
 exports.CartManager = CartManager;
 
-},{"../../../../schema/generated/cartridge":35,"../../../../schema/lib/fingerprint":36,"./db":18}],17:[function(require,module,exports){
+},{"../../../../schema/generated/cartridge":36,"../../../../schema/lib/fingerprint":37,"./db":18}],17:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.HUD_ContextMenu = exports.KateContextMenu = void 0;
@@ -1390,7 +1469,6 @@ class KateContextMenu {
         }
         this.in_context = true;
         this.os.processes.running?.pause();
-        const old_context = this.os.focus_handler.current_root;
         const menu = new HUD_ContextMenu(this.os);
         menu.on_close.listen(() => {
             this.in_context = false;
@@ -1398,10 +1476,10 @@ class KateContextMenu {
             this.os.kernel.console.on_tick.once(() => {
                 this.os.processes.running?.unpause();
             });
-            this.os.focus_handler.compare_and_change_root(old_context, menu.canvas);
+            this.os.focus_handler.pop_root(menu.canvas);
         });
         this.os.show_hud(menu);
-        this.os.focus_handler.change_root(menu.canvas);
+        this.os.focus_handler.push_root(menu.canvas);
     }
 }
 exports.KateContextMenu = KateContextMenu;
@@ -1464,9 +1542,9 @@ class HUD_ContextMenu extends scenes_1.Scene {
         });
     };
     on_close_game = async () => {
-        await this.os.processes.running?.exit();
         this.os.hide_hud(this);
         this.on_close.emit();
+        await this.os.processes.running?.exit();
     };
     on_return = async () => {
         this.os.hide_hud(this);
@@ -1480,7 +1558,7 @@ class HUD_ContextMenu extends scenes_1.Scene {
 }
 exports.HUD_ContextMenu = HUD_ContextMenu;
 
-},{"../../../../util/build/events":38,"../ui":32,"../ui/scenes":33}],18:[function(require,module,exports){
+},{"../../../../util/build/events":39,"../ui":32,"../ui/scenes":33}],18:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.cart_kvstore = exports.notifications = exports.cart_files = exports.cart_meta = exports.kate = void 0;
@@ -1577,10 +1655,9 @@ class HUD_Dialog extends scenes_1.Scene {
         try {
             this.canvas.textContent = "";
             this.canvas.appendChild(element);
-            const old_root = this.os.focus_handler.current_root;
-            this.os.focus_handler.change_root(this.canvas);
+            this.os.focus_handler.push_root(this.canvas);
             return_value = await result.promise;
-            this.os.focus_handler.compare_and_change_root(old_root, this.canvas);
+            this.os.focus_handler.pop_root(this.canvas);
             setTimeout(async () => {
                 element.classList.add("leaving");
                 await (0, time_1.wait)(this.FADE_OUT_TIME_MS);
@@ -1618,10 +1695,9 @@ class HUD_Dialog extends scenes_1.Scene {
         try {
             this.canvas.textContent = "";
             this.canvas.appendChild(element);
-            const old_root = this.os.focus_handler.current_root;
-            this.os.focus_handler.change_root(this.canvas);
+            this.os.focus_handler.push_root(this.canvas);
             return_value = await result.promise;
-            this.os.focus_handler.compare_and_change_root(old_root, this.canvas);
+            this.os.focus_handler.pop_root(this.canvas);
             setTimeout(async () => {
                 element.classList.add("leaving");
                 await (0, time_1.wait)(this.FADE_OUT_TIME_MS);
@@ -1636,7 +1712,7 @@ class HUD_Dialog extends scenes_1.Scene {
 }
 exports.HUD_Dialog = HUD_Dialog;
 
-},{"../../../../util/build/promise":41,"../time":31,"../ui":32,"../ui/scenes":33}],20:[function(require,module,exports){
+},{"../../../../util/build/promise":42,"../time":31,"../ui":32,"../ui/scenes":33}],20:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.HUD_DropInstaller = exports.KateDropInstaller = void 0;
@@ -1794,12 +1870,13 @@ class StorageFile {
 }
 exports.StorageFile = StorageFile;
 
-},{"../../../../schema/generated/cartridge":35}],22:[function(require,module,exports){
+},{"../../../../schema/generated/cartridge":36}],22:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.KateFocusHandler = void 0;
 class KateFocusHandler {
     os;
+    _stack = [];
     _current_root = null;
     constructor(os) {
         this.os = os;
@@ -1813,7 +1890,8 @@ class KateFocusHandler {
     get current_root() {
         return this._current_root;
     }
-    change_root(element) {
+    push_root(element) {
+        this._stack.push(this._current_root);
         this._current_root = element;
         if (element != null && element.querySelector(".focus") == null) {
             const candidates0 = Array.from(element.querySelectorAll(".kate-ui-focus-target"));
@@ -1821,17 +1899,20 @@ class KateFocusHandler {
             this.focus(candidates[0]);
         }
     }
-    compare_and_change_root(element, old) {
-        if (this.current_root === old) {
-            this.change_root(element);
-            return true;
+    pop_root(expected) {
+        if (expected != this._current_root) {
+            console.warn(`pop_root() with unexpected root`, {
+                expected,
+                current: this._current_root,
+            });
+            return;
+        }
+        if (this._stack.length > 0) {
+            this._current_root = this._stack.pop();
         }
         else {
-            return false;
+            throw new Error(`pop_root() on an empty focus stack`);
         }
-    }
-    focus_current_scene() {
-        this.change_root(this.os.current_scene?.canvas ?? null);
     }
     handle_input = (key) => {
         if (this._current_root == null || !this.should_handle(key)) {
@@ -1997,14 +2078,18 @@ class KateIPCServer {
             typeof type === "string" &&
             typeof id === "string" &&
             typeof payload === "object") {
-            console.log("kate-ipc <==", { type, id, payload });
+            console.debug("kate-ipc <==", { type, id, payload });
             const handler = this._handlers.get(secret);
             if (handler != null) {
-                const { ok, value } = await this.process_message(handler, {
+                const result = await this.process_message(handler, {
                     type: type,
                     payload,
                 });
-                console.log("kate-ipc ==>", { id, ok, value });
+                if (result == null) {
+                    return;
+                }
+                const { ok, value } = result;
+                console.debug("kate-ipc ==>", { id, ok, value });
                 handler.window()?.postMessage({
                     type: "kate:reply",
                     id: id,
@@ -2018,6 +2103,11 @@ class KateIPCServer {
         const err = (code) => ({ ok: false, value: { code } });
         const ok = (value) => ({ ok: true, value });
         switch (message.type) {
+            // -- Special
+            case "kate:special.focus": {
+                window.focus();
+                return null;
+            }
             // -- Cart FS
             case "kate:cart.read-file": {
                 const file = process.cart.files.find((x) => x.path === message.payload.path);
@@ -2062,31 +2152,10 @@ class KateIPCServer {
             case "kate:audio.create-channel": {
                 try {
                     const channel = await process.audio.create_channel(message.payload.max_tracks ?? 1);
-                    channel.resume().catch(() => { });
                     return ok({ id: channel.id, volume: channel.volume.gain.value });
                 }
                 catch (error) {
                     return err(`kate:audio.cannot-create-channel`);
-                }
-            }
-            case "kate:audio.resume-channel": {
-                try {
-                    const channel = process.audio.get_channel(message.payload.id);
-                    channel.resume().catch(() => { });
-                    return ok(null);
-                }
-                catch (_) {
-                    return err("kate:audio.cannot-resume");
-                }
-            }
-            case "kate:audio.pause-channel": {
-                try {
-                    const channel = process.audio.get_channel(message.payload.id);
-                    await channel.suspend();
-                    return ok(null);
-                }
-                catch (_) {
-                    return err("kate:audio.cannot-pause");
                 }
             }
             case "kate:audio.stop-all-sources": {
@@ -2294,7 +2363,7 @@ class KateProcesses {
         }
         const loading = new HUD_LoadIndicator(this.os);
         this.os.show_hud(loading);
-        this.os.focus_handler.change_root(null);
+        this.os.focus_handler.push_root(null);
         try {
             const cart = await this.os.db.transaction([Db.cart_files], "readonly", async (t) => {
                 const files = t.get_table(Db.cart_files);
@@ -2319,7 +2388,7 @@ class KateProcesses {
     notify_exit(process) {
         if (process === this._running) {
             this._running = null;
-            this.os.focus_handler.focus_current_scene();
+            this.os.focus_handler.pop_root(null);
             this.os.kernel.console.os_root.classList.remove("in-background");
         }
     }
@@ -2543,14 +2612,15 @@ class KateOS {
         }
         this._current_scene = scene;
         scene.attach(this.display);
-        this.focus_handler.change_root(scene.canvas);
+        this.focus_handler.push_root(scene.canvas);
     }
     pop_scene() {
         if (this._current_scene != null) {
+            this.focus_handler.pop_root(this._current_scene.canvas);
             this._current_scene.detach();
         }
         this._current_scene = this._scene_stack.pop() ?? null;
-        this.focus_handler.change_root(this._current_scene?.canvas ?? null);
+        this.focus_handler.push_root(this._current_scene?.canvas ?? null);
     }
     show_hud(scene) {
         this._active_hud.push(scene);
@@ -2576,7 +2646,7 @@ class KateOS {
 }
 exports.KateOS = KateOS;
 
-},{"../../../util/build/events":38,"./apis":23,"./apis/cart-manager":16,"./apis/context_menu":17,"./apis/db":18,"./apis/dialog":19,"./apis/drop-installer":20,"./apis/file_storage":21,"./apis/focus-handler":22,"./apis/ipc":24,"./apis/kv_storage":25,"./apis/notification":26,"./apis/processes":27,"./apis/status-bar":28,"./time":31,"./ui/scenes":33}],31:[function(require,module,exports){
+},{"../../../util/build/events":39,"./apis":23,"./apis/cart-manager":16,"./apis/context_menu":17,"./apis/db":18,"./apis/dialog":19,"./apis/drop-installer":20,"./apis/file_storage":21,"./apis/focus-handler":22,"./apis/ipc":24,"./apis/kv_storage":25,"./apis/notification":26,"./apis/processes":27,"./apis/status-bar":28,"./time":31,"./ui/scenes":33}],31:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.wait = void 0;
@@ -2973,7 +3043,25 @@ class Icon extends Widget {
 }
 exports.Icon = Icon;
 
-},{"../../../../util/build/events":38}],35:[function(require,module,exports){
+},{"../../../../util/build/events":39}],35:[function(require,module,exports){
+module.exports={
+  "name": "@qteatime/kate-core",
+  "version": "0.3.0",
+  "description": "The Kate emulator --- a fantasy console for 2d story games.",
+  "main": "build/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/qteatime/kate.git"
+  },
+  "author": "Q.",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/qteatime/kate/issues"
+  },
+  "homepage": "https://github.com/qteatime/kate#readme"
+}
+
+},{}],36:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.KeyboardKey = exports.VirtualKey = exports.VirtualKey$Base = exports.Bridge = exports.Bridge$Base = exports.Platform = exports.Platform$Base = exports.Booklet_align = exports.Booklet_align$Base = exports.Booklet_cell = exports.Booklet_row = exports.Booklet_expr = exports.Booklet_expr$Base = exports.Accessibility = exports.Accessibility$Base = exports.Language = exports.Player_range = exports.Input_method = exports.Input_method$Base = exports.Duration = exports.Duration$Base = exports.Date = exports.Content_rating = exports.Content_rating$Base = exports.Version = exports.Release_type = exports.Release_type$Base = exports.Genre = exports.Genre$Base = exports.Capability = exports.Capability$Base = exports.Extra = exports.Extra$Base = exports.Meta_play = exports.Meta_rating = exports.Meta_release = exports.Meta_title = exports.Metadata = exports.File = exports.Cartridge = exports.Meta_security = exports._Encoder = exports._Decoder = void 0;
@@ -5911,6 +5999,7 @@ class Bridge$Base {
             case 0: return Bridge.Network_proxy.decode($d);
             case 1: return Bridge.Local_storage_proxy.decode($d);
             case 2: return Bridge.Input_proxy.decode($d);
+            case 3: return Bridge.RPGMaker_MV.decode($d);
             default:
                 throw new Error(`Unknown tag ${$tag} in union Bridge`);
         }
@@ -6006,6 +6095,31 @@ var Bridge;
         }
     }
     Bridge.Input_proxy = Input_proxy;
+    class RPGMaker_MV extends Bridge$Base {
+        static $tag = 3 /* $Tags.RPGMaker_MV */;
+        $tag = 3 /* $Tags.RPGMaker_MV */;
+        constructor() {
+            super();
+        }
+        static decode($d) {
+            return RPGMaker_MV.$do_decode($d);
+        }
+        static $do_decode($d) {
+            const $tag = $d.ui8();
+            if ($tag !== 3) {
+                throw new Error(`Invalid tag ${$tag} for Bridge.RPGMaker-MV: expected 3`);
+            }
+            return new RPGMaker_MV();
+        }
+        encode($e) {
+            $e.ui32(25);
+            this.$do_encode($e);
+        }
+        $do_encode($e) {
+            $e.ui8(3);
+        }
+    }
+    Bridge.RPGMaker_MV = RPGMaker_MV;
 })(Bridge = exports.Bridge || (exports.Bridge = {}));
 class VirtualKey$Base {
     static decode($d) {
@@ -6323,7 +6437,7 @@ class KeyboardKey {
 }
 exports.KeyboardKey = KeyboardKey;
 
-},{}],36:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.remove_fingerprint = exports.add_fingerprint = exports.check_fingerprint = exports.fingerprint = void 0;
@@ -6352,7 +6466,7 @@ function remove_fingerprint(data) {
 }
 exports.remove_fingerprint = remove_fingerprint;
 
-},{}],37:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.unreachable = void 0;
@@ -6361,7 +6475,7 @@ function unreachable(x, message = "") {
 }
 exports.unreachable = unreachable;
 
-},{}],38:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EventStream = void 0;
@@ -6417,7 +6531,7 @@ class EventStream {
 }
 exports.EventStream = EventStream;
 
-},{}],39:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -6438,8 +6552,9 @@ __exportStar(require("./assert"), exports);
 __exportStar(require("./events"), exports);
 __exportStar(require("./promise"), exports);
 __exportStar(require("./random"), exports);
+__exportStar(require("./pathname"), exports);
 
-},{"./assert":37,"./events":38,"./promise":41,"./random":42}],40:[function(require,module,exports){
+},{"./assert":38,"./events":39,"./pathname":41,"./promise":42,"./random":43}],41:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Pathname = void 0;
@@ -6529,7 +6644,7 @@ function parse_segment(x) {
     }
 }
 
-},{}],41:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.sleep = exports.defer = void 0;
@@ -6549,7 +6664,7 @@ function sleep(ms) {
 }
 exports.sleep = sleep;
 
-},{}],42:[function(require,module,exports){
+},{}],43:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.make_id = void 0;
