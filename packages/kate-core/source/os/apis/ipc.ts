@@ -30,7 +30,8 @@ type Message =
   | {
       type: "kate:audio.play";
       payload: { channel: string; source: string; loop: boolean };
-    };
+    }
+  | { type: "kate:special.focus" };
 
 export class KateIPCServer {
   private _handlers = new Map<string, Process>();
@@ -81,14 +82,18 @@ export class KateIPCServer {
       typeof id === "string" &&
       typeof payload === "object"
     ) {
-      console.log("kate-ipc <==", { type, id, payload });
+      console.debug("kate-ipc <==", { type, id, payload });
       const handler = this._handlers.get(secret);
       if (handler != null) {
-        const { ok, value } = await this.process_message(handler, {
+        const result = await this.process_message(handler, {
           type: type as any,
           payload,
         });
-        console.log("kate-ipc ==>", { id, ok, value });
+        if (result == null) {
+          return;
+        }
+        const { ok, value } = result;
+        console.debug("kate-ipc ==>", { id, ok, value });
         handler.window()?.postMessage(
           {
             type: "kate:reply",
@@ -105,11 +110,17 @@ export class KateIPCServer {
   async process_message(
     process: Process,
     message: Message
-  ): Promise<{ ok: boolean; value: any }> {
+  ): Promise<{ ok: boolean; value: any } | null> {
     const err = (code: string) => ({ ok: false, value: { code } });
     const ok = (value: any) => ({ ok: true, value });
 
     switch (message.type) {
+      // -- Special
+      case "kate:special.focus": {
+        window.focus();
+        return null;
+      }
+
       // -- Cart FS
       case "kate:cart.read-file": {
         const file = process.cart.files.find(

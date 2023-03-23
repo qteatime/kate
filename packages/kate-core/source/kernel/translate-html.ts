@@ -1,6 +1,6 @@
 import { bridges } from "../../../kate-bridges/build";
 import * as Cart from "../../../schema/generated/cartridge";
-import { unreachable } from "../../../util/build";
+import { make_id, unreachable } from "../../../util/build";
 import { Pathname } from "../../../util/build/pathname";
 import type { InputKey } from "./virtual";
 
@@ -19,7 +19,28 @@ export function translate_html(html: string, context: Context) {
   add_bridges(preamble, dom, context);
   inline_all_scripts(dom, context);
   inline_all_links(dom, context);
+  add_cover(dom, context);
   return dom.documentElement.outerHTML;
+}
+
+export function add_cover(dom: Document, context: Context) {
+  const element = dom.createElement("div");
+  const id = `kate_${make_id().replace(/\-/g, "_")}`;
+  element.id = id;
+  element.style.position = "fixed";
+  element.style.top = "0px";
+  element.style.left = "0px";
+  element.style.width = "100%";
+  element.style.height = "100%";
+  element.style.zIndex = "99999";
+  element.setAttribute(
+    "onclick",
+    `
+    event.preventDefault();
+    KateAPI.focus();
+    `
+  );
+  dom.body.appendChild(element);
 }
 
 function add_preamble(dom: Document, context: Context) {

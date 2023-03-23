@@ -24,6 +24,10 @@ export const audio = new KateAudio(channel);
 export const timer = new KateTimer();
 timer.setup();
 
+export const focus = () => {
+  channel.send_and_ignore_result("kate:special.focus", {});
+};
+
 export type KateAPI = {
   events: typeof events;
   cart_fs: typeof cart_fs;
@@ -31,6 +35,7 @@ export type KateAPI = {
   input: typeof input;
   audio: typeof audio;
   timer: typeof timer;
+  focus: () => void;
 };
 
 declare global {
