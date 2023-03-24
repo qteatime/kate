@@ -1,4 +1,6 @@
-// Handle keyboard input
+// This proxy translates Kate's input (keyboard, gamepad, and virtual console)
+// into keyboard events in this page. Mappings are provided when instantiating
+// this bridge.
 declare var key_mapping: { [key: string]: [string, string, number] };
 
 let paused = false;

@@ -1,3 +1,5 @@
+// Resolve GETs on the same domain to reads from the cartridge files.
+// This handles fetch, XMLHttpRequest, IMG, Audio, and Video.
 export {};
 
 const { cart_fs } = KateAPI;

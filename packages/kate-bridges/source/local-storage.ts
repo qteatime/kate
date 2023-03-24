@@ -1,3 +1,4 @@
+// Support localStorage by proxying it to Kate's regular storage.
 type Dict = { [key: string]: string };
 declare var KATE_LOCAL_STORAGE: Dict | null;
 

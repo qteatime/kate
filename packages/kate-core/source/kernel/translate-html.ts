@@ -154,6 +154,11 @@ function apply_bridge(
       break;
     }
 
+    case Cart.Bridge.$Tags.Preserve_render: {
+      append_proxy(bridges["preserve-render.js"]);
+      break;
+    }
+
     default:
       throw unreachable(bridge, "kate bridge");
   }

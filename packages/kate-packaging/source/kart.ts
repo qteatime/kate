@@ -127,7 +127,8 @@ type Bridge =
       type: "input-proxy";
       mapping: { [key: string]: KeyboardKey } | "defaults";
     }
-  | { type: "rpgmaker-mv" };
+  | { type: "rpgmaker-mv" }
+  | { type: "preserve-webgl-render" };
 
 class J<T extends { [key: string]: any }> {
   constructor(readonly value: T, readonly path: string[]) {}
@@ -539,6 +540,10 @@ function make_bridge(x: Bridge) {
 
     case "rpgmaker-mv": {
       return new Cart.Bridge.RPGMaker_MV();
+    }
+
+    case "preserve-webgl-render": {
+      return new Cart.Bridge.Preserve_render();
     }
 
     default:

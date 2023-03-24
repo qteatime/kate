@@ -3573,7 +3573,7 @@ export class Web_archive extends Platform$Base {
  static readonly $tag = $Tags.Web_archive;
  readonly $tag = $Tags.Web_archive;
 
- constructor(readonly html: string, readonly bridges: ((Bridge.Network_proxy | Bridge.Local_storage_proxy | Bridge.Input_proxy | Bridge.RPGMaker_MV))[]) {
+ constructor(readonly html: string, readonly bridges: ((Bridge.Network_proxy | Bridge.Local_storage_proxy | Bridge.Input_proxy | Bridge.RPGMaker_MV | Bridge.Preserve_render))[]) {
    super();
  }
 
@@ -3615,7 +3615,7 @@ $e.array((this.bridges), ($e, v) => {
 
 
 
-export type Bridge = Bridge.Network_proxy | Bridge.Local_storage_proxy | Bridge.Input_proxy | Bridge.RPGMaker_MV;
+export type Bridge = Bridge.Network_proxy | Bridge.Local_storage_proxy | Bridge.Input_proxy | Bridge.RPGMaker_MV | Bridge.Preserve_render;
 
 export abstract class Bridge$Base {
  static decode($d: _Decoder): Bridge {
@@ -3634,6 +3634,7 @@ export abstract class Bridge$Base {
 case 1: return Bridge.Local_storage_proxy.decode($d);
 case 2: return Bridge.Input_proxy.decode($d);
 case 3: return Bridge.RPGMaker_MV.decode($d);
+case 4: return Bridge.Preserve_render.decode($d);
 
      default:
        throw new Error(`Unknown tag ${$tag} in union Bridge`);
@@ -3643,7 +3644,7 @@ case 3: return Bridge.RPGMaker_MV.decode($d);
 
 export namespace Bridge {
  export const enum $Tags {
-   Network_proxy,Local_storage_proxy,Input_proxy,RPGMaker_MV
+   Network_proxy,Local_storage_proxy,Input_proxy,RPGMaker_MV,Preserve_render
  }
 
  
@@ -3795,6 +3796,41 @@ export class RPGMaker_MV extends Bridge$Base {
 
  $do_encode($e: _Encoder) {
    $e.ui8(3);
+   
+ }
+}
+
+
+
+export class Preserve_render extends Bridge$Base {
+ static readonly $tag = $Tags.Preserve_render;
+ readonly $tag = $Tags.Preserve_render;
+
+ constructor() {
+   super();
+ }
+
+ static decode($d: _Decoder): Preserve_render {
+   return Preserve_render.$do_decode($d);
+ }
+
+ static $do_decode($d: _Decoder): Preserve_render {
+   const $tag = $d.ui8();
+   if ($tag !== 4) {
+     throw new Error(`Invalid tag ${$tag} for Bridge.Preserve-render: expected 4`);
+   }
+
+   
+   return new Preserve_render();
+ }
+
+ encode($e: _Encoder) {
+   $e.ui32(25);
+   this.$do_encode($e);
+ }
+
+ $do_encode($e: _Encoder) {
+   $e.ui8(4);
    
  }
 }

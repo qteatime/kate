@@ -216,6 +216,7 @@ union Bridge {
     field mapping: VirtualKey -> KeyboardKey;
   }
   type RPGMaker-MV {}
+  type Preserve-render {}
 }
 
 union VirtualKey {
