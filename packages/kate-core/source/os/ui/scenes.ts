@@ -167,7 +167,7 @@ export class SceneHome extends Scene {
           null
       );
     } catch (error) {
-      console.log(error);
+      console.error("[Kate] Failed to load cartridges", error);
       this.os.notifications.push(
         "kate:os",
         "Failed to load games",
