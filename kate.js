@@ -515,7 +515,7 @@ class CR_Web_archive extends CartRuntime {
     proxy_html(secret) {
         return (0, translate_html_1.translate_html)(this.data.html, {
             secret,
-            zoom: Number(this.console.body.getAttribute("data-zoom") ?? "0"),
+            zoom: this.console.scale,
             bridges: this.data.bridges,
             cart: this.cart,
             local_storage: this.local_storage,
@@ -771,7 +771,6 @@ const pathname_1 = require("../../../util/build/pathname");
 function translate_html(html, context) {
     const dom = new DOMParser().parseFromString(html, "text/html");
     const preamble = add_preamble(dom, context);
-    add_zoom(dom, context);
     add_bridges(preamble, dom, context);
     inline_all_scripts(dom, context);
     inline_all_links(dom, context);
@@ -806,17 +805,6 @@ function add_preamble(dom, context) {
   `;
     dom.head.insertBefore(script, dom.head.firstChild);
     return script;
-}
-function add_zoom(dom, context) {
-    const style = dom.createElement("style");
-    style.textContent = `
-    :root {
-      --kate-zoom: ${context.zoom ?? "0"};
-      zoom: var(--kate-zoom);
-    }
-  `;
-    dom.head.appendChild(style);
-    return style;
 }
 function add_bridges(reference, dom, context) {
     for (const bridge of context.bridges) {
@@ -1024,6 +1012,7 @@ class VirtualConsole {
     ltrigger_button;
     rtrigger_button;
     is_listening = false;
+    _scale = 1;
     body;
     device_display;
     screen;
@@ -1033,6 +1022,7 @@ class VirtualConsole {
     on_input_changed = new events_1.EventStream();
     on_key_pressed = new events_1.EventStream();
     on_tick = new events_1.EventStream();
+    on_scale_changed = new events_1.EventStream();
     audio_context = new AudioContext();
     timer_id = null;
     last_time = null;
@@ -1133,11 +1123,24 @@ class VirtualConsole {
             this.timer_id = requestAnimationFrame(this.tick);
         }
     };
+    get scale() {
+        return this._scale;
+    }
     listen() {
         if (this.is_listening) {
             throw new Error(`listen called twice`);
         }
         this.is_listening = true;
+        window.addEventListener("load", () => this.update_scale(true));
+        window.addEventListener("resize", () => this.update_scale(true));
+        window.addEventListener("orientationchange", () => this.update_scale(true));
+        screen.addEventListener?.("orientationchange", () => this.update_scale(true));
+        this.update_scale(true);
+        this.body
+            .querySelector(".kate-engraving")
+            ?.addEventListener("click", () => {
+            this.request_fullscreen();
+        });
         const listen_button = (button, key) => {
             button.addEventListener("mousedown", (ev) => {
                 ev.preventDefault();
@@ -1168,6 +1171,36 @@ class VirtualConsole {
         listen_button(this.rtrigger_button, "rtrigger");
         this.start_ticking();
         this.on_tick.listen(this.key_update_loop);
+    }
+    update_scale(force) {
+        const width = 1312;
+        const ww = window.innerWidth;
+        const wh = window.innerHeight;
+        let zoom = Math.min(1, ww / width);
+        if (zoom === this._scale && !force) {
+            return;
+        }
+        const x = Math.round(ww - this.body.offsetWidth * zoom) / 2;
+        const y = Math.round(wh - this.body.offsetHeight * zoom) / 2;
+        this.body.style.transform = `scale(${zoom})`;
+        this.body.style.transformOrigin = `0 0`;
+        this.body.style.left = `${x}px`;
+        this.body.style.top = `${y}px`;
+        window.scrollTo({ left: 0, top: 0 });
+        document.body.scroll({ left: 0, top: 0 });
+        this._scale = zoom;
+        this.on_scale_changed.emit(zoom);
+    }
+    async request_fullscreen() {
+        try {
+            await document.body.requestFullscreen({ navigationUI: "hide" });
+            await screen.orientation.lock("landscape").catch((_) => { });
+            return true;
+        }
+        catch (error) {
+            console.warn(`[Kate] locking orientation in fullscreen not supported`, error);
+            return false;
+        }
     }
     key_update_loop = (time) => {
         for (const key of this.keys) {
@@ -1366,6 +1399,18 @@ class CartManager {
             return result;
         });
     }
+    async read(id) {
+        const cartridge = await this.os.db.transaction([Db.cart_files], "readonly", async (t) => {
+            const files = t.get_table(Db.cart_files);
+            const file = await files.get(id);
+            return this.os.kernel.loader.load_bytes(file.bytes.buffer);
+        });
+        return cartridge;
+    }
+    async read_legal(id) {
+        const cartridge = await this.read(id);
+        return cartridge.metadata.release.legal_notices;
+    }
     async install_from_file(file) {
         try {
             const cart = this.os.kernel.loader.load_bytes(await file.arrayBuffer());
@@ -1469,7 +1514,7 @@ class KateContextMenu {
         }
         this.in_context = true;
         this.os.processes.running?.pause();
-        const menu = new HUD_ContextMenu(this.os);
+        const menu = new HUD_ContextMenu(this.os, this);
         menu.on_close.listen(() => {
             this.in_context = false;
             // We want to avoid key presses being propagated on this tick
@@ -1481,26 +1526,35 @@ class KateContextMenu {
         this.os.show_hud(menu);
         this.os.focus_handler.push_root(menu.canvas);
     }
+    exit_context() {
+        this.in_context = false;
+    }
 }
 exports.KateContextMenu = KateContextMenu;
 class HUD_ContextMenu extends scenes_1.Scene {
     os;
+    context;
     on_close = new events_1.EventStream();
-    constructor(os) {
+    constructor(os, context) {
         super(os);
         this.os = os;
+        this.context = context;
     }
     render() {
+        const fullscreen_button = () => new UI.Button(["Toggle fullscreen"]).on_clicked(this.on_toggle_fullscreen);
         return UI.h("div", { class: "kate-os-hud-context-menu" }, [
             UI.h("div", { class: "kate-os-hud-context-menu-backdrop" }, []),
             UI.h("div", { class: "kate-os-hud-context-menu-content" }, [
                 new UI.If(() => this.os.processes.running != null, {
                     then: new UI.Menu_list([
                         new UI.Button(["Close game"]).on_clicked(this.on_close_game),
+                        fullscreen_button(),
+                        new UI.Button(["Legal notices"]).on_clicked(this.on_legal_notices),
                         new UI.Button(["Return"]).on_clicked(this.on_return),
                     ]),
                     else: new UI.Menu_list([
                         new UI.Button(["Power off"]).on_clicked(this.on_power_off),
+                        fullscreen_button(),
                         new UI.Button(["Install from file"]).on_clicked(this.on_install_from_file),
                         new UI.Button(["Return"]).on_clicked(this.on_return),
                     ]),
@@ -1508,9 +1562,37 @@ class HUD_ContextMenu extends scenes_1.Scene {
             ]),
         ]);
     }
-    on_install_from_file = async () => {
+    on_legal_notices = () => {
+        this.close(false);
+        this.os.focus_handler.pop_root(this.canvas);
+        this.context.exit_context();
+        const process = this.os.processes.running;
+        const legal = new scenes_1.SceneLicence(this.os, process.cart.metadata.title.title, process.cart.metadata.release.legal_notices, () => {
+            this.os.switch_mode("game");
+            this.os.kernel.console.on_tick.once(() => {
+                process.unpause();
+            });
+        });
+        this.os.push_scene(legal);
+        this.os.switch_mode("os");
+    };
+    on_toggle_fullscreen = () => {
+        this.close();
+        if (document.fullscreenElement) {
+            document.exitFullscreen();
+        }
+        else {
+            this.os.kernel.console.request_fullscreen();
+        }
+    };
+    close(notify = true) {
         this.os.hide_hud(this);
-        this.on_close.emit();
+        if (notify) {
+            this.on_close.emit();
+        }
+    }
+    on_install_from_file = async () => {
+        this.close();
         return new Promise((resolve, reject) => {
             const installer = document.querySelector("#kate-installer");
             const teardown = () => {
@@ -1542,13 +1624,11 @@ class HUD_ContextMenu extends scenes_1.Scene {
         });
     };
     on_close_game = async () => {
-        this.os.hide_hud(this);
-        this.on_close.emit();
+        this.close();
         await this.os.processes.running?.exit();
     };
     on_return = async () => {
-        this.os.hide_hud(this);
-        this.on_close.emit();
+        this.close();
     };
     on_power_off = async () => {
         window.close();
@@ -1878,11 +1958,18 @@ class KateFocusHandler {
     os;
     _stack = [];
     _current_root = null;
+    _handlers = [];
     constructor(os) {
         this.os = os;
     }
     setup() {
         this.os.kernel.console.on_key_pressed.listen(this.handle_input);
+    }
+    listen(root, handler) {
+        this._handlers.push({ root, handler });
+    }
+    remove(root, handler) {
+        this._handlers = this._handlers.filter((x) => x.root !== root && x.handler !== handler);
     }
     should_handle(key) {
         return ["up", "down", "left", "right", "o"].includes(key);
@@ -1915,7 +2002,17 @@ class KateFocusHandler {
         }
     }
     handle_input = (key) => {
-        if (this._current_root == null || !this.should_handle(key)) {
+        if (this._current_root == null) {
+            return;
+        }
+        for (const { root, handler } of this._handlers) {
+            if (this._current_root === root) {
+                if (handler(key)) {
+                    return;
+                }
+            }
+        }
+        if (!this.should_handle(key)) {
             return;
         }
         const focusable = Array.from(this._current_root.querySelectorAll(".kate-ui-focus-target")).map((x) => ({
@@ -2341,10 +2438,8 @@ exports.HUD_Toaster = HUD_Toaster;
 },{"../time":31,"../ui":32,"../ui/scenes":33,"./db":18}],27:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.KateProcess = exports.HUD_LoadIndicator = exports.KateProcesses = void 0;
-const ui_1 = require("../ui");
+exports.KateProcess = exports.KateProcesses = void 0;
 const scenes_1 = require("../ui/scenes");
-const Db = require("./db");
 class KateProcesses {
     os;
     _running = null;
@@ -2361,20 +2456,16 @@ class KateProcesses {
         if (this.is_busy) {
             throw new Error(`process already running`);
         }
-        const loading = new HUD_LoadIndicator(this.os);
+        const loading = new scenes_1.HUD_LoadIndicator(this.os);
         this.os.show_hud(loading);
         this.os.focus_handler.push_root(null);
         try {
-            const cart = await this.os.db.transaction([Db.cart_files], "readonly", async (t) => {
-                const files = t.get_table(Db.cart_files);
-                const file = await files.get(id);
-                return this.os.kernel.loader.load_bytes(file.bytes.buffer);
-            });
+            const cart = await this.os.cart_manager.read(id);
             const storage = this.os.kv_storage.get_store(cart.id);
             const runtime = this.os.kernel.runtimes.from_cartridge(cart, await storage.contents());
             const process = new KateProcess(this, cart, runtime.run(this.os));
             this._running = process;
-            this.os.kernel.console.os_root.classList.add("in-background");
+            this.os.switch_mode("game");
             return process;
         }
         catch (error) {
@@ -2389,17 +2480,11 @@ class KateProcesses {
         if (process === this._running) {
             this._running = null;
             this.os.focus_handler.pop_root(null);
-            this.os.kernel.console.os_root.classList.remove("in-background");
+            this.os.switch_mode("os");
         }
     }
 }
 exports.KateProcesses = KateProcesses;
-class HUD_LoadIndicator extends scenes_1.Scene {
-    render() {
-        return (0, ui_1.h)("div", { class: "kate-hud-load-screen" }, ["Loading..."]);
-    }
-}
-exports.HUD_LoadIndicator = HUD_LoadIndicator;
 class KateProcess {
     manager;
     cart;
@@ -2429,7 +2514,7 @@ class KateProcess {
 }
 exports.KateProcess = KateProcess;
 
-},{"../ui":32,"../ui/scenes":33,"./db":18}],28:[function(require,module,exports){
+},{"../ui/scenes":33}],28:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.KateStatus = exports.HUD_StatusBar = exports.KateStatusBar = void 0;
@@ -2554,6 +2639,7 @@ const kv_storage_1 = require("./apis/kv_storage");
 const ipc_1 = require("./apis/ipc");
 const apis_1 = require("./apis");
 const dialog_1 = require("./apis/dialog");
+const build_1 = require("../../../util/build");
 class KateOS {
     kernel;
     db;
@@ -2622,6 +2708,20 @@ class KateOS {
         this._current_scene = this._scene_stack.pop() ?? null;
         this.focus_handler.push_root(this._current_scene?.canvas ?? null);
     }
+    switch_mode(mode) {
+        switch (mode) {
+            case "game": {
+                this.kernel.console.os_root.classList.add("in-background");
+                break;
+            }
+            case "os": {
+                this.kernel.console.os_root.classList.remove("in-background");
+                break;
+            }
+            default:
+                throw (0, build_1.unreachable)(mode);
+        }
+    }
     show_hud(scene) {
         this._active_hud.push(scene);
         scene.attach(this.hud_display);
@@ -2646,7 +2746,7 @@ class KateOS {
 }
 exports.KateOS = KateOS;
 
-},{"../../../util/build/events":39,"./apis":23,"./apis/cart-manager":16,"./apis/context_menu":17,"./apis/db":18,"./apis/dialog":19,"./apis/drop-installer":20,"./apis/file_storage":21,"./apis/focus-handler":22,"./apis/ipc":24,"./apis/kv_storage":25,"./apis/notification":26,"./apis/processes":27,"./apis/status-bar":28,"./time":31,"./ui/scenes":33}],31:[function(require,module,exports){
+},{"../../../util/build":40,"../../../util/build/events":39,"./apis":23,"./apis/cart-manager":16,"./apis/context_menu":17,"./apis/db":18,"./apis/dialog":19,"./apis/drop-installer":20,"./apis/file_storage":21,"./apis/focus-handler":22,"./apis/ipc":24,"./apis/kv_storage":25,"./apis/notification":26,"./apis/processes":27,"./apis/status-bar":28,"./time":31,"./ui/scenes":33}],31:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.wait = void 0;
@@ -2680,9 +2780,10 @@ exports.Scenes = Scenes;
 },{"./scenes":33,"./widget":34}],33:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SceneHome = exports.SceneBoot = exports.Scene = void 0;
+exports.SceneHome = exports.SceneBoot = exports.SceneLicence = exports.HUD_LoadIndicator = exports.Scene = void 0;
 const widget_1 = require("./widget");
 const UI = require("./widget");
+const build_1 = require("../../../../util/build");
 class Scene {
     os;
     canvas;
@@ -2694,12 +2795,80 @@ class Scene {
         to.appendChild(this.canvas);
         this.canvas.innerHTML = "";
         (0, widget_1.append)(this.render(), this.canvas);
+        this.on_attached();
     }
     async detach() {
         this.canvas.remove();
+        this.on_detached();
     }
+    on_attached() { }
+    on_detached() { }
 }
 exports.Scene = Scene;
+class HUD_LoadIndicator extends Scene {
+    render() {
+        return (0, widget_1.h)("div", { class: "kate-hud-load-screen" }, ["Loading..."]);
+    }
+}
+exports.HUD_LoadIndicator = HUD_LoadIndicator;
+class SceneLicence extends Scene {
+    title;
+    text;
+    on_closed;
+    constructor(os, title, text, on_closed = () => { }) {
+        super(os);
+        this.title = title;
+        this.text = text;
+        this.on_closed = on_closed;
+    }
+    render() {
+        return (0, widget_1.h)("div", { class: "kate-os-simple-screen" }, [
+            new UI.Title_bar({
+                left: new UI.Section_title(["Legal notices"]),
+            }),
+            (0, widget_1.h)("div", { class: "kate-os-text-scroll" }, [
+                (0, widget_1.h)("div", { class: "kate-os-padding" }, [this.text]),
+            ]),
+            (0, widget_1.h)("div", { class: "kate-os-statusbar" }, [
+                new UI.Button([new UI.HBox(5, [new UI.Icon("x"), "Return"])])
+                    .on_clicked(this.handle_close)
+                    .focus_target(false),
+            ]),
+        ]);
+    }
+    on_attached() {
+        this.os.focus_handler.listen(this.canvas, this.handle_key_pressed);
+    }
+    on_detached() {
+        this.os.focus_handler.remove(this.canvas, this.handle_key_pressed);
+    }
+    handle_key_pressed = (key) => {
+        const scroll = this.canvas.querySelector(".kate-os-text-scroll");
+        if (scroll == null) {
+            return false;
+        }
+        switch (key) {
+            case "up": {
+                scroll.scrollBy({ top: -350, behavior: "smooth" });
+                return true;
+            }
+            case "down": {
+                scroll.scrollBy({ top: 350, behavior: "smooth" });
+                return true;
+            }
+            case "x": {
+                this.handle_close();
+                return true;
+            }
+        }
+        return false;
+    };
+    handle_close = () => {
+        this.os.pop_scene();
+        this.on_closed();
+    };
+}
+exports.SceneLicence = SceneLicence;
 class SceneBoot extends Scene {
     render() {
         return (0, widget_1.h)("div", { class: "kate-os-logo" }, [
@@ -2716,6 +2885,7 @@ class SceneBoot extends Scene {
 }
 exports.SceneBoot = SceneBoot;
 class SceneHome extends Scene {
+    cart_map = new Map();
     render_cart(x) {
         return new UI.Button([
             (0, widget_1.h)("div", { class: "kate-os-carts-box" }, [
@@ -2738,30 +2908,15 @@ class SceneHome extends Scene {
         try {
             const carts = (await this.os.cart_manager.list()).sort((a, b) => b.installed_at.getTime() - a.installed_at.getTime());
             list.textContent = "";
-            const cart_map = new Map();
+            this.cart_map = new Map();
             for (const x of carts) {
                 const child = this.render_cart(x).render();
-                cart_map.set(child, x);
+                this.cart_map.set(child, x);
                 list.appendChild(child);
             }
             this.os.focus_handler.focus(list.querySelector(".kate-ui-focus-target") ??
                 list.firstElementChild ??
                 null);
-            this.handle_key_pressed = async (key) => {
-                if (this.os.processes.is_busy) {
-                    return;
-                }
-                switch (key) {
-                    case "menu": {
-                        for (const [button, cart] of cart_map) {
-                            if (button.classList.contains("focus")) {
-                                await this.show_pop_menu(cart);
-                                return;
-                            }
-                        }
-                    }
-                }
-            };
         }
         catch (error) {
             console.log(error);
@@ -2771,6 +2926,7 @@ class SceneHome extends Scene {
     async show_pop_menu(cart) {
         const result = await this.os.dialog.pop_menu("kate:home", cart.title, [
             { label: "Play game", value: "play" },
+            { label: "Legal notices", value: "legal" },
             { label: "Uninstall", value: "uninstall" },
             { label: "Return", value: "close" },
         ]);
@@ -2792,10 +2948,33 @@ class SceneHome extends Scene {
                 }
                 break;
             }
+            case "close": {
+                break;
+            }
+            case "legal": {
+                const loading = new HUD_LoadIndicator(this.os);
+                this.os.show_hud(loading);
+                try {
+                    const licence = await this.os.cart_manager.read_legal(cart.id);
+                    const legal = new SceneLicence(this.os, cart.title, licence);
+                    this.os.push_scene(legal);
+                }
+                catch (error) {
+                    console.error(`Failed to show legal notices for ${cart.id}`, error);
+                    await this.os.notifications.push("kate:os", "Failed to open", "Cartridge may be corrupted or not compatible with this version");
+                }
+                finally {
+                    this.os.hide_hud(loading);
+                }
+                break;
+            }
+            default: {
+                throw (0, build_1.unreachable)(result);
+            }
         }
     }
     render() {
-        const home = (0, widget_1.h)("div", { class: "kate-os-home" }, [
+        return (0, widget_1.h)("div", { class: "kate-os-home" }, [
             new UI.Title_bar({
                 left: UI.fragment([new UI.Section_title(["Library"])]),
             }),
@@ -2803,22 +2982,40 @@ class SceneHome extends Scene {
                 (0, widget_1.h)("div", { class: "kate-os-carts" }, []),
             ]),
         ]);
+    }
+    on_attached() {
+        this.update_carts();
+        this.os.events.on_cart_inserted.listen(this.update_carts);
+        this.os.events.on_cart_removed.listen(this.update_carts);
+        this.os.focus_handler.listen(this.canvas, this.handle_key_pressed);
+    }
+    on_detached() {
+        this.os.events.on_cart_inserted.remove(this.update_carts);
+        this.os.events.on_cart_removed.remove(this.update_carts);
+        this.os.focus_handler.remove(this.canvas, this.handle_key_pressed);
+    }
+    update_carts = () => {
+        const home = this.canvas;
         const carts = home.querySelector(".kate-os-carts");
         this.show_carts(carts);
-        this.os.events.on_cart_inserted.listen(async (x) => {
-            this.show_carts(carts);
-        });
-        this.os.events.on_cart_removed.listen(async () => {
-            this.show_carts(carts);
-        });
-        this.os.kernel.console.on_key_pressed.listen((key) => this.handle_key_pressed(key));
-        return home;
-    }
-    handle_key_pressed = (key) => { };
+    };
+    handle_key_pressed = (key) => {
+        switch (key) {
+            case "menu": {
+                for (const [button, cart] of this.cart_map) {
+                    if (button.classList.contains("focus")) {
+                        this.show_pop_menu(cart);
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    };
 }
 exports.SceneHome = SceneHome;
 
-},{"./widget":34}],34:[function(require,module,exports){
+},{"../../../../util/build":40,"./widget":34}],34:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Icon = exports.Button = exports.If = exports.Menu_list = exports.Section_title = exports.Title_bar = exports.VBox = exports.HBox = exports.WithClass = exports.append = exports.render = exports.svg = exports.h = exports.fragment = exports.Widget = void 0;
@@ -2988,6 +3185,7 @@ exports.If = If;
 class Button extends Widget {
     children;
     _on_clicked = new events_1.EventStream();
+    _is_focus_target = true;
     constructor(children) {
         super();
         this.children = children;
@@ -2996,8 +3194,15 @@ class Button extends Widget {
         this._on_clicked.listen(fn);
         return this;
     }
+    focus_target(x) {
+        this._is_focus_target = x;
+        return this;
+    }
     render() {
-        const element = h("button", { class: "kate-ui-button kate-ui-focus-target" }, this.children);
+        const element = h("button", { class: "kate-ui-button" }, this.children);
+        if (this._is_focus_target) {
+            element.classList.add("kate-ui-focus-target");
+        }
         element.addEventListener("click", (ev) => {
             ev.preventDefault();
             this._on_clicked.emit();
