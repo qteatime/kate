@@ -77,7 +77,7 @@ The first public release of Kate is planned for this year, targeting webkit/Elec
 - [x] Gamepad support;
 - [ ] In-cartridge digital game booklets & box art for that nostalgia feel;
 - [x] Uninstalling cartridges;
-- [ ] Screen capture;
+- [x] Screen capture;
 - [ ] Media gallery (screenshots only);
 - [ ] Cartridge permissions;
 - [ ] Electron-based executable;
