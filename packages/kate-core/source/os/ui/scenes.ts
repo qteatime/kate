@@ -2,7 +2,7 @@ import type { KateOS } from "../os";
 import { Widget, h, append, Widgetable } from "./widget";
 import * as UI from "./widget";
 import { ExtendedInputKey } from "../../kernel";
-import * as Db from "../apis/db";
+import * as Db from "../../data/db";
 import { unreachable } from "../../../../util/build";
 
 export abstract class Scene {

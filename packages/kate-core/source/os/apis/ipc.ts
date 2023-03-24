@@ -31,7 +31,11 @@ type Message =
       type: "kate:audio.play";
       payload: { channel: string; source: string; loop: boolean };
     }
-  | { type: "kate:special.focus" };
+  | { type: "kate:special.focus" }
+  | {
+      type: "kate:capture.save-image";
+      payload: { data: Uint8Array; type: string };
+    };
 
 export class KateIPCServer {
   private _handlers = new Map<string, Process>();
@@ -118,6 +122,22 @@ export class KateIPCServer {
       // -- Special
       case "kate:special.focus": {
         window.focus();
+        return null;
+      }
+
+      // -- Capture
+      case "kate:capture.save-image": {
+        try {
+          const id = await this.os.capture.save_screenshot(
+            process.cart.id,
+            message.payload.data,
+            message.payload.type
+          );
+          await this.os.capture.download(id).catch(() => {});
+        } catch (error) {
+          console.debug(`[Kate] failed to save screenshot`, error);
+          return err(`kate.capture.failed`);
+        }
         return null;
       }
 

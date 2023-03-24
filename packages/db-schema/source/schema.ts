@@ -14,13 +14,13 @@ export class DatabaseSchema {
     since: number,
     name: string,
     options: { path: string; auto_increment: boolean },
-    indexes: IndexSchema[]
+    indexes: (t: IndexBuilder<T>) => IndexBuilder<T> = (t) => t
   ) {
     const table = new TableSchema<typeof name, typeof options["path"], T>(
       since,
       name,
       options,
-      indexes
+      indexes(new IndexBuilder<T>()).build()
     );
     this.tables.push(table);
     return table;
@@ -39,9 +39,7 @@ export class DatabaseSchema {
         const old_version = ev.oldVersion;
         const db = (ev.target as any).result as IDBDatabase;
         for (const table of this.tables) {
-          if (table.version > old_version) {
-            table.upgrade(db);
-          }
+          table.upgrade(db, old_version);
         }
       };
     });
@@ -66,22 +64,47 @@ export class TableSchema<
     return this.key.path;
   }
 
-  upgrade(db: IDBDatabase) {
-    const store = db.createObjectStore(this.name, {
-      keyPath: this.key.path,
-      autoIncrement: this.key.auto_increment,
-    });
-    for (const index of this.indexes) {
-      index.upgrade(store);
+  upgrade(db: IDBDatabase, old_version: number) {
+    if (this.version > old_version) {
+      const store = db.createObjectStore(this.name, {
+        keyPath: this.key.path,
+        autoIncrement: this.key.auto_increment,
+      });
+
+      for (const index of this.indexes) {
+        index.upgrade(store);
+      }
     }
+  }
+}
+
+export class IndexBuilder<T extends { [key: string]: any }> {
+  readonly indexes: IndexSchema[] = [];
+
+  add<K extends keyof T>(
+    name: string,
+    path: K[],
+    options?: { unique?: boolean; multiple?: boolean }
+  ) {
+    this.indexes.push(
+      new IndexSchema(name, path as string[], {
+        unique: options?.unique ?? false,
+        multiEntry: options?.multiple ?? false,
+      })
+    );
+    return this;
+  }
+
+  build() {
+    return this.indexes;
   }
 }
 
 export class IndexSchema {
   constructor(
     readonly name: string,
-    readonly key_path: string,
-    readonly options: { unique: boolean }
+    readonly key_path: string[],
+    readonly options: { unique: boolean; multiEntry: boolean }
   ) {}
 
   upgrade(store: IDBObjectStore) {

@@ -1,4 +1,5 @@
 import { KateAudio, KateAudioChannel, KateAudioSource } from "./audio";
+import { KateCapture } from "./capture";
 import { KateCartFS } from "./cart-fs";
 import { KateIPC } from "./channel";
 import { InputKey, ExtendedInputKey, KateInput } from "./input";
@@ -24,6 +25,9 @@ export const audio = new KateAudio(channel);
 export const timer = new KateTimer();
 timer.setup();
 
+export const capture = new KateCapture(channel);
+capture.setup();
+
 export const focus = () => {
   channel.send_and_ignore_result("kate:special.focus", {});
 };
@@ -35,6 +39,7 @@ export type KateAPI = {
   input: typeof input;
   audio: typeof audio;
   timer: typeof timer;
+  capture: typeof capture;
   focus: () => void;
 };
 

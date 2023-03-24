@@ -1,5 +1,5 @@
 import { Database } from "../../../db-schema/build";
-import * as KateDb from "./apis/db";
+import * as KateDb from "../data/db";
 import * as Cart from "../../../schema/generated/cartridge";
 import type { KateKernel } from "../kernel/kate";
 import { EventStream } from "../../../util/build/events";
@@ -18,6 +18,7 @@ import { KateIPCServer } from "./apis/ipc";
 import { KateAudioServer } from "./apis";
 import { KateDialog } from "./apis/dialog";
 import { unreachable } from "../../../util/build";
+import { KateCapture } from "./apis/capture";
 
 export class KateOS {
   private _scene_stack: Scene[] = [];
@@ -34,6 +35,7 @@ export class KateOS {
   readonly kv_storage: KateKVStorage;
   readonly ipc: KateIPCServer;
   readonly dialog: KateDialog;
+  readonly capture: KateCapture;
   readonly events = {
     on_cart_inserted: new EventStream<Cart.Cartridge>(),
     on_cart_removed: new EventStream<{ id: string; title: string }>(),
@@ -58,6 +60,7 @@ export class KateOS {
     this.ipc.setup();
     this.dialog = new KateDialog(this);
     this.dialog.setup();
+    this.capture = new KateCapture(this);
   }
 
   get display() {

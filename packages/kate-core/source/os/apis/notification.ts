@@ -1,7 +1,7 @@
 import type { KateOS } from "../os";
 import { Scene } from "../ui/scenes";
 import * as UI from "../ui";
-import * as Db from "./db";
+import * as Db from "../../data/db";
 import { wait } from "../time";
 
 export type NotificationType = "basic";
@@ -27,6 +27,10 @@ export class KateNotification {
         message,
       });
     });
+    this.hud.show(title, message);
+  }
+
+  async push_transient(process_id: string, title: string, message: string) {
     this.hud.show(title, message);
   }
 }

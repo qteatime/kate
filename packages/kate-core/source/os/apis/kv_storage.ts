@@ -1,4 +1,4 @@
-import * as Db from "./db";
+import * as Db from "../../data/db";
 import type { KateOS } from "../os";
 
 export class KateKVStorage {

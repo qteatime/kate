@@ -1,7 +1,7 @@
 import * as Cart from "../../../../schema/generated/cartridge";
 import { add_fingerprint } from "../../../../schema/lib/fingerprint";
 import type { KateOS } from "../os";
-import * as Db from "./db";
+import * as Db from "../../data/db";
 
 export class CartManager {
   constructor(readonly os: KateOS) {}
