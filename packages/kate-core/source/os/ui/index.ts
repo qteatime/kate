@@ -1,4 +1,4 @@
 export * from "./widget";
 
-import * as Scenes from "./scenes";
-export { Scenes };
+import * as scenes from "./scenes";
+export { scenes };
