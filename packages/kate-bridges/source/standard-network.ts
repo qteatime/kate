@@ -2,6 +2,14 @@ export {};
 
 const { cart_fs } = KateAPI;
 
+function is_data_url(x: any) {
+  if (typeof x !== "string") {
+    return false;
+  } else {
+    return /^data:\w+\/\w+;base64,/.test(x);
+  }
+}
+
 // -- Arbitrary fetching
 const old_fetch = window.fetch;
 window.fetch = async function (request: any, options) {
@@ -21,6 +29,10 @@ window.fetch = async function (request: any, options) {
       reject(new Error(`Non-GET requests are not supported.`))
     );
   }
+  if (is_data_url(url)) {
+    return old_fetch(url);
+  }
+
   return new Promise(async (resolve, reject) => {
     try {
       const file = await cart_fs.get_file_url(String(url));
@@ -87,6 +99,11 @@ Object.defineProperty(HTMLImageElement.prototype, "src", {
   },
   set(url) {
     this.__src = url;
+    if (is_data_url(url)) {
+      old_img_src.set!.call(this, url);
+      return;
+    }
+
     void (async () => {
       try {
         const real_url = await cart_fs.get_file_url(String(url));
@@ -111,6 +128,10 @@ Object.defineProperty(HTMLMediaElement.prototype, "src", {
   },
   set(url) {
     this.__src = url;
+    if (is_data_url(url)) {
+      old_media_src.set!.call(this, url);
+    }
+
     void (async () => {
       try {
         const real_url = await cart_fs.get_file_url(String(url));
