@@ -4,11 +4,25 @@ import type { KateOS } from "../os";
 export class KateFocusHandler {
   private _stack: (HTMLElement | null)[] = [];
   private _current_root: HTMLElement | null = null;
+  private _handlers: {
+    root: HTMLElement;
+    handler: (key: ExtendedInputKey) => boolean;
+  }[] = [];
 
   constructor(readonly os: KateOS) {}
 
   setup() {
     this.os.kernel.console.on_key_pressed.listen(this.handle_input);
+  }
+
+  listen(root: HTMLElement, handler: (key: ExtendedInputKey) => boolean) {
+    this._handlers.push({ root, handler });
+  }
+
+  remove(root: HTMLElement, handler: (key: ExtendedInputKey) => boolean) {
+    this._handlers = this._handlers.filter(
+      (x) => x.root !== root && x.handler !== handler
+    );
   }
 
   private should_handle(key: ExtendedInputKey) {
@@ -49,7 +63,19 @@ export class KateFocusHandler {
   }
 
   handle_input = (key: ExtendedInputKey) => {
-    if (this._current_root == null || !this.should_handle(key)) {
+    if (this._current_root == null) {
+      return;
+    }
+
+    for (const { root, handler } of this._handlers) {
+      if (this._current_root === root) {
+        if (handler(key)) {
+          return;
+        }
+      }
+    }
+
+    if (!this.should_handle(key)) {
       return;
     }
 

@@ -18,6 +18,24 @@ export class CartManager {
     );
   }
 
+  async read(id: string) {
+    const cartridge = await this.os.db.transaction(
+      [Db.cart_files],
+      "readonly",
+      async (t) => {
+        const files = t.get_table(Db.cart_files);
+        const file = await files.get(id);
+        return this.os.kernel.loader.load_bytes(file.bytes.buffer);
+      }
+    );
+    return cartridge;
+  }
+
+  async read_legal(id: string) {
+    const cartridge = await this.read(id);
+    return cartridge.metadata.release.legal_notices;
+  }
+
   async install_from_file(file: File) {
     try {
       const cart = this.os.kernel.loader.load_bytes(await file.arrayBuffer());

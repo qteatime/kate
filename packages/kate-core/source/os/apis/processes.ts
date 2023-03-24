@@ -1,9 +1,7 @@
 import * as Cart from "../../../../schema/generated/cartridge";
 import type { CR_Process } from "../../kernel/cart-runtime";
 import type { KateOS } from "../os";
-import { h } from "../ui";
-import { Scene } from "../ui/scenes";
-import * as Db from "./db";
+import { HUD_LoadIndicator } from "../ui/scenes";
 
 export class KateProcesses {
   private _running: KateProcess | null = null;
@@ -27,15 +25,7 @@ export class KateProcesses {
     this.os.show_hud(loading);
     this.os.focus_handler.push_root(null);
     try {
-      const cart = await this.os.db.transaction(
-        [Db.cart_files],
-        "readonly",
-        async (t) => {
-          const files = t.get_table(Db.cart_files);
-          const file = await files.get(id);
-          return this.os.kernel.loader.load_bytes(file.bytes.buffer);
-        }
-      );
+      const cart = await this.os.cart_manager.read(id);
       const storage = this.os.kv_storage.get_store(cart.id);
       const runtime = this.os.kernel.runtimes.from_cartridge(
         cart,
@@ -63,12 +53,6 @@ export class KateProcesses {
       this.os.focus_handler.pop_root(null);
       this.os.kernel.console.os_root.classList.remove("in-background");
     }
-  }
-}
-
-export class HUD_LoadIndicator extends Scene {
-  render() {
-    return h("div", { class: "kate-hud-load-screen" }, ["Loading..."]);
   }
 }
 
