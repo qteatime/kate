@@ -29,6 +29,7 @@ export class VirtualConsole {
   private ltrigger_button: HTMLElement;
   private rtrigger_button: HTMLElement;
   private is_listening = false;
+  private _scale: number = 1;
   readonly body: HTMLElement;
   readonly device_display: HTMLElement;
   readonly screen: HTMLElement;
@@ -41,6 +42,7 @@ export class VirtualConsole {
   }>();
   readonly on_key_pressed = new EventStream<ExtendedInputKey>();
   readonly on_tick = new EventStream<number>();
+  readonly on_scale_changed = new EventStream<number>();
   readonly audio_context = new AudioContext();
 
   private timer_id: any = null;
@@ -151,11 +153,25 @@ export class VirtualConsole {
     }
   };
 
+  get scale() {
+    return this._scale;
+  }
+
   listen() {
     if (this.is_listening) {
       throw new Error(`listen called twice`);
     }
     this.is_listening = true;
+
+    window.addEventListener("load", () => this.update_scale(true));
+    window.addEventListener("resize", () => this.update_scale(false));
+    this.update_scale(true);
+
+    this.body
+      .querySelector(".kate-engraving")
+      ?.addEventListener("click", () => {
+        this.request_fullscreen();
+      });
 
     const listen_button = (button: HTMLElement, key: InputKey) => {
       button.addEventListener("mousedown", (ev) => {
@@ -189,6 +205,42 @@ export class VirtualConsole {
 
     this.start_ticking();
     this.on_tick.listen(this.key_update_loop);
+  }
+
+  private update_scale(force: boolean) {
+    const width = 1312;
+    const ww = window.innerWidth;
+    const wh = window.innerHeight;
+    let zoom = Math.min(1, ww / width);
+    if (zoom === this._scale && !force) {
+      return;
+    }
+
+    const x = Math.round(ww - this.body.offsetWidth * zoom) / 2;
+    const y = Math.round(wh - this.body.offsetHeight * zoom) / 2;
+
+    (this.body.style as any).zoom = `${zoom}`;
+    this.body.style.left = `${x}px`;
+    this.body.style.top = `${y}px`;
+    window.scrollTo({ left: 0, top: 0 });
+    document.body.scroll({ left: 0, top: 0 });
+
+    this._scale = zoom;
+    this.on_scale_changed.emit(zoom);
+  }
+
+  async request_fullscreen() {
+    try {
+      await document.body.requestFullscreen({ navigationUI: "hide" });
+      await screen.orientation.lock("landscape").catch((_) => {});
+      return true;
+    } catch (error) {
+      console.warn(
+        `[Kate] locking orientation in fullscreen not supported`,
+        error
+      );
+      return false;
+    }
   }
 
   private key_update_loop = (time: number) => {

@@ -62,16 +62,23 @@ export class HUD_ContextMenu extends Scene {
   }
 
   render() {
+    const fullscreen_button = () =>
+      new UI.Button(["Toggle fullscreen"]).on_clicked(
+        this.on_toggle_fullscreen
+      );
+
     return UI.h("div", { class: "kate-os-hud-context-menu" }, [
       UI.h("div", { class: "kate-os-hud-context-menu-backdrop" }, []),
       UI.h("div", { class: "kate-os-hud-context-menu-content" }, [
         new UI.If(() => this.os.processes.running != null, {
           then: new UI.Menu_list([
             new UI.Button(["Close game"]).on_clicked(this.on_close_game),
+            fullscreen_button(),
             new UI.Button(["Return"]).on_clicked(this.on_return),
           ]),
           else: new UI.Menu_list([
             new UI.Button(["Power off"]).on_clicked(this.on_power_off),
+            fullscreen_button(),
             new UI.Button(["Install from file"]).on_clicked(
               this.on_install_from_file
             ),
@@ -82,9 +89,22 @@ export class HUD_ContextMenu extends Scene {
     ]);
   }
 
-  on_install_from_file = async () => {
+  on_toggle_fullscreen = () => {
+    this.close();
+    if (document.fullscreenElement) {
+      document.exitFullscreen();
+    } else {
+      this.os.kernel.console.request_fullscreen();
+    }
+  };
+
+  close() {
     this.os.hide_hud(this);
     this.on_close.emit();
+  }
+
+  on_install_from_file = async () => {
+    this.close();
 
     return new Promise<void>((resolve, reject) => {
       const installer = document.querySelector(
@@ -119,14 +139,12 @@ export class HUD_ContextMenu extends Scene {
   };
 
   on_close_game = async () => {
-    this.os.hide_hud(this);
-    this.on_close.emit();
+    this.close();
     await this.os.processes.running?.exit();
   };
 
   on_return = async () => {
-    this.os.hide_hud(this);
-    this.on_close.emit();
+    this.close();
   };
 
   on_power_off = async () => {
