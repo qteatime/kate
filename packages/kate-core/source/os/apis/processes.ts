@@ -33,7 +33,7 @@ export class KateProcesses {
       );
       const process = new KateProcess(this, cart, runtime.run(this.os));
       this._running = process;
-      this.os.kernel.console.os_root.classList.add("in-background");
+      this.os.switch_mode("game");
       return process;
     } catch (error) {
       console.error(`Failed to run cartridge ${id}:`, error);
@@ -51,7 +51,7 @@ export class KateProcesses {
     if (process === this._running) {
       this._running = null;
       this.os.focus_handler.pop_root(null);
-      this.os.kernel.console.os_root.classList.remove("in-background");
+      this.os.switch_mode("os");
     }
   }
 }

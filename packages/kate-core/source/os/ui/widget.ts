@@ -176,6 +176,7 @@ export class If extends Widget {
 
 export class Button extends Widget {
   private _on_clicked = new EventStream<void>();
+  private _is_focus_target = true;
 
   constructor(readonly children: Widgetable[]) {
     super();
@@ -186,12 +187,16 @@ export class Button extends Widget {
     return this;
   }
 
+  focus_target(x: boolean) {
+    this._is_focus_target = x;
+    return this;
+  }
+
   render() {
-    const element = h(
-      "button",
-      { class: "kate-ui-button kate-ui-focus-target" },
-      this.children
-    );
+    const element = h("button", { class: "kate-ui-button" }, this.children);
+    if (this._is_focus_target) {
+      element.classList.add("kate-ui-focus-target");
+    }
     element.addEventListener("click", (ev) => {
       ev.preventDefault();
       this._on_clicked.emit();

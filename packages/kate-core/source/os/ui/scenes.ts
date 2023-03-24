@@ -36,7 +36,12 @@ export class HUD_LoadIndicator extends Scene {
 }
 
 export class SceneLicence extends Scene {
-  constructor(os: KateOS, readonly title: string, readonly text: string) {
+  constructor(
+    os: KateOS,
+    readonly title: string,
+    readonly text: string,
+    readonly on_closed = () => {}
+  ) {
     super(os);
   }
 
@@ -49,9 +54,9 @@ export class SceneLicence extends Scene {
         h("div", { class: "kate-os-padding" }, [this.text]),
       ]),
       h("div", { class: "kate-os-statusbar" }, [
-        new UI.Button([
-          new UI.HBox(5, [new UI.Icon("x"), "Return"]),
-        ]).on_clicked(this.handle_close),
+        new UI.Button([new UI.HBox(5, [new UI.Icon("x"), "Return"])])
+          .on_clicked(this.handle_close)
+          .focus_target(false),
       ]),
     ]);
   }
@@ -80,7 +85,7 @@ export class SceneLicence extends Scene {
         return true;
       }
       case "x": {
-        this.os.pop_scene();
+        this.handle_close();
         return true;
       }
     }
@@ -89,6 +94,7 @@ export class SceneLicence extends Scene {
 
   handle_close = () => {
     this.os.pop_scene();
+    this.on_closed();
   };
 }
 

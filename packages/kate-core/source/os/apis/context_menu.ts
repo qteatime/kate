@@ -1,6 +1,6 @@
 import type { ExtendedInputKey, SpecialInputKey } from "../../kernel/virtual";
 import type { KateOS } from "../os";
-import { Scene } from "../ui/scenes";
+import { Scene, SceneLicence } from "../ui/scenes";
 import * as UI from "../ui";
 import { EventStream } from "../../../../util/build/events";
 
@@ -40,7 +40,7 @@ export class KateContextMenu {
     }
     this.in_context = true;
     this.os.processes.running?.pause();
-    const menu = new HUD_ContextMenu(this.os);
+    const menu = new HUD_ContextMenu(this.os, this);
     menu.on_close.listen(() => {
       this.in_context = false;
       // We want to avoid key presses being propagated on this tick
@@ -52,12 +52,16 @@ export class KateContextMenu {
     this.os.show_hud(menu);
     this.os.focus_handler.push_root(menu.canvas);
   }
+
+  exit_context() {
+    this.in_context = false;
+  }
 }
 
 export class HUD_ContextMenu extends Scene {
   readonly on_close = new EventStream<void>();
 
-  constructor(readonly os: KateOS) {
+  constructor(readonly os: KateOS, readonly context: KateContextMenu) {
     super(os);
   }
 
@@ -74,6 +78,7 @@ export class HUD_ContextMenu extends Scene {
           then: new UI.Menu_list([
             new UI.Button(["Close game"]).on_clicked(this.on_close_game),
             fullscreen_button(),
+            new UI.Button(["Legal notices"]).on_clicked(this.on_legal_notices),
             new UI.Button(["Return"]).on_clicked(this.on_return),
           ]),
           else: new UI.Menu_list([
@@ -89,6 +94,26 @@ export class HUD_ContextMenu extends Scene {
     ]);
   }
 
+  on_legal_notices = () => {
+    this.close(false);
+    this.os.focus_handler.pop_root(this.canvas);
+    this.context.exit_context();
+    const process = this.os.processes.running!;
+    const legal = new SceneLicence(
+      this.os,
+      process.cart.metadata.title.title,
+      process.cart.metadata.release.legal_notices,
+      () => {
+        this.os.switch_mode("game");
+        this.os.kernel.console.on_tick.once(() => {
+          process.unpause();
+        });
+      }
+    );
+    this.os.push_scene(legal);
+    this.os.switch_mode("os");
+  };
+
   on_toggle_fullscreen = () => {
     this.close();
     if (document.fullscreenElement) {
@@ -98,9 +123,11 @@ export class HUD_ContextMenu extends Scene {
     }
   };
 
-  close() {
+  close(notify = true) {
     this.os.hide_hud(this);
-    this.on_close.emit();
+    if (notify) {
+      this.on_close.emit();
+    }
   }
 
   on_install_from_file = async () => {

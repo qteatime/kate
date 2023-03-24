@@ -17,6 +17,7 @@ import { KateKVStorage } from "./apis/kv_storage";
 import { KateIPCServer } from "./apis/ipc";
 import { KateAudioServer } from "./apis";
 import { KateDialog } from "./apis/dialog";
+import { unreachable } from "../../../util/build";
 
 export class KateOS {
   private _scene_stack: Scene[] = [];
@@ -87,6 +88,23 @@ export class KateOS {
     }
     this._current_scene = this._scene_stack.pop() ?? null;
     this.focus_handler.push_root(this._current_scene?.canvas ?? null);
+  }
+
+  switch_mode(mode: "game" | "os") {
+    switch (mode) {
+      case "game": {
+        this.kernel.console.os_root.classList.add("in-background");
+        break;
+      }
+
+      case "os": {
+        this.kernel.console.os_root.classList.remove("in-background");
+        break;
+      }
+
+      default:
+        throw unreachable(mode);
+    }
   }
 
   show_hud(scene: Scene) {
