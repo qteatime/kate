@@ -15,7 +15,6 @@ interface Context {
 export function translate_html(html: string, context: Context) {
   const dom = new DOMParser().parseFromString(html, "text/html");
   const preamble = add_preamble(dom, context);
-  add_zoom(dom, context);
   add_bridges(preamble, dom, context);
   inline_all_scripts(dom, context);
   inline_all_links(dom, context);
@@ -53,18 +52,6 @@ function add_preamble(dom: Document, context: Context) {
   `;
   dom.head.insertBefore(script, dom.head.firstChild);
   return script;
-}
-
-function add_zoom(dom: Document, context: Context) {
-  const style = dom.createElement("style");
-  style.textContent = `
-    :root {
-      --kate-zoom: ${context.zoom ?? "0"};
-      zoom: var(--kate-zoom);
-    }
-  `;
-  dom.head.appendChild(style);
-  return style;
 }
 
 function add_bridges(reference: Element, dom: Document, context: Context) {

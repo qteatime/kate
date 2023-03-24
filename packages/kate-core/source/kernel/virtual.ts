@@ -164,7 +164,11 @@ export class VirtualConsole {
     this.is_listening = true;
 
     window.addEventListener("load", () => this.update_scale(true));
-    window.addEventListener("resize", () => this.update_scale(false));
+    window.addEventListener("resize", () => this.update_scale(true));
+    window.addEventListener("orientationchange", () => this.update_scale(true));
+    (screen as any).addEventListener?.("orientationchange", () =>
+      this.update_scale(true)
+    );
     this.update_scale(true);
 
     this.body
@@ -219,7 +223,8 @@ export class VirtualConsole {
     const x = Math.round(ww - this.body.offsetWidth * zoom) / 2;
     const y = Math.round(wh - this.body.offsetHeight * zoom) / 2;
 
-    (this.body.style as any).zoom = `${zoom}`;
+    this.body.style.transform = `scale(${zoom})`;
+    this.body.style.transformOrigin = `0 0`;
     this.body.style.left = `${x}px`;
     this.body.style.top = `${y}px`;
     window.scrollTo({ left: 0, top: 0 });

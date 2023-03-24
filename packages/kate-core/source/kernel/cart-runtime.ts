@@ -122,7 +122,7 @@ export class CR_Web_archive extends CartRuntime {
   proxy_html(secret: string) {
     return translate_html(this.data.html, {
       secret,
-      zoom: Number(this.console.body.getAttribute("data-zoom") ?? "0"),
+      zoom: this.console.scale,
       bridges: this.data.bridges,
       cart: this.cart,
       local_storage: this.local_storage,
