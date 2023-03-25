@@ -383,3 +383,28 @@ body {
 .kate-bean-button {
   -webkit-app-region: no-drag;
 }
+
+.kate-resources {
+  position: absolute;
+  width: 300px;
+  height: 30px;
+  bottom: 0px;
+  right: 240px;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+  overflow: hidden;
+}
+
+.kate-resources .kate-resource {
+  width: 16px;
+  height: 16px;
+  overflow: hidden;
+}
+
+.kate-resource-screen-recording {
+  background: #f21;
+  border-radius: 100%;
+}

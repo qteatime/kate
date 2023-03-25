@@ -93,6 +93,11 @@ export class KateOS {
     this.focus_handler.push_root(this._current_scene?.canvas ?? null);
   }
 
+  replace_scene(scene: Scene) {
+    this.pop_scene();
+    this.push_scene(scene);
+  }
+
   switch_mode(mode: "game" | "os") {
     switch (mode) {
       case "game": {

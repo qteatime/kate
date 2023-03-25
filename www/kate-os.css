@@ -129,6 +129,10 @@
   margin: 0;
 }
 
+.kate-ui-button {
+  white-space: nowrap;
+}
+
 /* common screens */
 .kate-os-logo {
   display: flex;
@@ -703,9 +707,102 @@
   font-size: 13px;
 }
 
+.kate-os-statusbar .kate-icon[data-name="menu"],
+.kate-os-statusbar .kate-icon[data-name="capture"] {
+  height: 8px;
+}
+
+.kate-os-statusbar .kate-icon[data-name="ltrigger"],
+.kate-os-statusbar .kate-icon[data-name="rtrigger"] {
+  width: 22px;
+}
+
 .kate-ui-hbox {
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
   align-items: center;
+}
+
+/* Media screens */
+.kate-os-media-status {
+  font-size: 17px;
+  white-space: nowrap;
+}
+
+.kate-os-scroll {
+  flex-grow: 1;
+  height: 100%;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+.kate-os-media-items {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  padding: 16px;
+  gap: 10px;
+}
+
+.kate-os-media-items .kate-ui-button {
+  width: fit-content;
+  height: fit-content;
+}
+
+.kate-os-media-items .focus {
+  outline: 3px solid #69c;
+  outline-offset: 1px;
+}
+
+.kate-os-media-thumbnail {
+  width: 140px;
+  height: auto;
+  aspect-ratio: 5/3;
+  overflow: hidden;
+  border: 1px solid #ececea;
+  position: relative;
+}
+
+.kate-os-media-thumbnail img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 5/3;
+  display: block;
+}
+
+.kate-os-media-thumbnail .kate-os-video-duration {
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  padding: 2px;
+  background: #ececea;
+  border-radius: 2px;
+  font-size: 10px;
+}
+
+.kate-os-media-fullscreen {
+  height: 100%;
+  width: 100%;
+  position: relative;
+}
+
+.kate-os-media-fullscreen .kate-os-statusbar {
+  position: absolute;
+  width: 100%;
+  bottom: 0px;
+  opacity: 0.8;
+}
+
+.kate-os-media-fullscreen .kate-os-statusbar:not(.visible) {
+  display: none;
+}
+
+.kate-os-media-fullscreen .kate-os-media-container {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  background: #2f2f2f;
 }

@@ -17,6 +17,8 @@ export type SpecialInputKey = "menu" | "capture";
 
 export type ExtendedInputKey = InputKey | `long_${SpecialInputKey}`;
 
+export type Resource = "screen-recording";
+
 export class VirtualConsole {
   private up_button: HTMLElement;
   private right_button: HTMLElement;
@@ -36,6 +38,7 @@ export class VirtualConsole {
   readonly hud: HTMLElement;
   readonly os_root: HTMLElement;
   readonly version_container: HTMLElement | null;
+  readonly resources_container: HTMLElement;
   readonly on_input_changed = new EventStream<{
     key: InputKey;
     is_down: boolean;
@@ -44,6 +47,7 @@ export class VirtualConsole {
   readonly on_tick = new EventStream<number>();
   readonly on_scale_changed = new EventStream<number>();
   readonly audio_context = new AudioContext();
+  readonly resources = new Map<Resource, number>();
 
   private timer_id: any = null;
   private last_time: number | null = null;
@@ -82,6 +86,7 @@ export class VirtualConsole {
     this.device_display = root.querySelector(".kate-screen")!;
     this.body = root.querySelector(".kate-body")!;
     this.version_container = root.querySelector(".kate-version");
+    this.resources_container = root.querySelector(".kate-resources")!;
     if (this.version_container != null && pkg.version != null) {
       this.version_container.textContent = `v${pkg.version}`;
     }
@@ -316,6 +321,29 @@ export class VirtualConsole {
       button.classList.add("down");
     } else {
       button.classList.remove("down");
+    }
+  }
+
+  take_resource(resource: Resource) {
+    const refs = this.resources.get(resource) ?? 0;
+    this.resources.set(resource, refs + 1);
+    this.update_resource_display();
+  }
+
+  release_resource(resource: Resource) {
+    const refs = this.resources.get(resource) ?? 0;
+    this.resources.set(resource, Math.max(0, refs - 1));
+    this.update_resource_display();
+  }
+
+  private update_resource_display() {
+    this.resources_container.textContent = "";
+    for (const [resource, refs] of this.resources.entries()) {
+      if (refs > 0) {
+        const e = document.createElement("div");
+        e.className = `kate-resource kate-resource-${resource}`;
+        this.resources_container.append(e);
+      }
     }
   }
 }

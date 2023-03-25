@@ -38,6 +38,8 @@ export const media_store = kate.table<{
   mime: string;
   file: FileSystemFileHandle;
   time: Date;
+  thumbnail: string; // As data URL
+  video_length: number | null;
 }>(2, "media_store", { path: "id", auto_increment: true }, (s) =>
   s.add("cart_id", ["cart_id"], { unique: false, multiple: false })
 );

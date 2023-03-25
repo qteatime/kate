@@ -33,6 +33,10 @@ export class KateFocusHandler {
     return this._current_root;
   }
 
+  get current_focus(): HTMLElement | null {
+    return this._current_root?.querySelector(".focus") ?? null;
+  }
+
   push_root(element: HTMLElement | null) {
     this._stack.push(this._current_root);
     this._current_root = element;
@@ -117,12 +121,10 @@ export class KateFocusHandler {
         const candidates = focusable
           .filter((x) => x.position.bottom < bottom)
           .sort((a, b) => b.position.bottom - a.position.bottom);
-        const closest = candidates.sort((a, b) => {
-          return (
-            Math.min(a.position.x - left, a.position.right - right) -
-            Math.min(b.position.x - left, b.position.right - right)
-          );
-        });
+        const closest = candidates.sort(
+          (a, b) =>
+            Math.abs(a.position.x - left) - Math.abs(b.position.x - left)
+        );
         this.focus(closest[0]?.element);
         break;
       }
@@ -131,12 +133,10 @@ export class KateFocusHandler {
         const candidates = focusable
           .filter((x) => x.position.y > top)
           .sort((a, b) => a.position.y - b.position.y);
-        const closest = candidates.sort((a, b) => {
-          return (
-            Math.min(a.position.x - left, a.position.right - right) -
-            Math.min(b.position.x - left, b.position.right - right)
-          );
-        });
+        const closest = candidates.sort(
+          (a, b) =>
+            Math.abs(a.position.x - left) - Math.abs(b.position.x - left)
+        );
         this.focus(closest[0]?.element);
         break;
       }
@@ -145,12 +145,9 @@ export class KateFocusHandler {
         const candidates = focusable
           .filter((x) => x.position.right < right)
           .sort((a, b) => b.position.right - a.position.right);
-        const closest = candidates.sort((a, b) => {
-          return (
-            Math.min(a.position.y - top, a.position.bottom - bottom) -
-            Math.min(b.position.y - top, b.position.bottom - bottom)
-          );
-        });
+        const closest = candidates.sort(
+          (a, b) => Math.abs(a.position.y - top) - Math.abs(b.position.y - top)
+        );
         this.focus(closest[0]?.element);
         break;
       }
@@ -159,12 +156,9 @@ export class KateFocusHandler {
         const candidates = focusable
           .filter((x) => x.position.x > left)
           .sort((a, b) => a.position.x - b.position.x);
-        const closest = candidates.sort((a, b) => {
-          return (
-            Math.min(a.position.y - top, a.position.bottom - bottom) -
-            Math.min(b.position.y - top, b.position.bottom - bottom)
-          );
-        });
+        const closest = candidates.sort(
+          (a, b) => Math.abs(a.position.y - top) - Math.abs(b.position.y - top)
+        );
         this.focus(closest[0]?.element);
         break;
       }

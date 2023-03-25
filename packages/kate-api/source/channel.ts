@@ -22,7 +22,7 @@ export class KateIPC {
     this.#server = server;
   }
 
-  private make_id() {
+  #make_id() {
     let id = new Uint8Array(16);
     crypto.getRandomValues(id);
     return Array.from(id)
@@ -38,7 +38,7 @@ export class KateIPC {
     window.addEventListener("message", this.handle_message);
   }
 
-  private do_send(id: string, type: string, payload: Payload) {
+  #do_send(id: string, type: string, payload: Payload) {
     this.#server.postMessage(
       {
         type: type,
@@ -52,14 +52,14 @@ export class KateIPC {
 
   async call<A>(type: string, payload: Payload) {
     const deferred = defer<A>();
-    const id = this.make_id();
+    const id = this.#make_id();
     this.#pending.set(id, deferred);
-    this.do_send(id, type, payload);
+    this.#do_send(id, type, payload);
     return deferred.promise;
   }
 
   async send_and_ignore_result(type: string, payload: Payload) {
-    this.do_send(this.make_id(), type, payload);
+    this.#do_send(this.#make_id(), type, payload);
   }
 
   private handle_message = (ev: MessageEvent<any>) => {

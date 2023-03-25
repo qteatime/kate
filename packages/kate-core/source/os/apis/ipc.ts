@@ -35,6 +35,11 @@ type Message =
   | {
       type: "kate:capture.save-image";
       payload: { data: Uint8Array; type: string };
+    }
+  | { type: "kate:capture.start-recording" }
+  | {
+      type: "kate:capture.save-recording";
+      payload: { data: Uint8Array; type: string };
     };
 
 export class KateIPCServer {
@@ -128,14 +133,39 @@ export class KateIPCServer {
       // -- Capture
       case "kate:capture.save-image": {
         try {
-          const id = await this.os.capture.save_screenshot(
+          await this.os.capture.save_screenshot(
             process.cart.id,
             message.payload.data,
             message.payload.type
           );
-          await this.os.capture.download(id).catch(() => {});
         } catch (error) {
           console.debug(`[Kate] failed to save screenshot`, error);
+          return err(`kate.capture.failed`);
+        }
+        return null;
+      }
+
+      case "kate:capture.start-recording": {
+        this.os.kernel.console.take_resource("screen-recording");
+        await this.os.notifications.push(
+          process.cart.id,
+          "Screen recording started",
+          ""
+        );
+
+        return null;
+      }
+
+      case "kate:capture.save-recording": {
+        try {
+          this.os.kernel.console.release_resource("screen-recording");
+          await this.os.capture.save_video(
+            process.cart.id,
+            message.payload.data,
+            message.payload.type
+          );
+        } catch (error) {
+          console.debug(`[Kate] failed to save recording`, error);
           return err(`kate.capture.failed`);
         }
         return null;

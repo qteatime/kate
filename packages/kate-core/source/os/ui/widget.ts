@@ -211,6 +211,10 @@ export class Button extends Widget {
   }
 }
 
+export function icon_button(icon: InputKey, text: string) {
+  return new Button([new HBox(5, [new Icon(icon), text])]).focus_target(false);
+}
+
 export class Icon extends Widget {
   constructor(readonly type: InputKey) {
     super();
