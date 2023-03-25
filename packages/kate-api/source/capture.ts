@@ -1,6 +1,6 @@
 import { defer } from "../../util/build/promise";
 import type { KateIPC } from "./channel";
-import type { ExtendedInputKey } from "./input";
+import type { ExtendedInputKey, KateInput } from "./input";
 
 export class KateCapture {
   readonly CAPTURE_FPS = 24;
@@ -11,7 +11,7 @@ export class KateCapture {
   #capture_root: HTMLCanvasElement | null = null;
   #capture_monitor: RecorderMonitor | null = null;
 
-  constructor(channel: KateIPC) {
+  constructor(channel: KateIPC, private _input: KateInput) {
     this.#channel = channel;
   }
 
@@ -34,7 +34,7 @@ export class KateCapture {
   }
 
   #handle_key_press = (key: ExtendedInputKey) => {
-    if (this.#capture_root == null) {
+    if (this.#capture_root == null || this._input.is_paused) {
       return;
     }
 

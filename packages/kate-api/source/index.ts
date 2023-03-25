@@ -25,7 +25,7 @@ export const audio = new KateAudio(channel);
 export const timer = new KateTimer();
 timer.setup();
 
-export const capture = new KateCapture(channel);
+export const capture = new KateCapture(channel, input);
 capture.setup();
 
 export const focus = () => {

@@ -39,6 +39,10 @@ export class KateInput {
     this.#channel = channel;
   }
 
+  get is_paused() {
+    return this._paused;
+  }
+
   setup() {
     this.#channel.events.input_state_changed.listen(({ key, is_down }) => {
       if (!this._paused) {
