@@ -247,8 +247,16 @@
   background: rgba(252, 252, 252, 0.9);
   width: 250px;
   height: 480px;
-  padding: 25px 5px;
   animation: kate-slide-in-left 0.2s ease-out;
+  display: flex;
+  flex-direction: column;
+}
+
+.kate-os-hud-context-menu-items {
+  flex-grow: 1;
+  padding: 16px 0;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .kate-hud-notifications {
@@ -319,14 +327,13 @@
 .kate-ui-menu-list > .kate-ui-button {
   border-bottom: 1px solid #ececea;
   border-left: 10px solid transparent;
-  padding: 5px;
   margin: 5px;
   font-size: 20px;
+  height: 48px;
 }
 
 .kate-ui-menu-list > .kate-ui-button.focus {
-  border-left: 10px solid #69c;
-  font-weight: bold;
+  outline: 4px solid #69c;
 }
 
 .kate-ui-title-bar {

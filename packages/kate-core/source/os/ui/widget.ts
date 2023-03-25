@@ -137,6 +137,23 @@ export class Title_bar extends Widget {
   }
 }
 
+export class Space extends Widget {
+  constructor(readonly x: { width?: number; height?: number }) {
+    super();
+  }
+
+  render() {
+    return h(
+      "div",
+      {
+        class: "kate-ui-space",
+        style: `width: ${this.x.width ?? 0}px; height: ${this.x.height ?? 0}px`,
+      },
+      []
+    );
+  }
+}
+
 export class Section_title extends Widget {
   constructor(readonly children: Widgetable[]) {
     super();

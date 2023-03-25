@@ -63,23 +63,31 @@ export class HUD_ContextMenu extends Scene {
     return UI.h("div", { class: "kate-os-hud-context-menu" }, [
       UI.h("div", { class: "kate-os-hud-context-menu-backdrop" }, []),
       UI.h("div", { class: "kate-os-hud-context-menu-content" }, [
-        new UI.If(() => this.os.processes.running != null, {
-          then: new UI.Menu_list([
-            new UI.Button(["Close game"]).on_clicked(this.on_close_game),
-            fullscreen_button(),
-            new UI.Button(["Legal notices"]).on_clicked(this.on_legal_notices),
-            new UI.Button(["Media gallery"]).on_clicked(this.on_media_gallery),
-            new UI.Button(["Return"]).on_clicked(this.on_return),
-          ]),
-          else: new UI.Menu_list([
-            new UI.Button(["Power off"]).on_clicked(this.on_power_off),
-            fullscreen_button(),
-            new UI.Button(["Install from file"]).on_clicked(
-              this.on_install_from_file
-            ),
-            new UI.Button(["Return"]).on_clicked(this.on_return),
-          ]),
-        }),
+        UI.h("div", { class: "kate-os-hud-context-menu-items" }, [
+          new UI.If(() => this.os.processes.running != null, {
+            then: new UI.Menu_list([
+              new UI.Button(["Close game"]).on_clicked(this.on_close_game),
+              fullscreen_button(),
+              new UI.Button(["Legal notices"]).on_clicked(
+                this.on_legal_notices
+              ),
+              new UI.Button(["Media gallery"]).on_clicked(
+                this.on_media_gallery
+              ),
+            ]),
+            else: new UI.Menu_list([
+              new UI.Button(["Power off"]).on_clicked(this.on_power_off),
+              fullscreen_button(),
+              new UI.Button(["Install from file"]).on_clicked(
+                this.on_install_from_file
+              ),
+            ]),
+          }),
+        ]),
+        UI.h("div", { class: "kate-os-statusbar" }, [
+          new UI.HBox(6, [new UI.Icon("x"), "Return"]),
+          new UI.HBox(6, [new UI.Icon("o"), "Select"]),
+        ]),
       ]),
     ]);
   }

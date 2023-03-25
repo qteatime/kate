@@ -1,4 +1,5 @@
 import { defer } from "../../../../util/build/promise";
+import type { ExtendedInputKey } from "../../kernel";
 import type { KateOS } from "../os";
 import { wait } from "../time";
 import * as UI from "../ui";
@@ -43,9 +44,10 @@ export class KateDialog {
   async pop_menu<A>(
     id: string,
     heading: string,
-    buttons: { label: string; value: A }[]
+    buttons: { label: string; value: A }[],
+    cancel_value: A
   ) {
-    return await this.hud.pop_menu(id, heading, buttons);
+    return await this.hud.pop_menu(id, heading, buttons, cancel_value);
   }
 }
 
@@ -138,7 +140,8 @@ export class HUD_Dialog extends Scene {
   async pop_menu<A>(
     id: string,
     heading: string,
-    buttons: { label: string; value: A }[]
+    buttons: { label: string; value: A }[],
+    cancel_value: A
   ) {
     const result = defer<A>();
     const element = UI.h(
@@ -176,9 +179,18 @@ export class HUD_Dialog extends Scene {
     try {
       this.canvas.textContent = "";
       this.canvas.appendChild(element);
+      const key_handler = (key: ExtendedInputKey) => {
+        if (key === "x") {
+          result.resolve(cancel_value);
+          return true;
+        }
+        return false;
+      };
       this.os.focus_handler.push_root(this.canvas);
+      this.os.focus_handler.listen(this.canvas, key_handler);
       return_value = await result.promise;
       this.os.focus_handler.pop_root(this.canvas);
+      this.os.focus_handler.remove(this.canvas, key_handler);
       setTimeout(async () => {
         element.classList.add("leaving");
         await wait(this.FADE_OUT_TIME_MS);

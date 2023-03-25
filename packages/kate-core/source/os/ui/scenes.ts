@@ -198,18 +198,16 @@ export class SceneHome extends Scene {
   }
 
   async show_pop_menu(cart: typeof Db["cart_meta"]["__schema"]) {
-    const result = await this.os.dialog.pop_menu("kate:home", cart.title, [
-      { label: "Play game", value: "play" as const },
-      { label: "Legal notices", value: "legal" as const },
-      { label: "Uninstall", value: "uninstall" as const },
-      { label: "Return", value: "close" as const },
-    ]);
+    const result = await this.os.dialog.pop_menu(
+      "kate:home",
+      cart.title,
+      [
+        { label: "Legal notices", value: "legal" as const },
+        { label: "Uninstall", value: "uninstall" as const },
+      ],
+      "close"
+    );
     switch (result) {
-      case "play": {
-        this.os.processes.run(cart.id);
-        break;
-      }
-
       case "uninstall": {
         const should_uninstall = await this.os.dialog.confirm("kate:home", {
           title: `Uninstall ${cart.title}?`,
@@ -415,10 +413,12 @@ export class SceneMedia extends Scene {
     const meta = this.media.get(current);
     if (!meta) return;
 
-    const result = await this.os.dialog.pop_menu("kate:media", "Media", [
-      { label: "Delete", value: "delete" as const },
-      { label: "Return", value: "close" as const },
-    ]);
+    const result = await this.os.dialog.pop_menu(
+      "kate:media",
+      "Media",
+      [{ label: "Delete", value: "delete" as const }],
+      "close"
+    );
     switch (result) {
       case "delete": {
         if (
