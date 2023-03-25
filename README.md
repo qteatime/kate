@@ -78,7 +78,7 @@ The first public release of Kate is planned for this year, targeting webkit/Elec
 - [ ] In-cartridge digital game booklets & box art for that nostalgia feel;
 - [x] Uninstalling cartridges;
 - [x] Screen capture;
-- [ ] Media gallery (screenshots only);
+- [x] Media gallery;
 - [ ] Cartridge permissions;
 - [ ] Electron-based executable;
 
@@ -93,7 +93,7 @@ Future planned features:
   - [ ] Badges/achievements API;
   - [ ] Networking API;
   - [ ] Improved audio API (effects, graphs, etc);
-  - [ ] Screen recording/capture API;
+  - [ ] Improved screen recording/capture API with audio;
 - **KateOS UI improvements**:
   - [ ] Reconfiguring keybindings;
   - [ ] Tracking play times locally;
