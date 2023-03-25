@@ -16,6 +16,18 @@ export class KateProcesses {
     return this._running;
   }
 
+  async run_from_cartridge(cart: Cart.Cartridge) {
+    const storage = this.os.kv_storage.get_store(cart.id);
+    const runtime = this.os.kernel.runtimes.from_cartridge(
+      cart,
+      await storage.contents()
+    );
+    const process = new KateProcess(this, cart, runtime.run(this.os));
+    this._running = process;
+    this.os.push_scene(new SceneGame(this.os, process));
+    return process;
+  }
+
   async run(id: string) {
     if (this.is_busy) {
       throw new Error(`process already running`);
@@ -25,15 +37,7 @@ export class KateProcesses {
     this.os.show_hud(loading);
     try {
       const cart = await this.os.cart_manager.read(id);
-      const storage = this.os.kv_storage.get_store(cart.id);
-      const runtime = this.os.kernel.runtimes.from_cartridge(
-        cart,
-        await storage.contents()
-      );
-      const process = new KateProcess(this, cart, runtime.run(this.os));
-      this._running = process;
-      this.os.push_scene(new SceneGame(this.os, process));
-      return process;
+      this.run_from_cartridge(cart);
     } catch (error) {
       console.error(`Failed to run cartridge ${id}:`, error);
       await this.os.notifications.push(

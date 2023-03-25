@@ -94,7 +94,7 @@
           const kate_os = await Kate.os.KateOS.boot(kate);
           const loading = new Kate.os.scenes.HUD_LoadIndicator();
           kate_os.show_hud(loading);
-          kate_os.focus_handler.push_root(null);
+
           const game = await (await fetch("game.kart")).arrayBuffer();
           const cart = kate.loader.load_bytes(game);
 
@@ -106,18 +106,7 @@
             window.removeEventListener("keydown", start);
             window.removeEventListener("touchstart", start);
 
-            const storage = kate_os.kv_storage.get_store(cart.id);
-            const runtime = kate.runtimes.from_cartridge(
-              cart,
-              await storage.contents()
-            );
-            const process = new Kate.os.KateProcess(
-              this,
-              cart,
-              runtime.run(kate_os)
-            );
-            kate_os.processes._running = process;
-            kate.console.os_root.classList.add("in-background");
+            await kate_os.processes.run_from_cartridge(cart);
             kate_os.hide_hud(loading);
           }
           window.addEventListener("touchstart", start);
