@@ -16,9 +16,13 @@ export class KateDialog {
   }
 
   async message(id: string, x: { title: string; message: string }) {
-    return await this.hud.show(id, x.title, x.message, [
-      { label: "Ok", kind: "primary", value: null },
-    ]);
+    return await this.hud.show(
+      id,
+      x.title,
+      x.message,
+      [{ label: "Ok", kind: "primary", value: null }],
+      null
+    );
   }
 
   async confirm(
@@ -31,14 +35,20 @@ export class KateDialog {
       dangerous?: boolean;
     }
   ) {
-    return await this.hud.show(id, x.title, x.message, [
-      { label: x.cancel ?? "Cancel", kind: "cancel", value: false },
-      {
-        label: x.ok ?? "Ok",
-        kind: x.dangerous === true ? "dangerous" : "primary",
-        value: true,
-      },
-    ]);
+    return await this.hud.show(
+      id,
+      x.title,
+      x.message,
+      [
+        { label: x.cancel ?? "Cancel", kind: "cancel", value: false },
+        {
+          label: x.ok ?? "Ok",
+          kind: x.dangerous === true ? "dangerous" : "primary",
+          value: true,
+        },
+      ],
+      false
+    );
   }
 
   async pop_menu<A>(
@@ -83,7 +93,8 @@ export class HUD_Dialog extends Scene {
       label: string;
       kind?: "primary" | "dangerous" | "cancel" | "button";
       value: A;
-    }[]
+    }[],
+    cancel_value: A
   ) {
     const result = defer<A>();
     const element = UI.h(
@@ -115,6 +126,11 @@ export class HUD_Dialog extends Scene {
         ]),
       ]
     );
+    element.addEventListener("click", (ev) => {
+      if (ev.target === element) {
+        result.resolve(cancel_value);
+      }
+    });
 
     let return_value;
     if (this.is_trusted(id)) {
@@ -123,9 +139,18 @@ export class HUD_Dialog extends Scene {
     try {
       this.canvas.textContent = "";
       this.canvas.appendChild(element);
+      const key_handler = (key: ExtendedInputKey) => {
+        if (key === "x") {
+          result.resolve(cancel_value);
+          return true;
+        }
+        return false;
+      };
       this.os.focus_handler.push_root(this.canvas);
+      this.os.focus_handler.listen(this.canvas, key_handler);
       return_value = await result.promise;
       this.os.focus_handler.pop_root(this.canvas);
+      this.os.focus_handler.remove(this.canvas, key_handler);
       setTimeout(async () => {
         element.classList.add("leaving");
         await wait(this.FADE_OUT_TIME_MS);
@@ -171,6 +196,11 @@ export class HUD_Dialog extends Scene {
         ]),
       ]
     );
+    element.addEventListener("click", (ev) => {
+      if (ev.target === element) {
+        result.resolve(cancel_value);
+      }
+    });
 
     let return_value;
     if (this.is_trusted(id)) {
