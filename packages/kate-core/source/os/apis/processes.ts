@@ -17,6 +17,10 @@ export class KateProcesses {
   }
 
   async run_from_cartridge(cart: Cart.Cartridge) {
+    if (this.is_busy) {
+      throw new Error(`a process is already running`);
+    }
+
     const storage = this.os.kv_storage.get_store(cart.id);
     const runtime = this.os.kernel.runtimes.from_cartridge(
       cart,
@@ -30,15 +34,16 @@ export class KateProcesses {
 
   async run(id: string) {
     if (this.is_busy) {
-      throw new Error(`process already running`);
+      throw new Error(`a process is already running`);
     }
 
     const loading = new HUD_LoadIndicator(this.os);
     this.os.show_hud(loading);
     try {
       const cart = await this.os.cart_manager.read(id);
-      this.run_from_cartridge(cart);
+      await this.run_from_cartridge(cart);
     } catch (error) {
+      this._running = null;
       console.error(`Failed to run cartridge ${id}:`, error);
       await this.os.notifications.push(
         "kate:os",
