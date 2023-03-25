@@ -140,6 +140,11 @@ export class KateIPCServer {
           );
         } catch (error) {
           console.debug(`[Kate] failed to save screenshot`, error);
+          this.os.notifications.push_transient(
+            "kate:capture",
+            "Failed to save screenshot",
+            ""
+          );
           return err(`kate.capture.failed`);
         }
         return null;
@@ -166,6 +171,11 @@ export class KateIPCServer {
           );
         } catch (error) {
           console.debug(`[Kate] failed to save recording`, error);
+          this.os.notifications.push_transient(
+            "kate:capture",
+            "Failed to save screen recording",
+            ""
+          );
           return err(`kate.capture.failed`);
         }
         return null;
