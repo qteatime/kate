@@ -35,6 +35,7 @@ export abstract class CR_Process {
   abstract exit(): Promise<void>;
   abstract pause(): Promise<void>;
   abstract unpause(): Promise<void>;
+  abstract node: Node;
 }
 
 export class CRW_Process extends CR_Process {
@@ -46,6 +47,10 @@ export class CRW_Process extends CR_Process {
     readonly audio: KateAudioServer
   ) {
     super();
+  }
+
+  get node() {
+    return this.frame;
   }
 
   async exit() {
@@ -115,7 +120,6 @@ export class CR_Web_archive extends CartRuntime {
       new Blob([this.proxy_html(secret)], { type: "text/html" })
     );
     frame.scrolling = "no";
-    this.console.screen.appendChild(frame);
     return new CRW_Process(this, frame, secret, channel, audio_server);
   }
 

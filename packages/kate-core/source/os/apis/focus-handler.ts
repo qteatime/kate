@@ -1,3 +1,4 @@
+import { EventStream } from "../../../../util/build/events";
 import { ExtendedInputKey } from "../../kernel/virtual";
 import type { KateOS } from "../os";
 
@@ -8,6 +9,7 @@ export class KateFocusHandler {
     root: HTMLElement;
     handler: (key: ExtendedInputKey) => boolean;
   }[] = [];
+  readonly on_focus_changed = new EventStream<HTMLElement | null>();
 
   constructor(readonly os: KateOS) {}
 
@@ -40,6 +42,7 @@ export class KateFocusHandler {
   push_root(element: HTMLElement | null) {
     this._stack.push(this._current_root);
     this._current_root = element;
+    this.on_focus_changed.emit(element);
     if (element != null && element.querySelector(".focus") == null) {
       const candidates0 = Array.from(
         element.querySelectorAll(".kate-ui-focus-target")
@@ -61,6 +64,7 @@ export class KateFocusHandler {
     }
     if (this._stack.length > 0) {
       this._current_root = this._stack.pop()!;
+      this.on_focus_changed.emit(this._current_root);
     } else {
       throw new Error(`pop_root() on an empty focus stack`);
     }

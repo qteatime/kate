@@ -1,6 +1,6 @@
 import type { ExtendedInputKey, SpecialInputKey } from "../../kernel/virtual";
 import type { KateOS } from "../os";
-import { Scene, SceneLicence } from "../ui/scenes";
+import { Scene, SceneLicence, SceneMedia } from "../ui/scenes";
 import * as UI from "../ui";
 import { EventStream } from "../../../../util/build/events";
 
@@ -39,22 +39,11 @@ export class KateContextMenu {
       return;
     }
     this.in_context = true;
-    this.os.processes.running?.pause();
     const menu = new HUD_ContextMenu(this.os, this);
     menu.on_close.listen(() => {
       this.in_context = false;
-      // We want to avoid key presses being propagated on this tick
-      this.os.kernel.console.on_tick.once(() => {
-        this.os.processes.running?.unpause();
-      });
-      this.os.focus_handler.pop_root(menu.canvas);
     });
-    this.os.show_hud(menu);
-    this.os.focus_handler.push_root(menu.canvas);
-  }
-
-  exit_context() {
-    this.in_context = false;
+    this.os.push_scene(menu);
   }
 }
 
@@ -79,6 +68,7 @@ export class HUD_ContextMenu extends Scene {
             new UI.Button(["Close game"]).on_clicked(this.on_close_game),
             fullscreen_button(),
             new UI.Button(["Legal notices"]).on_clicked(this.on_legal_notices),
+            new UI.Button(["Media gallery"]).on_clicked(this.on_media_gallery),
             new UI.Button(["Return"]).on_clicked(this.on_return),
           ]),
           else: new UI.Menu_list([
@@ -94,24 +84,40 @@ export class HUD_ContextMenu extends Scene {
     ]);
   }
 
+  on_attached(): void {
+    this.os.focus_handler.listen(this.canvas, this.handle_key_pressed);
+  }
+
+  on_detached(): void {
+    this.os.focus_handler.remove(this.canvas, this.handle_key_pressed);
+  }
+
+  handle_key_pressed = (key: ExtendedInputKey) => {
+    switch (key) {
+      case "x": {
+        this.on_return();
+        return true;
+      }
+    }
+
+    return false;
+  };
+
+  on_media_gallery = async () => {
+    const process = this.os.processes.running!;
+    const meta = await this.os.cart_manager.read_meta(process.cart.id);
+    const media = new SceneMedia(this.os, meta);
+    this.os.push_scene(media);
+  };
+
   on_legal_notices = () => {
-    this.close(false);
-    this.os.focus_handler.pop_root(this.canvas);
-    this.context.exit_context();
     const process = this.os.processes.running!;
     const legal = new SceneLicence(
       this.os,
       process.cart.metadata.title.title,
-      process.cart.metadata.release.legal_notices,
-      () => {
-        this.os.switch_mode("game");
-        this.os.kernel.console.on_tick.once(() => {
-          process.unpause();
-        });
-      }
+      process.cart.metadata.release.legal_notices
     );
     this.os.push_scene(legal);
-    this.os.switch_mode("os");
   };
 
   on_toggle_fullscreen = () => {
@@ -123,11 +129,9 @@ export class HUD_ContextMenu extends Scene {
     }
   };
 
-  close(notify = true) {
-    this.os.hide_hud(this);
-    if (notify) {
-      this.on_close.emit();
-    }
+  close() {
+    this.os.pop_scene();
+    this.on_close.emit();
   }
 
   on_install_from_file = async () => {
@@ -175,8 +179,7 @@ export class HUD_ContextMenu extends Scene {
   };
 
   on_power_off = async () => {
+    this.close();
     window.close();
-    this.os.hide_hud(this);
-    this.on_close.emit();
   };
 }

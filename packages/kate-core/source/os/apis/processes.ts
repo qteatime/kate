@@ -1,7 +1,7 @@
 import * as Cart from "../../../../schema/generated/cartridge";
 import type { CR_Process } from "../../kernel/cart-runtime";
 import type { KateOS } from "../os";
-import { HUD_LoadIndicator } from "../ui/scenes";
+import { HUD_LoadIndicator, SceneGame } from "../ui/scenes";
 
 export class KateProcesses {
   private _running: KateProcess | null = null;
@@ -23,7 +23,6 @@ export class KateProcesses {
 
     const loading = new HUD_LoadIndicator(this.os);
     this.os.show_hud(loading);
-    this.os.focus_handler.push_root(null);
     try {
       const cart = await this.os.cart_manager.read(id);
       const storage = this.os.kv_storage.get_store(cart.id);
@@ -33,7 +32,7 @@ export class KateProcesses {
       );
       const process = new KateProcess(this, cart, runtime.run(this.os));
       this._running = process;
-      this.os.switch_mode("game");
+      this.os.push_scene(new SceneGame(this.os, process));
       return process;
     } catch (error) {
       console.error(`Failed to run cartridge ${id}:`, error);
@@ -50,8 +49,7 @@ export class KateProcesses {
   notify_exit(process: KateProcess) {
     if (process === this._running) {
       this._running = null;
-      this.os.focus_handler.pop_root(null);
-      this.os.switch_mode("os");
+      this.os.pop_scene();
     }
   }
 }

@@ -31,6 +31,17 @@ export class CartManager {
     return cartridge;
   }
 
+  async read_meta(id: string) {
+    return await this.os.db.transaction(
+      [Db.cart_meta],
+      "readonly",
+      async (t) => {
+        const meta = t.get_table(Db.cart_meta);
+        return meta.get(id);
+      }
+    );
+  }
+
   async read_legal(id: string) {
     const cartridge = await this.read(id);
     return cartridge.metadata.release.legal_notices;

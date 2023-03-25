@@ -98,23 +98,6 @@ export class KateOS {
     this.push_scene(scene);
   }
 
-  switch_mode(mode: "game" | "os") {
-    switch (mode) {
-      case "game": {
-        this.kernel.console.os_root.classList.add("in-background");
-        break;
-      }
-
-      case "os": {
-        this.kernel.console.os_root.classList.remove("in-background");
-        break;
-      }
-
-      default:
-        throw unreachable(mode);
-    }
-  }
-
   show_hud(scene: Scene) {
     this._active_hud.push(scene);
     scene.attach(this.hud_display);

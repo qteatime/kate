@@ -1,9 +1,10 @@
 import type { KateOS } from "../os";
 import { Widget, h, append, Widgetable } from "./widget";
 import * as UI from "./widget";
-import { ExtendedInputKey } from "../../kernel";
+import type { ExtendedInputKey } from "../../kernel";
 import * as Db from "../../data/db";
 import { unreachable } from "../../../../util/build";
+import type { KateProcess } from "../apis/processes";
 
 export abstract class Scene {
   readonly canvas: HTMLElement;
@@ -35,13 +36,36 @@ export class HUD_LoadIndicator extends Scene {
   }
 }
 
+export class SceneGame extends Scene {
+  constructor(os: KateOS, readonly process: KateProcess) {
+    super(os);
+  }
+
+  on_attached(): void {
+    this.os.focus_handler.on_focus_changed.listen(this.handle_focus_changed);
+  }
+
+  on_detached(): void {
+    this.os.focus_handler.on_focus_changed.remove(this.handle_focus_changed);
+  }
+
+  handle_focus_changed = (focus: HTMLElement | null) => {
+    if (focus === this.canvas) {
+      setTimeout(() => {
+        this.process.unpause();
+      });
+    } else {
+      this.process.pause();
+    }
+  };
+
+  render() {
+    return h("div", { class: "kate-os-game" }, [this.process.runtime.node]);
+  }
+}
+
 export class SceneLicence extends Scene {
-  constructor(
-    os: KateOS,
-    readonly title: string,
-    readonly text: string,
-    readonly on_closed = () => {}
-  ) {
+  constructor(os: KateOS, readonly title: string, readonly text: string) {
     super(os);
   }
 
@@ -92,7 +116,6 @@ export class SceneLicence extends Scene {
 
   handle_close = () => {
     this.os.pop_scene();
-    this.on_closed();
   };
 }
 
@@ -275,7 +298,7 @@ export class SceneHome extends Scene {
       }
 
       case "rtrigger": {
-        const media = new SceneMedia(this.os);
+        const media = new SceneMedia(this.os, null);
         this.os.push_scene(media);
         return true;
       }
@@ -286,6 +309,13 @@ export class SceneHome extends Scene {
 
 export class SceneMedia extends Scene {
   private media = new Map<HTMLElement, typeof Db["media_store"]["__schema"]>();
+
+  constructor(
+    os: KateOS,
+    readonly filter: null | typeof Db["cart_meta"]["__schema"]
+  ) {
+    super(os);
+  }
 
   render() {
     return h("div", { class: "kate-os-simple-screen" }, [
@@ -313,9 +343,22 @@ export class SceneMedia extends Scene {
     this.os.focus_handler.remove(this.canvas, this.handle_key_pressed);
   }
 
+  private async get_media_filtered() {
+    const media0 = await this.os.capture.list();
+    const filter = this.filter;
+    if (filter == null) {
+      return { title: "All", media: media0 };
+    } else {
+      return {
+        title: filter.title,
+        media: media0.filter((x) => x.cart_id === filter.id),
+      };
+    }
+  }
+
   private async load_media() {
-    const media = await this.os.capture.list();
-    this.update_status(`All screenshots and videos (${media.length})`);
+    const { title, media } = await this.get_media_filtered();
+    this.update_status(`${title} (${media.length})`);
     const buttons = await Promise.all(
       media.map(async (x) => [x, await this.make_button(x)] as const)
     );
