@@ -85,8 +85,8 @@ export class HUD_ContextMenu extends Scene {
           }),
         ]),
         UI.h("div", { class: "kate-os-statusbar" }, [
-          new UI.HBox(6, [new UI.Icon("x"), "Return"]),
-          new UI.HBox(6, [new UI.Icon("o"), "Select"]),
+          UI.icon_button("x", "Return").on_clicked(this.on_return),
+          UI.icon_button("o", "Select").on_clicked(() => {}),
         ]),
       ]),
     ]);

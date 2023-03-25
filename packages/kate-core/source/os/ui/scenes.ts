@@ -256,7 +256,11 @@ export class SceneHome extends Scene {
     return h("div", { class: "kate-os-home" }, [
       new UI.Title_bar({
         left: UI.fragment([new UI.Section_title(["Library"])]),
-        right: new UI.HBox(10, ["Media", new UI.Icon("rtrigger")]),
+        right: new UI.Button([
+          new UI.HBox(10, ["Media", new UI.Icon("rtrigger")]),
+        ])
+          .focus_target(false)
+          .on_clicked(this.handle_to_media),
       }),
       h("div", { class: "kate-os-carts-scroll" }, [
         h("div", { class: "kate-os-carts" }, []),
@@ -296,12 +300,16 @@ export class SceneHome extends Scene {
       }
 
       case "rtrigger": {
-        const media = new SceneMedia(this.os, null);
-        this.os.push_scene(media);
+        this.handle_to_media();
         return true;
       }
     }
     return false;
+  };
+
+  handle_to_media = () => {
+    const media = new SceneMedia(this.os, null);
+    this.os.push_scene(media);
   };
 }
 
@@ -325,7 +333,6 @@ export class SceneMedia extends Scene {
         h("div", { class: "kate-os-media-items" }, []),
       ]),
       h("div", { class: "kate-os-statusbar" }, [
-        UI.icon_button("menu", "Options").on_clicked(this.handle_menu),
         UI.icon_button("x", "Return").on_clicked(this.handle_close),
         UI.icon_button("o", "View").on_clicked(this.handle_view),
       ]),
@@ -407,43 +414,6 @@ export class SceneMedia extends Scene {
     }
   };
 
-  handle_menu = async () => {
-    const current = this.os.focus_handler.current_focus;
-    if (!current) return;
-    const meta = this.media.get(current);
-    if (!meta) return;
-
-    const result = await this.os.dialog.pop_menu(
-      "kate:media",
-      "Media",
-      [{ label: "Delete", value: "delete" as const }],
-      "close"
-    );
-    switch (result) {
-      case "delete": {
-        if (
-          await this.os.dialog.confirm("kate:media", {
-            title: "Delete media?",
-            message: "",
-            ok: "Delete",
-            cancel: "Keep media",
-            dangerous: true,
-          })
-        ) {
-          await this.os.capture.delete(meta.id!);
-          await this.os.notifications.push("kate:media", `Media deleted`, "");
-          await this.load_media();
-        }
-        break;
-      }
-      case "close": {
-        break;
-      }
-      default:
-        throw unreachable(result);
-    }
-  };
-
   handle_key_pressed = (key: ExtendedInputKey) => {
     switch (key) {
       case "x": {
@@ -455,19 +425,29 @@ export class SceneMedia extends Scene {
         this.handle_view();
         return true;
       }
-
-      case "menu": {
-        this.handle_menu();
-        return true;
-      }
     }
 
     return false;
   };
 
   view = (x: typeof Db["media_store"]["__schema"]) => {
-    const viewer = new SceneViewMedia(this.os, x);
+    const viewer = new SceneViewMedia(this.os, this, x);
     this.os.push_scene(viewer);
+  };
+
+  mark_deleted = (id: number) => {
+    for (const [button, meta] of this.media) {
+      if (meta.id === id) {
+        if (button.classList.contains("focus")) {
+          const new_focus =
+            button.previousElementSibling ?? button.nextElementSibling ?? null;
+          this.os.focus_handler.focus(new_focus as HTMLElement | null);
+          button.remove();
+          this.media.delete(button);
+        }
+        break;
+      }
+    }
   };
 }
 
@@ -476,6 +456,7 @@ export class SceneViewMedia extends Scene {
 
   constructor(
     os: KateOS,
+    readonly media_list: SceneMedia,
     readonly media: typeof Db["media_store"]["__schema"]
   ) {
     super(os);
@@ -485,11 +466,24 @@ export class SceneViewMedia extends Scene {
     return h("div", { class: "kate-os-media-fullscreen" }, [
       h("div", { class: "kate-os-media-container" }, []),
       h("div", { class: "kate-os-statusbar visible" }, [
-        UI.icon_button("menu", "Hide UI").on_clicked(this.handle_toggle_ui),
+        UI.icon_button("menu", "Options").on_clicked(this.handle_options),
         UI.icon_button("x", "Return").on_clicked(this.handle_close),
-        UI.icon_button("o", "Download").on_clicked(this.handle_download),
+        this.media_type === "video"
+          ? UI.icon_button("o", "Play/Pause").on_clicked(this.handle_play_pause)
+          : null,
       ]),
     ]);
+  }
+
+  get media_type() {
+    switch (this.media.mime) {
+      case "image/png":
+        return "image";
+      case "video/webm":
+        return "video";
+      default:
+        return "unknown";
+    }
   }
 
   async on_attached(): Promise<void> {
@@ -502,16 +496,19 @@ export class SceneViewMedia extends Scene {
   }
 
   render_media(url: string) {
-    switch (this.media.mime) {
-      case "image/png": {
+    switch (this.media_type) {
+      case "image": {
         this.render_image(url);
         break;
       }
 
-      case "video/webm": {
+      case "video": {
         this.render_video(url);
         break;
       }
+
+      default:
+        return null;
     }
   }
 
@@ -532,6 +529,7 @@ export class SceneViewMedia extends Scene {
         src: url,
         class: "kate-os-media-video",
         autoplay: "autoplay",
+        loop: "loop",
       },
       []
     );
@@ -553,12 +551,12 @@ export class SceneViewMedia extends Scene {
       }
 
       case "o": {
-        this.handle_download();
+        this.handle_play_pause();
         return true;
       }
 
       case "menu": {
-        this.handle_toggle_ui();
+        this.handle_options();
         return true;
       }
     }
@@ -566,9 +564,77 @@ export class SceneViewMedia extends Scene {
     return false;
   };
 
+  handle_play_pause = () => {
+    const video = this.canvas.querySelector("video");
+    if (video != null) {
+      if (video.paused || video.ended) {
+        video.play();
+      } else {
+        video.pause();
+      }
+    }
+  };
+
   handle_toggle_ui = () => {
     const status = this.canvas.querySelector(".kate-os-statusbar")!;
     status.classList.toggle("visible");
+  };
+
+  handle_options = async () => {
+    const ui = this.canvas.querySelector(".kate-os-statusbar")!;
+    const ui_visible = ui.classList.contains("visible");
+    const result = await this.os.dialog.pop_menu(
+      "kate:media",
+      "",
+      [
+        { label: "Delete", value: "delete" as const },
+        {
+          label: `${ui_visible ? "Hide" : "Show"} UI`,
+          value: "toggle-ui" as const,
+        },
+        { label: "Download", value: "download" as const },
+      ],
+      "close"
+    );
+    switch (result) {
+      case "toggle-ui": {
+        this.handle_toggle_ui();
+        break;
+      }
+
+      case "close": {
+        break;
+      }
+
+      case "delete": {
+        this.handle_delete();
+        break;
+      }
+
+      case "download": {
+        this.handle_download();
+        break;
+      }
+
+      default:
+        throw unreachable(result);
+    }
+  };
+
+  handle_delete = async () => {
+    const should_delete = await this.os.dialog.confirm("kate:media", {
+      title: "",
+      message: "Delete this file? This is an irreversible operation.",
+      ok: "Delete",
+      cancel: "Keep file",
+      dangerous: true,
+    });
+    if (should_delete) {
+      await this.os.capture.delete(this.media.id!);
+      await this.os.notifications.push("kate:media", `Media deleted`, "");
+      this.media_list.mark_deleted(this.media.id!);
+      this.os.pop_scene();
+    }
   };
 
   handle_close = () => {
