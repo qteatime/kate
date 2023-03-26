@@ -12,6 +12,20 @@ Glomp does not support:
 
 - AMD or any module system different from Node's built-in one. Browser packages are expected to rely on an exported global name.
 
+- Sourcemaps;
+
+- Automatic polyfilling or magic requires, which may load unaudited modules;
+
+- Plugins or any other form of user extension of its semantics, as we can't prove those are sensible with the rest of the compiler — you should not be putting unaudited packages anywhere near trusted/secure packages anyway;
+
+- Native ECMAScript modules (Glomp works with CommonJS);
+
+- Dead code elimination, traced as in tree-shaking or not;
+
+- Hot-patching, incremental builds, and other developer niceties. While they aren't impossible to secure, they increase the code size considerably and make it harder to audit or reason about the compilation pipeline. Use glomp to generate production builds.
+
+- Minification. Kate and Crochet do not need to worry about module sizes as they're aimed at offline use cases, and minification requires a substantially more complex compiler.
+
 ## Usage
 
 With the CLI tool:
