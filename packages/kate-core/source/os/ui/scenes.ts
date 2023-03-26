@@ -5,6 +5,7 @@ import type { ExtendedInputKey } from "../../kernel";
 import * as Db from "../../data/db";
 import { unreachable } from "../../../../util/build";
 import type { KateProcess } from "../apis/processes";
+import * as Legal from "../../legal";
 
 export abstract class Scene {
   readonly canvas: HTMLElement;
@@ -719,7 +720,13 @@ export class SceneApps extends Scene {
       icon: UI.fa_icon("images"),
       open: () => new SceneMedia(this.os, null),
     },
-  ] as const;
+    {
+      name: "about",
+      title: "About Kate",
+      icon: UI.fa_icon("cat"),
+      open: () => new SceneAboutKate(this.os),
+    },
+  ];
 
   render() {
     return h("div", { class: "kate-os-simple-screen" }, [
@@ -784,4 +791,65 @@ export class SceneApps extends Scene {
     const screen = app.open();
     this.os.push_scene(screen);
   }
+}
+
+export class SceneAboutKate extends Scene {
+  render() {
+    return h("div", { class: "kate-os-simple-screen" }, [
+      new UI.Title_bar({
+        left: UI.fragment([
+          UI.fa_icon("cat", "lg"),
+          new UI.Section_title(["About Kate"]),
+        ]),
+      }),
+      h("div", { class: "kate-os-scroll kate-os-content kate-about-bg" }, [
+        h("div", { class: "kate-os-about-box" }, [
+          h("div", { class: "kate-os-about-content" }, [
+            h("h2", {}, [
+              "Kate",
+              new UI.Space({ width: 10 }),
+              this.os.kernel.console.version,
+            ]),
+            h("div", { class: "kt-meta" }, [
+              "Copyright (c) 2023 Q. (MIT licensed)",
+            ]),
+            new UI.Space({ height: 32 }),
+            new UI.Button(["Third-party notices"]).on_clicked(
+              this.handle_third_party
+            ),
+          ]),
+        ]),
+      ]),
+      h("div", { class: "kate-os-statusbar" }, [
+        UI.icon_button("x", "Return").on_clicked(this.handle_close),
+      ]),
+    ]);
+  }
+
+  on_attached(): void {
+    this.os.focus_handler.listen(this.canvas, this.handle_key_pressed);
+  }
+
+  on_detached(): void {
+    this.os.focus_handler.remove(this.canvas, this.handle_key_pressed);
+  }
+
+  handle_key_pressed = (key: ExtendedInputKey) => {
+    switch (key) {
+      case "x": {
+        this.handle_close();
+        return true;
+      }
+    }
+
+    return false;
+  };
+
+  handle_close = () => {
+    this.os.pop_scene();
+  };
+
+  handle_third_party = () => {
+    this.os.push_scene(new SceneLicence(this.os, "Kate", Legal.notice));
+  };
 }

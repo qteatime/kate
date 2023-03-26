@@ -98,12 +98,11 @@
   --color-black-l1: #5f5f5f;
   --color-black-l2: #9f9f9f;
 
-  /* palette is Pollen8 by Conker : https://lospec.com/palette-list/pollen8 */
-  --color-primary-d2: #73464c;
-  --color-primary-d1: #ab5675;
-  --color-primary: #ee6a7c;
-  --color-primary-l1: #ffa7a5;
-  --color-primary-l2: #ffe7d6;
+  --color-primary-d2: #1f1f1f;
+  --color-primary-d1: #3f3f3f;
+  --color-primary: #5f5f5f;
+  --color-primary-l1: #dcdcda;
+  --color-primary-l2: #ececea;
 
   --color-text: var(--color-black);
   --color-text-inverted: var(--color-white);
@@ -192,6 +191,10 @@
   scroll-behavior: smooth;
   scroll-padding: 30px;
   padding-right: 250px;
+  background: url(img/kate-chan.png) no-repeat fixed;
+  background-size: 40%;
+  background-position-x: 560px;
+  background-position-y: 150px;
 }
 
 .kate-os-carts {
@@ -927,4 +930,78 @@
   width: 100%;
   height: 100%;
   background: var(--color-black);
+}
+
+/* Content */
+.kate-os-content {
+  padding: 1rem;
+}
+
+.kate-os-content h2 {
+  font-family: var(--font-family-title);
+  font-size: 2.5rem;
+  line-height: 1.8em;
+  display: flex;
+  flex-direction: row;
+  font-weight: 500;
+  margin: 1.5rem 0 0 0;
+}
+
+.kate-os-content h2:first-child {
+  margin-top: 0;
+}
+
+.kate-os-content .kt-meta {
+  color: var(--color-muted);
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  margin-top: -0.5rem;
+}
+
+.kate-os-content .kt-picture {
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.kate-os-content .kt-picture img {
+  width: 100%;
+  height: auto;
+}
+
+.kate-os-content .kt-padding {
+  padding: 2rem;
+}
+
+.kate-os-content .kate-ui-button {
+  text-transform: uppercase;
+  font-weight: 500;
+  padding: 1em 2em;
+  border: 2px solid var(--color-primary);
+  border-radius: 4px;
+  color: var(--color-text);
+  width: 100%;
+  text-align: center;
+}
+
+.kate-os-content .kate-ui-button.focus {
+  background: var(--color-primary);
+  color: var(--color-text-inverted);
+}
+
+.kate-os-about-box {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 2rem;
+}
+
+.kate-about-bg {
+  background: url("./img/kate-chan.png") no-repeat fixed top right;
+}
+
+.kate-os-about-content {
+  flex-grow: 1;
+  max-width: 450px;
 }

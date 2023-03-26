@@ -39,6 +39,7 @@ export class VirtualConsole {
   readonly os_root: HTMLElement;
   readonly version_container: HTMLElement | null;
   readonly resources_container: HTMLElement;
+  readonly version = pkg?.version == null ? null : `v${pkg.version}`;
   readonly on_input_changed = new EventStream<{
     key: InputKey;
     is_down: boolean;
@@ -87,8 +88,8 @@ export class VirtualConsole {
     this.body = root.querySelector(".kate-body")!;
     this.version_container = root.querySelector(".kate-version");
     this.resources_container = root.querySelector(".kate-resources")!;
-    if (this.version_container != null && pkg.version != null) {
-      this.version_container.textContent = `v${pkg.version}`;
+    if (this.version_container != null && this.version != null) {
+      this.version_container.textContent = this.version;
     }
     this.open_audio_output();
     this.reset_states();
