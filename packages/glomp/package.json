@@ -1,0 +1,19 @@
+{
+  "name": "@qteatime/glomp",
+  "version": "0.2.0",
+  "description": "Pack arbitrary files as single-file web archives.",
+  "main": "build/index.js",
+  "bin": {
+    "glomp": "./bin/glomp.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/qteatime/kate.git"
+  },
+  "author": "Q.",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/qteatime/kate/issues"
+  },
+  "homepage": "https://github.com/qteatime/kate#readme"
+}

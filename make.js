@@ -96,9 +96,12 @@ function exec_file_capture(command, args, opts) {
   }
 }
 
-function browserify(args) {
-  const file = Path.join(__dirname, "node_modules/browserify/bin/cmd.js");
-  exec_file("node", [file, ...args]);
+function glomp({ entry, out, name }) {
+  const { pack } = require("./packages/glomp/build/index.js");
+  const code = pack(entry, __dirname, name);
+  FS.mkdirSync(Path.dirname(out), { recursive: true });
+  FS.writeFileSync(out, code);
+  console.log(`-> Glomp packaged (${entry}) to (${out})`);
 }
 
 function tsc(project) {
@@ -150,6 +153,13 @@ w.task("util:compile", [], () => {
 
 w.task("util:build", ["util:compile"], () => {});
 
+// -- Glomp
+w.task("glomp:compile", [], () => {
+  tsc("packages/glomp");
+});
+
+w.task("glomp:build", ["glomp:compile"], () => {});
+
 // -- Schema
 w.task("schema:generate", [], () => {
   ljtc(
@@ -183,15 +193,12 @@ w.task("bridges:compile", ["api:build"], () => {
   tsc("packages/kate-bridges");
 });
 
-w.task("bridges:bundle-api", ["api:build"], () => {
-  browserify([
-    "-e",
-    "packages/kate-api/build/index.js",
-    "-o",
-    "packages/kate-bridges/build/kate-api.js",
-    "-s",
-    "KateAPI",
-  ]);
+w.task("bridges:bundle-api", ["api:build", "glomp:build"], () => {
+  glomp({
+    entry: "packages/kate-api/build/index.js",
+    out: "packages/kate-bridges/build/kate-api.js",
+    name: "KateAPI",
+  });
 });
 
 w.task("bridges:generate", ["bridges:compile", "bridges:bundle-api"], () => {
@@ -251,15 +258,12 @@ w.task("packaging:compile", ["schema:build"], () => {
 w.task("packaging:build", ["packaging:compile"], () => {});
 
 // -- WWW
-w.task("www:bundle", ["core:build"], () => {
-  browserify([
-    "-e",
-    "packages/kate-core/build/index.js",
-    "-o",
-    "www/kate.js",
-    "-s",
-    "Kate",
-  ]);
+w.task("www:bundle", ["core:build", "glomp:build"], () => {
+  glomp({
+    entry: "packages/kate-core/build/index.js",
+    out: "www/kate.js",
+    name: "Kate",
+  });
 });
 
 // -- Examples
@@ -270,19 +274,22 @@ w.task("example:hello-world", ["packaging:build"], () => {
   });
 });
 
-w.task("example:boon-scrolling", ["packaging:build", "domui:build"], () => {
-  tsc("examples/boon-scrolling");
-  browserify([
-    "-e",
-    "examples/boon-scrolling/build/index.js",
-    "-o",
-    "examples/boon-scrolling/www/game.js",
-  ]);
-  kart({
-    config: "examples/boon-scrolling/kate.json",
-    output: "examples/boon-scrolling/boon-scrolling.kart",
-  });
-});
+w.task(
+  "example:boon-scrolling",
+  ["packaging:build", "domui:build", "glomp:build"],
+  () => {
+    tsc("examples/boon-scrolling");
+    glomp({
+      entry: "examples/boon-scrolling/build/index.js",
+      out: "examples/boon-scrolling/www/game.js",
+      name: "BoonScrolling",
+    });
+    kart({
+      config: "examples/boon-scrolling/kate.json",
+      output: "examples/boon-scrolling/boon-scrolling.kart",
+    });
+  }
+);
 
 w.task(
   "example:all",
@@ -327,6 +334,7 @@ w.task("chore:clean-tsc-cache", [], () => {
 w.task(
   "all",
   [
+    "glomp:build",
     "util:build",
     "schema:build",
     "db-schema:build",
