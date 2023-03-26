@@ -87,14 +87,38 @@
 }
 
 .kate-screen {
-  --font-family-title: "PT Sans Caption", sans-serif;
-  --font-family-serif: "Lora", serif;
+  --font-family-title: "Poppins", sans-serif;
   --font-family-sans: "Roboto", sans-serif;
-  --font-family-mono: "Source Code Pro", monospace;
+  --font-family-mono: "Roboto Mono", monospace;
+
+  --color-white: #fafafa;
+  --color-black: #2f2f2f;
+  --color-grey: #ececea;
+  --color-dark-grey: #dcdcda;
+
+  /* palette is Pollen8 by Conker : https://lospec.com/palette-list/pollen8 */
+  --color-primary-d2: #73464c;
+  --color-primary-d1: #ab5675;
+  --color-primary: #ee6a7c;
+  --color-primary-l1: #ffa7a5;
+  --color-primary-l2: #ffe7d6;
+
+  --color-text: var(--color-black);
+  --color-text-inverted: var(--color-white);
+  --color-border: var(--color-grey);
+  --color-border-d1: var(--color-dark-grey);
+  --color-background: var(--color-white);
+  --color-dangerous: var(
+    --color-primary-d1
+  ); /* TODO: pick better primary/dangerous */
+  --color-backdrop: rgba(0, 0, 0, 0.4);
+  --color-shadow: rgba(0, 0, 0, 0.5);
+  --color-status-background: var(--color-primary-d1);
+  --color-duration-background: var(--color-primary-d1);
 
   font-family: var(--font-family-sans);
   font-size: 16px;
-  color: #2f2f2f;
+  color: var(--color-black);
 }
 
 #kate-os-root {
@@ -103,10 +127,6 @@
   left: 0px;
   width: 800px;
   height: 480px;
-}
-
-#kate-os-root.in-background {
-  display: none;
 }
 
 .kate-os-screen {
@@ -125,6 +145,7 @@
   outline: none;
   text-align: left;
   font-family: var(--font-family-sans);
+  color: inherit;
   font-size: 100%;
   padding: 0;
   margin: 0;
@@ -134,27 +155,28 @@
   white-space: nowrap;
 }
 
-/* common screens */
+/* #Screen: Logo */
 .kate-os-logo {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100%;
+  background: var(--color-black);
 }
 
 .kate-os-logo-image {
-  font-family: var(--font-family-serif);
+  font-family: var(--font-family-title);
   font-size: 128px;
-  color: #fafafa;
+  color: var(--color-white);
   opacity: 0;
   animation: kate-os-fade-in-out 2s ease-in-out;
 }
 
+/* #Screen: Home */
 .kate-os-home {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  background: #fafafa;
+  background: var(--color-background);
   height: 100%;
   animation: kate-os-fade-in 0.25s ease-in;
 }
@@ -194,12 +216,12 @@
   align-items: center;
   outline: 0px solid transparent;
   transition: all 0.1s ease-out;
-  border: 1px solid #ececea;
+  border: 1px solid var(--color-border);
 }
 
 .focus .kate-os-carts-box .kate-os-carts-image {
-  outline: 5px solid #69c;
-  border: 2px solid #fafafa;
+  outline: 5px solid var(--color-primary);
+  border: 2px solid transparent;
   transform: scale(1.04);
 }
 
@@ -222,18 +244,57 @@
   animation: kate-os-fade-in 0.25s ease-out;
 }
 
+/* Common widgets */
+/* #Widget: title bar */
+.kate-ui-title-bar {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 18px;
+  height: 64px;
+}
+
+.kate-ui-title-bar-child {
+  flex-grow: 1;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+}
+
+.kate-ui-title-bar-child:first-child {
+  justify-content: left;
+  margin-left: 16px;
+}
+
+.kate-ui-title-bar-child:last-child:not(:first-child) {
+  justify-content: right;
+  margin-right: 16px;
+}
+
+.kate-ui-section-title {
+  font-family: var(--font-family-title);
+  font-size: 36px;
+  font-weight: 300;
+  line-height: 1.8em;
+}
+
 /* HUDs */
 .kate-hud {
   position: absolute;
 }
 
+/* #Context menu */
 .kate-os-hud-context-menu {
   position: absolute;
 }
 
 .kate-os-hud-context-menu-backdrop {
   position: absolute;
-  background: rgba(0, 0, 0, 0.3);
+  background: var(--color-backdrop);
   width: 800px;
   height: 480px;
   backdrop-filter: blur(5px);
@@ -243,9 +304,8 @@
   position: absolute;
   left: 0px;
   top: 0px;
-  border-right: 1px solid #ececea;
-  box-shadow: 1px 0px 2px rgba(0, 0, 0, 0.5);
-  background: rgba(252, 252, 252, 0.9);
+  box-shadow: 1px 0px 2px var(--color-shadow);
+  background: var(--color-background);
   width: 250px;
   height: 480px;
   animation: kate-slide-in-left 0.2s ease-out;
@@ -260,12 +320,192 @@
   overflow-x: hidden;
 }
 
+/* #Pop menu */
+.kate-hud-dialog-pop-menu {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 800px;
+  height: 480px;
+  overflow: clip;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  background: var(--color-backdrop);
+  backdrop-filter: blur(2px);
+  animation: kate-os-fade-in 0.25s ease-out forwards;
+}
+
+.kate-hud-dialog-pop-menu-container {
+  position: absolute;
+  bottom: 0px;
+  background: var(--color-background);
+  border-radius: 10px 10px 0 0;
+  padding: 20px;
+  box-shadow: 0px 0px 3px var(--color-backdrop);
+  animation: kate-os-pop-menu-in 0.25s ease-out forwards;
+  width: 500px;
+}
+
+.kate-hud-dialog-pop-menu.leaving {
+  animation: kate-os-fade-out 0.25s ease-out forwards;
+}
+
+.leaving .kate-hud-dialog-pop-menu-container {
+  animation: kate-os-pop-menu-out 0.25s ease-out forwards;
+}
+
+.kate-hud-dialog-pop-menu-title:not(:empty) {
+  font-size: 1.25rem;
+  font-weight: bold;
+  font-family: var(--font-family-title);
+  margin-bottom: 1em;
+}
+
+.kate-hud-dialog-pop-menu-actions {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.kate-hud-dialog-pop-menu-action {
+  width: 100%;
+  flex-grow: 1;
+}
+
+.kate-hud-dialog-pop-menu-action .kate-ui-button {
+  border: none;
+  outline: none;
+  background: none;
+  font-family: var(--font-sans-serif);
+  font-size: 0.9rem;
+  width: 100%;
+  display: block;
+  padding: 1em;
+  text-align: center;
+  font-weight: bold;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--color-border);
+  --focus-background: var(--color-primary);
+}
+
+.kate-hud-dialog-pop-menu-action[data-kind="primary"] {
+  color: var(--color-primary);
+}
+
+.kate-hud-dialog-pop-menu-action[data-kind="dangerous"] {
+  color: var(--color-dangerous);
+  --focus-background: var(--color-dangerous);
+}
+
+.kate-hud-dialog-pop-menu-action .kate-ui-button.focus {
+  background: var(--focus-background);
+  color: var(--color-text-inverted);
+  position: relative;
+  z-index: 1;
+}
+
+/* #Dialog message */
+.kate-hud-dialog-message {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-backdrop);
+  backdrop-filter: blur(5px);
+  animation: kate-os-fade-in 0.25s ease-out forwards;
+}
+
+.kate-hud-dialog-message.leaving {
+  animation: kate-os-fade-out 0.25s ease-out forwards;
+}
+
+.kate-hud-dialog-container {
+  background: var(--color-background);
+  border-radius: 5px;
+  box-shadow: 0px 0px 3px var(--color-shadow);
+  max-width: 70%;
+  min-width: 50%;
+  overflow: hidden;
+}
+
+.kate-hud-dialog-title:empty {
+  display: none;
+}
+
+.kate-hud-dialog-title {
+  font-size: 1.25rem;
+  font-weight: bold;
+  font-family: var(--font-family-title);
+  border-bottom: 1px solid var(--color-border);
+  padding: 0.5em;
+}
+
+.kate-hud-dialog-text {
+  padding: 2em 1em;
+  text-align: left;
+}
+
+.kate-hud-dialog-actions {
+  display: flex;
+  flex-direction: row;
+  justify-content: stretch;
+  align-items: center;
+  border-top: 1px solid var(--color-border);
+  background: var(--color-border);
+}
+
+.kate-hud-dialog-action {
+  width: 100%;
+  flex-grow: 1;
+}
+
+.kate-hud-dialog-action .kate-ui-button {
+  border: none;
+  outline: none;
+  background: none;
+  font-family: var(--font-sans-serif);
+  font-size: 0.9rem;
+  width: 100%;
+  display: block;
+  padding: 1em;
+  text-align: center;
+  font-weight: bold;
+  text-transform: uppercase;
+  --focus-background: var(--color-primary);
+}
+
+.kate-hud-dialog-action[data-kind="primary"] .kate-ui-button {
+  color: var(--color-primary);
+}
+
+.kate-hud-dialog-action[data-kind="dangerous"] .kate-ui-button {
+  color: var(--color-dangerous);
+  --focus-background: var(--color-dangerous);
+}
+
+.kate-hud-dialog-action .kate-ui-button.focus {
+  background: var(--focus-background);
+  color: var(--color-text-inverted);
+  position: relative;
+  z-index: 1;
+}
+
+/* #Notifications */
 .kate-hud-notifications {
   position: absolute;
   top: 10px;
   right: 10px;
-  max-width: 300px;
+  max-width: 320px;
   max-height: 460px;
+  padding: 10px;
   overflow: hidden;
   z-index: 9;
   display: flex;
@@ -276,13 +516,12 @@
 .kate-hud-notification-item {
   position: relative;
   width: 300px;
-  padding: 10px;
   border-radius: 5px;
-  background: rgba(252, 252, 252, 0.9);
+  background: var(--color-background);
   backdrop-filter: blur(5px);
   animation: kate-hud-notification-in 0.2s ease-out;
-  border: 1px solid #bcbcba;
-  box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.4);
+  border: var(--color-border);
+  box-shadow: 0px 1px 3px 1px var(--color-shadow);
 }
 
 .kate-hud-notification-item.leaving {
@@ -291,25 +530,34 @@
   top: -50px;
 }
 
-.kate-hud-notification-title {
+.kate-hud-notification-title:not(:empty) {
   font-weight: bold;
-  font-size: 20px;
+  text-transform: uppercase;
   line-height: 1.5em;
+  padding: 0.5em 10px;
+  margin-bottom: 0.8em;
+  font-size: 0.8em;
+  background: var(--color-border);
 }
 
+.kate-hud-notification-message {
+  padding: 0 10px 10px 10px;
+}
+
+/* #Drop installer */
 .kate-hud-drop-installer {
   position: absolute;
   margin: 5px;
   width: 790px;
   height: 470px;
-  border: 10px dashed #ececea;
+  border: 10px dashed var(--color-border);
   border-radius: 20px;
   font-size: 32px;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   gap: 50px;
-  color: #4f4f4f;
   display: none;
   background: rgba(255, 255, 255, 0.8);
 }
@@ -319,60 +567,77 @@
   animation: kate-os-fade-in 0.1s ease-out;
 }
 
-/* kate UI */
+/* #Status bar */
+.kate-hud-status-bar {
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  color: var(--color-text-inverted);
+  background: var(--color-status-background);
+  border-top-left-radius: 24px;
+  justify-content: right;
+  align-items: center;
+  padding: 0px 20px;
+  max-width: 400px;
+  height: 36px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: none;
+  transition: width 0.1s ease-out;
+}
+
+.kate-hud-status-bar.active {
+  display: flex;
+}
+
+.kate-hud-status-item {
+  display: none;
+}
+
+.kate-hud-status-item.active {
+  display: block;
+}
+
+/* #Loading screen */
+.kate-hud-load-screen {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: flex-end;
+  padding: 25px;
+  background: var(--color-background);
+  color: var(--color-white);
+  font-size: 24px;
+  font-weight: bold;
+  animation: kate-os-fade-in 0.1s ease-out;
+}
+
+/* Kate UI */
 .kate-os-screen .kate-ui-menu-list {
   display: flex;
   flex-direction: column;
 }
 
 .kate-ui-menu-list > .kate-ui-button {
-  border-bottom: 1px solid #ececea;
-  border-left: 10px solid transparent;
-  margin: 5px;
+  border-bottom: 1px solid var(--color-border);
+  padding: 0 16px;
   font-size: 20px;
   height: 48px;
 }
 
 .kate-ui-menu-list > .kate-ui-button.focus {
-  outline: 4px solid #69c;
+  background: var(--color-primary);
+  color: var(--color-text-inverted);
+  font-weight: 500;
 }
 
-.kate-ui-title-bar {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  border-bottom: 1px solid #dcdcda;
-  font-size: 24px;
-  height: 64px;
-}
+/* -- TODO -- */
 
-.kate-ui-title-bar-child {
-  flex-grow: 1;
-  width: 100%;
-  font-size: 24px;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 10px;
-}
-
-.kate-ui-title-bar-child:first-child {
-  justify-content: left;
-  margin-left: 15px;
-}
-
-.kate-ui-title-bar-child:last-child:not(:first-child) {
-  justify-content: right;
-  margin-right: 15px;
-}
-
-.kate-ui-section-title {
-  font-family: var(--font-family-title);
-  font-size: 32px;
-  font-weight: bold;
-  line-height: 1.8em;
-}
-
+/* kate UI */
+/* #Kate icons */
 .kate-icon {
   width: 1em;
   height: 1em;
@@ -453,229 +718,7 @@
   transform: rotate(-27deg);
 }
 
-.kate-hud-load-screen {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  align-items: flex-end;
-  padding: 25px;
-  background: #2f2f2f;
-  color: #fafafa;
-  font-size: 24px;
-  font-weight: bold;
-  animation: kate-os-fade-in 0.1s ease-out;
-}
-
-.kate-hud-status-bar {
-  position: absolute;
-  bottom: 0px;
-  right: 0px;
-  color: #fafafa;
-  background: #2f2f2f;
-  border-top-left-radius: 24px;
-  justify-content: right;
-  align-items: center;
-  padding: 0px 20px;
-  max-width: 400px;
-  height: 36px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: none;
-  transition: width 0.1s ease-out;
-}
-
-.kate-hud-status-bar.active {
-  display: flex;
-}
-
-.kate-hud-status-item {
-  display: none;
-}
-
-.kate-hud-status-item.active {
-  display: block;
-}
-
-.kate-hud-dialog-message {
-  position: absolute;
-  top: 0px;
-  left: 0px;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(5px);
-  animation: kate-os-fade-in 0.25s ease-out forwards;
-}
-
-.kate-hud-dialog-message.leaving {
-  animation: kate-os-fade-out 0.25s ease-out forwards;
-}
-
-.kate-hud-dialog-container {
-  background: #fafafa;
-  border-radius: 5px;
-  box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.3);
-  max-width: 70%;
-  min-width: 50%;
-}
-
-.kate-hud-dialog-title:empty {
-  display: none;
-}
-
-.kate-hud-dialog-title {
-  font-size: 1.25rem;
-  font-weight: bold;
-  font-family: var(--font-family-title);
-  border-bottom: 1px solid #ececea;
-  padding: 0.5em;
-}
-
-.kate-hud-dialog-text {
-  padding: 2em 1em;
-  text-align: left;
-}
-
-.kate-hud-dialog-actions {
-  display: flex;
-  flex-direction: row;
-  justify-content: stretch;
-  align-items: center;
-  border-top: 1px solid #ececea;
-  background: #ececea;
-}
-
-.kate-hud-dialog-action {
-  width: 100%;
-  flex-grow: 1;
-}
-
-.kate-hud-dialog-action .kate-ui-button {
-  border: none;
-  outline: none;
-  background: none;
-  font-family: var(--font-sans-serif);
-  font-size: 0.9rem;
-  width: 100%;
-  display: block;
-  padding: 1em;
-  text-align: center;
-  font-weight: bold;
-  text-transform: uppercase;
-}
-
-.kate-hud-dialog-action[data-kind="primary"] {
-  background: #69c;
-  color: #fafafa;
-}
-
-.kate-hud-dialog-action[data-kind="dangerous"] {
-  background: #c55;
-  color: #fafafa;
-}
-
-.kate-hud-dialog-action .kate-ui-button.focus {
-  outline: 3px solid #69c;
-  outline-offset: 1px;
-  position: relative;
-  z-index: 1;
-}
-
-.kate-hud-dialog-pop-menu {
-  position: absolute;
-  top: 0px;
-  left: 0px;
-  width: 800px;
-  height: 480px;
-  overflow: clip;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(2px);
-  animation: kate-os-fade-in 0.25s ease-out forwards;
-}
-
-.kate-hud-dialog-pop-menu.leaving {
-  animation: kate-os-fade-out 0.25s ease-out forwards;
-}
-
-.kate-hud-dialog-pop-menu-container {
-  position: absolute;
-  bottom: 0px;
-  background: #fafafa;
-  border-radius: 10px 10px 0 0;
-  padding: 20px;
-  box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.3);
-  animation: kate-os-pop-menu-in 0.25s ease-out forwards;
-  width: 500px;
-}
-
-.leaving .kate-hud-dialog-pop-menu-container {
-  animation: kate-os-pop-menu-out 0.25s ease-out forwards;
-}
-
-.kate-hud-dialog-pop-menu-title:not(:empty) {
-  font-size: 1.25rem;
-  font-weight: bold;
-  font-family: var(--font-family-title);
-  border-bottom: 1px solid #ececea;
-  margin-bottom: 0.5em;
-}
-
-.kate-hud-dialog-pop-menu-actions {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
-}
-
-.kate-hud-dialog-pop-menu-action {
-  width: 100%;
-  flex-grow: 1;
-}
-
-.kate-hud-dialog-pop-menu-action .kate-ui-button {
-  border: none;
-  outline: none;
-  background: none;
-  font-family: var(--font-sans-serif);
-  font-size: 0.9rem;
-  width: 100%;
-  display: block;
-  padding: 1em;
-  text-align: center;
-  font-weight: bold;
-  text-transform: uppercase;
-  border-bottom: 1px solid #ececea;
-}
-
-.kate-hud-dialog-pop-menu-action[data-kind="primary"] {
-  background: #69c;
-  color: #fafafa;
-}
-
-.kate-hud-dialog-pop-menu-action[data-kind="dangerous"] {
-  background: #c55;
-  color: #fafafa;
-}
-
-.kate-hud-dialog-pop-menu-action .kate-ui-button.focus {
-  outline: 3px solid #69c;
-  outline-offset: 1px;
-  position: relative;
-  z-index: 1;
-}
-
-/* Legal and similar screens */
+/* #Simple screens */
 .kate-os-simple-screen {
   background: #fafafa;
   width: 100%;
@@ -704,8 +747,8 @@
   gap: 20px;
   justify-content: flex-end;
   align-items: center;
-  border-top: 1px solid #dcdcda;
-  background: #ececea;
+  border-top: 1px solid var(--color-border-d1);
+  background: var(--color-border);
   padding: 0 16px;
   flex-shrink: 0;
 }
@@ -765,7 +808,7 @@
 }
 
 .kate-os-media-items .focus {
-  outline: 3px solid #69c;
+  outline: 3px solid var(--color-primary);
   outline-offset: 1px;
 }
 
@@ -774,7 +817,7 @@
   height: auto;
   aspect-ratio: 5/3;
   overflow: hidden;
-  border: 1px solid #ececea;
+  border: 1px solid var(--color-border);
   position: relative;
 }
 
@@ -789,10 +832,14 @@
   position: absolute;
   bottom: 0px;
   right: 0px;
-  padding: 2px;
-  background: #ececea;
+  padding: 2px 10px 2px 14px;
+  background: var(--color-duration-background);
+  color: var(--color-text-inverted);
   border-radius: 2px;
-  font-size: 10px;
+  border-top-left-radius: 16px;
+  height: 16px;
+  font-size: 12px;
+  font-weight: 500;
 }
 
 .kate-os-media-fullscreen {
@@ -818,7 +865,7 @@
   left: 0px;
   width: 100%;
   height: 100%;
-  background: #2f2f2f;
+  background: var(--color-black);
 }
 
 .kate-os-media-container img,
@@ -833,5 +880,5 @@
   left: 0px;
   width: 100%;
   height: 100%;
-  background: #2f2f2f;
+  background: var(--color-black);
 }

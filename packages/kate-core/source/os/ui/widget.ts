@@ -232,6 +232,10 @@ export function icon_button(icon: InputKey, text: string) {
   return new Button([new HBox(5, [new Icon(icon), text])]).focus_target(false);
 }
 
+export function fa_icon_button(name: string, text: string, spacing = 10) {
+  return new Button([new HBox(spacing, [fa_icon(name), text])]);
+}
+
 export class Icon extends Widget {
   constructor(readonly type: InputKey) {
     super();
@@ -263,4 +267,28 @@ export class Icon extends Widget {
         ]);
     }
   }
+}
+
+export function status_bar(children: Widgetable[]) {
+  return h("div", { class: "kate-os-statusbar" }, [...children]);
+}
+
+export function fa_icon(
+  name: string,
+  size:
+    | "2xs"
+    | "xs"
+    | "1x"
+    | "lg"
+    | "xl"
+    | "2x"
+    | "3x"
+    | "4x"
+    | "5x"
+    | "6x"
+    | "7x"
+    | "8x" = "1x",
+  style: "solid" = "solid"
+) {
+  return h("i", { class: `fa-${style} fa-${size} fa-${name}` }, []);
 }

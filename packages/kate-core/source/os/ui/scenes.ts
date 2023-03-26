@@ -72,7 +72,10 @@ export class SceneLicence extends Scene {
   render() {
     return h("div", { class: "kate-os-simple-screen" }, [
       new UI.Title_bar({
-        left: new UI.Section_title(["Legal notices"]),
+        left: UI.fragment([
+          UI.fa_icon("circle-info", "lg"),
+          new UI.Section_title(["Legal notices"]),
+        ]),
       }),
       h("div", { class: "kate-os-text-scroll" }, [
         h("div", { class: "kate-os-padding" }, [this.text]),
@@ -255,15 +258,21 @@ export class SceneHome extends Scene {
   render() {
     return h("div", { class: "kate-os-home" }, [
       new UI.Title_bar({
-        left: UI.fragment([new UI.Section_title(["Library"])]),
-        right: new UI.Button([
-          new UI.HBox(10, ["Media", new UI.Icon("rtrigger")]),
-        ])
-          .focus_target(false)
-          .on_clicked(this.handle_to_media),
+        left: UI.fragment([
+          UI.fa_icon("diamond", "lg"),
+          new UI.Section_title(["Start"]),
+        ]),
+        right: "Recently played and favourites",
       }),
       h("div", { class: "kate-os-carts-scroll" }, [
         h("div", { class: "kate-os-carts" }, []),
+      ]),
+      UI.status_bar([
+        UI.icon_button("ltrigger", "Applications").on_clicked(
+          this.handle_applications
+        ),
+        UI.icon_button("menu", "Options").on_clicked(this.handle_options),
+        UI.icon_button("o", "Play").on_clicked(this.handle_play),
       ]),
     ]);
   }
@@ -291,23 +300,35 @@ export class SceneHome extends Scene {
   handle_key_pressed = (key: ExtendedInputKey) => {
     switch (key) {
       case "menu": {
-        for (const [button, cart] of this.cart_map) {
-          if (button.classList.contains("focus")) {
-            this.show_pop_menu(cart);
-            return true;
-          }
-        }
+        this.handle_options();
+        return true;
       }
 
-      case "rtrigger": {
-        this.handle_to_media();
+      case "ltrigger": {
+        this.handle_applications();
         return true;
       }
     }
     return false;
   };
 
-  handle_to_media = () => {
+  handle_options = () => {
+    for (const [button, cart] of this.cart_map) {
+      if (button.classList.contains("focus")) {
+        this.show_pop_menu(cart);
+        return;
+      }
+    }
+  };
+
+  handle_play = () => {
+    const current = this.os.focus_handler.current_focus;
+    if (current != null) {
+      current.click();
+    }
+  };
+
+  handle_applications = () => {
     const media = new SceneMedia(this.os, null);
     this.os.push_scene(media);
   };
@@ -326,7 +347,10 @@ export class SceneMedia extends Scene {
   render() {
     return h("div", { class: "kate-os-simple-screen" }, [
       new UI.Title_bar({
-        left: new UI.Section_title(["Media"]),
+        left: UI.fragment([
+          UI.fa_icon("images", "lg"),
+          new UI.Section_title(["Media gallery"]),
+        ]),
         right: h("div", { class: "kate-os-media-status" }, []),
       }),
       h("div", { class: "kate-os-scroll" }, [
@@ -391,9 +415,27 @@ export class SceneMedia extends Scene {
       return null;
     } else {
       return h("div", { class: "kate-os-video-duration" }, [
-        `${Math.round(duration)}s`,
+        this.format_duration(duration),
       ]);
     }
+  }
+
+  private format_duration(n0: number) {
+    const units = [
+      [60, "mins"],
+      [60, "hours"],
+    ] as const;
+    let n = n0;
+    let unit = "secs";
+    for (const [span, new_unit] of units) {
+      if (n >= span) {
+        n = n / span;
+        unit = new_unit;
+      } else {
+        break;
+      }
+    }
+    return `${Math.round(n)} ${unit}`;
   }
 
   private update_status(text: string) {
@@ -525,7 +567,6 @@ export class SceneViewMedia extends Scene {
     const player = h(
       "video",
       {
-        controls: "controls",
         src: url,
         class: "kate-os-media-video",
         autoplay: "autoplay",

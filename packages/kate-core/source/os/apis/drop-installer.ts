@@ -66,7 +66,9 @@ export class HUD_DropInstaller extends Scene {
 
   render() {
     return UI.fragment([
-      UI.h("div", { class: "kate-hud-drop-installer-icon" }, []),
+      UI.h("div", { class: "kate-hud-drop-installer-icon" }, [
+        UI.fa_icon("download", "3x"),
+      ]),
       UI.h("div", { class: "kate-hud-drop-installer-description" }, [
         "Drop ",
         UI.h("tt", {}, [".kart"]),
