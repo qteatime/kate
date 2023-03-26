@@ -92,9 +92,11 @@
   --font-family-mono: "Roboto Mono", monospace;
 
   --color-white: #fafafa;
+  --color-white-d1: #ececea;
+  --color-white-d2: #dcdcda;
   --color-black: #2f2f2f;
-  --color-grey: #ececea;
-  --color-dark-grey: #dcdcda;
+  --color-black-l1: #5f5f5f;
+  --color-black-l2: #9f9f9f;
 
   /* palette is Pollen8 by Conker : https://lospec.com/palette-list/pollen8 */
   --color-primary-d2: #73464c;
@@ -105,8 +107,10 @@
 
   --color-text: var(--color-black);
   --color-text-inverted: var(--color-white);
-  --color-border: var(--color-grey);
-  --color-border-d1: var(--color-dark-grey);
+  --color-text-muted: var(--color-black-l1);
+  --color-text-very-muted: var(--color-black-l2);
+  --color-border: var(--color-white-l1);
+  --color-border-d1: var(--color-white-l2);
   --color-background: var(--color-white);
   --color-dangerous: var(
     --color-primary-d1
@@ -242,6 +246,48 @@
 .focus .kate-os-carts-box .kate-os-carts-title {
   opacity: 1;
   animation: kate-os-fade-in 0.25s ease-out;
+}
+
+/* #Apps */
+.kate-os-applications {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: stretch;
+  padding: 1rem;
+}
+
+.kate-os-app-button {
+  width: 156px;
+  min-height: 128px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.kate-os-app-button-icon {
+  font-size: 4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.kate-os-app-button-title {
+  font-weight: 500;
+  text-align: center;
+}
+
+.kate-os-applications .kate-ui-button {
+  color: var(--color-text-muted);
+  border-radius: 6px;
+}
+
+.kate-os-applications .kate-ui-button.focus {
+  color: var(--color-text-inverted);
+  background: var(--color-primary);
 }
 
 /* Common widgets */
@@ -730,7 +776,7 @@
 .kate-os-text-scroll {
   width: 100%;
   height: 100%;
-  overflow-y: scroll;
+  overflow-y: auto;
   white-space: pre-wrap;
   font-family: var(--font-family-mono);
 }
@@ -790,7 +836,7 @@
 .kate-os-scroll {
   flex-grow: 1;
   height: 100%;
-  overflow-y: scroll;
+  overflow-y: auto;
   overflow-x: hidden;
 }
 
