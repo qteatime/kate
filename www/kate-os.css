@@ -821,6 +821,12 @@
   background: #2f2f2f;
 }
 
+.kate-os-media-container img,
+.kate-os-media-container video {
+  width: 100%;
+  height: auto;
+}
+
 .kate-os-game {
   position: absolute;
   top: 0px;
