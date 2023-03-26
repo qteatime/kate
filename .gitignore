@@ -8,6 +8,7 @@ build/
 www/kate.js
 www/kate-os.js
 www/app.js
+www/native-api.js
 !types/kate-api/kate-api.d.ts
 packages/kate-bridges/source/index.ts
 examples/boon-scrolling/**/*.js

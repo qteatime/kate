@@ -1,6 +1,6 @@
 import type { ExtendedInputKey, SpecialInputKey } from "../../kernel/virtual";
 import type { KateOS } from "../os";
-import { Scene, SceneLicence, SceneMedia } from "../ui/scenes";
+import { Scene, SceneAboutKate, SceneLicence, SceneMedia } from "../ui/scenes";
 import * as UI from "../ui";
 import { EventStream } from "../../../../util/build/events";
 
@@ -59,6 +59,7 @@ export class HUD_ContextMenu extends Scene {
       UI.fa_icon_button("expand", "Fullscreen").on_clicked(
         this.on_toggle_fullscreen
       );
+    const emulator = this.os.kernel.console;
 
     return UI.h("div", { class: "kate-os-hud-context-menu" }, [
       UI.h("div", { class: "kate-os-hud-context-menu-backdrop" }, []),
@@ -66,9 +67,11 @@ export class HUD_ContextMenu extends Scene {
         UI.h("div", { class: "kate-os-hud-context-menu-items" }, [
           new UI.If(() => this.os.processes.running != null, {
             then: new UI.Menu_list([
-              UI.fa_icon_button("square-xmark", "Close game").on_clicked(
-                this.on_close_game
-              ),
+              UI.when(emulator.options.mode !== "single", [
+                UI.fa_icon_button("square-xmark", "Close game").on_clicked(
+                  this.on_close_game
+                ),
+              ]),
               fullscreen_button(),
               UI.fa_icon_button("circle-info", "Legal notices").on_clicked(
                 this.on_legal_notices
@@ -76,11 +79,18 @@ export class HUD_ContextMenu extends Scene {
               UI.fa_icon_button("images", "Media gallery").on_clicked(
                 this.on_media_gallery
               ),
+              UI.when(emulator.options.mode === "single", [
+                UI.fa_icon_button("cat", "About Kate").on_clicked(
+                  this.on_about_kate
+                ),
+              ]),
             ]),
             else: new UI.Menu_list([
-              UI.fa_icon_button("power-off", "Power off").on_clicked(
-                this.on_power_off
-              ),
+              UI.when(emulator.options.mode === "native", [
+                UI.fa_icon_button("power-off", "Power off").on_clicked(
+                  this.on_power_off
+                ),
+              ]),
               fullscreen_button(),
               UI.fa_icon_button("download", "Install cartridge").on_clicked(
                 this.on_install_from_file
@@ -130,6 +140,10 @@ export class HUD_ContextMenu extends Scene {
       process.cart.metadata.release.legal_notices
     );
     this.os.push_scene(legal);
+  };
+
+  on_about_kate = () => {
+    this.os.push_scene(new SceneAboutKate(this.os));
   };
 
   on_toggle_fullscreen = () => {

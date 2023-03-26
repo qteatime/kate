@@ -191,6 +191,14 @@ export class If extends Widget {
   }
 }
 
+export function when(condition: boolean, children: Widgetable[]) {
+  if (condition) {
+    return fragment(children);
+  } else {
+    return null;
+  }
+}
+
 export class Button extends Widget {
   private _on_clicked = new EventStream<void>();
   private _is_focus_target = true;

@@ -90,7 +90,10 @@
       void (async function () {
         try {
           const kate = Kate.kernel.KateKernel.from_root(
-            document.querySelector(".kate")
+            document.querySelector(".kate"),
+            {
+              mode: "single",
+            }
           );
           const kate_os = await Kate.os.KateOS.boot(kate);
           const loading = new Kate.os.scenes.HUD_LoadIndicator();

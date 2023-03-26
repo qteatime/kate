@@ -297,6 +297,7 @@ w.task("desktop:compile", [], () => {
 
 w.task("desktop:generate", ["desktop:compile"], () => {
   copy("packages/kate-desktop/build/app.js", "www/app.js");
+  copy("packages/kate-desktop/build/native-api.js", "www/native-api.js");
 });
 
 w.task("desktop:build", ["www:bundle", "desktop:generate"], () => {});

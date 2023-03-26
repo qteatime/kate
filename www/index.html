@@ -91,8 +91,14 @@
     <script src="kate.js"></script>
     <script>
       void (async function () {
+        const is_native =
+          typeof KateNative !== "undefined" && KateNative.is_native;
+
         const kate = Kate.kernel.KateKernel.from_root(
-          document.querySelector(".kate")
+          document.querySelector(".kate"),
+          {
+            mode: is_native ? "native" : "web",
+          }
         );
         const kate_os = await Kate.os.KateOS.boot(kate);
         window.kate = kate;

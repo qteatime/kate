@@ -8,6 +8,9 @@ const createWindow = () => {
     frame: false,
     transparent: true,
     icon: Path.join(__dirname, "icons/icon256.png"),
+    webPreferences: {
+      preload: Path.join(__dirname, "native-api.js"),
+    },
   });
 
   win.loadFile(Path.join(__dirname, "index.html"));

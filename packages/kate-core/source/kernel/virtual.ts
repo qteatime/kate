@@ -19,6 +19,10 @@ export type ExtendedInputKey = InputKey | `long_${SpecialInputKey}`;
 
 export type Resource = "screen-recording";
 
+export type ConsoleOptions = {
+  mode: "native" | "web" | "single";
+};
+
 export class VirtualConsole {
   private up_button: HTMLElement;
   private right_button: HTMLElement;
@@ -70,7 +74,7 @@ export class VirtualConsole {
   ];
   private special_keys: InputKey[] = ["menu", "capture"];
 
-  constructor(root: HTMLElement) {
+  constructor(root: HTMLElement, readonly options: ConsoleOptions) {
     this.up_button = root.querySelector(".kate-dpad-up")!;
     this.right_button = root.querySelector(".kate-dpad-right")!;
     this.down_button = root.querySelector(".kate-dpad-down")!;
