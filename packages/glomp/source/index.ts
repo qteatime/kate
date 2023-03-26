@@ -157,7 +157,7 @@ export function generate_js_resource(
         `require.define(${resource.id}, "", "", (module, exports, __dirname, __filename) => {`,
         `  module.exports = ${JSON.stringify(resource.content)};`,
         `})`,
-      ];
+      ].join("\n");
     }
 
     default:
