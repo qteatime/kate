@@ -1,0 +1,30 @@
+.kate-hud-status-bar {
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  color: var(--color-text-inverted);
+  background: var(--color-status-background);
+  border-top-left-radius: 24px;
+  justify-content: right;
+  align-items: center;
+  padding: 0px 20px;
+  max-width: 400px;
+  height: 36px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: none;
+  transition: width 0.1s ease-out;
+}
+
+.kate-hud-status-bar.active {
+  display: flex;
+}
+
+.kate-hud-status-item {
+  display: none;
+}
+
+.kate-hud-status-item.active {
+  display: block;
+}

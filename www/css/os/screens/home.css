@@ -1,0 +1,74 @@
+.kate-os-home {
+  display: flex;
+  flex-direction: column;
+  background: var(--color-background);
+  height: 100%;
+  animation: kate-os-fade-in 0.25s ease-in;
+}
+
+.kate-os-carts-scroll {
+  overflow: hidden;
+  padding: 5px 0;
+  margin-top: -5px;
+  scroll-behavior: smooth;
+  scroll-padding: 30px;
+  padding-right: 250px;
+  background: url("../../../img/kate-chan.png") no-repeat fixed;
+  background-size: 40%;
+  background-position-x: 560px;
+  background-position-y: 150px;
+}
+
+.kate-os-carts {
+  margin: 10px 15px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 10px;
+  padding-right: 800px;
+}
+
+.kate-os-carts-box {
+  width: 200px;
+  height: 380px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.kate-os-carts-image {
+  width: 100%;
+  height: 350px;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  outline: 0px solid transparent;
+  transition: all 0.1s ease-out;
+  border: 1px solid var(--color-border);
+}
+
+.focus .kate-os-carts-box .kate-os-carts-image {
+  outline: 5px solid var(--color-primary);
+  border: 2px solid transparent;
+  transform: scale(1.04);
+}
+
+.kate-os-carts-image img {
+  width: 100%;
+  height: auto;
+}
+
+.kate-os-carts-title {
+  height: 30px;
+  font-size: 20px;
+  font-weight: bold;
+  line-height: 30px;
+  white-space: nowrap;
+  opacity: 0;
+}
+
+.focus .kate-os-carts-box .kate-os-carts-title {
+  opacity: 1;
+  animation: kate-os-fade-in 0.25s ease-out;
+}

@@ -1,0 +1,85 @@
+.kate-hud-dialog-pop-menu {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 800px;
+  height: 480px;
+  overflow: clip;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  background: var(--color-backdrop);
+  backdrop-filter: blur(2px);
+  animation: kate-os-fade-in 0.25s ease-out forwards;
+}
+
+.kate-hud-dialog-pop-menu-container {
+  position: absolute;
+  bottom: 0px;
+  background: var(--color-background);
+  border-radius: 10px 10px 0 0;
+  padding: 20px;
+  box-shadow: 0px 0px 3px var(--color-backdrop);
+  animation: kate-os-pop-menu-in 0.25s ease-out forwards;
+  width: 500px;
+}
+
+.kate-hud-dialog-pop-menu.leaving {
+  animation: kate-os-fade-out 0.25s ease-out forwards;
+}
+
+.leaving .kate-hud-dialog-pop-menu-container {
+  animation: kate-os-pop-menu-out 0.25s ease-out forwards;
+}
+
+.kate-hud-dialog-pop-menu-title:not(:empty) {
+  font-size: 1.25rem;
+  font-weight: bold;
+  font-family: var(--font-family-title);
+  margin-bottom: 1em;
+}
+
+.kate-hud-dialog-pop-menu-actions {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.kate-hud-dialog-pop-menu-action {
+  width: 100%;
+  flex-grow: 1;
+}
+
+.kate-hud-dialog-pop-menu-action .kate-ui-button {
+  border: none;
+  outline: none;
+  background: none;
+  font-family: var(--font-sans-serif);
+  font-size: 0.9rem;
+  width: 100%;
+  display: block;
+  padding: 1em;
+  text-align: center;
+  font-weight: bold;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--color-border);
+  --focus-background: var(--color-primary);
+}
+
+.kate-hud-dialog-pop-menu-action[data-kind="primary"] {
+  color: var(--color-primary);
+}
+
+.kate-hud-dialog-pop-menu-action[data-kind="dangerous"] {
+  color: var(--color-dangerous);
+  --focus-background: var(--color-dangerous);
+}
+
+.kate-hud-dialog-pop-menu-action .kate-ui-button.focus {
+  background: var(--focus-background);
+  color: var(--color-text-inverted);
+  position: relative;
+  z-index: 1;
+}

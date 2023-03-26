@@ -29,7 +29,7 @@ Licensed under the SIL Open Font License.
 ---
 
 Roboto and Roboto Mono (c) Google
-(https://fonts.google.com/specimen/Roboto)
+(https://fonts.google.com/specimen/Roboto/about)
 Licensed under the Apache License 2.0.
 
 _______________________________________________________________________________
