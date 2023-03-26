@@ -13,6 +13,6 @@
   },
   "homepage": "https://github.com/qteatime/kate#readme",
   "dependencies": {
-    "electron": "^20.3.11"
+    "electron": "^23.2.0"
   }
 }
