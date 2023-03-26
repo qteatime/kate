@@ -17,6 +17,7 @@
   background-size: 40%;
   background-position-x: 560px;
   background-position-y: 150px;
+  flex-grow: 1;
 }
 
 .kate-os-carts {

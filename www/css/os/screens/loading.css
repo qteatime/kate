@@ -6,9 +6,9 @@
   justify-content: flex-end;
   align-items: flex-end;
   padding: 25px;
-  background: var(--color-background);
+  background: var(--color-black);
   color: var(--color-white);
   font-size: 24px;
-  font-weight: bold;
+  font-weight: 500;
   animation: kate-os-fade-in 0.1s ease-out;
 }
