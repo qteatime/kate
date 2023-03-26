@@ -109,8 +109,8 @@
   --color-text-inverted: var(--color-white);
   --color-text-muted: var(--color-black-l1);
   --color-text-very-muted: var(--color-black-l2);
-  --color-border: var(--color-white-l1);
-  --color-border-d1: var(--color-white-l2);
+  --color-border: var(--color-white-d1);
+  --color-border-d1: var(--color-white-d2);
   --color-background: var(--color-white);
   --color-dangerous: var(
     --color-primary-d1
