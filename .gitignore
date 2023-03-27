@@ -20,3 +20,5 @@ dist/
 !examples/hello-world/hello.kart
 !examples/boon-scrolling/boon-scrolling.kart
 asset-source
+packages/kate-desktop/app
+packages/kate-tools/packaging

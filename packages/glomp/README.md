@@ -4,11 +4,13 @@ Glomp is a very straight-forward packaging tool for JavaScript projects. It does
 
 Glomp supports:
 
-- Resolving modules using Node algorithm (node_modules resolution is not currently supported, however);
+- Resolving modules using Node's module algorithm **for relative paths**;
 
 - Static require() calls to JavaScript and JSON files.
 
 Glomp does not support:
+
+- Resolving references to node_modules packages. This restriction might be lifted in the future, but for now Glomp leaves them as-is in the code and lets Node.js do the resolution at runtime. Browsers will throw an error at runtime for these references, if they're evaluated.
 
 - AMD or any module system different from Node's built-in one. Browser packages are expected to rely on an exported global name.
 

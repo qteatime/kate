@@ -131,7 +131,7 @@ function pack_assets({ glob: pattern, filter, name, target }) {
 
 function kart({ config, output }) {
   exec_file("node", [
-    "packages/kate-packaging/cli/kart.js",
+    "packages/kate-tools/cli/kart.js",
     "--output",
     output,
     config,
@@ -142,6 +142,80 @@ function copy(from, to) {
   console.log("-> Copy", from, "->", to);
   FS.mkdirSync(Path.dirname(to), { recursive: true });
   FS.copyFileSync(from, to);
+}
+
+function copy_tree(from, to) {
+  console.log("-> Copy tree", from, "->", to);
+
+  const go = (src, dst) => {
+    const stat = FS.statSync(src);
+    if (stat.isFile()) {
+      copy(src, dst);
+    } else if (stat.isDirectory()) {
+      for (const entry of FS.readdirSync(src)) {
+        go(Path.join(src, entry), Path.join(dst, entry));
+      }
+    } else {
+      throw new Error(`Unsupported entity: ${src}`);
+    }
+  };
+
+  go(from, to);
+}
+
+function clean_build(root) {
+  remove(Path.join(root, "build"), { recursive: true, force: true });
+  remove(Path.join(root, "tsconfig.tsbuildinfo"), { force: true });
+}
+
+function remove(
+  path,
+  { recursive, force } = { recursive: false, force: false }
+) {
+  if (!FS.existsSync(path) && force) {
+    return;
+  }
+
+  console.log("--> Removing", path);
+  FS.rmSync(path, { recursive: recursive ?? false, force: force ?? false });
+}
+
+function make_npm_package({ source, build }) {
+  const from = Path.join("packages", source);
+  const to = Path.join("dist/npm", source);
+  const cp = (src, dst) => {
+    copy(Path.join(from, src), Path.join(to, dst ?? src));
+  };
+  const mcp = (src, dst) => {
+    if (FS.existsSync(Path.join(from, src))) {
+      cp(src, dst);
+    }
+  };
+  const ct = (src, dst) => {
+    copy_tree(Path.join(from, src), Path.join(to, dst ?? src));
+  };
+  const glomp_deps = (root) => {
+    for (const dep of FS.readdirSync(Path.join(from, root, "deps"))) {
+      if (Path.extname(dep) === ".js") {
+        glomp({
+          entry: Path.join(from, root, "deps", dep),
+          out: Path.join(to, root, "deps", dep),
+          name: Path.basename(dep),
+        });
+      }
+    }
+  };
+
+  console.log("--> Packaging", source, "as a npm package");
+  remove(to, { recursive: true, force: true });
+  FS.mkdirSync(to, { recursive: true });
+  cp("package.json");
+  mcp("package-lock.json");
+  mcp("README.md");
+  copy("LICENCE", Path.join(to, "LICENCE"));
+  build({ from, to, copy: cp, maybe_copy: mcp, copy_tree: ct, glomp_deps });
+  console.log("--> Dry-running npm-pack for", source);
+  exec("npm pack --dry-run", { cwd: to });
 }
 
 const w = new World();
@@ -159,6 +233,21 @@ w.task("glomp:compile", [], () => {
 });
 
 w.task("glomp:build", ["glomp:compile"], () => {});
+
+w.task("glomp:clean", [], () => {
+  clean_build("packages/glomp");
+});
+
+w.task("glomp:make-npm-package", ["glomp:clean", "glomp:build"], () => {
+  make_npm_package({
+    source: "glomp",
+    build: (b) => {
+      b.copy_tree("bin");
+      b.copy_tree("build");
+      b.glomp_deps("build");
+    },
+  });
+});
 
 // -- Schema
 w.task("schema:generate", [], () => {
@@ -250,12 +339,32 @@ w.task("adv:compile", ["domui:build"], () => {
 
 w.task("adv:build", ["adv:compile"], () => {});
 
-// -- Packaging
-w.task("packaging:compile", ["schema:build"], () => {
-  tsc("packages/kate-packaging");
+// -- Tools
+w.task("tools:compile", ["schema:build"], () => {
+  tsc("packages/kate-tools");
 });
 
-w.task("packaging:build", ["packaging:compile"], () => {});
+w.task("tools:build", ["tools:compile", "www:bundle"], () => {
+  remove("packages/kate-tools/packaging/web", { recursive: true, force: true });
+  copy_tree("www", "packages/kate-tools/packaging/web");
+});
+
+w.task("tools:clean", [], () => {
+  clean_build("packages/kate-tools");
+});
+
+w.task("tools:make-npm-package", ["tools:clean", "tools:build"], () => {
+  make_npm_package({
+    source: "kate-tools",
+    build: (b) => {
+      b.copy_tree("assets");
+      b.copy_tree("packaging");
+      b.copy_tree("cli");
+      b.copy_tree("build");
+      b.glomp_deps("build");
+    },
+  });
+});
 
 // -- WWW
 w.task("www:bundle", ["core:build", "glomp:build"], () => {
@@ -267,7 +376,7 @@ w.task("www:bundle", ["core:build", "glomp:build"], () => {
 });
 
 // -- Examples
-w.task("example:hello-world", ["packaging:build"], () => {
+w.task("example:hello-world", ["tools:build"], () => {
   kart({
     config: "examples/hello-world/kate.json",
     output: "examples/hello-world/hello.kart",
@@ -276,7 +385,7 @@ w.task("example:hello-world", ["packaging:build"], () => {
 
 w.task(
   "example:boon-scrolling",
-  ["packaging:build", "domui:build", "glomp:build"],
+  ["tools:build", "domui:build", "glomp:build"],
   () => {
     tsc("examples/boon-scrolling");
     glomp({
@@ -302,18 +411,31 @@ w.task("desktop:compile", [], () => {
   tsc("packages/kate-desktop");
 });
 
+w.task("desktop:clean", [], () => {
+  clean_build("packages/kate-desktop");
+});
+
 w.task("desktop:generate", ["desktop:compile"], () => {
-  copy("packages/kate-desktop/build/app.js", "www/app.js");
-  copy("packages/kate-desktop/build/native-api.js", "www/native-api.js");
+  remove("packages/kate-desktop/app", { recursive: true, force: true });
+  copy_tree("packages/kate-desktop/build", "packages/kate-desktop/app");
+  copy_tree("www", "packages/kate-desktop/app/www");
 });
 
 w.task("desktop:build", ["www:bundle", "desktop:generate"], () => {});
 
-w.task("desktop:run", [], () => {
+w.task("desktop:run", ["desktop:generate"], () => {
   const Electron = require("electron");
-  const child = exec_file(Electron, [Path.join(__dirname, "www/app.js")]);
-  child.on("exit", (code) => {
-    process.exit(code ?? 0);
+  exec_file(Electron, [Path.join(__dirname, "packages/kate-desktop")]);
+});
+
+w.task("desktop:make-npm-package", ["desktop:clean", "desktop:build"], () => {
+  make_npm_package({
+    source: "kate-desktop",
+    build: (b) => {
+      b.copy_tree("app");
+      b.copy_tree("bin");
+      copy("README.md", Path.join(b.to, "README.md"));
+    },
   });
 });
 
@@ -325,7 +447,7 @@ w.task("chore:clean-tsc-cache", [], () => {
   });
   for (const file of files) {
     if (!file.includes("node_modules")) {
-      FS.unlinkSync(file);
+      FS.rm(file);
     }
   }
 });
@@ -343,7 +465,7 @@ w.task(
     "core:build",
     "domui:build",
     "adv:build",
-    "packaging:build",
+    "tools:build",
     "www:bundle",
     "example:all",
     "desktop:build",

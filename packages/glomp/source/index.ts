@@ -1,4 +1,4 @@
-import { unreachable } from "../../util/build/assert";
+import { unreachable } from "./deps/util";
 import * as Path from "path";
 import * as FS from "fs";
 
@@ -81,8 +81,12 @@ export function generate_js(resources: ResolvedResource[], context: Context) {
   }
   const sid = JSON.stringify(context.var_name);
 
-  return `void function([module, exports]) {
+  return `void function([module, exports, node_require]) {
   const require = (id) => {
+    if (typeof id === "string") {
+      return node_require(id);
+    }
+
     const module = require.mapping.get(id);
     if (module == null) {
       throw new Error("Undefined module " + id);
@@ -117,7 +121,7 @@ ${definitions.join("\n\n")}
 module.exports = require(${entry.id});
 }((() => {
   if (typeof require !== "undefined" && typeof module !== "undefined") {
-    return [module, module.exports];
+    return [module, module.exports, require];
   } else if (typeof window !== "undefined") {
     const module = Object.create(null);
     module.exports = Object.create(null);
@@ -125,7 +129,9 @@ module.exports = require(${entry.id});
       get() { return module.exports },
       set(v) { module.exports = v }
     });
-    return [module, module.exports];
+    return [module, module.exports, (id) => {
+      throw new Error("Cannot load " + JSON.stringify(id) + " because node modules are not supported.");
+    }];
   } else {
     throw new Error("Unsupported environment");
   }
@@ -280,7 +286,10 @@ function resolve_js_path(root: string, to: string, resource: Resource) {
   } else if (Path.isAbsolute(to)) {
     return resolve_js_destination(to, resource);
   } else {
-    throw new Error(`Node modules are not supported`);
+    console.warn(
+      `Skipping node module ${to} in ${resource.path}: will be loaded by Node's require at runtime.`
+    );
+    return to;
   }
 }
 

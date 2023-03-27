@@ -1,7 +1,7 @@
 {
-  "name": "@qteatime/kate-packaging",
-  "version": "0.2.0",
-  "description": "Tools for packaging games as Kate cartridges.",
+  "name": "@qteatime/kate-tools",
+  "version": "0.3.1",
+  "description": "Command line tools for interacting with Kate cartridges.",
   "main": "build/index.js",
   "bin": {
     "kart": "./cli/kart.js",

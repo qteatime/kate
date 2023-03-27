@@ -10,6 +10,22 @@ You can try Kate directly from your web-browser: go to https://kate.qteati.me/ a
 
 ![](./docs/kate.png)
 
+## Installation
+
+Kate only supports installing from npm currently. You'll need [Node.js 16+](https://nodejs.org/en) installed. Run the following from the command line:
+
+    $ npm install @qteatime/kate-desktop@experimental
+
+You can then start it from the command-line as well:
+
+    $ kate-desktop
+
+Alternatively, you can use Kate online from https://kate.qteati.me/. It's possible to install the page as a web application and have it work offline:
+
+- On Windows: open the page in Microsoft Edge and choose `Apps -> Install site as an app` from the menu;
+- On iPhone: open the page in Safari and choose `Share -> Add to Home Screen`;
+- On Android: open the page in Google Chrome and choose `Install app` from the menu;
+
 ## Specifications
 
 |                          |                                                               |

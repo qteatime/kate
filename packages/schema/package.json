@@ -1,6 +1,6 @@
 {
   "name": "@qteatime/kate-schemas",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Binary schemas for parsing Kate cartridges and similar files.",
   "main": "lib/index.js",
   "repository": {

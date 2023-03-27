@@ -1,8 +1,15 @@
 {
   "name": "@qteatime/kate-desktop",
-  "version": "0.1.0",
+  "version": "0.3.1",
   "description": "Electron-based desktop application for the fantasy handheld console Kate.",
   "author": "Q.",
+  "main": "app/index.js",
+  "bin": {
+    "kate-desktop": "bin/kate-desktop.js"
+  },
+  "scripts": {
+    "start": "electron ."
+  },
   "license": "MIT",
   "repository": {
     "type": "git",

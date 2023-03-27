@@ -1,8 +1,7 @@
 import * as Path from "path";
 import * as FS from "fs";
-import * as Cart from "../../schema/generated/cartridge";
-import { add_fingerprint } from "../../schema/lib/fingerprint";
-import { unreachable } from "../../util/build/assert";
+import { Cart, add_fingerprint } from "./deps/schema";
+import { unreachable } from "./deps/util";
 import * as Glob from "glob";
 
 type Kart = {

@@ -1,6 +1,6 @@
 {
   "name": "@qteatime/glomp",
-  "version": "0.2.0",
+  "version": "0.1.0",
   "description": "Pack arbitrary files as single-file web archives.",
   "main": "build/index.js",
   "bin": {

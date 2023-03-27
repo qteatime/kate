@@ -2,7 +2,7 @@ import * as Path from "path";
 import * as FS from "fs";
 import * as Glob from "glob";
 
-const www_root = Path.join(__dirname, "../../../www");
+const www_root = Path.join(__dirname, "../packaging/web");
 const asset_root = Path.join(__dirname, "../assets");
 
 function copy(root: string, from: string, out: string) {
