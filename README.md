@@ -22,7 +22,7 @@ You can then start it from the command-line as well:
 
 Alternatively, you can use Kate online from https://kate.qteati.me/. It's possible to install the page as a web application and have it work offline:
 
-- On Windows: open the page in Microsoft Edge and choose `Apps -> Install site as an app` from the menu;
+- On Windows 10+: open the page in Microsoft Edge and choose `Apps -> Install site as an app` from the menu;
 - On iPhone: open the page in Safari and choose `Share -> Add to Home Screen`;
 - On Android: open the page in Google Chrome and choose `Install app` from the menu;
 
@@ -87,50 +87,35 @@ See the `hello-world` example cartridge for some practical example of how this a
 
 ## Roadmap
 
-The first public release of Kate is planned for this year, targeting webkit/Electron, and with the following features:
-
-- [x] Running web-based games;
-- [x] Gamepad support;
-- [ ] In-cartridge digital game booklets & box art for that nostalgia feel;
-- [x] Uninstalling cartridges;
-- [x] Screen capture;
-- [x] Media gallery;
-- [ ] Cartridge permissions;
-- [ ] Electron-based executable;
+For the current work, see [the Kate Preview meta-issue](https://github.com/qteatime/kate/issues/1).
 
 Future planned features:
 
 - **Additional APIs**:
-  - [ ] Touch-input support;
-  - [ ] Keyboard/Virtual keyboard input for text;
-  - [ ] Haptic feedback/vibration;
-  - [ ] Object store API (flat, tag-based file system);
-  - [ ] Object database API (IndexedDB-like);
-  - [ ] Badges/achievements API;
-  - [ ] Networking API;
-  - [ ] Improved audio API (effects, graphs, etc);
-  - [ ] Improved screen recording/capture API with audio;
+  - Touch-input support;
+  - Keyboard/Virtual keyboard input for text;
+  - Haptic feedback/vibration;
+  - Object store API (flat, tag-based file system);
+  - Object database API (IndexedDB-like);
+  - Badges/achievements API;
+  - Networking API;
+  - Improved audio API (effects, graphs, etc);
+  - Improved screen recording/capture API with audio;
 - **KateOS UI improvements**:
-  - [ ] Reconfiguring keybindings;
-  - [ ] Tracking play times locally;
-  - [ ] Game collections and filtering;
-  - [ ] Browsing cartridges' object store/key-value store;
-  - [ ] Extending media gallery to videos;
-  - [ ] OST player for cartridges;
-  - [ ] "Store", for finding games in connected distributed repositories;
-  - [ ] Audit, for auditing security logs/actions in the console;
+  - Reconfiguring keybindings;
+  - Tracking play times locally;
+  - Game collections and filtering;
+  - Browsing cartridges' object store/key-value store;
+  - Extending media gallery to videos;
+  - OST player for cartridges;
+  - "Store", for finding games in connected distributed repositories;
+  - Audit, for auditing security logs/actions in the console;
 - **Supporting games not designed for Kate**:
-  - [ ] Proxying HTML Audio/Web Audio APIs;
-  - [ ] Proxying IndexedDB API;
-  - [ ] Full support for RPG Maker MV games;
-  - [ ] Full support for Ren'Py games;
+  - Proxying HTML Audio/Web Audio APIs;
+  - Proxying IndexedDB API;
+  - Full support for common game engines through bridges;
 - **Supporting tooling**:
-  - [ ] Kate IDE, a fully integrated way of building Kate games;
-- **Additional platforms**:
-  - [ ] Android (partial support currently);
-  - [ ] iPhone (bad partial support currently);
-  - [ ] iPad (unknown support);
-  - [ ] Non-webkit browsers (unknown support);
+  - Kate IDE, a fully integrated way of building Kate games;
 
 ## Licence
 
