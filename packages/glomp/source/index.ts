@@ -92,14 +92,15 @@ export function generate_js(resources: ResolvedResource[], context: Context) {
       throw new Error("Undefined module " + id);
     }
     if (!module.initialised) {
+      module.initialised = true;
       module.load.call(null,
         module.module,
-        module.exports,
+        module.module.exports,
         module.dirname,
         module.filename
       );
     }
-    return module.exports;
+    return module.module.exports;
   };
   
   require.mapping = new Map();
@@ -108,7 +109,6 @@ export function generate_js(resources: ResolvedResource[], context: Context) {
     module.exports = Object.create(null);
     require.mapping.set(id, {
       module: module,
-      exports: module.exports,
       dirname,
       filename,
       initialised: false,
