@@ -89,33 +89,37 @@ See the `hello-world` example cartridge for some practical example of how this a
 
 For the current work, see [the Kate Preview meta-issue](https://github.com/qteatime/kate/issues/1).
 
-Future planned features:
+Planned features:
 
-- **Additional APIs**:
-  - Touch-input support;
-  - Keyboard/Virtual keyboard input for text;
-  - Haptic feedback/vibration;
-  - Object store API (flat, tag-based file system);
+- **Game APIs**:
+  - Multi-touch input;
+  - Keyboard and virtual keyboard input for arbitrary text;
+  - Gyroscope input support;
+  - Haptic feedback/vibration (console and gamepad);
+  - Object store API (flat, tag-based);
   - Object database API (IndexedDB-like);
+  - Improved audio API (graph-based);
+  - Improved screen recording API (audio support);
+  - Networking API (http, p2p);
   - Badges/achievements API;
-  - Networking API;
-  - Improved audio API (effects, graphs, etc);
-  - Improved screen recording/capture API with audio;
-- **KateOS UI improvements**:
+- **KateOS improvements**
   - Reconfiguring keybindings;
   - Tracking play times locally;
   - Game collections and filtering;
-  - Browsing cartridges' object store/key-value store;
-  - Extending media gallery to videos;
-  - OST player for cartridges;
-  - "Store", for finding games in connected distributed repositories;
-  - Audit, for auditing security logs/actions in the console;
+  - Support for game booklets and OSTs;
+  - "Store" for finding games in connected distributed repositories;
+  - "Audit" for auditing security logs/actions in the console;
+  - Visualising and managing storage usage per cartridge;
+  - Notification preferences;
+  - Custom emulator themes;
+  - Exporting/synchronising save data across devices;
 - **Supporting games not designed for Kate**:
   - Proxying HTML Audio/Web Audio APIs;
   - Proxying IndexedDB API;
   - Full support for common game engines through bridges;
 - **Supporting tooling**:
-  - Kate IDE, a fully integrated way of building Kate games;
+  - Kate Studio, a fully integrated game maker for Kate games;
+  - Kate SDK, a lower-level set of tools/libraries for building games;
 
 ## Licence
 
