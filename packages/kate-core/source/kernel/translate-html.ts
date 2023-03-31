@@ -18,6 +18,7 @@ export function translate_html(html: string, context: Context) {
   add_bridges(preamble, dom, context);
   inline_all_scripts(dom, context);
   inline_all_links(dom, context);
+  load_all_media(dom, context);
   add_cover(dom, context);
   return dom.documentElement.outerHTML;
 }
@@ -40,6 +41,35 @@ export function add_cover(dom: Document, context: Context) {
     `
   );
   dom.body.appendChild(element);
+}
+
+function load_all_media(dom: Document, context: Context) {
+  for (const img of Array.from(dom.querySelectorAll("img"))) {
+    const path = img.getAttribute("src")!;
+    const file = try_get_file(path, context.cart);
+    if (file == null) {
+      continue;
+    }
+    if (file.data.length < 1024 * 1024) {
+      // inline 1mb or less images
+      img.setAttribute("src", get_data_url(path, context.cart));
+    } else {
+      img.classList.add("kate-lazy-load");
+    }
+  }
+
+  const loader = dom.createElement("script");
+  loader.textContent = `
+  void async function() {
+    for (const element of Array.from(document.querySelectorAll(".kate-lazy-load"))) {
+      const path = element.getAttribute("src");
+      if (path) {
+        element.setAttribute("src", await KateAPI.cart_fs.get_file_url(path));
+      }
+    }
+  }();
+  `;
+  dom.body.appendChild(loader);
 }
 
 function add_preamble(dom: Document, context: Context) {
