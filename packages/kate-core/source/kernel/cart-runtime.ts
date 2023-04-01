@@ -1,24 +1,33 @@
-import * as Cart from "../../../schema/generated/cartridge";
 import type { KateOS, KateIPCChannel, KateAudioServer } from "../os";
-import { make_id } from "../../../util/build";
+import { make_id } from "../utils";
 import { VirtualConsole } from "./virtual";
 import { translate_html } from "./translate-html";
+import * as Cart from "../cart";
+
+export type RuntimeEnvConfig = {
+  cart: Cart.CartMeta;
+  read_file: (path: string) => Promise<Cart.File>;
+  local_storage: { [key: string]: string };
+};
+
+export type RuntimeEnv = RuntimeEnvConfig & {
+  secret: string;
+  audio_server: KateAudioServer;
+  frame: HTMLIFrameElement;
+  channel: KateIPCChannel;
+};
 
 export class KateRuntimes {
   constructor(readonly console: VirtualConsole) {}
 
-  from_cartridge(
-    cart: Cart.Cartridge,
-    local_storage: { [key: string]: string }
-  ): CartRuntime {
-    switch (cart.platform.$tag) {
-      case Cart.Platform.$Tags.Web_archive:
+  from_cartridge(cart: Cart.CartMeta, env: RuntimeEnvConfig): CartRuntime {
+    switch (cart.runtime.type) {
+      case "web-archive":
         return new CR_Web_archive(
           this.console,
-          cart.id,
-          cart,
-          cart.platform,
-          local_storage
+          cart.metadata,
+          cart.runtime,
+          env
         );
 
       default:
@@ -28,7 +37,7 @@ export class KateRuntimes {
 }
 
 export abstract class CartRuntime {
-  abstract run(os: KateOS): CR_Process;
+  abstract run(os: KateOS): Promise<CR_Process>;
 }
 
 export abstract class CR_Process {
@@ -78,24 +87,26 @@ export class CRW_Process extends CR_Process {
 export class CR_Web_archive extends CartRuntime {
   constructor(
     readonly console: VirtualConsole,
-    readonly id: string,
-    readonly cart: Cart.Cartridge,
-    readonly data: Cart.Platform.Web_archive,
-    readonly local_storage: { [key: string]: string }
+    readonly metadata: Cart.Metadata,
+    readonly runtime: Cart.WebArchiveRuntime,
+    readonly env: RuntimeEnvConfig
   ) {
     super();
   }
 
-  run(os: KateOS) {
+  async run(os: KateOS) {
     const secret = make_id();
     const frame = document.createElement("iframe");
     const audio_server = os.make_audio_server();
-    const channel = os.ipc.add_process(
-      secret,
-      this.cart,
-      () => frame.contentWindow,
-      audio_server
-    );
+    const env: RuntimeEnv = {
+      ...this.env,
+      secret: secret,
+      frame: frame,
+      audio_server: audio_server,
+      channel: null as any,
+    };
+
+    const channel = os.ipc.add_process(env);
 
     frame.className = "kate-game-frame kate-game-frame-defaults";
     (frame as any).sandbox = "allow-scripts";
@@ -117,19 +128,13 @@ export class CR_Web_archive extends CartRuntime {
     });
 
     frame.src = URL.createObjectURL(
-      new Blob([this.proxy_html(secret)], { type: "text/html" })
+      new Blob([await this.proxy_html(env)], { type: "text/html" })
     );
     frame.scrolling = "no";
     return new CRW_Process(this, frame, secret, channel, audio_server);
   }
 
-  proxy_html(secret: string) {
-    return translate_html(this.data.html, {
-      secret,
-      zoom: this.console.scale,
-      bridges: this.data.bridges,
-      cart: this.cart,
-      local_storage: this.local_storage,
-    });
+  async proxy_html(env: RuntimeEnv) {
+    return translate_html(this.env.cart.runtime.html, env);
   }
 }

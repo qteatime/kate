@@ -1,11 +1,9 @@
 import { CartRuntime, KateRuntimes } from "./cart-runtime";
 import { GamepadInput } from "./gamepad";
 import { KeyboardInput } from "./input";
-import { KateLoader } from "./loader";
 import { ConsoleOptions, VirtualConsole } from "./virtual";
 
 export class KateKernel {
-  readonly loader = new KateLoader();
   readonly runtimes: KateRuntimes;
 
   private constructor(

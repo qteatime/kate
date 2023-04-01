@@ -18,7 +18,7 @@ export class KateKVStoragePartition {
 
   async contents() {
     return this.db.transaction([Db.cart_kvstore], "readonly", async (t) => {
-      const store = t.get_table(Db.cart_kvstore);
+      const store = t.get_table1(Db.cart_kvstore);
       return (await store.try_get(this.id))?.content ?? Object.create(null);
     });
   }
@@ -29,18 +29,18 @@ export class KateKVStoragePartition {
       data[key] = String(value);
     }
     return this.db.transaction([Db.cart_kvstore], "readwrite", async (t) => {
-      const store = t.get_table(Db.cart_kvstore);
-      await store.write({ id: this.id, content: data });
+      const store = t.get_table1(Db.cart_kvstore);
+      await store.put({ id: this.id, content: data });
     });
   }
 
   async set_pair(key: string, value: string) {
     return this.db.transaction([Db.cart_kvstore], "readwrite", async (t) => {
-      const store = t.get_table(Db.cart_kvstore);
+      const store = t.get_table1(Db.cart_kvstore);
       const value =
         (await store.try_get(this.id))?.content ?? Object.create(null);
       value[key] = value;
-      await store.write({ id: this.id, content: value });
+      await store.put({ id: this.id, content: value });
     });
   }
 }

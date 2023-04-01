@@ -1,4 +1,4 @@
-import { EventStream } from "../../../../util/build/events";
+import { EventStream } from "../../utils";
 import { ExtendedInputKey } from "../../kernel/virtual";
 import type { KateOS } from "../os";
 

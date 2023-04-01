@@ -521,28 +521,62 @@ function save(cart: Cart.Cartridge, output: string) {
   FS.writeFileSync(output, add_fingerprint(encoder.to_bytes()));
 }
 
-function make_bridge(x: Bridge) {
+function make_bridge(x: Bridge): Cart.Bridge[] {
   switch (x.type) {
     case "standard-network": {
-      return new Cart.Bridge.Network_proxy();
+      return [new Cart.Bridge.Network_proxy()];
     }
 
     case "local-storage": {
-      return new Cart.Bridge.Local_storage_proxy();
+      return [new Cart.Bridge.Local_storage_proxy()];
     }
 
     case "input-proxy": {
-      return new Cart.Bridge.Input_proxy(
-        new Map(Object.entries(get_mapping(x.mapping)).map(make_key_pair))
-      );
+      return [
+        new Cart.Bridge.Input_proxy(
+          new Map(Object.entries(get_mapping(x.mapping)).map(make_key_pair))
+        ),
+      ];
     }
 
     case "rpgmaker-mv": {
-      return new Cart.Bridge.RPGMaker_MV();
+      const key_map = new Map<Cart.VirtualKey, Cart.KeyboardKey>([
+        [
+          new Cart.VirtualKey.Up(),
+          new Cart.KeyboardKey("ArrowUp", "ArrowUp", 38n),
+        ],
+        [
+          new Cart.VirtualKey.Right(),
+          new Cart.KeyboardKey("ArrowRight", "ArrowRight", 39n),
+        ],
+        [
+          new Cart.VirtualKey.Down(),
+          new Cart.KeyboardKey("ArrowDown", "ArrowDown", 40n),
+        ],
+        [
+          new Cart.VirtualKey.Left(),
+          new Cart.KeyboardKey("ArrowLeft", "ArrowLeft", 37n),
+        ],
+        [new Cart.VirtualKey.O(), new Cart.KeyboardKey("z", "KeyZ", 90n)],
+        [new Cart.VirtualKey.X(), new Cart.KeyboardKey("x", "KeyX", 88n)],
+        [
+          new Cart.VirtualKey.L_trigger(),
+          new Cart.KeyboardKey("PageUp", "PageUp", 33n),
+        ],
+        [
+          new Cart.VirtualKey.R_trigger(),
+          new Cart.KeyboardKey("PageDown", "PageDown", 34n),
+        ],
+      ]);
+      return [
+        new Cart.Bridge.Local_storage_proxy(),
+        new Cart.Bridge.Network_proxy(),
+        new Cart.Bridge.Input_proxy(key_map),
+      ];
     }
 
     case "preserve-webgl-render": {
-      return new Cart.Bridge.Preserve_render();
+      return [new Cart.Bridge.Preserve_render()];
     }
 
     default:
@@ -629,7 +663,7 @@ export function make_cartridge(path: string, output: string) {
           archive,
           new Cart.Platform.Web_archive(
             load_text_file(x.html, dir_root, base_dir),
-            x.bridges.map(make_bridge)
+            x.bridges.flatMap(make_bridge)
           )
         ),
         output

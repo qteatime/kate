@@ -1,9 +1,8 @@
-import { Database } from "../../../db-schema/build";
-import * as KateDb from "../data/db";
-import * as Cart from "../../../schema/generated/cartridge";
+import { Database } from "../db-schema";
+import * as KateDb from "../data";
+import * as Cart from "../cart";
 import type { KateKernel } from "../kernel/kate";
-import { EventStream } from "../../../util/build/events";
-import { KateStorage } from "./apis/file_storage";
+import { EventStream } from "../utils";
 import { wait } from "./time";
 import { Scene, SceneBoot, SceneHome } from "./ui/scenes";
 import { CartManager } from "./apis/cart-manager";
@@ -17,7 +16,6 @@ import { KateKVStorage } from "./apis/kv_storage";
 import { KateIPCServer } from "./apis/ipc";
 import { KateAudioServer } from "./apis";
 import { KateDialog } from "./apis/dialog";
-import { unreachable } from "../../../util/build";
 import { KateCapture } from "./apis/capture";
 import { KateSfx } from "./sfx";
 
@@ -25,7 +23,6 @@ export class KateOS {
   private _scene_stack: Scene[] = [];
   private _active_hud: Scene[] = [];
   private _current_scene: Scene | null = null;
-  readonly storage: KateStorage;
   readonly cart_manager: CartManager;
   readonly processes: KateProcesses;
   readonly context_menu: KateContextMenu;
@@ -38,7 +35,7 @@ export class KateOS {
   readonly dialog: KateDialog;
   readonly capture: KateCapture;
   readonly events = {
-    on_cart_inserted: new EventStream<Cart.Cartridge>(),
+    on_cart_inserted: new EventStream<Cart.CartMeta>(),
     on_cart_removed: new EventStream<{ id: string; title: string }>(),
   };
 
@@ -47,7 +44,6 @@ export class KateOS {
     readonly db: Database,
     readonly sfx: KateSfx
   ) {
-    this.storage = new KateStorage(this);
     this.cart_manager = new CartManager(this);
     this.processes = new KateProcesses(this);
     this.kv_storage = new KateKVStorage(this);
@@ -119,7 +115,7 @@ export class KateOS {
 
   static async boot(kernel: KateKernel) {
     const sfx = await KateSfx.make(kernel);
-    const db = await KateDb.kate.open();
+    const { db } = await KateDb.kate.open();
     const os = new KateOS(kernel, db, sfx);
     await request_persistent_storage(os);
     const boot_screen = new SceneBoot(os);

@@ -139,35 +139,15 @@ export class SceneBoot extends Scene {
 }
 
 export class SceneHome extends Scene {
-  private cart_map = new Map<Element, typeof Db["cart_meta"]["__schema"]>();
+  private cart_map = new Map<Element, Db.CartMeta>();
 
-  render_cart(x: {
-    id: string;
-    title: string;
-    thumbnail: { mime: string; bytes: Uint8Array } | null;
-  }) {
+  render_cart(x: Db.CartMeta) {
     return new UI.Button([
       h("div", { class: "kate-os-carts-box" }, [
-        h(
-          "div",
-          { class: "kate-os-carts-image" },
-          x.thumbnail
-            ? [
-                h(
-                  "img",
-                  {
-                    src: URL.createObjectURL(
-                      new Blob([x.thumbnail!.bytes], {
-                        type: x.thumbnail!.mime,
-                      })
-                    ),
-                  },
-                  []
-                ),
-              ]
-            : []
-        ),
-        h("div", { class: "kate-os-carts-title" }, [x.title]),
+        h("div", { class: "kate-os-carts-image" }, [
+          h("img", { src: x.thumbnail_dataurl }, []),
+        ]),
+        h("div", { class: "kate-os-carts-title" }, [x.metadata.game.title]),
       ]),
     ]).on_clicked(() => {
       this.os.processes.run(x.id);
@@ -201,10 +181,10 @@ export class SceneHome extends Scene {
     }
   }
 
-  async show_pop_menu(cart: typeof Db["cart_meta"]["__schema"]) {
+  async show_pop_menu(cart: Db.CartMeta) {
     const result = await this.os.dialog.pop_menu(
       "kate:home",
-      cart.title,
+      cart.metadata.game.title,
       [
         { label: "Legal notices", value: "legal" as const },
         { label: "Uninstall", value: "uninstall" as const },
@@ -214,14 +194,17 @@ export class SceneHome extends Scene {
     switch (result) {
       case "uninstall": {
         const should_uninstall = await this.os.dialog.confirm("kate:home", {
-          title: `Uninstall ${cart.title}?`,
-          message: `This will remove the cartridge and all its related data (including save data).`,
+          title: `Uninstall ${cart.metadata.game.title}?`,
+          message: `This will remove the cartridge files, but not save data.`,
           cancel: "Keep game",
           ok: "Uninstall game",
           dangerous: true,
         });
         if (should_uninstall) {
-          this.os.cart_manager.uninstall(cart);
+          this.os.cart_manager.uninstall({
+            id: cart.metadata.id,
+            title: cart.metadata.game.title,
+          });
         }
         break;
       }
@@ -234,8 +217,11 @@ export class SceneHome extends Scene {
         const loading = new HUD_LoadIndicator(this.os);
         this.os.show_hud(loading);
         try {
-          const licence = await this.os.cart_manager.read_legal(cart.id);
-          const legal = new SceneLicence(this.os, cart.title, licence);
+          const legal = new SceneLicence(
+            this.os,
+            cart.metadata.game.title,
+            cart.metadata.release.legal_notices
+          );
           this.os.push_scene(legal);
         } catch (error) {
           console.error(`Failed to show legal notices for ${cart.id}`, error);
@@ -336,12 +322,9 @@ export class SceneHome extends Scene {
 }
 
 export class SceneMedia extends Scene {
-  private media = new Map<HTMLElement, typeof Db["media_store"]["__schema"]>();
+  private media = new Map<HTMLElement, Db.Media>();
 
-  constructor(
-    os: KateOS,
-    readonly filter: null | typeof Db["cart_meta"]["__schema"]
-  ) {
+  constructor(os: KateOS, readonly filter: null | Db.CartMeta) {
     super(os);
   }
 
@@ -380,7 +363,7 @@ export class SceneMedia extends Scene {
       return { title: "All", media: media0 };
     } else {
       return {
-        title: filter.title,
+        title: filter.metadata.game.title,
         media: media0.filter((x) => x.cart_id === filter.id),
       };
     }
@@ -401,7 +384,7 @@ export class SceneMedia extends Scene {
     }
   }
 
-  private async make_button(x: typeof Db["media_store"]["__schema"]) {
+  private async make_button(x: Db.Media) {
     const element = new UI.Button([
       h("div", { class: "kate-os-media-thumbnail" }, [
         h("img", { src: x.thumbnail }, []),
@@ -473,7 +456,7 @@ export class SceneMedia extends Scene {
     return false;
   };
 
-  view = (x: typeof Db["media_store"]["__schema"]) => {
+  view = (x: Db.Media) => {
     const viewer = new SceneViewMedia(this.os, this, x);
     this.os.push_scene(viewer);
   };
@@ -500,7 +483,7 @@ export class SceneViewMedia extends Scene {
   constructor(
     os: KateOS,
     readonly media_list: SceneMedia,
-    readonly media: typeof Db["media_store"]["__schema"]
+    readonly media: Db.Media
   ) {
     super(os);
   }

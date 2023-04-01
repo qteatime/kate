@@ -1,29 +1,21 @@
-import { bridges } from "../../../kate-bridges/build";
-import * as Cart from "../../../schema/generated/cartridge";
-import { make_id, unreachable } from "../../../util/build";
-import { Pathname } from "../../../util/build/pathname";
+import { bridges } from "../bridges";
+import * as Cart from "../cart";
+import { make_id, unreachable, file_to_dataurl, Pathname } from "../utils";
 import type { InputKey } from "./virtual";
+import { RuntimeEnv } from "./cart-runtime";
 
-interface Context {
-  local_storage?: { [key: string]: string };
-  zoom?: number;
-  secret: string;
-  cart: Cart.Cartridge;
-  bridges: Cart.Bridge[];
-}
-
-export function translate_html(html: string, context: Context) {
+export async function translate_html(html: string, context: RuntimeEnv) {
   const dom = new DOMParser().parseFromString(html, "text/html");
   const preamble = add_preamble(dom, context);
   add_bridges(preamble, dom, context);
-  inline_all_scripts(dom, context);
-  inline_all_links(dom, context);
-  load_all_media(dom, context);
+  await inline_all_scripts(dom, context);
+  await inline_all_links(dom, context);
+  await load_all_media(dom, context);
   add_cover(dom, context);
   return dom.documentElement.outerHTML;
 }
 
-export function add_cover(dom: Document, context: Context) {
+export function add_cover(dom: Document, context: RuntimeEnv) {
   const element = dom.createElement("div");
   const id = `kate_${make_id().replace(/\-/g, "_")}`;
   element.id = id;
@@ -43,16 +35,16 @@ export function add_cover(dom: Document, context: Context) {
   dom.body.appendChild(element);
 }
 
-function load_all_media(dom: Document, context: Context) {
+async function load_all_media(dom: Document, context: RuntimeEnv) {
   for (const img of Array.from(dom.querySelectorAll("img"))) {
     const path = img.getAttribute("src")!;
-    const file = try_get_file(path, context.cart);
+    const file = await try_get_file(path, context);
     if (file == null) {
       continue;
     }
     if (file.data.length < 1024 * 1024) {
       // inline 1mb or less images
-      img.setAttribute("src", get_data_url(path, context.cart));
+      img.setAttribute("src", await get_data_url(path, context));
     } else {
       img.classList.add("kate-lazy-load");
     }
@@ -72,7 +64,7 @@ function load_all_media(dom: Document, context: Context) {
   dom.body.appendChild(loader);
 }
 
-function add_preamble(dom: Document, context: Context) {
+function add_preamble(dom: Document, context: RuntimeEnv) {
   const script = dom.createElement("script");
   script.textContent = `
   void function() {
@@ -84,8 +76,8 @@ function add_preamble(dom: Document, context: Context) {
   return script;
 }
 
-function add_bridges(reference: Element, dom: Document, context: Context) {
-  for (const bridge of context.bridges) {
+function add_bridges(reference: Element, dom: Document, context: RuntimeEnv) {
+  for (const bridge of context.cart.runtime.bridges) {
     apply_bridge(bridge, reference, dom, context);
   }
 }
@@ -94,7 +86,7 @@ function apply_bridge(
   bridge: Cart.Bridge,
   reference: Element,
   dom: Document,
-  context: Context
+  context: RuntimeEnv
 ): void {
   const wrap = (source: string) => {
     return `void function(exports) {
@@ -112,13 +104,13 @@ function apply_bridge(
     }
   };
 
-  switch (bridge.$tag) {
-    case Cart.Bridge.$Tags.Network_proxy: {
+  switch (bridge.type) {
+    case "network-proxy": {
       append_proxy(bridges["standard-network.js"]);
       break;
     }
 
-    case Cart.Bridge.$Tags.Input_proxy: {
+    case "input-proxy": {
       const code = bridges["input.js"];
       const keys = JSON.stringify(
         generate_proxied_key_mappings(bridge.mapping),
@@ -130,7 +122,7 @@ function apply_bridge(
       break;
     }
 
-    case Cart.Bridge.$Tags.Local_storage_proxy: {
+    case "local-storage-proxy": {
       const full_source = `
         var KATE_LOCAL_STORAGE = ${JSON.stringify(context.local_storage ?? {})};
         ${bridges["local-storage.js"]}
@@ -139,52 +131,7 @@ function apply_bridge(
       break;
     }
 
-    case Cart.Bridge.$Tags.RPGMaker_MV: {
-      apply_bridge(
-        new Cart.Bridge.Local_storage_proxy(),
-        reference,
-        dom,
-        context
-      );
-      apply_bridge(new Cart.Bridge.Network_proxy(), reference, dom, context);
-      const key_map = new Map<Cart.VirtualKey, Cart.KeyboardKey>([
-        [
-          new Cart.VirtualKey.Up(),
-          new Cart.KeyboardKey("ArrowUp", "ArrowUp", 38n),
-        ],
-        [
-          new Cart.VirtualKey.Right(),
-          new Cart.KeyboardKey("ArrowRight", "ArrowRight", 39n),
-        ],
-        [
-          new Cart.VirtualKey.Down(),
-          new Cart.KeyboardKey("ArrowDown", "ArrowDown", 40n),
-        ],
-        [
-          new Cart.VirtualKey.Left(),
-          new Cart.KeyboardKey("ArrowLeft", "ArrowLeft", 37n),
-        ],
-        [new Cart.VirtualKey.O(), new Cart.KeyboardKey("z", "KeyZ", 90n)],
-        [new Cart.VirtualKey.X(), new Cart.KeyboardKey("x", "KeyX", 88n)],
-        [
-          new Cart.VirtualKey.L_trigger(),
-          new Cart.KeyboardKey("PageUp", "PageUp", 33n),
-        ],
-        [
-          new Cart.VirtualKey.R_trigger(),
-          new Cart.KeyboardKey("PageDown", "PageDown", 34n),
-        ],
-      ]);
-      apply_bridge(
-        new Cart.Bridge.Input_proxy(key_map),
-        reference,
-        dom,
-        context
-      );
-      break;
-    }
-
-    case Cart.Bridge.$Tags.Preserve_render: {
+    case "preserve-render": {
       append_proxy(bridges["preserve-render.js"]);
       break;
     }
@@ -194,49 +141,20 @@ function apply_bridge(
   }
 }
 
-function virtual_key_to_code(key: Cart.VirtualKey): InputKey {
-  switch (key.$tag) {
-    case Cart.VirtualKey.$Tags.Up:
-      return "up";
-    case Cart.VirtualKey.$Tags.Right:
-      return "right";
-    case Cart.VirtualKey.$Tags.Down:
-      return "down";
-    case Cart.VirtualKey.$Tags.Left:
-      return "left";
-    case Cart.VirtualKey.$Tags.O:
-      return "o";
-    case Cart.VirtualKey.$Tags.X:
-      return "x";
-    case Cart.VirtualKey.$Tags.L_trigger:
-      return "ltrigger";
-    case Cart.VirtualKey.$Tags.R_trigger:
-      return "rtrigger";
-    case Cart.VirtualKey.$Tags.Menu:
-      return "menu";
-    case Cart.VirtualKey.$Tags.Capture:
-      return "capture";
-    default:
-      throw unreachable(key, "virtual key");
-  }
-}
-
-function generate_proxied_key_mappings(
-  map: Map<Cart.VirtualKey, Cart.KeyboardKey>
-) {
+function generate_proxied_key_mappings(map: Map<InputKey, Cart.Key>) {
   const pairs = [...map.entries()].map(([k, v]) => [
-    virtual_key_to_code(k),
+    k,
     [v.key, v.code, Number(v.key_code)],
   ]);
   return Object.fromEntries(pairs);
 }
 
-function inline_all_scripts(dom: Document, context: Context) {
+async function inline_all_scripts(dom: Document, context: RuntimeEnv) {
   for (const script of Array.from(dom.querySelectorAll("script"))) {
     const src = script.getAttribute("src");
     if (src != null && src.trim() !== "") {
       const real_path = Pathname.from_string(src).make_absolute().as_string();
-      const contents = get_text_file(real_path, context.cart);
+      const contents = await get_text_file(real_path, context);
       script.removeAttribute("src");
       script.removeAttribute("type");
       script.textContent = contents;
@@ -244,26 +162,26 @@ function inline_all_scripts(dom: Document, context: Context) {
   }
 }
 
-function inline_all_links(dom: Document, context: Context) {
+async function inline_all_links(dom: Document, context: RuntimeEnv) {
   for (const link of Array.from(dom.querySelectorAll("link"))) {
     const href = link.getAttribute("href") ?? "";
     const path = Pathname.from_string(href).make_absolute();
     if (link.rel === "stylesheet") {
-      inline_css(link, path, dom, context);
+      await inline_css(link, path, dom, context);
     } else {
-      link.setAttribute("href", get_data_url(path.as_string(), context.cart));
+      link.setAttribute("href", await get_data_url(path.as_string(), context));
     }
   }
 }
 
-function inline_css(
+async function inline_css(
   link: HTMLLinkElement,
   root: Pathname,
   dom: Document,
-  context: Context
+  context: RuntimeEnv
 ) {
-  const source0 = get_text_file(root.as_string(), context.cart);
-  const source1 = transform_css_urls(root.dirname(), source0, context);
+  const source0 = await get_text_file(root.as_string(), context);
+  const source1 = await transform_css_urls(root.dirname(), source0, context);
   // TODO: inline imports
   const style = dom.createElement("style");
   style.textContent = source1;
@@ -271,21 +189,37 @@ function inline_css(
   link.remove();
 }
 
-function transform_css_urls(base: Pathname, source: string, context: Context) {
+async function transform_css_urls(
+  base: Pathname,
+  source: string,
+  context: RuntimeEnv
+) {
+  const imports = Array.from(
+    new Set([...source.matchAll(/\burl\(("[^"]+")\)/g)].map((x) => x[1]))
+  );
+  const import_map = new Map(
+    await Promise.all(
+      imports.map(async (url_string) => {
+        const url_path = Pathname.from_string(JSON.parse(url_string));
+        const path = base.join(url_path).as_string();
+        const data_url = await get_data_url(path, context);
+        return [url_string, data_url] as const;
+      })
+    )
+  );
+
   return source.replace(/\burl\(("[^"]+")\)/g, (_, url_string: string) => {
-    const url_path = Pathname.from_string(JSON.parse(url_string));
-    const path = base.join(url_path).as_string();
-    const data_url = get_data_url(path, context.cart);
+    const data_url = import_map.get(url_string)!;
     return `url(${JSON.stringify(data_url)})`;
   });
 }
 
-function try_get_file(path: string, cart: Cart.Cartridge) {
-  return cart.files.find((x) => x.path === path);
+async function try_get_file(path: string, env: RuntimeEnv) {
+  return await env.read_file(path);
 }
 
-function try_get_text_file(path: string, cart: Cart.Cartridge) {
-  const file = try_get_file(path, cart);
+async function try_get_text_file(path: string, env: RuntimeEnv) {
+  const file = await try_get_file(path, env);
   if (file != null) {
     const decoder = new TextDecoder("utf-8");
     return decoder.decode(file.data);
@@ -294,8 +228,8 @@ function try_get_text_file(path: string, cart: Cart.Cartridge) {
   }
 }
 
-function get_text_file(real_path: string, cart: Cart.Cartridge) {
-  const contents = try_get_text_file(real_path, cart);
+async function get_text_file(real_path: string, env: RuntimeEnv) {
+  const contents = await try_get_text_file(real_path, env);
   if (contents != null) {
     return contents;
   } else {
@@ -303,13 +237,10 @@ function get_text_file(real_path: string, cart: Cart.Cartridge) {
   }
 }
 
-function get_data_url(real_path: string, cart: Cart.Cartridge) {
-  const file = try_get_file(real_path, cart);
+async function get_data_url(real_path: string, env: RuntimeEnv) {
+  const file = await try_get_file(real_path, env);
   if (file != null) {
-    const content = Array.from(file.data)
-      .map((x) => String.fromCharCode(x))
-      .join("");
-    return `data:${file.mime};base64,${btoa(content)}`;
+    return file_to_dataurl(file);
   } else {
     throw new Error(`File not found: ${real_path}`);
   }

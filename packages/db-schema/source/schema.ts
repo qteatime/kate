@@ -1,115 +1,219 @@
-import { Database } from "./db";
-
-export class DBError_UnableToOpen extends Error {
-  constructor(readonly db: DatabaseSchema) {
-    super(`Unable to open ${db.name}`);
-  }
-}
+import { Database } from "./core";
 
 export class DatabaseSchema {
-  readonly tables: TableSchema<string, string, any>[] = [];
+  readonly tables: TableSchema<any>[] = [];
   constructor(readonly name: string, readonly version: number) {}
 
-  table<T extends { [key: string]: any }>(
-    since: number,
-    name: string,
-    options: { path: string; auto_increment: boolean },
-    indexes: (t: IndexBuilder<T>) => IndexBuilder<T> = (t) => t
-  ) {
-    const table = new TableSchema<typeof name, typeof options["path"], T>(
-      since,
-      name,
-      options,
-      indexes(new IndexBuilder<T>()).build()
+  async open() {
+    return new Promise<{ db: Database; old_version: number }>(
+      (resolve, reject) => {
+        const request = indexedDB.open(this.name, this.version);
+        let old_version: number = this.version;
+
+        request.onerror = (ev) => {
+          console.error(`[Kate] failed to open database`, ev);
+          reject(new Error(`Unable to open database`));
+        };
+        request.onsuccess = (ev) => {
+          resolve({
+            db: new Database(request.result),
+            old_version,
+          });
+        };
+        request.onupgradeneeded = (ev) => {
+          old_version = ev.oldVersion;
+          const request = ev.target as IDBRequest;
+          const db = request.result;
+          const transaction = request.transaction!;
+          for (const table of this.tables) {
+            table.upgrade(db, transaction, old_version);
+          }
+        };
+      }
     );
+  }
+
+  table1<S, K extends keyof S>(x: {
+    since: number;
+    name: string;
+    path: K;
+    auto_increment: boolean;
+    deprecated_since?: number;
+  }) {
+    const table = new TableSchema1<S, K>(x.since, x.name, {
+      path: x.path,
+      auto_increment: x.auto_increment,
+    });
     this.tables.push(table);
     return table;
   }
 
-  async open() {
-    return new Promise<Database>((resolve, reject) => {
-      const request = indexedDB.open(this.name, this.version);
-      request.onerror = (ev) => {
-        reject(new DBError_UnableToOpen(this));
-      };
-      request.onsuccess = (ev) => {
-        resolve(new Database(request.result));
-      };
-      request.onupgradeneeded = (ev) => {
-        const old_version = ev.oldVersion;
-        const db = (ev.target as any).result as IDBDatabase;
-        for (const table of this.tables) {
-          table.upgrade(db, old_version);
-        }
-      };
+  table2<S, K1 extends keyof S, K2 extends keyof S>(x: {
+    since: number;
+    name: string;
+    path: [K1, K2];
+    auto_increment: boolean;
+    deprecated_since?: number;
+  }) {
+    const table = new TableSchema2<S, K1, K2>(x.since, x.name, {
+      path: x.path,
+      auto_increment: x.auto_increment,
     });
+    this.tables.push(table);
+    return table;
   }
 }
 
-export class TableSchema<
-  K extends string,
-  Id extends string,
-  Schema extends { [key: string]: any }
-> {
-  __schema!: Schema;
+export abstract class TableSchema<S> {
+  readonly indexes: IndexSchema[] = [];
 
   constructor(
     readonly version: number,
-    readonly name: K,
-    readonly key: { path: Id; auto_increment: boolean },
-    readonly indexes: IndexSchema[]
+    readonly name: string,
+    readonly key: { path: any; auto_increment: boolean }
   ) {}
 
-  get key_path() {
-    return this.key.path;
-  }
-
-  upgrade(db: IDBDatabase, old_version: number) {
+  upgrade(db: IDBDatabase, transaction: IDBTransaction, old_version: number) {
     if (this.version > old_version) {
-      const store = db.createObjectStore(this.name, {
-        keyPath: this.key.path,
+      db.createObjectStore(this.name, {
+        keyPath: this.key.path as any,
         autoIncrement: this.key.auto_increment,
       });
+    }
 
-      for (const index of this.indexes) {
-        index.upgrade(store);
+    for (const index of this.indexes) {
+      index.upgrade(transaction, old_version);
+    }
+  }
+
+  index1<K1 extends keyof S>(x: {
+    since: number;
+    name: string;
+    path: [K1];
+    unique?: boolean;
+    multi_entry?: boolean;
+  }) {
+    const id = new IndexSchema1<S, K1>(this as any, x.since, x.name, x.path, {
+      unique: x.unique ?? true,
+      multi_entry: x.multi_entry ?? false,
+    });
+    this.indexes.push(id);
+    return id;
+  }
+
+  index2<K1 extends keyof S, K2 extends keyof S>(x: {
+    since: number;
+    name: string;
+    path: [K1, K2];
+    unique?: boolean;
+    multi_entry?: boolean;
+  }) {
+    const id = new IndexSchema2<S, K1, K2>(
+      this as any,
+      x.since,
+      x.name,
+      x.path,
+      {
+        unique: x.unique ?? true,
+        multi_entry: x.multi_entry ?? false,
       }
+    );
+    this.indexes.push(id);
+    return id;
+  }
+}
+
+export class TableSchema1<
+  Schema,
+  Id extends keyof Schema
+> extends TableSchema<Schema> {
+  readonly __schema1!: Schema;
+  readonly __k1!: Id;
+  readonly __kt1!: Schema[Id];
+
+  constructor(
+    version: number,
+    name: string,
+    key: { path: Id; auto_increment: boolean }
+  ) {
+    super(version, name, key);
+  }
+}
+
+export class TableSchema2<
+  Schema,
+  K1 extends keyof Schema,
+  K2 extends keyof Schema
+> extends TableSchema<Schema> {
+  readonly __schema2!: Schema;
+  readonly __k1!: K1;
+  readonly __kt1!: Schema[K1];
+  readonly __k2!: K2;
+  readonly __kt2!: Schema[K2];
+
+  constructor(
+    version: number,
+    name: string,
+    key: { path: [K1, K2]; auto_increment: boolean }
+  ) {
+    super(version, name, key);
+  }
+}
+
+abstract class IndexSchema {
+  constructor(
+    readonly table: TableSchema<any>,
+    readonly version: number,
+    readonly name: string,
+    readonly key: any[],
+    readonly options: { unique: boolean; multi_entry: boolean }
+  ) {}
+
+  upgrade(transaction: IDBTransaction, old_version: number) {
+    if (this.version > old_version) {
+      const store = transaction.objectStore(this.table.name);
+      store.createIndex(this.name, this.key as any, {
+        unique: this.options.unique,
+        multiEntry: this.options.multi_entry,
+      });
     }
   }
 }
 
-export class IndexBuilder<T extends { [key: string]: any }> {
-  readonly indexes: IndexSchema[] = [];
+export class IndexSchema1<S, K1 extends keyof S> extends IndexSchema {
+  readonly __schema1!: S;
+  readonly __k1!: K1;
+  readonly __kt1!: S[K1];
 
-  add<K extends keyof T>(
+  constructor(
+    table: TableSchema1<S, K1>,
+    version: number,
     name: string,
-    path: K[],
-    options?: { unique?: boolean; multiple?: boolean }
+    key: [K1],
+    options: { unique: boolean; multi_entry: boolean }
   ) {
-    this.indexes.push(
-      new IndexSchema(name, path as string[], {
-        unique: options?.unique ?? false,
-        multiEntry: options?.multiple ?? false,
-      })
-    );
-    return this;
-  }
-
-  build() {
-    return this.indexes;
+    super(table, version, name, key, options);
   }
 }
 
-export class IndexSchema {
-  constructor(
-    readonly name: string,
-    readonly key_path: string[],
-    readonly options: { unique: boolean; multiEntry: boolean }
-  ) {}
+export class IndexSchema2<
+  S,
+  K1 extends keyof S,
+  K2 extends keyof S
+> extends IndexSchema {
+  readonly __schema2!: S;
+  readonly __k1!: K1;
+  readonly __kt1!: S[K1];
+  readonly __k2!: K2;
+  readonly __kt2!: S[K2];
 
-  upgrade(store: IDBObjectStore) {
-    store.createIndex(this.name, this.key_path, {
-      unique: this.options.unique,
-    });
+  constructor(
+    table: TableSchema2<S, K1, K2>,
+    version: number,
+    name: string,
+    key: [K1, K2],
+    options: { unique: boolean; multi_entry: boolean }
+  ) {
+    super(table, version, name, key, options);
   }
 }

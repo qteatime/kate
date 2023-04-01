@@ -1,4 +1,4 @@
-import { defer } from "../../../../util/build/promise";
+import { defer } from "../../utils";
 import type { ExtendedInputKey } from "../../kernel";
 import type { KateOS } from "../os";
 import { wait } from "../time";

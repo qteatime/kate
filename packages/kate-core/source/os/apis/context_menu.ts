@@ -1,8 +1,8 @@
-import type { ExtendedInputKey, SpecialInputKey } from "../../kernel/virtual";
+import type { ExtendedInputKey } from "../../kernel/virtual";
 import type { KateOS } from "../os";
 import { Scene, SceneAboutKate, SceneLicence, SceneMedia } from "../ui/scenes";
 import * as UI from "../ui";
-import { EventStream } from "../../../../util/build/events";
+import { EventStream } from "../../utils";
 
 declare global {
   function showOpenFilePicker(options: {
@@ -127,7 +127,9 @@ export class HUD_ContextMenu extends Scene {
 
   on_media_gallery = async () => {
     const process = this.os.processes.running!;
-    const meta = await this.os.cart_manager.read_meta(process.cart.id);
+    const meta = await this.os.cart_manager.read_metadata(
+      process.cart.metadata.id
+    );
     const media = new SceneMedia(this.os, meta);
     this.os.push_scene(media);
   };
@@ -136,7 +138,7 @@ export class HUD_ContextMenu extends Scene {
     const process = this.os.processes.running!;
     const legal = new SceneLicence(
       this.os,
-      process.cart.metadata.title.title,
+      process.cart.metadata.game.title,
       process.cart.metadata.release.legal_notices
     );
     this.os.push_scene(legal);

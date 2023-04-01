@@ -1,5 +1,5 @@
-import * as Cart from "../../../../schema/generated/cartridge";
-import type { CR_Process } from "../../kernel/cart-runtime";
+import * as Cart from "../../cart";
+import type { CR_Process, CartRuntime } from "../../kernel/cart-runtime";
 import type { KateOS } from "../os";
 import { HUD_LoadIndicator, SceneGame } from "../ui/scenes";
 
@@ -16,17 +16,31 @@ export class KateProcesses {
     return this._running;
   }
 
-  async run_from_cartridge(cart: Cart.Cartridge) {
+  async run_from_cartridge(bytes: Uint8Array) {
     if (this.is_busy) {
       throw new Error(`a process is already running`);
     }
 
-    const storage = this.os.kv_storage.get_store(cart.id);
-    const runtime = this.os.kernel.runtimes.from_cartridge(
-      cart,
-      await storage.contents()
-    );
-    const process = new KateProcess(this, cart, runtime.run(this.os));
+    const cart = Cart.parse(bytes);
+    const file_map = new Map(cart.files.map((x) => [x.path, x] as const));
+
+    const storage = this.os.kv_storage.get_store(cart.metadata.id);
+    const runtime = this.os.kernel.runtimes.from_cartridge(cart, {
+      cart: cart,
+      local_storage: await storage.contents(),
+      async read_file(path): Promise<Cart.File> {
+        const file = file_map.get(path);
+        if (file == null) {
+          throw new Error(`File not found in ${cart.metadata.id}: ${path}`);
+        }
+        return file;
+      },
+    });
+    return await this.display_process(cart, runtime);
+  }
+
+  private async display_process(cart: Cart.CartMeta, runtime: CartRuntime) {
+    const process = new KateProcess(this, cart, await runtime.run(this.os));
     this._running = process;
     this.os.push_scene(new SceneGame(this.os, process));
     return process;
@@ -40,8 +54,23 @@ export class KateProcesses {
     const loading = new HUD_LoadIndicator(this.os);
     this.os.show_hud(loading);
     try {
-      const cart = await this.os.cart_manager.read(id);
-      await this.run_from_cartridge(cart);
+      const cart = await this.os.cart_manager.read_metadata(id);
+      const file_map = new Map(cart.files.map((x) => [x.path, x.id] as const));
+
+      const storage = this.os.kv_storage.get_store(cart.metadata.id);
+      const runtime = this.os.kernel.runtimes.from_cartridge(cart, {
+        cart: cart,
+        local_storage: await storage.contents(),
+        read_file: async (path) => {
+          const file_id = file_map.get(path);
+          if (file_id == null) {
+            throw new Error(`File not found in ${cart.metadata.id}: ${path}`);
+          }
+          const file = await this.os.cart_manager.read_file_by_id(id, file_id);
+          return { mime: file.mime, data: file.data, path: path };
+        },
+      });
+      return this.display_process(cart, runtime);
     } catch (error) {
       this._running = null;
       console.error(`Failed to run cartridge ${id}:`, error);
@@ -68,7 +97,7 @@ export class KateProcess {
 
   constructor(
     readonly manager: KateProcesses,
-    readonly cart: Cart.Cartridge,
+    readonly cart: Cart.CartMeta,
     readonly runtime: CR_Process
   ) {}
 

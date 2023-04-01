@@ -1,4 +1,4 @@
-import * as Cart from "../../../../schema/generated/cartridge";
+import * as Cart from "../../cart";
 import type { KateOS } from "../os";
 
 type WritableData = ArrayBuffer | Uint8Array | DataView | Blob | string;
@@ -35,90 +35,90 @@ declare global {
   }
 }
 
-export class KateStorage {
-  constructor(readonly os: KateOS) {}
+// export class KateStorage {
+//   constructor(readonly os: KateOS) {}
 
-  private get backend() {
-    return navigator.storage;
-  }
+//   private get backend() {
+//     return navigator.storage;
+//   }
 
-  async usage() {
-    const estimate = await this.backend.estimate();
-    return {
-      total: estimate.quota ?? 0,
-      used: estimate.usage ?? 0,
-    };
-  }
+//   async usage() {
+//     const estimate = await this.backend.estimate();
+//     return {
+//       total: estimate.quota ?? 0,
+//       used: estimate.usage ?? 0,
+//     };
+//   }
 
-  private async get_real_bucket(name: string) {
-    const root = await this.backend.getDirectory();
-    const dir = await root.getDirectoryHandle(name, { create: true });
-    return new StorageBucket(this, dir);
-  }
+//   private async get_real_bucket(name: string) {
+//     const root = await this.backend.getDirectory();
+//     const dir = await root.getDirectoryHandle(name, { create: true });
+//     return new StorageBucket(this, dir);
+//   }
 
-  async get_bucket(name: string) {
-    return this.get_real_bucket(`user.${name}`);
-  }
+//   async get_bucket(name: string) {
+//     return this.get_real_bucket(`user.${name}`);
+//   }
 
-  async get_carts() {
-    return this.get_real_bucket("kate.carts");
-  }
+//   async get_carts() {
+//     return this.get_real_bucket("kate.carts");
+//   }
 
-  async get_cart_bucket(cart: Cart.Cartridge) {
-    return this.get_real_bucket(`cart.${cart.id}`);
-  }
+//   async get_cart_bucket(cart: Cart.CartMeta) {
+//     return this.get_real_bucket(`cart.${cart.metadata.id}`);
+//   }
 
-  async install_cart(cart: Cart.Cartridge) {
-    const encoder = new Cart._Encoder();
-    cart.encode(encoder);
-    const bytes = encoder.to_bytes();
-    const bucket = await this.get_carts();
-    const file = await bucket.file_at(cart.id, true);
-    await file.write(bytes.buffer);
-    this.os.events.on_cart_inserted.emit(cart);
-  }
-}
+//   async install_cart(cart: Cart.CartMeta) {
+//     // const encoder = new Cart._Encoder();
+//     // cart.encode(encoder);
+//     // const bytes = encoder.to_bytes();
+//     // const bucket = await this.get_carts();
+//     // const file = await bucket.file_at(cart.id, true);
+//     // await file.write(bytes.buffer);
+//     // this.os.events.on_cart_inserted.emit(cart);
+//   }
+// }
 
-export class StorageBucket {
-  constructor(
-    readonly storage: KateStorage,
-    readonly handle: FileSystemDirectoryHandle
-  ) {}
+// export class StorageBucket {
+//   constructor(
+//     readonly storage: KateStorage,
+//     readonly handle: FileSystemDirectoryHandle
+//   ) {}
 
-  async list() {
-    const result = [];
-    for await (const file of this.handle.values()) {
-      if (file.kind === "file" && !file.name.endsWith(".crswap")) {
-        result.push(file);
-      }
-    }
-    return result;
-  }
+//   async list() {
+//     const result = [];
+//     for await (const file of this.handle.values()) {
+//       if (file.kind === "file" && !file.name.endsWith(".crswap")) {
+//         result.push(file);
+//       }
+//     }
+//     return result;
+//   }
 
-  async file_at(name: string, create: boolean) {
-    return new StorageFile(
-      this,
-      await this.handle.getFileHandle(name, { create })
-    );
-  }
-}
+//   async file_at(name: string, create: boolean) {
+//     return new StorageFile(
+//       this,
+//       await this.handle.getFileHandle(name, { create })
+//     );
+//   }
+// }
 
-export class StorageFile {
-  constructor(
-    readonly bucket: StorageBucket,
-    readonly handle: FileSystemFileHandle
-  ) {}
+// export class StorageFile {
+//   constructor(
+//     readonly bucket: StorageBucket,
+//     readonly handle: FileSystemFileHandle
+//   ) {}
 
-  async read() {
-    return await this.handle.getFile();
-  }
+//   async read() {
+//     return await this.handle.getFile();
+//   }
 
-  async write(data: WritableData) {
-    const stream = await this.handle.createWritable();
-    stream.write(data);
-  }
+//   async write(data: WritableData) {
+//     const stream = await this.handle.createWritable();
+//     stream.write(data);
+//   }
 
-  async get_write_stream() {
-    return await this.handle.createWritable();
-  }
-}
+//   async get_write_stream() {
+//     return await this.handle.createWritable();
+//   }
+// }

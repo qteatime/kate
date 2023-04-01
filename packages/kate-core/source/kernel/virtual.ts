@@ -1,4 +1,4 @@
-import { EventStream } from "../../../util/build/events";
+import { EventStream } from "../utils";
 const pkg = require("../../package.json");
 
 export type InputKey =

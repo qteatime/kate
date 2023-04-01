@@ -1,4 +1,4 @@
-import { make_id } from "../../../../util/build/random";
+import { make_id } from "../../utils";
 import type { KateKernel } from "../../kernel";
 
 export class KateAudioServer {

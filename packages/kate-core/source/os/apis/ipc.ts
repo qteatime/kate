@@ -1,13 +1,5 @@
-import * as Cart from "../../../../schema/generated/cartridge";
+import type { RuntimeEnv } from "../../kernel";
 import type { KateOS } from "../os";
-import type { KateAudioServer } from "./audio";
-
-type Process = {
-  secret: string;
-  cart: Cart.Cartridge;
-  window: () => Window | null;
-  audio: KateAudioServer;
-};
 
 type Message =
   | { type: "kate:cart.read-file"; payload: { path: string } }
@@ -47,7 +39,7 @@ type Message =
     };
 
 export class KateIPCServer {
-  private _handlers = new Map<string, Process>();
+  private _handlers = new Map<string, RuntimeEnv>();
   private _initialised = false;
 
   constructor(readonly os: KateOS) {}
@@ -61,27 +53,21 @@ export class KateIPCServer {
     window.addEventListener("message", this.handle_message);
   }
 
-  add_process(
-    secret: string,
-    cart: Cart.Cartridge,
-    window: () => Window | null,
-    audio: KateAudioServer
-  ) {
-    if (this._handlers.has(secret)) {
+  add_process(env: RuntimeEnv) {
+    if (this._handlers.has(env.secret)) {
       throw new Error(`Duplicated secret when constructing IPC channel`);
     }
 
-    const process = { secret, cart, window, audio };
-    this._handlers.set(secret, process);
-    return new KateIPCChannel(this, process);
+    this._handlers.set(env.secret, env);
+    return new KateIPCChannel(this, env);
   }
 
-  remove_process(process: Process) {
+  remove_process(process: RuntimeEnv) {
     this._handlers.delete(process.secret);
   }
 
-  send(process: Process, message: { [key: string]: any }) {
-    process.window()?.postMessage(message, "*");
+  send(process: RuntimeEnv, message: { [key: string]: any }) {
+    process.frame.contentWindow?.postMessage(message, "*");
   }
 
   handle_message = async (ev: MessageEvent<any>) => {
@@ -107,7 +93,7 @@ export class KateIPCServer {
         }
         const { ok, value } = result;
         console.debug("kate-ipc ==>", { id, ok, value });
-        handler.window()?.postMessage(
+        handler.frame.contentWindow?.postMessage(
           {
             type: "kate:reply",
             id: id,
@@ -121,7 +107,7 @@ export class KateIPCServer {
   };
 
   async process_message(
-    process: Process,
+    env: RuntimeEnv,
     message: Message
   ): Promise<{ ok: boolean; value: any } | null> {
     const err = (code: string) => ({ ok: false, value: { code } });
@@ -137,7 +123,7 @@ export class KateIPCServer {
       // -- Notification
       case "kate:notify.transient": {
         this.os.notifications.push_transient(
-          process.cart.id,
+          env.cart.metadata.id,
           String(message.payload.title ?? ""),
           String(message.payload.message ?? "")
         );
@@ -149,7 +135,7 @@ export class KateIPCServer {
         try {
           this.os.sfx.play("shutter");
           await this.os.capture.save_screenshot(
-            process.cart.id,
+            env.cart.metadata.id,
             message.payload.data,
             message.payload.type
           );
@@ -168,7 +154,7 @@ export class KateIPCServer {
       case "kate:capture.start-recording": {
         this.os.kernel.console.take_resource("screen-recording");
         await this.os.notifications.push(
-          process.cart.id,
+          env.cart.metadata.id,
           "Screen recording started",
           ""
         );
@@ -180,7 +166,7 @@ export class KateIPCServer {
         try {
           this.os.kernel.console.release_resource("screen-recording");
           await this.os.capture.save_video(
-            process.cart.id,
+            env.cart.metadata.id,
             message.payload.data,
             message.payload.type
           );
@@ -198,24 +184,25 @@ export class KateIPCServer {
 
       // -- Cart FS
       case "kate:cart.read-file": {
-        const file = process.cart.files.find(
-          (x) => x.path === message.payload.path
-        );
-        if (file != null) {
+        try {
+          const file = await env.read_file(message.payload.path);
           return ok({ mime: file.mime, bytes: file.data });
-        } else {
+        } catch (error) {
+          console.error(
+            `[Kate] failed to read file ${message.payload.path} from ${env.cart.metadata.id}`
+          );
           return err("kate.cart-fs.file-not-found");
         }
       }
 
       // -- KV store
       case "kate:kv-store.read-all": {
-        const storage = this.os.kv_storage.get_store(process.cart.id);
+        const storage = this.os.kv_storage.get_store(env.cart.metadata.id);
         return ok(storage.contents());
       }
 
       case "kate:kv-store.update-all": {
-        const storage = this.os.kv_storage.get_store(process.cart.id);
+        const storage = this.os.kv_storage.get_store(env.cart.metadata.id);
         try {
           await storage.write(message.payload.value);
           return ok(null);
@@ -225,13 +212,13 @@ export class KateIPCServer {
       }
 
       case "kate:kv-store.get": {
-        const storage = this.os.kv_storage.get_store(process.cart.id);
+        const storage = this.os.kv_storage.get_store(env.cart.metadata.id);
         const value = (await storage.contents())[message.payload.key] ?? null;
         return ok(value);
       }
 
       case "kate:kv-store.set": {
-        const storage = this.os.kv_storage.get_store(process.cart.id);
+        const storage = this.os.kv_storage.get_store(env.cart.metadata.id);
         try {
           await storage.set_pair(message.payload.key, message.payload.value);
           return ok(null);
@@ -243,7 +230,7 @@ export class KateIPCServer {
       // -- Audio
       case "kate:audio.create-channel": {
         try {
-          const channel = await process.audio.create_channel(
+          const channel = await env.audio_server.create_channel(
             message.payload.max_tracks ?? 1
           );
           return ok({ id: channel.id, volume: channel.volume.gain.value });
@@ -254,7 +241,7 @@ export class KateIPCServer {
 
       case "kate:audio.stop-all-sources": {
         try {
-          const channel = process.audio.get_channel(message.payload.id);
+          const channel = env.audio_server.get_channel(message.payload.id);
           await channel.stop_all_sources();
           return ok(null);
         } catch (_) {
@@ -264,7 +251,7 @@ export class KateIPCServer {
 
       case "kate:audio.change-volume": {
         try {
-          const channel = process.audio.get_channel(message.payload.id);
+          const channel = env.audio_server.get_channel(message.payload.id);
           await channel.set_volume(message.payload.volume);
           return ok(null);
         } catch (_) {
@@ -274,7 +261,9 @@ export class KateIPCServer {
 
       case "kate:audio.load": {
         try {
-          const source = await process.audio.load_sound(message.payload.bytes);
+          const source = await env.audio_server.load_sound(
+            message.payload.bytes
+          );
           return ok(source.id);
         } catch (_) {
           return err("kate:audio.cannot-load");
@@ -283,8 +272,8 @@ export class KateIPCServer {
 
       case "kate:audio.play": {
         try {
-          const channel = process.audio.get_channel(message.payload.channel);
-          const source = process.audio.get_source(message.payload.source);
+          const channel = env.audio_server.get_channel(message.payload.channel);
+          const source = env.audio_server.get_source(message.payload.source);
           await channel.play(source, message.payload.loop);
           return ok(null);
         } catch (_) {
@@ -299,13 +288,13 @@ export class KateIPCServer {
 }
 
 export class KateIPCChannel {
-  constructor(readonly server: KateIPCServer, readonly process: Process) {}
+  constructor(readonly server: KateIPCServer, readonly env: RuntimeEnv) {}
 
   send(message: { [key: string]: any }) {
-    this.server.send(this.process, message);
+    this.server.send(this.env, message);
   }
 
   dispose() {
-    this.server.remove_process(this.process);
+    this.server.remove_process(this.env);
   }
 }

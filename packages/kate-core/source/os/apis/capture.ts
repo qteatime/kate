@@ -1,6 +1,6 @@
 import { KateOS } from "../os";
 import * as Db from "../../data";
-import { make_id, unreachable } from "../../../../util/build";
+import { make_id, unreachable, load_image, make_thumbnail } from "../../utils";
 
 declare global {
   function showSaveFilePicker(options?: {
@@ -37,8 +37,8 @@ export class KateCapture {
       [Db.media_store],
       "readwrite",
       async (t) => {
-        const media = t.get_table(Db.media_store);
-        const id = await media.write({
+        const media = t.get_table1(Db.media_store);
+        const id = await media.add({
           cart_id: game_id,
           file: file,
           mime: type,
@@ -46,7 +46,7 @@ export class KateCapture {
           thumbnail: thumbnail,
           video_length: length,
         });
-        return id as number;
+        return id;
       }
     );
     return id;
@@ -80,8 +80,20 @@ export class KateCapture {
       [Db.media_store],
       "readonly",
       async (t) => {
-        const media = t.get_table(Db.media_store);
+        const media = t.get_table1(Db.media_store);
         return media.get_all();
+      }
+    );
+    return files;
+  }
+
+  async list_by_game(id: string) {
+    const files = await this.os.db.transaction(
+      [Db.media_store],
+      "readonly",
+      async (t) => {
+        const media = t.get_index1(Db.idx_media_store_by_cart);
+        return media.get_all(id);
       }
     );
     return files;
@@ -92,7 +104,7 @@ export class KateCapture {
       [Db.media_store],
       "readonly",
       async (t) => {
-        const media = t.get_table(Db.media_store);
+        const media = t.get_table1(Db.media_store);
         return media.get(id as any);
       }
     );
@@ -103,7 +115,7 @@ export class KateCapture {
     const bucket = await this.bucket(meta.cart_id);
     await bucket.removeEntry(meta.file.name);
     await this.os.db.transaction([Db.media_store], "readwrite", async (t) => {
-      const media = t.get_table(Db.media_store);
+      const media = t.get_table1(Db.media_store);
       await media.delete(id as any);
     });
   }
@@ -144,15 +156,6 @@ export class KateCapture {
       URL.revokeObjectURL(url);
     }
   }
-}
-
-function load_image(url: string) {
-  return new Promise<HTMLImageElement>((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => resolve(img);
-    img.onerror = () => reject(new Error(`Loading image from ${url} failed`));
-    img.src = url;
-  });
 }
 
 async function load_first_frame(url: string, width: number, height: number) {
@@ -200,17 +203,4 @@ async function load_first_frame(url: string, width: number, height: number) {
     video.src = url;
     video.load();
   });
-}
-
-function make_thumbnail(
-  width: number,
-  height: number,
-  image: HTMLImageElement | HTMLVideoElement
-) {
-  const canvas = document.createElement("canvas");
-  canvas.width = width;
-  canvas.height = height;
-  const context = canvas.getContext("2d")!;
-  context.drawImage(image, 0, 0, width, height);
-  return canvas.toDataURL("image/png");
 }

@@ -18,8 +18,8 @@ export class KateNotification {
 
   async push(process_id: string, title: string, message: string) {
     await this.os.db.transaction([Db.notifications], "readwrite", async (t) => {
-      const notifications = t.get_table(Db.notifications);
-      await notifications.write({
+      const notifications = t.get_table1(Db.notifications);
+      await notifications.put({
         type: "basic",
         process_id,
         time: new Date(),
