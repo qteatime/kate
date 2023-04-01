@@ -19,6 +19,7 @@ import { KateAudioServer } from "./apis";
 import { KateDialog } from "./apis/dialog";
 import { unreachable } from "../../../util/build";
 import { KateCapture } from "./apis/capture";
+import { KateSfx } from "./sfx";
 
 export class KateOS {
   private _scene_stack: Scene[] = [];
@@ -41,7 +42,11 @@ export class KateOS {
     on_cart_removed: new EventStream<{ id: string; title: string }>(),
   };
 
-  private constructor(readonly kernel: KateKernel, readonly db: Database) {
+  private constructor(
+    readonly kernel: KateKernel,
+    readonly db: Database,
+    readonly sfx: KateSfx
+  ) {
     this.storage = new KateStorage(this);
     this.cart_manager = new CartManager(this);
     this.processes = new KateProcesses(this);
@@ -109,12 +114,13 @@ export class KateOS {
   }
 
   make_audio_server() {
-    return new KateAudioServer(this);
+    return new KateAudioServer(this.kernel);
   }
 
   static async boot(kernel: KateKernel) {
+    const sfx = await KateSfx.make(kernel);
     const db = await KateDb.kate.open();
-    const os = new KateOS(kernel, db);
+    const os = new KateOS(kernel, db, sfx);
     const boot_screen = new SceneBoot(os);
     os.push_scene(boot_screen);
     await wait(2100);

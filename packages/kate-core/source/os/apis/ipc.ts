@@ -147,6 +147,7 @@ export class KateIPCServer {
       // -- Capture
       case "kate:capture.save-image": {
         try {
+          this.os.sfx.play("shutter");
           await this.os.capture.save_screenshot(
             process.cart.id,
             message.payload.data,

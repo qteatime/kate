@@ -1,15 +1,15 @@
 import { make_id } from "../../../../util/build/random";
-import type { KateOS } from "../os";
+import type { KateKernel } from "../../kernel";
 
 export class KateAudioServer {
   private channels = new Map<string, AudioChannel>();
   private sources = new Map<string, AudioSource>();
 
   get audio_context() {
-    return this.os.kernel.console.audio_context;
+    return this.kernel.console.audio_context;
   }
 
-  constructor(readonly os: KateOS) {}
+  constructor(readonly kernel: KateKernel) {}
 
   async create_channel(max_tracks: number) {
     const id = make_id();
@@ -48,7 +48,7 @@ export class KateAudioServer {
   }
 }
 
-class AudioChannel {
+export class AudioChannel {
   readonly volume: GainNode;
   private sources: AudioBufferSourceNode[] = [];
 
@@ -96,7 +96,7 @@ class AudioChannel {
   }
 }
 
-class AudioSource {
+export class AudioSource {
   constructor(readonly id: string, readonly buffer: AudioBuffer) {}
 
   static async from_bytes(
