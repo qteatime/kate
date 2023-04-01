@@ -34,7 +34,16 @@ export class KateCapture {
   }
 
   #handle_key_press = (key: ExtendedInputKey) => {
-    if (this.#capture_root == null || this._input.is_paused) {
+    if (this.#capture_root == null) {
+      if (key === "capture" || key === "long_capture") {
+        this.#channel.send_and_ignore_result("kate:notify.transient", {
+          title: "Capture unsupported",
+          message: "Screen capture is not available right now.",
+        });
+      }
+      return;
+    }
+    if (this._input.is_paused) {
       return;
     }
 

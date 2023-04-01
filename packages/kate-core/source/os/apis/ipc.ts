@@ -40,6 +40,10 @@ type Message =
   | {
       type: "kate:capture.save-recording";
       payload: { data: Uint8Array; type: string };
+    }
+  | {
+      type: "kate:notify.transient";
+      payload: { title: string; message: string };
     };
 
 export class KateIPCServer {
@@ -127,6 +131,16 @@ export class KateIPCServer {
       // -- Special
       case "kate:special.focus": {
         window.focus();
+        return null;
+      }
+
+      // -- Notification
+      case "kate:notify.transient": {
+        this.os.notifications.push_transient(
+          process.cart.id,
+          String(message.payload.title ?? ""),
+          String(message.payload.message ?? "")
+        );
         return null;
       }
 
