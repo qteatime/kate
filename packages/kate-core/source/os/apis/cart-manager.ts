@@ -4,6 +4,8 @@ import type { KateOS } from "../os";
 import * as Db from "../../data/db";
 
 export class CartManager {
+  readonly CARTRIDGE_SIZE_LIMIT = 1024 * 1024 * 512; // 512MB
+
   constructor(readonly os: KateOS) {}
 
   async list() {
@@ -48,6 +50,15 @@ export class CartManager {
   }
 
   async install_from_file(file: File) {
+    if (file.size > this.CARTRIDGE_SIZE_LIMIT) {
+      this.os.notifications.push_transient(
+        "kate:cart-manager",
+        "Installation failed",
+        `${file.name} exceeds the 512MB cartridge size limit.`
+      );
+      return;
+    }
+
     try {
       const cart = this.os.kernel.loader.load_bytes(await file.arrayBuffer());
       await this.install(cart);
