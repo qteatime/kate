@@ -121,6 +121,7 @@ export class KateOS {
     const sfx = await KateSfx.make(kernel);
     const db = await KateDb.kate.open();
     const os = new KateOS(kernel, db, sfx);
+    await request_persistent_storage(os);
     const boot_screen = new SceneBoot(os);
     os.push_scene(boot_screen);
     await wait(2100);
@@ -128,4 +129,17 @@ export class KateOS {
     os.push_scene(new SceneHome(os));
     return os;
   }
+}
+
+async function request_persistent_storage(os: KateOS) {
+  if (
+    os.kernel.console.options.persistent_storage &&
+    !(await navigator.storage.persisted())
+  ) {
+    const persistent = await navigator.storage.persist();
+    if (persistent) {
+      return;
+    }
+  }
+  os.kernel.console.take_resource("transient-storage");
 }

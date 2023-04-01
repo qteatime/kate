@@ -19,6 +19,7 @@ export class KateKernel {
   static from_root(root: HTMLElement, options: Partial<ConsoleOptions>) {
     const console = new VirtualConsole(root, {
       mode: options.mode ?? "web",
+      persistent_storage: options.persistent_storage ?? false,
     });
     const keyboard = new KeyboardInput(console);
     const gamepad = new GamepadInput(console);

@@ -386,3 +386,28 @@ body {
   background: #f21;
   border-radius: 100%;
 }
+
+.kate-resource-transient-storage {
+  font-family: "Font Awesome 6 Free";
+  font-size: 16px;
+  position: relative;
+}
+
+.kate-resource-transient-storage::before {
+  content: "\f0a0";
+  display: block;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  font-size: 14px;
+}
+
+.kate-resource-transient-storage::after {
+  content: "\f017";
+  display: block;
+  font-size: 8px;
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  color: #fff;
+}

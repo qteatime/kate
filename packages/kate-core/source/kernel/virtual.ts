@@ -17,10 +17,11 @@ export type SpecialInputKey = "menu" | "capture";
 
 export type ExtendedInputKey = InputKey | `long_${SpecialInputKey}`;
 
-export type Resource = "screen-recording";
+export type Resource = "screen-recording" | "transient-storage";
 
 export type ConsoleOptions = {
   mode: "native" | "web" | "single";
+  persistent_storage: boolean;
 };
 
 export class VirtualConsole {

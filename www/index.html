@@ -95,6 +95,7 @@
           document.querySelector(".kate"),
           {
             mode: is_native ? "native" : "web",
+            persistent_storage: true,
           }
         );
         const kate_os = await Kate.os.KateOS.boot(kate);
