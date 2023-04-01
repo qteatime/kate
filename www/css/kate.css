@@ -409,5 +409,5 @@ body {
   position: absolute;
   bottom: 0px;
   right: 0px;
-  text-shadow: -1px -1px 0 #faaaaa, 0px -1px 0 #faaaaa;
+  text-shadow: -1px -1px 0 #faaaaa, 0px -1px 0 #faaaaa, -1px 0 0 #faaaaa;
 }
