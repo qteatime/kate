@@ -141,5 +141,7 @@ async function request_persistent_storage(os: KateOS) {
       return;
     }
   }
-  os.kernel.console.take_resource("transient-storage");
+  if (!(await navigator.storage.persisted())) {
+    os.kernel.console.take_resource("transient-storage");
+  }
 }
