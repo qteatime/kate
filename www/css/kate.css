@@ -405,9 +405,9 @@ body {
 .kate-resource-transient-storage::after {
   content: "\f017";
   display: block;
-  font-size: 8px;
+  font-size: 9px;
   position: absolute;
   bottom: 0px;
   right: 0px;
-  color: #fff;
+  text-shadow: -1px -1px 0 #faaaaa, 0px -1px 0 #faaaaa;
 }
