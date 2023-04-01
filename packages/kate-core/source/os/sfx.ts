@@ -6,6 +6,9 @@ export class KateSfx {
   readonly channel: AudioChannel;
   readonly sources: {
     shutter: AudioSource;
+    invalid: AudioSource;
+    select: AudioSource;
+    cursor: AudioSource;
   };
 
   constructor(
@@ -23,7 +26,15 @@ export class KateSfx {
     const server = new KateAudioServer(kernel);
     const channel = await server.create_channel(1);
     const shutter = await server.load_sound(await get_sfx("/sfx/shutter.wav"));
-    return new KateSfx(kernel, server, channel, { shutter });
+    const invalid = await server.load_sound(await get_sfx("/sfx/invalid.wav"));
+    const select = await server.load_sound(await get_sfx("/sfx/select.wav"));
+    const cursor = await server.load_sound(await get_sfx("/sfx/cursor.wav"));
+    return new KateSfx(kernel, server, channel, {
+      shutter,
+      invalid,
+      select,
+      cursor,
+    });
   }
 
   play(source: keyof KateSfx["sources"]) {

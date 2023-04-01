@@ -116,6 +116,7 @@ export class KateFocusHandler {
     switch (key) {
       case "o": {
         if (current != null) {
+          this.os.sfx.play("select");
           current.element.click();
         }
         break;
@@ -129,7 +130,7 @@ export class KateFocusHandler {
           (a, b) =>
             Math.abs(a.position.x - left) - Math.abs(b.position.x - left)
         );
-        this.focus(closest[0]?.element);
+        this.focus(closest[0]?.element, key);
         break;
       }
 
@@ -141,7 +142,7 @@ export class KateFocusHandler {
           (a, b) =>
             Math.abs(a.position.x - left) - Math.abs(b.position.x - left)
         );
-        this.focus(closest[0]?.element);
+        this.focus(closest[0]?.element, key);
         break;
       }
 
@@ -152,7 +153,7 @@ export class KateFocusHandler {
         const closest = candidates.sort(
           (a, b) => Math.abs(a.position.y - top) - Math.abs(b.position.y - top)
         );
-        this.focus(closest[0]?.element);
+        this.focus(closest[0]?.element, key);
         break;
       }
 
@@ -163,17 +164,23 @@ export class KateFocusHandler {
         const closest = candidates.sort(
           (a, b) => Math.abs(a.position.y - top) - Math.abs(b.position.y - top)
         );
-        this.focus(closest[0]?.element);
+        this.focus(closest[0]?.element, key);
         break;
       }
     }
   };
 
-  focus(element: HTMLElement | null) {
+  focus(element: HTMLElement | null, key: ExtendedInputKey | null = null) {
     if (element == null || this._current_root == null) {
+      if (key != null) {
+        this.os.sfx.play("invalid");
+      }
       return;
     }
 
+    if (key != null) {
+      this.os.sfx.play("cursor");
+    }
     for (const x of Array.from(this._current_root.querySelectorAll(".focus"))) {
       x.classList.remove("focus");
     }

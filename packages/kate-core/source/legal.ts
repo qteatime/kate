@@ -8,6 +8,8 @@ license, and all original non-code assets it uses is released
 under the CC0 1.0 Universal licence (essentially, they're
 in the public domain).
 
+Some of the UI sounds are currently generated with jsfxr.
+
 Full text for all relevant licenses are included here after
 attributions, in the goal of making them offline-friendly.
 
