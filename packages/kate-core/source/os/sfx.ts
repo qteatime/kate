@@ -25,10 +25,10 @@ export class KateSfx {
   static async make(kernel: KateKernel) {
     const server = new KateAudioServer(kernel);
     const channel = await server.create_channel(1);
-    const shutter = await server.load_sound(await get_sfx("/sfx/shutter.wav"));
-    const invalid = await server.load_sound(await get_sfx("/sfx/invalid.wav"));
-    const select = await server.load_sound(await get_sfx("/sfx/select.wav"));
-    const cursor = await server.load_sound(await get_sfx("/sfx/cursor.wav"));
+    const shutter = await server.load_sound(await get_sfx("sfx/shutter.wav"));
+    const invalid = await server.load_sound(await get_sfx("sfx/invalid.wav"));
+    const select = await server.load_sound(await get_sfx("sfx/select.wav"));
+    const cursor = await server.load_sound(await get_sfx("sfx/cursor.wav"));
     return new KateSfx(kernel, server, channel, {
       shutter,
       invalid,
