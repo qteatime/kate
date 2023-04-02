@@ -8,9 +8,10 @@ type Context = {
   var_name: string;
 };
 
-type Resource = JsResource | JsonResource;
+type Resource = JsResource | JsonResource | TextResource;
 type JsResource = { type: "js"; path: string; content: string };
 type JsonResource = { type: "json"; path: string; content: unknown };
+type TextResource = { type: "text"; path: string; content: string };
 
 type Mapping = { reference_mapping: Map<string, string> };
 type Numbering = { id: number };
@@ -166,6 +167,15 @@ export function generate_js_resource(
       ].join("\n");
     }
 
+    case "text": {
+      return [
+        `// ${filename}`,
+        `require.define(${resource.id}, "", "", (module, exports, __dirname, __filename) => {`,
+        `  module.exports = ${JSON.stringify(String(resource.content))}`,
+        `})`,
+      ].join("\n");
+    }
+
     default:
       throw unreachable(type);
   }
@@ -189,6 +199,9 @@ function resolve_references(
     case "json": {
       return resource;
     }
+
+    case "text":
+      return resource;
 
     default:
       throw unreachable(type);
@@ -231,6 +244,15 @@ function resolve_js_references(
 }
 
 function parse(path: string): Resource {
+  if (path.endsWith("!text")) {
+    const real_path = path.replace(/!text$/, "");
+    return {
+      type: "text",
+      path: real_path,
+      content: FS.readFileSync(real_path, "utf-8"),
+    };
+  }
+
   switch (Path.extname(path)) {
     case ".js": {
       return { type: "js", path, content: FS.readFileSync(path, "utf8") };
@@ -257,6 +279,13 @@ function find_references(resource: Resource) {
     }
 
     case "json": {
+      return {
+        mapping: new Map<string, string>(),
+        references: new Set<string>(),
+      };
+    }
+
+    case "text": {
       return {
         mapping: new Map<string, string>(),
         references: new Set<string>(),
@@ -293,7 +322,13 @@ function resolve_js_path(root: string, to: string, resource: Resource) {
   }
 }
 
-function resolve_js_destination(target: string, resource: Resource): string {
+function without_file_filter(path: string) {
+  return path.replace(/!text$/, "");
+}
+
+function resolve_js_destination(target0: string, resource: Resource): string {
+  const target = without_file_filter(target0);
+
   const stat = maybe_stat(target);
   if (stat == null) {
     if (Path.extname(target) === "") {
@@ -307,7 +342,7 @@ function resolve_js_destination(target: string, resource: Resource): string {
 
   const index = Path.resolve(target, "index.js");
   if (stat.isFile()) {
-    return target;
+    return target0;
   } else if (stat.isDirectory() && maybe_stat(index)?.isFile()) {
     return index;
   } else {
