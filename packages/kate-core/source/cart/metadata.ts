@@ -93,7 +93,7 @@ export function version_string(meta: Metadata) {
 
 export function parse_metadata(cart: Cart_v2.Cartridge): Metadata {
   return {
-    id: cart.id,
+    id: valid_id(cart.id),
     game: {
       title: str(cart.metadata.title.title, 255),
       author: str(cart.metadata.title.author, 255),
@@ -287,3 +287,4 @@ function date(x: Cart_v2.Date): Date {
 }
 
 const tag = regex("tag", /^[a-z\-]+$/);
+const valid_id = regex("id", /^[a-z0-9\-]+(\.[a-z0-9\-]+)*$/);
