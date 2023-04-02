@@ -136,6 +136,10 @@ export class CR_Web_archive extends CartRuntime {
     super();
   }
 
+  get run_isolated() {
+    return this.console.options.mode !== "single";
+  }
+
   async run(os: KateOS) {
     const secret = make_id();
     const frame = document.createElement("iframe");
@@ -151,10 +155,16 @@ export class CR_Web_archive extends CartRuntime {
     const channel = os.ipc.add_process(env);
 
     frame.className = "kate-game-frame kate-game-frame-defaults";
-    (frame as any).sandbox = "allow-scripts";
-    frame.allow = "";
-    (frame as any).csp =
-      "default-src data: blob: 'unsafe-inline' 'unsafe-eval' 'unsafe-inline' 'wasm-unsafe-eval'; navigate-to 'none'";
+    // Only sandbox cartridges if we're not running single distributions.
+    // There's no point in sandboxing single distributions as whoever is
+    // publishing Kate also owns the cartridge's origin; no useful security
+    // properties can be guaranteed there.
+    if (this.run_isolated) {
+      (frame as any).sandbox = "allow-scripts";
+      frame.allow = "";
+      (frame as any).csp =
+        "default-src data: blob: 'unsafe-inline' 'unsafe-eval' 'unsafe-inline' 'wasm-unsafe-eval'; navigate-to 'none'";
+    }
     this.console.on_input_changed.listen((ev) => {
       channel.send({
         type: "kate:input-state-changed",
