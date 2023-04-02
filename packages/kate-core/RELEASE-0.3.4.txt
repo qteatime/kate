@@ -76,6 +76,23 @@ still loaded from local storage, so it should be fast enough for most
 use cases.
 
 
+New ObjectStorage API
+---------------------
+
+This version adds a new ObjectStorage API, which is a key/value store
+with enforced quota. This should allow cartridges to serialise save
+data while protecting users from malicious cartridges trying to
+overload the device's storage.
+
+Each cartridge gets 32MB of storage in the object store. There will
+be a capability to request more storage in future versions, but for
+now this should be enough for most save data use cases.
+
+Note that the ObjectStorage API does not protect against degrading
+the device storage by abusing writes. That's something that may be
+looked into for future versions.
+
+
 A new JS packaging tool
 -----------------------
 
