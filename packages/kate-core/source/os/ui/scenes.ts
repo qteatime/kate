@@ -159,8 +159,11 @@ export class SceneHome extends Scene {
   }
 
   async show_carts(list: HTMLElement) {
-    const recency = (x: Db.CartMeta) => {
-      return Math.max(x.last_played?.getTime() ?? 0, x.updated_at.getTime());
+    const recency = (x: { meta: Db.CartMeta; habits: Db.PlayHabits }) => {
+      return Math.max(
+        x.habits.last_played?.getTime() ?? 0,
+        x.meta.updated_at.getTime()
+      );
     };
 
     try {
@@ -170,8 +173,8 @@ export class SceneHome extends Scene {
       list.textContent = "";
       this.cart_map = new Map();
       for (const x of carts) {
-        const child = this.render_cart(x).render();
-        this.cart_map.set(child, x);
+        const child = this.render_cart(x.meta).render();
+        this.cart_map.set(child, x.meta);
         list.appendChild(child);
       }
       this.os.focus_handler.focus(

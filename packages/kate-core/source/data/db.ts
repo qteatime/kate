@@ -3,7 +3,7 @@ import * as CartMetadata from "../cart/metadata";
 import * as CartRuntime from "../cart/runtime";
 import type { NotificationType } from "../os/apis/notification";
 
-export const kate = new Db.DatabaseSchema("kate", 4);
+export const kate = new Db.DatabaseSchema("kate", 5);
 
 // Table definitions
 export type CartMeta = {
@@ -14,12 +14,22 @@ export type CartMeta = {
   files: { path: string; id: string; size: number }[];
   installed_at: Date;
   updated_at: Date;
-  last_played: Date | null;
-  play_time: number;
 };
 export const cart_meta = kate.table1<CartMeta, "id">({
   since: 3,
   name: "cart_meta_v2",
+  path: "id",
+  auto_increment: false,
+});
+
+export type PlayHabits = {
+  id: string;
+  last_played: Date | null;
+  play_time: number;
+};
+export const play_habits = kate.table1<PlayHabits, "id">({
+  since: 5,
+  name: "play_habits",
   path: "id",
   auto_increment: false,
 });

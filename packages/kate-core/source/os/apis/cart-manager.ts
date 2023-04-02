@@ -10,14 +10,20 @@ export class CartManager {
 
   constructor(readonly os: KateOS) {}
 
-  async list() {
+  async list(): Promise<{ meta: Db.CartMeta; habits: Db.PlayHabits }[]> {
     return await this.os.db.transaction(
-      [Db.cart_meta],
+      [Db.cart_meta, Db.play_habits],
       "readonly",
       async (t) => {
         const meta = t.get_table1(Db.cart_meta);
-        const result = await meta.get_all();
-        return result;
+        const habits = t.get_table1(Db.play_habits);
+
+        const carts = await meta.get_all();
+        const full_data = carts.map(async (x) => ({
+          meta: x,
+          habits: await habits.get(x.id),
+        }));
+        return Promise.all(full_data);
       }
     );
   }
@@ -149,11 +155,12 @@ export class CartManager {
     );
 
     await this.os.db.transaction(
-      [Db.cart_meta, Db.cart_files],
+      [Db.cart_meta, Db.cart_files, Db.play_habits],
       "readwrite",
       async (t) => {
         const meta = t.get_table1(Db.cart_meta);
         const files = t.get_table2(Db.cart_files);
+        const habits = t.get_table1(Db.play_habits);
 
         if (old_meta != null) {
           for (const file of old_meta.files) {
@@ -185,9 +192,13 @@ export class CartManager {
           files: nodes,
           installed_at: old_meta?.installed_at ?? now,
           updated_at: now,
+        });
+        const play_habits = (await habits.try_get(cart.metadata.id)) ?? {
+          id: cart.metadata.id,
           last_played: null,
           play_time: 0,
-        });
+        };
+        await habits.put(play_habits);
       }
     );
     await this.os.notifications.push(
@@ -200,12 +211,28 @@ export class CartManager {
   }
 
   // -- Playing habits
+  async read_habits(id: string) {
+    await this.os.db.transaction([Db.play_habits], "readonly", async (t) => {
+      const habits = t.get_table1(Db.play_habits);
+      return habits.get(id);
+    });
+  }
+
   async update_last_played(cart_id: string, last_played: Date | null) {
-    await this.os.db.transaction([Db.cart_meta], "readwrite", async (t) => {
-      const meta = t.get_table1(Db.cart_meta);
-      const cart = await meta.get(cart_id);
+    await this.os.db.transaction([Db.play_habits], "readwrite", async (t) => {
+      const habits = t.get_table1(Db.play_habits);
+      const cart = await habits.get(cart_id);
       cart.last_played = last_played;
-      await meta.put(cart);
+      await habits.put(cart);
+    });
+  }
+
+  async increase_play_time(cart_id: string, play_time: number) {
+    await this.os.db.transaction([Db.play_habits], "readwrite", async (t) => {
+      const habits = t.get_table1(Db.play_habits);
+      const cart = await habits.get(cart_id);
+      cart.play_time += play_time || 0;
+      await habits.put(cart);
     });
   }
 }
