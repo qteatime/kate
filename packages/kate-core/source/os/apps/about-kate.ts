@@ -67,8 +67,10 @@ export class SceneAboutKate extends Scene {
           os: `${ua.os.name} ${ua.os.version ?? ""}`,
           browser: ua.browser.map((x) => `${x.name} ${x.version ?? ""}`),
           device: device,
-          arm64_translation: ua.cpu.wow64,
-          architecture: ua.cpu.architecture,
+          arm64_translation: ua.cpu.wow64 ?? "unknown",
+          architecture: `${ua.cpu.architecture} (${
+            ua.cpu.bitness ?? "unknown bitness"
+          })`,
         },
         hardware: {
           cpu_model: "unknown",
