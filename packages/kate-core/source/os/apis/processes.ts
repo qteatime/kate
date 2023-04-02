@@ -70,6 +70,7 @@ export class KateProcesses {
           return { mime: file.mime, data: file.data, path: path };
         },
       });
+      await this.os.cart_manager.update_last_played(id, new Date());
       return this.display_process(cart, runtime);
     } catch (error) {
       this._running = null;

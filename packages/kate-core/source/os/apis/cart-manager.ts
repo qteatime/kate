@@ -22,6 +22,7 @@ export class CartManager {
     );
   }
 
+  // -- Retrieval
   async read_files_by_cart(id: string) {
     const cartridge = await this.os.db.transaction(
       [Db.cart_meta, Db.cart_files],
@@ -74,6 +75,7 @@ export class CartManager {
     return metadata;
   }
 
+  // -- Installation
   async install_from_file(file: File) {
     if (file.size > this.CARTRIDGE_SIZE_LIMIT) {
       this.os.notifications.push_transient(
@@ -195,5 +197,15 @@ export class CartManager {
     );
     this.os.events.on_cart_inserted.emit(cart);
     return true;
+  }
+
+  // -- Playing habits
+  async update_last_played(cart_id: string, last_played: Date | null) {
+    await this.os.db.transaction([Db.cart_meta], "readwrite", async (t) => {
+      const meta = t.get_table1(Db.cart_meta);
+      const cart = await meta.get(cart_id);
+      cart.last_played = last_played;
+      await meta.put(cart);
+    });
   }
 }

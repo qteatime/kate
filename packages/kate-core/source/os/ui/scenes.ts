@@ -155,15 +155,17 @@ export class SceneHome extends Scene {
         ]),
         h("div", { class: "kate-os-carts-title" }, [x.metadata.game.title]),
       ]),
-    ]).on_clicked(() => {
-      this.os.processes.run(x.id);
-    });
+    ]).on_clicked(() => this.play(x.id));
   }
 
   async show_carts(list: HTMLElement) {
+    const recency = (x: Db.CartMeta) => {
+      return Math.max(x.last_played?.getTime() ?? 0, x.updated_at.getTime());
+    };
+
     try {
       const carts = (await this.os.cart_manager.list()).sort(
-        (a, b) => b.installed_at.getTime() - a.installed_at.getTime()
+        (a, b) => recency(b) - recency(a)
       );
       list.textContent = "";
       this.cart_map = new Map();
@@ -325,6 +327,11 @@ export class SceneHome extends Scene {
     const apps = new SceneApps(this.os);
     this.os.push_scene(apps);
   };
+
+  async play(id: string) {
+    await this.os.processes.run(id);
+    await this.update_carts();
+  }
 }
 
 export class SceneMedia extends Scene {
