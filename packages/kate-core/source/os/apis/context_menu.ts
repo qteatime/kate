@@ -127,10 +127,10 @@ export class HUD_ContextMenu extends Scene {
 
   on_media_gallery = async () => {
     const process = this.os.processes.running!;
-    const meta = await this.os.cart_manager.read_metadata(
-      process.cart.metadata.id
-    );
-    const media = new SceneMedia(this.os, meta);
+    const media = new SceneMedia(this.os, {
+      id: process.cart.metadata.id,
+      title: process.cart.metadata.game.title,
+    });
     this.os.push_scene(media);
   };
 

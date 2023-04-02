@@ -6,7 +6,6 @@ import * as Db from "../../data/db";
 import { unreachable } from "../../../../util/build";
 import type { KateProcess } from "../apis/processes";
 import * as Legal from "../../legal";
-import { to_extension } from "../../utils";
 
 export abstract class Scene {
   readonly canvas: HTMLElement;
@@ -325,7 +324,10 @@ export class SceneHome extends Scene {
 export class SceneMedia extends Scene {
   private media = new Map<HTMLElement, Db.Media>();
 
-  constructor(os: KateOS, readonly filter: null | Db.CartMeta) {
+  constructor(
+    os: KateOS,
+    readonly filter: null | { id: string; title: string }
+  ) {
     super(os);
   }
 
@@ -364,7 +366,7 @@ export class SceneMedia extends Scene {
       return { title: "All", media: media0 };
     } else {
       return {
-        title: filter.metadata.game.title,
+        title: filter.title,
         media: media0.filter((x) => x.cart_id === filter.id),
       };
     }

@@ -133,6 +133,14 @@ export class KateOS {
 
 async function request_persistent_storage(os: KateOS) {
   if (
+    navigator.storage?.persisted == null ||
+    navigator.storage?.persist == null
+  ) {
+    os.kernel.console.take_resource("transient-storage");
+    return;
+  }
+
+  if (
     os.kernel.console.options.persistent_storage &&
     !(await navigator.storage.persisted())
   ) {
