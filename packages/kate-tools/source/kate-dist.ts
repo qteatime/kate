@@ -5,6 +5,8 @@ import * as Glob from "glob";
 const www_root = Path.join(__dirname, "../packaging/web");
 const asset_root = Path.join(__dirname, "../assets");
 
+const ignored_files = new Set(["index.html", "manifest.json", "worker.js"]);
+
 function copy(root: string, from: string, out: string) {
   console.log("-> Copying", from);
   FS.mkdirSync(Path.dirname(Path.join(out, from)), { recursive: true });
@@ -26,7 +28,7 @@ export async function generate(
       }
       FS.mkdirSync(out, { recursive: true });
       for (const file of files) {
-        if (file === "index.html") {
+        if (ignored_files.has(file)) {
           continue;
         }
         copy(www_root, file, out);
