@@ -40,6 +40,21 @@ _______________________________________________________________________________
 The Candy Pop colour theme for Kate is based on a the Pollen8 palette
 by Conker (https://lospec.com/palette-list/pollen8)
 
+
+_______________________________________________________________________________
+
+## Code
+
+Kate includes code based on some open source projects. They're listed
+here, and the licenses are copied at the end of this document.
+
+  - ua-parser-js (https://www.npmjs.com/package/ua-parser-js)
+    Copyright © 2012-2023 Faisal Salman <f@faisalman.com>
+    Licensed under the MIT licence.
+
+    Used for displaying system information on browser versions of the
+    emulator in the About Kate page, for support purposes.
+
 _______________________________________________________________________________
 
 ## SIL Open Font License
@@ -746,8 +761,6 @@ Creative Commons may be contacted at creativecommons.org.
 _______________________________________________________________________________
 
 ## MIT Licence
-
-Copyright 2023 Fonticons, Inc.
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the "Software"),

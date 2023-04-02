@@ -300,3 +300,24 @@ export function fa_icon(
 ) {
   return h("i", { class: `fa-${style} fa-${size} fa-${name}` }, []);
 }
+
+export function focusable_container(children: Widgetable[]) {
+  return h(
+    "div",
+    { class: "kate-ui-focusable-container kate-ui-focus-target" },
+    [...children]
+  );
+}
+
+export function info_line(label: Widgetable, data: Widgetable[]) {
+  return focusable_container([
+    h("div", { class: "kate-ui-info-line" }, [
+      h("div", { class: "kate-ui-info-line-label" }, [label]),
+      h("div", { class: "kate-ui-info-line-data" }, [...data]),
+    ]),
+  ]);
+}
+
+export function legible_bg(children: Widgetable[]) {
+  return h("div", { class: "kate-ui-legible-bg" }, [...children]);
+}
