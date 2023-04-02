@@ -1,7 +1,8 @@
 import * as Cart from "../../cart";
 import type { CR_Process, CartRuntime } from "../../kernel/cart-runtime";
 import type { KateOS } from "../os";
-import { HUD_LoadIndicator, SceneGame } from "../ui/scenes";
+import { SceneGame } from "../apps/game";
+import { HUD_LoadIndicator } from "../apps/load-screen";
 
 export class KateProcesses {
   private _running: KateProcess | null = null;

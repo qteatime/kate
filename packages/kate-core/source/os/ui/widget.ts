@@ -1,5 +1,5 @@
 import { InputKey } from "../../kernel/virtual";
-import { EventStream } from "../../../../util/build/events";
+import { EventStream } from "../../utils";
 
 export abstract class Widget {
   abstract render(): Widgetable;

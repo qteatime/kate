@@ -1,6 +1,9 @@
 import type { ExtendedInputKey } from "../../kernel/virtual";
 import type { KateOS } from "../os";
-import { Scene, SceneAboutKate, SceneLicence, SceneMedia } from "../ui/scenes";
+import { Scene } from "../ui/scenes";
+import { SceneAboutKate } from "../apps/about-kate";
+import { SceneMedia } from "../apps/media";
+import { SceneLicence } from "../apps/licence";
 import * as UI from "../ui";
 import { EventStream } from "../../utils";
 
