@@ -3,7 +3,7 @@ import type { KateOS } from "../os";
 import { Scene } from "../ui/scenes";
 import { SceneAboutKate } from "../apps/about-kate";
 import { SceneMedia } from "../apps/media";
-import { SceneLicence } from "../apps/licence";
+import { SceneTextFile } from "../apps/licence";
 import * as UI from "../ui";
 import { EventStream } from "../../utils";
 
@@ -137,8 +137,9 @@ export class HUD_ContextMenu extends Scene {
 
   on_legal_notices = () => {
     const process = this.os.processes.running!;
-    const legal = new SceneLicence(
+    const legal = new SceneTextFile(
       this.os,
+      "Legal Notices",
       process.cart.metadata.game.title,
       process.cart.metadata.release.legal_notices
     );

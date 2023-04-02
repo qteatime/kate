@@ -1,0 +1,135 @@
+=======================================================================
+Kate v0.23.4  (April 2023)
+=======================================================================
+
+The v0.23.4 is April's experimental release of Kate, including a
+handful of bugfixes, some new features, and a database redesign
+(a breaking change).
+
+
+UI redesign & code simplifications
+----------------------------------
+
+This version has a minor UI redesign including more playful
+sans-serif fonts and a more pervasive use of button hints in the
+status bar. There's now some audio feedback for keyboard/gamepad
+actions and a more consistent handling of "X" as a "go back" button.
+
+Custom themes are going to land sometime later this year, there's
+still some work needed on how they're going to be distributed, and
+how to divide up capabilities in themming (e.g.: allowing people to
+install CSS files directly is too dangerous, since Kate relies
+heavily on having specific visual cues for security).
+
+There's been quite a lot of work in simplifying parts of the code,
+such as focus handling and game/OS scene handling. Though the code
+is still very much experimental, this should make management a
+little bit easier.
+
+
+Screen capture & Media gallery
+------------------------------
+
+There's support for taking screenshots and capturing videos of
+gameplay from an installed cartridge. The cartridge must indicate
+its intention of being captured by registering an HTML Canvas element
+with the Kate Capture API.
+
+Screenshots have audio feedback, screen recording has a visual
+feedback in the form of a little recording icon in the active
+resources area. Recording can be started by holding the Capture
+button for a second, and stopped by holding the Capture button
+for a second again.
+
+
+In-game legal notices
+---------------------
+
+Games, and indie games in particular, generally include content (such
+as code or assets) that have been developed by a third party, and made
+available under some sort of licence. Developers need to provide
+sufficiently visible notices of these licences, which is a bit trickier
+when you ship a binary cartridge around.
+
+This version of Kate adds support to including a text file that
+collects all these licences into a single place, and can be displayed
+to the user in a regular KateOS screen, which is similar to how other
+hand-held consoles handle the issue, and should fulfill the legal
+requirements of shipping licences in a readable format with your
+binary distribution.
+
+
+Storage and memory usage improvements
+-------------------------------------
+
+Cartridges are now unpacked in the IndexedDB storage, which means that
+cartridge binary changes do not affect already installed cartridges.
+
+Besides that, this has the benefit of improving memory usage for
+installed cartridges, as the game does not need to keep all of the
+files in memory while running. For games with a larger size, this
+should allow a little smoother playing, as long as individual files
+have reasonable sizes as well.
+
+While reading files has an added latency because of this, files are
+still loaded from local storage, so it should be fast enough for most
+use cases.
+
+
+A new JS packaging tool
+-----------------------
+
+This version does away with Browserify as a way of packaging Kate code
+and introduces a new tool, Glomp, which handles packaging JavaScript
+(and other web files) in a simplified manner.
+
+This was a requirement for improving Kate security, as Browserify is
+too large to manually audit, and it injects packages arbitrarily in the
+output.
+
+Glomp is not yet verified, and it does not handle mal-formed JavaScript;
+those are the next steps before a stable release of Kate.
+
+
+Loading images in HTML entry-point
+----------------------------------
+
+Images included in the HTML entry-point are now loaded while sandboxing
+the HTML page, so they should work in the same way as images
+dynamically loaded. Paths still need to point to a valid cartridge file
+path (e.g.: `/images/loading.png`)
+
+
+Active Resources Area
+---------------------
+
+It's hard to know what applications are doing sometimes. Previously
+Kate distinguished between trusted/untrusted prompts (like confirmation
+dialogs and menus) by showing a red border around the screen. But that
+doesn't work for things like "this game is using my microphone".
+
+This version of Kate introduces the "Active Resources Area", a small
+display of icons to the right of the "= KATE =" engraving in the
+emulator that shows which special resources the current application
+or game is using.
+
+Currently this is used to display the use of screen recording
+(a small red bullet is displayed), or the lack of persistent storage
+(a hard drive with a clock is displayed).
+
+Lack of persistent storage here means that data stored in Kate is
+stored in a "best effort" manner, where the browser might delete it
+if the device is running out of space. This should only be an issue
+when using Kate online, without having it installed as a WebApp.
+
+
+Playing habits
+--------------
+
+This version of Kate now collects small playing habit data, meaning
+that we store locally when a cartridge was last played, and how much
+time in total was spent in each cartridge.
+
+The last_played data is used to sort entries in the Home screen. The
+total play times are not currently used for anything, just available
+locally.

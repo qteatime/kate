@@ -4,8 +4,13 @@ import * as UI from "../ui/widget";
 import type { ExtendedInputKey } from "../../kernel";
 import { Scene } from "../ui/scenes";
 
-export class SceneLicence extends Scene {
-  constructor(os: KateOS, readonly title: string, readonly text: string) {
+export class SceneTextFile extends Scene {
+  constructor(
+    os: KateOS,
+    private title: string,
+    readonly app_title: string,
+    readonly text: string
+  ) {
     super(os);
   }
 
@@ -14,8 +19,9 @@ export class SceneLicence extends Scene {
       new UI.Title_bar({
         left: UI.fragment([
           UI.fa_icon("circle-info", "lg"),
-          new UI.Section_title(["Legal notices"]),
+          new UI.Section_title([this.title]),
         ]),
+        right: this.app_title,
       }),
       h("div", { class: "kate-os-text-scroll" }, [
         h("div", { class: "kate-os-padding" }, [this.text]),

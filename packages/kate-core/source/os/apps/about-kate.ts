@@ -2,8 +2,10 @@ import { h } from "../ui/widget";
 import * as UI from "../ui/widget";
 import type { ExtendedInputKey } from "../../kernel";
 import * as Legal from "../../legal";
-import { SceneLicence } from "./licence";
+import { SceneTextFile } from "./licence";
 import { Scene } from "../ui/scenes";
+
+const release_notes = require("../../../RELEASE-0.3.4.txt!text") as string;
 
 export class SceneAboutKate extends Scene {
   render() {
@@ -26,9 +28,15 @@ export class SceneAboutKate extends Scene {
               "Copyright (c) 2023 Q. (MIT licensed)",
             ]),
             new UI.Space({ height: 32 }),
-            new UI.Button(["Third-party notices"]).on_clicked(
-              this.handle_third_party
-            ),
+            new UI.VBox(10, [
+              new UI.Button(["Third-party notices"]).on_clicked(
+                this.handle_third_party
+              ),
+
+              new UI.Button(["Release notes"]).on_clicked(
+                this.handle_release_notes
+              ),
+            ]),
           ]),
         ]),
       ]),
@@ -62,6 +70,14 @@ export class SceneAboutKate extends Scene {
   };
 
   handle_third_party = () => {
-    this.os.push_scene(new SceneLicence(this.os, "Kate", Legal.notice));
+    this.os.push_scene(
+      new SceneTextFile(this.os, "Legal Notices", "Kate", Legal.notice)
+    );
+  };
+
+  handle_release_notes = () => {
+    this.os.push_scene(
+      new SceneTextFile(this.os, "Release Notes", "Kate", release_notes)
+    );
   };
 }

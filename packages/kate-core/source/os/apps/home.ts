@@ -5,7 +5,7 @@ import * as Db from "../../data/db";
 import { unreachable } from "../../utils";
 import { Scene } from "../ui/scenes";
 import { SceneApps } from "./applications";
-import { SceneLicence } from "./licence";
+import { SceneTextFile } from "./licence";
 import { HUD_LoadIndicator } from "./load-screen";
 
 export class SceneHome extends Scene {
@@ -92,8 +92,9 @@ export class SceneHome extends Scene {
         const loading = new HUD_LoadIndicator(this.os);
         this.os.show_hud(loading);
         try {
-          const legal = new SceneLicence(
+          const legal = new SceneTextFile(
             this.os,
+            `Legal Notices`,
             cart.metadata.game.title,
             cart.metadata.release.legal_notices
           );

@@ -52,3 +52,9 @@
   color: var(--color-text-inverted);
   font-weight: 500;
 }
+
+/* #Core widgets */
+.kate-ui-vbox {
+  display: flex;
+  flex-direction: column;
+}
