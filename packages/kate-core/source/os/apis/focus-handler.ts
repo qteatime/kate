@@ -83,6 +83,15 @@ export class KateFocusHandler {
       }
     }
 
+    if (key === "capture" || key === "long_capture") {
+      this.os.notifications.push_transient(
+        "kate:focus-manager",
+        "Capture unsupported",
+        "Screen capture is not available right now."
+      );
+      return;
+    }
+
     if (!this.should_handle(key)) {
       return;
     }
