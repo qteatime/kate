@@ -7,3 +7,4 @@ export * from "../../util/build/url";
 export * from "../../util/build/graphics";
 export * from "../../util/build/mime";
 export * from "../../util/build/ua-parser";
+export * as TC from "../../util/build/type-check";

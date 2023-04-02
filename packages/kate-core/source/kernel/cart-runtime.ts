@@ -7,7 +7,7 @@ import * as Cart from "../cart";
 export type RuntimeEnvConfig = {
   cart: Cart.CartMeta;
   read_file: (path: string) => Promise<Cart.File>;
-  local_storage: { [key: string]: string };
+  local_storage: unknown;
   on_playtime_update: (time: number) => void;
 };
 

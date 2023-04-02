@@ -3,7 +3,7 @@ import { KateCapture } from "./capture";
 import { KateCartFS } from "./cart-fs";
 import { KateIPC } from "./channel";
 import { InputKey, ExtendedInputKey, KateInput } from "./input";
-import { KateKVStore } from "./kv-store";
+import { KateObjectStore } from "./object-store";
 import { KateTimer } from "./timer";
 
 declare var KATE_SECRET: string;
@@ -15,7 +15,7 @@ export const events = channel.events;
 
 export const cart_fs = new KateCartFS(channel);
 
-export const kv_store = new KateKVStore(channel);
+export const store = new KateObjectStore(channel);
 
 export const input = new KateInput(channel);
 input.setup();
@@ -35,7 +35,7 @@ export const focus = () => {
 export type KateAPI = {
   events: typeof events;
   cart_fs: typeof cart_fs;
-  kv_store: typeof kv_store;
+  store: typeof store;
   input: typeof input;
   audio: typeof audio;
   timer: typeof timer;
@@ -54,7 +54,7 @@ declare global {
       ExtendedInputKey,
       KateInput,
       KateTimer,
-      KateKVStore,
+      KateObjectStore,
     };
   }
 }

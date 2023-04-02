@@ -93,7 +93,7 @@ export function version_string(meta: Metadata) {
 
 export function parse_metadata(cart: Cart_v2.Cartridge): Metadata {
   return {
-    id: valid_id(cart.id),
+    id: str(valid_id(cart.id), 255),
     game: {
       title: str(cart.metadata.title.title, 255),
       author: str(cart.metadata.title.author, 255),

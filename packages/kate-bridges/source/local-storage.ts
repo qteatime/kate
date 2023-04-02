@@ -2,14 +2,14 @@
 type Dict = { [key: string]: string };
 declare var KATE_LOCAL_STORAGE: Dict | null;
 
-const { kv_store } = KateAPI;
+const { store } = KateAPI;
 let contents = KATE_LOCAL_STORAGE ?? Object.create(null);
 
 let timer: any = null;
 function persist(contents: Dict) {
   clearTimeout(timer);
   timer = setTimeout(() => {
-    kv_store.replace_all(contents);
+    store.put(store.special_keys.local_storage, contents);
   });
 }
 
@@ -33,7 +33,7 @@ class KateStorage {
   }
 
   setItem(name: string, value: string) {
-    this.__contents[name] = value;
+    this.__contents[name] = String(value);
     this._persist();
   }
 

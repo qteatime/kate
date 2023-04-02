@@ -1,15 +1,16 @@
 import type { RuntimeEnv } from "../../kernel";
 import type { KateOS } from "../os";
+import { TC } from "../../utils";
 
 type Message =
   | { type: "kate:cart.read-file"; payload: { path: string } }
-  | { type: "kate:kv-store.read-all" }
-  | {
-      type: "kate:kv-store.update-all";
-      payload: { value: { [key: string]: string } };
-    }
-  | { type: "kate:kv-store.get"; payload: { key: string } }
-  | { type: "kate:kv-store.set"; payload: { key: string; value: string } }
+  | { type: "kate:store.list"; payload: { count?: number } }
+  | { type: "kate:store.get"; payload: { key: string } }
+  | { type: "kate:store.try-get"; payload: { key: string } }
+  | { type: "kate:store.put"; payload: { key: string; value: unknown } }
+  | { type: "kate:store.add"; payload: { key: string; value: unknown } }
+  | { type: "kate:store.delete"; payload: { key: string } }
+  | { type: "kate:store.usage"; payload: {} }
   | { type: "kate:audio.create-channel"; payload: { max_tracks?: number } }
   | { type: "kate:audio.resume-channel"; payload: { id: string } }
   | { type: "kate:audio.pause-channel"; payload: { id: string } }
@@ -195,36 +196,62 @@ export class KateIPCServer {
         }
       }
 
-      // -- KV store
-      case "kate:kv-store.read-all": {
-        const storage = this.os.kv_storage.get_store(env.cart.metadata.id);
-        return ok(storage.contents());
+      // -- Object store
+      case "kate:store.usage": {
+        const usage = await this.os.object_store.get_usage(
+          env.cart.metadata.id
+        );
+        return ok({ available: usage.available, used: usage.used });
       }
 
-      case "kate:kv-store.update-all": {
-        const storage = this.os.kv_storage.get_store(env.cart.metadata.id);
-        try {
-          await storage.write(message.payload.value);
-          return ok(null);
-        } catch (_) {
-          return err("kate.kv-store.write-failed");
-        }
+      case "kate:store.add": {
+        await this.os.object_store.add(
+          env.cart.metadata.id,
+          TC.string(message.payload.key),
+          message.payload.value
+        );
+        return ok(null);
       }
 
-      case "kate:kv-store.get": {
-        const storage = this.os.kv_storage.get_store(env.cart.metadata.id);
-        const value = (await storage.contents())[message.payload.key] ?? null;
+      case "kate:store.delete": {
+        await this.os.object_store.delete(
+          env.cart.metadata.id,
+          TC.string(message.payload.key)
+        );
+        return ok(null);
+      }
+
+      case "kate:store.get": {
+        const value = await this.os.object_store.get(
+          env.cart.metadata.id,
+          TC.string(message.payload.key)
+        );
         return ok(value);
       }
 
-      case "kate:kv-store.set": {
-        const storage = this.os.kv_storage.get_store(env.cart.metadata.id);
-        try {
-          await storage.set_pair(message.payload.key, message.payload.value);
-          return ok(null);
-        } catch (_) {
-          return err("kate:kv-store.write-failed");
-        }
+      case "kate:store.try-get": {
+        const value = await this.os.object_store.try_get(
+          env.cart.metadata.id,
+          TC.string(message.payload.key)
+        );
+        return ok(value);
+      }
+
+      case "kate:store.list": {
+        const values = await this.os.object_store.list(
+          env.cart.metadata.id,
+          TC.nullable(TC.integer, message.payload.count)
+        );
+        return ok(values);
+      }
+
+      case "kate:store.put": {
+        await this.os.object_store.put(
+          env.cart.metadata.id,
+          TC.string(message.payload.key),
+          message.payload.value
+        );
+        return ok(null);
       }
 
       // -- Audio

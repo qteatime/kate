@@ -14,9 +14,8 @@ import { KateNotification } from "./apis/notification";
 import { KateDropInstaller } from "./apis/drop-installer";
 import { KateFocusHandler } from "./apis/focus-handler";
 import { KateStatusBar } from "./apis/status-bar";
-import { KateKVStorage } from "./apis/kv_storage";
 import { KateIPCServer } from "./apis/ipc";
-import { KateAudioServer } from "./apis";
+import { KateAudioServer, KateObjectStore } from "./apis";
 import { KateDialog } from "./apis/dialog";
 import { KateCapture } from "./apis/capture";
 import { KateSfx } from "./sfx";
@@ -32,7 +31,7 @@ export class KateOS {
   readonly installer: KateDropInstaller;
   readonly focus_handler: KateFocusHandler;
   readonly status_bar: KateStatusBar;
-  readonly kv_storage: KateKVStorage;
+  readonly object_store: KateObjectStore;
   readonly ipc: KateIPCServer;
   readonly dialog: KateDialog;
   readonly capture: KateCapture;
@@ -48,7 +47,7 @@ export class KateOS {
   ) {
     this.cart_manager = new CartManager(this);
     this.processes = new KateProcesses(this);
-    this.kv_storage = new KateKVStorage(this);
+    this.object_store = new KateObjectStore(this);
     this.context_menu = new KateContextMenu(this);
     this.context_menu.setup();
     this.notifications = new KateNotification(this);

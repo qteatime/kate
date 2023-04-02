@@ -25,10 +25,13 @@ export class KateProcesses {
     const cart = Cart.parse(bytes);
     const file_map = new Map(cart.files.map((x) => [x.path, x] as const));
 
-    const storage = this.os.kv_storage.get_store(cart.metadata.id);
+    const storage = await this.os.object_store.try_get(
+      cart.metadata.id,
+      "kate:local-storage"
+    );
     const runtime = this.os.kernel.runtimes.from_cartridge(cart, {
       cart: cart,
-      local_storage: await storage.contents(),
+      local_storage: storage,
       async read_file(path): Promise<Cart.File> {
         const file = file_map.get(path);
         if (file == null) {
@@ -59,10 +62,12 @@ export class KateProcesses {
       const cart = await this.os.cart_manager.read_metadata(id);
       const file_map = new Map(cart.files.map((x) => [x.path, x.id] as const));
 
-      const storage = this.os.kv_storage.get_store(cart.metadata.id);
+      const storage = await this.os.object_store.get_local_storage(
+        cart.metadata.id
+      );
       const runtime = this.os.kernel.runtimes.from_cartridge(cart, {
         cart: cart,
-        local_storage: await storage.contents(),
+        local_storage: storage,
         read_file: async (path) => {
           const file_id = file_map.get(path);
           if (file_id == null) {

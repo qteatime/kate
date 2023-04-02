@@ -3,7 +3,7 @@ import * as CartMetadata from "../cart/metadata";
 import * as CartRuntime from "../cart/runtime";
 import type { NotificationType } from "../os/apis/notification";
 
-export const kate = new Db.DatabaseSchema("kate", 5);
+export const kate = new Db.DatabaseSchema("kate", 6);
 
 // Table definitions
 export type CartMeta = {
@@ -62,14 +62,34 @@ export const notifications = kate.table1<Notification, "id">({
   auto_increment: true,
 });
 
-export type KeyValue = {
+export type ObjectStore = {
+  cart_id: string;
   id: string;
-  content: { [key: string]: string };
+  size: number;
+  data: unknown;
 };
-export const cart_kvstore = kate.table1<KeyValue, "id">({
-  since: 1,
-  name: "cart_kvstore",
-  path: "id",
+export const object_store = kate.table2<ObjectStore, "cart_id", "id">({
+  since: 6,
+  name: "object_store",
+  path: ["cart_id", "id"],
+  auto_increment: false,
+});
+export const idx_cart_object_store_by_cart = object_store.index1({
+  since: 6,
+  name: "by_cart",
+  path: ["cart_id"],
+  unique: false,
+});
+
+export type QuotaUsage = {
+  cart_id: string;
+  available: number;
+  used: number;
+};
+export const quota_usage = kate.table1<QuotaUsage, "cart_id">({
+  since: 6,
+  name: "quota_usage",
+  path: "cart_id",
   auto_increment: false,
 });
 
@@ -93,7 +113,6 @@ export const idx_media_store_by_cart = media_store.index1({
   name: "by_cart",
   path: ["cart_id"],
   unique: false,
-  multi_entry: false,
 });
 
 export type MediaFile = {
