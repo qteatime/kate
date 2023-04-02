@@ -1,5 +1,6 @@
 import * as Path from "path";
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, ipcMain } from "electron";
+import * as SystemInformation from "./system-information";
 
 const createWindow = () => {
   const win = new BrowserWindow({
@@ -15,6 +16,11 @@ const createWindow = () => {
 
   win.loadFile(Path.join(__dirname, "www/index.html"));
 };
+
+ipcMain.handle("kate:get-system-info", async (_ev) => {
+  const info = await SystemInformation.get_system_info();
+  return info;
+});
 
 app.whenReady().then(() => {
   createWindow();
