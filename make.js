@@ -452,6 +452,21 @@ w.task("chore:clean-tsc-cache", [], () => {
   }
 });
 
+w.task("chore:update-versions", [], () => {
+  const version = require("./package.json").version;
+  for (const pkg of ["kate-tools", "kate-core", "kate-desktop"]) {
+    const json = JSON.parse(
+      FS.readFileSync(Path.join("packages", pkg, "package.json"))
+    );
+    json.version = version;
+    FS.writeFileSync(
+      Path.join("packages", pkg, "package.json"),
+      JSON.stringify(json, null, 2)
+    );
+    console.log(`--> Updated ${pkg} to ${version}`);
+  }
+});
+
 // -- Multi-project convenience
 w.task(
   "all",
