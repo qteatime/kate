@@ -13,8 +13,6 @@ declare global {
 }
 
 export class KateContextMenu {
-  private in_context = false;
-
   constructor(readonly os: KateOS) {}
 
   setup() {
@@ -35,15 +33,15 @@ export class KateContextMenu {
   };
 
   show_context_menu() {
-    if (this.in_context) {
+    if (this.in_context()) {
       return;
     }
-    this.in_context = true;
     const menu = new HUD_ContextMenu(this.os, this);
-    menu.on_close.listen(() => {
-      this.in_context = false;
-    });
     this.os.push_scene(menu);
+  }
+
+  in_context() {
+    return this.os.display.querySelector(".kate-os-hud-context-menu") != null;
   }
 }
 

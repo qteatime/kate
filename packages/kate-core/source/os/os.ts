@@ -76,17 +76,13 @@ export class KateOS {
     return this._current_scene;
   }
 
-  push_scene(scene: Scene, accept_focus: boolean = true) {
+  push_scene(scene: Scene) {
     if (this._current_scene != null) {
       this._scene_stack.push(this._current_scene);
     }
     this._current_scene = scene;
     scene.attach(this.display);
-    if (accept_focus) {
-      this.focus_handler.push_root(scene.canvas);
-    } else {
-      this.focus_handler.push_root(null);
-    }
+    this.focus_handler.push_root(scene.canvas);
   }
 
   pop_scene() {
