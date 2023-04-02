@@ -42,7 +42,7 @@ export class KateProcesses {
   private async display_process(cart: Cart.CartMeta, runtime: CartRuntime) {
     const process = new KateProcess(this, cart, await runtime.run(this.os));
     this._running = process;
-    this.os.push_scene(new SceneGame(this.os, process));
+    this.os.push_scene(new SceneGame(this.os, process), false);
     return process;
   }
 
