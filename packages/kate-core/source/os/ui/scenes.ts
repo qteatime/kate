@@ -6,6 +6,7 @@ import * as Db from "../../data/db";
 import { unreachable } from "../../../../util/build";
 import type { KateProcess } from "../apis/processes";
 import * as Legal from "../../legal";
+import { to_extension } from "../../utils";
 
 export abstract class Scene {
   readonly canvas: HTMLElement;
@@ -387,7 +388,7 @@ export class SceneMedia extends Scene {
   private async make_button(x: Db.Media) {
     const element = new UI.Button([
       h("div", { class: "kate-os-media-thumbnail" }, [
-        h("img", { src: x.thumbnail }, []),
+        h("img", { src: x.thumbnail_dataurl }, []),
         this.make_video_length(x.video_length),
       ]),
     ]).on_clicked(() => this.view(x));
@@ -461,7 +462,7 @@ export class SceneMedia extends Scene {
     this.os.push_scene(viewer);
   };
 
-  mark_deleted = (id: number) => {
+  mark_deleted = (id: string) => {
     for (const [button, meta] of this.media) {
       if (meta.id === id) {
         if (button.classList.contains("focus")) {
@@ -494,35 +495,23 @@ export class SceneViewMedia extends Scene {
       h("div", { class: "kate-os-statusbar visible" }, [
         UI.icon_button("menu", "Options").on_clicked(this.handle_options),
         UI.icon_button("x", "Return").on_clicked(this.handle_close),
-        this.media_type === "video"
+        this.media.kind === "video"
           ? UI.icon_button("o", "Play/Pause").on_clicked(this.handle_play_pause)
           : null,
       ]),
     ]);
   }
 
-  get media_type() {
-    switch (this.media.mime) {
-      case "image/png":
-        return "image";
-      case "video/webm":
-        return "video";
-      default:
-        return "unknown";
-    }
-  }
-
   async on_attached(): Promise<void> {
     this.os.focus_handler.listen(this.canvas, this.handle_key_pressed);
-    const file = await this.media.file.getFile();
-    const data = await file.arrayBuffer();
-    const blob = new Blob([data], { type: file.type });
+    const file = await this.os.capture.read_file(this.media.id);
+    const blob = new Blob([file.data], { type: file.mime });
     this.url = URL.createObjectURL(blob);
     this.render_media(this.url);
   }
 
   render_media(url: string) {
-    switch (this.media_type) {
+    switch (this.media.kind) {
       case "image": {
         this.render_image(url);
         break;
@@ -671,7 +660,7 @@ export class SceneViewMedia extends Scene {
       return;
     }
 
-    const extension = this.media.mime === "image/png" ? ".png" : ".webm";
+    const extension = this.media.kind === "image" ? ".png" : ".webm";
     this.download_url(this.url, "kate-capture", extension);
   };
 

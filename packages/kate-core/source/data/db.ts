@@ -3,7 +3,7 @@ import * as CartMetadata from "../cart/metadata";
 import * as CartRuntime from "../cart/runtime";
 import type { NotificationType } from "../os/apis/notification";
 
-export const kate = new Db.DatabaseSchema("kate", 3);
+export const kate = new Db.DatabaseSchema("kate", 4);
 
 // Table definitions
 export type CartMeta = {
@@ -64,19 +64,19 @@ export const cart_kvstore = kate.table1<KeyValue, "id">({
 });
 
 export type Media = {
-  id?: number;
+  id: string;
   cart_id: string;
-  mime: string;
-  file: FileSystemFileHandle;
+  kind: "image" | "video";
   time: Date;
-  thumbnail: string; // As data URL
+  thumbnail_dataurl: string;
   video_length: number | null;
+  size: number;
 };
 export const media_store = kate.table1<Media, "id">({
-  since: 2,
-  name: "media_store",
+  since: 4,
+  name: "media_store_v2",
   path: "id",
-  auto_increment: true,
+  auto_increment: false,
 });
 export const idx_media_store_by_cart = media_store.index1({
   since: 3,
@@ -84,6 +84,18 @@ export const idx_media_store_by_cart = media_store.index1({
   path: ["cart_id"],
   unique: false,
   multi_entry: false,
+});
+
+export type MediaFile = {
+  id: string;
+  mime: string;
+  data: Uint8Array;
+};
+export const media_files = kate.table1<MediaFile, "id">({
+  since: 4,
+  name: "media_files",
+  path: "id",
+  auto_increment: false,
 });
 
 // Data migrations

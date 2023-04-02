@@ -20,57 +20,48 @@ export class KateCapture {
 
   constructor(readonly os: KateOS) {}
 
-  async bucket(game_id: string) {
-    const root = await navigator.storage.getDirectory();
-    const media = await root.getDirectoryHandle("kate-media", { create: true });
-    return media.getDirectoryHandle(game_id, { create: true });
-  }
-
-  private async store_file_inode(
+  private async store_file(
     game_id: string,
-    file: FileSystemFileHandle,
-    type: string,
-    thumbnail: string,
-    length: number | null
+    data: Uint8Array,
+    mime: string,
+    kind: "image" | "video"
   ) {
-    const id = await this.os.db.transaction(
-      [Db.media_store],
+    const file_id = make_id();
+    const { thumbnail, length } = await this.make_thumbnail(data, mime, kind);
+    await this.os.db.transaction(
+      [Db.media_store, Db.media_files],
       "readwrite",
       async (t) => {
         const media = t.get_table1(Db.media_store);
-        const id = await media.add({
-          cart_id: game_id,
-          file: file,
-          mime: type,
-          time: new Date(),
-          thumbnail: thumbnail,
-          video_length: length,
+        const files = t.get_table1(Db.media_files);
+
+        await files.add({
+          id: file_id,
+          mime: mime,
+          data: data,
         });
-        return id;
+        await media.add({
+          id: file_id,
+          cart_id: game_id,
+          kind: kind,
+          time: new Date(),
+          thumbnail_dataurl: thumbnail,
+          video_length: length,
+          size: data.length,
+        });
       }
     );
-    return id;
-  }
-
-  private async store_file(game_id: string, data: Uint8Array, type: string) {
-    const bucket = await this.bucket(game_id);
-    const file_id = make_id();
-    const file = await bucket.getFileHandle(file_id, { create: true });
-    const writer = await file.createWritable();
-    await writer.write(data);
-    await writer.close();
-    const { thumbnail, length } = await this.make_thumbnail(data, type);
-    return await this.store_file_inode(game_id, file, type, thumbnail, length);
+    return file_id;
   }
 
   async save_screenshot(game_id: string, data: Uint8Array, type: string) {
-    const id = await this.store_file(game_id, data, type);
+    const id = await this.store_file(game_id, data, type, "image");
     await this.os.notifications.push(game_id, `Screenshot saved`, "");
     return id;
   }
 
   async save_video(game_id: string, data: Uint8Array, type: string) {
-    const id = await this.store_file(game_id, data, type);
+    const id = await this.store_file(game_id, data, type, "video");
     await this.os.notifications.push(game_id, `Recording saved`, "");
     return id;
   }
@@ -99,33 +90,52 @@ export class KateCapture {
     return files;
   }
 
-  async read(id: number) {
+  async read_metadata(id: string) {
     return await this.os.db.transaction(
       [Db.media_store],
       "readonly",
       async (t) => {
         const media = t.get_table1(Db.media_store);
-        return media.get(id as any);
+        return media.get(id);
       }
     );
   }
 
-  async delete(id: number) {
-    const meta = await this.read(id);
-    const bucket = await this.bucket(meta.cart_id);
-    await bucket.removeEntry(meta.file.name);
-    await this.os.db.transaction([Db.media_store], "readwrite", async (t) => {
-      const media = t.get_table1(Db.media_store);
-      await media.delete(id as any);
-    });
+  async read_file(id: string) {
+    return await this.os.db.transaction(
+      [Db.media_files],
+      "readonly",
+      async (t) => {
+        const media = t.get_table1(Db.media_files);
+        return media.get(id);
+      }
+    );
   }
 
-  private async make_thumbnail(data: Uint8Array, type: string) {
+  async delete(file_id: string) {
+    await this.os.db.transaction(
+      [Db.media_store, Db.media_files],
+      "readwrite",
+      async (t) => {
+        const media = t.get_table1(Db.media_store);
+        const files = t.get_table1(Db.media_files);
+
+        await media.delete(file_id);
+        await files.delete(file_id);
+      }
+    );
+  }
+
+  private async make_thumbnail(
+    data: Uint8Array,
+    type: string,
+    kind: "image" | "video"
+  ) {
     const blob = new Blob([data], { type: type });
     const url = URL.createObjectURL(blob);
     try {
-      switch (type) {
-        case "image/png": {
+      switch (kind) {
+        case "image": {
           const img = await load_image(url);
           return {
             thumbnail: make_thumbnail(
@@ -137,7 +147,7 @@ export class KateCapture {
           };
         }
 
-        case "video/webm": {
+        case "video": {
           const [img, length] = await load_first_frame(
             url,
             this.THUMBNAIL_WIDTH,
@@ -150,7 +160,7 @@ export class KateCapture {
         }
 
         default:
-          throw new Error(`Not supported: ${type}`);
+          throw unreachable(kind);
       }
     } finally {
       URL.revokeObjectURL(url);

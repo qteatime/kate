@@ -5,3 +5,4 @@ export * from "../../util/build/promise";
 export * from "../../util/build/events";
 export * from "../../util/build/url";
 export * from "../../util/build/graphics";
+export * from "../../util/build/mime";
