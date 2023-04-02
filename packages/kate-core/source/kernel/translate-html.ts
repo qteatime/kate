@@ -66,13 +66,25 @@ async function load_all_media(dom: Document, context: RuntimeEnv) {
 
 function add_preamble(dom: Document, context: RuntimeEnv) {
   const script = dom.createElement("script");
+  const id = `preamble_${make_id()}`;
+  script.id = id;
   script.textContent = `
   void function() {
     var KATE_SECRET = ${JSON.stringify(context.secret)};
     ${bridges["kate-api.js"]};
+    
+    let script = document.getElementById(${JSON.stringify(id)});
+    script.remove();
+    script = null;
   }();
   `;
   dom.head.insertBefore(script, dom.head.firstChild);
+  const all_scripts = Array.from(dom.querySelectorAll("script"));
+  if (all_scripts[0] !== script) {
+    throw new Error(
+      `Cannot sandbox HTML: aborting insecure cartridge instantiation`
+    );
+  }
   return script;
 }
 
