@@ -34,51 +34,81 @@ export class SceneAboutKate extends Scene {
 
   async system_info() {
     const mode = this.os.kernel.console.options.mode;
-    const ua = await user_agent_info();
-    const device = ua.device.mobile
-      ? `(Mobile) ${ua.device.model ?? "unknown"}`
-      : ua.device.model ?? "";
 
-    if (mode === "native") {
-      const info = await this.native_info();
+    switch (mode) {
+      case "native": {
+        const info = await this.native_info();
+        const ua = await user_agent_info();
+        const device = ua.device.mobile
+          ? `(Mobile) ${ua.device.model ?? "unknown"}`
+          : ua.device.model ?? "unknown";
 
-      return {
-        kate: this.kate_info(),
-        host: {
-          os: info.os.name,
-          browser: info.engine.map((x: any) => `${x.name} ${x.version}`),
-          device: device,
-          arm64_translation: info.os.arm64_translation,
-          architecture: info.os.architecture,
-        },
-        hardware: {
-          cpu_model: info.cpu.model,
-          cpu_logical_cores: info.cpu.logical_cores,
-          cpu_frequency: mhz_to_ghz(info.cpu.speed),
-          memory: `${from_bytes(info.memory.total)} (${from_bytes(
-            info.memory.free
-          )} free)`,
-        },
-      };
-    } else {
-      return {
-        kate: this.kate_info(),
-        host: {
-          os: `${ua.os.name} ${ua.os.version ?? ""}`,
-          browser: ua.browser.map((x) => `${x.name} ${x.version ?? ""}`),
-          device: device,
-          arm64_translation: ua.cpu.wow64 ?? "unknown",
-          architecture: `${ua.cpu.architecture} (${
-            ua.cpu.bitness ?? "unknown bitness"
-          })`,
-        },
-        hardware: {
-          cpu_model: "unknown",
-          cpu_logical_cores: "unknown",
-          cpu_frequency: "unknown",
-          memory: "unknown",
-        },
-      };
+        return {
+          kate: this.kate_info(),
+          host: {
+            os: info.os.name,
+            browser: info.engine.map((x: any) => `${x.name} ${x.version}`),
+            device: device,
+            arm64_translation: info.os.arm64_translation,
+            architecture: info.os.architecture,
+          },
+          hardware: {
+            cpu_model: info.cpu.model,
+            cpu_logical_cores: info.cpu.logical_cores,
+            cpu_frequency: mhz_to_ghz(info.cpu.speed),
+            memory: `${from_bytes(info.memory.total)} (${from_bytes(
+              info.memory.free
+            )} free)`,
+          },
+        };
+      }
+
+      case "web": {
+        const ua = await user_agent_info();
+        const device = ua.device.mobile
+          ? `(Mobile) ${ua.device.model ?? "unknown"}`
+          : ua.device.model ?? "";
+        return {
+          kate: this.kate_info(),
+          host: {
+            os: `${ua.os.name} ${ua.os.version ?? ""}`,
+            browser: ua.browser.map((x) => `${x.name} ${x.version ?? ""}`),
+            device: device,
+            arm64_translation: ua.cpu.wow64 ?? "unknown",
+            architecture: `${ua.cpu.architecture} (${
+              ua.cpu.bitness ?? "unknown bitness"
+            })`,
+          },
+          hardware: {
+            cpu_model: "unknown",
+            cpu_logical_cores: "unknown",
+            cpu_frequency: "unknown",
+            memory: "unknown",
+          },
+        };
+      }
+      case "single": {
+        const ua = navigator.userAgentData ?? {};
+
+        return {
+          kate: this.kate_info(),
+          host: {
+            os: ua.platform ?? "unknown",
+            browser: (ua.brands ?? [{ brand: "unknown", version: "" }])
+              .map((x) => `${x.brand} ${x.version}`)
+              .filter((x) => !(/not/i.test(x) && /brand/i.test(x))),
+            device: ua.mobile ? "(Mobile) unknown" : "unknown",
+            arm64_translation: "unknown",
+            architecture: "unknown",
+          },
+          hardware: {
+            cpu_model: "unknown",
+            cpu_logical_cores: "unknown",
+            cpu_frequency: "unknown",
+            memory: "unknown",
+          },
+        };
+      }
     }
   }
 
