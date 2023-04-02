@@ -96,8 +96,9 @@
           const loading = new Kate.os.scenes.HUD_LoadIndicator();
           kate_os.show_hud(loading);
 
-          const game = await (await fetch("game.kart")).arrayBuffer();
-          const cart = kate.loader.load_bytes(game);
+          const cart_bytes = new Uint8Array(
+            await (await fetch("game.kart")).arrayBuffer()
+          );
 
           document.querySelector(".kate-hud-load-screen").textContent =
             "Click, touch, or press a key to start...";
@@ -107,7 +108,7 @@
             window.removeEventListener("keydown", start);
             window.removeEventListener("touchstart", start);
 
-            await kate_os.processes.run_from_cartridge(cart);
+            await kate_os.processes.run_from_cartridge(cart_bytes);
             kate_os.hide_hud(loading);
           }
           window.addEventListener("touchstart", start);
