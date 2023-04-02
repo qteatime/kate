@@ -543,29 +543,29 @@ function make_bridge(x: Bridge): Cart.Bridge[] {
       const key_map = new Map<Cart.VirtualKey, Cart.KeyboardKey>([
         [
           new Cart.VirtualKey.Up(),
-          new Cart.KeyboardKey("ArrowUp", "ArrowUp", 38n),
+          new Cart.KeyboardKey("ArrowUp", "ArrowUp", 38),
         ],
         [
           new Cart.VirtualKey.Right(),
-          new Cart.KeyboardKey("ArrowRight", "ArrowRight", 39n),
+          new Cart.KeyboardKey("ArrowRight", "ArrowRight", 39),
         ],
         [
           new Cart.VirtualKey.Down(),
-          new Cart.KeyboardKey("ArrowDown", "ArrowDown", 40n),
+          new Cart.KeyboardKey("ArrowDown", "ArrowDown", 40),
         ],
         [
           new Cart.VirtualKey.Left(),
-          new Cart.KeyboardKey("ArrowLeft", "ArrowLeft", 37n),
+          new Cart.KeyboardKey("ArrowLeft", "ArrowLeft", 37),
         ],
-        [new Cart.VirtualKey.O(), new Cart.KeyboardKey("z", "KeyZ", 90n)],
-        [new Cart.VirtualKey.X(), new Cart.KeyboardKey("x", "KeyX", 88n)],
+        [new Cart.VirtualKey.O(), new Cart.KeyboardKey("z", "KeyZ", 90)],
+        [new Cart.VirtualKey.X(), new Cart.KeyboardKey("x", "KeyX", 88)],
         [
           new Cart.VirtualKey.L_trigger(),
-          new Cart.KeyboardKey("PageUp", "PageUp", 33n),
+          new Cart.KeyboardKey("PageUp", "PageUp", 33),
         ],
         [
           new Cart.VirtualKey.R_trigger(),
-          new Cart.KeyboardKey("PageDown", "PageDown", 34n),
+          new Cart.KeyboardKey("PageDown", "PageDown", 34),
         ],
       ]);
       return [
@@ -609,7 +609,7 @@ function make_key_pair([virtual, { key, code, key_code }]: [
 ]): [Cart.VirtualKey, Cart.KeyboardKey] {
   return [
     make_virtual_key(virtual),
-    new Cart.KeyboardKey(key, code, BigInt(key_code)),
+    new Cart.KeyboardKey(key, code, Math.floor(key_code)),
   ];
 }
 

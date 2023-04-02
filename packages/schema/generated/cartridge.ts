@@ -3573,7 +3573,7 @@ export class Web_archive extends Platform$Base {
  static readonly $tag = $Tags.Web_archive;
  readonly $tag = $Tags.Web_archive;
 
- constructor(readonly html: string, readonly bridges: ((Bridge.Network_proxy | Bridge.Local_storage_proxy | Bridge.Input_proxy | Bridge.RPGMaker_MV | Bridge.Preserve_render))[]) {
+ constructor(readonly html: string, readonly bridges: ((Bridge.Network_proxy | Bridge.Local_storage_proxy | Bridge.Input_proxy | Bridge.Preserve_render))[]) {
    super();
  }
 
@@ -3615,7 +3615,7 @@ $e.array((this.bridges), ($e, v) => {
 
 
 
-export type Bridge = Bridge.Network_proxy | Bridge.Local_storage_proxy | Bridge.Input_proxy | Bridge.RPGMaker_MV | Bridge.Preserve_render;
+export type Bridge = Bridge.Network_proxy | Bridge.Local_storage_proxy | Bridge.Input_proxy | Bridge.Preserve_render;
 
 export abstract class Bridge$Base {
  static decode($d: _Decoder): Bridge {
@@ -3633,8 +3633,7 @@ export abstract class Bridge$Base {
      case 0: return Bridge.Network_proxy.decode($d);
 case 1: return Bridge.Local_storage_proxy.decode($d);
 case 2: return Bridge.Input_proxy.decode($d);
-case 3: return Bridge.RPGMaker_MV.decode($d);
-case 4: return Bridge.Preserve_render.decode($d);
+case 3: return Bridge.Preserve_render.decode($d);
 
      default:
        throw new Error(`Unknown tag ${$tag} in union Bridge`);
@@ -3644,7 +3643,7 @@ case 4: return Bridge.Preserve_render.decode($d);
 
 export namespace Bridge {
  export const enum $Tags {
-   Network_proxy,Local_storage_proxy,Input_proxy,RPGMaker_MV,Preserve_render
+   Network_proxy,Local_storage_proxy,Input_proxy,Preserve_render
  }
 
  
@@ -3767,41 +3766,6 @@ const mapping = $d.map(
 
 
 
-export class RPGMaker_MV extends Bridge$Base {
- static readonly $tag = $Tags.RPGMaker_MV;
- readonly $tag = $Tags.RPGMaker_MV;
-
- constructor() {
-   super();
- }
-
- static decode($d: _Decoder): RPGMaker_MV {
-   return RPGMaker_MV.$do_decode($d);
- }
-
- static $do_decode($d: _Decoder): RPGMaker_MV {
-   const $tag = $d.ui8();
-   if ($tag !== 3) {
-     throw new Error(`Invalid tag ${$tag} for Bridge.RPGMaker-MV: expected 3`);
-   }
-
-   
-   return new RPGMaker_MV();
- }
-
- encode($e: _Encoder) {
-   $e.ui32(25);
-   this.$do_encode($e);
- }
-
- $do_encode($e: _Encoder) {
-   $e.ui8(3);
-   
- }
-}
-
-
-
 export class Preserve_render extends Bridge$Base {
  static readonly $tag = $Tags.Preserve_render;
  readonly $tag = $Tags.Preserve_render;
@@ -3816,8 +3780,8 @@ export class Preserve_render extends Bridge$Base {
 
  static $do_decode($d: _Decoder): Preserve_render {
    const $tag = $d.ui8();
-   if ($tag !== 4) {
-     throw new Error(`Invalid tag ${$tag} for Bridge.Preserve-render: expected 4`);
+   if ($tag !== 3) {
+     throw new Error(`Invalid tag ${$tag} for Bridge.Preserve-render: expected 3`);
    }
 
    
@@ -3830,7 +3794,7 @@ export class Preserve_render extends Bridge$Base {
  }
 
  $do_encode($e: _Encoder) {
-   $e.ui8(4);
+   $e.ui8(3);
    
  }
 }
@@ -4233,7 +4197,7 @@ export class KeyboardKey {
  static readonly $tag = 27;
  readonly $tag = 27;
 
- constructor(readonly key: string, readonly code: string, readonly key_code: bigint) {}
+ constructor(readonly key: string, readonly code: string, readonly key_code: UInt32) {}
 
  static decode($d: _Decoder): KeyboardKey {
    const $tag = $d.ui32();
@@ -4246,7 +4210,7 @@ export class KeyboardKey {
  static $do_decode($d: _Decoder): KeyboardKey {
    const key = $d.text();
 const code = $d.text();
-const key_code = $d.bigint();
+const key_code = $d.ui32();
    return new KeyboardKey(key, code, key_code);
  }
 
@@ -4258,7 +4222,7 @@ const key_code = $d.bigint();
  $do_encode($e: _Encoder) {
    $e.text(this.key);
 $e.text(this.code);
-$e.integer(this.key_code);
+$e.ui32(this.key_code);
  }
 }
 

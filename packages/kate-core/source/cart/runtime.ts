@@ -56,9 +56,6 @@ function bridge(x: Cart_v2.Bridge): Bridge {
     case Cart_v2.Bridge.$Tags.Preserve_render: {
       return { type: "preserve-render" };
     }
-    case Cart_v2.Bridge.$Tags.RPGMaker_MV: {
-      throw new Error(`Unsupported legacy.`);
-    }
     default:
       throw unreachable(x);
   }

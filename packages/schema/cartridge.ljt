@@ -215,7 +215,6 @@ union Bridge {
   type Input-proxy {
     field mapping: VirtualKey -> KeyboardKey;
   }
-  type RPGMaker-MV {}
   type Preserve-render {}
 }
 
@@ -236,5 +235,5 @@ union VirtualKey {
 type KeyboardKey {
   field key: Text;
   field code: Text;
-  field key-code: Integer;
+  field key-code: Uint32;
 }
