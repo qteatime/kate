@@ -85,6 +85,13 @@ export class KateIPCServer {
       console.debug("kate-ipc <==", { type, id, payload });
       const handler = this._handlers.get(secret);
       if (handler != null) {
+        if (handler.frame.contentWindow !== ev.source) {
+          const suspicious_handler = this.handler_for_window(ev.source);
+          if (suspicious_handler != null) {
+            this.mark_suspicious_activity(ev, suspicious_handler);
+          }
+          return;
+        }
         const result = await this.process_message(handler, {
           type: type as any,
           payload,
@@ -103,9 +110,42 @@ export class KateIPCServer {
           },
           "*"
         );
+      } else {
+        const handler = this.handler_for_window(ev.source);
+        if (handler != null) {
+          this.mark_suspicious_activity(ev, handler);
+        }
       }
     }
   };
+
+  private async mark_suspicious_activity(
+    ev: MessageEvent,
+    handler: RuntimeEnv
+  ) {
+    if (handler != null) {
+      console.debug(`[Kate] suspicious IPC activity`, {
+        message: ev.data,
+        source: ev.source,
+        origin: ev.origin,
+      });
+      this._handlers.delete(handler.secret);
+      await this.os.processes.terminate(
+        handler.cart.metadata.id,
+        "kate:ipc",
+        "suspicious IPC activity"
+      );
+    }
+  }
+
+  private handler_for_window(window: unknown) {
+    for (const [key, env] of this._handlers.entries()) {
+      if (env.frame.contentWindow === window) {
+        return env;
+      }
+    }
+    return null;
+  }
 
   async process_message(
     env: RuntimeEnv,

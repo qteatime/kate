@@ -51,6 +51,17 @@ export class KateProcesses {
     return process;
   }
 
+  async terminate(id: string, requester: string, reason: string) {
+    if (this._running != null && this._running.cart.metadata.id === id) {
+      await this.os.notifications.push(
+        requester,
+        "Process terminated",
+        `${id} was terminated for ${reason}.`
+      );
+      await this._running.exit();
+    }
+  }
+
   async run(id: string) {
     if (this.is_busy) {
       throw new Error(`a process is already running`);
