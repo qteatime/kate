@@ -149,6 +149,7 @@ export class CR_Web_archive extends CartRuntime {
     };
 
     const channel = os.ipc.add_process(env);
+    env.channel = channel;
 
     frame.className = "kate-game-frame kate-game-frame-defaults";
     (frame as any).sandbox = "allow-scripts";
