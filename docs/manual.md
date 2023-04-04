@@ -6,7 +6,7 @@ Kate is a fantasy hand-held console for small 2d applications, particularly RPGs
 
 Kate is an accessibility, security, and privacy conscious platform. We want players to be in control of their gaming experience, and we want to make sure they have a fun (and safe!) time playing regardless of what cartridge they choose to run.
 
-This manual describes both the underlying technology for Kate, so you have a better idea of how it achieves this safety and privacy goals, as well as how to develop and share games for it.
+This manual describes the underlying technology Kate uses, so you have a better idea of how it achieves these safety and privacy goals. As well as what features it provides.
 
 ## Hardware specification
 
@@ -90,13 +90,16 @@ The **Single Application** mode cannot install games, it's designed to run a sin
 
 You can always check which mode the emulator is running by going to `Applications -> About Kate` and checking the `System` section.
 
-Note that due to security limitations, the `Host` and `Hardware` sections are not accurate in the **Web** and **Single** modes.
+> **NOTE:**  
+> Due to privacy restrictions in browsers to avoid tracking and fingerprinting, the `Host` and `Hardware` sections cannot be made accurate in the **Web** and **Single** modes. If you experience problems running Kate in these modes, please attach some additional information about the browser and device you're using when reporting the issue.
 
-## Kate Cartridges
+## Kate cartridges
 
-Games for Kate are packaged in a special binary format called a Kate Cartridge (with the `.kart` extension). Cartridges contain the complete data for a video game or application that runs in Kate. You can think of it like a ROM in other common emulators.
+Games for Kate are packaged in a special binary format called a Kate Cartridge (with the `.kart` extension). Cartridges contain the complete data for a video game or application that runs, sandboxed, in Kate. You can think of it like a ROM in other common emulators.
 
 You install games by dragging cartridge files from your computer and dropping them on top of the Kate emulator. In devices where dragging files is not easily achievable, like in mobile phones, you can install cartridges by holding down `Menu` for one second, and then selecting `Install cartridge`. This will open up a file picker where you can choose the `.kart` file to install.
+
+You can uninstall games by focusing them in the `Home` screen, then pressing `Menu` and choosing `Uninstall`. Uninstalling will remove the cartridge meta-data and files, but will leave behind save files and screenshots/videos captured from that game.
 
 Kate limits cartridges to a maximum size of 512MB. This is close to what you would get if the game was packaged as a CD in the 2000s. It's a reasonable choice given Kate's hardware limitations, but also helps users have more space to install games. Sharing (space) is caring!
 
@@ -119,7 +122,29 @@ Unlike phones, note that Kate does not allow cartridges to make any online conne
 By doing this Kate makes it possible for you to download a `.kart` file from anywhere, install it in a Kate emulator, and play the game without being as careful with it as you would have to downloading a native executable. If the cartridge turns out to be malicious in the end, as long you don't give it more permissions than the default ones there isn't much damage it can do.
 
 > **IMPORTANT NOTE:**  
-> In the **Single Application** mode there are no security or privacy guarantees that Kate can make. That's because whoever is distributing the Kate emulator to you controls those guarantees instead, you'd have to trust that they're upholding all of the guarantees above first.
+> In the **Single Application** mode there are no security or privacy guarantees that Kate can make. That's because whoever is distributing the Kate emulator to you controls those guarantees instead. You'd have to trust that they're upholding all of the guarantees we describe here first.
+
+## KateOS applications
+
+Kate comes bundled with a few applications for managing installed games and captured media. Currently it consists of:
+
+### Home
+
+The Home screen lists all games installed in the console, sorting them from mostly recent installed/played to least recent. You can use (![Left and Right in the D-Pad](./img/h-dpad_16.png)) to select a cartridge. (![Menu](./img/menu_16.png)) will bring up a list of things you can do with it, and you can run a cartridge by touching its cover art, or by pressing (![Ok](./img/ok_16.png)) when it's focused.
+
+Pressing (![L](./img/l_16.png)) takes you to the Applications list.
+
+### Media Gallery
+
+The Media Gallery screen lists all screenshots and videos you've captured (potentially filtered by a specific game). You can use (![D-Pad](./img/dpad_16.png)) to select one of the files, and (![Ok](./img/ok_16.png)) to open it.
+
+Once opened, you can delete or download the file by pressing (![Menu](./img/menu_16.png)) and choosing the respective option there. Bulk deletions are not currently supported, but planned for a future version.
+
+### About Kate
+
+The About Kate screen displays the version of Kate you're running and other information about your device, which you can then use when reporting an issue in the emulator to help diagnosing the problem.
+
+This page also contains the "Third Party licences", which tells you what software and assets are included in Kate, and how they're licensed to you; as well as the "Release Notes" for the version you're running, which tells you what features were added, changed, or removed, and what bugs were addressed in it.
 
 ---
 
