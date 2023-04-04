@@ -17,13 +17,13 @@ export const cart_fs = new KateCartFS(channel);
 
 export const store = new KateObjectStore(channel);
 
-export const input = new KateInput(channel);
-input.setup();
-
 export const audio = new KateAudio(channel);
 
 export const timer = new KateTimer();
 timer.setup();
+
+export const input = new KateInput(channel, timer);
+input.setup();
 
 export const capture = new KateCapture(channel, input);
 capture.setup();
@@ -51,7 +51,6 @@ declare global {
       KateAudioSource,
       KateAudioChannel,
       InputKey,
-      ExtendedInputKey,
       KateInput,
       KateTimer,
       KateObjectStore,
