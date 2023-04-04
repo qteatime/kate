@@ -4,7 +4,13 @@ import type { ConsoleOptions, ExtendedInputKey } from "../../kernel";
 import * as Legal from "../../legal";
 import { SceneTextFile } from "./licence";
 import { Scene } from "../ui/scenes";
-import { UAInfo, from_bytes, mhz_to_ghz, user_agent_info } from "../../utils";
+import {
+  UAInfo,
+  basic_ua_details,
+  from_bytes,
+  mhz_to_ghz,
+  user_agent_info,
+} from "../../utils";
 
 const release_notes = require("../../../RELEASE-0.3.4.txt!text") as string;
 
@@ -39,9 +45,7 @@ export class SceneAboutKate extends Scene {
       case "native": {
         const info = await this.native_info();
         const ua = await user_agent_info();
-        const device = ua.device.mobile
-          ? `(Mobile) ${ua.device.model ?? "unknown"}`
-          : ua.device.model ?? "unknown";
+        const device = ua.mobile ? "Mobile" : "Other";
 
         return {
           kate: this.kate_info(),
@@ -65,19 +69,15 @@ export class SceneAboutKate extends Scene {
 
       case "web": {
         const ua = await user_agent_info();
-        const device = ua.device.mobile
-          ? `(Mobile) ${ua.device.model ?? "unknown"}`
-          : ua.device.model ?? "";
+        const device = ua.mobile ? "Mobile" : "Other";
         return {
           kate: this.kate_info(),
           host: {
             os: `${ua.os.name} ${ua.os.version ?? ""}`,
-            browser: ua.browser.map((x) => `${x.name} ${x.version ?? ""}`),
+            browser: ua.engine.map((x) => `${x.name} ${x.version ?? ""}`),
             device: device,
             arm64_translation: ua.cpu.wow64 ?? "unknown",
-            architecture: `${ua.cpu.architecture} (${
-              ua.cpu.bitness ?? "unknown bitness"
-            })`,
+            architecture: ua.cpu.architecture,
           },
           hardware: {
             cpu_model: "unknown",
@@ -88,16 +88,14 @@ export class SceneAboutKate extends Scene {
         };
       }
       case "single": {
-        const ua = navigator.userAgentData ?? {};
+        const ua = basic_ua_details();
 
         return {
           kate: this.kate_info(),
           host: {
-            os: ua.platform ?? "unknown",
-            browser: (ua.brands ?? [{ brand: "unknown", version: "" }])
-              .map((x) => `${x.brand} ${x.version}`)
-              .filter((x) => !(/not/i.test(x) && /brand/i.test(x))),
-            device: ua.mobile ? "(Mobile) unknown" : "unknown",
+            os: ua.os.name ?? "unknown",
+            browser: ua.engine.map((x) => `${x.name} ${x.version ?? ""}`),
+            device: ua.mobile ? "Mobile" : "Other",
             arm64_translation: "unknown",
             architecture: "unknown",
           },
