@@ -8,6 +8,8 @@ Kate is an accessibility, security, and privacy conscious platform. We want play
 
 This manual describes the underlying technology Kate uses, so you have a better idea of how it achieves these safety and privacy goals. As well as what features it provides.
 
+For information on how to make games for Kate, see [Making games for Kate!](./dev-manual.md).
+
 ## Hardware specification
 
 |                      |                                                                                               |
