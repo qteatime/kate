@@ -1,20 +1,29 @@
 # Kate
 
-> **NOTE:** Kate is an experimental proof-of-concept currently, expect it to randomly break on every new release (or, like, just on a regular usage). Cartridge format is not final and old binaries will not work on version changes.
+> **NOTE:**  
+> Kate is an experimental proof-of-concept currently, its security properties are not proven, and it may break randomly. Cartridge format is not final, you might need to re-package your game for newer versions.
 
-Kate is a fantasy handheld console designed for simpler story-rich games, like Visual Novels and 2d RPGs. It looks like an old handheld, but runs on Windows, Mac, Linux, or in your browser. That way, you can easily and **safely** share small games as a single file that can run anywhere; and players can install and play it without worrying too much about security, since it's all sandboxed!
+Kate is a fantasy handheld console designed for simpler story-rich games, like Visual Novels and 2d RPGs. It looks like an old handheld, but runs on Windows, Mac, Linux, or in your browser.
 
-You can dive into more details about the concept and technical specifications on [Kate's Concept Paper](./docs/CONCEPT.md). To understand more about what technology powers Kate, and what guarantees you can expect from it, see the [Kate's Underlying Technology](./docs/TECHNOLOGY.md) page.
-
-You can try Kate directly from your web-browser: go to https://kate.qteati.me/ and install the `hello.kart` file provided in this repository by drag-dropping it over the console.
+It's built to be secure, respect your privacy, and give you agency on how you play your games. Developers can package their existing games for Kate and distribute it as a single cartridge file, playable on any platform the Kate emulator runs on. All sandboxed so players don't have to worry about malicious applications masquerading as games.
 
 ![](./docs/kate.png)
+
+## Documentation
+
+- [The Kate Concept Paper](./docs/concept.md) — wondering why Kate was made and what drives its design? Your answers are here.
+
+- [The Kate User Manual](./docs/user-manual.md) — confused about how Kate works, or want something to link from your game page for common things like "how controls work" and "what's this icon on the screen?". This is where you go.
+
+- [Making games for Kate!](./docs/dev-manual.md) — want to build a new game for Kate or port an existing web game to it? This guide will walk you through it. (work in progress)
+
+- [Kate's Underlying Technology](./docs/technology.md) — curious about what's powering Kate, and what the system requirements are? This covers all that. (work in progress)
 
 ## Installation
 
 Kate only supports installing from npm currently. You'll need [Node.js 16+](https://nodejs.org/en) installed. Run the following from the command line:
 
-    $ npm install @qteatime/kate-desktop@experimental
+    $ npm install -g @qteatime/kate-desktop@experimental
 
 You can then start it from the command-line as well:
 
@@ -26,25 +35,7 @@ Alternatively, you can use Kate online from https://kate.qteati.me/. It's possib
 - On iPhone: open the page in Safari and choose `Share -> Add to Home Screen`;
 - On Android: open the page in Google Chrome and choose `Install app` from the menu;
 
-## Specifications
-
-|                          |                                                               |
-| ------------------------ | ------------------------------------------------------------- |
-| **Display**              | 800x480 — a 5:3 screen                                        |
-| **Cartridge size limit** | 512mb                                                         |
-| **Input**                | D-pad, O, X, L, R, Menu, and Capture (6 buttons), multi-touch |
-
-## Default input configuration
-
-| **Kate** | **Common uses**                                   | **Keyboard** |
-| -------- | ------------------------------------------------- | ------------ |
-| D-pad    | Navigation, directional input                     | arrow keys   |
-| O        | Confirm selection, Ok                             | Z            |
-| X        | Cancel selection, alternate input                 | X            |
-| L        | Previous page                                     | A            |
-| R        | Next page                                         | S            |
-| Menu     | Contextual menu, long-press for OS menu           | left Shift   |
-| Capture  | Take a screenshot, long-press for recording video | left Ctrl    |
+Note that the web option is practical, but not recommended for archival; you can't trust domains to always resolve to the same computer forever.
 
 ## Hacking on Kate
 
@@ -59,7 +50,7 @@ $ node make all
 
 After this you should have a working Kate. You can either use `node make desktop:run` to run it as an Electron app, or start a server on the `www` folder and point a modern browser there.
 
-You should see a screen similar to the screenshot above, but without any cartridges. Drag the `hello.kart` file from the `examples/` folder and drop it over the console to install it. Then either click the game or use the keyboard/virtual buttons to play.
+You should see a screen similar to the screenshot in this page, but without any cartridges. Drag the `hello.kart` file from the `examples/` folder and drop it over the console to install it. Then either click the game or use the keyboard/virtual buttons to play.
 
 ## Examples
 
@@ -71,7 +62,7 @@ See the `examples/` folder in this repository for some example games. You can bu
 
 ## Cartridges and runtime
 
-Kate games are packaged as a single `.kart` binary file. This file contains something that can run in a webbrowser, a specification of which runtime it needs to use, some meta-data, and a set of arbitrary files in a read-only file-system. In that sense, it's much like a `.tar` or `.zip` file, just without compression and with some additional meta-data for the console.
+Kate games are packaged as a single `.kart` binary file. This file contains something that can run in a webbrowser, a specification of which runtime it needs to use, some meta-data, and a set of files in a read-only file-system. In that sense, it's much like a `.zip` file, just without compression and with some additional meta-data for the console.
 
 Currently the only supported runtime is `Web Archive`, which means you provide an HTML entry point and Kate will display that page in the console in a [fully sandboxed IFrame](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#attr-sandbox) with JavaScript support.
 
@@ -81,7 +72,7 @@ Web APIs can be emulated through what Kate calls "bridges": small scripts inject
 
 By doing this, there's also no need for a web-server. Games can be played locally using all standard web technologies (and some enhanced Kate ones), and without worrying about network latency when loading resources. Players on the other hand enjoy the same benefits of regular executables without having to worry about sandboxing them themselves, or playing them in a different machine.
 
-You build these `.kart` files using the included `kate-packaging` (`kart`) application, providing it with a JSON configuration file and an output location. For safety the cartridge can only include files that are contained in the directory of the JSON file.
+You build these `.kart` files using the included `kart` application, providing it with a JSON configuration file and an output location. For safety the cartridge can only include files that are contained in the directory of the JSON file.
 
 See the `hello-world` example cartridge for some practical example of how this all works.
 
@@ -96,7 +87,7 @@ Planned features:
   - Keyboard and virtual keyboard input for arbitrary text;
   - Gyroscope input support;
   - Haptic feedback/vibration (console and gamepad);
-  - Object store API (flat, tag-based);
+  - ~~Object store API (flat, tag-based);~~
   - Object database API (IndexedDB-like);
   - Improved audio API (graph-based);
   - Improved screen recording API (audio support);
@@ -104,7 +95,7 @@ Planned features:
   - Badges/achievements API;
 - **KateOS improvements**
   - Reconfiguring keybindings;
-  - Tracking play times locally;
+  - ~~Tracking play times locally;~~
   - Game collections and filtering;
   - Support for game booklets and OSTs;
   - "Store" for finding games in connected distributed repositories;
