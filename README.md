@@ -114,5 +114,5 @@ Planned features:
 
 ## Licence
 
-Copyright (c) 2023 Q.
+Copyright (c) 2023 Q.  
 Licensed under the permissive MIT licence.
