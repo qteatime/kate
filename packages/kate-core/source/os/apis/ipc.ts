@@ -92,24 +92,40 @@ export class KateIPCServer {
           }
           return;
         }
-        const result = await this.process_message(handler, {
-          type: type as any,
-          payload,
-        });
-        if (result == null) {
-          return;
+        try {
+          const result = await this.process_message(handler, {
+            type: type as any,
+            payload,
+          });
+          if (result == null) {
+            return;
+          }
+          const { ok, value } = result;
+          console.debug("kate-ipc ==>", { id, ok, value });
+          handler.frame.contentWindow?.postMessage(
+            {
+              type: "kate:reply",
+              id: id,
+              ok: ok,
+              value: value,
+            },
+            "*"
+          );
+        } catch (error) {
+          console.error(`[Kate] unknown error handling ${type}`, {
+            payload,
+            error,
+          });
+          handler.frame.contentWindow?.postMessage(
+            {
+              type: "kate:reply",
+              id: id,
+              ok: false,
+              value: { code: "kate.unknown-error" },
+            },
+            "*"
+          );
         }
-        const { ok, value } = result;
-        console.debug("kate-ipc ==>", { id, ok, value });
-        handler.frame.contentWindow?.postMessage(
-          {
-            type: "kate:reply",
-            id: id,
-            ok: ok,
-            value: value,
-          },
-          "*"
-        );
       } else {
         const handler = this.handler_for_window(ev.source);
         if (handler != null) {
