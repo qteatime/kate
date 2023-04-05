@@ -155,7 +155,7 @@ export class KateObjectStore {
       async (t) => {
         const store = t.get_table2(Db.object_store);
 
-        return (await store.try_get([cart_id, key]))?.data;
+        return (await store.try_get([cart_id, key]))?.data ?? null;
       }
     );
   }
