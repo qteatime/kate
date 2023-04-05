@@ -148,6 +148,36 @@ The About Kate screen displays the version of Kate you're running and other info
 
 This page also contains the "Third Party licences", which tells you what software and assets are included in Kate, and how they're licensed to you; as well as the "Release Notes" for the version you're running, which tells you what features were added, changed, or removed, and what bugs were addressed in it.
 
+## Storage and privacy
+
+In Kate, data is only ever stored locally, on your device. The Kate emulator itself never sends any of your data over the internet, although cartridges might **if** you give them network access, which is disabled by default.
+
+There's four kinds of data about the cartridges you run that are stored:
+
+- **The cartridges' data**: this is the data from the cartridges themselves. Kate copies the data from the cartridge into your local storage in a format that's more efficient and memory conscious for running games.
+
+  The Kate emulator can read any cartridge's data, but each cartridge can only read its own files; for cartridges, it's as if no other cartridge existed in the console.
+
+  Cartridge data is never modified; it is a read-only format. It might, however, be deleted if you choose to uninstall a cartridge.
+
+- **The additional cartridge data**: these are things like save files and other pieces of data associated with a particular cartridge. Games can store any piece of data up to their storage quota (by default, 32 MB), and they may ask you to increase their quota as well.
+
+  Each cartridge can read, modify, and delete its own additional data, but never other cartridge's data.
+
+  The Kate emulator can delete this additional data on your request, but it will delete _all_ of it or none of it, to ensure that cartridges never see inconsistent data they stored.
+
+- **The cartridge captures**: these are screenshots and gameplay recordings of cartridges in Kate. Screenshots and captures are only created from your own action: if you don't press the capture button, there will be no captures created. Kate does not impose a limit on how many captures you can store, it's only limited by your own device's own storage.
+
+  The Kate emulator can read and modify capture data (e.g.: for re-encoding videos), however it never **changes** or deletes the data without your explicit action.
+
+  Cartridges cannot read, modify, or delete this data. Even if they were captured from the cartridge itself. However, in the future, you'll be able to selective share your captures with the cartridge.
+
+- **The gameplay habits**: these are things like when a cartridge was last executed on the emulator, or how many hours you've spent running a cartridge. Kate collects this data by default and stores locally. It's used by Kate only for sorting and filtering cartridges in your library.
+
+  The Kate emulator will read this data when displaying cartridges, and will modify it both when you run a cartridge and when you close it. It also updates play time every 10 minutes of game play.
+
+  Cartridges cannot read, modify, or delete this data. Even data about its own play habits.
+
 ---
 
 [std-gamepad]: https://www.w3.org/TR/gamepad/#remapping
