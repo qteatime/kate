@@ -1,0 +1,15 @@
+.kate-os-logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  background: var(--color-black);
+}
+
+.kate-os-logo-image {
+  font-family: var(--font-family-title);
+  font-size: 128px;
+  color: var(--color-white);
+  opacity: 0;
+  animation: kate-os-fade-in-out 2s ease-in-out;
+}

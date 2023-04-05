@@ -1,0 +1,15 @@
+.kate-os-screen button {
+  border: none;
+  background: none;
+  outline: none;
+  text-align: left;
+  font-family: var(--font-family-sans);
+  color: inherit;
+  font-size: 100%;
+  padding: 0;
+  margin: 0;
+}
+
+.kate-ui-button {
+  white-space: nowrap;
+}

@@ -1,0 +1,15 @@
+.kate-os-about-box {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 2rem;
+}
+
+.kate-about-bg {
+  background: url("../../../img/kate-chan.png") no-repeat fixed top right;
+}
+
+.kate-os-about-content {
+  flex-grow: 1;
+  max-width: 450px;
+}

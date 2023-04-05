@@ -1,0 +1,413 @@
+:root {
+  touch-action: none;
+}
+
+body {
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+.kate {
+  --screen-bevel: 10px;
+}
+
+.kate * {
+  box-sizing: border-box;
+}
+
+.kate {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+}
+
+.kate-body {
+  position: fixed;
+  background: #faaaaa;
+  width: 1310px;
+  height: 550px;
+  border-radius: 20px;
+  box-shadow: -1px -1px 1px rgb(255 255 255 / 50%), 0px 10px 1px #c99;
+  user-select: none;
+}
+
+.kate-body.drag * {
+  pointer-events: none;
+}
+
+.kate-trigger {
+  width: 230px;
+  height: 100px;
+  position: absolute;
+  top: -15px;
+}
+
+.kate-trigger-button {
+  width: 100%;
+  height: 30px;
+  background: #69c;
+  border-radius: 15px 15px 0 0;
+  position: absolute;
+}
+
+.down .kate-trigger-button {
+  top: 10px;
+}
+
+.kate-trigger-cover {
+  width: 100%;
+  height: 35px;
+  background: #faaaaa;
+  position: absolute;
+  top: 15px;
+  border-top: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.kate-trigger-left {
+  left: 15px;
+}
+
+.kate-trigger-right {
+  right: 15px;
+}
+
+.kate-dpad {
+  position: absolute;
+  top: 100px;
+  left: 25px;
+  width: 200px;
+  height: 200px;
+  border-radius: 100%;
+  background: #fafafa;
+  box-shadow: 0px -1px 2px rgb(0 0 0 / 30%);
+}
+
+.kate-action {
+  position: absolute;
+  top: 100px;
+  right: 25px;
+  width: 200px;
+  height: 200px;
+}
+
+.kate-button-bg {
+  position: absolute;
+  top: 0px;
+  right: 50px;
+  width: 100px;
+  height: 200px;
+  border-radius: 50px;
+  background: #fafafa;
+  box-shadow: 0px -1px 2px rgb(0 0 0 / 30%);
+  transform: rotate(45deg);
+}
+
+.kate-screen {
+  position: absolute;
+  top: 20px;
+  left: 250px;
+  width: calc(800px + var(--screen-bevel) * 2);
+  height: calc(480px + var(--screen-bevel) * 2);
+  background: #2f2f2f;
+  border: var(--screen-bevel) solid #4f4f4f;
+  border-radius: var(--screen-bevel);
+  overflow: hidden;
+  user-select: text;
+}
+
+.trusted-mode .kate-screen {
+  border-color: #933;
+}
+
+.kate-button {
+  position: absolute;
+  background: #69c;
+  width: 70px;
+  height: 70px;
+  border-radius: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 32px;
+  font-weight: bold;
+  font-family: sans-serif;
+  color: #fafafa;
+  box-shadow: 1px 1px 1px rgb(0 0 0 / 30%), -1px -1px 1px rgb(255 255 255 / 50%);
+  cursor: pointer;
+}
+
+.kate-button img {
+  width: 64px;
+  height: 64px;
+}
+
+.kate-button.down {
+  background: #9af;
+}
+
+.kate-button-o {
+  top: 30px;
+  right: 30px;
+}
+
+.kate-button-x {
+  bottom: 30px;
+  left: 30px;
+}
+
+.kate-dpad-button,
+.kate-dpad-mid {
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  background: #ececea;
+  box-shadow: -1px -1px 1px rgba(255, 255, 255, 0.5),
+    1px 1px 1px rgba(0, 0, 0, 0.3);
+}
+
+.kate-dpad-button {
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.kate-dpad-button img {
+  width: 32px;
+  height: 32px;
+  filter: brightness(0.5);
+}
+
+.kate-dpad-button.down {
+  background: #ddd;
+}
+
+.kate-dpad-up {
+  top: 25px;
+  left: 75px;
+}
+
+.kate-dpad-right {
+  top: 75px;
+  right: 25px;
+}
+
+.kate-dpad-down {
+  bottom: 25px;
+  left: 75px;
+}
+
+.kate-dpad-left {
+  top: 75px;
+  left: 25px;
+}
+
+.kate-dpad-mid {
+  top: 75px;
+  left: 75px;
+  box-shadow: none;
+}
+
+.kate-whiskers {
+  position: absolute;
+  bottom: 30px;
+  width: 200px;
+  height: 140px;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.kate-whiskers-left {
+  left: 25px;
+}
+
+.kate-whiskers-left .kate-whisker-item {
+  transform: rotate(15deg);
+}
+
+.kate-whiskers-right {
+  right: 25px;
+}
+
+.kate-whiskers-right .kate-whisker-item {
+  transform: rotate(-15deg);
+}
+
+.kate-whisker-item {
+  width: 200px;
+  border-radius: 8px;
+  height: 15px;
+  box-shadow: -1px -1px 1px rgba(0, 0, 0, 0.4),
+    1px 1px 1px rgba(255, 255, 255, 0.5);
+}
+
+.kate-special-button {
+  position: absolute;
+  top: 340px;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.kate-special-button-left {
+  left: 170px;
+  transform: rotate(15deg);
+}
+
+.kate-special-button-right {
+  right: 170px;
+  transform: rotate(-15deg);
+}
+
+.kate-bean-button {
+  width: 50px;
+  height: 15px;
+  border-radius: 7.5px;
+  background: #ececea;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+}
+
+.down .kate-bean-button {
+  background: #ddd;
+}
+
+.kate-bean-button-label {
+  text-transform: uppercase;
+  font-family: sans-serif;
+  font-size: 10px;
+  text-align: center;
+  font-weight: bold;
+  color: #2f2f2f;
+}
+
+.kate-halt-screen {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  padding: 1em;
+  background: #fafafa;
+  color: #f21;
+}
+
+.kate-engraving {
+  position: absolute;
+  bottom: 3px;
+  left: 0px;
+  width: 100%;
+  font-family: sans-serif;
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: 10px;
+  text-align: center;
+  color: #932;
+  opacity: 0.75;
+  text-shadow: -1px -1px 0px rgb(0 0 0 / 20%),
+    1px 1px 0px rgb(255 255 255 / 20%);
+}
+
+.kate-version {
+  font-family: sans-serif;
+  font-size: 14px;
+  font-weight: bold;
+  color: #fafafa;
+  position: absolute;
+  bottom: 15px;
+  right: 20px;
+  text-shadow: -1px -1px 0px rgba(0, 0, 0, 0.2);
+}
+
+/* Screen */
+.kate-game-cover {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  display: none;
+}
+
+.kate-game-frame {
+  width: 100%;
+  height: 100%;
+  border: none;
+  overflow: hidden;
+}
+
+.kate-game-frame-defaults {
+  width: 800px;
+  height: 480px;
+}
+
+/* Electron */
+.kate-body {
+  -webkit-user-select: none;
+  -webkit-app-region: drag;
+}
+
+.kate-trigger,
+.kate-dpad-button,
+.kate-screen,
+.kate-button,
+.kate-bean-button {
+  -webkit-app-region: no-drag;
+}
+
+.kate-resources {
+  position: absolute;
+  width: 300px;
+  height: 30px;
+  bottom: 0px;
+  right: 240px;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+  overflow: hidden;
+}
+
+.kate-resources .kate-resource {
+  width: 16px;
+  height: 16px;
+  overflow: hidden;
+}
+
+.kate-resource-screen-recording {
+  background: #f21;
+  border-radius: 100%;
+}
+
+.kate-resource-transient-storage {
+  font-family: "Font Awesome 6 Free";
+  font-size: 16px;
+  position: relative;
+}
+
+.kate-resource-transient-storage::before {
+  content: "\f0a0";
+  display: block;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  font-size: 14px;
+}
+
+.kate-resource-transient-storage::after {
+  content: "\f017";
+  display: block;
+  font-size: 9px;
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  text-shadow: -1px -1px 0 #faaaaa, 0px -1px 0 #faaaaa, -1px 0 0 #faaaaa;
+}

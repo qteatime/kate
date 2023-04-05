@@ -1,0 +1,56 @@
+.kate-os-content {
+  padding: 1rem;
+}
+
+.kate-os-content h2 {
+  font-family: var(--font-family-title);
+  font-size: 2.5rem;
+  line-height: 1.8em;
+  display: flex;
+  flex-direction: row;
+  font-weight: 500;
+  margin: 1.5rem 0 0 0;
+}
+
+.kate-os-content h2:first-child {
+  margin-top: 0;
+}
+
+.kate-os-content .kt-meta {
+  color: var(--color-muted);
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  margin-top: -0.5rem;
+}
+
+.kate-os-content .kt-picture {
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.kate-os-content .kt-picture img {
+  width: 100%;
+  height: auto;
+}
+
+.kate-os-content .kt-padding {
+  padding: 2rem;
+}
+
+.kate-os-content .kate-ui-button {
+  text-transform: uppercase;
+  font-weight: 500;
+  padding: 1em 2em;
+  border: 2px solid var(--color-primary);
+  border-radius: 4px;
+  color: var(--color-text);
+  width: 100%;
+  text-align: center;
+}
+
+.kate-os-content .kate-ui-button.focus {
+  background: var(--color-primary);
+  color: var(--color-text-inverted);
+}

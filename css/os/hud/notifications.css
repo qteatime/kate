@@ -1,0 +1,44 @@
+.kate-hud-notifications {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  max-width: 320px;
+  max-height: 460px;
+  padding: 10px;
+  overflow: hidden;
+  z-index: 9;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 10px;
+}
+
+.kate-hud-notification-item {
+  position: relative;
+  width: 300px;
+  border-radius: 5px;
+  background: var(--color-background);
+  backdrop-filter: blur(5px);
+  animation: kate-hud-notification-in 0.2s ease-out;
+  border: var(--color-border);
+  box-shadow: 0px 1px 3px 1px var(--color-shadow);
+}
+
+.kate-hud-notification-item.leaving {
+  animation: kate-hud-notification-out 0.1s ease-in;
+  opacity: 0;
+  top: -50px;
+}
+
+.kate-hud-notification-title:not(:empty) {
+  font-weight: bold;
+  text-transform: uppercase;
+  line-height: 1.5em;
+  padding: 0.5em 10px;
+  margin-bottom: 0.8em;
+  font-size: 0.8em;
+  background: var(--color-border);
+}
+
+.kate-hud-notification-message {
+  padding: 0 10px 10px 10px;
+}

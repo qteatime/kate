@@ -8,8 +8,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <link rel="manifest" href="manifest.json" />
     <title>Kate</title>
-    <link href="kate.css" rel="stylesheet" />
-    <link href="kate-os.css" rel="stylesheet" />
+    <link href="css/kate.css" rel="stylesheet" />
+    <link href="css/kate-os.css" rel="stylesheet" />
     <link href="icons/icon256.png" rel="icon" />
     <link href="icons/icon256.png" rel="apple-touch-icon" />
   </head>
@@ -46,8 +46,6 @@
           <div class="kate-dpad-mid"></div>
         </div>
         <div class="kate-screen">
-          <div id="kate-game"></div>
-          <div class="kate-game-cover"></div>
           <div id="kate-os-root"></div>
           <div id="kate-hud"></div>
         </div>
@@ -84,13 +82,21 @@
         </div>
         <div class="kate-engraving">=KATE=</div>
         <div class="kate-version"></div>
+        <div class="kate-resources"></div>
       </div>
     </div>
     <script src="kate.js"></script>
     <script>
       void (async function () {
+        const is_native =
+          typeof KateNative !== "undefined" && KateNative.is_native;
+
         const kate = Kate.kernel.KateKernel.from_root(
-          document.querySelector(".kate")
+          document.querySelector(".kate"),
+          {
+            mode: is_native ? "native" : "web",
+            persistent_storage: true,
+          }
         );
         const kate_os = await Kate.os.KateOS.boot(kate);
         window.kate = kate;
