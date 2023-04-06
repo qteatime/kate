@@ -321,6 +321,11 @@ export class SceneAboutKate extends Scene {
     });
 
     if (should_update) {
+      await this.os.notifications.log(
+        "kate:update",
+        `Updated to v${version.version}`,
+        ""
+      );
       localStorage["kate-version"] = JSON.stringify(version);
       window.location.reload();
     }
