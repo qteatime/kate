@@ -7,7 +7,7 @@ export class KateFocusHandler {
   private _current_root: HTMLElement | null = null;
   private _handlers: {
     root: HTMLElement;
-    handler: (key: ExtendedInputKey) => boolean;
+    handler: (ev: { key: ExtendedInputKey; is_repeat: boolean }) => boolean;
   }[] = [];
   readonly on_focus_changed = new EventStream<HTMLElement | null>();
 
@@ -17,11 +17,17 @@ export class KateFocusHandler {
     this.os.kernel.console.on_key_pressed.listen(this.handle_input);
   }
 
-  listen(root: HTMLElement, handler: (key: ExtendedInputKey) => boolean) {
+  listen(
+    root: HTMLElement,
+    handler: (ev: { key: ExtendedInputKey; is_repeat: boolean }) => boolean
+  ) {
     this._handlers.push({ root, handler });
   }
 
-  remove(root: HTMLElement, handler: (key: ExtendedInputKey) => boolean) {
+  remove(
+    root: HTMLElement,
+    handler: (ev: { key: ExtendedInputKey; is_repeat: boolean }) => boolean
+  ) {
     this._handlers = this._handlers.filter(
       (x) => x.root !== root && x.handler !== handler
     );
@@ -70,20 +76,26 @@ export class KateFocusHandler {
     }
   }
 
-  handle_input = (key: ExtendedInputKey) => {
+  handle_input = ({
+    key,
+    is_repeat,
+  }: {
+    key: ExtendedInputKey;
+    is_repeat: boolean;
+  }) => {
     if (this._current_root == null) {
       return;
     }
 
     for (const { root, handler } of this._handlers) {
       if (this._current_root === root) {
-        if (handler(key)) {
+        if (handler({ key, is_repeat })) {
           return;
         }
       }
     }
 
-    if (key === "capture" || key === "long_capture") {
+    if ((key === "capture" || key === "long_capture") && !is_repeat) {
       this.os.notifications.push_transient(
         "kate:focus-manager",
         "Capture unsupported",
@@ -124,7 +136,7 @@ export class KateFocusHandler {
 
     switch (key) {
       case "o": {
-        if (current != null) {
+        if (current != null && !is_repeat) {
           this.os.sfx.play("select");
           current.element.click();
         }

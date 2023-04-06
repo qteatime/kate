@@ -314,7 +314,7 @@ export class Keymap extends Widget {
     }
 
     for (const [key, handler] of Object.entries(this.mapping)) {
-      if (KateAPI.input.is_down(key as InputKey)) {
+      if (KateAPI.input.is_pressed(key as InputKey)) {
         this.active = false;
         this.active = await handler();
         break;

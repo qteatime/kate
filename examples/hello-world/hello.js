@@ -16,7 +16,7 @@ void (function () {
   ];
 
   function update() {
-    const pressing = keys.filter((x) => api.input.is_down(x));
+    const pressing = keys.filter((x) => api.input.is_pressed(x));
     if (pressing.length === 0) {
       message.textContent = "You're not pressing anything.";
     } else {

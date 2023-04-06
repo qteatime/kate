@@ -3,7 +3,7 @@ import type { KateOS } from "../os";
 import { Scene } from "../ui/scenes";
 import { SceneAboutKate } from "../apps/about-kate";
 import { SceneMedia } from "../apps/media";
-import { SceneTextFile } from "../apps/licence";
+import { SceneTextFile } from "../apps/text-file";
 import * as UI from "../ui";
 import { EventStream } from "../../utils";
 
@@ -26,8 +26,12 @@ export class KateContextMenu {
     this.os.kernel.console.on_key_pressed.remove(this.handle_key_press);
   }
 
-  handle_key_press = (key: ExtendedInputKey) => {
-    switch (key) {
+  handle_key_press = (x: { key: ExtendedInputKey; is_repeat: boolean }) => {
+    if (x.is_repeat) {
+      return;
+    }
+
+    switch (x.key) {
       case "long_menu": {
         this.show_context_menu();
         break;
@@ -115,11 +119,13 @@ export class HUD_ContextMenu extends Scene {
     this.os.focus_handler.remove(this.canvas, this.handle_key_pressed);
   }
 
-  handle_key_pressed = (key: ExtendedInputKey) => {
-    switch (key) {
+  handle_key_pressed = (x: { key: ExtendedInputKey; is_repeat: boolean }) => {
+    switch (x.key) {
       case "x": {
-        this.on_return();
-        return true;
+        if (!x.is_repeat) {
+          this.on_return();
+          return true;
+        }
       }
     }
 

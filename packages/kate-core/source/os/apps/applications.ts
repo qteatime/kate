@@ -49,11 +49,13 @@ export class SceneApps extends Scene {
     this.os.focus_handler.remove(this.canvas, this.handle_key_pressed);
   }
 
-  handle_key_pressed = (key: ExtendedInputKey) => {
-    switch (key) {
+  handle_key_pressed = (x: { key: ExtendedInputKey; is_repeat: boolean }) => {
+    switch (x.key) {
       case "x": {
-        this.handle_close();
-        return true;
+        if (!x.is_repeat) {
+          this.handle_close();
+          return true;
+        }
       }
     }
 

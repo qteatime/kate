@@ -52,6 +52,7 @@ declare global {
       KateAudioChannel,
       InputKey,
       KateInput,
+      ExtendedInputKey,
       KateTimer,
       KateObjectStore,
     };

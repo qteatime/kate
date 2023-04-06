@@ -3,7 +3,7 @@ export * from "./applications";
 export * from "./boot";
 export * from "./game";
 export * from "./home";
-export * from "./licence";
+export * from "./text-file";
 export * from "./load-screen";
 export * from "./media";
 export * from "./view-media";

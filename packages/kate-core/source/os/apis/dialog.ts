@@ -139,8 +139,11 @@ export class HUD_Dialog extends Scene {
     try {
       this.canvas.textContent = "";
       this.canvas.appendChild(element);
-      const key_handler = (key: ExtendedInputKey) => {
-        if (key === "x") {
+      const key_handler = (x: {
+        key: ExtendedInputKey;
+        is_repeat: boolean;
+      }) => {
+        if (x.key === "x" && !x.is_repeat) {
           result.resolve(cancel_value);
           return true;
         }
@@ -209,8 +212,11 @@ export class HUD_Dialog extends Scene {
     try {
       this.canvas.textContent = "";
       this.canvas.appendChild(element);
-      const key_handler = (key: ExtendedInputKey) => {
-        if (key === "x") {
+      const key_handler = (x: {
+        key: ExtendedInputKey;
+        is_repeat: boolean;
+      }) => {
+        if (x.key === "x" && !x.is_repeat) {
           result.resolve(cancel_value);
           return true;
         }

@@ -40,13 +40,13 @@ export class SceneTextFile extends Scene {
     this.os.focus_handler.remove(this.canvas, this.handle_key_pressed);
   }
 
-  handle_key_pressed = (key: ExtendedInputKey) => {
+  handle_key_pressed = (x: { key: ExtendedInputKey; is_repeat: boolean }) => {
     const scroll = this.canvas.querySelector(".kate-os-text-scroll");
     if (scroll == null) {
       return false;
     }
 
-    switch (key) {
+    switch (x.key) {
       case "up": {
         scroll.scrollBy({ top: -350, behavior: "smooth" });
         return true;
@@ -56,8 +56,10 @@ export class SceneTextFile extends Scene {
         return true;
       }
       case "x": {
-        this.handle_close();
-        return true;
+        if (!x.is_repeat) {
+          this.handle_close();
+          return true;
+        }
       }
     }
     return false;

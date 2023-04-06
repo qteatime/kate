@@ -19,7 +19,7 @@ export class SceneGame extends Scene {
     this.os.focus_handler.listen(this.canvas, this.handle_key_pressed);
   }
 
-  handle_key_pressed = (ev: ExtendedInputKey) => {
+  handle_key_pressed = (x: { key: ExtendedInputKey; is_repeat: boolean }) => {
     return true;
   };
 

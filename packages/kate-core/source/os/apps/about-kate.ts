@@ -2,7 +2,7 @@ import { h } from "../ui/widget";
 import * as UI from "../ui/widget";
 import type { ConsoleOptions, ExtendedInputKey } from "../../kernel";
 import * as Legal from "../../legal";
-import { SceneTextFile } from "./licence";
+import { SceneTextFile } from "./text-file";
 import { Scene } from "../ui/scenes";
 import {
   UAInfo,
@@ -213,11 +213,13 @@ export class SceneAboutKate extends Scene {
     this.os.focus_handler.remove(this.canvas, this.handle_key_pressed);
   }
 
-  handle_key_pressed = (key: ExtendedInputKey) => {
-    switch (key) {
+  handle_key_pressed = (x: { key: ExtendedInputKey; is_repeat: boolean }) => {
+    switch (x.key) {
       case "x": {
-        this.handle_close();
-        return true;
+        if (!x.is_repeat) {
+          this.handle_close();
+          return true;
+        }
       }
     }
 

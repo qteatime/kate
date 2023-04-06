@@ -128,8 +128,12 @@ export class SceneMedia extends Scene {
     }
   };
 
-  handle_key_pressed = (key: ExtendedInputKey) => {
-    switch (key) {
+  handle_key_pressed = (x: { key: ExtendedInputKey; is_repeat: boolean }) => {
+    if (x.is_repeat) {
+      return false;
+    }
+
+    switch (x.key) {
       case "x": {
         this.handle_close();
         return true;

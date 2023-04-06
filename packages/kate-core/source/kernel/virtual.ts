@@ -48,7 +48,10 @@ export class VirtualConsole {
     key: InputKey;
     is_down: boolean;
   }>();
-  readonly on_key_pressed = new EventStream<ExtendedInputKey>();
+  readonly on_key_pressed = new EventStream<{
+    key: ExtendedInputKey;
+    is_repeat: boolean;
+  }>();
   readonly on_tick = new EventStream<number>();
   readonly on_scale_changed = new EventStream<number>();
   readonly audio_context = new AudioContext();
@@ -58,6 +61,7 @@ export class VirtualConsole {
   private last_time: number | null = null;
 
   readonly SPECIAL_FRAMES = 15;
+  readonly REPEAT_FRAMES = 10;
   readonly FPS = 30;
   readonly ONE_FRAME = Math.ceil(1000 / 30);
 
@@ -273,11 +277,16 @@ export class VirtualConsole {
       if (special && x.count >= this.SPECIAL_FRAMES) {
         x.count = 0;
         x.pressed = false;
-        this.on_key_pressed.emit(`long_${key as SpecialInputKey}`);
+        this.on_key_pressed.emit({
+          key: `long_${key as SpecialInputKey}`,
+          is_repeat: false,
+        });
         this.render_button_state(key, false);
       } else if (!special && x.count === 1) {
         this.on_input_changed.emit({ key, is_down: true });
-        this.on_key_pressed.emit(key);
+        this.on_key_pressed.emit({ key, is_repeat: false });
+      } else if (!special && x.count % this.REPEAT_FRAMES === 0) {
+        this.on_key_pressed.emit({ key, is_repeat: true });
       }
     } else {
       if (special) {
@@ -286,7 +295,7 @@ export class VirtualConsole {
           x.count = 0;
         } else if (x.count > 0 && x.count < this.SPECIAL_FRAMES) {
           this.on_input_changed.emit({ key, is_down: true });
-          this.on_key_pressed.emit(key);
+          this.on_key_pressed.emit({ key, is_repeat: false });
           x.count = -1;
         }
       } else if (x.count > 0) {

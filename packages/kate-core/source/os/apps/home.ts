@@ -5,7 +5,7 @@ import * as Db from "../../data/db";
 import { unreachable } from "../../utils";
 import { Scene } from "../ui/scenes";
 import { SceneApps } from "./applications";
-import { SceneTextFile } from "./licence";
+import { SceneTextFile } from "./text-file";
 import { HUD_LoadIndicator } from "./load-screen";
 
 export class SceneHome extends Scene {
@@ -160,8 +160,12 @@ export class SceneHome extends Scene {
     this.show_carts(carts);
   };
 
-  handle_key_pressed = (key: ExtendedInputKey) => {
-    switch (key) {
+  handle_key_pressed = (x: { key: ExtendedInputKey; is_repeat: boolean }) => {
+    if (x.is_repeat) {
+      return false;
+    }
+
+    switch (x.key) {
       case "menu": {
         this.handle_options();
         return true;
