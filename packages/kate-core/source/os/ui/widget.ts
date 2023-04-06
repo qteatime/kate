@@ -236,6 +236,28 @@ export class Button extends Widget {
   }
 }
 
+export function link(
+  text: Widgetable,
+  x: { href?: string; target?: string; on_click?: () => void }
+) {
+  const link = h(
+    "a",
+    {
+      class: "kate-ui-button-link kate-ui-focus-target",
+      href: x.href ?? "#",
+      target: x.target ?? "",
+    },
+    [text]
+  );
+  if (x.on_click != null) {
+    link.addEventListener("click", (ev) => {
+      ev.preventDefault();
+      x.on_click!();
+    });
+  }
+  return link;
+}
+
 export function icon_button(icon: InputKey, text: string) {
   return new Button([new HBox(5, [new Icon(icon), text])]).focus_target(false);
 }

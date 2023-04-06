@@ -368,11 +368,16 @@ w.task("tools:make-npm-package", ["tools:clean", "tools:build"], () => {
 
 // -- WWW
 w.task("www:bundle", ["core:build", "glomp:build"], () => {
+  const version = require("./package.json").version;
+  if (!/^[0-9a-z\.\-]+$/.test(version)) {
+    throw new Error(`FATAL: package.json version is malformed`);
+  }
   glomp({
     entry: "packages/kate-core/build/index.js",
-    out: "www/kate.js",
+    out: `www/kate/kate-${version}.js`,
     name: "Kate",
   });
+  copy("packages/kate-core/RELEASE.txt", `www/kate/RELEASE-${version}.txt`);
 });
 
 // -- Examples
@@ -419,6 +424,15 @@ w.task("desktop:generate", ["desktop:compile"], () => {
   remove("packages/kate-desktop/app", { recursive: true, force: true });
   copy_tree("packages/kate-desktop/build", "packages/kate-desktop/app");
   copy_tree("www", "packages/kate-desktop/app/www");
+  glomp({
+    entry: "packages/kate-core/build/index.js",
+    out: "packages/kate-desktop/app/www/kate.js",
+    name: "Kate",
+  });
+  copy(
+    "packages/kate-desktop/assets/loader.js",
+    "packages/kate-desktop/app/www/loader.js"
+  );
 });
 
 w.task("desktop:build", ["www:bundle", "desktop:generate"], () => {});

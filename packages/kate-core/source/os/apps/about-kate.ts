@@ -12,7 +12,20 @@ import {
   user_agent_info,
 } from "../../utils";
 
-const release_notes = require("../../../RELEASE-0.3.4.txt!text") as string;
+const release_notes = require("../../../RELEASE.txt!text") as string;
+
+type Version = {
+  version: string;
+  main: string;
+  breaking_change: boolean;
+  migration_needed: boolean;
+  release_notes: string;
+  channels: string[];
+};
+type VersionMeta = {
+  versions: Version[];
+  channels: { [key: string]: string };
+};
 
 function friendly_mode(mode: ConsoleOptions["mode"]) {
   switch (mode) {
@@ -146,6 +159,11 @@ export class SceneAboutKate extends Scene {
     const sysinfo = h("div", { class: "kate-os-system-information" }, []);
     this.render_sysinfo(sysinfo);
 
+    const update_button = h("div", { class: "kate-os-update-button" }, [
+      "Checking for updates...",
+    ]);
+    this.check_for_updates(update_button);
+
     return h("div", { class: "kate-os-simple-screen" }, [
       new UI.Title_bar({
         left: UI.fragment([
@@ -164,6 +182,8 @@ export class SceneAboutKate extends Scene {
             h("div", { class: "kt-meta" }, [
               "Copyright (c) 2023 Q. (MIT licensed)",
             ]),
+            new UI.Space({ height: 12 }),
+            update_button,
             new UI.Space({ height: 32 }),
             new UI.VBox(10, [
               new UI.Button(["Third-party notices"]).on_clicked(
@@ -219,4 +239,76 @@ export class SceneAboutKate extends Scene {
       new SceneTextFile(this.os, "Release Notes", "Kate", release_notes)
     );
   };
+
+  async check_for_updates(container: HTMLElement) {
+    if (this.os.kernel.console.options.mode !== "web") {
+      container.textContent = "";
+      return;
+    }
+
+    const versions = (await fetch("/versions.json").then((x) =>
+      x.json()
+    )) as VersionMeta;
+    const channel = localStorage["kate-channel"];
+    const current = JSON.parse(localStorage["kate-version"]) as Version;
+    const available = versions.versions.filter((x) =>
+      x.channels.includes(channel)
+    );
+    if (available.length > 0) {
+      const current_index =
+        available.findIndex((x) => x.version === current.version) ?? 0;
+      if (current_index < available.length - 1) {
+        const latest = available.at(-1)!;
+        container.textContent = "";
+        container.append(
+          h("div", {}, [
+            new UI.VBox(5, [
+              new UI.HBox(5, [
+                `Version ${latest.version} is available!`,
+                UI.link("(Release Notes)", {
+                  on_click: () => this.handle_release_notes_for_version(latest),
+                }),
+              ]),
+              new UI.Button([`Update to ${latest.version}`]).on_clicked(() => {
+                this.handle_update_to_version(latest);
+              }),
+            ]),
+          ])
+        );
+        return;
+      }
+    }
+
+    container.textContent = "You're up to date!";
+  }
+
+  async handle_release_notes_for_version(version: Version) {
+    const text = await fetch(version.release_notes).then((x) => x.text());
+    await this.os.push_scene(
+      new SceneTextFile(
+        this.os,
+        `Release notes v${version.version}`,
+        "Kate",
+        text
+      )
+    );
+  }
+
+  async handle_update_to_version(version: Version) {
+    const suffix = version.migration_needed
+      ? "We'll need to update your storage to a new format, this may take a few minutes."
+      : "";
+
+    const should_update = await this.os.dialog.confirm("kate:update", {
+      title: `Update to v${version.version}`,
+      message: `The application will reload to complete the update. ${suffix}`,
+      cancel: "Cancel",
+      ok: "Update now",
+    });
+
+    if (should_update) {
+      localStorage["kate-version"] = JSON.stringify(version);
+      window.location.reload();
+    }
+  }
 }
