@@ -143,10 +143,29 @@ when using Kate online, without having it installed as a WebApp.
 Playing habits
 --------------
 
-This version of Kate now collects small playing habit data, meaning
-that we store locally when a cartridge was last played, and how much
-time in total was spent in each cartridge.
+This version of Kate now collects small playing habit data by default,
+meaning that we store locally when a cartridge was last played, and
+how much time in total was spent in each cartridge. There's a new
+settings screen where this feature can be turned off, and collected
+data both visualised and deleted.
 
 The last_played data is used to sort entries in the Home screen. The
 total play times are not currently used for anything, just available
 locally.
+
+
+Pinned versions on the web
+--------------------------
+
+The web version of the Kate emulator no longer updates automatically.
+We record what version you're running, and offer the option to update
+at your leisure from the About Kate screen.
+
+This is needed because, since all data is stored locally, some upgrades
+require updating the local data due to format changes, and these
+updates can run for a few minutes if you have a lot of data. Having
+the player initiate these updates means less surprises when they're
+just trying to play something.
+
+This also gives players a chance of reviewing what has changed between
+the current version and the new one.
