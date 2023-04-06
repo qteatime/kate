@@ -277,21 +277,21 @@ export class VirtualConsole {
         this.render_button_state(key, false);
       } else if (!special && x.count === 1) {
         this.on_input_changed.emit({ key, is_down: true });
+        this.on_key_pressed.emit(key);
       }
     } else {
       if (special) {
         if (x.count === -1) {
           this.on_input_changed.emit({ key, is_down: false });
-          this.on_key_pressed.emit(key);
           x.count = 0;
         } else if (x.count > 0 && x.count < this.SPECIAL_FRAMES) {
           this.on_input_changed.emit({ key, is_down: true });
+          this.on_key_pressed.emit(key);
           x.count = -1;
         }
       } else if (x.count > 0) {
         x.count = 0;
         this.on_input_changed.emit({ key, is_down: false });
-        this.on_key_pressed.emit(key);
       }
     }
   }
