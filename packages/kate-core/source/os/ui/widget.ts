@@ -331,15 +331,116 @@ export function focusable_container(children: Widgetable[]) {
   );
 }
 
-export function info_line(label: Widgetable, data: Widgetable[]) {
-  return focusable_container([
+export function info_line(
+  label: Widgetable,
+  data: Widgetable[],
+  x?: { interactive?: boolean }
+) {
+  const info = [
     h("div", { class: "kate-ui-info-line" }, [
       h("div", { class: "kate-ui-info-line-label" }, [label]),
       h("div", { class: "kate-ui-info-line-data" }, [...data]),
     ]),
-  ]);
+  ];
+  if (x?.interactive) {
+    return focusable_container(info);
+  } else {
+    return fragment(info);
+  }
+}
+
+export function toggle(
+  value: boolean,
+  x: {
+    enabled?: Widgetable;
+    disabled?: Widgetable;
+    on_changed?: (value: boolean) => void;
+  } = {}
+) {
+  let checked = value;
+  const container = h(
+    "div",
+    { class: "kate-ui-toggle-container kate-ui-focus-target" },
+    [
+      h("div", { class: "kate-ui-toggle-view" }, [
+        h("div", { class: "kate-ui-toggle-bullet" }, []),
+      ]),
+      h("div", { class: "kate-ui-toggle-label-yes" }, [x.enabled ?? "YES"]),
+      h("div", { class: "kate-ui-toggle-label-no" }, [x.disabled ?? "NO "]),
+    ]
+  );
+
+  container.classList.toggle("active", checked);
+
+  container.addEventListener("click", () => {
+    checked = !checked;
+    container.classList.toggle("active", checked);
+    x.on_changed?.(checked);
+  });
+
+  return container;
 }
 
 export function legible_bg(children: Widgetable[]) {
   return h("div", { class: "kate-ui-legible-bg" }, [...children]);
+}
+
+export function link_card(x: {
+  icon: string;
+  title: string;
+  description: string;
+  on_click?: () => void;
+}) {
+  const element = h(
+    "div",
+    { class: "kate-ui-link-card kate-ui-focus-target" },
+    [
+      h("div", { class: "kate-ui-link-card-icon" }, [fa_icon(x.icon, "2x")]),
+      h("div", { class: "kate-ui-link-card-text" }, [
+        h("div", { class: "kate-ui-link-card-title" }, [x.title]),
+        h("div", { class: "kate-ui-link-card-description" }, [x.description]),
+      ]),
+    ]
+  );
+  if (x.on_click) {
+    element.classList.add("kate-ui-link-card-clickable");
+    element.addEventListener("click", () => x.on_click!());
+  }
+  return element;
+}
+
+export function statusbar(children: Widgetable[]) {
+  return h("div", { class: "kate-os-statusbar" }, [...children]);
+}
+
+export function scroll(children: Widgetable[]) {
+  return h("div", { class: "kate-os-scroll" }, [...children]);
+}
+
+export function simple_screen(x: {
+  icon: string;
+  title: Widgetable[];
+  subtitle?: Widgetable | null;
+  body: Widgetable;
+  status?: Widgetable[] | null;
+}) {
+  return h("div", { class: "kate-os-simple-screen" }, [
+    new Title_bar({
+      left: fragment([fa_icon(x.icon, "lg"), new Section_title(x.title)]),
+      right: x.subtitle,
+    }),
+    x.body,
+    x.status ? statusbar([...x.status]) : null,
+  ]);
+}
+
+export function text_panel(x: { title: Widgetable; description: Widgetable }) {
+  return h("div", { class: "kate-ui-text-panel" }, [
+    h("div", { class: "kate-ui-text-panel-title" }, [x.title]),
+    h("div", { class: "kate-ui-text-panel-description" }, [x.description]),
+  ]);
+}
+
+export function padding(amount: number, children: Widgetable[]) {
+  return h("div", { style: `padding: ${amount}px` }, [...children]);
 }

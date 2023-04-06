@@ -17,6 +17,11 @@ export class KateNotification {
   }
 
   async push(process_id: string, title: string, message: string) {
+    await this.log(process_id, title, message);
+    this.hud.show(title, message);
+  }
+
+  async log(process_id: string, title: string, message: string) {
     await this.os.db.transaction([Db.notifications], "readwrite", async (t) => {
       const notifications = t.get_table1(Db.notifications);
       await notifications.put({
@@ -27,7 +32,6 @@ export class KateNotification {
         message,
       });
     });
-    this.hud.show(title, message);
   }
 
   async push_transient(process_id: string, title: string, message: string) {

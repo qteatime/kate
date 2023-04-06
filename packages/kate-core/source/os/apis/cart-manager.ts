@@ -218,7 +218,25 @@ export class CartManager {
     });
   }
 
+  async delete_play_habits() {
+    await this.os.db.transaction([Db.play_habits], "readwrite", async (t) => {
+      const habits = t.get_table1(Db.play_habits);
+      const rows = await habits.get_all();
+      for (const row of rows) {
+        await habits.put({
+          id: row.id,
+          last_played: null,
+          play_time: 0,
+        });
+      }
+    });
+  }
+
   async update_last_played(cart_id: string, last_played: Date | null) {
+    if (!this.os.settings.get("play_habits").recently_played) {
+      return;
+    }
+
     await this.os.db.transaction([Db.play_habits], "readwrite", async (t) => {
       const habits = t.get_table1(Db.play_habits);
       const cart = await habits.get(cart_id);
@@ -228,6 +246,10 @@ export class CartManager {
   }
 
   async increase_play_time(cart_id: string, play_time: number) {
+    if (!this.os.settings.get("play_habits").play_times) {
+      return;
+    }
+
     await this.os.db.transaction([Db.play_habits], "readwrite", async (t) => {
       const habits = t.get_table1(Db.play_habits);
       const cart = await habits.get(cart_id);

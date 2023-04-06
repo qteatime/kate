@@ -4,6 +4,7 @@ import type { ExtendedInputKey } from "../../kernel";
 import { SceneMedia } from "./media";
 import { Scene } from "../ui/scenes";
 import { SceneAboutKate } from "./about-kate";
+import { SceneSettings } from "./settings";
 
 export class SceneApps extends Scene {
   readonly apps = [
@@ -18,6 +19,12 @@ export class SceneApps extends Scene {
       title: "About Kate",
       icon: UI.fa_icon("cat"),
       open: () => new SceneAboutKate(this.os),
+    },
+    {
+      name: "settings",
+      title: "Settings",
+      icon: UI.fa_icon("gear"),
+      open: () => new SceneSettings(this.os),
     },
   ];
 

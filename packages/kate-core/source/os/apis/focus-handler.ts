@@ -53,9 +53,7 @@ export class KateFocusHandler {
       const candidates0 = Array.from(
         element.querySelectorAll(".kate-ui-focus-target")
       ) as HTMLElement[];
-      const candidates = candidates0.sort(
-        (a, b) => a.offsetLeft - b.offsetLeft
-      );
+      const candidates = candidates0.sort((a, b) => a.offsetTop - b.offsetTop);
       this.focus(candidates[0]);
     }
   }
