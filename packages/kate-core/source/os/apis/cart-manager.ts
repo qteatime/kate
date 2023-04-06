@@ -218,6 +218,30 @@ export class CartManager {
     });
   }
 
+  async habit_history() {
+    return await this.os.db.transaction(
+      [Db.play_habits, Db.cart_meta],
+      "readonly",
+      async (t) => {
+        const carts = t.get_table1(Db.cart_meta);
+        const habits = t.get_table1(Db.play_habits);
+        const entries = await habits.get_all();
+
+        return Promise.all<Db.PlayHabits & { title: string }>(
+          entries.map(async (x) => {
+            const cart = await carts.try_get(x.id);
+            return {
+              id: x.id,
+              title: cart?.metadata.game.title ?? x.id,
+              last_played: x.last_played,
+              play_time: x.play_time,
+            };
+          })
+        );
+      }
+    );
+  }
+
   async delete_play_habits() {
     await this.os.db.transaction([Db.play_habits], "readwrite", async (t) => {
       const habits = t.get_table1(Db.play_habits);

@@ -38,6 +38,17 @@ function friendly_mode(mode: ConsoleOptions["mode"]) {
   }
 }
 
+export function bool_text(x: boolean | null) {
+  switch (x) {
+    case null:
+      return "unknown";
+    case true:
+      return "Yes";
+    case false:
+      return "No";
+  }
+}
+
 export class SceneAboutKate extends Scene {
   kate_info() {
     const console = this.os.kernel.console;
@@ -89,7 +100,7 @@ export class SceneAboutKate extends Scene {
             os: `${ua.os.name} ${ua.os.version ?? ""}`,
             browser: ua.engine.map((x) => `${x.name} ${x.version ?? ""}`),
             device: device,
-            arm64_translation: ua.cpu.wow64 ?? "unknown",
+            arm64_translation: ua.cpu.wow64 ?? null,
             architecture: ua.cpu.architecture,
           },
           hardware: {
@@ -109,7 +120,7 @@ export class SceneAboutKate extends Scene {
             os: ua.os.name ?? "unknown",
             browser: ua.engine.map((x) => `${x.name} ${x.version ?? ""}`),
             device: ua.mobile ? "Mobile" : "Other",
-            arm64_translation: "unknown",
+            arm64_translation: null,
             architecture: "unknown",
           },
           hardware: {
@@ -140,7 +151,7 @@ export class SceneAboutKate extends Scene {
         UI.info_line("OS", [x.host.os]),
         UI.info_line("Architecture", [x.host.architecture]),
         UI.info_line("x64/ARM64 translation?", [
-          String(x.host.arm64_translation),
+          bool_text(x.host.arm64_translation),
         ]),
         UI.info_line("Device", [x.host.device]),
 
@@ -160,6 +171,7 @@ export class SceneAboutKate extends Scene {
     this.render_sysinfo(sysinfo);
 
     const update_button = h("div", { class: "kate-os-update-button" }, [
+      h("h2", {}, ["Updates"]),
       "Checking for updates...",
     ]);
     this.check_for_updates(update_button);
@@ -182,8 +194,6 @@ export class SceneAboutKate extends Scene {
             h("div", { class: "kt-meta" }, [
               "Copyright (c) 2023 Q. (MIT licensed)",
             ]),
-            new UI.Space({ height: 12 }),
-            update_button,
             new UI.Space({ height: 32 }),
             new UI.VBox(10, [
               new UI.Button(["Third-party notices"]).on_clicked(
@@ -194,6 +204,8 @@ export class SceneAboutKate extends Scene {
                 this.handle_release_notes
               ),
             ]),
+            new UI.Space({ height: 24 }),
+            update_button,
             new UI.Space({ height: 32 }),
             sysinfo,
           ]),

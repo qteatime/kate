@@ -342,11 +342,15 @@ export function info_line(
       h("div", { class: "kate-ui-info-line-data" }, [...data]),
     ]),
   ];
-  if (x?.interactive) {
+  if (x?.interactive !== true) {
     return focusable_container(info);
   } else {
     return fragment(info);
   }
+}
+
+export function info_cell(label: Widgetable, data: Widgetable[]) {
+  return info_line(label, data, { interactive: true });
 }
 
 export function toggle(
@@ -443,4 +447,8 @@ export function text_panel(x: { title: Widgetable; description: Widgetable }) {
 
 export function padding(amount: number, children: Widgetable[]) {
   return h("div", { style: `padding: ${amount}px` }, [...children]);
+}
+
+export function p(children: Widgetable[]) {
+  return h("p", {}, [...children]);
 }

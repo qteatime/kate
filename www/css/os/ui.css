@@ -88,6 +88,16 @@
   backdrop-filter: blur(5);
 }
 
+/* #Link */
+.kate-ui-button-link {
+  text-decoration: none;
+}
+
+.kate-ui-button-link.focus {
+  outline: 2px dashed var(--color-primary);
+  outline-offset: 2px;
+}
+
 /* #Link card */
 .kate-ui-link-card {
   padding: 1em;
