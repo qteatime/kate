@@ -1,20 +1,20 @@
 {
-  "id": "me.qteati.kate.hello-world",
+  "id": "me.qteati.kate.katchu",
   "metadata": {
     "game": {
       "author": "Q.",
-      "title": "Hello, from Kate",
-      "description": "A simple demo to test Kate.",
-      "genre": ["tool"],
-      "tags": ["kate-sample"],
+      "title": "Kat'chu",
+      "description": "Collect consoles and rack up the score!",
+      "genre": ["action"],
+      "tags": ["kate-sample", "arcade", "short"],
       "thumbnail_path": "thumbnail.png"
     },
     "release": {
       "kind": "demo",
       "date": {
         "year": 2023,
-        "month": 2,
-        "day": 13
+        "month": 4,
+        "day": 7
       },
       "version": {
         "major": 1,
@@ -49,10 +49,16 @@
       "custom_css_path": null
     }
   },
-  "files": ["*.css", "*.js", "*.html"],
+  "files": [
+    "www/*.html",
+    "www/*.css",
+    "www/*.js",
+    "images/*.png",
+    "audio/*.wav"
+  ],
   "platform": {
     "type": "web-archive",
-    "html": "index.html",
+    "html": "www/index.html",
     "bridges": []
   }
 }

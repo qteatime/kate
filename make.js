@@ -405,9 +405,22 @@ w.task(
   }
 );
 
+w.task("example:katchu", ["tools:build", "glomp:build"], () => {
+  tsc("examples/katchu");
+  glomp({
+    entry: "examples/katchu/build/index.js",
+    out: "examples/katchu/www/katchu.js",
+    name: "Katchu",
+  });
+  kart({
+    config: "examples/katchu/kate.json",
+    output: "examples/katchu/katchu.kart",
+  });
+});
+
 w.task(
   "example:all",
-  ["example:hello-world", "example:boon-scrolling"],
+  ["example:hello-world", "example:boon-scrolling", "example:katchu"],
   () => {}
 );
 

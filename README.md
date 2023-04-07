@@ -56,9 +56,11 @@ You should see a screen similar to the screenshot in this page, but without any 
 
 See the `examples/` folder in this repository for some example games. You can build all of them into cartridges by running `node make example:all`.
 
-- [**Hello, from Kate**](examples/hello-world/): A hello-world type demo that shows what keys you're pressing (uses the `input` API).
+- [**Hello, from Kate**](examples/hello-world/): A hello-world type demo that shows what keys you're pressing (uses the input API).
 
-- [**Boon-scrolling**](examples/boon-scrolling/): A small "doom-scrolling" simulation with procedural generation (uses the `cart_fs`, `audio`, and `input` APIs, as well as the `domui` library for UI).
+- [**Boon-scrolling**](examples/boon-scrolling/): A small "doom-scrolling" simulation with procedural generation (uses the cartridge, audio, and input APIs, as well as the `domui` library for UI).
+
+- [**Kat'chu**](examples/katchu/): An older-style handheld arcade where you shoot for the highest score in 30 seconds (uses the timer, cartridge, audio, input, capture, and storage APIs).
 
 ## Cartridges and runtime
 
