@@ -64,7 +64,14 @@ export class ScenePlayHabits extends UI.SimpleScene {
       items.push(
         UI.focusable_container([
           UI.text_panel({
-            title: entry.title,
+            title: UI.fragment([
+              entry.title,
+              entry.installed
+                ? null
+                : UI.h("em", { style: "margin-left: 8px" }, [
+                    "(not installed)",
+                  ]),
+            ]),
             description: UI.fragment([
               entry.play_time === 0
                 ? "No total play time recorded"

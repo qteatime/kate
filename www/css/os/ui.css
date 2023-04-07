@@ -131,6 +131,11 @@
   font-weight: 500;
 }
 
+.kate-ui-text-panel-title em {
+  color: var(--color-primary);
+  font-weight: normal;
+}
+
 .kate-ui-link-card-description,
 .kate-ui-text-panel-description {
   color: var(--color-text-muted);

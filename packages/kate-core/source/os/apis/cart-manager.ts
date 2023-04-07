@@ -227,11 +227,14 @@ export class CartManager {
         const habits = t.get_table1(Db.play_habits);
         const entries = await habits.get_all();
 
-        return Promise.all<Db.PlayHabits & { title: string }>(
+        return Promise.all<
+          Db.PlayHabits & { title: string; installed: boolean }
+        >(
           entries.map(async (x) => {
             const cart = await carts.try_get(x.id);
             return {
               id: x.id,
+              installed: cart != null,
               title: cart?.metadata.game.title ?? x.id,
               last_played: x.last_played,
               play_time: x.play_time,
