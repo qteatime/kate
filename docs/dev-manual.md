@@ -340,14 +340,14 @@ Kate will keep the same limitations of the Web Storage API and convert all value
 >
 > The unfortunate effect is that, in particularly complicated edge cases, if you store data using this translation layer, and your cartridge crashes and closes right after, the data might not have been persisted.
 
-#### Force preserve render
+#### Preserve WebGL render
 
 Specify it as:
 
 ```json
 "bridges": [
   {
-    "type": "force-preserve-render"
+    "type": "preserve-webgl-render"
   }
 ]
 ```
@@ -355,3 +355,39 @@ Specify it as:
 Kate's screenshot feature runs on its own process, and is not synchronised with your game's drawing loop. The [WebGL API](https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API) offers a rendering optimisation where the contents drawn to the screen are not always available to Kate's separate process, and in that case the player might capture a screenshot that ends up blank, because your game is in the process of updating the screen.
 
 In some cases this optimisation is turned on by whatever engine you're using (e.g.: Ren'Py), and it might be quite difficult to disable it. This bridge will force the optimisation to be disabled in order to offer consistent support for screenshots instead. Since Kate has a very small screen, the performance impact of disabling the optimisation is generally acceptable.
+
+#### Capture canvas
+
+Specify it as:
+
+```json
+"bridges": [
+  {
+    "type": "capture-canvas",
+    "selector": "#canvas"
+  }
+]
+```
+
+Tells Kate which canvas to capture as the game screen. The `selector` option is a [CSS Selector](https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/Selectors) that must resolve to a canvas element when the page is loaded.
+
+Kate will actually poll for the selector, so this bridge also works with elements that are added dynamically to the page from a script.
+
+## Porting from specific engines
+
+If your game was written using a game engine that exports for the web, it's generally easier to follow a cookbook process of how to configure Kart to repackage that game for Kate. This section provides common configurations for common engines Kate supports.
+
+### Ren'Py
+
+Games exported with [Ren'Py web](https://www.renpy.org/) can run on Kate by adding a few [Bridges](#using-bridges) to the configuration. For an example, see the [code for the sound of rain.](https://github.com/qteatime/games/blob/main/the-sound-of-rain).
+
+The bridge configuration for Ren'Py looks like this:
+
+```json
+"bridges": [
+  {"type": "network-proxy"},
+  {"type": "input-proxy", "mapping": "renpy"},
+  {"type": "preserve-webgl-render"},
+  {"type": "capture-canvas", "selector": "#canvas"}
+]
+```
