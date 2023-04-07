@@ -15,6 +15,9 @@ export class KateIPC {
       key: ExtendedInputKey;
       is_repeat: boolean;
     }>(),
+    take_screenshot: new EventStream<{ token: string }>(),
+    start_recording: new EventStream<{ token: string }>(),
+    stop_recording: new EventStream<void>(),
     paused: new EventStream<boolean>(),
   };
 
@@ -95,6 +98,21 @@ export class KateIPC {
 
       case "kate:paused": {
         this.events.paused.emit(ev.data.state);
+        break;
+      }
+
+      case "kate:take-screenshot": {
+        this.events.take_screenshot.emit({ token: ev.data.token });
+        break;
+      }
+
+      case "kate:start-recording": {
+        this.events.start_recording.emit({ token: ev.data.token });
+        break;
+      }
+
+      case "kate:stop-recording": {
+        this.events.stop_recording.emit();
         break;
       }
     }

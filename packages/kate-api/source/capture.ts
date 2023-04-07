@@ -20,7 +20,35 @@ export class KateCapture {
       throw new Error(`setup() called twice`);
     }
     this.#initialised = true;
-    this.#channel.events.key_pressed.listen(this.#handle_key_press);
+
+    this.#channel.events.take_screenshot.listen(({ token }) => {
+      if (this.will_capture()) {
+        this.#save_screenshot(token);
+      }
+    });
+
+    this.#channel.events.start_recording.listen(({ token }) => {
+      if (this.#capture_monitor != null) {
+        return;
+      }
+
+      if (this.will_capture()) {
+        this.#capture_monitor = this.#record_video(token);
+      }
+    });
+
+    this.#channel.events.stop_recording.listen(() => {
+      if (this.#capture_monitor == null) {
+        return;
+      }
+
+      if (this.will_capture()) {
+        this.#capture_monitor.stop((blob, token) =>
+          this.#save_video(blob, token)
+        );
+        this.#capture_monitor = null;
+      }
+    });
   }
 
   set_root(element: HTMLCanvasElement | null) {
@@ -33,43 +61,19 @@ export class KateCapture {
     this.#capture_root = element;
   }
 
-  #handle_key_press = (x: { key: ExtendedInputKey; is_repeat: boolean }) => {
-    if (x.is_repeat) {
-      return;
-    }
-    const key = x.key;
-
+  will_capture() {
     if (this.#capture_root == null) {
-      if (key === "capture" || key === "long_capture") {
-        this.#channel.send_and_ignore_result("kate:notify.transient", {
-          title: "Capture unsupported",
-          message: "Screen capture is not available right now.",
-        });
-      }
-      return;
-    }
-    if (this._input.is_paused) {
-      return;
+      this.#channel.send_and_ignore_result("kate:notify.transient", {
+        title: "Capture unsupported",
+        message: "Screen capture is not available right now.",
+      });
+      return false;
     }
 
-    switch (key) {
-      case "capture": {
-        this.#save_screenshot();
-        break;
-      }
+    return true;
+  }
 
-      case "long_capture": {
-        if (this.#capture_monitor != null) {
-          this.#capture_monitor.stop((blob) => this.#save_video(blob));
-          this.#capture_monitor = null;
-        } else {
-          this.#capture_monitor = this.#record_video();
-        }
-      }
-    }
-  };
-
-  #record_video() {
+  #record_video(token: string) {
     const data = defer<Blob>();
 
     const canvas = this.#capture_root!;
@@ -85,28 +89,30 @@ export class KateCapture {
     recorder.start();
     this.#channel.send_and_ignore_result("kate:capture.start-recording", {});
 
-    const monitor = new RecorderMonitor(recorder, data.promise);
+    const monitor = new RecorderMonitor(recorder, data.promise, token);
     setTimeout(() => {
-      monitor.stop((blob) => this.#save_video(blob));
+      monitor.stop((blob) => this.#save_video(blob, token));
     }, this.CAPTURE_MAX_LENGTH);
 
     return monitor;
   }
 
-  async #save_video(blob: Blob) {
+  async #save_video(blob: Blob, token: string) {
     const buffer = await blob.arrayBuffer();
     await this.#channel.call("kate:capture.save-recording", {
       data: new Uint8Array(buffer),
       type: "video/webm",
+      token: token,
     });
   }
 
-  async #save_screenshot() {
+  async #save_screenshot(token: string) {
     const blob = await this.#take_screenshot();
     const buffer = await blob.arrayBuffer();
     await this.#channel.call("kate:capture.save-image", {
       data: new Uint8Array(buffer),
       type: "image/png",
+      token: token,
     });
   }
 
@@ -129,9 +135,13 @@ export class KateCapture {
 
 class RecorderMonitor {
   private _stopped: boolean = false;
-  constructor(private recorder: MediaRecorder, readonly data: Promise<Blob>) {}
+  constructor(
+    private recorder: MediaRecorder,
+    readonly data: Promise<Blob>,
+    readonly token: string
+  ) {}
 
-  async stop(save: (blob: Blob) => void) {
+  async stop(save: (blob: Blob, token: string) => void) {
     if (this._stopped) {
       return;
     }
@@ -139,6 +149,6 @@ class RecorderMonitor {
     this._stopped = true;
     this.recorder.stop();
     const data = await this.data;
-    save(data);
+    save(data, this.token);
   }
 }

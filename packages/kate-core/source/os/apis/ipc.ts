@@ -27,12 +27,12 @@ type Message =
   | { type: "kate:special.focus" }
   | {
       type: "kate:capture.save-image";
-      payload: { data: Uint8Array; type: string };
+      payload: { data: Uint8Array; type: string; token: string };
     }
   | { type: "kate:capture.start-recording" }
   | {
       type: "kate:capture.save-recording";
-      payload: { data: Uint8Array; type: string };
+      payload: { data: Uint8Array; type: string; token: string };
     }
   | {
       type: "kate:notify.transient";
@@ -163,6 +163,24 @@ export class KateIPCServer {
     return null;
   }
 
+  async consume_capture_token(
+    token: string,
+    env: RuntimeEnv,
+    message: Message
+  ) {
+    if (!env.capture_tokens.has(token)) {
+      await this.mark_suspicious_activity(
+        {
+          data: message,
+          source: env.frame.contentWindow,
+        } as any,
+        env
+      );
+      throw new Error(`Invalid capture token.`);
+    }
+    env.capture_tokens.delete(token);
+  }
+
   async process_message(
     env: RuntimeEnv,
     message: Message
@@ -189,6 +207,8 @@ export class KateIPCServer {
 
       // -- Capture
       case "kate:capture.save-image": {
+        await this.consume_capture_token(message.payload.token, env, message);
+
         try {
           this.os.sfx.play("shutter");
           await this.os.capture.save_screenshot(
@@ -220,6 +240,8 @@ export class KateIPCServer {
       }
 
       case "kate:capture.save-recording": {
+        await this.consume_capture_token(message.payload.token, env, message);
+
         try {
           this.os.kernel.console.release_resource("screen-recording");
           await this.os.capture.save_video(

@@ -1,6 +1,14 @@
 import { KateOS } from "../os";
 import * as Db from "../../data";
-import { make_id, unreachable, load_image, make_thumbnail } from "../../utils";
+import {
+  make_id,
+  unreachable,
+  load_image,
+  make_thumbnail,
+  mb,
+  from_bytes,
+  kb,
+} from "../../utils";
 
 declare global {
   function showSaveFilePicker(options?: {
@@ -17,6 +25,9 @@ declare global {
 export class KateCapture {
   readonly THUMBNAIL_WIDTH = 160;
   readonly THUMBNAIL_HEIGHT = 96;
+
+  readonly MAX_SCREENSHOT_SIZE = mb(1);
+  readonly MAX_VIDEO_SIZE = mb(16);
 
   constructor(readonly os: KateOS) {}
 
@@ -55,12 +66,30 @@ export class KateCapture {
   }
 
   async save_screenshot(game_id: string, data: Uint8Array, type: string) {
+    if (data.length > this.MAX_SCREENSHOT_SIZE) {
+      await this.os.notifications.push(
+        game_id,
+        "Failed to save screenshot",
+        `Size limit of ${from_bytes(this.MAX_SCREENSHOT_SIZE)} exceeded`
+      );
+      return null;
+    }
+
     const id = await this.store_file(game_id, data, type, "image");
     await this.os.notifications.push(game_id, `Screenshot saved`, "");
     return id;
   }
 
   async save_video(game_id: string, data: Uint8Array, type: string) {
+    if (data.length > this.MAX_VIDEO_SIZE) {
+      await this.os.notifications.push(
+        game_id,
+        "Failed to save recording",
+        `Size limit of ${from_bytes(this.MAX_VIDEO_SIZE)} exceeded`
+      );
+      return null;
+    }
+
     const id = await this.store_file(game_id, data, type, "video");
     await this.os.notifications.push(game_id, `Recording saved`, "");
     return id;

@@ -16,6 +16,7 @@ export type RuntimeEnv = RuntimeEnvConfig & {
   audio_server: KateAudioServer;
   frame: HTMLIFrameElement;
   channel: KateIPCChannel;
+  capture_tokens: Set<string>;
 };
 
 export class KateRuntimes {
@@ -140,12 +141,14 @@ export class CR_Web_archive extends CartRuntime {
     const secret = make_id();
     const frame = document.createElement("iframe");
     const audio_server = os.make_audio_server();
+    const capture_tokens = new Set<string>();
     const env: RuntimeEnv = {
       ...this.env,
       secret: secret,
       frame: frame,
       audio_server: audio_server,
       channel: null as any,
+      capture_tokens,
     };
 
     const channel = os.ipc.add_process(env);
@@ -156,6 +159,7 @@ export class CR_Web_archive extends CartRuntime {
     frame.allow = "";
     (frame as any).csp =
       "default-src data: blob: 'unsafe-inline' 'unsafe-eval' 'unsafe-inline' 'wasm-unsafe-eval'; navigate-to 'none'";
+
     this.console.on_input_changed.listen((ev) => {
       channel.send({
         type: "kate:input-state-changed",
@@ -163,11 +167,28 @@ export class CR_Web_archive extends CartRuntime {
         is_down: ev.is_down,
       });
     });
+
+    let recording = false;
     this.console.on_key_pressed.listen((key) => {
       channel.send({
         type: "kate:input-key-pressed",
         key: key,
       });
+      if (key.key === "capture") {
+        const token = make_id();
+        env.capture_tokens.add(token);
+        channel.send({ type: "kate:take-screenshot", token });
+      }
+      if (key.key === "long_capture") {
+        recording = !recording;
+        if (recording) {
+          const token = make_id();
+          env.capture_tokens.add(token);
+          channel.send({ type: "kate:start-recording", token });
+        } else {
+          channel.send({ type: "kate:stop-recording" });
+        }
+      }
     });
 
     frame.src = URL.createObjectURL(

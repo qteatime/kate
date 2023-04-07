@@ -23,3 +23,19 @@ export function from_bytes(n0: number) {
 
   return `${n.toFixed(2)} ${use_unit}`;
 }
+
+export function bytes(n: number) {
+  return n;
+}
+
+export function kb(n: number) {
+  return 1_024 * bytes(n);
+}
+
+export function mb(n: number) {
+  return 1_024 * kb(n);
+}
+
+export function gb(n: number) {
+  return 1_024 * mb(n);
+}
