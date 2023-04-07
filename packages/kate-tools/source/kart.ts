@@ -3,6 +3,13 @@ import * as FS from "fs";
 import { Cart, add_fingerprint } from "./deps/schema";
 import { unreachable } from "./deps/util";
 import * as Glob from "glob";
+const keymap = require("../assets/keymap.json") as {
+  [key: string]: {
+    key: string;
+    code: string;
+    key_code: number;
+  };
+};
 
 type Kart = {
   id: string;
@@ -106,18 +113,14 @@ type KPWeb = {
   bridges: Bridge[];
 };
 
-type KeyboardKey = {
-  key: string;
-  code: string;
-  key_code: number;
-};
+type KeyMapping = { [key: string]: string } | "defaults" | "kate";
 
 type Bridge =
   | { type: "network-proxy" }
   | { type: "local-storage-proxy" }
   | {
       type: "input-proxy";
-      mapping: { [key: string]: KeyboardKey } | "defaults";
+      mapping: KeyMapping;
     }
   | { type: "preserve-webgl-render" }
   | { type: "capture-canvas"; selector: string };
@@ -545,29 +548,50 @@ function make_bridge(x: Bridge): Cart.Bridge[] {
   }
 }
 
-function get_mapping(x: "defaults" | { [key: string]: KeyboardKey }) {
-  if (x === "defaults") {
-    return {
-      up: { key: "ArrowUp", code: "ArrowUp", key_code: 38 },
-      right: { key: "ArrowRight", code: "ArrowRight", key_code: 39 },
-      down: { key: "ArrowDown", code: "ArrowDown", key_code: 40 },
-      left: { key: "ArrowLeft", code: "ArrowLeft", key_code: 37 },
-      x: { key: "Escape", code: "Escape", key_code: 27 },
-      o: { key: "Enter", code: "Enter", key_code: 13 },
-      menu: { key: "Shift", code: "ShiftLeft", key_code: 16 },
-      capture: { key: "Control", code: "ControlLeft", key_code: 17 },
-      l: { key: "PageUp", code: "PageUp", key_code: 33 },
-      r: { key: "PageDown", code: "PageDown", key_code: 34 },
-    };
+function get_mapping(x: KeyMapping) {
+  if (typeof x === "string") {
+    switch (x) {
+      case "defaults":
+        return {
+          up: "ArrowUp",
+          right: "ArrowRight",
+          left: "ArrowLeft",
+          down: "ArrowDown",
+          x: "Escape",
+          o: "Enter",
+          menu: "ShiftLeft",
+          capture: "ControlLeft",
+          l: "PageUp",
+          r: "PageDown",
+        };
+
+      case "kate":
+        return {
+          up: "ArrowUp",
+          right: "ArrowRight",
+          left: "ArrowLeft",
+          down: "ArrowDown",
+          x: "KeyX",
+          o: "KeyZ",
+          menu: "ShiftLeft",
+          capture: "ControlLeft",
+          l: "KeyA",
+          r: "KeyS",
+        };
+
+      default:
+        throw unreachable(x);
+    }
   } else {
     return x;
   }
 }
 
-function make_key_pair([virtual, { key, code, key_code }]: [
-  string,
-  KeyboardKey
-]): [Cart.VirtualKey, Cart.KeyboardKey] {
+function make_key_pair([virtual, key_id]: [string, string]): [
+  Cart.VirtualKey,
+  Cart.KeyboardKey
+] {
+  const { key, code, key_code } = keymap[key_id];
   return [
     make_virtual_key(virtual),
     new Cart.KeyboardKey(key, code, Math.floor(key_code)),

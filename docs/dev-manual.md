@@ -284,7 +284,7 @@ Kate can handle:
 
 #### Input proxy
 
-To use the same keybindings as the Kate defaults, specify it as:
+The default mapping fits most web games (`O` maps to `Enter`, `X` maps to `Escape`). You can specify it as:
 
 ```json
 "bridges": [
@@ -295,7 +295,7 @@ To use the same keybindings as the Kate defaults, specify it as:
 ]
 ```
 
-If your game uses different keybindings, you'll need to map it manually. Specify it as:
+The other pre-defined mapping is `"kate"`, which uses the same mappings as the standard Kate keyboard configuration. If your game uses different keybindings, you'll need to map it manually. Specify it as:
 
 ```json
 "bridges": [
@@ -316,6 +316,8 @@ If your game uses different keybindings, you'll need to map it manually. Specify
   }
 ]
 ```
+
+The supported key identifiers can be seen in Kart's [keymap.json](../packages/kate-tools/assets/keymap.json).
 
 The input proxy translates Kate input (keyboard, gamepad, and virtual buttons) into keyboard events dispatched on the Window or Document objects, depending on where your game listens to them.
 
@@ -386,7 +388,7 @@ The bridge configuration for Ren'Py looks like this:
 ```json
 "bridges": [
   {"type": "network-proxy"},
-  {"type": "input-proxy", "mapping": "renpy"},
+  {"type": "input-proxy", "mapping": "defaults"},
   {"type": "preserve-webgl-render"},
   {"type": "capture-canvas", "selector": "#canvas"}
 ]
