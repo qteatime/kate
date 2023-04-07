@@ -1,6 +1,6 @@
 import { EventStream } from "../../util/build/events";
 import { defer, Deferred } from "../../util/build/promise";
-import type { InputKey } from "./input";
+import type { ExtendedInputKey, InputKey } from "./input";
 
 type Payload = { [key: string]: any };
 
@@ -11,7 +11,10 @@ export class KateIPC {
   #server: Window;
   readonly events = {
     input_state_changed: new EventStream<{ key: InputKey; is_down: boolean }>(),
-    key_pressed: new EventStream<InputKey>(),
+    key_pressed: new EventStream<{
+      key: ExtendedInputKey;
+      is_repeat: boolean;
+    }>(),
     paused: new EventStream<boolean>(),
   };
 

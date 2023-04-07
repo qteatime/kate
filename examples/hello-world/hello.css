@@ -29,6 +29,8 @@
 
 #message {
   font-family: Verdana, sans-serif;
+  white-space: pre-wrap;
+  text-align: center;
   font-size: 24px;
   color: #4f4f4f;
 }

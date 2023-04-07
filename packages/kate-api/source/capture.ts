@@ -33,7 +33,12 @@ export class KateCapture {
     this.#capture_root = element;
   }
 
-  #handle_key_press = (key: ExtendedInputKey) => {
+  #handle_key_press = (x: { key: ExtendedInputKey; is_repeat: boolean }) => {
+    if (x.is_repeat) {
+      return;
+    }
+    const key = x.key;
+
     if (this.#capture_root == null) {
       if (key === "capture" || key === "long_capture") {
         this.#channel.send_and_ignore_result("kate:notify.transient", {
