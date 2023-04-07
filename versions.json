@@ -1,0 +1,15 @@
+{
+  "versions": [
+    {
+      "version": "0.23.4-a1",
+      "main": "/kate/kate-0.23.4-a1.js",
+      "breaking_change": false,
+      "migration_needed": false,
+      "channels": ["preview"],
+      "release_notes": "/kate/RELEASE-0.23.4-a1.txt"
+    }
+  ],
+  "channels": {
+    "preview": "0.23.4-a1"
+  }
+}
