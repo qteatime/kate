@@ -100,18 +100,11 @@ type BookletExpr = unknown;
 
 type KartPlatform = KPWeb;
 
-type KPWeb =
-  | {
-      type: "web";
-      url: string;
-      width: number;
-      height: number;
-    }
-  | {
-      type: "web-archive";
-      html: string;
-      bridges: Bridge[];
-    };
+type KPWeb = {
+  type: "web-archive";
+  html: string;
+  bridges: Bridge[];
+};
 
 type KeyboardKey = {
   key: string;
@@ -120,14 +113,14 @@ type KeyboardKey = {
 };
 
 type Bridge =
-  | { type: "standard-network" }
-  | { type: "local-storage" }
+  | { type: "network-proxy" }
+  | { type: "local-storage-proxy" }
   | {
       type: "input-proxy";
       mapping: { [key: string]: KeyboardKey } | "defaults";
     }
-  | { type: "rpgmaker-mv" }
-  | { type: "preserve-webgl-render" };
+  | { type: "preserve-webgl-render" }
+  | { type: "capture-canvas"; selector: string };
 
 class J<T extends { [key: string]: any }> {
   constructor(readonly value: T, readonly path: string[]) {}
@@ -523,11 +516,11 @@ function save(cart: Cart.Cartridge, output: string) {
 
 function make_bridge(x: Bridge): Cart.Bridge[] {
   switch (x.type) {
-    case "standard-network": {
+    case "network-proxy": {
       return [new Cart.Bridge.Network_proxy()];
     }
 
-    case "local-storage": {
+    case "local-storage-proxy": {
       return [new Cart.Bridge.Local_storage_proxy()];
     }
 
@@ -539,44 +532,12 @@ function make_bridge(x: Bridge): Cart.Bridge[] {
       ];
     }
 
-    case "rpgmaker-mv": {
-      const key_map = new Map<Cart.VirtualKey, Cart.KeyboardKey>([
-        [
-          new Cart.VirtualKey.Up(),
-          new Cart.KeyboardKey("ArrowUp", "ArrowUp", 38),
-        ],
-        [
-          new Cart.VirtualKey.Right(),
-          new Cart.KeyboardKey("ArrowRight", "ArrowRight", 39),
-        ],
-        [
-          new Cart.VirtualKey.Down(),
-          new Cart.KeyboardKey("ArrowDown", "ArrowDown", 40),
-        ],
-        [
-          new Cart.VirtualKey.Left(),
-          new Cart.KeyboardKey("ArrowLeft", "ArrowLeft", 37),
-        ],
-        [new Cart.VirtualKey.O(), new Cart.KeyboardKey("z", "KeyZ", 90)],
-        [new Cart.VirtualKey.X(), new Cart.KeyboardKey("x", "KeyX", 88)],
-        [
-          new Cart.VirtualKey.L_trigger(),
-          new Cart.KeyboardKey("PageUp", "PageUp", 33),
-        ],
-        [
-          new Cart.VirtualKey.R_trigger(),
-          new Cart.KeyboardKey("PageDown", "PageDown", 34),
-        ],
-      ]);
-      return [
-        new Cart.Bridge.Local_storage_proxy(),
-        new Cart.Bridge.Network_proxy(),
-        new Cart.Bridge.Input_proxy(key_map),
-      ];
+    case "preserve-webgl-render": {
+      return [new Cart.Bridge.Preserve_webgl_render()];
     }
 
-    case "preserve-webgl-render": {
-      return [new Cart.Bridge.Preserve_render()];
+    case "capture-canvas": {
+      return [new Cart.Bridge.Capture_canvas(x.selector)];
     }
 
     default:

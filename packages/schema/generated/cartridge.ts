@@ -3573,7 +3573,7 @@ export class Web_archive extends Platform$Base {
  static readonly $tag = $Tags.Web_archive;
  readonly $tag = $Tags.Web_archive;
 
- constructor(readonly html: string, readonly bridges: ((Bridge.Network_proxy | Bridge.Local_storage_proxy | Bridge.Input_proxy | Bridge.Preserve_render))[]) {
+ constructor(readonly html: string, readonly bridges: ((Bridge.Network_proxy | Bridge.Local_storage_proxy | Bridge.Input_proxy | Bridge.Preserve_webgl_render | Bridge.Capture_canvas))[]) {
    super();
  }
 
@@ -3615,7 +3615,7 @@ $e.array((this.bridges), ($e, v) => {
 
 
 
-export type Bridge = Bridge.Network_proxy | Bridge.Local_storage_proxy | Bridge.Input_proxy | Bridge.Preserve_render;
+export type Bridge = Bridge.Network_proxy | Bridge.Local_storage_proxy | Bridge.Input_proxy | Bridge.Preserve_webgl_render | Bridge.Capture_canvas;
 
 export abstract class Bridge$Base {
  static decode($d: _Decoder): Bridge {
@@ -3633,7 +3633,8 @@ export abstract class Bridge$Base {
      case 0: return Bridge.Network_proxy.decode($d);
 case 1: return Bridge.Local_storage_proxy.decode($d);
 case 2: return Bridge.Input_proxy.decode($d);
-case 3: return Bridge.Preserve_render.decode($d);
+case 3: return Bridge.Preserve_webgl_render.decode($d);
+case 4: return Bridge.Capture_canvas.decode($d);
 
      default:
        throw new Error(`Unknown tag ${$tag} in union Bridge`);
@@ -3643,7 +3644,7 @@ case 3: return Bridge.Preserve_render.decode($d);
 
 export namespace Bridge {
  export const enum $Tags {
-   Network_proxy,Local_storage_proxy,Input_proxy,Preserve_render
+   Network_proxy,Local_storage_proxy,Input_proxy,Preserve_webgl_render,Capture_canvas
  }
 
  
@@ -3766,26 +3767,26 @@ const mapping = $d.map(
 
 
 
-export class Preserve_render extends Bridge$Base {
- static readonly $tag = $Tags.Preserve_render;
- readonly $tag = $Tags.Preserve_render;
+export class Preserve_webgl_render extends Bridge$Base {
+ static readonly $tag = $Tags.Preserve_webgl_render;
+ readonly $tag = $Tags.Preserve_webgl_render;
 
  constructor() {
    super();
  }
 
- static decode($d: _Decoder): Preserve_render {
-   return Preserve_render.$do_decode($d);
+ static decode($d: _Decoder): Preserve_webgl_render {
+   return Preserve_webgl_render.$do_decode($d);
  }
 
- static $do_decode($d: _Decoder): Preserve_render {
+ static $do_decode($d: _Decoder): Preserve_webgl_render {
    const $tag = $d.ui8();
    if ($tag !== 3) {
-     throw new Error(`Invalid tag ${$tag} for Bridge.Preserve-render: expected 3`);
+     throw new Error(`Invalid tag ${$tag} for Bridge.Preserve-webgl-render: expected 3`);
    }
 
    
-   return new Preserve_render();
+   return new Preserve_webgl_render();
  }
 
  encode($e: _Encoder) {
@@ -3796,6 +3797,41 @@ export class Preserve_render extends Bridge$Base {
  $do_encode($e: _Encoder) {
    $e.ui8(3);
    
+ }
+}
+
+
+
+export class Capture_canvas extends Bridge$Base {
+ static readonly $tag = $Tags.Capture_canvas;
+ readonly $tag = $Tags.Capture_canvas;
+
+ constructor(readonly selector: string) {
+   super();
+ }
+
+ static decode($d: _Decoder): Capture_canvas {
+   return Capture_canvas.$do_decode($d);
+ }
+
+ static $do_decode($d: _Decoder): Capture_canvas {
+   const $tag = $d.ui8();
+   if ($tag !== 4) {
+     throw new Error(`Invalid tag ${$tag} for Bridge.Capture-canvas: expected 4`);
+   }
+
+   const selector = $d.text();
+   return new Capture_canvas(selector);
+ }
+
+ encode($e: _Encoder) {
+   $e.ui32(25);
+   this.$do_encode($e);
+ }
+
+ $do_encode($e: _Encoder) {
+   $e.ui8(4);
+   $e.text(this.selector);
  }
 }
 

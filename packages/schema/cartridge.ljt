@@ -215,7 +215,10 @@ union Bridge {
   type Input-proxy {
     field mapping: VirtualKey -> KeyboardKey;
   }
-  type Preserve-render {}
+  type Preserve-webgl-render {}
+  type Capture-canvas {
+    field selector: Text;
+  }
 }
 
 union VirtualKey {

@@ -102,6 +102,7 @@ function apply_bridge(
 ): void {
   const wrap = (source: string) => {
     return `void function(exports) {
+      "use strict";
       ${source};
     }({});`;
   };
@@ -145,6 +146,17 @@ function apply_bridge(
 
     case "preserve-render": {
       append_proxy(bridges["preserve-render.js"]);
+      break;
+    }
+
+    case "capture-canvas": {
+      const code = bridges["capture-canvas.js"];
+      const full_source = `const SELECTOR = ${JSON.stringify(
+        bridge.selector
+      )};\n${code}`;
+      const script = document.createElement("script");
+      script.textContent = wrap(full_source);
+      dom.body.appendChild(script);
       break;
     }
 

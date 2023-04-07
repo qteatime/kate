@@ -371,7 +371,7 @@ Specify it as:
 
 Tells Kate which canvas to capture as the game screen. The `selector` option is a [CSS Selector](https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/Selectors) that must resolve to a canvas element when the page is loaded.
 
-Kate will actually poll for the selector, so this bridge also works with elements that are added dynamically to the page from a script.
+Kate will actually poll for the selector, so this bridge also works with elements that are added dynamically to the page from a script. However, it will give up if the element is not found in the page after 1 minute.
 
 ## Porting from specific engines
 

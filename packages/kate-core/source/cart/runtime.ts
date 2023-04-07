@@ -15,7 +15,8 @@ export type Bridge =
   | { type: "network-proxy" }
   | { type: "local-storage-proxy" }
   | { type: "input-proxy"; mapping: Map<InputKey, Key> }
-  | { type: "preserve-render" };
+  | { type: "preserve-render" }
+  | { type: "capture-canvas"; selector: string };
 
 export type Key = {
   key: string;
@@ -53,8 +54,11 @@ function bridge(x: Cart_v2.Bridge): Bridge {
     case Cart_v2.Bridge.$Tags.Network_proxy: {
       return { type: "network-proxy" };
     }
-    case Cart_v2.Bridge.$Tags.Preserve_render: {
+    case Cart_v2.Bridge.$Tags.Preserve_webgl_render: {
       return { type: "preserve-render" };
+    }
+    case Cart_v2.Bridge.$Tags.Capture_canvas: {
+      return { type: "capture-canvas", selector: str(x.selector, 255) };
     }
     default:
       throw unreachable(x);
