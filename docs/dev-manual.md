@@ -108,7 +108,7 @@ Create a file called `kate.json`, in the same folder as your `index.html`, with 
 
 ```json
 {
-  "id": "my-first-cartridge",
+  "id": "my-namespace/my-first-cartridge",
   "metadata": {
     "game": {
       "title": "My First Cartridge"
@@ -122,7 +122,7 @@ Create a file called `kate.json`, in the same folder as your `index.html`, with 
 }
 ```
 
-This file tells Kate that there's a game identified by `my-first-cartridge`. This identification **must** be unique, and we'll get into what that means later. For now, `my-first-cartridge` will work.
+This file tells Kate that there's a game identified by `my-namespace/my-first-cartridge`. This identification **must** be unique, and we'll get into what that means later.
 
 We also provide a more readable title, `My First Cartridge`. This is what players will see in the cartridge selection screen.
 
@@ -156,4 +156,202 @@ And if you click (or press ![Ok](./img/ok_16.png)) to play it, your emulator sho
 
 ![](./img/dev/demo3.png)
 
-From here you can either try [making a small game from scratch for Kate](#making-a-game-for-kate), or [porting a game you already have]().
+From here you can try [porting a game you already have to Kate](#porting-to-kate).
+
+## Porting to Kate
+
+Chances are you already have a game that runs on Kate—if it runs on a web browser, there are high chances it's supported in Kate as well. Just note that if you use more dangerous/privacy-concerning APIs (like geolocation), then Kate does not offer support for it currently.
+
+So, what goes into porting a game for Kate? Here's a small checklist:
+
+- **Can you map your game's controls to Kate's input buttons?** — Kate only has a D-Pad and the buttons O, X, L, R, and Menu usable by your game. That's a total of 9 buttons you can map. If your game has complex controls or relies on a touch screen instead of a gamepad, it might be difficult to port.
+
+  Touch support is coming in a future version, but that'll take a while.
+
+- **Does your game work offline?** — If your game can't work with just the files you add to the cartridge, and needs to download or upload additional content elsewhere, Kate does not support it currently. Restricted network access is coming in a future version, but it'll still be heavily policed to protect players' privacy and security.
+
+- **Does your game look reasonable in 800x480?** — Kate has a 800x480 (5:3) screen, many games can be upscaled or downscaled to that size, then padded with black bars on the side. But if your game is designed for portrait mode, it might not have enough space to make the text and graphics readable.
+
+- **Does your game work without dangerous APIs?** — Kate currently does not support access to microphone, camera, geolocation, and any other API that poses a privacy risk if misused. Some of these are planned for future versions, but there's significant work needed on ensuring that they respect players privacy and mitigate as much potential damage as possible.
+
+If you can answer yes to all those questions, then porting your game to Kate is reasonably straightforward. Kate offers two porting modes:
+
+- **Bridge-based porting**: If you have a game using standard web technologies, you can specify Bridges in your configuration and Kate will automatically patch your cartridge to translate Web API calls into Kate API calls. No additional effort required from you.
+
+- **Manual porting**: Some Web APIs are more powerful than the ones Kate offers, or they don't map 1:1. In some cases, you might need to write code that calls the Kate APIs directly, rather than the respective Web APIs.
+
+### Basics of porting
+
+In order to port a game to Kate you need to have at least:
+
+- One web-based game (with an HTML page);
+- A `kate.json` configuration that describes your cartridge;
+- The [Kate Tools](#what-will-i-need), in particular `kart`, installed.
+
+You can look at the `examples/` folder for some configuration examples, but a minimal `kate.json` file will look like this:
+
+```json
+{
+  "id": "qteati.me/my-game-name",
+  "metadata": {
+    "game": {
+      "author": "Me",
+      "title": "My Game Title",
+      "thumbnail_path": "thumbnail.png"
+    }
+  },
+  "files": ["**/*.html", "**/*.css", "**/*.js", "**/*.png", "**/*.wav"],
+  "platform": {
+    "type": "web-archive",
+    "html": "index.html",
+    "bridges": []
+  }
+}
+```
+
+A few important parts of this configuration file are:
+
+- `id`: This is a unique identifier for your game. It's composed of a universally unique namespace (something no one else would pick), and a name that's unique within your namespace.
+
+  A convention is to use a domain name that you own online. For example `qteati.me` is a domain the author owns, so it's unlikely that others would choose the same namespace. It's ok to use something like `my-username.itch.io` as a namespace.
+
+  Both namespaces and names can only contain lower-case latin letters, hyphens, and dots. Each side must have at least one letter.
+
+- `metadata`: This is a section where you can describe different aspects of your game, such as genre, description, release date, etc. You must specify, at the very least, an `author` name, a `title`, and a `thumbnail_path`, which are used to show your cartridge to the player.
+
+  Note that the thumbnail image should be 200x350 pixels. Kate will still scale up or down any other resolution while maintaining that same aspect-ratio, but it might end up not looking great.
+
+  Meta-data is used for different things in the emulator, but mostly to allow players to filter cartridges and to display the cartridges in the library (and other screens, like storage settings);
+
+- `files`: This describes which files Kart should include in your cartridge. You specify a [Glob pattern](<https://en.wikipedia.org/wiki/Glob_(programming)>) that can match one or many files. In the example above, `**/*.png` is used to include any `.png` file in the same directory as the `kate.json` file, or any of the subdirectories.
+
+  It's very important to note that, for security reasons, Kart does not allow you to refer to files that are outside of your game directory. That is, something like `../thumbnail.png` is not allowed. If it were, then building a cartridge from source could potentially include privacy or security-sensitive data without any warning.
+
+- `platform`: This describes how Kate should run your cartridge. The only supported runtime is `web-archive`, in which Kate expects you to provide an HTML page for it to load (the page is loaded locally and sandboxed, it will have no access to making network requests).
+
+  You can also provide a list of Bridges, which are small internal scripts that Kate can inject in your page when running it to automatically translate between standard Web APIs (like `fetch`) and the APIs that Kate provides.
+
+### Using bridges
+
+A bridge is a small script that gets injected in your cartridge to translate
+standard Web API calls into the appropriate Kate API calls. For example,
+consider how a web game would go about loading an image to show on the
+screen:
+
+```js
+const my_character = new Image();
+my_character.src = "images/my-character.png";
+```
+
+In this case the `my-character.png` exists as a separate file from the initial
+HTML that Kate loaded. In a web browser, the browser would fetch that file by
+making a network request to the server and asking for the data for
+`images/my-character.png`. Kate doesn't allow cartridges to make network
+requests, so the cartridge would crash right at that line.
+
+You'd have to go through your code and change all such instances to use the
+`KateAPI.cart_fs.read_file` call instead. Bridges just save you from that
+manual work. By specifying the Standard Network bridge, for example, Kate
+would automatically translate the image loading into a call to
+`KateAPI.cart_fs.read_file`, and your game would work on Kate **and** on
+a regular browser without any manual changes.
+
+The following bridges are available in Kate:
+
+#### Network proxy
+
+Specify it as:
+
+```json
+"bridges": [
+  {
+    "type": "network-proxy"
+  }
+]
+```
+
+This bridge translates all GET requests to a path in the same domain into
+reading the file with the same path through the Kate Cartridge API. That is,
+a request for `images/character.png` reads the cartridge file
+`/images/character.png` instead of performing a network request.
+
+Kate can handle:
+
+- [XMLHttpRequest](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest) and [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) APIs (only for GET requests with pathnames as URLs!);
+- [Image](https://developer.mozilla.org/en-US/docs/Web/API/HTMLImageElement/Image) as well as [Audio and Video](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Client-side_web_APIs/Video_and_audio_APIs) APIs (if you use the `src` property);
+
+[Data URLs](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URLs) are supported, and the bridge does not translate those as they do not result in a network request.
+
+#### Input proxy
+
+To use the same keybindings as the Kate defaults, specify it as:
+
+```json
+"bridges": [
+  {
+    "type": "input-proxy",
+    "mapping": "defaults"
+  }
+]
+```
+
+If your game uses different keybindings, you'll need to map it manually. Specify it as:
+
+```json
+"bridges": [
+  {
+    "type": "input-proxy",
+    "mapping": {
+      "up": "ArrowUp",
+      "right": "ArrowRight",
+      "down": "ArrowDown",
+      "left": "ArrowLeft",
+      "x": "Escape",
+      "o": "Enter",
+      "menu": "ShiftLeft",
+      "capture": "ControlLeft",
+      "l": "PageUp",
+      "r": "PageDown"
+    }
+  }
+]
+```
+
+The input proxy translates Kate input (keyboard, gamepad, and virtual buttons) into keyboard events dispatched on the Window or Document objects, depending on where your game listens to them.
+
+#### Local storage proxy
+
+Specify it as:
+
+```json
+"bridges": [
+  {
+    "type": "local-storage-proxy"
+  }
+]
+```
+
+The local storage proxy modifies the default [WebStorage](https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API) API so that data is persisted isolated to the current cartridge (and counting towards its storage quota) by using Kate's Storage API. Anything stored in SessionStorage is only kept in memory, so it will be gone once the cartridge is closed.
+
+Kate will keep the same limitations of the Web Storage API and convert all values to strings, even though Kate's storage API supports storing complex values.
+
+> **IMPORTANT CONSISTENCY NOTE:**  
+> Since the WebStorage APIs are synchronous, but all Kate APIs are asynchronous, Kate will load the contents of the storage when opening the cartridge, and buffer updates locally before actually writing them to the database. This keeps the synchronous aspect of the API, but not its durability guarantees!
+>
+> The unfortunate effect is that, in particularly complicated edge cases, if you store data using this translation layer, and your cartridge crashes and closes right after, the data might not have been persisted.
+
+#### Force preserve render
+
+Specify it as:
+
+```json
+"bridges": [
+  {
+    "type": "force-preserve-render"
+  }
+]
+```
+
+Kate's screenshot feature runs on its own process, and is not synchronised with your game's drawing loop. The [WebGL API](https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API) offers a rendering optimisation where the contents drawn to the screen are not always available to Kate's separate process, and in that case the player might capture a screenshot that ends up blank, because your game is in the process of updating the screen.
+
+In some cases this optimisation is turned on by whatever engine you're using (e.g.: Ren'Py), and it might be quite difficult to disable it. This bridge will force the optimisation to be disabled in order to offer consistent support for screenshots instead. Since Kate has a very small screen, the performance impact of disabling the optimisation is generally acceptable.
