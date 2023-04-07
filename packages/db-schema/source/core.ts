@@ -16,6 +16,11 @@ function lift_request<A>(req: IDBRequest<A>): Promise<A> {
 export class Database {
   constructor(private db: IDBDatabase) {}
 
+  async delete_database() {
+    this.db.close();
+    await lift_request(indexedDB.deleteDatabase(this.db.name));
+  }
+
   async transaction<A>(
     tables: TableSchema<any>[],
     mode: IDBTransactionMode,

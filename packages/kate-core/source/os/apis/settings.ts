@@ -10,10 +10,21 @@ export type SettingsData = {
   play_habits: PlayHabits;
 };
 
+const defaults: SettingsData = {
+  play_habits: {
+    recently_played: true,
+    play_times: true,
+  },
+};
+
 export class KateSettings {
   private _data: SettingsData | null = null;
 
   constructor(readonly db: Database) {}
+
+  get defaults() {
+    return defaults;
+  }
 
   static async load(db: Database) {
     const settings = new KateSettings(db);
@@ -35,11 +46,8 @@ export class KateSettings {
       async (t) => {
         const settings = t.get_table1(Db.settings);
 
-        const play_habits: PlayHabits = (await settings.try_get("play_habits"))
-          ?.data ?? {
-          play_times: true,
-          recently_played: true,
-        };
+        const play_habits: PlayHabits =
+          (await settings.try_get("play_habits"))?.data ?? defaults.play_habits;
 
         return {
           play_habits,
@@ -61,6 +69,20 @@ export class KateSettings {
         last_updated: new Date(),
       });
       this._data![key] = value;
+    });
+  }
+
+  async reset_to_defaults() {
+    await this.db.transaction([Db.settings], "readwrite", async (t) => {
+      const settings = t.get_table1(Db.settings);
+      for (const [key, value] of Object.entries(defaults)) {
+        settings.put({
+          key: key,
+          data: value,
+          last_updated: new Date(),
+        });
+        (this._data as any)[key] = value;
+      }
     });
   }
 }

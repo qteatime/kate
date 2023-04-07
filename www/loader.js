@@ -22,6 +22,7 @@ void (async function () {
       "/css/os/ui.css",
       "/css/os/hud/context-menu.css",
       "/css/os/hud/dialog-message.css",
+      "/css/os/hud/dialog-progress.css",
       "/css/os/hud/drop-installer.css",
       "/css/os/hud/index.css",
       "/css/os/hud/notifications.css",

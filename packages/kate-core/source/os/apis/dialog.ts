@@ -51,6 +51,14 @@ export class KateDialog {
     );
   }
 
+  async progress(
+    id: string,
+    message: string,
+    process: (_: Progress) => Promise<void>
+  ) {
+    return await this.hud.progress(id, message, process);
+  }
+
   async pop_menu<A>(
     id: string,
     heading: string,
@@ -58,6 +66,29 @@ export class KateDialog {
     cancel_value: A
   ) {
     return await this.hud.pop_menu(id, heading, buttons, cancel_value);
+  }
+}
+
+export class Progress {
+  readonly canvas: HTMLElement;
+  constructor(private _message: string) {
+    this.canvas = document.createElement("div");
+    this.canvas.append(this.render());
+  }
+
+  render() {
+    return UI.h("div", { class: "kate-ui-progress-container" }, [
+      UI.h("div", { class: "kate-ui-progress-message" }, [this._message]),
+      UI.h("div", { class: "kate-ui-progress-indicator" }, [
+        UI.fa_icon("circle-notch", "2x", "solid", "spin"),
+      ]),
+    ]);
+  }
+
+  set_message(message: string) {
+    this._message = message;
+    this.canvas.querySelector(".kate-ui-progress-message")!.textContent =
+      message;
   }
 }
 
@@ -83,6 +114,38 @@ export class HUD_Dialog extends Scene {
 
   is_trusted(id: string) {
     return id.startsWith("kate:");
+  }
+
+  async progress(
+    id: string,
+    message: string,
+    process: (_: Progress) => Promise<void>
+  ) {
+    const progress = new Progress(message);
+    const element = UI.h(
+      "div",
+      {
+        class: "kate-hud-dialog-message",
+        "data-trusted": String(this.is_trusted(id)),
+      },
+      [progress.canvas]
+    );
+    try {
+      const result = process(progress);
+      this.canvas.textContent = "";
+      this.canvas.appendChild(element);
+      this.os.focus_handler.push_root(this.canvas);
+      await result;
+      this.os.focus_handler.pop_root(this.canvas);
+      setTimeout(async () => {
+        element.classList.add("leaving");
+        await wait(this.FADE_OUT_TIME_MS);
+        element.remove();
+      });
+    } finally {
+      this.os.kernel.console.body.classList.remove("trusted-mode");
+      this.canvas.textContent = "";
+    }
   }
 
   async show<A>(

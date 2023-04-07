@@ -318,9 +318,11 @@ export function fa_icon(
     | "6x"
     | "7x"
     | "8x" = "1x",
-  style: "solid" = "solid"
+  style: "solid" = "solid",
+  animation?: "spin" | "bounce" | "beat" | null
 ) {
-  return h("i", { class: `fa-${style} fa-${size} fa-${name}` }, []);
+  const anim = animation == null ? "" : `fa-${animation}`;
+  return h("i", { class: `fa-${style} fa-${size} fa-${name} ${anim}` }, []);
 }
 
 export function focusable_container(children: Widgetable[]) {
@@ -451,4 +453,31 @@ export function padding(amount: number, children: Widgetable[]) {
 
 export function p(children: Widgetable[]) {
   return h("p", {}, [...children]);
+}
+
+export function button(
+  text: Widgetable,
+  x: {
+    on_clicked?: () => void;
+    focus_target?: boolean;
+  }
+) {
+  const button = new Button([text]);
+  button.focus_target(x.focus_target ?? true);
+  if (x.on_clicked != null) {
+    button.on_clicked(x.on_clicked);
+  }
+  return button;
+}
+
+export function vspace(x: number) {
+  return new Space({ height: x });
+}
+
+export function hspace(x: number) {
+  return new Space({ width: x });
+}
+
+export function vdivider() {
+  return h("div", { class: "kate-ui-vertical-divider" }, []);
 }

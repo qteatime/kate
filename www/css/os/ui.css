@@ -195,3 +195,10 @@
 .active .kate-ui-toggle-label-yes {
   display: block;
 }
+
+/* #Divider */
+.kate-ui-vertical-divider {
+  margin: 1.5em 0;
+  height: 1px;
+  background: var(--color-border);
+}
