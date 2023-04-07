@@ -178,7 +178,42 @@ There's four kinds of data about the cartridges you run that are stored:
 
   Cartridges cannot read, modify, or delete this data. Even data about its own play habits.
 
+## Resource indicators
+
+Computers often do things (and very dangerous things) without providing any feedback to the user. For example, you might want to know when a computer is using the microphone, or the camera, or similarly privacy-impacting resources.
+
+The Kate emulator deals with this using what it calls a "resource indicator". These are a set of different visual cues in the interface that cannot be mimic'd by cartridges running in the Kate emulator, thus you can trust them to be a real indication of dangerous or important things that are happening in the emulator.
+
+There are two kinds of resource indicators today:
+
+### The `trust` frame
+
+Sometimes the Kate emulator will prompt you for dangerous actions (e.g.: removing files or granting permissions). To make sure these requests are truly coming from the Kate emulator, and not from a malicious cartridge, Kate will have a distinctive border around the screen during such requests.
+
+With the default theme, this is a red-ish borderthat surrounds the screen, so you should see no black borders between the console's case and the screen. The screenshot below illustrates this:
+
+![](./icons/trust-frame.png)
+
+### The resource indicators
+
+Sometimes the Kate emulator has to tell you that something is happening behind-the-scenes in the console, but it's difficult to do so in a less intrusive way. We also want to make sure we do this in a way that cartridges cannot tamper with or mimic, because it's used, among other things, to tell you when Kate is using your microphone or recording your screen.
+
+The way Kate deals with this is through the Resource Indicator band, a small section at bottom right of the console's case that contains small icons describing dangerous or important things happening in the console at that point in time.
+
+Note that dangerous actions are _always_ auditable independently, by looking at the audit log in the console. The resource indicators just provide a quick view of what's happening.
+
+![](./icons/resource-indicator.png)
+
+Kate currently uses the following resource icons:
+
+| Icon                               | What is it used for?                                                                                                                                                                                                                                                                                                    |
+| ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ![](./icons/temporary-storage.png) | **Temporary storage**. Used in the [Web Application mode](#kate-modes) to indicate when the emulator is operating on a [Best-Effort storage mode](https://developer.mozilla.org/en-US/docs/Web/API/Storage_API#bucket_modes), and so the browser may decide to erase the console data if you start running out of space |
+| ![](./icons/recording.png)         | **Recording screen**. Used to indicate when a cartridge is currently recording the screen through the Kate Capture API.                                                                                                                                                                                                 |
+
 ---
+
+> Some of the icons used by Kate are from [Fontawesome](https://fontawesome.com/), (c) Fonticons 2023, licensed under CC-By 4.0. Full license information can be found in [LICENCES.txt](https://github.com/qteatime/kate/blob/main/packages/kate-core/LICENCES.txt) in the kate-core folder.
 
 [std-gamepad]: https://www.w3.org/TR/gamepad/#remapping
 [electron]: https://www.electronjs.org/

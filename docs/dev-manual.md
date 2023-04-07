@@ -4,7 +4,7 @@
 
 Kate is a fantasy hand-held console for small 2d applications, particularly RPGs, Visual Novels, and similar story-driven games. You can build real games that run in the console, which you distribute to your players as a single `.kart` file they can install and run offline, at their convenience, in any device.
 
-Kate supports Windows, Linux, and MacOS natively, and supports many other platforms with a modern web-browser (e.g.: iOS and Android). When programming for Kate you program for a single platform, distribute a single file, and allows players to run the game anywhere, as well as synchronise their data among their devices, without any additional programming on your side.
+Kate supports Windows, Linux, and MacOS natively, and supports many other platforms with a modern web-browser (e.g.: iOS and Android). When programming for Kate you program for a single platform, distribute a single file, and allow players to run the game anywhere, as well as synchronise their data among their devices, without any additional programming on your side.
 
 This manual describes how to make games for Kate with a hands-on approach, as well as diving into some of its technical details and approach to security and privacy.
 
@@ -24,7 +24,7 @@ As a developer, by making a game for Kate you get to:
 
 - Avoid players being overly cautious of downloading a small game packaged as a native executable because they have been a victim of malware before;
 
-- Have the option of package the emulator with your game as a webpage, which can then be used to provide a web-playable version in a platform like Itch.io, or on your own site;
+- Have the option of packaging the emulator with your game as a webpage, which can then be used to provide a web-playable version in a platform like Itch.io, or on your own site;
 
 - Use the same game making tools you're already familiar with, as long as they have an option to make a web export; and
 
@@ -171,7 +171,7 @@ So, what goes into porting a game for Kate? Here's a small checklist:
 
 - **Does your game work offline?** — If your game can't work with just the files you add to the cartridge, and needs to download or upload additional content elsewhere, Kate does not support it currently. Restricted network access is coming in a future version, but it'll still be heavily policed to protect players' privacy and security.
 
-- **Does your game look reasonable in 800x480?** — Kate has a 800x480 (5:3) screen, many games can be upscaled or downscaled to that size, then padded with black bars on the side. But if your game is designed for portrait mode, it might not have enough space to make the text and graphics readable.
+- **Does your game look reasonable in 800x480?** — Kate has a 800x480 (5:3) screen. Many games can be upscaled or downscaled to that size, then padded with black bars on the side. But if your game is designed for portrait mode, it might not have enough real screen space to make the text and graphics readable.
 
 - **Does your game work without dangerous APIs?** — Kate currently does not support access to microphone, camera, geolocation, and any other API that poses a privacy risk if misused. Some of these are planned for future versions, but there's significant work needed on ensuring that they respect players privacy and mitigate as much potential damage as possible.
 
@@ -252,7 +252,7 @@ requests, so the cartridge would crash right at that line.
 
 You'd have to go through your code and change all such instances to use the
 `KateAPI.cart_fs.read_file` call instead. Bridges just save you from that
-manual work. By specifying the Standard Network bridge, for example, Kate
+manual work. By specifying the Network Proxy bridge, for example, Kate
 would automatically translate the image loading into a call to
 `KateAPI.cart_fs.read_file`, and your game would work on Kate **and** on
 a regular browser without any manual changes.
@@ -394,3 +394,6 @@ The bridge configuration for Ren'Py looks like this:
   {"type": "capture-canvas", "selector": "#canvas"}
 ]
 ```
+
+> **CURRENT LIMITATIONS:**
+> Ren'Py uses [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API) to store save files. Kate does not provide a bridge for IndexedDB yet, so Ren'Py games will run on Kate without support for saving/loading the player's progress.
