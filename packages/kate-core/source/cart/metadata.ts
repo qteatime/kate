@@ -287,4 +287,7 @@ function date(x: Cart_v2.Date): Date {
 }
 
 const tag = regex("tag", /^[a-z\-]+$/);
-const valid_id = regex("id", /^[a-z0-9\-]+(\.[a-z0-9\-]+)*$/);
+const valid_id = regex(
+  "id",
+  /^[a-z0-9\-]+(\.[a-z0-9\-]+)*\/[a-z0-9\-]+(\.[a-z0-9\-]+)*$/
+);
