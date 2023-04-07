@@ -583,7 +583,7 @@ export class Meta_rating {
  static readonly $tag = 5;
  readonly $tag = 5;
 
- constructor(readonly rating: (Content_rating.General | Content_rating.Teen_and_up | Content_rating.Mature | Content_rating.Explicit), readonly warnings: (string)[]) {}
+ constructor(readonly rating: (Content_rating.General | Content_rating.Teen_and_up | Content_rating.Mature | Content_rating.Explicit | Content_rating.Unknown), readonly warnings: (string) | null) {}
 
  static decode($d: _Decoder): Meta_rating {
    const $tag = $d.ui32();
@@ -596,7 +596,7 @@ export class Meta_rating {
  static $do_decode($d: _Decoder): Meta_rating {
    const rating = Content_rating$Base.$do_decode($d);
 
-const warnings = $d.array(() => {
+const warnings = $d.optional(() => {
  const item = $d.text();;
  return item;
 });
@@ -611,9 +611,9 @@ const warnings = $d.array(() => {
 
  $do_encode($e: _Encoder) {
    (this.rating).$do_encode($e);
-$e.array((this.warnings), ($e, v) => {
-  $e.text(v);
-});
+$e.optional((this.warnings),
+  ($e, v) => { $e.text(v); }
+);
  }
 }
 
@@ -1658,7 +1658,7 @@ $e.ui32(this.minor);
 
 
 
-export type Content_rating = Content_rating.General | Content_rating.Teen_and_up | Content_rating.Mature | Content_rating.Explicit;
+export type Content_rating = Content_rating.General | Content_rating.Teen_and_up | Content_rating.Mature | Content_rating.Explicit | Content_rating.Unknown;
 
 export abstract class Content_rating$Base {
  static decode($d: _Decoder): Content_rating {
@@ -1677,6 +1677,7 @@ export abstract class Content_rating$Base {
 case 1: return Content_rating.Teen_and_up.decode($d);
 case 2: return Content_rating.Mature.decode($d);
 case 3: return Content_rating.Explicit.decode($d);
+case 4: return Content_rating.Unknown.decode($d);
 
      default:
        throw new Error(`Unknown tag ${$tag} in union Content-rating`);
@@ -1686,7 +1687,7 @@ case 3: return Content_rating.Explicit.decode($d);
 
 export namespace Content_rating {
  export const enum $Tags {
-   General,Teen_and_up,Mature,Explicit
+   General,Teen_and_up,Mature,Explicit,Unknown
  }
 
  
@@ -1824,6 +1825,41 @@ export class Explicit extends Content_rating$Base {
 
  $do_encode($e: _Encoder) {
    $e.ui8(3);
+   
+ }
+}
+
+
+
+export class Unknown extends Content_rating$Base {
+ static readonly $tag = $Tags.Unknown;
+ readonly $tag = $Tags.Unknown;
+
+ constructor() {
+   super();
+ }
+
+ static decode($d: _Decoder): Unknown {
+   return Unknown.$do_decode($d);
+ }
+
+ static $do_decode($d: _Decoder): Unknown {
+   const $tag = $d.ui8();
+   if ($tag !== 4) {
+     throw new Error(`Invalid tag ${$tag} for Content-rating.Unknown: expected 4`);
+   }
+
+   
+   return new Unknown();
+ }
+
+ encode($e: _Encoder) {
+   $e.ui32(13);
+   this.$do_encode($e);
+ }
+
+ $do_encode($e: _Encoder) {
+   $e.ui8(4);
    
  }
 }

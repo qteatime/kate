@@ -3,6 +3,7 @@ import * as FS from "fs";
 import { Cart, add_fingerprint } from "./deps/schema";
 import { unreachable } from "./deps/util";
 import * as Glob from "glob";
+import { Spec as T } from "./deps/util";
 const keymap = require("../assets/keymap.json") as {
   [key: string]: {
     key: string;
@@ -11,44 +12,188 @@ const keymap = require("../assets/keymap.json") as {
   };
 };
 
-type Kart = {
-  id: string;
-  root?: string;
-  metadata: {
-    game: {
-      author: string;
-      title: string;
-      description: string;
-      genre: Genre[];
-      tags: string[];
-      thumbnail_path: string;
-    };
-    release: {
-      kind: ReleaseType;
-      date: CartDate;
-      version: Version;
-      legal_notices_path: string | null;
-      licence_name: string;
-      allow_derivative: boolean;
-      allow_commercial: boolean;
-    };
-    rating: {
-      rating: ContentRating;
-      warnings: string[];
-    };
-    play_style: {
-      input_methods: InputMethod[];
-      local_multiplayer: PlayerRange | null;
-      online_multiplayer: PlayerRange | null;
-      languages: Language[];
-      accessibility: Accessibility[];
-      average_duration: Duration;
-    };
-    extras: never[];
+const genre = T.one_of([
+  "action",
+  "fighting",
+  "interactive-fiction",
+  "platformer",
+  "puzzle",
+  "racing",
+  "rhythm",
+  "rpg",
+  "simulation",
+  "shooter",
+  "sports",
+  "strategy",
+  "tool",
+  "other",
+] as const);
+
+const release_type = T.one_of([
+  "prototype",
+  "early-access",
+  "beta",
+  "demo",
+  "full",
+] as const);
+
+const content_rating = T.one_of([
+  "general",
+  "teen-and-up",
+  "mature",
+  "explicit",
+  "unknown",
+] as const);
+
+const duration = T.one_of([
+  "seconds",
+  "few-minutes",
+  "half-hour",
+  "few-hours",
+  "several-hours",
+  "unknown",
+] as const);
+
+const input_method = T.one_of(["kate-buttons", "touch"] as const);
+
+const accessibility = T.one_of([
+  "high-contrast",
+  "subtitles",
+  "image-captions",
+  "voiced-text",
+  "configurable-difficulty",
+  "skippable-content",
+] as const);
+
+const player_range = T.spec({
+  minimum: T.int,
+  maximum: T.int,
+});
+
+const valid_id = T.regex(
+  "valid id",
+  /^[a-z0-9\-]+(\.[a-z0-9\-]+)*\/[a-z0-9\-]+(\.[a-z0-9\-]+)*$/
+);
+const valid_language = T.regex(
+  "valid ISO language code",
+  /^[a-z]{2}(?:[\-_][a-zA-Z_]{2,})?$/
+);
+
+const meta = T.spec({
+  game: T.spec({
+    author: T.short_str(255),
+    title: T.short_str(255),
+    description: T.optional("", T.short_str(10_000)),
+    genre: T.optional(
+      ["other"],
+      T.seq2(T.list_of(genre), T.min_max_items(1, 10))
+    ) as (_: any) => Genre[],
+    tags: T.optional(
+      [],
+      T.seq2(T.list_of(T.short_str(255)), T.min_max_items(1, 10))
+    ) as (_: any) => string[],
+    thumbnail_path: T.str,
+  }),
+  release: T.nullable(
+    T.spec({
+      kind: T.optional("full", release_type),
+      date: T.lazy_optional(
+        today,
+        T.spec({
+          year: T.int,
+          month: T.int,
+          day: T.int,
+        })
+      ),
+      version: T.optional(
+        { major: 1, minor: 0 },
+        T.spec({
+          major: T.int,
+          minor: T.int,
+        })
+      ),
+      legal_notices_path: T.nullable(T.str),
+      licence_name: T.optional("All rights reserved", T.short_str(1_000)),
+      allow_derivative: T.optional(false, T.bool),
+      allow_commercial: T.optional(false, T.bool),
+    })
+  ),
+  rating: T.nullable(
+    T.spec({
+      rating: T.optional("unknown", content_rating),
+      warnings: T.nullable(T.short_str(1_000)),
+    })
+  ),
+  play_style: T.nullable(
+    T.spec({
+      input_methods: T.optional([], T.list_of(input_method)),
+      local_multiplayer: T.nullable(player_range),
+      online_multiplayer: T.nullable(player_range),
+      languages: T.optional(
+        [],
+        T.list_of(
+          T.spec({
+            iso_code: T.seq2(T.short_str(255), valid_language),
+            interface: T.bool,
+            audio: T.bool,
+            text: T.bool,
+          })
+        )
+      ),
+      accessibility: T.optional([], T.list_of(accessibility)),
+      average_duration: T.optional("unknown", duration),
+    })
+  ),
+});
+
+const bridges: (_: any) => Bridge = T.tagged_choice({
+  "network-proxy": T.spec({
+    type: T.constant("network-proxy"),
+  }),
+  "local-storage-proxy": T.spec({
+    type: T.constant("local-storage-proxy"),
+  }),
+  "input-proxy": T.spec({
+    type: T.constant("input-proxy"),
+    mapping: T.or3(
+      T.constant("defaults"),
+      T.constant("kate"),
+      T.dictionary(T.str)
+    ),
+  }),
+  "preserve-webgl-render": T.spec({
+    type: T.constant("preserve-webgl-render"),
+  }),
+  "capture-canvas": T.spec({
+    type: T.constant("capture-canvas"),
+    selector: T.short_str(1_000),
+  }),
+}) as any;
+
+const platform_web = T.spec({
+  type: T.constant("web-archive"),
+  html: T.str,
+  bridges: T.list_of(bridges),
+});
+
+const config = T.spec({
+  id: T.seq2(T.short_str(255), valid_id),
+  root: T.nullable(T.str),
+  metadata: meta,
+  files: T.list_of(T.str),
+  platform: platform_web,
+});
+
+function today(): CartDate {
+  const now = new Date();
+  return {
+    year: now.getFullYear(),
+    month: now.getMonth() + 1,
+    day: now.getDate(),
   };
-  files: string[];
-  platform: KartPlatform;
-};
+}
+
+type Kart = ReturnType<typeof config>;
 
 type Genre =
   | null
@@ -73,7 +218,12 @@ type Version = { major: number; minor: number };
 
 type ReleaseType = "prototype" | "early-access" | "beta" | "demo" | "full";
 
-type ContentRating = "general" | "teen-and-up" | "mature" | "explicit";
+type ContentRating =
+  | "general"
+  | "teen-and-up"
+  | "mature"
+  | "explicit"
+  | "unknown";
 
 type Duration =
   | "seconds"
@@ -125,114 +275,6 @@ type Bridge =
   | { type: "preserve-webgl-render" }
   | { type: "capture-canvas"; selector: string };
 
-class J<T extends { [key: string]: any }> {
-  constructor(readonly value: T, readonly path: string[]) {}
-
-  static from<T extends { [key: string]: any }>(x: T) {
-    return new J(x, []);
-  }
-
-  fail(key: any, msg: string) {
-    const fullpath = [...this.path, key].join(".");
-    throw new Error(`${msg} at ${fullpath}`);
-  }
-
-  leaf<K extends keyof T>(k: K) {
-    const v = this.get(k);
-    return new J({ x: v }, [...this.path, k as any]);
-  }
-
-  at<K extends keyof T>(k: K) {
-    const v = this.get(k);
-    if (v == null || typeof v !== "object") {
-      throw this.fail(k as string, `not an object`);
-    } else {
-      return new J<T[K]>(v as any, [...this.path, k as any]);
-    }
-  }
-
-  get<K extends keyof T>(k: K) {
-    if (k in this.value) {
-      return this.value[k];
-    } else {
-      throw this.fail(k, `missing key`);
-    }
-  }
-
-  int<K extends keyof T>(k: K) {
-    const v = this.get(k);
-    if (typeof v !== "number" || v !== (v | 0)) {
-      throw this.fail(k, `not an integer`);
-    } else {
-      return v;
-    }
-  }
-
-  bool<K extends keyof T>(k: K) {
-    const v = this.get(k);
-    if (typeof v !== "boolean") {
-      throw this.fail(k, `not a boolean`);
-    } else {
-      return v;
-    }
-  }
-
-  str<K extends keyof T>(k: K) {
-    const v = this.get(k);
-    if (typeof v !== "string") {
-      throw this.fail(k, `not a string`);
-    } else {
-      return v;
-    }
-  }
-
-  str_opt<K extends keyof T>(k: K) {
-    const v = this.get(k);
-    if (typeof v !== "string" && v != null) {
-      throw this.fail(k, `not a string or null`);
-    } else {
-      return v;
-    }
-  }
-
-  str_list<K extends keyof T>(k: K): string[] {
-    const v = this.get(k);
-    if (!Array.isArray(v)) {
-      throw this.fail(k, `not an array`);
-    } else if (!v.every((x: any) => typeof x === "string")) {
-      throw this.fail(k, `not an array of strings`);
-    }
-    return v;
-  }
-
-  map<K extends keyof T, B>(
-    k: K,
-    fn: (_: T[K][0], v: J<T[K]>, i: number) => B
-  ): B[] {
-    const v = this.get(k);
-    if (!Array.isArray(v)) {
-      throw this.fail(k, `not an array`);
-    } else {
-      const j = this.at(k);
-      return (v as T[K][]).map((x, i) => {
-        return fn(x, j, i);
-      });
-    }
-  }
-
-  mapj<K extends keyof T, B>(k: K, fn: (_: J<T[K][0]>) => B): B[] {
-    const v = this.get(k);
-    if (!Array.isArray(v)) {
-      throw this.fail(k, `not an array`);
-    } else {
-      const j = this.at(k);
-      return (v as T[K][]).map((x, i) => {
-        return fn(new J(x, [...this.path, String(i)]));
-      });
-    }
-  }
-}
-
 const mime_table = Object.assign(Object.create(null), {
   ".png": "image/png",
   ".json": "application/json",
@@ -277,46 +319,54 @@ function maybe_load_text_file(
   }
 }
 
-function metadata(x: J<Kart["metadata"]>, root: string, base_dir: string) {
-  const xgame = x.at("game");
+function metadata(x: Kart["metadata"], root: string, base_dir: string) {
   const game = new Cart.Meta_title(
-    xgame.str("author"),
-    xgame.str("title"),
-    xgame.str("description"),
-    xgame.map("genre", make_genre),
-    xgame.str_list("tags"),
+    x.game.author,
+    x.game.title,
+    x.game.description,
+    x.game.genre.map(make_genre),
+    x.game.tags,
     new Cart.File(
       "thumbnail.png",
       "image/png",
-      load_file(xgame.str("thumbnail_path"), root, base_dir)
+      load_file(x.game.thumbnail_path, root, base_dir)
     )
   );
-  const xrel = x.at("release");
-  const release = new Cart.Meta_release(
-    make_release_type(xrel.leaf("kind")),
-    make_date(xrel.at("date")),
-    make_version(xrel.at("version")),
-    maybe_load_text_file(xrel.str_opt("legal_notices_path"), root, base_dir),
-    xrel.str("licence_name"),
-    xrel.bool("allow_derivative"),
-    xrel.bool("allow_commercial")
-  );
 
-  const xrat = x.at("rating");
-  const rating = new Cart.Meta_rating(
-    make_rating(xrat.leaf("rating")),
-    xrat.str_list("warnings")
-  );
+  const release = x.release
+    ? new Cart.Meta_release(
+        make_release_type(x.release.kind),
+        make_date(x.release.date),
+        make_version(x.release.version),
+        maybe_load_text_file(x.release.legal_notices_path, root, base_dir),
+        x.release.licence_name,
+        x.release.allow_derivative,
+        x.release.allow_commercial
+      )
+    : new Cart.Meta_release(
+        make_release_type("full"),
+        make_date(today()),
+        make_version({ major: 1, minor: 0 }),
+        "",
+        "",
+        false,
+        false
+      );
 
-  const xp = x.at("play_style");
-  const play = new Cart.Meta_play(
-    xp.map("input_methods", make_input_method),
-    make_player_range(xp.leaf("local_multiplayer")),
-    make_player_range(xp.leaf("online_multiplayer")),
-    xp.mapj("languages", make_language),
-    xp.map("accessibility", make_accessibility),
-    make_duration(xp.leaf("average_duration"))
-  );
+  const rating = x.rating
+    ? new Cart.Meta_rating(make_rating(x.rating.rating), x.rating.warnings)
+    : new Cart.Meta_rating(make_rating("unknown"), null);
+
+  const play = x.play_style
+    ? new Cart.Meta_play(
+        x.play_style.input_methods.map(make_input_method),
+        make_player_range(x.play_style.local_multiplayer),
+        make_player_range(x.play_style.online_multiplayer),
+        x.play_style.languages.map(make_language),
+        x.play_style.accessibility.map(make_accessibility),
+        make_duration(x.play_style.average_duration)
+      )
+    : new Cart.Meta_play([], null, null, [], [], make_duration("unknown"));
 
   const extras: any[] = [];
 
@@ -325,7 +375,7 @@ function metadata(x: J<Kart["metadata"]>, root: string, base_dir: string) {
   return new Cart.Metadata(game, release, rating, play, security, extras);
 }
 
-function make_genre(x: Genre, j: J<any>, i: number): Cart.Genre {
+function make_genre(x: Genre): Cart.Genre {
   if (x == null) {
     return new Cart.Genre.Not_specified();
   } else {
@@ -359,14 +409,12 @@ function make_genre(x: Genre, j: J<any>, i: number): Cart.Genre {
       case "tool":
         return new Cart.Genre.Tool();
       default:
-        j.fail(String(i), `not a genre: ${x}`);
         throw unreachable(x);
     }
   }
 }
 
-function make_release_type(j: J<{ x: ReleaseType }>): Cart.Release_type {
-  const x = j.get("x");
+function make_release_type(x: ReleaseType): Cart.Release_type {
   switch (x) {
     case "prototype":
       return new Cart.Release_type.Prototype();
@@ -379,21 +427,19 @@ function make_release_type(j: J<{ x: ReleaseType }>): Cart.Release_type {
     case "full":
       return new Cart.Release_type.Full();
     default:
-      j.fail(null, "not a valid release type");
       throw unreachable(x);
   }
 }
 
-function make_date(x: J<CartDate>) {
-  return new Cart.Date(x.int("year"), x.int("month"), x.int("day"));
+function make_date(x: CartDate) {
+  return new Cart.Date(x.year, x.month, x.day);
 }
 
-function make_version(x: J<Version>) {
-  return new Cart.Version(x.int("major"), x.int("minor"));
+function make_version(x: Version) {
+  return new Cart.Version(x.major, x.minor);
 }
 
-function make_rating(j: J<{ x: ContentRating }>) {
-  const x = j.get("x");
+function make_rating(x: ContentRating) {
   switch (x) {
     case "general":
       return new Cart.Content_rating.General();
@@ -403,43 +449,37 @@ function make_rating(j: J<{ x: ContentRating }>) {
       return new Cart.Content_rating.Mature();
     case "explicit":
       return new Cart.Content_rating.Explicit();
+    case "unknown":
+      return new Cart.Content_rating.Unknown();
     default:
-      j.fail(null, "not a valid rating");
       throw unreachable(x);
   }
 }
 
-function make_input_method(x: InputMethod, j: J<any>, i: number) {
+function make_input_method(x: InputMethod) {
   switch (x) {
     case "kate-buttons":
       return new Cart.Input_method.Kate_buttons();
     case "touch":
       return new Cart.Input_method.Touch();
     default:
-      j.fail(String(i), "not a valid input method");
       throw unreachable(x);
   }
 }
 
-function make_player_range(x0: J<{ x: PlayerRange | null }>) {
-  if (x0.get("x") == null) {
+function make_player_range(x: PlayerRange | null) {
+  if (x == null) {
     return null;
   } else {
-    const x = x0.at("x") as J<PlayerRange>;
-    return new Cart.Player_range(x.int("minimum"), x.int("maximum"));
+    return new Cart.Player_range(x.minimum, x.maximum);
   }
 }
 
-function make_language(x: J<Language>) {
-  return new Cart.Language(
-    x.str("iso_code"), // TODO: check iso code
-    x.bool("interface"),
-    x.bool("audio"),
-    x.bool("text")
-  );
+function make_language(x: Language) {
+  return new Cart.Language(x.iso_code, x.interface, x.audio, x.text);
 }
 
-function make_accessibility(x: Accessibility, jj: J<any>, i: number) {
+function make_accessibility(x: Accessibility) {
   switch (x) {
     case "configurable-difficulty":
       return new Cart.Accessibility.Configurable_difficulty();
@@ -454,13 +494,11 @@ function make_accessibility(x: Accessibility, jj: J<any>, i: number) {
     case "voiced-text":
       return new Cart.Accessibility.Voiced_text();
     default:
-      jj.fail(String(i), "not a valid accessibility feature");
       throw unreachable(x);
   }
 }
 
-function make_duration(j: J<{ x: Duration }>) {
-  const x = j.get("x");
+function make_duration(x: Duration) {
   switch (x) {
     case "seconds":
       return new Cart.Duration.Seconds();
@@ -477,7 +515,6 @@ function make_duration(j: J<{ x: Duration }>) {
     case "unknown":
       return new Cart.Duration.Unknown();
     default:
-      j.fail(null, "not a valid duration");
       throw unreachable(x);
   }
 }
@@ -628,7 +665,8 @@ function make_virtual_key(key: string) {
 export function make_cartridge(path: string, output: string) {
   let base_dir = Path.dirname(Path.resolve(path));
   const dir_root = base_dir;
-  const json: Kart = JSON.parse(FS.readFileSync(path, "utf-8"));
+  const json0: unknown = JSON.parse(FS.readFileSync(path, "utf-8"));
+  const json = T.parse(config, json0);
   const x = json.platform;
   if (json.root != null) {
     const new_base_dir = Path.resolve(base_dir, json.root);
@@ -636,7 +674,7 @@ export function make_cartridge(path: string, output: string) {
     base_dir = new_base_dir;
   }
 
-  const meta = metadata(J.from(json).at("metadata"), dir_root, base_dir);
+  const meta = metadata(json.metadata, dir_root, base_dir);
   const archive = files(json.files, dir_root, base_dir);
 
   switch (x.type) {

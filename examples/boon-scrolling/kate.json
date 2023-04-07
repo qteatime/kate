@@ -20,19 +20,15 @@
         "major": 1,
         "minor": 0
       },
-      "legal_notices_path": null,
       "licence_name": "MIT",
       "allow_derivative": true,
       "allow_commercial": true
     },
     "rating": {
-      "rating": "general",
-      "warnings": []
+      "rating": "general"
     },
     "play_style": {
       "input_methods": ["kate-buttons"],
-      "local_multiplayer": null,
-      "online_multiplayer": null,
       "languages": [
         {
           "iso_code": "en",
@@ -41,12 +37,7 @@
           "text": true
         }
       ],
-      "accessibility": [],
       "average_duration": "seconds"
-    },
-    "booklet": {
-      "pages": [],
-      "custom_css_path": null
     }
   },
   "files": ["assets/*", "www/*"],

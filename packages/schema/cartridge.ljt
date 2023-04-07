@@ -45,7 +45,7 @@ type Meta-release {
 
 type Meta-rating {
   field rating: Content-rating;
-  field warnings: Text[];
+  field warnings: Text?;
 }
 
 type Meta-play {
@@ -111,6 +111,7 @@ union Content-rating {
   type Teen-and-up {}
   type Mature {}
   type Explicit {}
+  type Unknown {}
 }
 
 type Date {

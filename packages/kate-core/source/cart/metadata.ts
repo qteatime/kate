@@ -22,7 +22,7 @@ export type Metadata = {
   };
   rating: {
     rating: ContentRating;
-    content_warning: string;
+    content_warning: string | null;
   };
   play_style: {
     input_methods: Set<InputMethod>;
@@ -55,7 +55,12 @@ type Version = { major: number; minor: number };
 
 type ReleaseType = "prototype" | "early-access" | "beta" | "demo" | "full";
 
-type ContentRating = "general" | "teen-and-up" | "mature" | "explicit";
+type ContentRating =
+  | "general"
+  | "teen-and-up"
+  | "mature"
+  | "explicit"
+  | "unknown";
 
 type Duration =
   | "seconds"
@@ -120,10 +125,9 @@ export function parse_metadata(cart: Cart_v2.Cartridge): Metadata {
     },
     rating: {
       rating: content_rating(cart.metadata.rating.rating),
-      content_warning: str(
-        cart.metadata.rating.warnings.join("\n"),
-        chars_in_mb(1)
-      ),
+      content_warning: cart.metadata.rating.warnings
+        ? str(cart.metadata.rating.warnings, 1_000)
+        : null,
     },
     play_style: {
       accessibility: new Set(
@@ -204,6 +208,8 @@ function content_rating(x: Cart_v2.Content_rating) {
       return "mature";
     case Cart_v2.Content_rating.$Tags.Explicit:
       return "explicit";
+    case Cart_v2.Content_rating.$Tags.Unknown:
+      return "unknown";
     default:
       throw unreachable(x);
   }
