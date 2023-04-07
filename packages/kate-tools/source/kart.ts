@@ -92,7 +92,7 @@ const meta = T.spec({
       [],
       T.seq2(T.list_of(T.short_str(255)), T.min_max_items(1, 10))
     ) as (_: any) => string[],
-    thumbnail_path: T.str,
+    thumbnail_path: T.nullable(T.str),
   }),
   release: T.nullable(
     T.spec({
@@ -173,7 +173,7 @@ const bridges: (_: any) => Bridge = T.tagged_choice({
 const platform_web = T.spec({
   type: T.constant("web-archive"),
   html: T.str,
-  bridges: T.list_of(bridges),
+  bridges: T.optional([], T.list_of(bridges)),
 });
 
 const config = T.spec({
@@ -329,7 +329,13 @@ function metadata(x: Kart["metadata"], root: string, base_dir: string) {
     new Cart.File(
       "thumbnail.png",
       "image/png",
-      load_file(x.game.thumbnail_path, root, base_dir)
+      x.game.thumbnail_path
+        ? load_file(x.game.thumbnail_path, root, base_dir)
+        : new Uint8Array(
+            FS.readFileSync(
+              Path.join(__dirname, "../assets/default-thumbnail.png")
+            )
+          )
     )
   );
 

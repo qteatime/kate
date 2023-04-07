@@ -111,6 +111,7 @@ Create a file called `kate.json`, in the same folder as your `index.html`, with 
   "id": "my-namespace/my-first-cartridge",
   "metadata": {
     "game": {
+      "author": "Your Name",
       "title": "My First Cartridge"
     }
   },
