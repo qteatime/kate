@@ -75,7 +75,7 @@ export class SceneAboutKate extends Scene {
           kate: this.kate_info(),
           host: {
             os: info.os.name,
-            browser: info.engine.map((x: any) => `${x.name} ${x.version}`),
+            browser: info.engine.map((x) => `${x.name} ${x.version}`),
             device: device,
             arm64_translation: info.os.arm64_translation,
             architecture: info.os.architecture,

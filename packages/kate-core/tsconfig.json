@@ -16,7 +16,6 @@
   "references": [
     { "path": "../schema" },
     { "path": "../util" },
-    { "path": "../db-schema" },
-    { "path": "../kate-desktop" }
+    { "path": "../db-schema" }
   ]
 }
