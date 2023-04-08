@@ -19,6 +19,8 @@ It's built to be secure, respect your privacy, and give you agency on how you pl
 
 - [Kate's Underlying Technology](./docs/technology.md) — curious about what's powering Kate, and what the system requirements are? This covers all that. (work in progress)
 
+- [Known issues & limitations](./docs/known-issues.md) — Kate is still in preview/early-access. Known issues are documented here.
+
 ## Installation
 
 Kate only supports installing from npm currently. You'll need [Node.js 16+](https://nodejs.org/en) installed. Run the following from the command line:
