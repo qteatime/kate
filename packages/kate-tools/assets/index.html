@@ -93,7 +93,7 @@
             }
           );
           const kate_os = await Kate.os.KateOS.boot(kate);
-          const loading = new Kate.os.scenes.HUD_LoadIndicator();
+          const loading = new Kate.os.apps.HUD_LoadIndicator();
           kate_os.show_hud(loading);
 
           const cart_bytes = new Uint8Array(

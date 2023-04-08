@@ -347,6 +347,15 @@ w.task("tools:compile", ["schema:build"], () => {
 w.task("tools:build", ["tools:compile", "www:bundle"], () => {
   remove("packages/kate-tools/packaging/web", { recursive: true, force: true });
   copy_tree("www", "packages/kate-tools/packaging/web");
+  glomp({
+    entry: "packages/kate-core/build/index.js",
+    out: `packages/kate-tools/packaging/web/kate.js`,
+    name: "Kate",
+  });
+  copy(
+    "packages/kate-core/LICENCES.txt",
+    `packages/kate-tools/packaging/web/KATE-LICENCES.txt`
+  );
 });
 
 w.task("tools:clean", [], () => {
