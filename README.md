@@ -23,7 +23,7 @@ It's built to be secure, respect your privacy, and give you agency on how you pl
 
 ## Installation
 
-Kate only supports installing from npm currently. You'll need [Node.js 16+](https://nodejs.org/en) installed. Run the following from the command line:
+Kate only supports installing from npm and [from source](#hacking-on-kate) currently. You'll need [Node.js 16+](https://nodejs.org/en) installed. To install from npm run the following from the command line:
 
     $ npm install -g @qteatime/kate-desktop@experimental
 
