@@ -363,6 +363,11 @@ w.task("tools:build", ["tools:compile", "www:bundle"], () => {
     out: `packages/kate-tools/packaging/web/kate.js`,
     name: "Kate",
   });
+  glomp({
+    entry: "packages/kate-tools/build/client/loader.js",
+    out: `packages/kate-tools/packaging/web/loader.js`,
+    name: "Kate_single_loader",
+  });
   copy(
     "packages/kate-core/LICENCES.txt",
     `packages/kate-tools/packaging/web/KATE-LICENCES.txt`
