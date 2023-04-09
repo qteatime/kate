@@ -133,11 +133,13 @@ export class CartManager {
   async install(cart: Cart.Cart) {
     const old_meta = await this.try_read_metadata(cart.metadata.id);
     if (old_meta != null) {
-      const version = old_meta.metadata.release.version;
-      const title = old_meta.metadata.game.title;
+      const version = cart.metadata.release.version;
+      const title = cart.metadata.game.title;
+      const old_title = old_meta.metadata.game.title;
+      const old_version = old_meta.metadata.release.version;
       const should_update = await this.os.dialog.confirm("kate:installer", {
-        title: `Update ${title}?`,
-        message: `A cartridge already exists for ${cart.metadata.id}. Update it to ${title} v${version.major}.${version.minor}?`,
+        title: `Update ${old_title}?`,
+        message: `A cartridge already exists for ${cart.metadata.id} (${old_title} v${old_version.major}.${old_version.minor}). Update it to ${title} v${version.major}.${version.minor}?`,
         ok: "Update",
         cancel: "Keep old version",
         dangerous: true,

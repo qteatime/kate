@@ -5,3 +5,11 @@ Kate v0.23.5  (May 2023)
 The v0.23.5 is May's experimental release of Kate, including a
 handful of bugfixes.
 
+
+Fixed bugs
+----------
+
+  - The prompt for updating a cartridge used to display the new
+    cartridge details instead of the installed ones. It now
+    correctly identifies what you're updating from, and what
+    you're updating to.
