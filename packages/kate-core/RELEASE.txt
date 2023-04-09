@@ -3,7 +3,7 @@ Kate v0.23.5  (May 2023)
 =======================================================================
 
 The v0.23.5 is May's experimental release of Kate, including a
-handful of bugfixes.
+handful of bugfixes and small improvements.
 
 
 Fixed bugs
@@ -13,3 +13,11 @@ Fixed bugs
     cartridge details instead of the installed ones. It now
     correctly identifies what you're updating from, and what
     you're updating to.
+
+
+Small improvements
+------------------
+
+  - The Single Cartridge mode now won't copy files intended for
+    the Web Application mode, meaning you can just zip everything
+    in the folder and upload to your web server/Itch.io.

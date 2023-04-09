@@ -144,13 +144,15 @@ function copy(from, to) {
   FS.copyFileSync(from, to);
 }
 
-function copy_tree(from, to) {
+function copy_tree(from, to, filter = (x) => true) {
   console.log("-> Copy tree", from, "->", to);
 
   const go = (src, dst) => {
     const stat = FS.statSync(src);
     if (stat.isFile()) {
-      copy(src, dst);
+      if (filter(src)) {
+        copy(src, dst);
+      }
     } else if (stat.isDirectory()) {
       for (const entry of FS.readdirSync(src)) {
         go(Path.join(src, entry), Path.join(dst, entry));
@@ -346,7 +348,16 @@ w.task("tools:compile", ["schema:build"], () => {
 
 w.task("tools:build", ["tools:compile", "www:bundle"], () => {
   remove("packages/kate-tools/packaging/web", { recursive: true, force: true });
-  copy_tree("www", "packages/kate-tools/packaging/web");
+  copy_tree("www", "packages/kate-tools/packaging/web", (src) => {
+    return !(
+      src.endsWith("loader.js") ||
+      src.endsWith("manifest.json") ||
+      src.endsWith("index.html") ||
+      src.endsWith("versions.json") ||
+      /kate-.*?\.js$/.test(src) ||
+      /RELEASE-.*?\.txt$/.test(src)
+    );
+  });
   glomp({
     entry: "packages/kate-core/build/index.js",
     out: `packages/kate-tools/packaging/web/kate.js`,
