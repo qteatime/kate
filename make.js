@@ -377,16 +377,21 @@ w.task("tools:make-npm-package", ["tools:clean", "tools:build"], () => {
 
 // -- WWW
 w.task("www:bundle", ["core:build", "glomp:build"], () => {
+  glomp({
+    entry: "packages/kate-core/build/index.js",
+    out: `www/kate/kate-latest.js`,
+    name: "Kate",
+  });
+  copy("packages/kate-core/RELEASE.txt", `www/kate/RELEASE-latest.txt`);
+});
+
+w.task("www:release", ["www:bundle"], () => {
   const version = require("./package.json").version;
   if (!/^[0-9a-z\.\-]+$/.test(version)) {
     throw new Error(`FATAL: package.json version is malformed`);
   }
-  glomp({
-    entry: "packages/kate-core/build/index.js",
-    out: `www/kate/kate-${version}.js`,
-    name: "Kate",
-  });
-  copy("packages/kate-core/RELEASE.txt", `www/kate/RELEASE-${version}.txt`);
+  copy("www/kate/kate-latest.js", `www/kate/kate-${version}.js`);
+  copy("www/kate/RELEASE-latest.txt", `www/kate/RELEASE-${version}.txt`);
 });
 
 // -- Examples

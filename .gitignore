@@ -5,7 +5,8 @@ build/
 *.kart
 *.lingua.crochet
 .binary/
-www/kate/
+www/kate/kate-latest.js
+www/kate/RELEASE-latest.txt
 www/kate-os.js
 www/app.js
 www/native-api.js

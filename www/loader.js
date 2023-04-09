@@ -1,6 +1,5 @@
 void (async function () {
   "strict mode";
-  const global_eval = eval;
   const default_channel = "preview";
 
   async function cache_version(version) {
@@ -75,6 +74,26 @@ void (async function () {
     await cache.add(version.main);
   }
 
+  async function load_script(url) {
+    return new Promise((resolve, reject) => {
+      const script = document.createElement("script");
+      script.onload = () => resolve();
+      script.onerror = (ev, source, lineno, colno, error) => {
+        console.error(
+          `[Kate] failed to load script at ${url}`,
+          ev,
+          source,
+          lineno,
+          colno,
+          error
+        );
+        reject(new Error(`failed to load script at ${url}`));
+      };
+      script.src = url;
+      document.body.appendChild(script);
+    });
+  }
+
   // Check what version to load
   let version = JSON.parse(localStorage["kate-version"] ?? "null");
   if (version == null) {
@@ -92,11 +111,9 @@ void (async function () {
   }
 
   // Load Kate
-  const response = await fetch(version.main);
-  if (response.ok) {
-    const code = await response.text();
-    global_eval(code);
-  } else {
+  try {
+    await load_script(version.main);
+  } catch (e) {
     alert(`Kate version ${version.version} could not be found.`);
     return;
   }

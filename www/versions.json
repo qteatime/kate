@@ -7,9 +7,18 @@
       "migration_needed": false,
       "channels": ["preview"],
       "release_notes": "/kate/RELEASE-0.23.4-a1.txt"
+    },
+    {
+      "version": "latest",
+      "main": "/kate/kate-latest.js",
+      "breaking_change": true,
+      "migration_needed": true,
+      "channels": ["latest"],
+      "release_notes": "/kate/RELEASE-latest.txt"
     }
   ],
   "channels": {
-    "preview": "0.23.4-a1"
+    "preview": "0.23.4-a1",
+    "latest": "latest"
   }
 }
