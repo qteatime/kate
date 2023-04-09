@@ -4,6 +4,7 @@ import type {
   TableSchema2,
   IndexSchema1,
   IndexSchema2,
+  TableSchema3,
 } from "./schema";
 
 function lift_request<A>(req: IDBRequest<A>): Promise<A> {
@@ -76,6 +77,14 @@ export class Transaction {
       T["__schema2"],
       [T["__kt1"], T["__kt2"]],
       [T["__k1"], T["__k2"]]
+    >(this.trans.objectStore(table.name));
+  }
+
+  get_table3<T extends TableSchema3<any, any, any, any>>(table: T) {
+    return new Table<
+      T["__schema3"],
+      [T["__kt1"], T["__kt2"], T["__kt3"]],
+      [T["__k1"], T["__k2"], T["__k3"]]
     >(this.trans.objectStore(table.name));
   }
 

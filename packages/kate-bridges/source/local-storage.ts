@@ -4,12 +4,13 @@ declare var KATE_LOCAL_STORAGE: Dict | null;
 
 const { store } = KateAPI;
 let contents = KATE_LOCAL_STORAGE ?? Object.create(null);
+const bucket = store.get_special_bucket();
 
 let timer: any = null;
 function persist(contents: Dict) {
   clearTimeout(timer);
   timer = setTimeout(() => {
-    store.put(store.special_keys.local_storage, contents);
+    bucket.put(store.special_keys.local_storage, contents);
   });
 }
 

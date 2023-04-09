@@ -85,13 +85,20 @@ export class KateOS {
     }
     this._current_scene = scene;
     scene.attach(this.display);
+    scene.canvas.classList.remove("kate-os-leaving");
+    scene.canvas.classList.add("kate-os-entering");
     this.focus_handler.push_root(scene.canvas);
   }
 
   pop_scene() {
     if (this._current_scene != null) {
       this.focus_handler.pop_root(this._current_scene.canvas);
-      this._current_scene.detach();
+      const scene = this._current_scene;
+      scene.canvas.classList.remove("kate-os-entering");
+      scene.canvas.classList.add("kate-os-leaving");
+      wait(250).then(() => {
+        scene.detach();
+      });
     }
     this._current_scene = this._scene_stack.pop() ?? null;
     this.focus_handler.push_root(this._current_scene?.canvas ?? null);
@@ -117,15 +124,34 @@ export class KateOS {
   }
 
   static async boot(kernel: KateKernel) {
+    // Setup OS
     const sfx = await KateSfx.make(kernel);
-    const { db } = await KateDb.kate.open();
+    const { db, old_version } = await KateDb.kate.open();
     const settings = await KateSettings.load(db);
     const os = new KateOS(kernel, db, sfx, settings);
-    await request_persistent_storage(os);
+    const min_boot_time = wait(1000);
     const boot_screen = new SceneBoot(os);
+
+    // Perform boot operations (migrations, etc)
+    await request_persistent_storage(os);
     os.push_scene(boot_screen);
-    await wait(2100);
+
+    await KateDb.kate.run_data_migration(
+      old_version,
+      db,
+      (migration, current, total) => {
+        boot_screen.set_message(
+          `Updating database (${current} of ${total}): ${migration.description}`
+        );
+      }
+    );
+
+    boot_screen.set_message("");
+
+    await min_boot_time;
     os.pop_scene();
+
+    // Show start screen
     os.push_scene(new SceneHome(os));
     return os;
   }

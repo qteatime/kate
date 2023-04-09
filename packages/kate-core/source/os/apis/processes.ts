@@ -25,9 +25,8 @@ export class KateProcesses {
     const cart = Cart.parse(bytes);
     const file_map = new Map(cart.files.map((x) => [x.path, x] as const));
 
-    const storage = await this.os.object_store.try_get(
-      cart.metadata.id,
-      "kate:local-storage"
+    const storage = await this.os.object_store.get_local_storage(
+      cart.metadata.id
     );
     const runtime = this.os.kernel.runtimes.from_cartridge(cart, {
       cart: cart,

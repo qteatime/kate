@@ -56,3 +56,11 @@
 .kate-hud {
   position: absolute;
 }
+
+.kate-os-entering {
+  animation: kate-os-fade-in 0.2s ease-out forwards;
+}
+
+.kate-os-leaving {
+  animation: kate-os-fade-out 0.2s linear forwards;
+}

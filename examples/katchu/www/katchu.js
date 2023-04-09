@@ -65,7 +65,9 @@ class HighScore {
         this._score = _score;
     }
     static async load() {
-        const score = (await KateAPI.store.try_get(HighScore.KEY));
+        const score = (await KateAPI.store
+            .get_special_bucket()
+            .try_get(HighScore.KEY));
         return new HighScore(score ?? 0);
     }
     get score() {
@@ -73,7 +75,7 @@ class HighScore {
     }
     async save_if_highest(score) {
         if (score > this._score) {
-            await KateAPI.store.put(HighScore.KEY, score);
+            await KateAPI.store.get_special_bucket().put(HighScore.KEY, score);
             this._score = score;
         }
     }

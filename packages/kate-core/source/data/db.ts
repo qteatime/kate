@@ -3,7 +3,22 @@ import * as CartMetadata from "../cart/metadata";
 import * as CartRuntime from "../cart/runtime";
 import type { NotificationType } from "../os/apis/notification";
 
-export const kate = new Db.DatabaseSchema("kate", 7);
+export const kate = new Db.DatabaseSchema("kate", 8);
+
+// Deprecated tables
+export type ObjectStore_v1 = {
+  cart_id: string;
+  id: string;
+  size: number;
+  data: unknown;
+};
+export const object_store_v1 = kate.table2<ObjectStore_v1, "cart_id", "id">({
+  since: 6,
+  name: "object_store",
+  path: ["cart_id", "id"],
+  auto_increment: false,
+  deprecated_since: 8,
+});
 
 // Table definitions
 export type CartMeta = {
@@ -64,21 +79,33 @@ export const notifications = kate.table1<Notification, "id">({
 
 export type ObjectStore = {
   cart_id: string;
+  bucket_id: string;
   id: string;
   size: number;
   data: unknown;
 };
-export const object_store = kate.table2<ObjectStore, "cart_id", "id">({
-  since: 6,
-  name: "object_store",
-  path: ["cart_id", "id"],
+export const object_store = kate.table3<
+  ObjectStore,
+  "cart_id",
+  "bucket_id",
+  "id"
+>({
+  since: 8,
+  name: "object_store_v2",
+  path: ["cart_id", "bucket_id", "id"],
   auto_increment: false,
 });
 export const idx_cart_object_store_by_cart = object_store.index1({
-  since: 6,
+  since: 8,
   name: "by_cart",
   path: ["cart_id"],
   unique: false,
+});
+export const idx_cart_object_store_by_bucket = object_store.index2({
+  since: 8,
+  name: "by_bucket",
+  path: ["cart_id", "bucket_id"],
+  unique: true,
 });
 
 export type QuotaUsage = {
@@ -140,3 +167,25 @@ export const settings = kate.table1<Settings, "key">({
 });
 
 // Data migrations
+kate.data_migration({
+  since: 8,
+  description: "update object storage tables",
+  process: async (db) => {
+    await db.transaction(
+      [object_store_v1, object_store],
+      "readwrite",
+      async (t) => {
+        const store_v1 = t.get_table2(object_store_v1);
+        const store_v2 = t.get_table3(object_store);
+        const special_bucket = "kate:special";
+
+        const entries = await store_v1.get_all();
+        for (const entry of entries) {
+          await store_v2.add({ ...entry, bucket_id: special_bucket });
+        }
+
+        await store_v1.clear();
+      }
+    );
+  },
+});

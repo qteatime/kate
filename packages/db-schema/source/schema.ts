@@ -2,6 +2,7 @@ import { Database } from "./core";
 
 export class DatabaseSchema {
   readonly tables: TableSchema<any>[] = [];
+  readonly data_migrations: DataMigration[] = [];
   constructor(readonly name: string, readonly version: number) {}
 
   async open() {
@@ -33,6 +34,34 @@ export class DatabaseSchema {
     );
   }
 
+  needs_data_migration(version: number) {
+    return this.data_migrations.some((x) => x.is_needed(version));
+  }
+
+  async run_data_migration(
+    version: number,
+    db: Database,
+    progress: (migration: DataMigration, current: number, total: number) => void
+  ) {
+    const migrations = this.data_migrations.filter((x) => x.is_needed(version));
+    let current = 1;
+    for (const migration of migrations) {
+      progress(migration, current, migrations.length);
+      await migration.run(version, db);
+      current += 1;
+    }
+  }
+
+  data_migration(x: {
+    since: number;
+    description: string;
+    process: (_: Database) => Promise<void>;
+  }) {
+    this.data_migrations.push(
+      new DataMigration(x.since, x.description, x.process)
+    );
+  }
+
   table1<S, K extends keyof S>(x: {
     since: number;
     name: string;
@@ -56,6 +85,21 @@ export class DatabaseSchema {
     deprecated_since?: number;
   }) {
     const table = new TableSchema2<S, K1, K2>(x.since, x.name, {
+      path: x.path,
+      auto_increment: x.auto_increment,
+    });
+    this.tables.push(table);
+    return table;
+  }
+
+  table3<S, K1 extends keyof S, K2 extends keyof S, K3 extends keyof S>(x: {
+    since: number;
+    name: string;
+    path: [K1, K2, K3];
+    auto_increment: boolean;
+    deprecated_since?: number;
+  }) {
+    const table = new TableSchema3<S, K1, K2, K3>(x.since, x.name, {
       path: x.path,
       auto_increment: x.auto_increment,
     });
@@ -160,6 +204,29 @@ export class TableSchema2<
   }
 }
 
+export class TableSchema3<
+  Schema,
+  K1 extends keyof Schema,
+  K2 extends keyof Schema,
+  K3 extends keyof Schema
+> extends TableSchema<Schema> {
+  readonly __schema3!: Schema;
+  readonly __k1!: K1;
+  readonly __kt1!: Schema[K1];
+  readonly __k2!: K2;
+  readonly __kt2!: Schema[K2];
+  readonly __k3!: K3;
+  readonly __kt3!: Schema[K3];
+
+  constructor(
+    version: number,
+    name: string,
+    key: { path: [K1, K2, K3]; auto_increment: boolean }
+  ) {
+    super(version, name, key);
+  }
+}
+
 abstract class IndexSchema {
   constructor(
     readonly table: TableSchema<any>,
@@ -215,5 +282,23 @@ export class IndexSchema2<
     options: { unique: boolean; multi_entry: boolean }
   ) {
     super(table, version, name, key, options);
+  }
+}
+
+export class DataMigration {
+  constructor(
+    readonly version: number,
+    readonly description: string,
+    readonly process: (_: Database) => Promise<void>
+  ) {}
+
+  is_needed(version: number) {
+    return version < this.version;
+  }
+
+  async run(version: number, db: Database) {
+    if (this.is_needed(version)) {
+      await this.process(db);
+    }
   }
 }

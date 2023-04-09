@@ -6,6 +6,22 @@ The v0.23.5 is May's experimental release of Kate, including a
 handful of bugfixes and small improvements.
 
 
+Adding buckets to Storage API
+-----------------------------
+
+This version adds buckets to the storage API, which brings the API a
+bit closer to IndexedDB in order to make it possible to bridge it
+adequately.
+
+It's a breaking change on the API level; unbucketed keys stored
+previously are now moved to a "special bucket", and the code must
+always acquire a reference to a bucket to operate on the key/value
+pairs stored there.
+
+Previous data is automatically migrated on boot, so it's not a
+breaking change from players' perspective.
+
+
 Fixed bugs
 ----------
 

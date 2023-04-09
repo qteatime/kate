@@ -4,12 +4,19 @@ import { TC } from "../../utils";
 
 type Message =
   | { type: "kate:cart.read-file"; payload: { path: string } }
-  | { type: "kate:store.list"; payload: { count?: number } }
-  | { type: "kate:store.get"; payload: { key: string } }
-  | { type: "kate:store.try-get"; payload: { key: string } }
-  | { type: "kate:store.put"; payload: { key: string; value: unknown } }
-  | { type: "kate:store.add"; payload: { key: string; value: unknown } }
-  | { type: "kate:store.delete"; payload: { key: string } }
+  | { type: "kate:store.list"; payload: { bucket: string; count?: number } }
+  | { type: "kate:store.get"; payload: { bucket: string; key: string } }
+  | { type: "kate:store.try-get"; payload: { bucket: string; key: string } }
+  | {
+      type: "kate:store.put";
+      payload: { bucket: string; key: string; value: unknown };
+    }
+  | {
+      type: "kate:store.add";
+      payload: { bucket: string; key: string; value: unknown };
+    }
+  | { type: "kate:store.delete"; payload: { bucket: string; key: string } }
+  | { type: "kate:store.clear"; payload: { bucket: string } }
   | { type: "kate:store.usage"; payload: {} }
   | { type: "kate:audio.create-channel"; payload: { max_tracks?: number } }
   | { type: "kate:audio.resume-channel"; payload: { id: string } }
@@ -283,52 +290,51 @@ export class KateIPCServer {
       }
 
       case "kate:store.add": {
-        await this.os.object_store.add(
-          env.cart.metadata.id,
-          TC.string(message.payload.key),
-          message.payload.value
-        );
+        await this.os.object_store
+          .get_bucket(env.cart.metadata.id, message.payload.bucket)
+          .add(TC.string(message.payload.key), message.payload.value);
         return ok(null);
       }
 
       case "kate:store.delete": {
-        await this.os.object_store.delete(
-          env.cart.metadata.id,
-          TC.string(message.payload.key)
-        );
+        await this.os.object_store
+          .get_bucket(env.cart.metadata.id, message.payload.bucket)
+          .delete(TC.string(message.payload.key));
         return ok(null);
       }
 
       case "kate:store.get": {
-        const value = await this.os.object_store.get(
-          env.cart.metadata.id,
-          TC.string(message.payload.key)
-        );
+        const value = await this.os.object_store
+          .get_bucket(env.cart.metadata.id, message.payload.bucket)
+          .get(TC.string(message.payload.key));
         return ok(value);
       }
 
       case "kate:store.try-get": {
-        const value = await this.os.object_store.try_get(
-          env.cart.metadata.id,
-          TC.string(message.payload.key)
-        );
+        const value = await this.os.object_store
+          .get_bucket(env.cart.metadata.id, message.payload.bucket)
+          .try_get(TC.string(message.payload.key));
         return ok(value);
       }
 
       case "kate:store.list": {
-        const values = await this.os.object_store.list(
-          env.cart.metadata.id,
-          TC.nullable(TC.integer, message.payload.count)
-        );
+        const values = await this.os.object_store
+          .get_bucket(env.cart.metadata.id, message.payload.bucket)
+          .list(TC.nullable(TC.integer, message.payload.count));
         return ok(values);
       }
 
       case "kate:store.put": {
-        await this.os.object_store.put(
-          env.cart.metadata.id,
-          TC.string(message.payload.key),
-          message.payload.value
-        );
+        await this.os.object_store
+          .get_bucket(env.cart.metadata.id, message.payload.bucket)
+          .put(TC.string(message.payload.key), message.payload.value);
+        return ok(null);
+      }
+
+      case "kate:store.clear": {
+        await this.os.object_store
+          .get_bucket(env.cart.metadata.id, message.payload.bucket)
+          .clear();
         return ok(null);
       }
 

@@ -5,13 +5,13 @@ export class SceneBoot extends Scene {
   render() {
     return h("div", { class: "kate-os-logo" }, [
       h("div", { class: "kate-os-logo-image" }, [
-        h("div", { class: "kate-os-logo-paw" }, [
-          h("i", {}, []),
-          h("i", {}, []),
-          h("i", {}, []),
-        ]),
         h("div", { class: "kate-os-logo-name" }, ["Kate"]),
+        h("div", { class: "kate-os-boot-message" }, []),
       ]),
     ]);
+  }
+
+  set_message(message: string) {
+    this.canvas.querySelector(".kate-os-boot-message")!.textContent = message;
   }
 }
