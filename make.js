@@ -477,10 +477,11 @@ w.task("desktop:generate", ["desktop:compile"], () => {
     out: "packages/kate-desktop/app/www/kate.js",
     name: "Kate",
   });
-  copy(
-    "packages/kate-desktop/assets/loader.js",
-    "packages/kate-desktop/app/www/loader.js"
-  );
+  glomp({
+    entry: "packages/kate-desktop/build/client/loader.js",
+    out: "packages/kate-desktop/app/www/loader.js",
+    name: "Kate_desktop_loader",
+  });
 });
 
 w.task("desktop:build", ["www:bundle", "desktop:generate"], () => {});
