@@ -25,3 +25,4 @@ packages/kate-desktop/app
 packages/kate-tools/packaging
 examples/katchu/katchu.js
 !examples/katchu/katchu.kart
+www/loader.js
