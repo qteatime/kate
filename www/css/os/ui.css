@@ -204,3 +204,27 @@
   height: 1px;
   background: var(--color-border);
 }
+
+.kate-ui-padded-container[data-padding="s"] {
+  padding: 0.5rem;
+}
+
+.kate-ui-padded-container[data-padding="1x"] {
+  padding: 1rem;
+}
+
+.kate-ui-padded-container[data-padding="lg"] {
+  padding: 1.5rem;
+}
+
+.kate-ui-padded-container[data-padding="2x"] {
+  padding: 2rem;
+}
+
+.kate-ui-padded-container[data-padding="3x"] {
+  padding: 3rem;
+}
+
+.kate-ui-padded-container[data-padding="4x"] {
+  padding: 4rem;
+}

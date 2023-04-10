@@ -597,3 +597,14 @@ export function interactive(
 
   return element;
 }
+
+export function padded_container(
+  padding: "s" | "1x" | "lg" | "2x" | "3x" | "4x",
+  children: Widgetable[]
+) {
+  return h(
+    "div",
+    { class: "kate-ui-padded-container", "data-padding": padding },
+    [...children]
+  );
+}

@@ -13,9 +13,31 @@ export type KeyboardToKate = {
   buttons: InputKey[];
 };
 
+export type GamepadToKate = {
+  id: string;
+  layout: string;
+  button_mapping: GamepadButtonToKate[];
+  axis_mapping: GamepadAxisToKate[];
+};
+
+export type GamepadButtonToKate = {
+  id: number;
+  soft_press: InputKey[];
+  full_press: InputKey[];
+};
+
+export type GamepadAxisToKate = {
+  id: number;
+  soft_negative: InputKey[];
+  full_negative: InputKey[];
+  soft_positive: InputKey[];
+  full_positive: InputKey[];
+};
+
 export type Input = {
   haptic_feedback_for_virtual_button: boolean;
   keyboard_mapping: KeyboardToKate[];
+  gamepads: GamepadToKate[];
 };
 
 export type UI = {
@@ -84,6 +106,7 @@ const defaults: SettingsData = {
         buttons: ["rtrigger"],
       },
     ],
+    gamepads: [],
   },
 };
 

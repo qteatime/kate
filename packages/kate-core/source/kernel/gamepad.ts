@@ -23,6 +23,18 @@ export class GamepadInput {
     });
   }
 
+  pause(gamepad: Gamepad) {
+    if (this.gamepad?.is_same(gamepad)) {
+      this.gamepad.pause();
+    }
+  }
+
+  unpause(gamepad: Gamepad) {
+    if (this.gamepad?.is_same(gamepad)) {
+      this.gamepad.unpause();
+    }
+  }
+
   update_gamepad(gamepad: Gamepad, connected: boolean) {
     if (this.gamepad == null && connected) {
       this.gamepad = this.get_layout(gamepad);
@@ -53,6 +65,7 @@ export class GamepadInput {
 
 class LayoutedGamepad {
   private last_update: number | null = null;
+  private _paused: boolean = false;
   constructor(
     readonly raw_gamepad: Gamepad,
     readonly layout: GamepadLayout,
@@ -61,6 +74,14 @@ class LayoutedGamepad {
 
   is_same(gamepad: Gamepad) {
     return this.raw_gamepad.id === gamepad.id;
+  }
+
+  pause() {
+    this._paused = true;
+  }
+
+  unpause() {
+    this._paused = false;
   }
 
   private resolve_gamepad() {
@@ -73,6 +94,10 @@ class LayoutedGamepad {
   }
 
   update_virtual_state(time: number) {
+    if (this._paused) {
+      return;
+    }
+
     const g = this.resolve_gamepad();
     if (g == null) {
       return;
