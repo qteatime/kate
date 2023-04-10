@@ -5,7 +5,7 @@ declare var Kate: {
 };
 
 const DEFAULT_CHANNEL =
-  location.hostname === "localhost" ? "latest" : "preview";
+  location.hostname === "kate.qteati.me" ? "preview" : "latest";
 
 type Version = {
   version: string;
@@ -117,18 +117,19 @@ async function main() {
   let version: Version | null = JSON.parse(
     localStorage["kate-version"] ?? "null"
   );
+  const channel: string = localStorage["kate-channel"] || DEFAULT_CHANNEL;
   if (version == null) {
     const versions = (await fetch("versions.json").then((x) =>
       x.json()
     )) as VersionMeta;
-    const latest = versions.channels[DEFAULT_CHANNEL];
+    const latest = versions.channels[channel];
     version = versions.versions.find((x) => x.version === latest) ?? null;
     if (version == null) {
       alert("Could not find a Kate version to download.");
       return;
     }
     localStorage["kate-version"] = JSON.stringify(version);
-    localStorage["kate-channel"] = DEFAULT_CHANNEL;
+    localStorage["kate-channel"] = channel;
 
     await cache_version(version);
   }

@@ -128,6 +128,10 @@ export class KateOS {
     const sfx = await KateSfx.make(kernel);
     const { db, old_version } = await KateDb.kate.open();
     const settings = await KateSettings.load(db);
+    kernel.console.set_vibration_on_virtual_input(
+      settings.get("input").haptic_feedback_for_virtual_button
+    );
+
     const os = new KateOS(kernel, db, sfx, settings);
     const min_boot_time = wait(1000);
     const boot_screen = new SceneBoot(os);

@@ -1,5 +1,6 @@
 import * as UI from "../../ui";
-import { ScenePlayHabits } from "./play-habits";
+import { SceneInputSettings } from "./input";
+import { ScenePlayHabitsSettings } from "./play-habits";
 import { SceneRecovery } from "./recovery";
 
 export class SceneSettings extends UI.SimpleScene {
@@ -9,11 +10,21 @@ export class SceneSettings extends UI.SimpleScene {
   body() {
     return [
       UI.link_card({
-        icon: "gamepad",
+        icon: "calendar",
         title: "Play habits",
         description: "Recently played and play time",
         on_click: () => {
-          this.os.push_scene(new ScenePlayHabits(this.os));
+          this.os.push_scene(new ScenePlayHabitsSettings(this.os));
+        },
+      }),
+
+      UI.link_card({
+        icon: "gamepad",
+        title: "Controller & Sensors",
+        description:
+          "Configure virtual buttons, keyboard, gamepad, and other input sources",
+        on_click: () => {
+          this.os.push_scene(new SceneInputSettings(this.os));
         },
       }),
 

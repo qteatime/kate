@@ -1,7 +1,7 @@
 import * as UI from "../../ui";
 
-export class ScenePlayHabits extends UI.SimpleScene {
-  icon = "gamepad";
+export class ScenePlayHabitsSettings extends UI.SimpleScene {
+  icon = "calendar";
   title = ["Play habits"];
 
   body() {

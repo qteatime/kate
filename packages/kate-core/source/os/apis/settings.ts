@@ -6,14 +6,22 @@ export type PlayHabits = {
   play_times: boolean;
 };
 
+export type Input = {
+  haptic_feedback_for_virtual_button: boolean;
+};
+
 export type SettingsData = {
   play_habits: PlayHabits;
+  input: Input;
 };
 
 const defaults: SettingsData = {
   play_habits: {
     recently_played: true,
     play_times: true,
+  },
+  input: {
+    haptic_feedback_for_virtual_button: true,
   },
 };
 
@@ -32,7 +40,7 @@ export class KateSettings {
     return settings;
   }
 
-  get(key: keyof SettingsData) {
+  get<K extends keyof SettingsData>(key: K): SettingsData[K] {
     if (this._data == null) {
       throw new Error(`get() called without settings being loaded`);
     }
@@ -48,9 +56,12 @@ export class KateSettings {
 
         const play_habits: PlayHabits =
           (await settings.try_get("play_habits"))?.data ?? defaults.play_habits;
+        const input: Input =
+          (await settings.try_get("input"))?.data ?? defaults.input;
 
         return {
           play_habits,
+          input,
         };
       }
     );
