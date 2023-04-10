@@ -16,7 +16,7 @@ export class KeyboardInput {
 
   private ignore_repeat = ["menu", "capture"];
 
-  private physical_map!: { [key: string]: InputKey };
+  private physical_map!: { [key: string]: InputKey[] };
   private attached = false;
 
   constructor(private console: VirtualConsole) {
@@ -24,9 +24,17 @@ export class KeyboardInput {
   }
 
   private update_physical_map() {
-    const map: { [key: string]: InputKey } = Object.create(null);
+    const map: { [key: string]: InputKey[] } = Object.create(null);
     for (const [key, value] of Object.entries(this.physical_config)) {
-      map[value] = key as InputKey;
+      map[value] = [key as InputKey];
+    }
+    this.physical_map = map;
+  }
+
+  remap(mapping: { key: string; buttons: InputKey[] }[]) {
+    const map: { [key: string]: InputKey[] } = Object.create(null);
+    for (const { key, buttons } of mapping) {
+      map[key] = buttons;
     }
     this.physical_map = map;
   }
@@ -40,9 +48,11 @@ export class KeyboardInput {
     document.addEventListener("keydown", (ev) => {
       if (ev.code in this.physical_map) {
         ev.preventDefault();
-        const key = this.physical_map[ev.code];
-        if (!this.ignore_repeat.includes(key) || !ev.repeat) {
-          this.console.update_virtual_key(key, true);
+        const keys = this.physical_map[ev.code];
+        for (const key of keys) {
+          if (!this.ignore_repeat.includes(key) || !ev.repeat) {
+            this.console.update_virtual_key(key, true);
+          }
         }
       }
     });
@@ -50,7 +60,10 @@ export class KeyboardInput {
     document.addEventListener("keyup", (ev) => {
       if (ev.code in this.physical_map) {
         ev.preventDefault();
-        this.console.update_virtual_key(this.physical_map[ev.code], false);
+        const keys = this.physical_map[ev.code];
+        for (const key of keys) {
+          this.console.update_virtual_key(key, false);
+        }
       }
     });
   }

@@ -299,6 +299,10 @@ export class Icon extends Widget {
   }
 }
 
+export function icon(x: InputKey) {
+  return new Icon(x);
+}
+
 export function status_bar(children: Widgetable[]) {
   return h("div", { class: "kate-os-statusbar" }, [...children]);
 }

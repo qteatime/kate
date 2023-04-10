@@ -140,6 +140,7 @@ export class KateOS {
     kernel.console.on_virtual_button_touched.listen(
       os.handle_virtual_button_feedback
     );
+    kernel.keyboard.remap(settings.get("input").keyboard_mapping);
 
     const min_boot_time = wait(1000);
     const boot_screen = new SceneBoot(os);

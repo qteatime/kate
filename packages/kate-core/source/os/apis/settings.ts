@@ -1,19 +1,29 @@
 import * as Db from "../../data";
-import { Database } from "../../db-schema";
+import type { Database } from "../../db-schema";
+import type { InputKey } from "../../kernel";
+import { EventStream } from "../../utils";
 
 export type PlayHabits = {
   recently_played: boolean;
   play_times: boolean;
 };
 
+export type KeyboardToKate = {
+  key: string;
+  buttons: InputKey[];
+};
+
 export type Input = {
   haptic_feedback_for_virtual_button: boolean;
+  keyboard_mapping: KeyboardToKate[];
 };
 
 export type SettingsData = {
   play_habits: PlayHabits;
   input: Input;
 };
+
+export type AnySetting = SettingsData[keyof SettingsData];
 
 const defaults: SettingsData = {
   play_habits: {
@@ -22,11 +32,61 @@ const defaults: SettingsData = {
   },
   input: {
     haptic_feedback_for_virtual_button: true,
+    keyboard_mapping: [
+      {
+        key: "ArrowUp",
+        buttons: ["up"],
+      },
+      {
+        key: "ArrowRight",
+        buttons: ["right"],
+      },
+      {
+        key: "ArrowDown",
+        buttons: ["down"],
+      },
+      {
+        key: "ArrowLeft",
+        buttons: ["left"],
+      },
+      {
+        key: "ShiftLeft",
+        buttons: ["menu"],
+      },
+      {
+        key: "ControlLeft",
+        buttons: ["capture"],
+      },
+      {
+        key: "KeyX",
+        buttons: ["x"],
+      },
+      {
+        key: "KeyZ",
+        buttons: ["o"],
+      },
+      {
+        key: "KeyA",
+        buttons: ["ltrigger"],
+      },
+      {
+        key: "KeyS",
+        buttons: ["rtrigger"],
+      },
+    ],
   },
+};
+
+export type ChangedSetting<K extends keyof SettingsData> = {
+  key: K;
+  value: SettingsData[K];
 };
 
 export class KateSettings {
   private _data: SettingsData | null = null;
+  readonly on_settings_changed = new EventStream<
+    ChangedSetting<keyof SettingsData>
+  >();
 
   constructor(readonly db: Database) {}
 
@@ -55,13 +115,12 @@ export class KateSettings {
         const settings = t.get_table1(Db.settings);
 
         const play_habits: PlayHabits =
-          (await settings.try_get("play_habits"))?.data ?? defaults.play_habits;
-        const input: Input =
-          (await settings.try_get("input"))?.data ?? defaults.input;
+          (await settings.try_get("play_habits"))?.data ?? {};
+        const input: Input = (await settings.try_get("input"))?.data ?? {};
 
         return {
-          play_habits,
-          input,
+          play_habits: { ...defaults.play_habits, ...play_habits },
+          input: { ...defaults.input, ...input },
         };
       }
     );
@@ -70,8 +129,8 @@ export class KateSettings {
   async update<K extends keyof SettingsData>(
     key: K,
     fn: (_: SettingsData[K]) => SettingsData[K]
-  ) {
-    await this.db.transaction([Db.settings], "readwrite", async (t) => {
+  ): Promise<SettingsData[K]> {
+    return await this.db.transaction([Db.settings], "readwrite", async (t) => {
       const settings = t.get_table1(Db.settings);
       const value = fn(this.get(key));
       settings.put({
@@ -80,6 +139,8 @@ export class KateSettings {
         last_updated: new Date(),
       });
       this._data![key] = value;
+      this.on_settings_changed.emit({ key, value });
+      return value;
     });
   }
 
@@ -93,6 +154,10 @@ export class KateSettings {
           last_updated: new Date(),
         });
         (this._data as any)[key] = value;
+        this.on_settings_changed.emit({
+          key: key as keyof SettingsData,
+          value,
+        });
       }
     });
   }
