@@ -9,3 +9,4 @@ export * from "../../util/build/mime";
 export * from "../../util/build/ua-parser";
 export * as TC from "../../util/build/type-check";
 export * from "../../util/build/unit";
+export * as Sets from "../../util/build/sets";

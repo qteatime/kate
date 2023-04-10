@@ -82,7 +82,68 @@ class KeyboardInputSettings extends UI.SimpleScene {
   }
 
   render_mapping_entry(x: KeyboardToKate) {
-    return UI.info_line(x.key, x.buttons.map(UI.icon));
+    return UI.interactive(
+      this.os,
+      UI.info_cell(x.key, x.buttons.map(UI.icon)),
+      [
+        {
+          key: ["o"],
+          label: "Edit",
+          on_click: true,
+          handler: () => {
+            this.os.push_scene(
+              new KeyboardMappingSettings(this.os, x.key, x.buttons)
+            );
+          },
+        },
+        {
+          key: ["menu"],
+          label: "Options",
+          on_menu: true,
+          handler: async () => {
+            const result = await this.os.dialog.pop_menu(
+              "kate:settings",
+              `${friendly_keyboard(x.key)}`,
+              [
+                {
+                  label: "Edit",
+                  value: "edit" as const,
+                },
+                {
+                  label: "Delete",
+                  value: "delete" as const,
+                },
+              ],
+              null
+            );
+            switch (result) {
+              case "edit": {
+                this.os.push_scene(
+                  new KeyboardMappingSettings(this.os, x.key, x.buttons)
+                );
+                return;
+              }
+
+              case "delete": {
+                await this.os.settings.update("input", (input) => {
+                  const mappings = input.keyboard_mapping.filter(
+                    (m) => m.key !== x.key
+                  );
+                  return { ...input, keyboard_mapping: mappings };
+                });
+                return;
+              }
+
+              case null:
+                return;
+
+              default:
+                throw unreachable(result);
+            }
+          },
+        },
+      ]
+    );
   }
 
   handle_mappings_update = (ev: ChangedSetting<keyof SettingsData>) => {

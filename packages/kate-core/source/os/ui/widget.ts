@@ -1,5 +1,7 @@
 import { InputKey } from "../../kernel/virtual";
 import { EventStream } from "../../utils";
+import { InteractionHandler } from "../apis";
+import type { KateOS } from "../os";
 
 export abstract class Widget {
   abstract render(): Widgetable;
@@ -258,8 +260,16 @@ export function link(
   return link;
 }
 
-export function icon_button(icon: InputKey, text: string) {
-  return new Button([new HBox(5, [new Icon(icon), text])]).focus_target(false);
+export function icon_button(icon: InputKey | InputKey[], text: string) {
+  if (typeof icon === "string") {
+    return new Button([new HBox(5, [new Icon(icon), text])]).focus_target(
+      false
+    );
+  } else {
+    return new Button([
+      new HBox(5, [...icon.map((x) => new Icon(x)), text]),
+    ]).focus_target(false);
+  }
 }
 
 export function fa_icon_button(name: string, text: string, spacing = 10) {
@@ -484,4 +494,34 @@ export function hspace(x: number) {
 
 export function vdivider() {
   return h("div", { class: "kate-ui-vertical-divider" }, []);
+}
+
+export function interactive(
+  os: KateOS,
+  child: Widgetable,
+  interactions: InteractionHandler[]
+) {
+  const element = document.createElement("div");
+  element.className = "kate-ui-interactive kate-ui-focus-target";
+  append(child, element);
+
+  os.focus_handler.register_interactive(element, { handlers: interactions });
+
+  const click_handler = interactions.find((x) => x.on_click);
+  if (click_handler != null) {
+    element.addEventListener("click", (ev) => {
+      ev.preventDefault();
+      click_handler.handler("o", false);
+    });
+  }
+
+  const menu_handler = interactions.find((x) => x.on_menu);
+  if (menu_handler != null) {
+    element.addEventListener("contextmenu", (ev) => {
+      ev.preventDefault();
+      menu_handler.handler("menu", false);
+    });
+  }
+
+  return element;
 }

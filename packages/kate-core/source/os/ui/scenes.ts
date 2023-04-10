@@ -1,4 +1,6 @@
 import type { ExtendedInputKey } from "../../kernel";
+import { Sets } from "../../utils";
+import { FocusInteraction } from "../apis";
 import type { KateOS } from "../os";
 import {
   h,
@@ -38,6 +40,7 @@ export abstract class SimpleScene extends Scene {
   abstract title: Widgetable[];
   subtitle: Widgetable | null = null;
   abstract body(): Widgetable[];
+  private _previous_traps: FocusInteraction | null = null;
 
   render() {
     return simple_screen({
@@ -47,10 +50,7 @@ export abstract class SimpleScene extends Scene {
       body: scroll([
         h("div", { class: "kate-os-content kate-os-screen-body" }, this.body()),
       ]),
-      status: [
-        icon_button("x", "Return").on_clicked(this.handle_close),
-        icon_button("o", "Open").on_clicked(this.handle_open),
-      ],
+      status: [icon_button("x", "Return").on_clicked(this.handle_close)],
     });
   }
 
@@ -66,11 +66,53 @@ export abstract class SimpleScene extends Scene {
 
   on_attached(): void {
     this.os.focus_handler.listen(this.canvas, this.handle_key_pressed);
+    this.os.focus_handler.on_traps_changed.listen(
+      this.update_status_with_traps
+    );
   }
 
   on_detached(): void {
     this.os.focus_handler.remove(this.canvas, this.handle_key_pressed);
+    this.os.focus_handler.on_traps_changed.remove(
+      this.update_status_with_traps
+    );
   }
+
+  update_status_with_traps = (traps: FocusInteraction | null) => {
+    if (this._previous_traps == null && traps == null) {
+      return;
+    }
+
+    const handlers = traps?.handlers ?? [];
+    if (this._previous_traps != null) {
+      const new_keys = new Set(
+        handlers.map((x) => `${x.key.join(",")}:${x.label}`)
+      );
+      const old_keys = new Set(
+        this._previous_traps.handlers.map(
+          (x) => `${x.key.join(" ")}:${x.label}`
+        )
+      );
+      if (Sets.same_set(new_keys, old_keys)) {
+        return;
+      }
+    }
+    this._previous_traps = traps;
+
+    const status = this.canvas.querySelector(".kate-os-statusbar") ?? null;
+    if (status != null) {
+      status.textContent = "";
+      append(icon_button("x", "Return").on_clicked(this.handle_close), status);
+      for (const handler of handlers) {
+        append(
+          icon_button(handler.key, handler.label).on_clicked(() => {
+            handler.handler(handler.key[0], false);
+          }),
+          status
+        );
+      }
+    }
+  };
 
   handle_key_pressed = (x: { key: ExtendedInputKey; is_repeat: boolean }) => {
     if (x.is_repeat) {
@@ -78,10 +120,6 @@ export abstract class SimpleScene extends Scene {
     }
 
     switch (x.key) {
-      case "o":
-        this.handle_open();
-        return true;
-
       case "x":
         this.handle_close();
         return true;
@@ -91,12 +129,5 @@ export abstract class SimpleScene extends Scene {
 
   handle_close = () => {
     this.os.pop_scene();
-  };
-
-  handle_open = () => {
-    const current = this.os.focus_handler.current_focus;
-    if (current != null) {
-      current.click();
-    }
   };
 }

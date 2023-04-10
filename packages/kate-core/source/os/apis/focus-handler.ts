@@ -1,15 +1,31 @@
 import { EventStream } from "../../utils";
-import { ExtendedInputKey } from "../../kernel/virtual";
+import { ExtendedInputKey, InputKey } from "../../kernel/virtual";
 import type { KateOS } from "../os";
+
+export type InteractionHandler = {
+  key: InputKey[];
+  allow_repeat?: boolean;
+  on_click?: boolean;
+  on_menu?: boolean;
+  label: string;
+  handler: (key: InputKey, is_repeat: boolean) => void;
+};
+
+export type FocusInteraction = {
+  handlers: InteractionHandler[];
+};
 
 export class KateFocusHandler {
   private _stack: (HTMLElement | null)[] = [];
   private _current_root: HTMLElement | null = null;
+  private _previous_traps: FocusInteraction | null = null;
   private _handlers: {
     root: HTMLElement;
     handler: (ev: { key: ExtendedInputKey; is_repeat: boolean }) => boolean;
   }[] = [];
   readonly on_focus_changed = new EventStream<HTMLElement | null>();
+  readonly on_traps_changed = new EventStream<FocusInteraction | null>();
+  readonly interactives = new WeakMap<HTMLElement, FocusInteraction>();
 
   constructor(readonly os: KateOS) {}
 
@@ -31,6 +47,10 @@ export class KateFocusHandler {
     this._handlers = this._handlers.filter(
       (x) => x.root !== root && x.handler !== handler
     );
+  }
+
+  register_interactive(element: HTMLElement, interactions: FocusInteraction) {
+    this.interactives.set(element, interactions);
   }
 
   private should_handle(key: ExtendedInputKey) {
@@ -88,6 +108,21 @@ export class KateFocusHandler {
     for (const { root, handler } of this._handlers) {
       if (this._current_root === root) {
         if (handler({ key, is_repeat })) {
+          return;
+        }
+      }
+    }
+
+    const current_focus = this.current_focus;
+    if (current_focus != null) {
+      const traps = this.interactives.get(current_focus);
+      if (traps != null) {
+        const trap = traps.handlers.find(
+          (x) =>
+            x.key.includes(key as InputKey) && (!is_repeat || x.allow_repeat)
+        );
+        if (trap != null) {
+          trap.handler(key as InputKey, is_repeat);
           return;
         }
       }
@@ -209,5 +244,16 @@ export class KateFocusHandler {
       block: "center",
       inline: "center",
     });
+
+    const traps = this.interactives.get(element) ?? null;
+    if (traps === this._previous_traps) {
+      return;
+    }
+    this._previous_traps = traps;
+    if (traps != null) {
+      this.on_traps_changed.emit(traps);
+    } else {
+      this.on_traps_changed.emit(null);
+    }
   }
 }

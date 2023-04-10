@@ -55,3 +55,8 @@
   color: var(--color-text-inverted);
   border-color: var(--color-primary);
 }
+
+.kate-ui-interactive.focus {
+  outline: 2px solid var(--color-primary);
+  border-radius: 2px;
+}
