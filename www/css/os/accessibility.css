@@ -1,0 +1,81 @@
+.disable-animation .kate-ui-interactive.focus {
+  animation: none !important;
+}
+
+.disable-animation .kate-ui-focusable-container.focus {
+  animation: none !important;
+}
+
+.disable-animation .focus .kate-os-carts-box .kate-os-carts-image {
+  animation: none !important;
+}
+
+.disable-animation .focus .screen-card {
+  animation: none !important;
+}
+
+.disable-animation .kate-os-hud-context-menu-content {
+  animation: none !important;
+}
+
+.disable-animation .kate-hud-notification-item {
+  animation: none !important;
+}
+
+.disable-animation .kate-hud-dialog-pop-menu-container {
+  animation: none !important;
+}
+
+@media (prefers-reduced-motion) {
+  @keyframes kate-focus-in {
+    from {
+    }
+    to {
+    }
+  }
+
+  @keyframes kate-slide-in-left {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes kate-os-pop-menu-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes kate-os-pop-menu-out {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes kate-hud-notification-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes kate-hud-notification-out {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}

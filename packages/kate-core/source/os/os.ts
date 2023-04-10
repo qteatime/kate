@@ -142,6 +142,10 @@ export class KateOS {
     }
   };
 
+  set_os_animation(enabled: boolean) {
+    this.display.classList.toggle("disable-animation", !enabled);
+  }
+
   static async boot(kernel: KateKernel) {
     // Setup OS
     const sfx = await KateSfx.make(kernel);
@@ -152,6 +156,8 @@ export class KateOS {
       os.handle_virtual_button_feedback
     );
     kernel.keyboard.remap(settings.get("input").keyboard_mapping);
+    sfx.set_enabled(settings.get("ui").sound_feedback);
+    os.set_os_animation(settings.get("ui").animation_effects);
 
     const min_boot_time = wait(1000);
     const boot_screen = new SceneBoot(os);

@@ -91,12 +91,3 @@
     outline-width: 8px;
   }
 }
-
-@media (prefers-reduced-motion) {
-  @keyframes kate-focus-in {
-    from {
-    }
-    to {
-    }
-  }
-}

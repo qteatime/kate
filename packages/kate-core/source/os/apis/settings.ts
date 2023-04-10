@@ -18,14 +18,24 @@ export type Input = {
   keyboard_mapping: KeyboardToKate[];
 };
 
+export type UI = {
+  sound_feedback: boolean;
+  animation_effects: boolean;
+};
+
 export type SettingsData = {
   play_habits: PlayHabits;
   input: Input;
+  ui: UI;
 };
 
 export type AnySetting = SettingsData[keyof SettingsData];
 
 const defaults: SettingsData = {
+  ui: {
+    sound_feedback: true,
+    animation_effects: true,
+  },
   play_habits: {
     recently_played: true,
     play_times: true,
@@ -114,14 +124,14 @@ export class KateSettings {
       async (t) => {
         const settings = t.get_table1(Db.settings);
 
-        const play_habits: PlayHabits =
-          (await settings.try_get("play_habits"))?.data ?? {};
-        const input: Input = (await settings.try_get("input"))?.data ?? {};
+        const result: SettingsData = Object.create(null);
+        for (const [key, default_value] of Object.entries(defaults)) {
+          const stored = await settings.try_get(key);
+          const value = { ...default_value, ...(stored?.data ?? {}) };
+          result[key as keyof SettingsData] = value;
+        }
 
-        return {
-          play_habits: { ...defaults.play_habits, ...play_habits },
-          input: { ...defaults.input, ...input },
-        };
+        return result;
       }
     );
   }

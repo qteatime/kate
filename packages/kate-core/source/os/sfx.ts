@@ -10,6 +10,7 @@ export class KateSfx {
     select: AudioSource;
     cursor: AudioSource;
   };
+  private _enabled: boolean = true;
 
   constructor(
     readonly console: KateKernel,
@@ -37,8 +38,14 @@ export class KateSfx {
     });
   }
 
+  set_enabled(enabled: boolean) {
+    this._enabled = enabled;
+  }
+
   play(source: keyof KateSfx["sources"]) {
-    this.channel.play(this.sources[source], false);
+    if (this._enabled) {
+      this.channel.play(this.sources[source], false);
+    }
   }
 }
 
