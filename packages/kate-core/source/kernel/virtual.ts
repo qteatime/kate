@@ -1,6 +1,15 @@
 import { EventStream } from "../utils";
 const pkg = require("../../package.json");
 
+declare global {
+  interface Navigator {
+    userActivation: null | {
+      hasBeenActive: boolean;
+      isActive: boolean;
+    };
+  }
+}
+
 export type InputKey =
   | "up"
   | "right"
@@ -171,8 +180,22 @@ export class VirtualConsole {
     return this._scale;
   }
 
+  get active() {
+    return (
+      this.options.mode === "native" ||
+      (navigator.userActivation?.isActive ?? true)
+    );
+  }
+
+  get sticky_active() {
+    return (
+      this.options.mode === "native" ||
+      (navigator.userActivation?.hasBeenActive ?? true)
+    );
+  }
+
   vibrate(pattern: number | number[]) {
-    if (navigator.vibrate != null) {
+    if (navigator.vibrate != null && this.sticky_active) {
       navigator.vibrate(pattern);
     }
   }
