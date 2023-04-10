@@ -43,7 +43,7 @@
   text-transform: uppercase;
   font-weight: 500;
   padding: 1em 2em;
-  border: 2px solid var(--color-primary);
+  border: 2px solid var(--color-border-d1);
   border-radius: 4px;
   color: var(--color-text);
   width: 100%;
@@ -53,4 +53,5 @@
 .kate-os-content .kate-ui-button.focus {
   background: var(--color-primary);
   color: var(--color-text-inverted);
+  border-color: var(--color-primary);
 }
