@@ -113,6 +113,13 @@ export class HUD_ContextMenu extends Scene {
 
   on_attached(): void {
     this.os.focus_handler.listen(this.canvas, this.handle_key_pressed);
+    const backdrop = this.canvas.querySelector(
+      ".kate-os-hud-context-menu-backdrop"
+    ) as HTMLElement;
+    backdrop.addEventListener("click", (ev: Event) => {
+      ev.preventDefault();
+      this.on_return();
+    });
   }
 
   on_detached(): void {

@@ -9,7 +9,7 @@ function try_capture(retries: number) {
   } else if (retries > 0) {
     setTimeout(() => try_capture(retries - 1), 1_000);
   } else {
-    console.log(
+    console.warn(
       `[Kate] Could not find '${SELECTOR}' to capture in ${MAX_RETRIES} seconds. Giving up.`
     );
   }

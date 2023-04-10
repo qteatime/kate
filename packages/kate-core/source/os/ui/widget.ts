@@ -492,6 +492,14 @@ export function scroll(children: Widgetable[]) {
   return h("div", { class: "kate-os-scroll" }, [...children]);
 }
 
+export function stringify(children: Widgetable[]) {
+  const element = document.createElement("div");
+  for (const child of children) {
+    append(child, element);
+  }
+  return element.textContent ?? "";
+}
+
 export function simple_screen(x: {
   icon: string;
   title: Widgetable[];
@@ -499,14 +507,18 @@ export function simple_screen(x: {
   body: Widgetable;
   status?: Widgetable[] | null;
 }) {
-  return h("div", { class: "kate-os-simple-screen" }, [
-    new Title_bar({
-      left: fragment([fa_icon(x.icon, "lg"), new Section_title(x.title)]),
-      right: x.subtitle,
-    }),
-    x.body,
-    x.status ? statusbar([...x.status]) : null,
-  ]);
+  return h(
+    "div",
+    { class: "kate-os-simple-screen", "data-title": stringify(x.title) },
+    [
+      new Title_bar({
+        left: fragment([fa_icon(x.icon, "lg"), new Section_title(x.title)]),
+        right: x.subtitle,
+      }),
+      x.body,
+      x.status ? statusbar([...x.status]) : null,
+    ]
+  );
 }
 
 export function text_panel(x: { title: Widgetable; description: Widgetable }) {

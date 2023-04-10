@@ -102,7 +102,18 @@ export class KateOS {
       });
     }
     this._current_scene = this._scene_stack.pop() ?? null;
-    this.focus_handler.push_root(this._current_scene?.canvas ?? null);
+    if (
+      this._current_scene != null &&
+      this.focus_handler.current_root !== this._current_scene.canvas
+    ) {
+      console.warn(
+        `[Kate] incorrect focus root when moving scenes`,
+        "Expected:",
+        this._current_scene.canvas,
+        "Got:",
+        this.focus_handler.current_root
+      );
+    }
   }
 
   replace_scene(scene: Scene) {

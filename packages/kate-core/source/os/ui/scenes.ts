@@ -9,6 +9,7 @@ import {
   simple_screen,
   scroll,
   icon_button,
+  stringify,
 } from "./widget";
 
 export abstract class Scene {
@@ -90,6 +91,7 @@ export abstract class SimpleScene extends Scene {
   }
 
   on_attached(): void {
+    this.canvas.setAttribute("data-title", stringify(this.title));
     this.os.focus_handler.listen(this.canvas, this.handle_key_pressed);
     this.os.focus_handler.on_traps_changed.listen(
       this.update_status_with_traps
