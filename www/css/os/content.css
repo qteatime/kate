@@ -58,5 +58,12 @@
 
 .kate-ui-interactive.focus {
   outline: 2px solid var(--color-primary);
-  border-radius: 2px;
+  border-radius: 4px;
+}
+
+.kate-ui-interactive.focus .kate-ui-text-button {
+  background: var(--color-primary);
+  color: var(--color-text-inverted);
+  border-color: var(--color-primary);
+  border-radius: 0;
 }

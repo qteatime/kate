@@ -99,6 +99,10 @@ export class HBox extends Widget {
   }
 }
 
+export function hbox(gap: number, children: Widgetable[]) {
+  return new HBox(gap, children);
+}
+
 export class VBox extends Widget {
   constructor(readonly gap: number, readonly children: Widgetable[]) {
     super();
@@ -111,6 +115,10 @@ export class VBox extends Widget {
       this.children
     );
   }
+}
+
+export function vbox(gap: number, children: Widgetable[]) {
+  return new VBox(gap, children);
 }
 
 export class Title_bar extends Widget {
@@ -239,25 +247,35 @@ export class Button extends Widget {
 }
 
 export function link(
+  os: KateOS,
   text: Widgetable,
-  x: { href?: string; target?: string; on_click?: () => void }
-) {
-  const link = h(
-    "a",
-    {
-      class: "kate-ui-button-link kate-ui-focus-target",
-      href: x.href ?? "#",
-      target: x.target ?? "",
-    },
-    [text]
-  );
-  if (x.on_click != null) {
-    link.addEventListener("click", (ev) => {
-      ev.preventDefault();
-      x.on_click!();
-    });
+  x: {
+    href?: string;
+    target?: string;
+    status_label?: string;
+    on_click?: () => void;
   }
-  return link;
+) {
+  return interactive(
+    os,
+    h(
+      "a",
+      {
+        class: "kate-ui-button-link kate-ui-focus-target",
+        href: x.href ?? "#",
+        target: x.target ?? "",
+      },
+      [text]
+    ),
+    [
+      {
+        key: ["o"],
+        on_click: true,
+        label: x.status_label ?? "Ok",
+        handler: () => x.on_click?.(),
+      },
+    ]
+  );
 }
 
 export function icon_button(icon: InputKey | InputKey[], text: string) {
@@ -274,6 +292,25 @@ export function icon_button(icon: InputKey | InputKey[], text: string) {
 
 export function fa_icon_button(name: string, text: string, spacing = 10) {
   return new Button([new HBox(spacing, [fa_icon(name), text])]);
+}
+
+export function text_button(
+  os: KateOS,
+  text: string,
+  x: { status_label?: string; on_click: () => void }
+) {
+  return interactive(
+    os,
+    h("button", { class: "kate-ui-button kate-ui-text-button" }, [text]),
+    [
+      {
+        key: ["o"],
+        label: x.status_label ?? "Ok",
+        on_click: true,
+        handler: () => x.on_click(),
+      },
+    ]
+  );
 }
 
 export class Icon extends Widget {
@@ -370,6 +407,7 @@ export function info_cell(label: Widgetable, data: Widgetable[]) {
 }
 
 export function toggle(
+  os: KateOS,
   value: boolean,
   x: {
     enabled?: Widgetable;
@@ -392,13 +430,18 @@ export function toggle(
 
   container.classList.toggle("active", checked);
 
-  container.addEventListener("click", () => {
-    checked = !checked;
-    container.classList.toggle("active", checked);
-    x.on_changed?.(checked);
-  });
-
-  return container;
+  return interactive(os, container, [
+    {
+      key: ["o"],
+      label: "Toggle",
+      on_click: true,
+      handler: () => {
+        checked = !checked;
+        container.classList.toggle("active", checked);
+        x.on_changed?.(checked);
+      },
+    },
+  ]);
 }
 
 export function legible_bg(children: Widgetable[]) {

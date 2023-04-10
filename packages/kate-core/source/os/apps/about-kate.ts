@@ -3,7 +3,7 @@ import * as UI from "../ui/widget";
 import type { ConsoleOptions, ExtendedInputKey } from "../../kernel";
 import * as Legal from "../../legal";
 import { SceneTextFile } from "./text-file";
-import { Scene } from "../ui/scenes";
+import { Scene, SimpleScene } from "../ui/scenes";
 import {
   UAInfo,
   basic_ua_details,
@@ -49,7 +49,53 @@ export function bool_text(x: boolean | null) {
   }
 }
 
-export class SceneAboutKate extends Scene {
+export class SceneAboutKate extends SimpleScene {
+  icon = "cat";
+  title = ["About Kate"];
+
+  body_container(body: UI.Widgetable[]): HTMLElement {
+    return h("div", { class: "kate-os-scroll kate-os-content kate-about-bg" }, [
+      ...body,
+    ]);
+  }
+
+  body() {
+    const sysinfo = h("div", { class: "kate-os-system-information" }, []);
+    this.render_sysinfo(sysinfo);
+
+    const update_button = h("div", { class: "kate-os-update-button" }, [
+      h("h2", {}, ["Updates"]),
+      "Checking for updates...",
+    ]);
+    this.check_for_updates(update_button);
+
+    return [
+      h("div", { class: "kate-os-about-box" }, [
+        h("div", { class: "kate-os-about-content" }, [
+          h("h2", {}, ["Kate", UI.hspace(10), this.os.kernel.console.version]),
+          h("div", { class: "kt-meta" }, [
+            "Copyright (c) 2023 Q. (MIT licensed)",
+          ]),
+          UI.vspace(32),
+          UI.vbox(10, [
+            UI.text_button(this.os, "Third-party notices", {
+              status_label: "Open",
+              on_click: this.handle_third_party,
+            }),
+            UI.text_button(this.os, "Release notes", {
+              status_label: "Open",
+              on_click: this.handle_release_notes,
+            }),
+          ]),
+          UI.vspace(24),
+          update_button,
+          UI.vspace(32),
+          sysinfo,
+        ]),
+      ]),
+    ];
+  }
+
   kate_info() {
     const console = this.os.kernel.console;
     return {
@@ -140,11 +186,11 @@ export class SceneAboutKate extends Scene {
     canvas.textContent = "";
     canvas.append(
       UI.legible_bg([
-        h("h2", {}, ["System"]),
+        h("h3", {}, ["System"]),
         UI.info_line("Kate version", [x.kate.version]),
         UI.info_line("Kate mode", [x.kate.mode]),
 
-        h("h2", {}, ["Host"]),
+        h("h3", {}, ["Host"]),
         UI.info_line("Browser", [
           new UI.VBox(5, [...x.host.browser.map((x) => UI.h("div", {}, [x]))]),
         ]),
@@ -155,7 +201,7 @@ export class SceneAboutKate extends Scene {
         ]),
         UI.info_line("Device", [x.host.device]),
 
-        h("h2", {}, ["Hardware"]),
+        h("h3", {}, ["Hardware"]),
         UI.info_line("CPU model", [x.hardware.cpu_model]),
         UI.info_line("CPU logical cores", [
           String(x.hardware.cpu_logical_cores),
@@ -165,82 +211,6 @@ export class SceneAboutKate extends Scene {
       ])
     );
   }
-
-  render() {
-    const sysinfo = h("div", { class: "kate-os-system-information" }, []);
-    this.render_sysinfo(sysinfo);
-
-    const update_button = h("div", { class: "kate-os-update-button" }, [
-      h("h2", {}, ["Updates"]),
-      "Checking for updates...",
-    ]);
-    this.check_for_updates(update_button);
-
-    return h("div", { class: "kate-os-simple-screen" }, [
-      new UI.Title_bar({
-        left: UI.fragment([
-          UI.fa_icon("cat", "lg"),
-          new UI.Section_title(["About Kate"]),
-        ]),
-      }),
-      h("div", { class: "kate-os-scroll kate-os-content kate-about-bg" }, [
-        h("div", { class: "kate-os-about-box" }, [
-          h("div", { class: "kate-os-about-content" }, [
-            h("h2", {}, [
-              "Kate",
-              new UI.Space({ width: 10 }),
-              this.os.kernel.console.version,
-            ]),
-            h("div", { class: "kt-meta" }, [
-              "Copyright (c) 2023 Q. (MIT licensed)",
-            ]),
-            new UI.Space({ height: 32 }),
-            new UI.VBox(10, [
-              new UI.Button(["Third-party notices"]).on_clicked(
-                this.handle_third_party
-              ),
-
-              new UI.Button(["Release notes"]).on_clicked(
-                this.handle_release_notes
-              ),
-            ]),
-            new UI.Space({ height: 24 }),
-            update_button,
-            new UI.Space({ height: 32 }),
-            sysinfo,
-          ]),
-        ]),
-      ]),
-      h("div", { class: "kate-os-statusbar" }, [
-        UI.icon_button("x", "Return").on_clicked(this.handle_close),
-      ]),
-    ]);
-  }
-
-  on_attached(): void {
-    this.os.focus_handler.listen(this.canvas, this.handle_key_pressed);
-  }
-
-  on_detached(): void {
-    this.os.focus_handler.remove(this.canvas, this.handle_key_pressed);
-  }
-
-  handle_key_pressed = (x: { key: ExtendedInputKey; is_repeat: boolean }) => {
-    switch (x.key) {
-      case "x": {
-        if (!x.is_repeat) {
-          this.handle_close();
-          return true;
-        }
-      }
-    }
-
-    return false;
-  };
-
-  handle_close = () => {
-    this.os.pop_scene();
-  };
 
   handle_third_party = () => {
     this.os.push_scene(
@@ -276,15 +246,17 @@ export class SceneAboutKate extends Scene {
         container.textContent = "";
         container.append(
           h("div", {}, [
-            new UI.VBox(5, [
-              new UI.HBox(5, [
+            UI.vbox(5, [
+              UI.hbox(5, [
                 `Version ${latest.version} is available!`,
-                UI.link("(Release Notes)", {
+                UI.link(this.os, "(Release Notes)", {
+                  status_label: "Open",
                   on_click: () => this.handle_release_notes_for_version(latest),
                 }),
               ]),
-              new UI.Button([`Update to ${latest.version}`]).on_clicked(() => {
-                this.handle_update_to_version(latest);
+              UI.text_button(this.os, `Update to ${latest.version}`, {
+                status_label: "Update",
+                on_click: () => this.handle_update_to_version(latest),
               }),
             ]),
           ])

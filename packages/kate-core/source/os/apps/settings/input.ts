@@ -23,20 +23,22 @@ export class SceneInputSettings extends UI.SimpleScene {
           description: "Vibrate the console when a virtual button is touched",
         }),
         [
-          UI.toggle(data.haptic_feedback_for_virtual_button, {
+          UI.toggle(this.os, data.haptic_feedback_for_virtual_button, {
             on_changed: this.handle_haptics_change,
           }),
         ]
       ),
 
       UI.h("h3", {}, ["Alternative input methods"]),
-      UI.button("Configure keyboard mappings", {
-        on_clicked: () => {
+      UI.text_button(this.os, "Configure keyboard mappings", {
+        on_click: () => {
           this.os.push_scene(new KeyboardInputSettings(this.os));
         },
       }),
       UI.vspace(6),
-      UI.button("Configure gamepad mappings", {}),
+      UI.text_button(this.os, "Configure gamepad mappings", {
+        on_click: () => {},
+      }),
     ];
   }
 
@@ -61,8 +63,8 @@ class KeyboardInputSettings extends UI.SimpleScene {
     const mappings = this.os.settings.get("input").keyboard_mapping;
 
     return [
-      UI.button("Add a new mapping", {
-        on_clicked: this.handle_add_new_mapping,
+      UI.text_button(this.os, "Add a new mapping", {
+        on_click: this.handle_add_new_mapping,
       }),
       UI.vspace(16),
       UI.h("div", { class: "kate-os-keyboard-mapping-list" }, [
@@ -196,8 +198,8 @@ class KeyboardMappingSettings extends UI.SimpleScene {
         this.button("menu"),
       ]),
       UI.vspace(16),
-      UI.button("Save mapping", {
-        on_clicked: this.handle_save,
+      UI.text_button(this.os, "Save mapping", {
+        on_click: this.handle_save,
       }),
     ];
   }

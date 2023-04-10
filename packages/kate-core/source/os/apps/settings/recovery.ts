@@ -13,13 +13,15 @@ export class SceneRecovery extends UI.SimpleScene {
       ]),
       UI.vspace(16),
 
-      UI.button("Restore default settings", {
-        on_clicked: this.restore_default_settings,
+      UI.text_button(this.os, "Restore default settings", {
+        on_click: this.restore_default_settings,
       }),
       UI.p([`Switch all settings back to the default ones.`]),
       UI.vdivider(),
 
-      UI.button("Delete all data", { on_clicked: this.delete_all_data }),
+      UI.text_button(this.os, "Delete all data", {
+        on_click: this.delete_all_data,
+      }),
       UI.p([
         `Delete ALL data locally stored in the console. The application will reload
         afterwards.`,
