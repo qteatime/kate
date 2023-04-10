@@ -89,6 +89,7 @@ export class KateFocusHandler {
     if (this._stack.length > 0) {
       this._current_root = this._stack.pop()!;
       this.on_focus_changed.emit(this._current_root);
+      this.focus(this.current_focus);
     } else {
       throw new Error(`pop_root() on an empty focus stack`);
     }
