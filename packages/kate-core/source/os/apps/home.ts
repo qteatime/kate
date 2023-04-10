@@ -3,23 +3,55 @@ import * as UI from "../ui/widget";
 import type { ExtendedInputKey } from "../../kernel";
 import * as Db from "../../data/db";
 import { unreachable } from "../../utils";
-import { Scene } from "../ui/scenes";
+import { Action, Scene, SimpleScene } from "../ui/scenes";
 import { SceneApps } from "./applications";
 import { SceneTextFile } from "./text-file";
 import { HUD_LoadIndicator } from "./load-screen";
 
-export class SceneHome extends Scene {
+export class SceneHome extends SimpleScene {
+  icon = "diamond";
+  title = ["Start"];
+  subtitle = "Recently played and favourites";
+
+  readonly actions: Action[] = [
+    {
+      key: ["ltrigger"],
+      label: "Applications",
+      handler: () => {
+        this.os.push_scene(new SceneApps(this.os));
+      },
+    },
+  ];
+
   private cart_map = new Map<Element, Db.CartMeta>();
 
   render_cart(x: Db.CartMeta) {
-    return new UI.Button([
+    return UI.interactive(
+      this.os,
       h("div", { class: "kate-os-carts-box" }, [
         h("div", { class: "kate-os-carts-image" }, [
           h("img", { src: x.thumbnail_dataurl }, []),
         ]),
         h("div", { class: "kate-os-carts-title" }, [x.metadata.game.title]),
       ]),
-    ]).on_clicked(() => this.play(x.id));
+      [
+        {
+          key: ["o"],
+          on_click: true,
+          label: "Play",
+          handler: () => this.play(x.id),
+        },
+        {
+          key: ["menu"],
+          on_menu: true,
+          label: "Options",
+          handler: () => this.show_pop_menu(x),
+        },
+      ],
+      {
+        default_focus_indicator: false,
+      }
+    );
   }
 
   async show_carts(list: HTMLElement) {
@@ -37,7 +69,7 @@ export class SceneHome extends Scene {
       list.textContent = "";
       this.cart_map = new Map();
       for (const x of carts) {
-        const child = this.render_cart(x.meta).render();
+        const child = this.render_cart(x.meta);
         this.cart_map.set(child, x.meta);
         list.appendChild(child);
       }
@@ -118,86 +150,34 @@ export class SceneHome extends Scene {
     }
   }
 
-  render() {
-    return h("div", { class: "kate-os-home" }, [
-      new UI.Title_bar({
-        left: UI.fragment([
-          UI.fa_icon("diamond", "lg"),
-          new UI.Section_title(["Start"]),
-        ]),
-        right: "Recently played and favourites",
-      }),
-      h("div", { class: "kate-os-carts-scroll" }, [
-        h("div", { class: "kate-os-carts" }, []),
-      ]),
-      UI.status_bar([
-        UI.icon_button("ltrigger", "Applications").on_clicked(
-          this.handle_applications
-        ),
-        UI.icon_button("menu", "Options").on_clicked(this.handle_options),
-        UI.icon_button("o", "Play").on_clicked(this.handle_play),
-      ]),
+  body_container(body: UI.Widgetable[]): HTMLElement {
+    return h("div", { class: "kate-os-carts-scroll" }, [
+      h("div", { class: "kate-os-carts" }, []),
     ]);
   }
 
-  on_attached() {
-    this.update_carts();
+  body() {
+    return [];
+  }
 
+  on_attached() {
+    super.on_attached();
+
+    this.update_carts();
     this.os.events.on_cart_inserted.listen(this.update_carts);
     this.os.events.on_cart_removed.listen(this.update_carts);
-    this.os.focus_handler.listen(this.canvas, this.handle_key_pressed);
   }
 
   on_detached() {
     this.os.events.on_cart_inserted.remove(this.update_carts);
     this.os.events.on_cart_removed.remove(this.update_carts);
-    this.os.focus_handler.remove(this.canvas, this.handle_key_pressed);
+    super.on_detached();
   }
 
   private update_carts = () => {
     const home = this.canvas!;
     const carts = home.querySelector(".kate-os-carts")! as HTMLElement;
     this.show_carts(carts);
-  };
-
-  handle_key_pressed = (x: { key: ExtendedInputKey; is_repeat: boolean }) => {
-    if (x.is_repeat) {
-      return false;
-    }
-
-    switch (x.key) {
-      case "menu": {
-        this.handle_options();
-        return true;
-      }
-
-      case "ltrigger": {
-        this.handle_applications();
-        return true;
-      }
-    }
-    return false;
-  };
-
-  handle_options = () => {
-    for (const [button, cart] of this.cart_map) {
-      if (button.classList.contains("focus")) {
-        this.show_pop_menu(cart);
-        return;
-      }
-    }
-  };
-
-  handle_play = () => {
-    const current = this.os.focus_handler.current_focus;
-    if (current != null) {
-      current.click();
-    }
-  };
-
-  handle_applications = () => {
-    const apps = new SceneApps(this.os);
-    this.os.push_scene(apps);
   };
 
   async play(id: string) {

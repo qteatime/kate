@@ -1,4 +1,4 @@
-import type { ExtendedInputKey } from "../../kernel";
+import type { ExtendedInputKey, InputKey } from "../../kernel";
 import { Sets } from "../../utils";
 import { FocusInteraction } from "../apis";
 import type { KateOS } from "../os";
@@ -35,11 +35,26 @@ export abstract class Scene {
   on_detached() {}
 }
 
+export type Action = {
+  key: InputKey[];
+  label: string;
+  handler: (key: InputKey, is_repeat: boolean) => void;
+};
+
 export abstract class SimpleScene extends Scene {
   abstract icon: string;
   abstract title: Widgetable[];
   subtitle: Widgetable | null = null;
   abstract body(): Widgetable[];
+  readonly actions: Action[] = [
+    {
+      key: ["x"],
+      label: "Return",
+      handler: () => {
+        this.os.pop_scene();
+      },
+    },
+  ];
   private _previous_traps: FocusInteraction | null = null;
 
   render() {
@@ -50,7 +65,7 @@ export abstract class SimpleScene extends Scene {
       body: this.body_container([
         h("div", { class: "kate-os-content kate-os-screen-body" }, this.body()),
       ]),
-      status: [icon_button("x", "Return").on_clicked(this.handle_close)],
+      status: [...this.actions.map((x) => this.render_action(x))],
     });
   }
 
@@ -66,6 +81,12 @@ export abstract class SimpleScene extends Scene {
         append(child, body);
       }
     }
+  }
+
+  render_action(action: Action) {
+    return icon_button(action.key, action.label).on_clicked(() =>
+      action.handler(action.key[0], false)
+    );
   }
 
   on_attached(): void {
@@ -106,7 +127,9 @@ export abstract class SimpleScene extends Scene {
     const status = this.canvas.querySelector(".kate-os-statusbar") ?? null;
     if (status != null) {
       status.textContent = "";
-      append(icon_button("x", "Return").on_clicked(this.handle_close), status);
+      for (const action of this.actions) {
+        append(this.render_action(action), status);
+      }
       for (const handler of handlers) {
         append(
           icon_button(handler.key, handler.label).on_clicked(() => {
@@ -123,15 +146,11 @@ export abstract class SimpleScene extends Scene {
       return false;
     }
 
-    switch (x.key) {
-      case "x":
-        this.handle_close();
-        return true;
+    const handler = this.actions.find((h) => h.key.includes(x.key as InputKey));
+    if (handler != null) {
+      handler.handler(x.key as InputKey, x.is_repeat);
+      return true;
     }
     return false;
-  };
-
-  handle_close = () => {
-    this.os.pop_scene();
   };
 }

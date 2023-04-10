@@ -554,11 +554,16 @@ export function vdivider() {
 export function interactive(
   os: KateOS,
   child: Widgetable,
-  interactions: InteractionHandler[]
+  interactions: InteractionHandler[],
+  x?: { default_focus_indicator?: boolean }
 ) {
   const element = document.createElement("div");
   element.className = "kate-ui-interactive kate-ui-focus-target";
   append(child, element);
+
+  if (x?.default_focus_indicator === false) {
+    element.setAttribute("data-custom-focus", "custom-focus");
+  }
 
   os.focus_handler.register_interactive(element, { handlers: interactions });
 
