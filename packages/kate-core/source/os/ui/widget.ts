@@ -448,12 +448,15 @@ export function legible_bg(children: Widgetable[]) {
   return h("div", { class: "kate-ui-legible-bg" }, [...children]);
 }
 
-export function link_card(x: {
-  icon: string;
-  title: string;
-  description: string;
-  on_click?: () => void;
-}) {
+export function link_card(
+  os: KateOS,
+  x: {
+    icon: string;
+    title: string;
+    description: string;
+    on_click?: () => void;
+  }
+) {
   const element = h(
     "div",
     { class: "kate-ui-link-card kate-ui-focus-target" },
@@ -467,9 +470,18 @@ export function link_card(x: {
   );
   if (x.on_click) {
     element.classList.add("kate-ui-link-card-clickable");
-    element.addEventListener("click", () => x.on_click!());
+    element.classList.remove("kate-ui-focus-target");
+    return interactive(os, element, [
+      {
+        key: ["o"],
+        on_click: true,
+        label: "Ok",
+        handler: () => x.on_click?.(),
+      },
+    ]);
+  } else {
+    return element;
   }
-  return element;
 }
 
 export function statusbar(children: Widgetable[]) {

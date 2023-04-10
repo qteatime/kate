@@ -9,7 +9,7 @@ export class SceneSettings extends UI.SimpleScene {
 
   body() {
     return [
-      UI.link_card({
+      UI.link_card(this.os, {
         icon: "calendar",
         title: "Play habits",
         description: "Recently played and play time",
@@ -18,7 +18,7 @@ export class SceneSettings extends UI.SimpleScene {
         },
       }),
 
-      UI.link_card({
+      UI.link_card(this.os, {
         icon: "gamepad",
         title: "Controller & Sensors",
         description:
@@ -28,7 +28,7 @@ export class SceneSettings extends UI.SimpleScene {
         },
       }),
 
-      UI.link_card({
+      UI.link_card(this.os, {
         icon: "stethoscope",
         title: "Diagnostics & Recovery",
         description: "Troubleshoot and reset parts of the console",

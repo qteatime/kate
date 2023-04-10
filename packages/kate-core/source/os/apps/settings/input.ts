@@ -210,29 +210,36 @@ class KeyboardMappingSettings extends UI.SimpleScene {
       { class: "kate-os-keyboard-mapping-feedback kate-ui-focus-target" },
       [this.key ? friendly_keyboard(this.key) : "(No key selected)"]
     );
-    element.addEventListener("click", (ev) => {
-      if (element.classList.contains("wait-for-key")) {
-        return;
-      }
 
-      const input = document.createElement("input");
-      element.classList.add("wait-for-key");
-      element.textContent = "Press a key to map...";
-      element.append(input);
-      setTimeout(() => {
-        input.focus();
-      });
-      const handle_key = (ev: KeyboardEvent) => {
-        ev.preventDefault();
-        ev.stopPropagation();
-        input.removeEventListener("keydown", handle_key);
-        element.classList.remove("wait-for-key");
-        this.key = ev.code;
-        element.textContent = friendly_keyboard(this.key);
-      };
-      input.addEventListener("keydown", handle_key);
-    });
-    return element;
+    return UI.interactive(this.os, element, [
+      {
+        key: ["o"],
+        on_click: true,
+        label: "Choose key",
+        handler: () => {
+          if (element.classList.contains("wait-for-key")) {
+            return;
+          }
+
+          const input = document.createElement("input");
+          element.classList.add("wait-for-key");
+          element.textContent = "Press a key to map...";
+          element.append(input);
+          setTimeout(() => {
+            input.focus();
+          });
+          const handle_key = (ev: KeyboardEvent) => {
+            ev.preventDefault();
+            ev.stopPropagation();
+            input.removeEventListener("keydown", handle_key);
+            element.classList.remove("wait-for-key");
+            this.key = ev.code;
+            element.textContent = friendly_keyboard(this.key);
+          };
+          input.addEventListener("keydown", handle_key);
+        },
+      },
+    ]);
   }
 
   button(key: InputKey) {
@@ -244,18 +251,23 @@ class KeyboardMappingSettings extends UI.SimpleScene {
     if (this.buttons.includes(key)) {
       element.classList.add("active");
     }
-    element.addEventListener("click", () => {
-      const mapped = this.buttons.includes(key);
-      if (mapped) {
-        this.buttons = this.buttons.filter((x) => x !== key);
-        element.classList.remove("active");
-      } else {
-        this.buttons.push(key);
-        element.classList.add("active");
-      }
-    });
-
-    return element;
+    return UI.interactive(this.os, element, [
+      {
+        key: ["o"],
+        label: "Toggle",
+        on_click: true,
+        handler: () => {
+          const mapped = this.buttons.includes(key);
+          if (mapped) {
+            this.buttons = this.buttons.filter((x) => x !== key);
+            element.classList.remove("active");
+          } else {
+            this.buttons.push(key);
+            element.classList.add("active");
+          }
+        },
+      },
+    ]);
   }
 
   handle_save = async () => {
