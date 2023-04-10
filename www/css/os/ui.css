@@ -62,7 +62,9 @@
 /* #Focusable container */
 .kate-ui-focusable-container.focus {
   outline: 2px solid var(--color-primary);
-  outline-offset: 1px;
+  outline-offset: 2px;
+  border-radius: 4px;
+  animation: kate-focus-in 0.5s ease-out;
 }
 
 /* #Info line */

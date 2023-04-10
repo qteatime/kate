@@ -50,9 +50,11 @@
 }
 
 .focus .kate-os-carts-box .kate-os-carts-image {
-  outline: 5px solid var(--color-primary);
+  outline: 2px solid var(--color-primary);
   border: 2px solid transparent;
+  border-radius: 4px;
   transform: scale(1.04);
+  animation: kate-focus-in 0.5s ease-out;
 }
 
 .kate-os-carts-image img {

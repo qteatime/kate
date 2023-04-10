@@ -59,6 +59,7 @@
 .kate-ui-interactive.focus:not([data-custom-focus]) {
   outline: 2px solid var(--color-primary);
   border-radius: 4px;
+  animation: kate-focus-in 0.5s ease-out;
 }
 
 .kate-ui-interactive.focus .kate-ui-text-button {
