@@ -40,8 +40,8 @@ For information on how to make games for Kate, see [Making games for Kate!](./de
 | ![](./img/cancel_24.png)  | Cancel  | X          | Bottom-most right button (0)<br><small>(e.g.: B on SNES, A on XBox)</small> |
 | ![](./img/l_24.png)       | L       | A          | Left bumper (frontmost) (4)                                                 |
 | ![](./img/r_24.png)       | R       | S          | Right bumper (frontmost) (5)                                                |
-| ![](./img/menu_24.png)    | Menu    | Left Shift | Left special button (8)<br><small>(e.g.: Select on SNES, View on XBox)      |
-| ![](./img/capture_24.png) | Capture | Left Ctrl  | Right special button (9)<br><small>(e.g.: Start on SNES, Menu on XBox)      |
+| ![](./img/menu_24.png)    | Menu    | Left Shift | Right special button (9)<br><small>(e.g.: Start on SNES, Menu on XBox)      |
+| ![](./img/capture_24.png) | Capture | Left Ctrl  | Left special button (8)<br><small>(e.g.: Select on SNES, View on XBox)      |
 
 Kate also supports controlling the emulator by touching/clicking the virtual buttons in the emulator application. For the bumpers, it's enough to touch anywhere near the top left/right corners of the emulator; you should see the button highlighted or moving on the screen when you do.
 

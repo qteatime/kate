@@ -130,7 +130,7 @@
   height: 0.3em;
   border-radius: 0.5em;
   width: 1em;
-  transform: rotate(27deg);
+  transform: rotate(-27deg);
 }
 
 .kate-icon[data-name="capture"] {
@@ -138,5 +138,5 @@
   height: 0.3em;
   border-radius: 0.5em;
   width: 1em;
-  transform: rotate(-27deg);
+  transform: rotate(27deg);
 }
