@@ -88,9 +88,13 @@ async function cache_version(version: Version) {
     "/sfx/select.wav",
     "/sfx/shutter.wav",
   ];
-  const cache = await caches.open(cache_name);
-  await cache.addAll(app_files);
-  await cache.add(version.main);
+  try {
+    const cache = await caches.open(cache_name);
+    await cache.addAll(app_files);
+    await cache.add(version.main);
+  } catch (e) {
+    console.error("[Kate] cache unavailable");
+  }
 }
 
 async function load_script(url: string) {
@@ -113,6 +117,15 @@ async function load_script(url: string) {
   });
 }
 
+async function load_kate(version: Version) {
+  try {
+    await load_script(version.main);
+  } catch (e) {
+    alert(`Kate version ${version.version} could not be found.`);
+    return;
+  }
+}
+
 async function main() {
   let version: Version | null = JSON.parse(
     localStorage["kate-version"] ?? "null"
@@ -130,16 +143,10 @@ async function main() {
     }
     localStorage["kate-version"] = JSON.stringify(version);
     localStorage["kate-channel"] = channel;
-
+    await load_kate(version);
     await cache_version(version);
-  }
-
-  // Load Kate
-  try {
-    await load_script(version.main);
-  } catch (e) {
-    alert(`Kate version ${version.version} could not be found.`);
-    return;
+  } else {
+    await load_kate(version);
   }
 
   // Run Kate
