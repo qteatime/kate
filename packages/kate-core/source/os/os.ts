@@ -20,6 +20,7 @@ import { KateDialog } from "./apis/dialog";
 import { KateCapture } from "./apis/capture";
 import { KateSfx } from "./sfx";
 import { KateSettings } from "./apis/settings";
+import { InputKey } from "../kernel";
 
 export class KateOS {
   private _scene_stack: Scene[] = [];
@@ -123,16 +124,23 @@ export class KateOS {
     return new KateAudioServer(this.kernel);
   }
 
+  handle_virtual_button_feedback = (key: InputKey) => {
+    const settings = this.settings.get("input");
+    if (settings.haptic_feedback_for_virtual_button) {
+      this.kernel.console.vibrate(30);
+    }
+  };
+
   static async boot(kernel: KateKernel) {
     // Setup OS
     const sfx = await KateSfx.make(kernel);
     const { db, old_version } = await KateDb.kate.open();
     const settings = await KateSettings.load(db);
-    kernel.console.set_vibration_on_virtual_input(
-      settings.get("input").haptic_feedback_for_virtual_button
+    const os = new KateOS(kernel, db, sfx, settings);
+    kernel.console.on_virtual_button_touched.listen(
+      os.handle_virtual_button_feedback
     );
 
-    const os = new KateOS(kernel, db, sfx, settings);
     const min_boot_time = wait(1000);
     const boot_screen = new SceneBoot(os);
 

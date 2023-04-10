@@ -28,7 +28,6 @@ export class SceneInputSettings extends UI.SimpleScene {
       ...v,
       haptic_feedback_for_virtual_button: x,
     }));
-    this.os.kernel.console.set_vibration_on_virtual_input(x);
     await this.os.notifications.log(
       "kate:settings",
       "Updated input settings",

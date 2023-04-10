@@ -61,6 +61,7 @@ export class VirtualConsole {
     key: ExtendedInputKey;
     is_repeat: boolean;
   }>();
+  readonly on_virtual_button_touched = new EventStream<InputKey>();
   readonly on_tick = new EventStream<number>();
   readonly on_scale_changed = new EventStream<number>();
   readonly audio_context = new AudioContext();
@@ -68,7 +69,6 @@ export class VirtualConsole {
 
   private timer_id: any = null;
   private last_time: number | null = null;
-  private _vibration_on_virtual_input: boolean = false;
 
   readonly SPECIAL_FRAMES = 15;
   readonly REPEAT_FRAMES = 10;
@@ -200,14 +200,6 @@ export class VirtualConsole {
     }
   }
 
-  set_vibration_on_virtual_input(enabled: boolean) {
-    this._vibration_on_virtual_input = enabled;
-  }
-
-  get vibration_on_virtual_input() {
-    return this._vibration_on_virtual_input;
-  }
-
   listen() {
     if (this.is_listening) {
       throw new Error(`listen called twice`);
@@ -239,9 +231,7 @@ export class VirtualConsole {
       });
       button.addEventListener("touchstart", (ev) => {
         ev.preventDefault();
-        if (this._vibration_on_virtual_input) {
-          this.vibrate(30);
-        }
+        this.on_virtual_button_touched.emit(key);
         this.update_virtual_key(key, true);
       });
       button.addEventListener("touchend", (ev) => {
