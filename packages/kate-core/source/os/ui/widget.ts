@@ -23,12 +23,18 @@ export function fragment(children: Widgetable[]) {
 
 export function h(
   tag: string,
-  attrs: { [key: string]: string },
+  attrs: { [key: string]: string | boolean },
   children: Widgetable[]
 ) {
   const element = document.createElement(tag);
   for (const [key, value] of Object.entries(attrs)) {
-    element.setAttribute(key, value);
+    if (typeof value === "string") {
+      element.setAttribute(key, value);
+    } else if (typeof value === "boolean") {
+      if (value) {
+        element.setAttribute(key, key);
+      }
+    }
   }
   for (const child of children) {
     append(child, element);
@@ -297,11 +303,18 @@ export function fa_icon_button(name: string, text: string, spacing = 10) {
 export function text_button(
   os: KateOS,
   text: string,
-  x: { status_label?: string; on_click: () => void }
+  x: { status_label?: string; on_click: () => void; dangerous?: boolean }
 ) {
   return interactive(
     os,
-    h("button", { class: "kate-ui-button kate-ui-text-button" }, [text]),
+    h(
+      "button",
+      {
+        class: "kate-ui-button kate-ui-text-button",
+        "data-dangerous": x.dangerous ?? false,
+      },
+      [text]
+    ),
     [
       {
         key: ["o"],
@@ -404,6 +417,45 @@ export function info_line(
 
 export function info_cell(label: Widgetable, data: Widgetable[]) {
   return info_line(label, data, { interactive: true });
+}
+
+export function button_panel(
+  os: KateOS,
+  x: {
+    title: string;
+    description?: string;
+    dangerous?: boolean;
+    status_label?: string;
+    on_click: () => void;
+  }
+) {
+  return interactive(
+    os,
+    h(
+      "button",
+      {
+        class: "kate-ui-button-panel",
+        "data-dangerous": x.dangerous ?? false,
+      },
+      [
+        h("div", { class: "kate-ui-button-panel-title" }, [x.title]),
+        h("div", { class: "kate-ui-button-panel-description" }, [
+          x.description ?? "",
+        ]),
+      ]
+    ),
+    [
+      {
+        key: ["o"],
+        label: x.status_label ?? "Ok",
+        on_click: true,
+        handler: () => x.on_click(),
+      },
+    ],
+    {
+      dangerous: x.dangerous,
+    }
+  );
 }
 
 export function toggle_cell(
@@ -612,7 +664,7 @@ export function interactive(
   os: KateOS,
   child: Widgetable,
   interactions: InteractionHandler[],
-  x?: { default_focus_indicator?: boolean }
+  x?: { default_focus_indicator?: boolean; dangerous?: boolean }
 ) {
   const element = document.createElement("div");
   element.className = "kate-ui-interactive kate-ui-focus-target";
@@ -620,6 +672,10 @@ export function interactive(
 
   if (x?.default_focus_indicator === false) {
     element.setAttribute("data-custom-focus", "custom-focus");
+  }
+
+  if (x?.dangerous === true) {
+    element.setAttribute("data-dangerous", "dangerous");
   }
 
   os.focus_handler.register_interactive(element, { handlers: interactions });

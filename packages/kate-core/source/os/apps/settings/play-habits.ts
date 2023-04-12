@@ -37,8 +37,12 @@ export class ScenePlayHabitsSettings extends UI.SimpleScene {
       }),
 
       UI.vspace(16),
-      UI.text_button(this.os, "Delete all stored play habits", {
+      UI.button_panel(this.os, {
+        title: "Delete all stored play habits",
+        description:
+          "Remove habits of uninstalled games, reset habits of installed games.",
         on_click: this.handle_delete,
+        dangerous: true,
       }),
 
       UI.vspace(32),

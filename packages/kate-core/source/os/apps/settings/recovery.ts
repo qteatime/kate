@@ -13,23 +13,37 @@ export class SceneRecovery extends UI.SimpleScene {
       ]),
       UI.vspace(16),
 
-      UI.text_button(this.os, "Restore default settings", {
+      UI.button_panel(this.os, {
+        title: "Restore default settings",
+        description: "Switch all settings back to the default ones.",
         on_click: this.restore_default_settings,
+        dangerous: true,
       }),
-      UI.p([`Switch all settings back to the default ones.`]),
       UI.vdivider(),
 
-      UI.text_button(this.os, "Delete all data", {
-        on_click: this.delete_all_data,
-      }),
-      UI.p([
-        `Delete ALL data locally stored in the console. The application will reload
+      UI.button_panel(this.os, {
+        title: "Delete all data",
+        description: `Delete ALL data locally stored in the console. The application will reload
         afterwards.`,
-      ]),
+        on_click: this.delete_all_data,
+        dangerous: true,
+      }),
     ];
   }
 
   restore_default_settings = async () => {
+    const should_reset = await this.os.dialog.confirm("kate:recovery", {
+      title: "Restore to default settings?",
+      message: `This will remove all of your custom configuration and reset Kate to
+       its original configuration. The operation is irreversible.`,
+      dangerous: true,
+      cancel: "Keep my configuration",
+      ok: "Reset to defaults",
+    });
+    if (!should_reset) {
+      return;
+    }
+
     await this.os.dialog.progress(
       "kate:recovery",
       "Restoring default settings",
@@ -44,6 +58,20 @@ export class SceneRecovery extends UI.SimpleScene {
   };
 
   delete_all_data = async () => {
+    const should_delete = await this.os.dialog.confirm("kate:recovery", {
+      title: "Remove all console data?",
+      message: `This will delete all data stored in the console, including
+      cartridge files, save data, screenshots, and settings. When Kate reloads
+      it'll be as if you were running it for the first time. This is an
+      irreversible operation.`,
+      dangerous: true,
+      cancel: "Keep my data",
+      ok: "Delete all data",
+    });
+    if (!should_delete) {
+      return;
+    }
+
     try {
       await this.os.dialog.progress(
         "kate:recovery",

@@ -62,9 +62,59 @@
   animation: kate-focus-in 0.5s ease-out;
 }
 
+.kate-ui-interactive.focus:not([data-custom-focus])[data-dangerous] {
+  outline-color: var(--color-dangerous);
+}
+
 .kate-ui-interactive.focus .kate-ui-text-button {
   background: var(--color-primary);
   color: var(--color-text-inverted);
   border-color: var(--color-primary);
   border-radius: 0;
+}
+
+.kate-os-screen .kate-ui-button-panel {
+  color: var(--color-text);
+  padding: 1rem;
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  gap: 0.3em;
+  position: relative;
+}
+
+.focus .kate-ui-button-panel {
+  border: 0;
+}
+
+.kate-ui-button-panel[data-dangerous] {
+  color: var(--color-dangerous);
+  padding-left: 2em;
+}
+
+.kate-ui-button-panel[data-dangerous]::before {
+  content: "DANGER";
+  font-size: 0.7em;
+  font-weight: 500;
+  color: var(--color-text-inverted);
+  background: var(--color-dangerous);
+  height: 100%;
+  padding: 0.3em;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  text-align: center;
+  text-orientation: mixed;
+  writing-mode: vertical-lr;
+  box-sizing: border-box;
+  letter-spacing: 0.1em;
+}
+
+.kate-ui-button-panel-title {
+  font-weight: 500;
+}
+
+.kate-ui-button-panel-description {
+  font-size: 0.9em;
+  color: var(--color-text-muted);
 }
