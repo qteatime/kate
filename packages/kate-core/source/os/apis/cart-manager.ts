@@ -261,6 +261,21 @@ export class CartManager {
     });
   }
 
+  async delete_single_play_habits(id: string, remove: boolean) {
+    await this.os.db.transaction([Db.play_habits], "readwrite", async (t) => {
+      const habits = t.get_table1(Db.play_habits);
+      if (remove) {
+        habits.delete(id);
+      } else {
+        habits.put({
+          id: id,
+          last_played: null,
+          play_time: 0,
+        });
+      }
+    });
+  }
+
   async update_last_played(cart_id: string, last_played: Date | null) {
     if (!this.os.settings.get("play_habits").recently_played) {
       return;

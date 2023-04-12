@@ -1,3 +1,4 @@
+import { PlayHabits } from "../../../data";
 import * as UI from "../../ui";
 
 export class ScenePlayHabitsSettings extends UI.SimpleScene {
@@ -52,31 +53,77 @@ export class ScenePlayHabitsSettings extends UI.SimpleScene {
     const history = await this.os.cart_manager.habit_history();
     for (const entry of history) {
       items.push(
-        UI.focusable_container([
-          UI.text_panel({
-            title: UI.fragment([
-              entry.title,
-              entry.installed
-                ? null
-                : UI.h("em", { style: "margin-left: 8px" }, [
-                    "(not installed)",
-                  ]),
-            ]),
-            description: UI.fragment([
-              entry.play_time === 0
-                ? "No total play time recorded"
-                : `Played for ${coarse_play_time(entry.play_time)}`,
-              UI.h("br", {}, []),
-              entry.last_played === null
-                ? "No play date recorded"
-                : `Last played ${relative_play_date(entry.last_played)}`,
-            ]),
-          }),
-        ])
+        UI.interactive(
+          this.os,
+          UI.padded_container("s", [
+            UI.text_panel({
+              title: UI.fragment([
+                entry.title,
+                entry.installed
+                  ? null
+                  : UI.h("em", { style: "margin-left: 8px" }, [
+                      "(not installed)",
+                    ]),
+              ]),
+              description: UI.fragment([
+                entry.play_time === 0
+                  ? "No total play time recorded"
+                  : `Played for ${coarse_play_time(entry.play_time)}`,
+                UI.h("br", {}, []),
+                entry.last_played === null
+                  ? "No play date recorded"
+                  : `Last played ${relative_play_date(entry.last_played)}`,
+              ]),
+            }),
+          ]),
+          [
+            {
+              key: ["menu"],
+              label: "Options",
+              on_menu: true,
+              handler: () => {
+                this.handle_play_entry_options(entry);
+              },
+            },
+          ]
+        )
       );
     }
     UI.append(new UI.VBox(20, [...items]), container);
   }
+
+  handle_play_entry_options = async (
+    entry: PlayHabits & { title: string; installed: boolean }
+  ) => {
+    const result = await this.os.dialog.pop_menu(
+      "kate:settings",
+      `${entry.title}`,
+      [
+        {
+          label: "Delete play habits",
+          value: "delete" as const,
+        },
+      ],
+      null
+    );
+    switch (result) {
+      case "delete": {
+        await this.os.cart_manager.delete_single_play_habits(
+          entry.id,
+          !entry.installed
+        );
+        await this.os.notifications.log(
+          "kate:settings",
+          "Play habits deleted",
+          `Deleted for ${entry.id}`
+        );
+        await this.load_history(
+          this.canvas.querySelector(".play-habit-history")!
+        );
+        return;
+      }
+    }
+  };
 
   handle_delete = async () => {
     const should_delete = await this.os.dialog.confirm("kate:settings", {
@@ -89,6 +136,11 @@ export class ScenePlayHabitsSettings extends UI.SimpleScene {
     });
     if (should_delete) {
       await this.os.cart_manager.delete_play_habits();
+      await this.os.notifications.log(
+        "kate:settings",
+        "Play habits deleted",
+        `Deleted for all cartridges`
+      );
       await this.load_history(
         this.canvas.querySelector(".play-habit-history")!
       );
