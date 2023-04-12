@@ -12,13 +12,14 @@ export class ScenePlayHabitsSettings extends UI.SimpleScene {
 
     return [
       UI.p([
-        `Kate stores, locally, data about the cartridges you play to
-        support filtering and sorting them in the library by recency
-        and usage.`,
+        `Kate stores data about the cartridges you play. This allows
+         you to sort and filter cartridges by recency and usage time in
+         your library.`,
       ]),
       UI.p([
-        `You can disable collection of this data here, and also remove
-         any previously collected data.`,
+        `The data is only stored in your device, but you can still disable
+         any collection of this data here. You can also remove any previously
+         stored data.`,
       ]),
 
       UI.vspace(32),
