@@ -22,28 +22,18 @@ export class ScenePlayHabitsSettings extends UI.SimpleScene {
 
       UI.vspace(32),
 
-      UI.info_cell(
-        UI.text_panel({
-          title: "Last played time",
-          description: "Record the last time you played a cartridge.",
-        }),
-        [
-          UI.toggle(this.os, data.recently_played, {
-            on_changed: this.handle_last_played_change,
-          }),
-        ]
-      ),
-      UI.info_cell(
-        UI.text_panel({
-          title: "Total play time",
-          description: "Record how many minutes you've played a cartridge.",
-        }),
-        [
-          UI.toggle(this.os, data.play_times, {
-            on_changed: this.handle_play_time_change,
-          }),
-        ]
-      ),
+      UI.toggle_cell(this.os, {
+        value: data.recently_played,
+        title: "Last played time",
+        description: "Record the last time you played a cartridge.",
+        on_changed: this.handle_last_played_change,
+      }),
+      UI.toggle_cell(this.os, {
+        value: data.play_times,
+        title: "Total play time",
+        description: "Record how many minutes you've played a cartridge.",
+        on_changed: this.handle_play_time_change,
+      }),
 
       UI.vspace(16),
       UI.text_button(this.os, "Delete all stored play habits", {

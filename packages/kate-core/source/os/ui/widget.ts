@@ -406,6 +406,51 @@ export function info_cell(label: Widgetable, data: Widgetable[]) {
   return info_line(label, data, { interactive: true });
 }
 
+export function toggle_cell(
+  os: KateOS,
+  x: {
+    title: Widgetable;
+    description: Widgetable;
+    value: boolean;
+    on_label?: Widgetable;
+    off_label?: Widgetable;
+    on_changed?: (value: boolean) => void;
+  }
+) {
+  let checked = x.value;
+  const container = h("div", { class: "kate-ui-toggle-container" }, [
+    h("div", { class: "kate-ui-toggle-view" }, [
+      h("div", { class: "kate-ui-toggle-bullet" }, []),
+    ]),
+    h("div", { class: "kate-ui-toggle-label-yes" }, [x.on_label ?? "ON "]),
+    h("div", { class: "kate-ui-toggle-label-no" }, [x.off_label ?? "OFF"]),
+  ]);
+
+  container.classList.toggle("active", checked);
+
+  return interactive(
+    os,
+    h("div", { class: "kate-ui-info-line" }, [
+      h("div", { class: "kate-ui-info-line-label" }, [
+        text_panel({ title: x.title, description: x.description }),
+      ]),
+      h("div", { class: "kate-ui-info-line-data" }, [container]),
+    ]),
+    [
+      {
+        key: ["o"],
+        label: "Toggle",
+        on_click: true,
+        handler: () => {
+          checked = !checked;
+          container.classList.toggle("active", checked);
+          x.on_changed?.(checked);
+        },
+      },
+    ]
+  );
+}
+
 export function toggle(
   os: KateOS,
   value: boolean,

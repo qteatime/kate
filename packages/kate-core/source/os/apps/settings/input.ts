@@ -18,17 +18,12 @@ export class SceneInputSettings extends UI.SimpleScene {
 
     return [
       UI.h("h3", {}, ["Virtual buttons"]),
-      UI.info_cell(
-        UI.text_panel({
-          title: "Haptic feedback",
-          description: "Vibrate the console when a virtual button is touched",
-        }),
-        [
-          UI.toggle(this.os, data.haptic_feedback_for_virtual_button, {
-            on_changed: this.handle_haptics_change,
-          }),
-        ]
-      ),
+      UI.toggle_cell(this.os, {
+        value: data.haptic_feedback_for_virtual_button,
+        title: "Haptic feedback",
+        description: "Vibrate the console when a virtual button is touched",
+        on_changed: this.handle_haptics_change,
+      }),
 
       UI.h("h3", {}, ["Alternative input methods"]),
       UI.text_button(this.os, "Configure keyboard mappings", {
