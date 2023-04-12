@@ -146,17 +146,21 @@ export class KateFocusHandler {
       Array.from(
         this._current_root.querySelectorAll(".kate-ui-focus-target")
       ) as HTMLElement[]
-    ).map((x) => ({
-      element: x,
-      position: {
-        x: x.offsetLeft,
-        y: x.offsetTop,
-        width: x.offsetWidth,
-        height: x.offsetHeight,
-        right: x.offsetLeft + x.offsetWidth,
-        bottom: x.offsetTop + x.offsetHeight,
-      },
-    }));
+    ).map((x) => {
+      const rect = x.getBoundingClientRect();
+
+      return {
+        element: x,
+        position: {
+          x: rect.x,
+          y: rect.y,
+          width: rect.width,
+          height: rect.height,
+          right: rect.right,
+          bottom: rect.bottom,
+        },
+      };
+    });
     const right_limit = Math.max(...focusable.map((x) => x.position.right));
     const bottom_limit = Math.max(...focusable.map((x) => x.position.bottom));
 

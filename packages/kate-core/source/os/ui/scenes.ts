@@ -63,15 +63,15 @@ export abstract class SimpleScene extends Scene {
       icon: this.icon,
       title: this.title,
       subtitle: this.subtitle,
-      body: this.body_container([
-        h("div", { class: "kate-os-content kate-os-screen-body" }, this.body()),
-      ]),
+      body: this.body_container(this.body()),
       status: [...this.actions.map((x) => this.render_action(x))],
     });
   }
 
   body_container(body: Widgetable[]) {
-    return scroll(body);
+    return scroll([
+      h("div", { class: "kate-os-content kate-os-screen-body" }, body),
+    ]);
   }
 
   replace_body(content: Widgetable[]) {

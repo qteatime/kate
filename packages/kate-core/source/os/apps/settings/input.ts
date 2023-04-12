@@ -8,6 +8,7 @@ import {
 } from "../../apis/settings";
 import { KateOS } from "../../os";
 import * as UI from "../../ui";
+import { KeyboardInputSettings } from "./keyboard-input";
 
 export class SceneInputSettings extends UI.SimpleScene {
   icon = "gamepad";
@@ -26,7 +27,10 @@ export class SceneInputSettings extends UI.SimpleScene {
       }),
 
       UI.h("h3", {}, ["Alternative input methods"]),
-      UI.text_button(this.os, "Configure keyboard mappings", {
+      UI.link_card(this.os, {
+        icon: "keyboard",
+        title: "Control Kate with a keyboard",
+        description: "Configure keyboard mappings for Kate buttons",
         on_click: () => {
           this.os.push_scene(new KeyboardInputSettings(this.os));
         },
@@ -53,7 +57,8 @@ export class SceneInputSettings extends UI.SimpleScene {
   };
 }
 
-class KeyboardInputSettings extends UI.SimpleScene {
+/*
+class KeyboardInputSettings0 extends UI.SimpleScene {
   icon = "keyboard";
   title = ["Keyboard mappings"];
 
@@ -61,6 +66,10 @@ class KeyboardInputSettings extends UI.SimpleScene {
     const mappings = this.os.settings.get("input").keyboard_mapping;
 
     return [
+      UI.h("div", { class: "kate-os-keyboard-settings" }, [
+        UI.h("div", { class: "kate-os-keyboard-settings-list" }, []),
+        UI.h("div", { class: "kate-os-keyboard-settings-actions" }, []),
+      ]),
       UI.text_button(this.os, "Add a new mapping", {
         on_click: this.handle_add_new_mapping,
       }),
@@ -307,6 +316,7 @@ class KeyboardMappingSettings extends UI.SimpleScene {
     this.os.pop_scene();
   };
 }
+*/
 
 class GamepadInputSettings extends UI.SimpleScene {
   icon = "gamepad";

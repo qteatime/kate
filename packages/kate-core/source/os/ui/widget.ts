@@ -549,8 +549,9 @@ export function link_card(
   os: KateOS,
   x: {
     icon: string;
-    title: string;
-    description: string;
+    arrow?: string;
+    title: Widgetable;
+    description?: Widgetable;
     on_click?: () => void;
   }
 ) {
@@ -561,7 +562,14 @@ export function link_card(
       h("div", { class: "kate-ui-link-card-icon" }, [fa_icon(x.icon, "2x")]),
       h("div", { class: "kate-ui-link-card-text" }, [
         h("div", { class: "kate-ui-link-card-title" }, [x.title]),
-        h("div", { class: "kate-ui-link-card-description" }, [x.description]),
+        h("div", { class: "kate-ui-link-card-description" }, [
+          x.description ?? null,
+        ]),
+      ]),
+      h("div", { class: "kate-ui-link-card-arrow" }, [
+        x.arrow != null
+          ? fa_icon(x.arrow, "xl")
+          : fa_icon("chevron-right", "xl"),
       ]),
     ]
   );

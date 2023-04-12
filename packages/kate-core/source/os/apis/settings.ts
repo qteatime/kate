@@ -10,7 +10,7 @@ export type PlayHabits = {
 
 export type KeyboardToKate = {
   key: string;
-  buttons: InputKey[];
+  button: InputKey;
 };
 
 export type GamepadToKate = {
@@ -67,43 +67,43 @@ const defaults: SettingsData = {
     keyboard_mapping: [
       {
         key: "ArrowUp",
-        buttons: ["up"],
+        button: "up",
       },
       {
         key: "ArrowRight",
-        buttons: ["right"],
+        button: "right",
       },
       {
         key: "ArrowDown",
-        buttons: ["down"],
+        button: "down",
       },
       {
         key: "ArrowLeft",
-        buttons: ["left"],
+        button: "left",
       },
       {
         key: "ShiftLeft",
-        buttons: ["menu"],
+        button: "menu",
       },
       {
         key: "ControlLeft",
-        buttons: ["capture"],
+        button: "capture",
       },
       {
         key: "KeyX",
-        buttons: ["x"],
+        button: "x",
       },
       {
         key: "KeyZ",
-        buttons: ["o"],
+        button: "o",
       },
       {
         key: "KeyA",
-        buttons: ["ltrigger"],
+        button: "ltrigger",
       },
       {
         key: "KeyS",
-        buttons: ["rtrigger"],
+        button: "rtrigger",
       },
     ],
     gamepads: [],

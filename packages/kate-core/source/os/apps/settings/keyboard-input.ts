@@ -1,0 +1,353 @@
+import * as UI from "../../ui";
+import type { KateOS } from "../../os";
+import { KeyboardToKate, SettingsData } from "../../apis/settings";
+import { InputKey } from "../../../kernel";
+import { defer } from "../../../utils";
+
+export class KeyboardInputSettings extends UI.SimpleScene {
+  icon = "keyboard";
+  title = ["Keyboard mapping"];
+
+  private _mapping: KeyboardToKate[];
+
+  constructor(os: KateOS) {
+    super(os);
+    this._mapping = os.settings.get("input").keyboard_mapping;
+  }
+
+  body_container(body: UI.Widgetable[]): HTMLElement {
+    return UI.h(
+      "div",
+      { class: "kate-keyboard-mapping kate-os-content kate-os-screen-body" },
+      [...body]
+    );
+  }
+
+  body() {
+    return [
+      UI.h("div", { class: "kate-keyboard-mapping-main" }, [
+        UI.h("div", { class: "kate-wireframe" }, [
+          UI.h("div", { class: "kate-wireframe-dpad" }, [
+            UI.h(
+              "div",
+              { class: "kate-wireframe-dpad-button kate-wireframe-dpad-up" },
+              [this.keymap("up")]
+            ),
+            UI.h(
+              "div",
+              {
+                class: "kate-wireframe-dpad-button kate-wireframe-dpad-right",
+              },
+              [this.keymap("right")]
+            ),
+            UI.h(
+              "div",
+              {
+                class: "kate-wireframe-dpad-button kate-wireframe-dpad-down",
+              },
+              [this.keymap("down")]
+            ),
+            UI.h(
+              "div",
+              {
+                class: "kate-wireframe-dpad-button kate-wireframe-dpad-left",
+              },
+              [this.keymap("left")]
+            ),
+          ]),
+          UI.h(
+            "div",
+            { class: "kate-wireframe-shoulder kate-wireframe-shoulder-left" },
+            [this.keymap("ltrigger")]
+          ),
+          UI.h(
+            "div",
+            {
+              class: "kate-wireframe-shoulder kate-wireframe-shoulder-right",
+            },
+            [this.keymap("rtrigger")]
+          ),
+          UI.h(
+            "div",
+            { class: "kate-wireframe-special kate-wireframe-special-left" },
+            [this.keymap("capture")]
+          ),
+          UI.h(
+            "div",
+            { class: "kate-wireframe-special kate-wireframe-special-right" },
+            [this.keymap("menu")]
+          ),
+          UI.h("div", { class: "kate-wireframe-buttons" }, [
+            UI.h(
+              "div",
+              { class: "kate-wireframe-button kate-wireframe-button-x" },
+              [this.keymap("x")]
+            ),
+            UI.h(
+              "div",
+              { class: "kate-wireframe-button kate-wireframe-button-o" },
+              [this.keymap("o")]
+            ),
+          ]),
+        ]),
+      ]),
+      UI.h("div", { class: "kate-keyboard-mapping-actions" }, [
+        UI.text_button(this.os, "Save", {
+          on_click: async () => {
+            await this.os.settings.update("input", (x) => {
+              return { ...x, keyboard_mapping: this._mapping };
+            });
+            await this.os.notifications.log(
+              "kate:settings",
+              "Updated keyboard mapping",
+              JSON.stringify(this._mapping)
+            );
+            this.os.kernel.keyboard.remap(this._mapping);
+            this.os.pop_scene();
+          },
+        }),
+        UI.text_button(this.os, "Cancel", {
+          on_click: async () => {
+            this.os.pop_scene();
+          },
+        }),
+      ]),
+    ];
+  }
+
+  keymap(key: InputKey) {
+    const kbd = this._mapping.find((x) => x.button === key);
+    const container = UI.h(
+      "div",
+      { class: "kate-wireframe-mapping-button", "data-key": key },
+      []
+    );
+    const update = (key: string | null) => {
+      container.setAttribute("title", key ?? "");
+      container.textContent = "";
+      UI.append(friendly_kbd(key), container);
+    };
+    update(kbd?.key ?? null);
+    return UI.h("div", { class: "kate-wireframe-mapping" }, [
+      UI.interactive(this.os, container, [
+        {
+          key: ["o"],
+          label: "Select key",
+          on_click: true,
+          handler: async () => {
+            const kbd_key = await this.ask_key(key);
+            if (kbd_key != null && (await this.associate(key, kbd_key))) {
+              update(kbd_key);
+            }
+          },
+        },
+      ]),
+    ]);
+  }
+
+  update_key_mapping(key: InputKey, kbd: string | null) {
+    const container = this.canvas.querySelector(
+      `.kate-wireframe-mapping-button[data-key=${JSON.stringify(key)}]`
+    );
+    if (container != null) {
+      container.setAttribute("title", kbd ?? "");
+      container.textContent = "";
+      UI.append(friendly_kbd(kbd), container);
+    }
+  }
+
+  async associate(key: InputKey, kbd: string) {
+    const previous = this._mapping.find((x) => x.key === kbd);
+    const mapping = this._mapping.filter(
+      (x) => x.key !== kbd && x.button !== key
+    );
+    if (previous != null && previous.button !== key) {
+      const should_associate = await this.os.dialog.confirm("kate:settings", {
+        title: "Replace mapping?",
+        message: `"${kbd}" is already associated with the virtual button "${previous.button}". Replace with "${key}"?`,
+        cancel: "Keep old mapping",
+        ok: "Replace",
+      });
+      if (should_associate) {
+        this.update_key_mapping(previous.button, null);
+        this._mapping = mapping.concat([
+          {
+            key: kbd,
+            button: key,
+          },
+        ]);
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      this._mapping = mapping.concat([
+        {
+          key: kbd,
+          button: key,
+        },
+      ]);
+      return true;
+    }
+  }
+
+  ask_key(key: InputKey) {
+    const result = defer<string | null>();
+    const dialog = UI.h(
+      "div",
+      { class: "kate-screen-dialog kate-screen-kbd-dialog" },
+      [
+        UI.h("div", { class: "kate-screen-dialog-container" }, [
+          UI.hbox(8, [
+            UI.h("span", {}, [
+              "Press a key in your keyboard to associate with ",
+            ]),
+            UI.icon(key),
+            UI.h("span", {}, [`(${key})`]),
+            UI.h("input", { class: "wait-for-key" }, []),
+          ]),
+        ]),
+      ]
+    );
+    const input = dialog.querySelector("input") as HTMLInputElement;
+    const handle_key = (ev: KeyboardEvent) => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      dismiss();
+      result.resolve(ev.code);
+    };
+    const click_cancel = (ev: MouseEvent) => {
+      ev.preventDefault();
+      dismiss();
+      result.resolve(null);
+    };
+    const x_cancel = (key: InputKey) => {
+      if (key === "x") {
+        dismiss();
+        result.resolve(null);
+      }
+    };
+    const dismiss = () => {
+      dialog.remove();
+      input.removeEventListener("keydown", handle_key);
+      dialog.removeEventListener("click", click_cancel);
+      this.os.kernel.console.on_virtual_button_touched.remove(x_cancel);
+    };
+    input.addEventListener("keydown", handle_key);
+    dialog.addEventListener("click", click_cancel);
+    this.os.kernel.console.on_virtual_button_touched.listen(x_cancel);
+    this.canvas.append(dialog);
+    input.focus();
+    return result.promise;
+  }
+
+  on_attached(): void {
+    super.on_attached();
+  }
+}
+
+export function friendly_kbd(x: string | null) {
+  if (x == null) {
+    return null;
+  }
+
+  const name = friendly_name[x];
+  if (name == null) {
+    return x;
+  } else {
+    return name;
+  }
+}
+
+export const friendly_name: { [key: string]: string | undefined } =
+  Object.assign(Object.create(null), {
+    ArrowLeft: UI.fa_icon("arrow-left"),
+    ArrowRight: UI.fa_icon("arrow-right"),
+    ArrowUp: UI.fa_icon("arrow-up"),
+    ArrowDown: UI.fa_icon("arrow-down"),
+    KeyQ: "Q",
+    KeyW: "W",
+    KeyE: "E",
+    KeyR: "R",
+    KeyT: "T",
+    KeyY: "Y",
+    KeyU: "U",
+    KeyI: "I",
+    KeyO: "O",
+    KeyP: "P",
+    KeyA: "A",
+    KeyS: "S",
+    KeyD: "D",
+    KeyF: "F",
+    KeyG: "G",
+    KeyH: "H",
+    KeyJ: "J",
+    KeyL: "L",
+    KeyK: "K",
+    KeyN: "N",
+    KeyM: "M",
+    KeyB: "B",
+    KeyV: "V",
+    KeyC: "C",
+    KeyX: "X",
+    KeyZ: "Z",
+    Delete: "Delete",
+    End: "End",
+    PageDown: "PgDn",
+    PageUp: "PgUp",
+    Insert: "Insert",
+    Home: "Home",
+    Enter: "Enter",
+    Backspace: UI.fa_icon("delete-left"),
+    Digit0: "0",
+    Digit9: "9",
+    Digit8: "8",
+    Digit7: "7",
+    Digit6: "6",
+    Digit5: "5",
+    Digit4: "4",
+    Digit3: "3",
+    Digit2: "2",
+    Digit1: "1",
+    Tab: "Tab",
+    CapsLock: "CapsLock",
+    ShiftLeft: "L Shift",
+    ControlLeft: "L Ctrl",
+    MetaLeft: "L Meta",
+    AltLeft: "L Alt",
+    Space: "Space",
+    AltRight: "R Alt",
+    ControlRight: "R Ctrl",
+    ShiftRight: "R Shift",
+    ContextMenu: "Context",
+    MetaRight: "R Meta",
+    NumpadDecimal: "Np .",
+    NumpadEnter: "Np Enter",
+    Numpad0: "Np 0",
+    Numpad1: "Np 1",
+    Numpad2: "Np 2",
+    Numpad3: "Np 3",
+    Numpad4: "Np 4",
+    Numpad5: "Np 5",
+    Numpad6: "Np 6",
+    Numpad7: "Np 7",
+    Numpad8: "Np 8",
+    Numpad9: "Np 9",
+    NumpadAdd: "Np +",
+    NumpadDivide: "Np /",
+    NumpadMultiply: "Np *",
+    NumpadSubtract: "Np -",
+    F1: "F1",
+    F2: "F2",
+    F3: "F3",
+    F4: "F4",
+    F5: "F5",
+    F6: "F6",
+    F7: "F7",
+    F8: "F8",
+    F9: "F9",
+    F10: "F10",
+    F11: "F11",
+    F12: "F12",
+    Escape: "Escape",
+  });
