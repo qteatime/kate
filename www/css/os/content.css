@@ -76,11 +76,11 @@
 .kate-os-screen .kate-ui-button-panel {
   color: var(--color-text);
   padding: 1rem;
-  border-bottom: 1px solid var(--color-border);
   display: flex;
   flex-direction: column;
   gap: 0.3em;
   position: relative;
+  width: 100%;
 }
 
 .focus .kate-ui-button-panel {
