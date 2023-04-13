@@ -26,14 +26,16 @@ export class ScenePlayHabitsSettings extends UI.SimpleScene {
 
       UI.toggle_cell(this.os, {
         value: data.recently_played,
-        title: "Last played time",
-        description: "Record the last time you played a cartridge.",
+        title: "Record last played time",
+        description:
+          "Track and store (locally) the last time you played a cartridge.",
         on_changed: this.handle_last_played_change,
       }),
       UI.toggle_cell(this.os, {
         value: data.play_times,
-        title: "Total play time",
-        description: "Record how many minutes you've played a cartridge.",
+        title: "Record total play time",
+        description:
+          "Track and store (locally) how many minutes you've played a cartridge.",
         on_changed: this.handle_play_time_change,
       }),
 
