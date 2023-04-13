@@ -303,7 +303,12 @@ export function fa_icon_button(name: string, text: string, spacing = 10) {
 export function text_button(
   os: KateOS,
   text: string,
-  x: { status_label?: string; on_click: () => void; dangerous?: boolean }
+  x: {
+    status_label?: string;
+    on_click: () => void;
+    dangerous?: boolean;
+    primary?: boolean;
+  }
 ) {
   return interactive(
     os,
@@ -312,6 +317,7 @@ export function text_button(
       {
         class: "kate-ui-button kate-ui-text-button",
         "data-dangerous": x.dangerous ?? false,
+        "data-primary": x.primary ?? false,
       },
       [text]
     ),

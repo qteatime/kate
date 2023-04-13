@@ -50,6 +50,12 @@
   text-align: center;
 }
 
+.kate-os-content .kate-ui-button[data-primary] {
+  border-color: var(--color-button-primary);
+  background: var(--color-button-primary);
+  color: var(--color-button-primary-text);
+}
+
 .kate-os-content .kate-ui-button.focus {
   background: var(--color-primary);
   color: var(--color-text-inverted);

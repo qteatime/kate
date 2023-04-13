@@ -93,6 +93,7 @@ export class KeyboardInputSettings extends UI.SimpleScene {
       ]),
       UI.h("div", { class: "kate-keyboard-mapping-actions" }, [
         UI.text_button(this.os, "Save", {
+          primary: true,
           on_click: async () => {
             await this.os.settings.update("input", (x) => {
               return { ...x, keyboard_mapping: this._mapping };
