@@ -1,5 +1,5 @@
 import { InputKey } from "../../kernel/virtual";
-import { EventStream } from "../../utils";
+import { EventStream, Observable } from "../../utils";
 import { InteractionHandler } from "../apis";
 import type { KateOS } from "../os";
 
@@ -21,6 +21,18 @@ export function fragment(children: Widgetable[]) {
   return x;
 }
 
+function set_attr(element: HTMLElement, key: string, value: string | boolean) {
+  if (typeof value === "string") {
+    element.setAttribute(key, value);
+  } else if (typeof value === "boolean") {
+    if (value) {
+      element.setAttribute(key, key);
+    } else {
+      element.removeAttribute(key);
+    }
+  }
+}
+
 export function h(
   tag: string,
   attrs: { [key: string]: string | boolean },
@@ -28,13 +40,7 @@ export function h(
 ) {
   const element = document.createElement(tag);
   for (const [key, value] of Object.entries(attrs)) {
-    if (typeof value === "string") {
-      element.setAttribute(key, value);
-    } else if (typeof value === "boolean") {
-      if (value) {
-        element.setAttribute(key, key);
-      }
-    }
+    set_attr(element, key, value);
   }
   for (const child of children) {
     append(child, element);
@@ -308,6 +314,7 @@ export function text_button(
     on_click: () => void;
     dangerous?: boolean;
     primary?: boolean;
+    enabled?: Observable<boolean>;
   }
 ) {
   return interactive(
@@ -327,8 +334,12 @@ export function text_button(
         label: x.status_label ?? "Ok",
         on_click: true,
         handler: () => x.on_click(),
+        enabled: () => x.enabled?.value ?? true,
       },
-    ]
+    ],
+    {
+      enabled: x.enabled,
+    }
   );
 }
 
@@ -678,7 +689,11 @@ export function interactive(
   os: KateOS,
   child: Widgetable,
   interactions: InteractionHandler[],
-  x?: { default_focus_indicator?: boolean; dangerous?: boolean }
+  x?: {
+    default_focus_indicator?: boolean;
+    dangerous?: boolean;
+    enabled?: Observable<boolean>;
+  }
 ) {
   const element = document.createElement("div");
   element.className = "kate-ui-interactive kate-ui-focus-target";
@@ -698,7 +713,9 @@ export function interactive(
   if (click_handler != null) {
     element.addEventListener("click", (ev) => {
       ev.preventDefault();
-      click_handler.handler("o", false);
+      if (click_handler.enabled?.() !== false) {
+        click_handler.handler("o", false);
+      }
     });
   }
 
@@ -706,7 +723,16 @@ export function interactive(
   if (menu_handler != null) {
     element.addEventListener("contextmenu", (ev) => {
       ev.preventDefault();
-      menu_handler.handler("menu", false);
+      if (menu_handler.enabled?.() !== false) {
+        menu_handler.handler("menu", false);
+      }
+    });
+  }
+
+  if (x?.enabled != null) {
+    set_attr(element, "disabled", !x.enabled.value);
+    x.enabled.stream.listen((enabled) => {
+      set_attr(element, "disabled", !enabled);
     });
   }
 

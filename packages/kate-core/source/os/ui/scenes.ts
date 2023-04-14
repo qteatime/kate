@@ -51,12 +51,14 @@ export abstract class SimpleScene extends Scene {
     {
       key: ["x"],
       label: "Return",
-      handler: () => {
-        this.os.pop_scene();
-      },
+      handler: () => this.on_return(),
     },
   ];
   private _previous_traps: FocusInteraction | null = null;
+
+  on_return = () => {
+    this.os.pop_scene();
+  };
 
   render() {
     return simple_screen({

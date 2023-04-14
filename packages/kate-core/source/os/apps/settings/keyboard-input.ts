@@ -2,18 +2,40 @@ import * as UI from "../../ui";
 import type { KateOS } from "../../os";
 import { KeyboardToKate, SettingsData } from "../../apis/settings";
 import { InputKey } from "../../../kernel";
-import { defer } from "../../../utils";
+import { Deferred, Observable, defer } from "../../../utils";
 
 export class KeyboardInputSettings extends UI.SimpleScene {
   icon = "keyboard";
   title = ["Keyboard mapping"];
 
   private _mapping: KeyboardToKate[];
+  private _changed = new Observable<boolean>(false);
+  private _wait_key = new Observable<null | Deferred<string | null>>(null);
 
   constructor(os: KateOS) {
     super(os);
     this._mapping = os.settings.get("input").keyboard_mapping;
   }
+
+  on_return = async () => {
+    if (this._wait_key.value != null) {
+      return;
+    } else if (this._changed.value) {
+      const discard_confirm = await this.os.dialog.confirm("kate:settings", {
+        title: "Discard changes?",
+        message:
+          "The changes made to the keyboard mapping have not been saved. Discard changes and leave the screen?",
+        cancel: "Review changes",
+        ok: "Discard changes",
+        dangerous: true,
+      });
+      if (discard_confirm) {
+        this.os.pop_scene();
+      }
+    } else {
+      this.os.pop_scene();
+    }
+  };
 
   body_container(body: UI.Widgetable[]): HTMLElement {
     return UI.h(
@@ -106,11 +128,13 @@ export class KeyboardInputSettings extends UI.SimpleScene {
             this.os.kernel.keyboard.remap(this._mapping);
             this.os.pop_scene();
           },
+          enabled: this._changed,
         }),
         UI.text_button(this.os, "Cancel", {
           on_click: async () => {
             this.os.pop_scene();
           },
+          enabled: this._wait_key.map((x) => !x),
         }),
       ]),
     ];
@@ -123,10 +147,10 @@ export class KeyboardInputSettings extends UI.SimpleScene {
       { class: "kate-wireframe-mapping-button", "data-key": key },
       []
     );
-    const update = (key: string | null) => {
+    const update = async (key: string | null) => {
       container.setAttribute("title", key ?? "");
       container.textContent = "";
-      UI.append(friendly_kbd(key), container);
+      UI.append(await friendly_kbd(key), container);
     };
     update(kbd?.key ?? null);
     return UI.h("div", { class: "kate-wireframe-mapping" }, [
@@ -136,24 +160,29 @@ export class KeyboardInputSettings extends UI.SimpleScene {
           label: "Select key",
           on_click: true,
           handler: async () => {
-            const kbd_key = await this.ask_key(key);
+            const waiter = this.ask_key(key);
+            this._wait_key.value = waiter;
+            const kbd_key = await waiter.promise;
+            this._wait_key.value = null;
             if (kbd_key != null && (await this.associate(key, kbd_key))) {
               update(kbd_key);
+              this._changed.value = true;
             }
           },
+          enabled: () => this._wait_key.value == null,
         },
       ]),
     ]);
   }
 
-  update_key_mapping(key: InputKey, kbd: string | null) {
+  async update_key_mapping(key: InputKey, kbd: string | null) {
     const container = this.canvas.querySelector(
       `.kate-wireframe-mapping-button[data-key=${JSON.stringify(key)}]`
     );
     if (container != null) {
       container.setAttribute("title", kbd ?? "");
       container.textContent = "";
-      UI.append(friendly_kbd(kbd), container);
+      UI.append(await friendly_kbd(kbd), container);
     }
   }
 
@@ -214,21 +243,19 @@ export class KeyboardInputSettings extends UI.SimpleScene {
     const handle_key = (ev: KeyboardEvent) => {
       ev.preventDefault();
       ev.stopPropagation();
-      dismiss();
       result.resolve(ev.code);
     };
     const click_cancel = (ev: MouseEvent) => {
       ev.preventDefault();
-      dismiss();
       result.resolve(null);
     };
     const x_cancel = (key: InputKey) => {
       if (key === "x") {
-        dismiss();
         result.resolve(null);
       }
     };
     const dismiss = () => {
+      this.os.focus_handler.pop_root(dialog);
       dialog.remove();
       input.removeEventListener("keydown", handle_key);
       dialog.removeEventListener("click", click_cancel);
@@ -239,7 +266,11 @@ export class KeyboardInputSettings extends UI.SimpleScene {
     this.os.kernel.console.on_virtual_button_touched.listen(x_cancel);
     this.canvas.append(dialog);
     input.focus();
-    return result.promise;
+    this.os.focus_handler.push_root(dialog);
+    result.promise.finally(() => {
+      dismiss();
+    });
+    return result;
   }
 
   on_attached(): void {
@@ -247,16 +278,16 @@ export class KeyboardInputSettings extends UI.SimpleScene {
   }
 }
 
-export function friendly_kbd(x: string | null) {
+export async function friendly_kbd(x: string | null) {
   if (x == null) {
     return null;
   }
 
-  const name = friendly_name[x];
-  if (name == null) {
-    return x;
+  if (navigator.keyboard != null) {
+    const layout = await navigator.keyboard.getLayoutMap();
+    return layout.get(x) ?? friendly_name[x] ?? x;
   } else {
-    return name;
+    return friendly_name[x] ?? x;
   }
 }
 

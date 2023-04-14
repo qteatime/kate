@@ -9,6 +9,7 @@ export type InteractionHandler = {
   on_menu?: boolean;
   label: string;
   handler: (key: InputKey, is_repeat: boolean) => void;
+  enabled?: () => boolean;
 };
 
 export type FocusInteraction = {
@@ -120,7 +121,9 @@ export class KateFocusHandler {
       if (traps != null) {
         const trap = traps.handlers.find(
           (x) =>
-            x.key.includes(key as InputKey) && (!is_repeat || x.allow_repeat)
+            x.key.includes(key as InputKey) &&
+            (!is_repeat || x.allow_repeat) &&
+            (x.enabled == null || x.enabled())
         );
         if (trap != null) {
           trap.handler(key as InputKey, is_repeat);
