@@ -1,12 +1,262 @@
 import * as UI from "../../ui";
 import type { KateOS } from "../../os";
-import {
-  ChangedSetting,
-  SettingsData,
-  GamepadToKate,
-} from "../../apis/settings";
+import { ChangedSetting, SettingsData } from "../../apis/settings";
+import { Observable } from "../../../utils";
+import { friendly_gamepad_id } from "../../../friendly/gamepad";
 
 export class GamepadInputSettings extends UI.SimpleScene {
+  icon = "gamepad";
+  title = ["Gamepad settings"];
+
+  body() {
+    return [
+      UI.link_card(this.os, {
+        icon: "wrench",
+        title: "Configure standard mapping",
+        description: "Change button configuration for standard gamepads",
+        on_click: () => {
+          this.os.push_scene(new GamepadStandardMappingSettings(this.os));
+        },
+      }),
+      UI.vspace(6),
+      UI.link_card(this.os, {
+        icon: "gamepad",
+        title: "Change active gamepad",
+        description: "Choose which connected gamepad will control Kate.",
+        on_click: () => {
+          this.os.push_scene(new ChooseActiveGamepadSettings(this.os));
+        },
+      }),
+    ];
+  }
+}
+
+export class GamepadStandardMappingSettings extends UI.SimpleScene {
+  icon = "wrench";
+  title = ["Change standard mapping"];
+
+  body() {
+    return [];
+  }
+}
+
+type PairedGamepad = {
+  id: string;
+  active: number | null;
+};
+
+export class ChooseActiveGamepadSettings extends UI.SimpleScene {
+  icon = "gamepad";
+  title = ["Choose active gamepad"];
+
+  actions: UI.Action[] = [
+    {
+      key: ["x"],
+      label: "Cancel",
+      handler: () => {
+        this.on_return();
+      },
+    },
+    {
+      key: ["o"],
+      label: "Save",
+      handler: async () => {
+        this.on_save();
+      },
+    },
+  ];
+
+  on_save = async () => {
+    const paired = this._paired.value;
+    if (paired == null) {
+      return;
+    }
+
+    await this.os.settings.update("input", (x) => {
+      return { ...x, paired_gamepad: paired.id };
+    });
+    await this.os.notifications.log(
+      "kate:settings",
+      "Updated paired gamepad",
+      JSON.stringify(paired.id)
+    );
+    this.os.kernel.gamepad.pair(paired.id);
+    this.os.pop_scene();
+  };
+
+  private _last_update: number | null = null;
+  private _left_held_at: number | null = null;
+  private _right_held_at: number | null = null;
+  private _paired: Observable<PairedGamepad | null>;
+
+  constructor(os: KateOS) {
+    super(os);
+    const paired = this.os.settings.get("input").paired_gamepad;
+    this._paired = new Observable<PairedGamepad | null>(
+      paired == null ? null : { id: paired, active: null }
+    );
+  }
+
+  on_attached(): void {
+    this.os.kernel.console.on_tick.listen(this.update_gamepads);
+    this.os.kernel.gamepad.pause();
+  }
+
+  on_detached(): void {
+    this.os.kernel.console.on_tick.remove(this.update_gamepads);
+    this.os.kernel.gamepad.unpause();
+  }
+
+  update_gamepads = (time: number) => {
+    const has_updated = (x: Gamepad | null) => {
+      if (x == null) {
+        return false;
+      } else if (this._last_update == null) {
+        return true;
+      } else {
+        return x.timestamp > this._last_update;
+      }
+    };
+
+    const is_pairing = (gamepad: Gamepad) => {
+      return gamepad.buttons[4].pressed || gamepad.buttons[5].pressed;
+    };
+
+    const all_gamepads = navigator
+      .getGamepads()
+      .filter((x) => x != null) as Gamepad[];
+    const gamepad = all_gamepads
+      .filter(has_updated)
+      .filter(is_pairing)
+      .sort((a, b) => b.timestamp - a.timestamp)[0] as Gamepad | null;
+
+    if (gamepad != null) {
+      if (
+        gamepad.id !== this._paired.value?.id ||
+        this._paired.value.active == null
+      ) {
+        this._paired.value = { id: gamepad.id, active: time };
+      }
+    } else if (
+      this._paired.value != null &&
+      this._paired.value.active != null
+    ) {
+      const active = this._paired.value.active;
+      const elapsed = time - active;
+      if (elapsed >= 1_000) {
+        this._paired.value = { ...this._paired.value, active: null };
+      }
+    }
+
+    const paired_update = all_gamepads
+      .filter(has_updated)
+      .find((x) => x.id === this._paired.value?.id);
+    if (paired_update != null) {
+      const is_left = (a: Gamepad) =>
+        a.buttons[14].pressed ||
+        a.buttons[2].pressed ||
+        a.axes[0] < -0.5 ||
+        a.axes[2] < -0.5;
+      const is_right = (a: Gamepad) =>
+        a.buttons[15].pressed ||
+        a.buttons[1].pressed ||
+        a.axes[0] > 0.5 ||
+        a.axes[2] > 0.5;
+
+      this._left_held_at = is_left(paired_update)
+        ? this._left_held_at ?? time
+        : null;
+      this._right_held_at = is_right(paired_update)
+        ? this._right_held_at ?? time
+        : null;
+    }
+
+    if (this._left_held_at != null && time - this._left_held_at > 1_000) {
+      this._left_held_at = null;
+      this._right_held_at = null;
+      this.on_return();
+    } else if (
+      this._right_held_at != null &&
+      time - this._right_held_at > 1_000
+    ) {
+      this._right_held_at = null;
+      this._right_held_at = null;
+      this.on_save();
+    }
+
+    this._last_update = Math.max(...all_gamepads.map((x) => x.timestamp));
+  };
+
+  body() {
+    const widgets = this._paired.map((x) => {
+      if (x == null) {
+        return UI.h(
+          "div",
+          {
+            class:
+              "gamepad-choose-controller gamepad-choose-controller-inactive",
+          },
+          [
+            UI.h("div", { class: "gamepad-choose-controller-port" }, [
+              "(No controller paired)",
+            ]),
+          ]
+        );
+      } else {
+        return UI.h(
+          "div",
+          {
+            class: "gamepad-choose-controller",
+            "data-active": x.active != null,
+          },
+          [
+            UI.fa_icon(
+              "gamepad",
+              "2x",
+              "solid",
+              x.active != null ? "bounce" : null
+            ),
+            UI.h("div", { class: "gamepad-choose-controller-name" }, [
+              friendly_gamepad_id(x.id),
+            ]),
+          ]
+        );
+      }
+    });
+
+    return [
+      UI.h("div", { class: "gamepad-choose-settings" }, [
+        UI.h("div", { class: "gamepad-choose-message" }, [
+          "Press",
+          UI.icon("ltrigger"),
+          "or",
+          UI.icon("rtrigger"),
+          "on the gamepad to pair with Kate.",
+        ]),
+        UI.h(
+          "div",
+          { class: "gamepad-choose-message", style: "font-size: 1rem" },
+          [
+            "On the paired gamepad, hold",
+            UI.button_icon("dpad-right"),
+            "to save, or",
+            UI.button_icon("dpad-left"),
+            "to return without changes.",
+          ]
+        ),
+        UI.vspace(8),
+        UI.dynamic(
+          widgets.map<UI.Widgetable>((x) =>
+            UI.h("div", { class: "gamepad-choose-paired" }, [x])
+          )
+        ),
+      ]),
+    ];
+  }
+}
+
+/*
+export class GamepadInputSettings0 extends UI.SimpleScene {
   icon = "gamepad";
   title = ["Gamepad mappings"];
 
@@ -428,3 +678,4 @@ export class StandardGamepadMappingSettings extends UI.SimpleScene {
 function axis_to_offset(x: number) {
   return x * 30 + 50;
 }
+*/

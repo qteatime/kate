@@ -1,6 +1,6 @@
 import * as Db from "../../data";
 import type { Database } from "../../db-schema";
-import type { InputKey } from "../../kernel";
+import type { GamepadMapping, InputKey } from "../../kernel";
 import { EventStream } from "../../utils";
 
 export type PlayHabits = {
@@ -13,31 +13,13 @@ export type KeyboardToKate = {
   button: InputKey;
 };
 
-export type GamepadToKate = {
-  id: string;
-  layout: string;
-  button_mapping: GamepadButtonToKate[];
-  axis_mapping: GamepadAxisToKate[];
-};
-
-export type GamepadButtonToKate = {
-  id: number;
-  soft_press: InputKey[];
-  full_press: InputKey[];
-};
-
-export type GamepadAxisToKate = {
-  id: number;
-  soft_negative: InputKey[];
-  full_negative: InputKey[];
-  soft_positive: InputKey[];
-  full_positive: InputKey[];
-};
-
 export type Input = {
   haptic_feedback_for_virtual_button: boolean;
   keyboard_mapping: KeyboardToKate[];
-  gamepads: GamepadToKate[];
+  gamepad_mapping: {
+    standard: GamepadMapping[];
+  };
+  paired_gamepad: string | null;
 };
 
 export type UI = {
@@ -106,7 +88,73 @@ const defaults: SettingsData = {
         button: "rtrigger",
       },
     ],
-    gamepads: [],
+    gamepad_mapping: {
+      standard: [
+        {
+          type: "button",
+          index: 12,
+          pressed: "up",
+        },
+        {
+          type: "button",
+          index: 15,
+          pressed: "right",
+        },
+        {
+          type: "button",
+          index: 13,
+          pressed: "down",
+        },
+        {
+          type: "button",
+          index: 14,
+          pressed: "left",
+        },
+        {
+          type: "button",
+          index: 9,
+          pressed: "menu",
+        },
+        {
+          type: "button",
+          index: 8,
+          pressed: "capture",
+        },
+        {
+          type: "button",
+          index: 0,
+          pressed: "x",
+        },
+        {
+          type: "button",
+          index: 1,
+          pressed: "o",
+        },
+        {
+          type: "button",
+          index: 4,
+          pressed: "ltrigger",
+        },
+        {
+          type: "button",
+          index: 5,
+          pressed: "rtrigger",
+        },
+        {
+          type: "axis",
+          index: 0,
+          negative: "left",
+          positive: "right",
+        },
+        {
+          type: "axis",
+          index: 1,
+          negative: "up",
+          positive: "down",
+        },
+      ],
+    },
+    paired_gamepad: null,
   },
 };
 

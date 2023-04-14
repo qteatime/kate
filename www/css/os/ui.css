@@ -237,3 +237,14 @@
 .kate-ui-padded-container[data-padding="4x"] {
   padding: 4rem;
 }
+
+.kate-button-icon {
+  width: 1.25em;
+  height: 1.25em;
+  vertical-align: middle;
+}
+
+.kate-button-icon img {
+  width: 100%;
+  height: 100%;
+}

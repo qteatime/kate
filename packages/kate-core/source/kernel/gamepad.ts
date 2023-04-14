@@ -1,9 +1,25 @@
-import type { VirtualConsole } from "./virtual";
+import type { InputKey, VirtualConsole } from "./virtual";
+
+export type GamepadButtonToKate = {
+  type: "button";
+  index: number;
+  pressed: InputKey;
+};
+
+export type GamepadAxisToKate = {
+  type: "axis";
+  index: number;
+  negative: InputKey;
+  positive: InputKey;
+};
+
+export type GamepadMapping = GamepadButtonToKate | GamepadAxisToKate;
 
 export class GamepadInput {
   private attached = false;
-  private gamepad: LayoutedGamepad | null = null;
-  private layouts = [new StandardGamepad()];
+  private _paired: string | null = null;
+  private gamepad: GamepadAdaptor | null = null;
+  private mapping: GamepadMapping[] = [];
   private timer_id: any = null;
 
   constructor(private console: VirtualConsole) {}
@@ -15,65 +31,95 @@ export class GamepadInput {
     this.attached = true;
 
     window.addEventListener("gamepadconnected", (ev) => {
-      this.update_gamepad(ev.gamepad, true);
+      this.select_gamepad();
     });
 
     window.addEventListener("gamepaddisconnected", (ev) => {
-      this.update_gamepad(ev.gamepad, false);
+      this.select_gamepad();
     });
   }
 
-  pause(gamepad: Gamepad) {
-    if (this.gamepad?.is_same(gamepad)) {
-      this.gamepad.pause();
+  pair(id: string | null) {
+    this._paired = id;
+    this.select_gamepad();
+  }
+
+  unpair() {
+    this._paired = null;
+    this.select_gamepad();
+  }
+
+  private find_active_gamepad() {
+    const gamepads = navigator.getGamepads();
+    return gamepads
+      .flatMap((x) => (x == null || !x.connected ? [] : [x]))
+      .sort((a, b) => b.timestamp - a.timestamp)
+      .find((_) => true);
+  }
+
+  pause() {
+    this.gamepad?.pause();
+  }
+
+  unpause() {
+    this.gamepad?.unpause();
+  }
+
+  remap(mapping: GamepadMapping[]) {
+    this.mapping = mapping;
+    if (this.gamepad != null) {
+      this.gamepad.remap(mapping);
     }
   }
 
-  unpause(gamepad: Gamepad) {
-    if (this.gamepad?.is_same(gamepad)) {
-      this.gamepad.unpause();
-    }
-  }
-
-  update_gamepad(gamepad: Gamepad, connected: boolean) {
-    if (this.gamepad == null && connected) {
-      this.gamepad = this.get_layout(gamepad);
-    } else if (this.gamepad?.is_same(gamepad) && !connected) {
+  use_gamepad(gamepad: Gamepad | null) {
+    if (gamepad != null && gamepad.mapping === "standard") {
+      this.gamepad = new GamepadAdaptor(gamepad, this.mapping, this.console);
+      this.schedule_update();
+    } else {
       this.gamepad = null;
     }
+  }
 
+  select_gamepad() {
+    const gamepads = navigator.getGamepads();
+    if (this._paired != null) {
+      const gamepad = gamepads.find((x) => x?.id === this._paired) ?? null;
+      this.use_gamepad(gamepad);
+    } else {
+      const gamepad = this.find_active_gamepad() ?? null;
+      this.use_gamepad(gamepad);
+    }
+  }
+
+  schedule_update() {
     if (this.gamepad != null) {
       cancelAnimationFrame(this.timer_id);
       this.timer_id = requestAnimationFrame(this.update_virtual_state);
     }
   }
 
-  get_layout(gamepad: Gamepad): LayoutedGamepad | null {
-    const layout = this.layouts.find((x) => x.accepts(gamepad));
-    if (layout != null) {
-      return new LayoutedGamepad(gamepad, layout, this.console);
-    } else {
-      return null;
-    }
-  }
-
   update_virtual_state = (time: number) => {
     this.gamepad?.update_virtual_state(time);
-    this.timer_id = requestAnimationFrame(this.update_virtual_state);
+    this.schedule_update();
   };
 }
 
-class LayoutedGamepad {
-  private last_update: number | null = null;
+class GamepadAdaptor {
+  private _last_update: number | null = null;
   private _paused: boolean = false;
   constructor(
-    readonly raw_gamepad: Gamepad,
-    readonly layout: GamepadLayout,
+    readonly raw: Gamepad,
+    private mapping: GamepadMapping[],
     readonly console: VirtualConsole
   ) {}
 
   is_same(gamepad: Gamepad) {
-    return this.raw_gamepad.id === gamepad.id;
+    return this.raw.id === gamepad.id;
+  }
+
+  remap(mapping: GamepadMapping[]) {
+    this.mapping = mapping;
   }
 
   pause() {
@@ -85,12 +131,7 @@ class LayoutedGamepad {
   }
 
   private resolve_gamepad() {
-    const gamepad = navigator.getGamepads()[this.raw_gamepad.index] ?? null;
-    if (gamepad?.id !== this.raw_gamepad.id) {
-      return null;
-    } else {
-      return gamepad;
-    }
+    return navigator.getGamepads().find((x) => x?.id === this.raw.id) ?? null;
   }
 
   update_virtual_state(time: number) {
@@ -102,60 +143,41 @@ class LayoutedGamepad {
     if (g == null) {
       return;
     }
-    if (this.last_update != null && this.last_update > g.timestamp) {
+    if (this._last_update != null && this._last_update > g.timestamp) {
       return;
     }
 
-    this.last_update = time;
-    this.layout.update(this.console, g);
-  }
-}
+    this._last_update = time;
+    const changes = new Map<InputKey, boolean>();
+    const update_state = (key: InputKey, value: boolean) => {
+      changes.set(key, changes.get(key) || value);
+    };
 
-const enum Std {
-  UP = 12,
-  RIGHT = 15,
-  DOWN = 13,
-  LEFT = 14,
-  MENU = 9,
-  CAPTURE = 8,
-  X = 0,
-  O = 1,
-  L = 4,
-  R = 5,
-}
+    for (const mapping of this.mapping) {
+      switch (mapping.type) {
+        case "button": {
+          update_state(mapping.pressed, g.buttons[mapping.index].pressed);
+          break;
+        }
 
-interface GamepadLayout {
-  accepts(gamepad: Gamepad): boolean;
-  update(console: VirtualConsole, gamepad: Gamepad): void;
-}
-
-class StandardGamepad implements GamepadLayout {
-  accepts(gamepad: Gamepad) {
-    return gamepad.mapping === "standard";
-  }
-
-  update(console: VirtualConsole, g: Gamepad) {
-    console.update_virtual_key(
-      "up",
-      g.buttons[Std.UP].pressed || g.axes[1] < -0.5
-    );
-    console.update_virtual_key(
-      "right",
-      g.buttons[Std.RIGHT].pressed || g.axes[0] > 0.5
-    );
-    console.update_virtual_key(
-      "down",
-      g.buttons[Std.DOWN].pressed || g.axes[1] > 0.5
-    );
-    console.update_virtual_key(
-      "left",
-      g.buttons[Std.LEFT].pressed || g.axes[0] < -0.5
-    );
-    console.update_virtual_key("x", g.buttons[Std.X].pressed);
-    console.update_virtual_key("o", g.buttons[Std.O].pressed);
-    console.update_virtual_key("ltrigger", g.buttons[Std.L].pressed);
-    console.update_virtual_key("rtrigger", g.buttons[Std.R].pressed);
-    console.update_virtual_key("menu", g.buttons[Std.MENU].pressed);
-    console.update_virtual_key("capture", g.buttons[Std.CAPTURE].pressed);
+        case "axis": {
+          const axis = g.axes[mapping.index];
+          if (axis < -0.5) {
+            update_state(mapping.negative, true);
+            update_state(mapping.positive, false);
+          } else if (axis > 0.5) {
+            update_state(mapping.negative, false);
+            update_state(mapping.positive, true);
+          } else {
+            update_state(mapping.negative, false);
+            update_state(mapping.positive, false);
+          }
+          break;
+        }
+      }
+    }
+    for (const [key, change] of changes) {
+      this.console.update_virtual_key(key, change);
+    }
   }
 }

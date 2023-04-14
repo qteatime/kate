@@ -156,6 +156,8 @@ export class KateOS {
       os.handle_virtual_button_feedback
     );
     kernel.keyboard.remap(settings.get("input").keyboard_mapping);
+    kernel.gamepad.remap(settings.get("input").gamepad_mapping.standard);
+    kernel.gamepad.pair(settings.get("input").paired_gamepad);
     sfx.set_enabled(settings.get("ui").sound_feedback);
     os.set_os_animation(settings.get("ui").animation_effects);
 

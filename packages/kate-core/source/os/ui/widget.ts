@@ -380,6 +380,34 @@ export function icon(x: InputKey) {
   return new Icon(x);
 }
 
+export function button_icon(
+  x:
+    | "cancel"
+    | "capture"
+    | "dpad-down"
+    | "dpad-fill"
+    | "dpad-horizontal"
+    | "dpad-left"
+    | "dpad-lower"
+    | "dpad-right"
+    | "dpad-stroke"
+    | "dpad-up"
+    | "dpad-upper"
+    | "dpad-vertical"
+    | "l"
+    | "menu"
+    | "ok"
+    | "r"
+) {
+  if (!/^[a-z\-]+$/.test(x)) {
+    throw new Error(`Invalid name`);
+  }
+
+  return h("div", { class: "kate-button-icon", "data-icon": x }, [
+    h("img", { src: `img/buttons/${x}.png` }, []),
+  ]);
+}
+
 export function status_bar(children: Widgetable[]) {
   return h("div", { class: "kate-os-statusbar" }, [...children]);
 }
@@ -748,4 +776,25 @@ export function padded_container(
     { class: "kate-ui-padded-container", "data-padding": padding },
     [...children]
   );
+}
+
+export function dynamic(x: Observable<Widgetable>) {
+  let installed = false;
+
+  const canvas = document.createElement("div");
+  canvas.className = "kate-ui-dynamic";
+  append(x.value, canvas);
+
+  x.stream.listen((widget) => {
+    if (canvas.isConnected) {
+      installed = true;
+      canvas.textContent = "";
+      append(widget, canvas);
+    } else if (!installed) {
+      canvas.textContent = "";
+      append(widget, canvas);
+    }
+  });
+
+  return canvas;
 }
