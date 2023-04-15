@@ -26,4 +26,12 @@ export class KateKernel {
     gamepad.setup();
     return new KateKernel(console, keyboard, gamepad);
   }
+
+  enter_trusted_mode() {
+    this.console.body.classList.add("trusted-mode");
+  }
+
+  exit_trusted_mode() {
+    this.console.body.classList.remove("trusted-mode");
+  }
 }

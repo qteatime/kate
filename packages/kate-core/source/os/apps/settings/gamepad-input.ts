@@ -1,9 +1,15 @@
 import * as UI from "../../ui";
 import type { KateOS } from "../../os";
 import { ChangedSetting, SettingsData } from "../../apis/settings";
-import { Observable, clamp, enumerate, unreachable } from "../../../utils";
+import {
+  Deferred,
+  Observable,
+  clamp,
+  enumerate,
+  unreachable,
+} from "../../../utils";
 import { friendly_gamepad_id } from "../../../friendly/gamepad";
-import { GamepadButtonToKate, GamepadMapping } from "../../../kernel";
+import { GamepadButtonToKate, GamepadMapping, InputKey } from "../../../kernel";
 
 export class GamepadInputSettings extends UI.SimpleScene {
   icon = "gamepad";
@@ -510,7 +516,127 @@ export class RemapStandardSettings extends UI.SimpleScene {
     });
   }
 
-  remap(button: HTMLElement) {}
+  private button_index(button: HTMLElement) {
+    const index_string = button.getAttribute("data-index");
+    if (index_string != null && !isNaN(Number(index_string))) {
+      return Number(index_string);
+    } else {
+      return null;
+    }
+  }
+
+  private current_press_mapping(index: number) {
+    const buttons = this._mapping.flatMap((x) =>
+      x.type === "button" ? [x] : []
+    );
+    return buttons.find((x) => x.index === index) ?? null;
+  }
+
+  async remap(button: HTMLElement) {
+    const index = this.button_index(button);
+    if (index == null) {
+      return;
+    }
+
+    let pressed = new Observable<null | InputKey>(
+      this.current_press_mapping(index)?.pressed ?? null
+    );
+    const choose_pressed = (key: InputKey, title: string) => {
+      const active = pressed.value === key ? "active" : "";
+      return UI.interactive(
+        this.os,
+        UI.h("div", { class: `kate-key-button ${active}` }, [
+          UI.h("div", { class: "kate-key-button-icon" }, [UI.icon(key)]),
+          UI.h("div", { class: "kate-key-button-title" }, [title]),
+        ]),
+        [
+          {
+            key: ["o"],
+            on_click: true,
+            label: "Select",
+            handler: () => {
+              if (pressed.value !== key) {
+                pressed.value = key;
+              }
+            },
+          },
+        ],
+        {
+          focused: pressed.value === key,
+        }
+      );
+    };
+
+    const result: Deferred<boolean> = this.os.dialog.custom(
+      "kate:settings",
+      "gamepad-remap-dialog",
+      [
+        UI.h("div", { class: "gamepad-remap-dialog-contents" }, [
+          UI.p(["When pressed, map to the Kate button below:"]),
+          UI.dynamic(
+            pressed.map<UI.Widgetable>((key) => {
+              return UI.h("div", { class: "gamepad-remap-kate-buttons" }, [
+                choose_pressed("up", "Up"),
+                choose_pressed("right", "Right"),
+                choose_pressed("down", "Down"),
+                choose_pressed("left", "Left"),
+                choose_pressed("o", "Ok"),
+                choose_pressed("x", "Cancel"),
+                choose_pressed("ltrigger", "L"),
+                choose_pressed("rtrigger", "R"),
+                choose_pressed("menu", "Menu"),
+                choose_pressed("capture", "Capture"),
+              ]);
+            })
+          ),
+        ]),
+        UI.h("div", { class: "kate-hud-dialog-actions" }, [
+          UI.h(
+            "div",
+            { class: "kate-hud-dialog-action", "data-kind": "cancel" },
+            [
+              UI.button("Discard", {
+                on_clicked: () => {
+                  result.resolve(false);
+                },
+              }),
+            ]
+          ),
+          UI.h(
+            "div",
+            { class: "kate-hud-dialog-action", "data-kind": "primary" },
+            [
+              UI.button("Remap", {
+                on_clicked: () => {
+                  result.resolve(true);
+                },
+              }),
+            ]
+          ),
+        ]),
+      ],
+      false
+    );
+    if (await result.promise) {
+      if (pressed.value != null) {
+        this.remap_pressed(Number(index), pressed.value);
+      }
+      this.refresh();
+    }
+  }
+
+  remap_pressed(index: number, key: InputKey) {
+    const mapping = this._mapping.filter(
+      (x) => x.type !== "button" || x.index !== index
+    );
+    this._mapping = mapping.concat([
+      { type: "button", index: index, pressed: key },
+    ]);
+  }
+
+  refresh() {
+    this.mode.value = this.mode.value;
+  }
 }
 
 type PairedGamepad = {

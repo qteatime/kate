@@ -724,6 +724,7 @@ export function interactive(
     dangerous?: boolean;
     enabled?: Observable<boolean>;
     replace?: boolean;
+    focused?: boolean;
   }
 ) {
   const as_element = (child: Widgetable) => {
@@ -750,6 +751,10 @@ export function interactive(
 
   if (x?.dangerous === true) {
     element.setAttribute("data-dangerous", "dangerous");
+  }
+
+  if (x?.focused === true) {
+    element.classList.add("focus");
   }
 
   os.focus_handler.register_interactive(element, { handlers: interactions });

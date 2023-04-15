@@ -1,4 +1,4 @@
-import { defer } from "../../utils";
+import { Deferred, defer } from "../../utils";
 import type { ExtendedInputKey } from "../../kernel";
 import type { KateOS } from "../os";
 import { wait } from "../time";
@@ -57,6 +57,20 @@ export class KateDialog {
     process: (_: Progress) => Promise<void>
   ) {
     return await this.hud.progress(id, message, process);
+  }
+
+  custom<A>(
+    id: string,
+    className: string,
+    contents: UI.Widgetable[],
+    cancel_value: A
+  ): Deferred<A> {
+    return this.hud.custom(
+      id,
+      `kate-hud-dialog-custom ${className}`,
+      contents,
+      cancel_value
+    );
   }
 
   async pop_menu<A>(
@@ -159,13 +173,9 @@ export class HUD_Dialog extends Scene {
     }[],
     cancel_value: A
   ) {
-    const result = defer<A>();
-    const element = UI.h(
-      "div",
-      {
-        class: "kate-hud-dialog-message",
-        "data-trusted": String(this.is_trusted(id)),
-      },
+    const result: Deferred<A> = this.custom(
+      id,
+      "kate-hud-dialog-message",
       [
         UI.h("div", { class: "kate-hud-dialog-container" }, [
           UI.h("div", { class: "kate-hud-dialog-title" }, [title]),
@@ -187,21 +197,38 @@ export class HUD_Dialog extends Scene {
             }),
           ]),
         ]),
-      ]
+      ],
+      cancel_value
     );
-    element.addEventListener("click", (ev) => {
-      if (ev.target === element) {
+    return result.promise;
+  }
+
+  custom<A>(
+    id: string,
+    className: string,
+    content: UI.Widgetable[],
+    cancel_value: A
+  ) {
+    const result = defer<A>();
+    const dialog = UI.h(
+      "div",
+      {
+        class: `kate-hud-dialog-root ${className}`,
+        "data-trusted": String(this.is_trusted(id)),
+      },
+      [UI.h("div", { class: "kate-hud-dialog-container" }, [...content])]
+    );
+    dialog.addEventListener("click", (ev) => {
+      if (ev.target === dialog) {
         result.resolve(cancel_value);
       }
     });
-
-    let return_value;
     if (this.is_trusted(id)) {
-      this.os.kernel.console.body.classList.add("trusted-mode");
+      this.os.kernel.enter_trusted_mode();
     }
     try {
       this.canvas.textContent = "";
-      this.canvas.appendChild(element);
+      this.canvas.appendChild(dialog);
       const key_handler = (x: {
         key: ExtendedInputKey;
         is_repeat: boolean;
@@ -214,18 +241,20 @@ export class HUD_Dialog extends Scene {
       };
       this.os.focus_handler.push_root(this.canvas);
       this.os.focus_handler.listen(this.canvas, key_handler);
-      return_value = await result.promise;
-      this.os.focus_handler.pop_root(this.canvas);
-      this.os.focus_handler.remove(this.canvas, key_handler);
-      setTimeout(async () => {
-        element.classList.add("leaving");
-        await wait(this.FADE_OUT_TIME_MS);
-        element.remove();
+      result.promise.finally(() => {
+        this.os.kernel.exit_trusted_mode();
+        this.os.focus_handler.pop_root(this.canvas);
+        this.os.focus_handler.remove(this.canvas, key_handler);
+        setTimeout(async () => {
+          dialog.classList.add("leaving");
+          await wait(this.FADE_OUT_TIME_MS);
+          dialog.remove();
+        });
       });
-    } finally {
-      this.os.kernel.console.body.classList.remove("trusted-mode");
+    } catch (_) {
+      this.os.kernel.exit_trusted_mode();
     }
-    return return_value;
+    return result;
   }
 
   async pop_menu<A>(
@@ -234,13 +263,9 @@ export class HUD_Dialog extends Scene {
     buttons: { label: string; value: A }[],
     cancel_value: A
   ) {
-    const result = defer<A>();
-    const element = UI.h(
-      "div",
-      {
-        class: "kate-hud-dialog-pop-menu",
-        "data-trusted": String(this.is_trusted(id)),
-      },
+    const result: Deferred<A> = this.custom(
+      id,
+      "kate-hud-dialog-pop-menu",
       [
         UI.h("div", { class: "kate-hud-dialog-pop-menu-container" }, [
           UI.h("div", { class: "kate-hud-dialog-pop-menu-title" }, [heading]),
@@ -260,44 +285,9 @@ export class HUD_Dialog extends Scene {
             }),
           ]),
         ]),
-      ]
+      ],
+      cancel_value
     );
-    element.addEventListener("click", (ev) => {
-      if (ev.target === element) {
-        result.resolve(cancel_value);
-      }
-    });
-
-    let return_value;
-    if (this.is_trusted(id)) {
-      this.os.kernel.console.body.classList.add("trusted-mode");
-    }
-    try {
-      this.canvas.textContent = "";
-      this.canvas.appendChild(element);
-      const key_handler = (x: {
-        key: ExtendedInputKey;
-        is_repeat: boolean;
-      }) => {
-        if (x.key === "x" && !x.is_repeat) {
-          result.resolve(cancel_value);
-          return true;
-        }
-        return false;
-      };
-      this.os.focus_handler.push_root(this.canvas);
-      this.os.focus_handler.listen(this.canvas, key_handler);
-      return_value = await result.promise;
-      this.os.focus_handler.pop_root(this.canvas);
-      this.os.focus_handler.remove(this.canvas, key_handler);
-      setTimeout(async () => {
-        element.classList.add("leaving");
-        await wait(this.FADE_OUT_TIME_MS);
-        element.remove();
-      });
-    } finally {
-      this.os.kernel.console.body.classList.remove("trusted-mode");
-    }
-    return return_value;
+    return result.promise;
   }
 }

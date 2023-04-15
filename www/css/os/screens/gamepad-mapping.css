@@ -71,3 +71,58 @@
   width: 100%;
   position: relative;
 }
+
+.gamepad-remap-dialog .kate-hud-dialog-container {
+  width: 700px;
+  min-width: unset;
+  max-width: unset;
+}
+
+.gamepad-remap-dialog-contents {
+  padding: 1rem;
+}
+
+.gamepad-remap-kate-buttons {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.kate-key-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  overflow: hidden;
+}
+
+.kate-key-button:not(.active) {
+  opacity: 0.5;
+}
+
+.kate-key-button.active {
+  outline: 2px solid var(--color-border-d1);
+  font-weight: bold;
+}
+
+.kate-key-button.focus {
+  outline: 2px solid var(--color-primary);
+}
+
+.kate-key-button-title {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 14px;
+  height: 20px;
+  line-height: 20px;
+}
+
+.kate-key-button-icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 20px;
+  flex-grow: 1;
+}
