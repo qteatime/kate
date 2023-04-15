@@ -177,25 +177,23 @@ export class HUD_Dialog extends Scene {
       id,
       "kate-hud-dialog-message",
       [
-        UI.h("div", { class: "kate-hud-dialog-container" }, [
-          UI.h("div", { class: "kate-hud-dialog-title" }, [title]),
-          UI.h("div", { class: "kate-hud-dialog-text" }, [message]),
-          UI.h("div", { class: "kate-hud-dialog-actions" }, [
-            ...buttons.map((x) => {
-              return UI.h(
-                "div",
-                {
-                  class: "kate-hud-dialog-action",
-                  "data-kind": x.kind ?? "cancel",
-                },
-                [
-                  new UI.Button([x.label]).on_clicked(() =>
-                    result.resolve(x.value)
-                  ),
-                ]
-              );
-            }),
-          ]),
+        UI.h("div", { class: "kate-hud-dialog-title" }, [title]),
+        UI.h("div", { class: "kate-hud-dialog-text" }, [message]),
+        UI.h("div", { class: "kate-hud-dialog-actions" }, [
+          ...buttons.map((x) => {
+            return UI.h(
+              "div",
+              {
+                class: "kate-hud-dialog-action",
+                "data-kind": x.kind ?? "cancel",
+              },
+              [
+                new UI.Button([x.label]).on_clicked(() =>
+                  result.resolve(x.value)
+                ),
+              ]
+            );
+          }),
         ]),
       ],
       cancel_value
