@@ -9,8 +9,8 @@ export type GamepadButtonToKate = {
 export type GamepadAxisToKate = {
   type: "axis";
   index: number;
-  negative: InputKey;
-  positive: InputKey;
+  negative: InputKey | null;
+  positive: InputKey | null;
 };
 
 export type GamepadMapping = GamepadButtonToKate | GamepadAxisToKate;
@@ -160,8 +160,10 @@ class GamepadAdaptor {
 
     this._last_update = time;
     const changes = new Map<InputKey, boolean>();
-    const update_state = (key: InputKey, value: boolean) => {
-      changes.set(key, changes.get(key) || value);
+    const update_state = (key: InputKey | null, value: boolean) => {
+      if (key != null) {
+        changes.set(key, changes.get(key) || value);
+      }
     };
 
     for (const mapping of this.mapping) {

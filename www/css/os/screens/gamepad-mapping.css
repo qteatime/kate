@@ -149,3 +149,48 @@
   display: flex;
   gap: 0.5rem;
 }
+
+.standard-gamepad-joystick-up {
+  position: absolute;
+  top: 0px;
+  left: 50%;
+  translate: -50% 0;
+  width: 30px;
+  height: 30px;
+}
+
+.standard-gamepad-joystick-down {
+  position: absolute;
+  bottom: 0px;
+  left: 50%;
+  translate: -50% 0;
+  width: 30px;
+  height: 30px;
+}
+
+.standard-gamepad-joystick-left {
+  position: absolute;
+  left: 0px;
+  top: 50%;
+  translate: 0 -50%;
+  width: 30px;
+  height: 30px;
+}
+
+.standard-gamepad-joystick-right {
+  position: absolute;
+  right: 0px;
+  top: 50%;
+  translate: 0 -50%;
+  width: 30px;
+  height: 30px;
+}
+
+.standard-gamepad-joystick-press {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  translate: -50% -50%;
+  width: 30px;
+  height: 30px;
+}
