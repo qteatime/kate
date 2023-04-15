@@ -228,12 +228,12 @@ export class KateFocusHandler {
     }
   };
 
-  refocus() {
+  refocus(container?: HTMLElement) {
     if (this.current_focus != null || this._current_root == null) {
       return;
     }
 
-    const root = this._current_root;
+    const root = container ?? this._current_root;
     const candidates0 = Array.from(
       root.querySelectorAll(".kate-ui-focus-target")
     ) as HTMLElement[];

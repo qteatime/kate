@@ -411,6 +411,7 @@ type ConfigMode = {
 
 export class RemapStandardSettings extends UI.SimpleScene {
   private mode = new Observable<ConfigMode>(config_modes[0]);
+  private updated = new Observable<boolean>(false);
   private _mapping: GamepadMapping[];
 
   constructor(os: KateOS) {
@@ -475,44 +476,86 @@ export class RemapStandardSettings extends UI.SimpleScene {
     return button;
   }
 
+  annotated_layout() {
+    return UI.dynamic(
+      this.mode.map<UI.Widgetable>((mode) => {
+        return standard_frame((index, button) => {
+          if (mode.active.includes(index)) {
+            return UI.interactive(
+              this.os,
+              this.fill_button(button as HTMLElement),
+              [
+                {
+                  key: ["o"],
+                  label: "Remap",
+                  on_click: true,
+                  handler: () => this.remap(button as HTMLElement),
+                },
+              ],
+              {
+                replace: true,
+                default_focus_indicator: false,
+              }
+            );
+          } else {
+            (button as HTMLElement).classList.add("inactive");
+            return this.fill_button(button as HTMLElement);
+          }
+        });
+      })
+    );
+  }
+
+  body_container(body: UI.Widgetable[]): HTMLElement {
+    return UI.h(
+      "div",
+      {
+        class:
+          "gamepad-settings-remap-container kate-os-content kate-os-screen-body",
+      },
+      [...body]
+    );
+  }
+
   body() {
     return [
-      UI.h("div", { class: "gamepad-settings-remap-container" }, [
-        UI.dynamic(
-          this.mode.map<UI.Widgetable>((mode) => {
-            return standard_frame((index, button) => {
-              if (mode.active.includes(index)) {
-                return UI.interactive(
-                  this.os,
-                  this.fill_button(button as HTMLElement),
-                  [
-                    {
-                      key: ["o"],
-                      label: "Remap",
-                      on_click: true,
-                      handler: () => this.remap(button as HTMLElement),
-                    },
-                  ],
-                  {
-                    replace: true,
-                    default_focus_indicator: false,
-                  }
-                );
-              } else {
-                (button as HTMLElement).classList.add("inactive");
-                return this.fill_button(button as HTMLElement);
-              }
-            });
-          })
-        ),
+      UI.h("div", { class: "gamepad-settings-remap-frame" }, [
+        this.annotated_layout(),
+      ]),
+      UI.h("div", { class: "gamepad-settings-remap-actions" }, [
+        UI.text_button(this.os, "Save", {
+          primary: true,
+          on_click: this.on_save,
+          enabled: this.updated,
+        }),
+        UI.text_button(this.os, "Cancel", {
+          on_click: this.on_return,
+        }),
       ]),
     ];
   }
 
+  on_save = async () => {
+    await this.os.settings.update("input", (x) => {
+      const mapping = { ...x.gamepad_mapping, standard: this._mapping };
+      return { ...x, gamepad_mapping: mapping };
+    });
+    await this.os.notifications.log(
+      "kate:settings",
+      "Updated standard gamepad mapping",
+      JSON.stringify(this._mapping)
+    );
+    this.os.kernel.gamepad.remap(this._mapping);
+    this.os.pop_scene();
+  };
+
   on_attached(): void {
     super.on_attached();
+    const frame = this.canvas.querySelector(
+      ".gamepad-settings-remap-frame"
+    ) as HTMLElement;
     this.mode.stream.listen(() => {
-      this.os.focus_handler.refocus();
+      this.os.focus_handler.refocus(frame);
     });
   }
 
@@ -621,6 +664,7 @@ export class RemapStandardSettings extends UI.SimpleScene {
       if (pressed.value != null) {
         this.remap_pressed(Number(index), pressed.value);
       }
+      this.updated.value = true;
       this.refresh();
     }
   }

@@ -126,3 +126,26 @@
   font-size: 20px;
   flex-grow: 1;
 }
+
+.gamepad-settings-remap-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 100%;
+}
+
+.gamepad-settings-remap-frame {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-grow: 1;
+}
+
+.gamepad-settings-remap-actions {
+  padding: 1rem;
+  border-left: 1px solid var(--color-border-d1);
+  height: 100%;
+  flex-direction: column-reverse;
+  display: flex;
+  gap: 0.5rem;
+}
