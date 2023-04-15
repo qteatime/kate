@@ -451,7 +451,7 @@ export class RemapStandardSettings extends UI.SimpleScene {
     {
       key: ["x"],
       label: "Return",
-      handler: this.on_return,
+      handler: () => this.on_return(),
     },
     {
       key: ["ltrigger"],
@@ -654,11 +654,39 @@ export class RemapStandardSettings extends UI.SimpleScene {
           enabled: this.updated,
         }),
         UI.text_button(this.os, "Cancel", {
-          on_click: this.on_return,
+          on_click: () => this.on_return(),
+        }),
+        UI.text_button(this.os, "Defaults", {
+          on_click: this.revert_defaults,
         }),
       ]),
     ];
   }
+
+  revert_defaults = async () => {
+    this._mapping =
+      this.os.settings.defaults.input.gamepad_mapping.standard.slice();
+    this.updated.value = true;
+    this.refresh();
+  };
+
+  on_return = async () => {
+    if (this.updated.value) {
+      const discard_confirm = await this.os.dialog.confirm("kate:settings", {
+        title: "Discard changes?",
+        message:
+          "The changes made to the gamepad mapping have not been saved. Discard changes and leave the screen?",
+        cancel: "Review changes",
+        ok: "Discard changes",
+        dangerous: true,
+      });
+      if (discard_confirm) {
+        this.os.pop_scene();
+      }
+    } else {
+      this.os.pop_scene();
+    }
+  };
 
   on_save = async () => {
     await this.os.settings.update("input", (x) => {
@@ -691,13 +719,6 @@ export class RemapStandardSettings extends UI.SimpleScene {
     } else {
       return null;
     }
-  }
-
-  private current_press_mapping(index: number) {
-    const buttons = this._mapping.flatMap((x) =>
-      x.type === "button" ? [x] : []
-    );
-    return buttons.find((x) => x.index === index) ?? null;
   }
 
   async ask_remap_axis(

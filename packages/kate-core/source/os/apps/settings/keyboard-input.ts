@@ -117,28 +117,60 @@ export class KeyboardInputSettings extends UI.SimpleScene {
         UI.text_button(this.os, "Save", {
           primary: true,
           on_click: async () => {
-            await this.os.settings.update("input", (x) => {
-              return { ...x, keyboard_mapping: this._mapping };
-            });
-            await this.os.notifications.log(
-              "kate:settings",
-              "Updated keyboard mapping",
-              JSON.stringify(this._mapping)
-            );
-            this.os.kernel.keyboard.remap(this._mapping);
-            this.os.pop_scene();
+            this.on_save();
           },
           enabled: this._changed,
         }),
         UI.text_button(this.os, "Cancel", {
           on_click: async () => {
-            this.os.pop_scene();
+            this.on_return();
           },
           enabled: this._wait_key.map((x) => !x),
+        }),
+        UI.text_button(this.os, "Defaults", {
+          on_click: async () => {
+            this.revert_defaults();
+          },
         }),
       ]),
     ];
   }
+
+  revert_defaults() {
+    this._mapping = this.os.settings.defaults.input.keyboard_mapping.slice();
+    const keys: InputKey[] = [
+      "up",
+      "right",
+      "down",
+      "left",
+      "ltrigger",
+      "rtrigger",
+      "x",
+      "o",
+      "menu",
+      "capture",
+    ];
+    for (const key of keys) {
+      this.update_key_mapping(key, null);
+    }
+    for (const entry of this._mapping) {
+      this.update_key_mapping(entry.button, entry.key);
+    }
+    this._changed.value = true;
+  }
+
+  on_save = async () => {
+    await this.os.settings.update("input", (x) => {
+      return { ...x, keyboard_mapping: this._mapping };
+    });
+    await this.os.notifications.log(
+      "kate:settings",
+      "Updated keyboard mapping",
+      JSON.stringify(this._mapping)
+    );
+    this.os.kernel.keyboard.remap(this._mapping);
+    this.os.pop_scene();
+  };
 
   keymap(key: InputKey) {
     const kbd = this._mapping.find((x) => x.button === key);
