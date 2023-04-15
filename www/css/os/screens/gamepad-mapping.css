@@ -73,7 +73,7 @@
 }
 
 .gamepad-remap-dialog .kate-hud-dialog-container {
-  width: 700px;
+  width: 720px;
   min-width: unset;
   max-width: unset;
 }
@@ -86,6 +86,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  margin-top: 1rem;
 }
 
 .kate-key-button {

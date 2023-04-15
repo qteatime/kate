@@ -741,6 +741,9 @@ export class RemapStandardSettings extends UI.SimpleScene {
         ? current_haxis?.positive
         : null) ?? null;
     const new_key = await this.remap(message, current);
+    if (new_key === false) {
+      return;
+    }
     if (new_key !== current) {
       switch (direction) {
         case "left":
@@ -777,6 +780,9 @@ export class RemapStandardSettings extends UI.SimpleScene {
         `When button ${index} is pressed`,
         current?.pressed ?? null
       );
+      if (key === false) {
+        return;
+      }
       if (key !== current) {
         const mapping = this._mapping.filter(
           (x) => x.type !== "button" || x.index !== index
@@ -792,12 +798,14 @@ export class RemapStandardSettings extends UI.SimpleScene {
 
   async remap(title: string, current: InputKey | null) {
     let pressed = new Observable<null | InputKey>(current);
-    const choose_pressed = (key: InputKey, title: string) => {
+    const choose_pressed = (key: InputKey | null, title: string) => {
       const active = pressed.value === key ? "active" : "";
       return UI.interactive(
         this.os,
         UI.h("div", { class: `kate-key-button ${active}` }, [
-          UI.h("div", { class: "kate-key-button-icon" }, [UI.icon(key)]),
+          UI.h("div", { class: "kate-key-button-icon" }, [
+            key == null ? null : UI.icon(key),
+          ]),
           UI.h("div", { class: "kate-key-button-title" }, [title]),
         ]),
         [
@@ -837,6 +845,7 @@ export class RemapStandardSettings extends UI.SimpleScene {
                 choose_pressed("rtrigger", "R"),
                 choose_pressed("menu", "Menu"),
                 choose_pressed("capture", "Capture"),
+                choose_pressed(null, "None"),
               ]);
             })
           ),
@@ -872,7 +881,7 @@ export class RemapStandardSettings extends UI.SimpleScene {
       if (remap) {
         return pressed.value;
       } else {
-        return null;
+        return false;
       }
     });
   }
