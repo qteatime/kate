@@ -593,7 +593,7 @@ export function legible_bg(children: Widgetable[]) {
 export function link_card(
   os: KateOS,
   x: {
-    icon: string;
+    icon?: string;
     arrow?: string;
     title: Widgetable;
     description?: Widgetable;
@@ -604,7 +604,9 @@ export function link_card(
     "div",
     { class: "kate-ui-link-card kate-ui-focus-target" },
     [
-      h("div", { class: "kate-ui-link-card-icon" }, [fa_icon(x.icon, "2x")]),
+      h("div", { class: "kate-ui-link-card-icon" }, [
+        x.icon ? fa_icon(x.icon, "2x") : null,
+      ]),
       h("div", { class: "kate-ui-link-card-text" }, [
         h("div", { class: "kate-ui-link-card-title" }, [x.title]),
         h("div", { class: "kate-ui-link-card-description" }, [
@@ -776,6 +778,10 @@ export function padded_container(
     { class: "kate-ui-padded-container", "data-padding": padding },
     [...children]
   );
+}
+
+export function centered_container(child: Widgetable) {
+  return h("div", { class: "kate-ui-centered-container" }, [child]);
 }
 
 export function dynamic(x: Observable<Widgetable>) {

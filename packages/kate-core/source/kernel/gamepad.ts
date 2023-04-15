@@ -39,6 +39,10 @@ export class GamepadInput {
     });
   }
 
+  get current() {
+    return this.gamepad;
+  }
+
   pair(id: string | null) {
     this._paired = id;
     this.select_gamepad();
@@ -109,13 +113,18 @@ class GamepadAdaptor {
   private _last_update: number | null = null;
   private _paused: boolean = false;
   constructor(
-    readonly raw: Gamepad,
+    private _raw_static: Gamepad,
     private mapping: GamepadMapping[],
     readonly console: VirtualConsole
   ) {}
 
   is_same(gamepad: Gamepad) {
-    return this.raw.id === gamepad.id;
+    return this._raw_static.id === gamepad.id;
+  }
+
+  get raw() {
+    const gamepads = navigator.getGamepads();
+    return gamepads.find((x) => x?.id === this._raw_static.id) ?? null;
   }
 
   remap(mapping: GamepadMapping[]) {
@@ -131,7 +140,9 @@ class GamepadAdaptor {
   }
 
   private resolve_gamepad() {
-    return navigator.getGamepads().find((x) => x?.id === this.raw.id) ?? null;
+    return (
+      navigator.getGamepads().find((x) => x?.id === this._raw_static.id) ?? null
+    );
   }
 
   update_virtual_state(time: number) {

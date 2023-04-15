@@ -113,7 +113,7 @@
   outline-offset: 1px;
 }
 
-.kate-ui-link-card-icon {
+.kate-ui-link-card-icon:not(:empty) {
   width: 64px;
   display: flex;
   justify-content: center;
@@ -212,6 +212,12 @@
   margin: 1.5em 0;
   height: 1px;
   background: var(--color-border);
+}
+
+.kate-ui-centered-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .kate-ui-padded-container[data-padding="s"] {

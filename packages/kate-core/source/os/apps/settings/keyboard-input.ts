@@ -272,10 +272,6 @@ export class KeyboardInputSettings extends UI.SimpleScene {
     });
     return result;
   }
-
-  on_attached(): void {
-    super.on_attached();
-  }
 }
 
 export async function friendly_kbd(x: string | null) {

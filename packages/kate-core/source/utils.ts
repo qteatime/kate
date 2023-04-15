@@ -11,3 +11,4 @@ export * as TC from "../../util/build/type-check";
 export * from "../../util/build/unit";
 export * as Sets from "../../util/build/sets";
 export * from "../../util/build/observable";
+export * from "../../util/build/iterable";

@@ -1,0 +1,42 @@
+.kate-gamepad-mapping {
+  height: 100%;
+  overflow: clip;
+}
+
+.kate-gamepad-mapping-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 100%;
+}
+
+.kate-gamepad-layout-container {
+  position: relative;
+  flex-grow: 1;
+  height: 100%;
+}
+
+.kate-gamepad-mapping-actions {
+  height: 100%;
+  border-left: 1px solid var(--color-border-d1);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 1rem;
+}
+
+.kate-gamepad-layout-frame {
+  position: absolute;
+  translate: -50% -50%;
+  top: 50%;
+  left: 50%;
+  transform-origin: 0 0;
+}
+
+.kate-gamepad-layout-map {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+}

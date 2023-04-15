@@ -1,7 +1,7 @@
 import * as UI from "../../ui";
 import type { KateOS } from "../../os";
 import { ChangedSetting, SettingsData } from "../../apis/settings";
-import { Observable } from "../../../utils";
+import { Observable, enumerate, unreachable } from "../../../utils";
 import { friendly_gamepad_id } from "../../../friendly/gamepad";
 
 export class GamepadInputSettings extends UI.SimpleScene {
@@ -11,18 +11,23 @@ export class GamepadInputSettings extends UI.SimpleScene {
   body() {
     return [
       UI.link_card(this.os, {
-        icon: "wrench",
+        title: "Test gamepad input",
+        description: "Check how Kate reads your gamepad buttons",
+        on_click: () => {
+          this.os.push_scene(new TestStandardMappingSettings(this.os));
+        },
+      }),
+      UI.link_card(this.os, {
         title: "Configure standard mapping",
         description: "Change button configuration for standard gamepads",
         on_click: () => {
-          this.os.push_scene(new GamepadStandardMappingSettings(this.os));
+          this.os.push_scene(new TestStandardMappingSettings(this.os));
         },
       }),
       UI.vspace(6),
       UI.link_card(this.os, {
-        icon: "gamepad",
         title: "Change active gamepad",
-        description: "Choose which connected gamepad will control Kate.",
+        description: "Choose which connected gamepad will control Kate",
         on_click: () => {
           this.os.push_scene(new ChooseActiveGamepadSettings(this.os));
         },
@@ -31,13 +36,282 @@ export class GamepadInputSettings extends UI.SimpleScene {
   }
 }
 
-export class GamepadStandardMappingSettings extends UI.SimpleScene {
-  icon = "wrench";
-  title = ["Change standard mapping"];
+export class TestStandardMappingSettings extends UI.SimpleScene {
+  icon = "gamepad";
+  title = ["Test input"];
+  subtitle = "Hold any button to exit";
+
+  private _buttons = new Map<number, HTMLElement>();
+  private _haxes = new Map<number, HTMLElement>();
+  private _vaxes = new Map<number, HTMLElement>();
+  private _last_update: number | null = null;
+  private _pressed = new Map<number, number | null>();
 
   body() {
-    return [];
+    return [UI.centered_container(standard_frame())];
   }
+
+  on_attached(): void {
+    this.os.kernel.console.on_tick.listen(this.update_gamepad_status);
+    this.os.kernel.gamepad.pause();
+    this.index_buttons();
+    super.on_attached();
+  }
+
+  on_detached(): void {
+    super.on_detached();
+    this.os.kernel.gamepad.unpause();
+    this.os.kernel.console.on_tick.remove(this.update_gamepad_status);
+  }
+
+  index_buttons = () => {
+    this._buttons = new Map();
+    for (const button of Array.from(
+      this.canvas.querySelectorAll("div[data-index]")
+    )) {
+      this._buttons.set(
+        Number(button.getAttribute("data-index")),
+        button as HTMLElement
+      );
+    }
+    this._haxes = new Map();
+    for (const axes of Array.from(
+      this.canvas.querySelectorAll("div[data-axis-h]")
+    )) {
+      this._haxes.set(
+        Number(axes.getAttribute("data-axis-h")),
+        axes as HTMLElement
+      );
+    }
+    this._vaxes = new Map();
+    for (const axes of Array.from(
+      this.canvas.querySelectorAll("div[data-axis-v]")
+    )) {
+      this._vaxes.set(
+        Number(axes.getAttribute("data-axis-v")),
+        axes as HTMLElement
+      );
+    }
+  };
+
+  update_gamepad_status = (time: number) => {
+    const gamepad = this.os.kernel.gamepad.current?.raw;
+    if (gamepad == null) {
+      return;
+    }
+    for (const [index, button] of enumerate(gamepad.buttons)) {
+      if (!button.pressed) {
+        this._pressed.set(index, null);
+      } else {
+        const previous = this._pressed.get(index) ?? time;
+        this._pressed.set(index, previous);
+        if (time - previous > 1_000) {
+          this._pressed = new Map();
+          this.os.pop_scene();
+          return;
+        }
+      }
+    }
+
+    if (this._last_update != null && gamepad.timestamp < this._last_update) {
+      return;
+    }
+    for (const [key, button] of this._buttons) {
+      button.classList.toggle("active", gamepad.buttons[key].pressed);
+    }
+    for (const [key, stick] of this._haxes) {
+      stick.style.left = `${axis_to_offset(gamepad.axes[key])}%`;
+    }
+    for (const [key, stick] of this._vaxes) {
+      stick.style.top = `${axis_to_offset(gamepad.axes[key])}%`;
+    }
+    this._last_update = gamepad.timestamp;
+  };
+
+  on_cancel = () => {
+    this.os.pop_scene();
+  };
+
+  on_save = () => {};
+}
+
+function axis_to_offset(x: number) {
+  return x * 30 + 50;
+}
+
+function standard_frame() {
+  return UI.h("div", { class: "standard-gamepad-frame" }, [
+    UI.h("div", { class: "standard-gamepad-left standard-gamepad-cluster" }, [
+      UI.h(
+        "div",
+        {
+          class: "standard-gamepad-button1 standard-gamepad-button",
+          "data-index": "12",
+        },
+        []
+      ),
+      UI.h(
+        "div",
+        {
+          class: "standard-gamepad-button2 standard-gamepad-button",
+          "data-index": "15",
+        },
+        []
+      ),
+      UI.h(
+        "div",
+        {
+          class: "standard-gamepad-button3 standard-gamepad-button",
+          "data-index": "13",
+        },
+        []
+      ),
+      UI.h(
+        "div",
+        {
+          class: "standard-gamepad-button4 standard-gamepad-button",
+          "data-index": "14",
+        },
+        []
+      ),
+    ]),
+    UI.h("div", { class: "standard-gamepad-right standard-gamepad-cluster" }, [
+      UI.h(
+        "div",
+        {
+          class: "standard-gamepad-button1 standard-gamepad-button",
+          "data-index": "3",
+        },
+        []
+      ),
+      UI.h(
+        "div",
+        {
+          class: "standard-gamepad-button2 standard-gamepad-button",
+          "data-index": "1",
+        },
+        []
+      ),
+      UI.h(
+        "div",
+        {
+          class: "standard-gamepad-button3 standard-gamepad-button",
+          "data-index": "0",
+        },
+        []
+      ),
+      UI.h(
+        "div",
+        {
+          class: "standard-gamepad-button4 standard-gamepad-button",
+          "data-index": "2",
+        },
+        []
+      ),
+    ]),
+    UI.h(
+      "div",
+      {
+        class: "standard-gamepad-special standard-gamepad-special-left",
+        "data-index": "8",
+      },
+      []
+    ),
+    UI.h(
+      "div",
+      {
+        class: "standard-gamepad-special standard-gamepad-special-center",
+        "data-index": "16",
+      },
+      []
+    ),
+    UI.h(
+      "div",
+      {
+        class: "standard-gamepad-special standard-gamepad-special-right",
+        "data-index": "9",
+      },
+      []
+    ),
+    UI.h("div", { class: "standard-gamepad-axes standard-gamepad-axes-left" }, [
+      UI.h(
+        "div",
+        {
+          class: "standard-gamepad-joystick",
+          "data-axis-h": "0",
+          "data-axis-v": "1",
+          "data-index": "10",
+        },
+        []
+      ),
+    ]),
+    UI.h(
+      "div",
+      { class: "standard-gamepad-axes standard-gamepad-axes-right" },
+      [
+        UI.h(
+          "div",
+          {
+            class: "standard-gamepad-joystick",
+            "data-axis-h": "2",
+            "data-axis-v": "3",
+            "data-index": "11",
+          },
+          []
+        ),
+      ]
+    ),
+    UI.h(
+      "div",
+      { class: "standard-gamepad-shoulder standard-gamepad-shoulder-left" },
+      [
+        UI.h(
+          "div",
+          {
+            class:
+              "standard-gamepad-shoulder-button standard-gamepad-shoulder-button1",
+            "data-index": "6",
+          },
+          []
+        ),
+        UI.h(
+          "div",
+          {
+            class:
+              "standard-gamepad-shoulder-button standard-gamepad-shoulder-button2",
+            "data-index": "4",
+          },
+          []
+        ),
+      ]
+    ),
+    UI.h(
+      "div",
+      {
+        class: "standard-gamepad-shoulder standard-gamepad-shoulder-right",
+      },
+      [
+        UI.h(
+          "div",
+          {
+            class:
+              "standard-gamepad-shoulder-button standard-gamepad-shoulder-button1",
+            "data-index": "7",
+          },
+          []
+        ),
+        UI.h(
+          "div",
+          {
+            class:
+              "standard-gamepad-shoulder-button standard-gamepad-shoulder-button2",
+            "data-index": "5",
+          },
+          []
+        ),
+      ]
+    ),
+  ]);
 }
 
 type PairedGamepad = {
@@ -98,6 +372,7 @@ export class ChooseActiveGamepadSettings extends UI.SimpleScene {
   }
 
   on_attached(): void {
+    super.on_attached();
     this.os.kernel.console.on_tick.listen(this.update_gamepads);
     this.os.kernel.gamepad.pause();
   }
@@ -105,6 +380,7 @@ export class ChooseActiveGamepadSettings extends UI.SimpleScene {
   on_detached(): void {
     this.os.kernel.console.on_tick.remove(this.update_gamepads);
     this.os.kernel.gamepad.unpause();
+    super.on_detached();
   }
 
   update_gamepads = (time: number) => {
