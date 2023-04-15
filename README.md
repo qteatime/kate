@@ -98,7 +98,7 @@ Planned features:
   - Networking API (http, p2p);
   - Badges/achievements API;
 - **KateOS improvements**
-  - Reconfiguring keybindings;
+  - ~~Reconfiguring keybindings;~~
   - ~~Tracking play times locally;~~
   - Game collections and filtering;
   - Support for game booklets and OSTs;
