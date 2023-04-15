@@ -723,11 +723,26 @@ export function interactive(
     default_focus_indicator?: boolean;
     dangerous?: boolean;
     enabled?: Observable<boolean>;
+    replace?: boolean;
   }
 ) {
-  const element = document.createElement("div");
-  element.className = "kate-ui-interactive kate-ui-focus-target";
-  append(child, element);
+  const as_element = (child: Widgetable) => {
+    if (!(child instanceof HTMLElement)) {
+      throw new Error("invalid element for interactive");
+    }
+    return child;
+  };
+
+  let element: HTMLElement;
+  if (x?.replace) {
+    element = as_element(child);
+    element.classList.add("kate-ui-interactive");
+    element.classList.add("kate-ui-focus-target");
+  } else {
+    element = document.createElement("div");
+    element.className = "kate-ui-interactive kate-ui-focus-target";
+    append(child, element);
+  }
 
   if (x?.default_focus_indicator === false) {
     element.setAttribute("data-custom-focus", "custom-focus");

@@ -71,11 +71,7 @@ export class KateFocusHandler {
     this._current_root = element;
     this.on_focus_changed.emit(element);
     if (element != null && element.querySelector(".focus") == null) {
-      const candidates0 = Array.from(
-        element.querySelectorAll(".kate-ui-focus-target")
-      ) as HTMLElement[];
-      const candidates = candidates0.sort((a, b) => a.offsetTop - b.offsetTop);
-      this.focus(candidates[0]);
+      this.refocus();
     }
   }
 
@@ -231,6 +227,23 @@ export class KateFocusHandler {
       }
     }
   };
+
+  refocus() {
+    if (this.current_focus != null || this._current_root == null) {
+      return;
+    }
+
+    const root = this._current_root;
+    const candidates0 = Array.from(
+      root.querySelectorAll(".kate-ui-focus-target")
+    ) as HTMLElement[];
+    const candidates1 = candidates0.map(
+      (x) => [x.getBoundingClientRect(), x] as const
+    );
+    const candidates = candidates1.sort(([ra, _], [rb, __]) => ra.top - rb.top);
+    const candidate = candidates[0]?.[1];
+    this.focus(candidate);
+  }
 
   focus(element: HTMLElement | null, key: ExtendedInputKey | null = null) {
     if (element == null || this._current_root == null) {

@@ -40,3 +40,34 @@
   width: 100%;
   height: 100%;
 }
+
+.gamepad-settings-remap-container .focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 1px;
+}
+
+.gamepad-settings-remap-container .inactive {
+  opacity: 0.3;
+}
+
+.standard-gamepad-button .gamepad-pressed-mapping {
+  font-size: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  position: relative;
+}
+
+.standard-gamepad-special .gamepad-pressed-mapping,
+.standard-gamepad-shoulder .gamepad-pressed-mapping,
+.standard-gamepad-joystick .gamepad-pressed-mapping {
+  font-size: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  position: relative;
+}

@@ -1,8 +1,9 @@
 import * as UI from "../../ui";
 import type { KateOS } from "../../os";
 import { ChangedSetting, SettingsData } from "../../apis/settings";
-import { Observable, enumerate, unreachable } from "../../../utils";
+import { Observable, clamp, enumerate, unreachable } from "../../../utils";
 import { friendly_gamepad_id } from "../../../friendly/gamepad";
+import { GamepadButtonToKate, GamepadMapping } from "../../../kernel";
 
 export class GamepadInputSettings extends UI.SimpleScene {
   icon = "gamepad";
@@ -21,7 +22,7 @@ export class GamepadInputSettings extends UI.SimpleScene {
         title: "Configure standard mapping",
         description: "Change button configuration for standard gamepads",
         on_click: () => {
-          this.os.push_scene(new TestStandardMappingSettings(this.os));
+          this.os.push_scene(new RemapStandardSettings(this.os));
         },
       }),
       UI.vspace(6),
@@ -38,7 +39,7 @@ export class GamepadInputSettings extends UI.SimpleScene {
 
 export class TestStandardMappingSettings extends UI.SimpleScene {
   icon = "gamepad";
-  title = ["Test input"];
+  title = ["Test gamepad input"];
   subtitle = "Hold any button to exit";
 
   private _buttons = new Map<number, HTMLElement>();
@@ -139,125 +140,167 @@ function axis_to_offset(x: number) {
   return x * 30 + 50;
 }
 
-function standard_frame() {
+function standard_frame(
+  handler: (index: number, element: UI.Widgetable) => UI.Widgetable = (_, x) =>
+    x
+) {
   return UI.h("div", { class: "standard-gamepad-frame" }, [
     UI.h("div", { class: "standard-gamepad-left standard-gamepad-cluster" }, [
-      UI.h(
-        "div",
-        {
-          class: "standard-gamepad-button1 standard-gamepad-button",
-          "data-index": "12",
-        },
-        []
+      handler(
+        12,
+        UI.h(
+          "div",
+          {
+            class: "standard-gamepad-button1 standard-gamepad-button",
+            "data-index": "12",
+          },
+          []
+        )
       ),
-      UI.h(
-        "div",
-        {
-          class: "standard-gamepad-button2 standard-gamepad-button",
-          "data-index": "15",
-        },
-        []
+      handler(
+        15,
+        UI.h(
+          "div",
+          {
+            class: "standard-gamepad-button2 standard-gamepad-button",
+            "data-index": "15",
+          },
+          []
+        )
       ),
-      UI.h(
-        "div",
-        {
-          class: "standard-gamepad-button3 standard-gamepad-button",
-          "data-index": "13",
-        },
-        []
+      handler(
+        13,
+        UI.h(
+          "div",
+          {
+            class: "standard-gamepad-button3 standard-gamepad-button",
+            "data-index": "13",
+          },
+          []
+        )
       ),
-      UI.h(
-        "div",
-        {
-          class: "standard-gamepad-button4 standard-gamepad-button",
-          "data-index": "14",
-        },
-        []
+      handler(
+        14,
+        UI.h(
+          "div",
+          {
+            class: "standard-gamepad-button4 standard-gamepad-button",
+            "data-index": "14",
+          },
+          []
+        )
       ),
     ]),
     UI.h("div", { class: "standard-gamepad-right standard-gamepad-cluster" }, [
-      UI.h(
-        "div",
-        {
-          class: "standard-gamepad-button1 standard-gamepad-button",
-          "data-index": "3",
-        },
-        []
+      handler(
+        3,
+        UI.h(
+          "div",
+          {
+            class: "standard-gamepad-button1 standard-gamepad-button",
+            "data-index": "3",
+          },
+          []
+        )
       ),
-      UI.h(
-        "div",
-        {
-          class: "standard-gamepad-button2 standard-gamepad-button",
-          "data-index": "1",
-        },
-        []
+      handler(
+        1,
+        UI.h(
+          "div",
+          {
+            class: "standard-gamepad-button2 standard-gamepad-button",
+            "data-index": "1",
+          },
+          []
+        )
       ),
-      UI.h(
-        "div",
-        {
-          class: "standard-gamepad-button3 standard-gamepad-button",
-          "data-index": "0",
-        },
-        []
+      handler(
+        0,
+        UI.h(
+          "div",
+          {
+            class: "standard-gamepad-button3 standard-gamepad-button",
+            "data-index": "0",
+          },
+          []
+        )
       ),
-      UI.h(
-        "div",
-        {
-          class: "standard-gamepad-button4 standard-gamepad-button",
-          "data-index": "2",
-        },
-        []
+      handler(
+        2,
+        UI.h(
+          "div",
+          {
+            class: "standard-gamepad-button4 standard-gamepad-button",
+            "data-index": "2",
+          },
+          []
+        )
       ),
     ]),
-    UI.h(
-      "div",
-      {
-        class: "standard-gamepad-special standard-gamepad-special-left",
-        "data-index": "8",
-      },
-      []
-    ),
-    UI.h(
-      "div",
-      {
-        class: "standard-gamepad-special standard-gamepad-special-center",
-        "data-index": "16",
-      },
-      []
-    ),
-    UI.h(
-      "div",
-      {
-        class: "standard-gamepad-special standard-gamepad-special-right",
-        "data-index": "9",
-      },
-      []
-    ),
-    UI.h("div", { class: "standard-gamepad-axes standard-gamepad-axes-left" }, [
+    handler(
+      8,
       UI.h(
         "div",
         {
-          class: "standard-gamepad-joystick",
-          "data-axis-h": "0",
-          "data-axis-v": "1",
-          "data-index": "10",
+          class: "standard-gamepad-special standard-gamepad-special-left",
+          "data-index": "8",
         },
         []
+      )
+    ),
+    handler(
+      16,
+      UI.h(
+        "div",
+        {
+          class: "standard-gamepad-special standard-gamepad-special-center",
+          "data-index": "16",
+        },
+        []
+      )
+    ),
+    handler(
+      9,
+      UI.h(
+        "div",
+        {
+          class: "standard-gamepad-special standard-gamepad-special-right",
+          "data-index": "9",
+        },
+        []
+      )
+    ),
+    UI.h("div", { class: "standard-gamepad-axes standard-gamepad-axes-left" }, [
+      handler(
+        10,
+        UI.h(
+          "div",
+          {
+            class: "standard-gamepad-joystick",
+            "data-axis-h": "0",
+            "data-axis-v": "1",
+            "data-index": "10",
+          },
+          []
+        )
       ),
     ]),
     UI.h(
       "div",
       { class: "standard-gamepad-axes standard-gamepad-axes-right" },
       [
-        UI.h(
-          "div",
-          {
-            class: "standard-gamepad-joystick",
-            "data-axis-h": "2",
-            "data-axis-v": "3",
-            "data-index": "11",
-          },
-          []
+        handler(
+          11,
+          UI.h(
+            "div",
+            {
+              class: "standard-gamepad-joystick",
+              "data-axis-h": "2",
+              "data-axis-v": "3",
+              "data-index": "11",
+            },
+            []
+          )
         ),
       ]
     ),
@@ -265,23 +308,29 @@ function standard_frame() {
       "div",
       { class: "standard-gamepad-shoulder standard-gamepad-shoulder-left" },
       [
-        UI.h(
-          "div",
-          {
-            class:
-              "standard-gamepad-shoulder-button standard-gamepad-shoulder-button1",
-            "data-index": "6",
-          },
-          []
+        handler(
+          6,
+          UI.h(
+            "div",
+            {
+              class:
+                "standard-gamepad-shoulder-button standard-gamepad-shoulder-button1",
+              "data-index": "6",
+            },
+            []
+          )
         ),
-        UI.h(
-          "div",
-          {
-            class:
-              "standard-gamepad-shoulder-button standard-gamepad-shoulder-button2",
-            "data-index": "4",
-          },
-          []
+        handler(
+          4,
+          UI.h(
+            "div",
+            {
+              class:
+                "standard-gamepad-shoulder-button standard-gamepad-shoulder-button2",
+              "data-index": "4",
+            },
+            []
+          )
         ),
       ]
     ),
@@ -291,27 +340,177 @@ function standard_frame() {
         class: "standard-gamepad-shoulder standard-gamepad-shoulder-right",
       },
       [
-        UI.h(
-          "div",
-          {
-            class:
-              "standard-gamepad-shoulder-button standard-gamepad-shoulder-button1",
-            "data-index": "7",
-          },
-          []
+        handler(
+          7,
+          UI.h(
+            "div",
+            {
+              class:
+                "standard-gamepad-shoulder-button standard-gamepad-shoulder-button1",
+              "data-index": "7",
+            },
+            []
+          )
         ),
-        UI.h(
-          "div",
-          {
-            class:
-              "standard-gamepad-shoulder-button standard-gamepad-shoulder-button2",
-            "data-index": "5",
-          },
-          []
+        handler(
+          5,
+          UI.h(
+            "div",
+            {
+              class:
+                "standard-gamepad-shoulder-button standard-gamepad-shoulder-button2",
+              "data-index": "5",
+            },
+            []
+          )
         ),
       ]
     ),
   ]);
+}
+
+const config_modes: ConfigMode[] = [
+  {
+    id: "d-pad",
+    title: "D-Pad",
+    active: [12, 13, 14, 15],
+  },
+  {
+    id: "buttons",
+    title: "Face buttons",
+    active: [0, 1, 2, 3],
+  },
+  {
+    id: "special",
+    title: "Special buttons",
+    active: [8, 9, 16],
+  },
+  {
+    id: "shoulder",
+    title: "Shoulder buttons",
+    active: [4, 5, 6, 7],
+  },
+  {
+    id: "axes",
+    title: "Thumbsticks",
+    active: [10, 11],
+  },
+];
+
+type ConfigMode = {
+  id: "d-pad" | "buttons" | "special" | "shoulder" | "axes";
+  title: string;
+  active: number[];
+};
+
+export class RemapStandardSettings extends UI.SimpleScene {
+  private mode = new Observable<ConfigMode>(config_modes[0]);
+  private _mapping: GamepadMapping[];
+
+  constructor(os: KateOS) {
+    super(os);
+    this._mapping = os.settings.get("input").gamepad_mapping.standard;
+  }
+
+  icon = "gamepad";
+  title = ["Remap buttons"];
+  subtitle = UI.hbox(8, [
+    UI.icon("ltrigger"),
+    UI.dynamic(this.mode.map<UI.Widgetable>((x) => x.title)),
+    UI.icon("rtrigger"),
+  ]);
+
+  actions: UI.Action[] = [
+    {
+      key: ["x"],
+      label: "Return",
+      handler: this.on_return,
+    },
+    {
+      key: ["ltrigger"],
+      label: "Previous button set",
+      handler: () => {
+        this.change_mode(-1);
+      },
+    },
+    {
+      key: ["rtrigger"],
+      label: "Next button set",
+      handler: () => {
+        this.change_mode(1);
+      },
+    },
+  ];
+
+  private change_mode(offset: number) {
+    const index = config_modes.findIndex((x) => x.id === this.mode.value.id);
+    const new_index = clamp(index + offset, 0, config_modes.length - 1);
+    if (new_index !== index) {
+      this.mode.value = config_modes[new_index];
+    }
+  }
+
+  private fill_button(button: HTMLElement) {
+    const index = Number(button.getAttribute("data-index") ?? "nan");
+    if (!isNaN(index)) {
+      const entry = this._mapping.find(
+        (x) => x.type === "button" && x.index === index
+      ) as GamepadButtonToKate | null;
+      if (entry != null) {
+        UI.append(
+          UI.h("div", { class: "gamepad-pressed-mapping" }, [
+            UI.icon(entry.pressed),
+          ]),
+          button
+        );
+      }
+    }
+
+    return button;
+  }
+
+  body() {
+    return [
+      UI.h("div", { class: "gamepad-settings-remap-container" }, [
+        UI.dynamic(
+          this.mode.map<UI.Widgetable>((mode) => {
+            return standard_frame((index, button) => {
+              if (mode.active.includes(index)) {
+                return UI.interactive(
+                  this.os,
+                  this.fill_button(button as HTMLElement),
+                  [
+                    {
+                      key: ["o"],
+                      label: "Remap",
+                      on_click: true,
+                      handler: () => this.remap(button as HTMLElement),
+                    },
+                  ],
+                  {
+                    replace: true,
+                    default_focus_indicator: false,
+                  }
+                );
+              } else {
+                (button as HTMLElement).classList.add("inactive");
+                return this.fill_button(button as HTMLElement);
+              }
+            });
+          })
+        ),
+      ]),
+    ];
+  }
+
+  on_attached(): void {
+    super.on_attached();
+    this.mode.stream.listen(() => {
+      this.os.focus_handler.refocus();
+    });
+  }
+
+  remap(button: HTMLElement) {}
 }
 
 type PairedGamepad = {
