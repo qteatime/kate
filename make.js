@@ -230,7 +230,7 @@ w.task("util:compile", [], () => {
 w.task("util:build", ["util:compile"], () => {});
 
 // -- Glomp
-w.task("glomp:compile", [], () => {
+w.task("glomp:compile", ["util:build"], () => {
   tsc("packages/glomp");
 });
 
