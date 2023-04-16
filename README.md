@@ -15,7 +15,9 @@ It's built to be secure, respect your privacy, and give you agency on how you pl
 
 - [The Kate User Manual](./docs/user-manual.md) — confused about how Kate works, or want something to link from your game page for common things like "how controls work" and "what's this icon on the screen?". This is where you go.
 
-- [Making games for Kate!](./docs/dev-manual.md) — want to build a new game for Kate or port an existing web game to it? This guide will walk you through it. (work in progress)
+- [The Kate Threat Model](./docs/threat-model.md) — wondering how Kate protects your safety and privacy? This document goes into details of what you're signing up for, using real-world examples. (work in progress, technical)
+
+- [Making games for Kate!](./docs/dev-manual.md) — want to build a new game for Kate or port an existing web game to it? This guide will walk you through it. (work in progress, technical)
 
 - [Kate's Underlying Technology](./docs/technology.md) — curious about what's powering Kate, and what the system requirements are? This covers all that. (work in progress)
 
