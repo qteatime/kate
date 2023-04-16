@@ -10,7 +10,7 @@ This package provides two simple tools for packaging games for Kate:
 
 Make sure you have [Node.js 16+](https://nodejs.org/en). Get it from npm:
 
-    $ npm install @qteatime/kate-packaging
+    $ npm install @qteatime/kate-tools@experimental
 
 ## Usage
 
