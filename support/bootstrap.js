@@ -100,7 +100,7 @@ async function main() {
   // Sets up npm
   if (args.values["npm-install"]) {
     console.log("> Installing npm dependencies");
-    exec(`npm install --ignore-scripts --bin-links false`);
+    exec(`npm install --ignore-scripts`);
   }
 
   // Downloads Electron, if needed
