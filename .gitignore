@@ -26,3 +26,5 @@ packages/kate-tools/packaging
 examples/katchu/katchu.js
 !examples/katchu/katchu.kart
 www/loader.js
+electron/
+!packages/kate-desktop/source/electron.d.ts

@@ -7,9 +7,6 @@
   "bin": {
     "kate-desktop": "bin/kate-desktop.js"
   },
-  "scripts": {
-    "start": "electron ."
-  },
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -18,8 +15,5 @@
   "bugs": {
     "url": "https://github.com/qteatime/kate/issues"
   },
-  "homepage": "https://github.com/qteatime/kate#readme",
-  "dependencies": {
-    "electron": "^23.2.0"
-  }
+  "homepage": "https://github.com/qteatime/kate#readme"
 }

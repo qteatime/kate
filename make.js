@@ -129,6 +129,22 @@ function pack_assets({ glob: pattern, filter, name, target }) {
   FS.writeFileSync(target, content);
 }
 
+function electron_name() {
+  switch (OS.platform()) {
+    case "mas":
+    case "darwin":
+      return "Electron.app/Contents/MacOS/Electron";
+    case "freebsd":
+    case "openbsd":
+    case "linux":
+      return "electron";
+    case "win32":
+      return "electron.exe";
+    default:
+      throw new Error(`Electron builds are not available on ${OS.platform()}`);
+  }
+}
+
 function kart({ config, output }) {
   exec_file("node", [
     "packages/kate-tools/cli/kart.js",
@@ -487,8 +503,8 @@ w.task("desktop:generate", ["desktop:compile"], () => {
 w.task("desktop:build", ["www:bundle", "desktop:generate"], () => {});
 
 w.task("desktop:run", ["desktop:generate"], () => {
-  const Electron = require("electron");
-  exec_file(Electron, [Path.join(__dirname, "packages/kate-desktop")]);
+  const electron_path = Path.join("electron", electron_name());
+  exec_file(electron_path, [Path.join(__dirname, "packages/kate-desktop")]);
 });
 
 w.task("desktop:make-npm-package", ["desktop:clean", "desktop:build"], () => {

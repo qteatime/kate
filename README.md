@@ -43,14 +43,27 @@ Note that the web option is practical, but not recommended for archival; you can
 
 ## Hacking on Kate
 
-The core of Kate is written in [TypeScript](https://www.typescriptlang.org/), some tools are written in [Crochet](https://crochet.qteati.me/). To build Kate you'll need at least a working [Node.js](https://nodejs.org/en/) environment.
+The core of Kate is written in [TypeScript](https://www.typescriptlang.org/), some tools are written in [Crochet](https://crochet.qteati.me/). To build Kate you'll need at least a working [Node.js 18+](https://nodejs.org/en/) environment.
 
-Setup things with:
+### Automatic bootstrapping (will download artifacts)
+
+There's an included bootstrap script in the repository that can set things up for you, in a common OS installation. However, it will download artifacts from the internet and invoke an external Zip application ([Extract-Archive](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.archive/expand-archive?view=powershell-7.3) on Windows, and `unzip` in MacOS/Linux) to unzip the Electron release. You can do all these steps with:
 
 ```shell
-$ npm install
+$ node support/bootstrap.js --npm-install --download-electron --unzip-electron --build
+```
+
+### Manual bootstrapping
+
+If you'd rather have a manual setup, you'll need the `glob` and `typescript` packages, and you'll need Electron 24.1.2. You can download the right `electron-*-.zip` for your OS/architecture from the [Electron releases page](https://github.com/electron/electron/releases/tag/v24.1.2), then extract to the `electron/` directory.
+
+After setting up, `node make all` will build all sub-packages.
+
+```shell
 $ node make all
 ```
+
+### Checking that bootstrap was successful
 
 After this you should have a working Kate. You can either use `node make desktop:run` to run it as an Electron app, or start a server on the `www` folder and point a modern browser there.
 
