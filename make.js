@@ -104,6 +104,10 @@ function glomp({ entry, out, name }) {
   console.log(`-> Glomp packaged (${entry}) to (${out})`);
 }
 
+function npm_install(project) {
+  exec(`npm install --ignore-scripts`, { cwd: project });
+}
+
 function tsc(project) {
   const file = Path.join(__dirname, "node_modules/typescript/bin/tsc");
   exec_file("node", [file, "-p", project]);
@@ -358,6 +362,10 @@ w.task("adv:compile", ["domui:build"], () => {
 w.task("adv:build", ["adv:compile"], () => {});
 
 // -- Tools
+w.task("tools:dependencies", [], () => {
+  npm_install("packages/kate-tools");
+});
+
 w.task("tools:compile", ["schema:build"], () => {
   tsc("packages/kate-tools");
 });
@@ -547,6 +555,8 @@ w.task("chore:update-versions", [], () => {
 });
 
 // -- Multi-project convenience
+w.task("dependencies", ["tools:dependencies"], () => {});
+
 w.task(
   "all",
   [

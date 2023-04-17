@@ -101,6 +101,7 @@ async function main() {
   if (args.values["npm-install"]) {
     console.log("> Installing npm dependencies");
     exec(`npm install --ignore-scripts`);
+    exec(`node make dependencies`);
   }
 
   // Downloads Electron, if needed
@@ -127,4 +128,5 @@ async function main() {
 
 main().catch((e) => {
   console.error(`---\nBootstrapping failed:\n${e?.stack ?? e}`);
+  process.exit(1);
 });

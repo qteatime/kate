@@ -57,6 +57,8 @@ $ node support/bootstrap.js --npm-install --download-electron --unzip-electron -
 
 If you'd rather have a manual setup, you'll need the `glob` and `typescript` packages, and you'll need Electron 24.1.2. You can download the right `electron-*-.zip` for your OS/architecture from the [Electron releases page](https://github.com/electron/electron/releases/tag/v24.1.2), then extract to the `electron/` directory.
 
+Note that some sub-packages also have dependencies that need to be installed. See `node make dependencies` for what to do if you want to avoid network requests.
+
 After setting up, `node make all` will build all sub-packages.
 
 ```shell

@@ -19,6 +19,6 @@
   "homepage": "https://github.com/qteatime/kate#readme",
   "dependencies": {
     "@types/glob": "^8.1.0",
-    "glob": "^10.1.0"
+    "glob": "^8.1.0"
   }
 }
