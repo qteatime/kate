@@ -1,8 +1,9 @@
 import type { KateOS } from "../os";
 import * as Db from "../../data/db";
+import { mb } from "../../utils";
 
 export class KateObjectStore {
-  readonly DEFAULT_QUOTA = 32 * 1024 * 1024; // 32MB
+  readonly DEFAULT_QUOTA = mb(64);
   readonly SPECIAL_BUCKET_KEY = "kate:special";
   readonly LOCAL_STORAGE_KEY = "kate:local-storage";
 
