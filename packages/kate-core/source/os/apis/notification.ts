@@ -1,7 +1,7 @@
 import type { KateOS } from "../os";
 import { Scene } from "../ui/scenes";
 import * as UI from "../ui";
-import * as Db from "../../data/db";
+import * as Db from "../../data";
 import { wait } from "../time";
 
 export type NotificationType = "basic";

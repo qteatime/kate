@@ -25,9 +25,9 @@ export class KateProcesses {
     const cart = Cart.parse(bytes);
     const file_map = new Map(cart.files.map((x) => [x.path, x] as const));
 
-    const storage = await this.os.object_store.get_local_storage(
-      cart.metadata.id
-    );
+    const storage = await this.os.object_store
+      .cartridge(cart)
+      .get_local_storage();
     const runtime = this.os.kernel.runtimes.from_cartridge(cart, {
       cart: cart,
       local_storage: storage,
@@ -72,9 +72,9 @@ export class KateProcesses {
       const cart = await this.os.cart_manager.read_metadata(id);
       const file_map = new Map(cart.files.map((x) => [x.path, x.id] as const));
 
-      const storage = await this.os.object_store.get_local_storage(
-        cart.metadata.id
-      );
+      const storage = await this.os.object_store
+        .cartridge(cart)
+        .get_local_storage();
       const runtime = this.os.kernel.runtimes.from_cartridge(cart, {
         cart: cart,
         local_storage: storage,
