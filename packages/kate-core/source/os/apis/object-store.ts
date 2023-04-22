@@ -1,257 +1,195 @@
 import type { KateOS } from "../os";
-import * as Db from "../../data/db";
+import * as Db from "../../data";
 import { mb } from "../../utils";
+import { CartridgeId, VersionId } from "../../data";
 
 export class KateObjectStore {
-  readonly DEFAULT_QUOTA = mb(64);
-  readonly SPECIAL_BUCKET_KEY = "kate:special";
-  readonly LOCAL_STORAGE_KEY = "kate:local-storage";
+  static readonly DEFAULT_QUOTA = {
+    maximum_size: mb(64),
+    maximum_buckets: 1_000,
+    maximum_entries: 10_000,
+  };
+  static readonly SPECIAL_BUCKET_KEY = "kate:special";
+  static readonly LOCAL_STORAGE_KEY = "kate:local-storage";
 
   constructor(readonly os: KateOS) {}
 
-  default_quota(cart_id: string): Db.QuotaUsage {
-    return {
-      cart_id: cart_id,
-      available: this.DEFAULT_QUOTA,
-      used: 0,
-    };
-  }
-
-  async get_usage(cart_id: string): Promise<Db.QuotaUsage> {
-    return await this.os.db.transaction(
-      [Db.quota_usage],
-      "readonly",
-      async (t) => {
-        const usage = t.get_table1(Db.quota_usage);
-        const value = await usage.try_get(cart_id);
-        if (value != null) {
-          return value;
-        } else {
-          return this.default_quota(cart_id);
-        }
-      }
-    );
-  }
-
-  async assert_can_store(cart_id: string, usage: Db.QuotaUsage, size: number) {
-    if (usage.used + size > usage.available) {
-      this.os.notifications.push_transient(
-        cart_id,
-        "Quota exceeded",
-        `Failed to save data because storage quota has been exceeded`
-      );
-      throw new Error(`Storage quota exceeded`);
-    }
-  }
-
-  get_bucket(cart_id: string, bucket_id: string) {
-    return new KateObjectBucket(this, cart_id, bucket_id);
-  }
-
-  get_special_bucket(cart_id: string) {
-    return this.get_bucket(cart_id, this.SPECIAL_BUCKET_KEY);
-  }
-
-  async delete_bucket(cart_id: string, bucket_id: string) {
-    await this.os.db.transaction(
-      [Db.object_store, Db.quota_usage],
-      "readwrite",
-      async (t) => {
-        const store = t.get_table3(Db.object_store);
-        const index = t.get_index2(Db.idx_cart_object_store_by_bucket);
-        const quota = t.get_table1(Db.quota_usage);
-
-        let previous_size = 0;
-        const usage =
-          (await quota.try_get(cart_id)) ?? this.default_quota(cart_id);
-
-        const entries = await index.get_all([cart_id, bucket_id]);
-        for (const entry of entries) {
-          previous_size += entry.size;
-          await store.delete([cart_id, bucket_id, entry.id]);
-        }
-        await quota.put({
-          cart_id: cart_id,
-          available: usage.available,
-          used: usage.used - previous_size,
-        });
-      }
-    );
-  }
-
-  async get_local_storage(cart_id: string): Promise<unknown> {
-    const value = await this.get_special_bucket(cart_id).try_get(
-      this.LOCAL_STORAGE_KEY
-    );
-    return value ?? Object.create(null);
+  cartridge(id: CartridgeId, version: VersionId) {
+    return new CartridgeObjectStore(this, id, version);
   }
 }
 
-export class KateObjectBucket {
+export class CartridgeObjectStore {
   constructor(
     readonly store: KateObjectStore,
-    readonly cart_id: string,
-    readonly bucket_id: string
+    readonly cartridge_id: CartridgeId,
+    readonly version: VersionId
   ) {}
 
-  get db() {
+  private get db() {
     return this.store.os.db;
   }
 
-  async list(count?: number) {
-    return await this.db.transaction(
-      [Db.object_store],
-      "readonly",
-      async (t) => {
-        const index = t.get_index2(Db.idx_cart_object_store_by_bucket);
-        return (await index.get_all([this.cart_id, this.bucket_id], count)).map(
-          (x) => x.data
-        );
-      }
-    );
+  private transaction<A>(
+    mode: IDBTransactionMode,
+    fn: (txn: Db.ObjectStorage) => Promise<A>
+  ) {
+    return Db.ObjectStorage.transaction(this.db, mode, fn);
   }
 
-  async add(key: string, value: unknown) {
-    const size = estimate(value) + estimate(key);
-    return await this.db.transaction(
-      [Db.object_store, Db.quota_usage],
-      "readwrite",
-      async (t) => {
-        const store = t.get_table3(Db.object_store);
-        const quota = t.get_table1(Db.quota_usage);
-        const usage =
-          (await quota.try_get(this.cart_id)) ??
-          this.store.default_quota(this.cart_id);
-
-        this.store.assert_can_store(this.cart_id, usage, size);
-
-        await store.add({
-          cart_id: this.cart_id,
-          bucket_id: this.bucket_id,
-          id: key,
-          size,
-          data: value,
-        });
-        await quota.put({
-          cart_id: this.cart_id,
-          available: usage.available,
-          used: usage.used + size,
-        });
-      }
-    );
+  async add_bucket(name: string) {
+    const bucket = await this.transaction("readwrite", async (storage) => {
+      return storage.add_bucket(this.cartridge_id, this.version, name);
+    });
+    return new CartridgeBucket(this, bucket);
   }
 
-  async put(key: string, value: unknown) {
-    const size = estimate(value) + estimate(key);
-    return await this.db.transaction(
-      [Db.object_store, Db.quota_usage],
-      "readwrite",
-      async (t) => {
-        const store = t.get_table3(Db.object_store);
-        const quota = t.get_table1(Db.quota_usage);
+  async get_bucket(name: string) {
+    const bucket = await this.transaction("readonly", async (storage) => {
+      return await storage.partitions.get([
+        this.cartridge_id,
+        this.version,
+        name,
+      ]);
+    });
+    return new CartridgeBucket(this, bucket);
+  }
 
-        const previous_size =
-          (await store.try_get([this.cart_id, this.bucket_id, key]))?.size ?? 0;
-        const usage =
-          (await quota.try_get(this.cart_id)) ??
-          this.store.default_quota(this.cart_id);
+  async list_buckets() {
+    const buckets = await this.transaction("readonly", async (storage) => {
+      return await storage.partitions_by_version.get_all([
+        this.cartridge_id,
+        this.version,
+      ]);
+    });
+    return buckets.map((x) => new CartridgeBucket(this, x));
+  }
+}
 
-        this.store.assert_can_store(this.cart_id, usage, size - previous_size);
+export class CartridgeBucket {
+  constructor(
+    readonly parent: CartridgeObjectStore,
+    readonly bucket: Db.OSPartition
+  ) {}
 
-        await store.put({
-          cart_id: this.cart_id,
-          bucket_id: this.bucket_id,
-          id: key,
-          size,
-          data: value,
-        });
-        await quota.put({
-          cart_id: this.cart_id,
-          available: usage.available,
-          used: usage.used + size - previous_size,
-        });
+  private get db() {
+    return this.parent.store.os.db;
+  }
+
+  private transaction<A>(
+    mode: IDBTransactionMode,
+    fn: (txn: Db.ObjectStorage) => Promise<A>
+  ) {
+    return Db.ObjectStorage.transaction(this.db, mode, fn);
+  }
+
+  async delete_bucket() {
+    await this.transaction("readwrite", async (storage) => {
+      await storage.remove_bucket(
+        this.parent.cartridge_id,
+        this.parent.version,
+        this.bucket.bucket_name
+      );
+    });
+  }
+
+  async list_metadata(count?: number) {
+    return await this.transaction("readonly", async (storage) => {
+      return storage.entries_by_bucket.get_all(
+        this.bucket.unique_bucket_id,
+        count
+      );
+    });
+  }
+
+  async count() {
+    return await this.transaction("readonly", async (storage) => {
+      return storage.entries_by_bucket.count(this.bucket.unique_bucket_id);
+    });
+  }
+
+  async read(key: string) {
+    return await this.transaction("readonly", async (storage) => {
+      const metadata = await storage.entries.get([
+        this.bucket.unique_bucket_id,
+        key,
+      ]);
+      const data = await storage.data.get([this.bucket.unique_bucket_id, key]);
+      return { ...metadata, data: data };
+    });
+  }
+
+  async try_read(key: string) {
+    return await this.transaction("readonly", async (storage) => {
+      const metadata = await storage.entries.try_get([
+        this.bucket.unique_bucket_id,
+        key,
+      ]);
+      if (metadata == null) {
+        return null;
+      } else {
+        const data = await storage.data.get([
+          this.bucket.unique_bucket_id,
+          key,
+        ]);
+        return { ...metadata, data: data };
       }
-    );
+    });
+  }
+
+  async add(
+    key: string,
+    entry: { type: string; metadata: unknown; data: unknown }
+  ) {
+    const size =
+      estimate(entry.data) + estimate(entry.metadata) + estimate(entry.type);
+    await this.transaction("readwrite", async (storage) => {
+      await storage.add_entry(
+        this.parent.cartridge_id,
+        this.parent.version,
+        this.bucket.unique_bucket_id,
+        {
+          key: key,
+          type: entry.type,
+          size: size,
+          metadata: entry.metadata,
+          data: entry.data,
+        }
+      );
+    });
+  }
+
+  async update(
+    key: string,
+    entry: { type: string; metadata: unknown; data: unknown }
+  ) {
+    const size =
+      estimate(entry.data) + estimate(entry.metadata) + estimate(entry.type);
+    await this.transaction("readwrite", async (storage) => {
+      await storage.update_entry(
+        this.parent.cartridge_id,
+        this.parent.version,
+        this.bucket.unique_bucket_id,
+        {
+          key: key,
+          type: entry.type,
+          size: size,
+          metadata: entry.metadata,
+          data: entry.data,
+        }
+      );
+    });
   }
 
   async delete(key: string) {
-    return await this.db.transaction(
-      [Db.object_store, Db.quota_usage],
-      "readwrite",
-      async (t) => {
-        const store = t.get_table3(Db.object_store);
-        const quota = t.get_table1(Db.quota_usage);
-
-        const previous_size = (
-          await store.get([this.cart_id, this.bucket_id, key])
-        ).size;
-        const usage =
-          (await quota.try_get(this.cart_id)) ??
-          this.store.default_quota(this.cart_id);
-
-        await store.delete([this.cart_id, this.bucket_id, key]);
-        await quota.put({
-          cart_id: this.cart_id,
-          available: usage.available,
-          used: usage.used - previous_size,
-        });
-      }
-    );
-  }
-
-  async clear() {
-    return await this.db.transaction(
-      [Db.object_store, Db.quota_usage],
-      "readwrite",
-      async (t) => {
-        const store = t.get_table3(Db.object_store);
-        const index = t.get_index2(Db.idx_cart_object_store_by_bucket);
-        const quota = t.get_table1(Db.quota_usage);
-
-        let previous_size = 0;
-        const usage =
-          (await quota.try_get(this.cart_id)) ??
-          this.store.default_quota(this.cart_id);
-
-        const entries = await index.get_all([this.cart_id, this.bucket_id]);
-        for (const entry of entries) {
-          previous_size += entry.size;
-          store.delete([this.cart_id, this.bucket_id, entry.id]);
-        }
-        await quota.put({
-          cart_id: this.cart_id,
-          available: usage.available,
-          used: usage.used - previous_size,
-        });
-      }
-    );
-  }
-
-  async get(key: string) {
-    return await this.db.transaction(
-      [Db.object_store, Db.quota_usage],
-      "readwrite",
-      async (t) => {
-        const store = t.get_table3(Db.object_store);
-
-        return (await store.get([this.cart_id, this.bucket_id, key])).data;
-      }
-    );
-  }
-
-  async try_get(key: string) {
-    return await this.db.transaction(
-      [Db.object_store, Db.quota_usage],
-      "readwrite",
-      async (t) => {
-        const store = t.get_table3(Db.object_store);
-
-        return (
-          (await store.try_get([this.cart_id, this.bucket_id, key]))?.data ??
-          null
-        );
-      }
-    );
+    await this.transaction("readwrite", async (storage) => {
+      storage.delete_entry(
+        this.parent.cartridge_id,
+        this.parent.version,
+        this.bucket.unique_bucket_id,
+        key
+      );
+    });
   }
 }
 

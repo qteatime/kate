@@ -57,7 +57,7 @@ export type OSEntry = {
   /* Mime-type of the entry */
   type: string;
   /* Arbitrary meta-data associated with the entry */
-  meta_data: unknown;
+  metadata: unknown;
 };
 export const os_entry = kate.table2<OSEntry, "unique_bucket_id", "key">({
   since: 9,
@@ -117,6 +117,7 @@ export const cartridge_quota = kate.table2<
   auto_increment: false,
 });
 
+// -- Errors -------------------------------------------------------------------
 export class EQuotaExceeded extends Error {
   constructor(
     readonly cartridge_id: CartridgeId,
@@ -131,6 +132,7 @@ export class EQuotaExceeded extends Error {
   }
 }
 
+// -- Accessors ----------------------------------------------------------------
 export class ObjectStorage {
   constructor(readonly transaction: Transaction) {}
 
@@ -139,17 +141,19 @@ export class ObjectStorage {
     mode: IDBTransactionMode,
     fn: (storage: ObjectStorage) => Promise<A>
   ) {
-    return db.transaction(
-      [os_partition, os_entry, os_data, cartridge_quota],
-      mode,
-      async (txn) => {
-        return await fn(new ObjectStorage(txn));
-      }
-    );
+    return db.transaction(ObjectStorage.tables, mode, async (txn) => {
+      return await fn(new ObjectStorage(txn));
+    });
   }
+
+  static tables = [os_partition, os_entry, os_data, cartridge_quota];
 
   get partitions() {
     return this.transaction.get_table3(os_partition);
+  }
+
+  get partitions_by_version() {
+    return this.transaction.get_index2(idx_os_partition_by_version);
   }
 
   get entries() {
@@ -174,13 +178,14 @@ export class ObjectStorage {
     name: string
   ) {
     const id = make_id();
-    await this.partitions.add({
+    const bucket = {
       cartridge_id: cartridge_id,
       version_id: version,
       bucket_name: name,
       created_at: new Date(),
       unique_bucket_id: id,
-    });
+    };
+    await this.partitions.add(bucket);
     const quota = await this.quota.get([cartridge_id, version]);
     const new_items = quota.current_buckets_in_storage + 1;
     if (new_items > quota.maximum_buckets_in_storage) {
@@ -193,7 +198,7 @@ export class ObjectStorage {
       );
     }
     await this.quota.put({ ...quota, current_buckets_in_storage: new_items });
-    return id;
+    return bucket;
   }
 
   async remove_bucket(
@@ -202,7 +207,9 @@ export class ObjectStorage {
     name: string
   ) {
     const bucket = await this.partitions.get([cartridge_id, version_id, name]);
-    const entries = await this.entries_by_bucket.get_all(bucket.bucket_name);
+    const entries = await this.entries_by_bucket.get_all(
+      bucket.unique_bucket_id
+    );
     for (const entry of entries) {
       await this.delete_entry(
         cartridge_id,
@@ -255,7 +262,7 @@ export class ObjectStorage {
       updated_at: new Date(),
       size: entry.size,
       type: entry.type,
-      meta_data: entry.metadata,
+      metadata: entry.metadata,
     });
     await this.data.add({
       unique_bucket_id: bucket_id,
@@ -310,7 +317,7 @@ export class ObjectStorage {
       updated_at: new Date(),
       size: entry.size,
       type: entry.type,
-      meta_data: entry.metadata,
+      metadata: entry.metadata,
     });
     await this.data.put({
       unique_bucket_id: bucket_id,
