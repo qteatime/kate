@@ -314,10 +314,11 @@ export class DataMigration {
     if (this.is_needed(old_version, db.version)) {
       await this.process(db);
 
-      const processed = JSON.parse(
+      let processed = JSON.parse(
         localStorage["kate:migrations:done"] ?? "[]"
       ) as number[];
       processed.push(this.id);
+      processed = [...new Set(processed)];
       localStorage["kate:migrations:done"] = JSON.stringify(processed);
     }
   }
