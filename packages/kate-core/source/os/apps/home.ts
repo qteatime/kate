@@ -1,9 +1,8 @@
 import { h } from "../ui/widget";
 import * as UI from "../ui/widget";
-import type { ExtendedInputKey } from "../../kernel";
-import * as Db from "../../data/db";
+import * as Db from "../../data";
 import { unreachable } from "../../utils";
-import { Action, Scene, SimpleScene } from "../ui/scenes";
+import { Action, SimpleScene } from "../ui/scenes";
 import { SceneApps } from "./applications";
 import { SceneTextFile } from "./text-file";
 import { HUD_LoadIndicator } from "./load-screen";
