@@ -181,6 +181,8 @@ Manipulate operations allow us to modify partitions and objects. All manipulatio
 
 Besides the global invariants we inherit from sets, the storage also requires that object ids be unique _within a Leaf partition_. That is, two distinct partitions P1 and P2 might house an object with id R1, and different contents, however there may not be two objects in the object set of P1 sharing the same reference id.
 
+There's also global invariants regarding to fairness of use of the shared storage. The number of leaf partitions within a cartridge version bucket cannot exceed 1000 (one thousand). And the number of entries within a cartridge version bucket (counting all leaf partitions) cannot exceed 10000 (ten thousand). These limits may be configurable in the future.
+
 ### Semantics for the Core Language
 
 Here we provide operational semantics for the operations above.
@@ -328,9 +330,9 @@ Because Kate ultimately does not control the underlying storage or the value ser
 ```
 // for scalar types we just use assume the value's size
 estimate(x :: number) = 8;
-estimate(x :: boolean) = 1;
-estimate(x :: null) = 1;
-estimate(x :: undefined) = 1;
+estimate(x :: boolean) = 2;
+estimate(x :: null) = 2;
+estimate(x :: undefined) = 2;
 estimate(x :: Date) = 8;
 
 // for bigints we do a naive estimation based on the number of bytes from
@@ -351,12 +353,9 @@ estimate(x :: {k: v}) =
 
 // for byte arrays we return whatever byte-length it reports
 estimate(x :: TypedArray) = byte-length(x);
-
-// for blobs we likewise use its byte-length, but account for type metadata
-estimate(x :: Blob) = byte-length(x) + estimate(x.type)
 ```
 
-We do not support serialisation of file handles currently in this schema, but that's something that can be investigated in the future if the need arises.
+We do not support serialisation of blobs or file handles currently in this schema, but that's something that can be investigated in the future if the need arises.
 
 ## Migrations
 

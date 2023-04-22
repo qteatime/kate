@@ -232,20 +232,34 @@ export class CartridgeBucket {
 }
 
 function estimate(value: unknown): number {
-  if (typeof value === "string") {
-    return value.length * 2;
-  } else if (
-    typeof value === "number" ||
-    typeof value === "boolean" ||
-    value == null ||
-    typeof value === "undefined"
-  ) {
+  if (value == null) {
     return 2;
-  } else if (typeof value === "bigint") {
-    return Math.ceil(value.toString(16).length / 2);
-  } else if (Array.isArray(value)) {
-    return value.map(estimate).reduce((a, b) => a + b, 0);
-  } else if (
+  }
+
+  switch (typeof value) {
+    case "number":
+      return 8;
+    case "boolean":
+      return 2;
+    case "bigint":
+      return Math.ceil(value.toString(16).length / 2);
+    case "string":
+      return value.length * 2;
+  }
+
+  if (value instanceof RegExp) {
+    return value.source.length * 2 + value.flags.length * 2;
+  }
+
+  if (Array.isArray(value)) {
+    let size = 0;
+    for (const x of value) {
+      size += estimate(x);
+    }
+    return size;
+  }
+
+  if (
     value instanceof Uint8Array ||
     value instanceof Uint32Array ||
     value instanceof Uint16Array ||
@@ -256,13 +270,20 @@ function estimate(value: unknown): number {
     value instanceof Int8Array
   ) {
     return value.byteLength;
-  } else if (typeof value === "object") {
+  }
+
+  if (value instanceof Date) {
+    return 8;
+  }
+
+  const proto = Object.getPrototypeOf(value);
+  if (proto === null || proto === Object.prototype) {
     let size = 0;
     for (const [k, v] of Object.entries(value)) {
       size += estimate(k) + estimate(v);
     }
     return size;
-  } else {
-    throw new Error(`Serialisation not supported: ${value}`);
   }
+
+  throw new Error(`Serialisation not supported: ${value}`);
 }
