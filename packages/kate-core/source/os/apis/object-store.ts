@@ -174,7 +174,10 @@ export class CartridgeBucket {
     entry: { type: string; metadata: unknown; data: unknown }
   ) {
     const size =
-      estimate(entry.data) + estimate(entry.metadata) + estimate(entry.type);
+      estimate(entry.data) +
+      estimate(entry.metadata) +
+      estimate(entry.type) +
+      estimate(key);
     await this.transaction("readwrite", async (storage) => {
       await storage.add_entry(
         this.parent.cartridge_id,
@@ -196,7 +199,10 @@ export class CartridgeBucket {
     entry: { type: string; metadata: unknown; data: unknown }
   ) {
     const size =
-      estimate(entry.data) + estimate(entry.metadata) + estimate(entry.type);
+      estimate(entry.data) +
+      estimate(entry.metadata) +
+      estimate(entry.type) +
+      estimate(key);
     await this.transaction("readwrite", async (storage) => {
       await storage.update_entry(
         this.parent.cartridge_id,

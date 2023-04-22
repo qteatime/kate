@@ -50,6 +50,8 @@ export const public_repr = {
   },
 };
 
+export const bucket_name = TC.short_str(255);
+
 export default [
   handler(
     "kate:store.list-buckets",
@@ -63,7 +65,7 @@ export default [
 
   handler(
     "kate:store.add-bucket",
-    TC.spec({ versioned: TC.bool, name: TC.str }),
+    TC.spec({ versioned: TC.bool, name: bucket_name }),
     async (os, env, ipc, { versioned, name }) => {
       const store = os.object_store.cartridge(env.cart, versioned);
       await store.add_bucket(name);
@@ -73,7 +75,7 @@ export default [
 
   handler(
     "kate:store.ensure-bucket",
-    TC.spec({ versioned: TC.bool, name: TC.str }),
+    TC.spec({ versioned: TC.bool, name: bucket_name }),
     async (os, env, ipc, { versioned, name }) => {
       const store = os.object_store.cartridge(env.cart, versioned);
       await store.ensure_bucket(name);
@@ -83,7 +85,7 @@ export default [
 
   handler(
     "kate:store.delete-bucket",
-    TC.spec({ versioned: TC.bool, name: TC.str }),
+    TC.spec({ versioned: TC.bool, name: bucket_name }),
     async (os, env, ipc, { versioned, name }) => {
       const store = os.object_store.cartridge(env.cart, versioned);
       const bucket = await store.get_bucket(name);
@@ -96,7 +98,7 @@ export default [
     "kate:store.count-entries",
     TC.spec({
       versioned: TC.bool,
-      bucket_name: TC.str,
+      bucket_name: bucket_name,
     }),
     async (os, env, ipc, { versioned, bucket_name }) => {
       const store = os.object_store.cartridge(env.cart, versioned);
@@ -109,7 +111,7 @@ export default [
     "kate:store.list-entries",
     TC.spec({
       versioned: TC.bool,
-      bucket_name: TC.str,
+      bucket_name,
       count: TC.optional(undefined, TC.int),
     }),
     async (os, env, ipc, { versioned, bucket_name, count }) => {
@@ -124,7 +126,7 @@ export default [
     "kate:store.read",
     TC.spec({
       versioned: TC.bool,
-      bucket_name: TC.str,
+      bucket_name,
       key: TC.str,
     }),
     async (os, env, ipc, { versioned, bucket_name, key }) => {
@@ -139,7 +141,7 @@ export default [
     "kate:store.try-read",
     TC.spec({
       versioned: TC.bool,
-      bucket_name: TC.str,
+      bucket_name,
       key: TC.str,
     }),
     async (os, env, ipc, { versioned, bucket_name, key }) => {
@@ -154,7 +156,7 @@ export default [
     "kate:store.update",
     TC.spec({
       versioned: TC.bool,
-      bucket_name: TC.str,
+      bucket_name,
       key: TC.str,
       type: TC.str,
       metadata: TC.dictionary,
@@ -181,7 +183,7 @@ export default [
     "kate:store.create",
     TC.spec({
       versioned: TC.bool,
-      bucket_name: TC.str,
+      bucket_name,
       key: TC.str,
       type: TC.str,
       metadata: TC.dictionary,
@@ -208,7 +210,7 @@ export default [
     "kate:store.delete",
     TC.spec({
       versioned: TC.bool,
-      bucket_name: TC.str,
+      bucket_name,
       key: TC.str,
     }),
     async (os, env, ipc, { versioned, bucket_name, key }) => {
