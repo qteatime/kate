@@ -28,3 +28,4 @@ examples/katchu/www/katchu.js
 www/loader.js
 electron/
 !packages/kate-desktop/source/electron.d.ts
+.cache

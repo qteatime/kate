@@ -25,51 +25,9 @@ It's built to be secure, respect your privacy, and give you agency on how you pl
 
 ## Installation
 
-Kate only supports installing from npm and [from source](#hacking-on-kate) currently. You'll need [Node.js 16+](https://nodejs.org/en) installed. To install from npm run the following from the command line:
+The current recommended way of trying out Kate is to use the Web version: https://kate.qteati.me/
 
-    $ npm install -g @qteatime/kate-desktop@experimental
-
-You can then start it from the command-line as well:
-
-    $ kate-desktop
-
-Alternatively, you can use Kate online from https://kate.qteati.me/. It's possible to install the page as a web application and have it work offline:
-
-- On Windows 10+: open the page in Microsoft Edge and choose `Apps -> Install site as an app` from the menu;
-- On iPhone: open the page in Safari and choose `Share -> Add to Home Screen`;
-- On Android: open the page in Google Chrome and choose `Install app` from the menu;
-
-Note that the web option is practical, but not recommended for archival; you can't trust domains to always resolve to the same computer forever.
-
-## Hacking on Kate
-
-The core of Kate is written in [TypeScript](https://www.typescriptlang.org/), some tools are written in [Crochet](https://crochet.qteati.me/). To build Kate you'll need at least a working [Node.js 18+](https://nodejs.org/en/) environment.
-
-### Automatic bootstrapping (will download artifacts)
-
-There's an included bootstrap script in the repository that can set things up for you, in a common OS installation. However, it will download artifacts from the internet and invoke an external Zip application ([Extract-Archive](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.archive/expand-archive?view=powershell-7.3) on Windows, and `unzip` in MacOS/Linux) to unzip the Electron release. You can do all these steps with:
-
-```shell
-$ node support/bootstrap.js --npm-install --download-electron --unzip-electron --build
-```
-
-### Manual bootstrapping
-
-If you'd rather have a manual setup, you'll need the `glob` and `typescript` packages, and you'll need Electron 24.1.2. You can download the right `electron-*-.zip` for your OS/architecture from the [Electron releases page](https://github.com/electron/electron/releases/tag/v24.1.2), then extract to the `electron/` directory.
-
-Note that some sub-packages also have dependencies that need to be installed. See `node make dependencies` for what to do if you want to avoid network requests.
-
-After setting up, `node make all` will build all sub-packages.
-
-```shell
-$ node make all
-```
-
-### Checking that bootstrap was successful
-
-After this you should have a working Kate. You can either use `node make desktop:run` to run it as an Electron app, or start a server on the `www` folder and point a modern browser there.
-
-You should see a screen similar to the screenshot in this page, but without any cartridges. Drag the `hello.kart` file from the `examples/` folder and drop it over the console to install it. Then either click the game or use the keyboard/virtual buttons to play.
+For alternative installation options and how to build Kate from source, please refer to the [Kate installation instructions](./docs/installation.md).
 
 ## Examples
 
@@ -81,21 +39,14 @@ See the `examples/` folder in this repository for some example games. You can bu
 
 - [**Kat'chu**](examples/katchu/): An older-style handheld arcade where you shoot for the highest score in 30 seconds (uses the timer, cartridge, audio, input, capture, and storage APIs).
 
-## Cartridges and runtime
+## Contributing to Kate
 
-Kate games are packaged as a single `.kart` binary file. This file contains something that can run in a webbrowser, a specification of which runtime it needs to use, some meta-data, and a set of files in a read-only file-system. In that sense, it's much like a `.zip` file, just without compression and with some additional meta-data for the console.
+Kate does not accept source contributions currently, since it has not reached a stable release yet. However here are some other ways you can contribute to Kate's development:
 
-Currently the only supported runtime is `Web Archive`, which means you provide an HTML entry point and Kate will display that page in the console in a [fully sandboxed IFrame](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#attr-sandbox) with JavaScript support.
-
-This means no access to things like `fetch` or even loading images. In order to remediate that, Kate provides an IPC layer that allows this sandboxed process to do things—by posting messages to the parent window, and handling messages sent by the parent window.
-
-Web APIs can be emulated through what Kate calls "bridges": small scripts injected into the page that replace common Web APIs with an implementation over Kate's IPC, so the game in question doesn't need to be Kate-aware.
-
-By doing this, there's also no need for a web-server. Games can be played locally using all standard web technologies (and some enhanced Kate ones), and without worrying about network latency when loading resources. Players on the other hand enjoy the same benefits of regular executables without having to worry about sandboxing them themselves, or playing them in a different machine.
-
-You build these `.kart` files using the included `kart` application, providing it with a JSON configuration file and an output location. For safety the cartridge can only include files that are contained in the directory of the JSON file.
-
-See the `hello-world` example cartridge for some practical example of how this all works.
+- [Try Kate out](./docs/installation.md);
+- [Try porting your game to Kate](./docs/dev-manual.md);
+- Tell other people about Kate;
+- Report things that don't work for you, or that you feel are too cumbersome or unsafe;
 
 ## Roadmap
 

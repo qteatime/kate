@@ -5,6 +5,8 @@ const OS = require("os");
 const Path = require("path");
 const FS = require("fs");
 const glob = require("glob").sync;
+const { copy, copy_tree, assert_root, zip } = require("./support/utils");
+const gen_build = require("./support/generate-builds");
 
 class World {
   constructor() {
@@ -156,33 +158,6 @@ function kart({ config, output }) {
     output,
     config,
   ]);
-}
-
-function copy(from, to) {
-  console.log("-> Copy", from, "->", to);
-  FS.mkdirSync(Path.dirname(to), { recursive: true });
-  FS.copyFileSync(from, to);
-}
-
-function copy_tree(from, to, filter = (x) => true) {
-  console.log("-> Copy tree", from, "->", to);
-
-  const go = (src, dst) => {
-    const stat = FS.statSync(src);
-    if (stat.isFile()) {
-      if (filter(src)) {
-        copy(src, dst);
-      }
-    } else if (stat.isDirectory()) {
-      for (const entry of FS.readdirSync(src)) {
-        go(Path.join(src, entry), Path.join(dst, entry));
-      }
-    } else {
-      throw new Error(`Unsupported entity: ${src}`);
-    }
-  };
-
-  go(from, to);
 }
 
 function clean_build(root) {
@@ -554,6 +529,43 @@ w.task("chore:update-versions", [], () => {
   }
 });
 
+// -- Generating releases
+w.task("release:win:x64", ["desktop:clean", "desktop:build"], async () => {
+  await gen_build.gen_unsigned_zip("win32", "x64");
+});
+
+w.task("release:win:x86", ["desktop:clean", "desktop:build"], async () => {
+  await gen_build.gen_unsigned_zip("win32", "ia32");
+});
+
+w.task("release:win:arm64", ["desktop:clean", "desktop:build"], async () => {
+  await gen_build.gen_unsigned_zip("win32", "arm64");
+});
+
+w.task(
+  "release:win:all",
+  ["release:win:x64", "release:win:x86", "release:win:arm64"],
+  () => {}
+);
+
+w.task("release:linux:x64", ["desktop:clean", "desktop:build"], async () => {
+  await gen_build.gen_unsigned_zip("linux", "x64");
+});
+
+w.task("release:linux:armv7l", ["desktop:clean", "desktop:build"], async () => {
+  await gen_build.gen_unsigned_zip("linux", "armv7l");
+});
+
+w.task("release:linux:arm64", ["desktop:clean", "desktop:build"], async () => {
+  await gen_build.gen_unsigned_zip("linux", "arm64");
+});
+
+w.task(
+  "release:linux:all",
+  ["release:linux:x64", "release:linux:armv7l", "release:linux:arm64"],
+  () => {}
+);
+
 // -- Multi-project convenience
 w.task("dependencies", ["tools:dependencies"], () => {});
 
@@ -594,6 +606,7 @@ if (!task) {
   );
 }
 
+assert_root("make");
 w.run(task_name).catch((error) => {
   console.log("---\nTask execution failed.");
   console.error(error.stack);
