@@ -34,20 +34,24 @@ export class DatabaseSchema {
     );
   }
 
-  needs_data_migration(version: number) {
-    return this.data_migrations.some((x) => x.is_needed(version));
+  needs_data_migration(old_version: number) {
+    return this.data_migrations.some((x) =>
+      x.is_needed(old_version, this.version)
+    );
   }
 
   async run_data_migration(
-    version: number,
+    old_version: number,
     db: Database,
     progress: (migration: DataMigration, current: number, total: number) => void
   ) {
-    const migrations = this.data_migrations.filter((x) => x.is_needed(version));
+    const migrations = this.data_migrations.filter((x) =>
+      x.is_needed(old_version, this.version)
+    );
     let current = 1;
     for (const migration of migrations) {
       progress(migration, current, migrations.length);
-      await migration.run(version, db);
+      await migration.run(old_version, db);
       current += 1;
     }
   }
@@ -292,12 +296,12 @@ export class DataMigration {
     readonly process: (_: Database) => Promise<void>
   ) {}
 
-  is_needed(version: number) {
-    return version < this.version;
+  is_needed(old_version: number, new_version: number) {
+    return old_version < this.version && this.version <= new_version;
   }
 
-  async run(version: number, db: Database) {
-    if (this.is_needed(version)) {
+  async run(old_version: number, db: Database) {
+    if (this.is_needed(old_version, db.version)) {
       await this.process(db);
     }
   }

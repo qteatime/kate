@@ -1,6 +1,6 @@
 {
   "private": true,
-  "version": "0.23.5-a1",
+  "version": "0.23.5-a2",
   "dependencies": {
     "glob": "^8.1.0"
   },

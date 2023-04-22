@@ -17,6 +17,10 @@ function lift_request<A>(req: IDBRequest<A>): Promise<A> {
 export class Database {
   constructor(private db: IDBDatabase) {}
 
+  get version() {
+    return this.db.version;
+  }
+
   async delete_database() {
     this.db.close();
     await lift_request(indexedDB.deleteDatabase(this.db.name));
