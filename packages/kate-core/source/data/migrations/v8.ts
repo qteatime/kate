@@ -2,6 +2,7 @@ import { kate } from "../db";
 import { object_store_v1, object_store_v2 } from "../deprecated";
 
 kate.data_migration({
+  id: 1,
   since: 8,
   description: "update object storage tables",
   process: async (db) => {

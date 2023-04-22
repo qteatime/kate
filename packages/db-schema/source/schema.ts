@@ -57,13 +57,15 @@ export class DatabaseSchema {
   }
 
   data_migration(x: {
+    id: number;
     since: number;
     description: string;
     process: (_: Database) => Promise<void>;
   }) {
     this.data_migrations.push(
-      new DataMigration(x.since, x.description, x.process)
+      new DataMigration(x.id, x.since, x.description, x.process)
     );
+    this.data_migrations.sort((a, b) => a.id - b.id);
   }
 
   table1<S, K extends keyof S>(x: {
@@ -291,18 +293,32 @@ export class IndexSchema2<
 
 export class DataMigration {
   constructor(
+    readonly id: number,
     readonly version: number,
     readonly description: string,
     readonly process: (_: Database) => Promise<void>
   ) {}
 
   is_needed(old_version: number, new_version: number) {
+    const processed = JSON.parse(
+      localStorage["kate:migrations:done"] ?? "[]"
+    ) as number[];
+    if (processed.includes(this.id)) {
+      return false;
+    }
+
     return old_version < this.version && this.version <= new_version;
   }
 
   async run(old_version: number, db: Database) {
     if (this.is_needed(old_version, db.version)) {
       await this.process(db);
+
+      const processed = JSON.parse(
+        localStorage["kate:migrations:done"] ?? "[]"
+      ) as number[];
+      processed.push(this.id);
+      localStorage["kate:migrations:done"] = JSON.stringify(processed);
     }
   }
 }

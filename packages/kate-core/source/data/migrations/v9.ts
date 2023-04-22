@@ -8,6 +8,7 @@ import {
 } from "../object-storage";
 
 kate.data_migration({
+  id: 2,
   since: 9,
   description: "Update cartridge metadata to new format",
   process: async (db) => {
@@ -23,6 +24,7 @@ kate.data_migration({
 });
 
 kate.data_migration({
+  id: 3,
   since: 9,
   description: "Setup default stores and quotas for installed cartridges",
   process: async (db) => {
@@ -41,9 +43,26 @@ kate.data_migration({
             bucket_name: "kate:special",
             unique_bucket_id: "kate:special",
           });
+          tbuckets.add({
+            cartridge_id: cartridge.id,
+            version_id: null,
+            created_at: new Date(),
+            bucket_name: "kate:special",
+            unique_bucket_id: "kate:special",
+          });
           tquota.add({
             cartridge_id: cartridge.id,
             version_id: cartridge.metadata.version_id,
+            current_buckets_in_storage: 1,
+            current_items_in_storage: 0,
+            current_size_in_bytes: 0,
+            maximum_buckets_in_storage: 1_000,
+            maximum_items_in_storage: 10_000,
+            maximum_size_in_bytes: mb(64),
+          });
+          tquota.add({
+            cartridge_id: cartridge.id,
+            version_id: null,
             current_buckets_in_storage: 1,
             current_items_in_storage: 0,
             current_size_in_bytes: 0,
