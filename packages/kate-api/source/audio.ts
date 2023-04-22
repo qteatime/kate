@@ -19,12 +19,14 @@ export class KateAudio {
   }
 
   async stop_all_sources(channel: KateAudioChannel) {
-    await this.#channel.call("kate:audio.stop-all-sources", { id: channel.id });
+    await this.#channel.call("kate:audio.stop-all-sources", {
+      channel_id: channel.id,
+    });
   }
 
   async change_channel_volume(channel: KateAudioChannel, value: number) {
     await this.#channel.call("kate:audio.change-volume", {
-      id: channel.id,
+      channel_id: channel.id,
       volume: value,
     });
   }
@@ -39,8 +41,8 @@ export class KateAudio {
 
   async play(channel: KateAudioChannel, audio: KateAudioSource, loop: boolean) {
     await this.#channel.call("kate:audio.play", {
-      channel: channel.id,
-      source: audio.id,
+      channel_id: channel.id,
+      source_id: audio.id,
       loop: loop,
     });
   }
