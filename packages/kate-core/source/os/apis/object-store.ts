@@ -1,4 +1,5 @@
 import type { KateOS } from "../os";
+import * as Cart from "../../cart";
 import * as Db from "../../data";
 import { mb } from "../../utils";
 import { CartridgeId, VersionId } from "../../data";
@@ -14,8 +15,12 @@ export class KateObjectStore {
 
   constructor(readonly os: KateOS) {}
 
-  cartridge(id: CartridgeId, version: VersionId) {
-    return new CartridgeObjectStore(this, id, version);
+  cartridge(cart: Cart.CartMeta) {
+    return new CartridgeObjectStore(
+      this,
+      cart.metadata.id,
+      cart.metadata.version_id
+    );
   }
 }
 
@@ -53,6 +58,16 @@ export class CartridgeObjectStore {
       ]);
     });
     return new CartridgeBucket(this, bucket);
+  }
+
+  async get_local_storage() {
+    const bucket = await this.get_bucket(KateObjectStore.SPECIAL_BUCKET_KEY);
+    const entry = await bucket.try_read(KateObjectStore.LOCAL_STORAGE_KEY);
+    if (entry != null) {
+      return entry.data;
+    } else {
+      return {};
+    }
   }
 
   async list_buckets() {
