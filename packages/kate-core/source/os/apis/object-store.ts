@@ -19,7 +19,7 @@ export class KateObjectStore {
     return new CartridgeObjectStore(
       this,
       cart.metadata.id,
-      versioned ? cart.metadata.version_id : null
+      versioned ? cart.metadata.version_id : "<unversioned>"
     );
   }
 }

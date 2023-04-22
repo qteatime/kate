@@ -3,7 +3,7 @@ import { make_id } from "../utils";
 import { kate } from "./db";
 
 export type CartridgeId = string;
-export type VersionId = string | null;
+export type VersionId = string | "<unversioned>";
 
 export type OSPartition = {
   /* The unique cartridge id that owns this partition */

@@ -45,7 +45,7 @@ kate.data_migration({
           });
           tbuckets.add({
             cartridge_id: cartridge.id,
-            version_id: null,
+            version_id: "<unversioned>",
             created_at: new Date(),
             bucket_name: "kate:special",
             unique_bucket_id: "kate:special",
@@ -62,7 +62,7 @@ kate.data_migration({
           });
           tquota.add({
             cartridge_id: cartridge.id,
-            version_id: null,
+            version_id: "<unversioned>",
             current_buckets_in_storage: 1,
             current_items_in_storage: 0,
             current_size_in_bytes: 0,
