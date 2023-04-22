@@ -37,7 +37,7 @@ class HighScore {
   async save_if_highest(score: number) {
     if (score > this._score) {
       const bucket = await HighScore.bucket;
-      await bucket.update_structured(HighScore.KEY, score);
+      await bucket.write_structured(HighScore.KEY, score);
       this._score = score;
     }
   }

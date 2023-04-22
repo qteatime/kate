@@ -87,12 +87,12 @@ export class CartridgeObjectStore {
     }
   }
 
-  async list_buckets() {
+  async list_buckets(count?: number) {
     const buckets = await this.transaction("readonly", async (storage) => {
-      return await storage.partitions_by_version.get_all([
-        this.cartridge_id,
-        this.version,
-      ]);
+      return await storage.partitions_by_version.get_all(
+        [this.cartridge_id, this.version],
+        count
+      );
     });
     return buckets.map((x) => new CartridgeBucket(this, x));
   }
@@ -169,7 +169,7 @@ export class CartridgeBucket {
     });
   }
 
-  async add(
+  async create(
     key: string,
     entry: { type: string; metadata: unknown; data: unknown }
   ) {
@@ -194,7 +194,7 @@ export class CartridgeBucket {
     });
   }
 
-  async update(
+  async write(
     key: string,
     entry: { type: string; metadata: unknown; data: unknown }
   ) {
@@ -204,7 +204,7 @@ export class CartridgeBucket {
       estimate(entry.type) +
       estimate(key);
     await this.transaction("readwrite", async (storage) => {
-      await storage.update_entry(
+      await storage.write_entry(
         this.parent.cartridge_id,
         this.parent.version,
         this.bucket.unique_bucket_id,

@@ -58,7 +58,7 @@ export default [
     TC.spec({ versioned: TC.bool, count: TC.optional(undefined, TC.int) }),
     async (os, env, ipc, { versioned, count }) => {
       const store = os.object_store.cartridge(env.cart, versioned);
-      const buckets = await store.list_buckets();
+      const buckets = await store.list_buckets(count);
       return buckets.map(public_repr.bucket);
     }
   ),
@@ -153,14 +153,14 @@ export default [
   ),
 
   handler(
-    "kate:store.update",
+    "kate:store.write",
     TC.spec({
       versioned: TC.bool,
       bucket_name,
       key: TC.str,
       type: TC.str,
-      metadata: TC.dictionary,
-      data: TC.anything,
+      metadata: TC.dictionary(TC.anything()),
+      data: TC.anything(),
     }),
     async (
       os,
@@ -170,7 +170,7 @@ export default [
     ) => {
       const store = os.object_store.cartridge(env.cart, versioned);
       const bucket = await store.get_bucket(bucket_name);
-      await bucket.update(key, {
+      await bucket.write(key, {
         type: type,
         metadata: metadata,
         data: data,
@@ -186,8 +186,8 @@ export default [
       bucket_name,
       key: TC.str,
       type: TC.str,
-      metadata: TC.dictionary,
-      data: TC.anything,
+      metadata: TC.dictionary(TC.anything()),
+      data: TC.anything(),
     }),
     async (
       os,
@@ -197,7 +197,7 @@ export default [
     ) => {
       const store = os.object_store.cartridge(env.cart, versioned);
       const bucket = await store.get_bucket(bucket_name);
-      await bucket.add(key, {
+      await bucket.create(key, {
         type: type,
         metadata: metadata,
         data: data,

@@ -93,7 +93,7 @@ class OSCartridge {
 
   async update_local_storage(data: { [key: string]: string }) {
     const bucket = await this.get_special_bucket();
-    await bucket.update("kate:local-storage", {
+    await bucket.write("kate:local-storage", {
       type: "kate::structured",
       metadata: {},
       data: data,
@@ -163,11 +163,11 @@ class OSBucket {
     return (await this.try_read(key))?.data ?? null;
   }
 
-  async update(
+  async write(
     key: string,
     entry: { type: string; metadata: { [key: string]: unknown }; data: unknown }
   ) {
-    return this.#channel.call("kate:store.update", {
+    return this.#channel.call("kate:store.write", {
       versioned: this.versioned,
       bucket_name: this.name,
       key: key,
@@ -177,12 +177,12 @@ class OSBucket {
     });
   }
 
-  async update_structured(
+  async write_structured(
     key: string,
     data: unknown,
     metadata: { [key: string]: unknown } = {}
   ) {
-    await this.update(key, { type: "kate::structured", metadata, data });
+    await this.write(key, { type: "kate::structured", metadata, data });
   }
 
   async create(

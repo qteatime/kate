@@ -297,7 +297,7 @@ export class ObjectStorage {
     });
   }
 
-  async update_entry(
+  async write_entry(
     cartridge_id: CartridgeId,
     version_id: VersionId,
     bucket_id: string,
@@ -309,12 +309,16 @@ export class ObjectStorage {
       data: unknown;
     }
   ) {
-    const previous_entry = await this.entries.get([bucket_id, entry.key]);
+    const previous_entry = await this.entries.try_get([bucket_id, entry.key]);
+    const now = new Date();
+    const previous_created_at = previous_entry?.created_at ?? now;
+    const previous_size = previous_entry?.size ?? 0;
+
     await this.entries.put({
       unique_bucket_id: bucket_id,
       key: entry.key,
-      created_at: previous_entry.created_at,
-      updated_at: new Date(),
+      created_at: previous_created_at,
+      updated_at: now,
       size: entry.size,
       type: entry.type,
       metadata: entry.metadata,
@@ -325,8 +329,7 @@ export class ObjectStorage {
       data: entry.data,
     });
     const quota = await this.quota.get([cartridge_id, version_id]);
-    const new_size =
-      quota.current_size_in_bytes + entry.size - previous_entry.size;
+    const new_size = quota.current_size_in_bytes + entry.size - previous_size;
     if (new_size > quota.maximum_size_in_bytes) {
       throw new EQuotaExceeded(
         cartridge_id,

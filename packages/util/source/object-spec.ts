@@ -142,7 +142,7 @@ export function dictionary<A>(p: (_: any) => A) {
       throw new EType("dictionary", x);
     }
     const result: { [key: string]: A } = Object.create(null);
-    for (const [k, v] of x) {
+    for (const [k, v] of Object.entries(x)) {
       result[k] = p(v);
     }
     return result;
