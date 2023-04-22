@@ -1,23 +1,76 @@
 import type { RuntimeEnv } from "../../kernel";
 import type { KateOS } from "../os";
 import { TC } from "../../utils";
+import { CartridgeBucket } from "./object-store";
+import { CartridgeQuota, OSEntry } from "../../data";
 
-type Message =
-  | { type: "kate:cart.read-file"; payload: { path: string } }
-  | { type: "kate:store.list"; payload: { bucket: string; count?: number } }
-  | { type: "kate:store.get"; payload: { bucket: string; key: string } }
-  | { type: "kate:store.try-get"; payload: { bucket: string; key: string } }
+type CartFS_Message = {
+  type: "kate:cart.read-file";
+  payload: { path: string };
+};
+
+type ObjectStore_Message =
   | {
-      type: "kate:store.put";
-      payload: { bucket: string; key: string; value: unknown };
+      type: "kate:store.list-buckets";
+      payload: { versioned: boolean; count?: number };
     }
   | {
-      type: "kate:store.add";
-      payload: { bucket: string; key: string; value: unknown };
+      type: "kate:store.add-bucket";
+      payload: { versioned: boolean; name: string };
     }
-  | { type: "kate:store.delete"; payload: { bucket: string; key: string } }
-  | { type: "kate:store.clear"; payload: { bucket: string } }
-  | { type: "kate:store.usage"; payload: {} }
+  | {
+      type: "kate:store.ensure-bucket";
+      payload: { versioned: boolean; name: string };
+    }
+  | {
+      type: "kate:store.delete-bucket";
+      payload: { versioned: boolean; name: string };
+    }
+  | {
+      type: "kate:store.count-entries";
+      payload: { versioned: boolean; bucket: string };
+    }
+  | {
+      type: "kate:store.list-entries";
+      payload: { versioned: boolean; bucket: string; count?: number };
+    }
+  | {
+      type: "kate:store.read";
+      payload: { versioned: boolean; bucket: string; key: string };
+    }
+  | {
+      type: "kate:store.try-read";
+      payload: { versioned: boolean; bucket: string; key: string };
+    }
+  | {
+      type: "kate:store.update";
+      payload: {
+        versioned: boolean;
+        bucket: string;
+        key: string;
+        type: string;
+        metadata: { [key: string]: unknown };
+        data: unknown;
+      };
+    }
+  | {
+      type: "kate:store.create";
+      payload: {
+        versioned: boolean;
+        bucket: string;
+        key: string;
+        type: string;
+        metadata: { [key: string]: unknown };
+        data: unknown;
+      };
+    }
+  | {
+      type: "kate:store.delete";
+      payload: { versioned: boolean; bucket: string; key: string };
+    }
+  | { type: "kate:store.usage"; payload: { versioned: boolean } };
+
+type Audio_Message =
   | { type: "kate:audio.create-channel"; payload: { max_tracks?: number } }
   | { type: "kate:audio.resume-channel"; payload: { id: string } }
   | { type: "kate:audio.pause-channel"; payload: { id: string } }
@@ -30,8 +83,11 @@ type Message =
   | {
       type: "kate:audio.play";
       payload: { channel: string; source: string; loop: boolean };
-    }
-  | { type: "kate:special.focus" }
+    };
+
+type Special_Message = { type: "kate:special.focus" };
+
+type Capture_Message =
   | {
       type: "kate:capture.save-image";
       payload: { data: Uint8Array; type: string; token: string };
@@ -40,11 +96,20 @@ type Message =
   | {
       type: "kate:capture.save-recording";
       payload: { data: Uint8Array; type: string; token: string };
-    }
-  | {
-      type: "kate:notify.transient";
-      payload: { title: string; message: string };
     };
+
+type Notify_Message = {
+  type: "kate:notify.transient";
+  payload: { title: string; message: string };
+};
+
+type Message =
+  | CartFS_Message
+  | ObjectStore_Message
+  | Audio_Message
+  | Special_Message
+  | Capture_Message
+  | Notify_Message;
 
 export class KateIPCServer {
   private _handlers = new Map<string, RuntimeEnv>();
@@ -282,60 +347,126 @@ export class KateIPCServer {
       }
 
       // -- Object store
-      case "kate:store.usage": {
-        const usage = await this.os.object_store.get_usage(
-          env.cart.metadata.id
+      case "kate:store.list-buckets": {
+        const store = this.os.object_store.cartridge(
+          env.cart,
+          message.payload.versioned
         );
-        return ok({ available: usage.available, used: usage.used });
+        const buckets = await store.list_buckets();
+        return ok(buckets.map(public_repr.bucket));
       }
 
-      case "kate:store.add": {
-        await this.os.object_store
-          .get_bucket(env.cart.metadata.id, message.payload.bucket)
-          .add(TC.string(message.payload.key), message.payload.value);
+      case "kate:store.add-bucket": {
+        const store = this.os.object_store.cartridge(
+          env.cart,
+          message.payload.versioned
+        );
+        await store.add_bucket(message.payload.name);
         return ok(null);
+      }
+
+      case "kate:store.ensure-bucket": {
+        const store = this.os.object_store.cartridge(
+          env.cart,
+          message.payload.versioned
+        );
+        await store.ensure_bucket(message.payload.name);
+        return ok(null);
+      }
+
+      case "kate:store.delete-bucket": {
+        const store = this.os.object_store.cartridge(
+          env.cart,
+          message.payload.versioned
+        );
+        const bucket = await store.get_bucket(message.payload.name);
+        await bucket.delete_bucket();
+        return ok(null);
+      }
+
+      case "kate:store.count-entries": {
+        const store = this.os.object_store.cartridge(
+          env.cart,
+          message.payload.versioned
+        );
+        const bucket = await store.get_bucket(message.payload.bucket);
+        return ok(await bucket.count());
+      }
+
+      case "kate:store.list-entries": {
+        const store = this.os.object_store.cartridge(
+          env.cart,
+          message.payload.versioned
+        );
+        const bucket = await store.get_bucket(message.payload.bucket);
+        const entries = await bucket.list_metadata(message.payload.count);
+        return ok(entries.map(public_repr.storage_entry));
+      }
+
+      case "kate:store.read": {
+        const store = this.os.object_store.cartridge(
+          env.cart,
+          message.payload.versioned
+        );
+        const bucket = await store.get_bucket(message.payload.bucket);
+        const entry = await bucket.read(message.payload.key);
+        return ok(public_repr.storage_entry_with_data(entry));
+      }
+
+      case "kate:store.try-read": {
+        const store = this.os.object_store.cartridge(
+          env.cart,
+          message.payload.versioned
+        );
+        const bucket = await store.get_bucket(message.payload.bucket);
+        const entry = await bucket.try_read(message.payload.key);
+        return entry == null
+          ? ok(null)
+          : ok(public_repr.storage_entry_with_data(entry));
+      }
+
+      case "kate:store.update": {
+        const store = this.os.object_store.cartridge(
+          env.cart,
+          message.payload.versioned
+        );
+        const bucket = await store.get_bucket(message.payload.bucket);
+        await bucket.update(message.payload.key, {
+          type: message.payload.type,
+          metadata: message.payload.metadata,
+          data: message.payload.data,
+        });
+      }
+
+      case "kate:store.create": {
+        const store = this.os.object_store.cartridge(
+          env.cart,
+          message.payload.versioned
+        );
+        const bucket = await store.get_bucket(message.payload.bucket);
+        await bucket.add(message.payload.key, {
+          type: message.payload.type,
+          metadata: message.payload.metadata,
+          data: message.payload.data,
+        });
       }
 
       case "kate:store.delete": {
-        await this.os.object_store
-          .get_bucket(env.cart.metadata.id, message.payload.bucket)
-          .delete(TC.string(message.payload.key));
-        return ok(null);
+        const store = this.os.object_store.cartridge(
+          env.cart,
+          message.payload.versioned
+        );
+        const bucket = await store.get_bucket(message.payload.bucket);
+        await bucket.delete(message.payload.key);
       }
 
-      case "kate:store.get": {
-        const value = await this.os.object_store
-          .get_bucket(env.cart.metadata.id, message.payload.bucket)
-          .get(TC.string(message.payload.key));
-        return ok(value);
-      }
-
-      case "kate:store.try-get": {
-        const value = await this.os.object_store
-          .get_bucket(env.cart.metadata.id, message.payload.bucket)
-          .try_get(TC.string(message.payload.key));
-        return ok(value);
-      }
-
-      case "kate:store.list": {
-        const values = await this.os.object_store
-          .get_bucket(env.cart.metadata.id, message.payload.bucket)
-          .list(TC.nullable(TC.integer, message.payload.count));
-        return ok(values);
-      }
-
-      case "kate:store.put": {
-        await this.os.object_store
-          .get_bucket(env.cart.metadata.id, message.payload.bucket)
-          .put(TC.string(message.payload.key), message.payload.value);
-        return ok(null);
-      }
-
-      case "kate:store.clear": {
-        await this.os.object_store
-          .get_bucket(env.cart.metadata.id, message.payload.bucket)
-          .clear();
-        return ok(null);
+      case "kate:store.usage": {
+        const store = this.os.object_store.cartridge(
+          env.cart,
+          message.payload.versioned
+        );
+        const usage = await store.usage();
+        return ok(public_repr.storage_usage(usage));
       }
 
       // -- Audio
@@ -409,3 +540,50 @@ export class KateIPCChannel {
     this.server.remove_process(this.env);
   }
 }
+
+export const public_repr = {
+  bucket: (x: CartridgeBucket) => {
+    return {
+      name: x.bucket.bucket_name,
+      created_at: x.bucket.created_at,
+    };
+  },
+
+  storage_entry: (x: OSEntry) => {
+    return {
+      key: x.key,
+      created_at: x.created_at,
+      updated_at: x.updated_at,
+      type: x.type,
+      size: x.size,
+      metadata: x.metadata,
+    };
+  },
+
+  storage_entry_with_data: (x: OSEntry & { data: unknown }) => {
+    return {
+      key: x.key,
+      created_at: x.created_at,
+      updated_at: x.updated_at,
+      type: x.type,
+      size: x.size,
+      metadata: x.metadata,
+      data: x.data,
+    };
+  },
+
+  storage_usage: (x: CartridgeQuota) => {
+    return {
+      limits: {
+        size_in_bytes: x.maximum_size_in_bytes,
+        buckets: x.maximum_buckets_in_storage,
+        entries: x.maximum_items_in_storage,
+      },
+      usage: {
+        size_in_bytes: x.current_size_in_bytes,
+        buckets: x.current_buckets_in_storage,
+        entries: x.current_items_in_storage,
+      },
+    };
+  },
+};

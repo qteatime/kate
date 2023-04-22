@@ -15,11 +15,11 @@ export class KateObjectStore {
 
   constructor(readonly os: KateOS) {}
 
-  cartridge(cart: Cart.CartMeta) {
+  cartridge(cart: Cart.CartMeta, versioned: boolean) {
     return new CartridgeObjectStore(
       this,
       cart.metadata.id,
-      cart.metadata.version_id
+      versioned ? cart.metadata.version_id : null
     );
   }
 }
@@ -42,11 +42,28 @@ export class CartridgeObjectStore {
     return Db.ObjectStorage.transaction(this.db, mode, fn);
   }
 
+  async usage() {
+    return await this.transaction("readonly", async (storage) => {
+      return storage.quota.get([this.cartridge_id, this.version]);
+    });
+  }
+
   async add_bucket(name: string) {
     const bucket = await this.transaction("readwrite", async (storage) => {
       return storage.add_bucket(this.cartridge_id, this.version, name);
     });
     return new CartridgeBucket(this, bucket);
+  }
+
+  async ensure_bucket(name: string) {
+    const bucket = await this.transaction("readonly", async (storage) =>
+      storage.partitions.try_get([this.cartridge_id, this.version, name])
+    );
+    if (bucket != null) {
+      return new CartridgeBucket(this, bucket);
+    } else {
+      return await this.add_bucket(name);
+    }
   }
 
   async get_bucket(name: string) {
@@ -130,7 +147,7 @@ export class CartridgeBucket {
         key,
       ]);
       const data = await storage.data.get([this.bucket.unique_bucket_id, key]);
-      return { ...metadata, data: data };
+      return { ...metadata, data: data.data };
     });
   }
 
@@ -147,7 +164,7 @@ export class CartridgeBucket {
           this.bucket.unique_bucket_id,
           key,
         ]);
-        return { ...metadata, data: data };
+        return { ...metadata, data: data.data };
       }
     });
   }
