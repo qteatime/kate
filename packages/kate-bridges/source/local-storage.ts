@@ -4,13 +4,15 @@ declare var KATE_LOCAL_STORAGE: Dict | null;
 
 const { store } = KateAPI;
 let contents = KATE_LOCAL_STORAGE ?? Object.create(null);
-const bucket = store.get_special_bucket();
+const unversioned_store = store.unversioned();
 
 let timer: any = null;
 function persist(contents: Dict) {
   clearTimeout(timer);
   timer = setTimeout(() => {
-    bucket.put(store.special_keys.local_storage, contents);
+    unversioned_store.update_local_storage(contents).catch((e) => {
+      console.error("[Kate] Failed to update local storage", e);
+    });
   });
 }
 

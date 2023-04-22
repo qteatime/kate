@@ -12,6 +12,16 @@ export class EType extends EParse {
   }
 }
 
+export class EInstance extends EParse {
+  constructor(readonly name: string, readonly value: any) {
+    super();
+  }
+
+  get message() {
+    return `Expected an instance of ${this.name}`;
+  }
+}
+
 export class EUnexpected extends EParse {
   constructor(readonly expected: any, readonly actual: any) {
     super();
@@ -122,13 +132,17 @@ export function bool(x: any): boolean {
   }
 }
 
+export function anything() {
+  return (x: unknown) => x;
+}
+
 export function dictionary<A>(p: (_: any) => A) {
   return (x: any) => {
     if (x == null || Object(x) !== x) {
       throw new EType("dictionary", x);
     }
     const result: { [key: string]: A } = Object.create(null);
-    for (const [k, v] of x) {
+    for (const [k, v] of Object.entries(x)) {
       result[k] = p(v);
     }
     return result;
@@ -273,6 +287,19 @@ export function one_of<K>(xs: readonly K[]) {
       return x as K;
     } else {
       throw new EOneOf(xs, x);
+    }
+  };
+}
+
+export function instance_of<A>(
+  type: { new (...args: any[]): A },
+  name?: string
+) {
+  return (x: unknown) => {
+    if (x instanceof type) {
+      return x;
+    } else {
+      throw new EInstance(name ?? type.name, x);
     }
   };
 }

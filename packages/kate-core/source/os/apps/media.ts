@@ -1,9 +1,8 @@
 import type { KateOS } from "../os";
 import { h } from "../ui/widget";
 import * as UI from "../ui/widget";
-import type { ExtendedInputKey } from "../../kernel";
-import * as Db from "../../data/db";
-import { Scene, SimpleScene } from "../ui/scenes";
+import * as Db from "../../data";
+import { SimpleScene } from "../ui/scenes";
 import { SceneViewMedia } from "./view-media";
 
 export class SceneMedia extends SimpleScene {

@@ -15,7 +15,7 @@ packages/kate-bridges/source/index.ts
 examples/boon-scrolling/**/*.js
 packages/kate-domui/source/assets.ts
 packages/schema/**/*.js
-design/
+/design/
 ignore/
 dist/
 !examples/hello-world/hello.kart
@@ -23,7 +23,7 @@ dist/
 asset-source
 packages/kate-desktop/app
 packages/kate-tools/packaging
-examples/katchu/katchu.js
+examples/katchu/www/katchu.js
 !examples/katchu/katchu.kart
 www/loader.js
 electron/

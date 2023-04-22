@@ -34,32 +34,38 @@ export class DatabaseSchema {
     );
   }
 
-  needs_data_migration(version: number) {
-    return this.data_migrations.some((x) => x.is_needed(version));
+  needs_data_migration(old_version: number) {
+    return this.data_migrations.some((x) =>
+      x.is_needed(old_version, this.version)
+    );
   }
 
   async run_data_migration(
-    version: number,
+    old_version: number,
     db: Database,
     progress: (migration: DataMigration, current: number, total: number) => void
   ) {
-    const migrations = this.data_migrations.filter((x) => x.is_needed(version));
+    const migrations = this.data_migrations.filter((x) =>
+      x.is_needed(old_version, this.version)
+    );
     let current = 1;
     for (const migration of migrations) {
       progress(migration, current, migrations.length);
-      await migration.run(version, db);
+      await migration.run(old_version, db);
       current += 1;
     }
   }
 
   data_migration(x: {
+    id: number;
     since: number;
     description: string;
     process: (_: Database) => Promise<void>;
   }) {
     this.data_migrations.push(
-      new DataMigration(x.since, x.description, x.process)
+      new DataMigration(x.id, x.since, x.description, x.process)
     );
+    this.data_migrations.sort((a, b) => a.id - b.id);
   }
 
   table1<S, K extends keyof S>(x: {
@@ -287,18 +293,33 @@ export class IndexSchema2<
 
 export class DataMigration {
   constructor(
+    readonly id: number,
     readonly version: number,
     readonly description: string,
     readonly process: (_: Database) => Promise<void>
   ) {}
 
-  is_needed(version: number) {
-    return version < this.version;
+  is_needed(old_version: number, new_version: number) {
+    const processed = JSON.parse(
+      localStorage["kate:migrations:done"] ?? "[]"
+    ) as number[];
+    if (processed.includes(this.id)) {
+      return false;
+    }
+
+    return old_version < this.version && this.version <= new_version;
   }
 
-  async run(version: number, db: Database) {
-    if (this.is_needed(version)) {
+  async run(old_version: number, db: Database) {
+    if (this.is_needed(old_version, db.version)) {
       await this.process(db);
+
+      let processed = JSON.parse(
+        localStorage["kate:migrations:done"] ?? "[]"
+      ) as number[];
+      processed.push(this.id);
+      processed = [...new Set(processed)];
+      localStorage["kate:migrations:done"] = JSON.stringify(processed);
     }
   }
 }

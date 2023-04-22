@@ -17,6 +17,10 @@ function lift_request<A>(req: IDBRequest<A>): Promise<A> {
 export class Database {
   constructor(private db: IDBDatabase) {}
 
+  get version() {
+    return this.db.version;
+  }
+
   async delete_database() {
     this.db.close();
     await lift_request(indexedDB.deleteDatabase(this.db.name));
@@ -109,10 +113,16 @@ export class Table<Schema, Key, Props> {
   constructor(private store: IDBObjectStore) {}
 
   async add(value: Schema): Promise<Key> {
+    if (value === undefined) {
+      throw new Error(`'undefined' is not supported as a value`);
+    }
     return (await lift_request(this.store.add(value))) as any;
   }
 
   async put(value: Schema): Promise<Key> {
+    if (value === undefined) {
+      throw new Error(`'undefined' is not supported as a value`);
+    }
     return (await lift_request(this.store.put(value))) as any;
   }
 
@@ -129,19 +139,23 @@ export class Table<Schema, Key, Props> {
   }
 
   async get(query: Key): Promise<Schema> {
-    return await lift_request(this.store.get(query as any));
+    const result = await lift_request(this.store.get(query as any));
+    if (result === undefined) {
+      throw new Error(`key not found: ${query}`);
+    }
+    return result;
   }
 
   async get_all(query?: Key, count?: number): Promise<Schema[]> {
     return await lift_request(this.store.getAll(query as any, count));
   }
 
-  async try_get(query?: Key) {
-    const value = await this.get_all(query, 1);
-    if (value.length === 1) {
-      return value[0];
-    } else {
+  async try_get(query?: Key): Promise<Schema | null> {
+    const value = await lift_request(this.store.get(query as any));
+    if (value === undefined) {
       return null;
+    } else {
+      return value;
     }
   }
 }

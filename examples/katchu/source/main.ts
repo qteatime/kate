@@ -20,10 +20,13 @@ class HighScore {
 
   constructor(private _score: number) {}
 
+  static get bucket() {
+    return KateAPI.store.unversioned().get_special_bucket();
+  }
+
   static async load() {
-    const score = (await KateAPI.store
-      .get_special_bucket()
-      .try_get(HighScore.KEY)) as number | null;
+    const bucket = await HighScore.bucket;
+    const score = (await bucket.try_read_data(HighScore.KEY)) as number | null;
     return new HighScore(score ?? 0);
   }
 
@@ -33,7 +36,8 @@ class HighScore {
 
   async save_if_highest(score: number) {
     if (score > this._score) {
-      await KateAPI.store.get_special_bucket().put(HighScore.KEY, score);
+      const bucket = await HighScore.bucket;
+      await bucket.write_structured(HighScore.KEY, score);
       this._score = score;
     }
   }

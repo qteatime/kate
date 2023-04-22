@@ -4,6 +4,7 @@ import { str, list, chars_in_mb, regex } from "./parser-utils";
 
 export type Metadata = {
   id: string;
+  version_id: string;
   game: {
     author: string;
     title: string;
@@ -97,8 +98,13 @@ export function version_string(meta: Metadata) {
 }
 
 export function parse_metadata(cart: Cart_v2.Cartridge): Metadata {
+  const version = {
+    major: Math.floor(cart.metadata.release.version.major),
+    minor: Math.floor(cart.metadata.release.version.minor),
+  };
   return {
     id: str(valid_id(cart.id), 255),
+    version_id: `${version.major}.${version.minor}`,
     game: {
       title: str(cart.metadata.title.title, 255),
       author: str(cart.metadata.title.author, 255),
@@ -114,10 +120,7 @@ export function parse_metadata(cart: Cart_v2.Cartridge): Metadata {
     release: {
       kind: release_kind(cart.metadata.release.release_type),
       date: date(cart.metadata.release.release_date),
-      version: {
-        major: Math.floor(cart.metadata.release.version.major),
-        minor: Math.floor(cart.metadata.release.version.minor),
-      },
+      version: version,
       licence_name: str(cart.metadata.release.licence_name, 255),
       allow_commercial: cart.metadata.release.allow_commercial,
       allow_derivative: cart.metadata.release.allow_derivative,
