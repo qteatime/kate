@@ -151,7 +151,7 @@ class OSBucket {
     return (await this.read(key)).data;
   }
 
-  async try_read(key: string): Promise<Object> {
+  async try_read(key: string): Promise<Object | null> {
     return this.#channel.call("kate:store.try-read", {
       versioned: this.versioned,
       bucket_name: this.name,
@@ -159,8 +159,8 @@ class OSBucket {
     });
   }
 
-  async try_read_data(key: string) {
-    return (await this.try_read(key)).data;
+  async try_read_data(key: string): Promise<unknown | null> {
+    return (await this.try_read(key))?.data ?? null;
   }
 
   async update(
