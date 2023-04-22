@@ -7,7 +7,7 @@ export * from "../../util/build/url";
 export * from "../../util/build/graphics";
 export * from "../../util/build/mime";
 export * from "../../util/build/ua-parser";
-export * as TC from "../../util/build/type-check";
+export * as TC from "../../util/build/object-spec";
 export * from "../../util/build/unit";
 export * as Sets from "../../util/build/sets";
 export * from "../../util/build/observable";

@@ -14,7 +14,7 @@ import { KateNotification } from "./apis/notification";
 import { KateDropInstaller } from "./apis/drop-installer";
 import { KateFocusHandler } from "./apis/focus-handler";
 import { KateStatusBar } from "./apis/status-bar";
-import { KateIPCServer } from "./apis/ipc";
+import { KateIPCServer } from "./ipc";
 import { KateAudioServer, KateObjectStore } from "./apis";
 import { KateDialog } from "./apis/dialog";
 import { KateCapture } from "./apis/capture";

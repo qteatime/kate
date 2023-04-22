@@ -3,7 +3,6 @@ export * from "./cart-manager";
 export * from "./context_menu";
 export * from "./drop-installer";
 export * from "./focus-handler";
-export * from "./ipc";
 export * from "./object-store";
 export * from "./notification";
 export * from "./processes";
