@@ -17,6 +17,7 @@ type SystemInfo = {
     name: string;
     platform: NodeJS.Platform;
     version: string;
+    extended_version: string;
     arm64_translation: boolean;
     architecture: string;
   };

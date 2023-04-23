@@ -21,9 +21,10 @@ export async function get_system_info() {
       free: memory.free,
     },
     os: {
-      name: OS.version(),
+      name: OS.type(),
       platform: OS.platform(),
       version: OS.release(),
+      extended_version: OS.version(),
       arm64_translation: app.runningUnderARM64Translation,
       architecture: OS.arch(),
     },

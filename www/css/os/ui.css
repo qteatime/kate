@@ -82,6 +82,7 @@
 
 .kate-ui-info-line-data {
   color: var(--color-text-muted);
+  white-space: pre-wrap;
 }
 
 /* #Legible bg */

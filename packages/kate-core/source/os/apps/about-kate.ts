@@ -120,7 +120,11 @@ export class SceneAboutKate extends SimpleScene {
         return {
           kate: this.kate_info(),
           host: {
-            os: info.os.name,
+            os: `${info.os.name} ${info.os.version}\n(${
+              info.os.extended_version === info.os.version
+                ? ""
+                : info.os.extended_version
+            })`,
             browser: info.engine.map((x) => `${x.name} ${x.version}`),
             device: device,
             arm64_translation: info.os.arm64_translation,
