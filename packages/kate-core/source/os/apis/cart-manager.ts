@@ -157,7 +157,7 @@ export class CartManager {
     );
 
     await this.os.db.transaction(
-      [Db.cart_meta, Db.cart_files, Db.play_habits],
+      [Db.cart_meta, Db.cart_files, Db.play_habits, ...Db.ObjectStorage.tables],
       "readwrite",
       async (t) => {
         const meta = t.get_table1(Db.cart_meta);
@@ -201,6 +201,11 @@ export class CartManager {
           play_time: 0,
         };
         await habits.put(play_habits);
+
+        await new Db.ObjectStorage(t).initialise(
+          cart.metadata.id,
+          cart.metadata.version_id
+        );
       }
     );
     await this.os.notifications.push(

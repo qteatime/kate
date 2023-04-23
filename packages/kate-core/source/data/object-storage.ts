@@ -1,5 +1,5 @@
 import { Database, Transaction } from "../db-schema";
-import { make_id } from "../utils";
+import { make_id, mb } from "../utils";
 import { kate } from "./db";
 
 export type CartridgeId = string;
@@ -342,6 +342,50 @@ export class ObjectStorage {
     await this.quota.put({
       ...quota,
       current_size_in_bytes: new_size,
+    });
+  }
+
+  async initialise(cartridge_id: string, version_id: string) {
+    // This might be a reinstall
+    const quota = await this.quota.try_get([cartridge_id, version_id]);
+    if (quota != null) {
+      return;
+    }
+
+    this.partitions.add({
+      cartridge_id,
+      version_id,
+      created_at: new Date(),
+      bucket_name: "kate:special",
+      unique_bucket_id: make_id(),
+    });
+
+    this.partitions.add({
+      cartridge_id,
+      version_id: "<unversioned>",
+      created_at: new Date(),
+      bucket_name: "kate:special",
+      unique_bucket_id: make_id(),
+    });
+    this.quota.add({
+      cartridge_id: cartridge_id,
+      version_id: version_id,
+      current_buckets_in_storage: 1,
+      current_items_in_storage: 0,
+      current_size_in_bytes: 0,
+      maximum_buckets_in_storage: 1_000,
+      maximum_items_in_storage: 10_000,
+      maximum_size_in_bytes: mb(64),
+    });
+    this.quota.add({
+      cartridge_id: cartridge_id,
+      version_id: "<unversioned>",
+      current_buckets_in_storage: 1,
+      current_items_in_storage: 0,
+      current_size_in_bytes: 0,
+      maximum_buckets_in_storage: 1_000,
+      maximum_items_in_storage: 10_000,
+      maximum_size_in_bytes: mb(64),
     });
   }
 }
