@@ -77,6 +77,10 @@ export class SceneHome extends SimpleScene {
           (list.firstElementChild as HTMLElement) ??
           null
       );
+      const qs = this.canvas.querySelector(
+        ".kate-os-quickstart"
+      ) as HTMLElement;
+      qs.classList.toggle("hidden", carts.length !== 0);
     } catch (error) {
       console.error("[Kate] Failed to load cartridges", error);
       this.os.notifications.push(
@@ -152,6 +156,19 @@ export class SceneHome extends SimpleScene {
   body_container(body: UI.Widgetable[]): HTMLElement {
     return h("div", { class: "kate-os-carts-scroll" }, [
       h("div", { class: "kate-os-carts" }, []),
+      h("div", { class: "kate-os-quickstart hidden" }, [
+        h("h2", { class: "kate-os-quickstart-title" }, ["No cartridges :("]),
+        h("div", { class: "kate-os-quickstart-description" }, [
+          "Drag and drop a ",
+          h("tt", {}, [".kart"]),
+          " file here ",
+          "to install it.\n",
+          "Or hold ",
+          UI.icon("menu"),
+          " (Menu) and choose ",
+          h("tt", {}, ["Install Cartridge..."]),
+        ]),
+      ]),
     ]);
   }
 
