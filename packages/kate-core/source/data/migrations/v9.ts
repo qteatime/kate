@@ -1,9 +1,12 @@
-import { mb } from "../../utils";
+import { Range } from "../../db-schema";
+import { make_id, mb } from "../../utils";
 import { cart_meta } from "../cartridge";
 import { kate } from "../db";
 import {
   ObjectStorage,
   cartridge_quota,
+  os_data,
+  os_entry,
   os_partition,
 } from "../object-storage";
 
@@ -41,14 +44,14 @@ kate.data_migration({
             version_id: cartridge.metadata.version_id,
             created_at: new Date(),
             bucket_name: "kate:special",
-            unique_bucket_id: "kate:special",
+            unique_bucket_id: make_id(),
           });
           tbuckets.add({
             cartridge_id: cartridge.id,
             version_id: "<unversioned>",
             created_at: new Date(),
             bucket_name: "kate:special",
-            unique_bucket_id: "kate:special",
+            unique_bucket_id: make_id(),
           });
           tquota.add({
             cartridge_id: cartridge.id,
@@ -73,5 +76,31 @@ kate.data_migration({
         }
       }
     );
+  },
+});
+
+kate.data_migration({
+  id: 4,
+  since: 9,
+  description: "Fix special storage buckets",
+  process: async (db) => {
+    await db.transaction(ObjectStorage.tables, "readwrite", async (trans) => {
+      const tbuckets = trans.get_table3(os_partition);
+      for (const bucket of await tbuckets.get_all()) {
+        if (bucket.unique_bucket_id === "kate:special") {
+          bucket.unique_bucket_id = make_id();
+          await tbuckets.put(bucket);
+        }
+      }
+
+      const tentries = trans.get_table2(os_entry);
+      const tdata = trans.get_table2(os_data);
+      for (const entry of await tentries.get_all(
+        Range.from(["kate:special", ""])
+      )) {
+        await tentries.delete(["kate:special", entry.key]);
+        await tdata.delete(["kate:special", entry.key]);
+      }
+    });
   },
 });

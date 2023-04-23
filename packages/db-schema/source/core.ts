@@ -14,6 +14,52 @@ function lift_request<A>(req: IDBRequest<A>): Promise<A> {
   });
 }
 
+type IRange<A> = IDBKeyRange & { __range: "range" };
+
+type QueryArray<T> = T extends [infer A, infer B, infer C]
+  ? [A, B, C] | IRange<[A, B, C]>
+  : T extends [infer A, infer B]
+  ? [A, B] | IRange<[A, B]>
+  : T extends [infer A]
+  ? [A] | IRange<[A]>
+  : T | IRange<T>;
+
+export class Range {
+  static from<A>(
+    key: A,
+    x: { inclusive: boolean } = { inclusive: true }
+  ): IRange<A> {
+    return IDBKeyRange.lowerBound(key, !x.inclusive) as IRange<A>;
+  }
+
+  static to<A>(
+    key: A,
+    x: { inclusive: boolean } = { inclusive: true }
+  ): IRange<A> {
+    return IDBKeyRange.upperBound(key, !x.inclusive) as IRange<A>;
+  }
+
+  static between<A>(
+    lower: A,
+    upper: A,
+    x: { lower_inclusive: boolean; upper_inclusive: boolean } = {
+      lower_inclusive: true,
+      upper_inclusive: true,
+    }
+  ): IRange<A> {
+    return IDBKeyRange.bound(
+      lower,
+      upper,
+      !x.lower_inclusive,
+      !x.upper_inclusive
+    ) as IRange<A>;
+  }
+
+  static exactly<A>(key: A): IRange<A> {
+    return IDBKeyRange.only(key) as IRange<A>;
+  }
+}
+
 export class Database {
   constructor(private db: IDBDatabase) {}
 
@@ -130,7 +176,7 @@ export class Table<Schema, Key, Props> {
     await lift_request(this.store.clear());
   }
 
-  async count(query?: Key) {
+  async count(query?: QueryArray<Key>) {
     return await lift_request(this.store.count(query as any));
   }
 
@@ -146,11 +192,11 @@ export class Table<Schema, Key, Props> {
     return result;
   }
 
-  async get_all(query?: Key, count?: number): Promise<Schema[]> {
+  async get_all(query?: QueryArray<Key>, count?: number): Promise<Schema[]> {
     return await lift_request(this.store.getAll(query as any, count));
   }
 
-  async try_get(query?: Key): Promise<Schema | null> {
+  async try_get(query: Key): Promise<Schema | null> {
     const value = await lift_request(this.store.get(query as any));
     if (value === undefined) {
       return null;
@@ -163,7 +209,7 @@ export class Table<Schema, Key, Props> {
 export class Index<Schema, Key, Props> {
   constructor(private index: IDBIndex) {}
 
-  async count(query: Key) {
+  async count(query: QueryArray<Key>) {
     return await lift_request(this.index.count(query as any));
   }
 
@@ -171,7 +217,7 @@ export class Index<Schema, Key, Props> {
     return await lift_request(this.index.get(query as any));
   }
 
-  async get_all(query: Key, count?: number): Promise<Schema[]> {
+  async get_all(query?: QueryArray<Key>, count?: number): Promise<Schema[]> {
     return await lift_request(this.index.getAll(query as any, count));
   }
 }

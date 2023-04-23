@@ -299,27 +299,29 @@ export class DataMigration {
     readonly process: (_: Database) => Promise<void>
   ) {}
 
+  private done(): number[] {
+    return JSON.parse(localStorage["kate:migrations:done"] ?? "[]");
+  }
+
+  private mark_done() {
+    const done = new Set(this.done());
+    done.add(this.id);
+    localStorage["kate:migrations:done"] = JSON.stringify([...done]);
+  }
+
   is_needed(old_version: number, new_version: number) {
-    const processed = JSON.parse(
-      localStorage["kate:migrations:done"] ?? "[]"
-    ) as number[];
+    const processed = this.done();
     if (processed.includes(this.id)) {
       return false;
     }
 
-    return old_version < this.version && this.version <= new_version;
+    return old_version <= this.version && this.version <= new_version;
   }
 
   async run(old_version: number, db: Database) {
     if (this.is_needed(old_version, db.version)) {
       await this.process(db);
-
-      let processed = JSON.parse(
-        localStorage["kate:migrations:done"] ?? "[]"
-      ) as number[];
-      processed.push(this.id);
-      processed = [...new Set(processed)];
-      localStorage["kate:migrations:done"] = JSON.stringify(processed);
+      this.mark_done();
     }
   }
 }
