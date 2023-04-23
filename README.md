@@ -13,7 +13,7 @@ It's built to be secure, respect your privacy, and give you agency on how you pl
 
 - [The Kate Concept Paper](./docs/concept.md) — wondering why Kate was made and what drives its design? Your answers are here.
 
-- [The Kate User Manual](./docs/user-manual.md) — confused about how Kate works, or want something to link from your game page for common things like "how controls work" and "what's this icon on the screen?". This is where you go.
+- [The Kate User Manual](./docs/user-manual.md) — confused about how Kate works, or want something to link from your game page for common things like "how controls work" and "what's this icon on the screen?". This is where you go. (work in progress)
 
 - [The Kate Threat Model](./docs/threat-model.md) — wondering how Kate protects your safety and privacy? This document goes into details of what you're signing up for, using real-world examples. (work in progress, technical)
 
