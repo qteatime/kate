@@ -11,28 +11,7 @@ export async function translate_html(html: string, context: RuntimeEnv) {
   await inline_all_scripts(dom, context);
   await inline_all_links(dom, context);
   await load_all_media(dom, context);
-  add_cover(dom, context);
   return dom.documentElement.outerHTML;
-}
-
-export function add_cover(dom: Document, context: RuntimeEnv) {
-  const element = dom.createElement("div");
-  const id = `kate_${make_id().replace(/\-/g, "_")}`;
-  element.id = id;
-  element.style.position = "fixed";
-  element.style.top = "0px";
-  element.style.left = "0px";
-  element.style.width = "100%";
-  element.style.height = "100%";
-  element.style.zIndex = "99999";
-  element.setAttribute(
-    "onclick",
-    `
-    event.preventDefault();
-    KateAPI.focus();
-    `
-  );
-  dom.body.appendChild(element);
 }
 
 async function load_all_media(dom: Document, context: RuntimeEnv) {

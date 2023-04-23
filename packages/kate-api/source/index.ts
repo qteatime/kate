@@ -28,9 +28,9 @@ input.setup();
 export const capture = new KateCapture(channel, input);
 capture.setup();
 
-export const focus = () => {
+window.addEventListener("focus", () => {
   channel.send_and_ignore_result("kate:special.focus", {});
-};
+});
 
 export type KateAPI = {
   events: typeof events;
@@ -40,7 +40,6 @@ export type KateAPI = {
   audio: typeof audio;
   timer: typeof timer;
   capture: typeof capture;
-  focus: () => void;
 };
 
 declare global {
