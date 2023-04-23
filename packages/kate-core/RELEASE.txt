@@ -76,6 +76,16 @@ Note that settings in Kate are not versioned, so the only supported action
 is always to revert to the default settings, then reconfigure.
 
 
+Pre-built binaries
+------------------
+
+This version is the first to feature pre-built native binaries (based on
+Electron v24). Binaries are still unsigned and themselves unsandboxed
+(though the Kate kernel and cartridges are subject to the Chromium
+sandbox, as usual), but sandboxing the emulator binary is the next
+step in shipping a safe Kate emulator that works for archival purposes.
+
+
 Fixed bugs
 ----------
 
