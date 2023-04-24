@@ -1,8 +1,9 @@
-import type { kernel, os } from "../../../kate-core";
+import type { kernel, os, cart } from "../../../kate-core";
 
 declare var Kate: {
   kernel: typeof kernel;
   os: typeof os;
+  cart: typeof cart;
 };
 
 async function main() {
@@ -13,15 +14,17 @@ async function main() {
         mode: "single",
       }
     );
-    const kate_os = await Kate.os.KateOS.boot(kate);
-    const loading = new Kate.os.apps.HUD_LoadIndicator(kate_os);
-    kate_os.show_hud(loading);
 
     const cart_bytes = new Uint8Array(
       await (await fetch("game.kart")).arrayBuffer()
     );
+    const cart = Kate.cart.parse(cart_bytes);
 
-    document.querySelector(".kate-hud-load-screen")!.textContent =
+    const kate_os = await Kate.os.KateOS.boot(kate, {
+      database: `kate/${cart.metadata.id}`,
+    });
+
+    document.querySelector("#kate-loading")!.textContent =
       "Click, touch, or press a key to start...";
 
     async function start() {
@@ -30,7 +33,7 @@ async function main() {
       window.removeEventListener("touchstart", start);
 
       await kate_os.processes.run_from_cartridge(cart_bytes);
-      kate_os.hide_hud(loading);
+      document.querySelector("#kate-loading")?.remove();
     }
     window.addEventListener("touchstart", start);
     window.addEventListener("click", start);

@@ -146,10 +146,10 @@ export class KateOS {
     this.display.classList.toggle("disable-animation", !enabled);
   }
 
-  static async boot(kernel: KateKernel) {
+  static async boot(kernel: KateKernel, x: { database?: string } = {}) {
     // Setup OS
     const sfx = await KateSfx.make(kernel);
-    const { db, old_version } = await KateDb.kate.open();
+    const { db, old_version } = await KateDb.kate.open(x.database);
     const settings = await KateSettings.load(db);
     const os = new KateOS(kernel, db, sfx, settings);
     kernel.console.on_virtual_button_touched.listen(

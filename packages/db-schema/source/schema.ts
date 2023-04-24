@@ -5,10 +5,12 @@ export class DatabaseSchema {
   readonly data_migrations: DataMigration[] = [];
   constructor(readonly name: string, readonly version: number) {}
 
-  async open() {
+  async open(override_name?: string) {
+    const name = override_name ?? this.name;
+
     return new Promise<{ db: Database; old_version: number }>(
       (resolve, reject) => {
-        const request = indexedDB.open(this.name, this.version);
+        const request = indexedDB.open(name, this.version);
         let old_version: number = this.version;
 
         request.onerror = (ev) => {
