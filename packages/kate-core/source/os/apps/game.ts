@@ -12,17 +12,11 @@ export class SceneGame extends Scene {
   on_attached(): void {
     this.os.focus_handler.on_focus_changed.listen(this.handle_focus_changed);
     this.os.focus_handler.listen(this.canvas, this.handle_key_pressed);
-    this.canvas
-      .querySelector(".kate-os-game-cover")!
-      .addEventListener("click", this.focus_frame);
   }
 
   on_detached(): void {
     this.os.focus_handler.on_focus_changed.remove(this.handle_focus_changed);
     this.os.focus_handler.listen(this.canvas, this.handle_key_pressed);
-    this.canvas
-      .querySelector(".kate-os-game-cover")!
-      .removeEventListener("click", this.focus_frame);
   }
 
   handle_key_pressed = (x: { key: ExtendedInputKey; is_repeat: boolean }) => {
@@ -47,9 +41,6 @@ export class SceneGame extends Scene {
   };
 
   render() {
-    return h("div", { class: "kate-os-game" }, [
-      this.process.runtime.node,
-      h("div", { class: "kate-os-game-cover" }, []),
-    ]);
+    return h("div", { class: "kate-os-game" }, [this.process.runtime.node]);
   }
 }

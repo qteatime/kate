@@ -32,6 +32,26 @@ window.addEventListener("focus", () => {
   channel.send_and_ignore_result("kate:special.focus", {});
 });
 
+// NOTE: this is a best-effort to avoid the game accidentally trapping focus
+//       and breaking keyboard/gamepad input, it's not a security measure;
+//       there is no way of making it secure from within the cartridge as
+//       we have to assume all cartridge code is malicious and hostile.
+const cover = document.createElement("div");
+cover.style.display = "block";
+cover.style.position = "absolute";
+cover.style.top = "0px";
+cover.style.left = "0px";
+cover.style.width = "100%";
+cover.style.height = "100%";
+const highest_zindex = /* prettier-ignore */ String((2**32)/2 - 1);
+
+window.addEventListener("load", () => {
+  document.body?.appendChild(cover);
+  setInterval(() => {
+    cover.style.zIndex = highest_zindex;
+  }, 1_000);
+});
+
 export type KateAPI = {
   events: typeof events;
   cart_fs: typeof cart_fs;
