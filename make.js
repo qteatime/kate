@@ -402,6 +402,7 @@ w.task("www:bundle", ["core:build", "glomp:build"], () => {
     out: `www/loader.js`,
     name: "Kate_webloader",
   });
+  copy("packages/kate-core/build/worker.js", "www/worker.js");
   copy("packages/kate-core/RELEASE.txt", `www/kate/RELEASE-latest.txt`);
 });
 

@@ -29,3 +29,4 @@ www/loader.js
 electron/
 !packages/kate-desktop/source/electron.d.ts
 .cache
+www/worker.js
