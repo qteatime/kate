@@ -421,7 +421,11 @@ body {
   overflow: hidden;
   display: flex;
   flex-direction: column-reverse;
-  justify-content: right;
+  justify-content: end;
   align-items: end;
   padding: 2rem;
+  background: #2f2f2f;
+  color: #fafafa;
+  font-size: 24px;
+  font-weight: bold;
 }

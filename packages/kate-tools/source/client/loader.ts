@@ -1,9 +1,10 @@
-import type { kernel, os, cart } from "../../../kate-core";
+import type { kernel, os, cart, data } from "../../../kate-core";
 
 declare var Kate: {
   kernel: typeof kernel;
   os: typeof os;
   cart: typeof cart;
+  data: typeof data;
 };
 
 async function main() {
@@ -24,6 +25,14 @@ async function main() {
       database: `kate/${cart.metadata.id}`,
     });
 
+    await Kate.data.ObjectStorage.transaction(
+      kate_os.db,
+      "readwrite",
+      async (storage) => {
+        await storage.initialise(cart.metadata.id, cart.metadata.version_id);
+      }
+    );
+
     document.querySelector("#kate-loading")!.textContent =
       "Click, touch, or press a key to start...";
 
@@ -32,8 +41,13 @@ async function main() {
       window.removeEventListener("keydown", start);
       window.removeEventListener("touchstart", start);
 
-      await kate_os.processes.run_from_cartridge(cart_bytes);
-      document.querySelector("#kate-loading")?.remove();
+      try {
+        await kate_os.processes.run_from_cartridge(cart_bytes);
+        document.querySelector("#kate-loading")?.remove();
+      } catch (error) {
+        alert(`Kate failed to run the cartridge: ${error}`);
+        console.error("[Kate] failed to run the cartridge", error);
+      }
     }
     window.addEventListener("touchstart", start);
     window.addEventListener("click", start);

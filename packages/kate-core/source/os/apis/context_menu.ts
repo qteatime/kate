@@ -6,6 +6,7 @@ import { SceneMedia } from "../apps/media";
 import { SceneTextFile } from "../apps/text-file";
 import * as UI from "../ui";
 import { EventStream } from "../../utils";
+import { SceneSettings } from "../apps";
 
 declare global {
   function showOpenFilePicker(options: {
@@ -88,6 +89,9 @@ export class HUD_ContextMenu extends Scene {
                 UI.fa_icon_button("cat", "About Kate").on_clicked(
                   this.on_about_kate
                 ),
+                UI.fa_icon_button("gear", "Settings").on_clicked(
+                  this.on_settings
+                ),
               ]),
             ]),
             else: new UI.Menu_list([
@@ -161,6 +165,10 @@ export class HUD_ContextMenu extends Scene {
 
   on_about_kate = () => {
     this.os.push_scene(new SceneAboutKate(this.os));
+  };
+
+  on_settings = () => {
+    this.os.push_scene(new SceneSettings(this.os));
   };
 
   on_toggle_fullscreen = () => {

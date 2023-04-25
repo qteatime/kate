@@ -10,14 +10,16 @@ export class SceneSettings extends UI.SimpleScene {
 
   body() {
     return [
-      UI.link_card(this.os, {
-        icon: "calendar",
-        title: "Play habits",
-        description: "Recently played and play time",
-        on_click: () => {
-          this.os.push_scene(new ScenePlayHabitsSettings(this.os));
-        },
-      }),
+      UI.when(this.os.kernel.console.options.mode !== "single", [
+        UI.link_card(this.os, {
+          icon: "calendar",
+          title: "Play habits",
+          description: "Recently played and play time",
+          on_click: () => {
+            this.os.push_scene(new ScenePlayHabitsSettings(this.os));
+          },
+        }),
+      ]),
 
       UI.link_card(this.os, {
         icon: "gamepad",
