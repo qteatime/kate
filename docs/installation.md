@@ -14,6 +14,8 @@ From most recommended to least recommended:
 - [Pre-built binaries](#pre-built-binaries) (available on Linux and Windows);
 - [Building from source](#building-from-source) (available on Linux and Windows);
 
+See the [compåatibility matrix](#compatibility-matrix) for all available options in each platform.
+
 > **NOTE:**<br>
 > The web version should be compatible with MacOS, ChromeOS, and other platforms with a modern browser. However those devices are not currently part of the testing pipeline. Once they are they will be added to the list, too.
 
@@ -122,3 +124,41 @@ Both of these will download Electron from [the Electron releases page on GitHub]
 ### Caveats
 
 The same caveats as with [the pre-built binaries](#pre-built-binaries) applies. Electron in itself is unsandboxed, only the Kate kernel and cartridge processes run inside of a sandbox.
+
+## Compatibility matrix
+
+### Web version
+
+We aim to support the latest version of all mainstream browsers. The web version of Kate has been tested and runs on the following browsers:
+
+| Browser            | Version supported | Device/OS tested                 |
+| ------------------ | ----------------- | -------------------------------- |
+| Microsoft Edge     | 110+              | Windows 10 x64, Windows 11 x64   |
+| Google Chrome      | 110+              | Windows 11 x64, Ubuntu 20.04 x64 |
+| Firefox            | 110+              | Windows 11 x64                   |
+| Opera              | 96+               | Windows 11 x64                   |
+| Chrome for Android | 108+              | Android 9                        |
+| Safari for iOS     | 16.4 (1)          | iOS 16.4                         |
+
+(1) Due to missing features from Apple, the latest Safari on iOS does not yet support: fullscreen, video recording.
+
+Installing the web app works in the following device/OSs:
+
+- iPhone/iPad: only with Safari;
+- Android: only with Chrome for Android;
+- Windows 10+: only with Microsoft Edge;
+
+### Native version
+
+The native version works on Windows 10+ (x64, x86, and ARM64 architectures), and on Linux (x64, ARM64, and ARMv7L). It should work on MacOS (x64 and ARM64) as well, but it's not tested and there are no pre-built binaries provided yet for it.
+
+Testing of the native version has been done on the following operating systems:
+
+- Windows:
+  - Windows 10 (x64);
+  - Windows 11 (x64);
+- Linux:
+  - Ubuntu 20.04 (x64);
+  - Raspbery Pi OS 11 (ARMv7L);
+
+Pre-built binaries do not work on Windows 8 and earlier because Google has stopped supporting those versions in Chromium.
