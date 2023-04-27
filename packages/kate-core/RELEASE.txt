@@ -2,8 +2,10 @@
 Kate v0.23.5  (May 2023)
 =======================================================================
 
-The v0.23.5 is May's experimental release of Kate, including a
-handful of bugfixes and small improvements.
+The v0.23.5 is May's experimental release of Kate with a focus on
+improving the storage and input APIs as well as how we communicate
+risks to players, but also includes a handful of assorted bugfixes
+and small improvements in other areas.
 
 
 Adding buckets to Storage API
