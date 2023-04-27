@@ -16,16 +16,22 @@ export async function translate_html(html: string, context: RuntimeEnv) {
 
 async function load_all_media(dom: Document, context: RuntimeEnv) {
   for (const img of Array.from(dom.querySelectorAll("img"))) {
-    const path = img.getAttribute("src")!;
-    const file = await try_get_file(path, context);
+    const maybe_path = img.getAttribute("src");
+    if (maybe_path == null) {
+      continue;
+    }
+    const path = Pathname.from_string(maybe_path);
+    const file = await try_get_file(path.as_string(), context);
     if (file == null) {
       continue;
     }
     if (file.data.length < 1024 * 1024) {
       // inline 1mb or less images
-      img.setAttribute("src", await get_data_url(path, context));
+      img.setAttribute("src", await get_data_url(path.as_string(), context));
     } else {
       img.classList.add("kate-lazy-load");
+      img.setAttribute("data-src", path.as_string());
+      img.removeAttribute("src");
     }
   }
 
@@ -33,7 +39,7 @@ async function load_all_media(dom: Document, context: RuntimeEnv) {
   loader.textContent = `
   void async function() {
     for (const element of Array.from(document.querySelectorAll(".kate-lazy-load"))) {
-      const path = element.getAttribute("src");
+      const path = element.getAttribute("data-src");
       if (path) {
         element.setAttribute("src", await KateAPI.cart_fs.get_file_url(path));
       }
