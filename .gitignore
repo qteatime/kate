@@ -18,13 +18,10 @@ packages/schema/**/*.js
 /design/
 ignore/
 dist/
-!examples/hello-world/hello.kart
-!examples/boon-scrolling/boon-scrolling.kart
 asset-source
 packages/kate-desktop/app
 packages/kate-tools/packaging
 examples/katchu/www/katchu.js
-!examples/katchu/katchu.kart
 www/loader.js
 electron/
 !packages/kate-desktop/source/electron.d.ts
