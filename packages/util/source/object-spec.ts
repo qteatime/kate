@@ -197,6 +197,16 @@ export function int(x: any): number {
   }
 }
 
+export function byte(x: any): number {
+  return seq2(int, (x) => {
+    if (x < 0 || x > 255) {
+      throw new EType("byte", x);
+    } else {
+      return x;
+    }
+  })(x);
+}
+
 export function max_length(size: number) {
   return (x: string) => {
     if (x.length < size) {
@@ -253,6 +263,10 @@ export function optional<A>(default_value: A, spec: (_: any) => A) {
       return spec(x);
     }
   };
+}
+
+export function lazy<A>(p: (_: any) => A) {
+  return (x: any) => p(x);
 }
 
 export function lazy_optional<A>(default_value: () => A, spec: (_: any) => A) {
@@ -350,17 +364,20 @@ export function seq3<A, B, C, D>(
   };
 }
 
-export function tagged_choice<U>(choices: { [key: string]: (_: any) => U }) {
+export function tagged_choice<U, T extends string>(
+  tag_field: string,
+  choices: Record<T, (_: any) => U>
+) {
   return (x: any) => {
     if (x == null || Object(x) !== x) {
       throw new EType("tagged object", x);
     }
-    if (typeof x.type !== "string" || !choices[x.type]) {
-      throw new EAt("type", new EOneOf(Object.keys(choices), x.type));
+    if (typeof x[tag_field] !== "string" || !choices[x[tag_field] as T]) {
+      throw new EAt(tag_field, new EOneOf(Object.keys(choices), x[tag_field]));
     }
 
     Object.entries(x);
-    const spec = choices[x.type];
+    const spec = choices[x[tag_field] as T];
     return spec(x);
   };
 }
@@ -377,6 +394,10 @@ export function or<A, B>(a: (_: any) => A, b: (_: any) => B) {
       }
     }
   };
+}
+
+export function choice<A>(a: ((_: any) => A)[]) {
+  return a.reduce(or);
 }
 
 type P<A> = (_: any) => A;

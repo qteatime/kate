@@ -1,5 +1,7 @@
 % ljt/0
 
+schema "KART" version 1
+
 type Cartridge {
   field id: Text;
   field metadata: Metadata;

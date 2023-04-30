@@ -1,9 +1,9 @@
-import * as Cart_v2 from "../../../schema/generated/cartridge";
-import * as Fingerprint from "../../../schema/lib/fingerprint";
+import * as Cart_v2 from "../../../../schema/generated/cartridge";
+import * as Fingerprint from "../../../../schema/lib/fingerprint";
 import * as Metadata from "./metadata";
 import * as Runtime from "./runtime";
 import * as Files from "./files";
-import { Cart } from "./cart-type";
+import { Cart } from "../cart-type";
 
 export { Cart_v2, Fingerprint };
 

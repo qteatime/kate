@@ -12,5 +12,8 @@
   "bugs": {
     "url": "https://github.com/qteatime/kate/issues"
   },
-  "homepage": "https://github.com/qteatime/kate#readme"
+  "homepage": "https://github.com/qteatime/kate#readme",
+  "dependencies": {
+    "@qteatime/ljt-vm": "^0.1.0"
+  }
 }

@@ -1,5 +1,5 @@
-import * as CartMetadata from "../cart/metadata";
-import * as CartRuntime from "../cart/runtime";
+import * as CartMetadata from "../cart/v2/metadata";
+import * as CartRuntime from "../cart/v2/runtime";
 import { kate } from "./db";
 
 export type CartMeta = {

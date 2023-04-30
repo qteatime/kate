@@ -1,0 +1,1334 @@
+{
+  "magic": [
+    75,
+    65,
+    82,
+    84
+  ],
+  "version": 1,
+  "entities": [
+    {
+      "type": "record",
+      "name": "Meta-security",
+      "id": 8,
+      "versions": [
+        {
+          "fields": [
+            {
+              "name": "capabilities",
+              "type": {
+                "op": "array",
+                "items": {
+                  "op": "union",
+                  "id": 9
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "record",
+      "name": "Cartridge",
+      "id": 0,
+      "versions": [
+        {
+          "fields": [
+            {
+              "name": "id",
+              "type": {
+                "op": "text"
+              }
+            },
+            {
+              "name": "metadata",
+              "type": {
+                "op": "record",
+                "id": 2
+              }
+            },
+            {
+              "name": "files",
+              "type": {
+                "op": "array",
+                "items": {
+                  "op": "record",
+                  "id": 1
+                }
+              }
+            },
+            {
+              "name": "platform",
+              "type": {
+                "op": "union",
+                "id": 24
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "record",
+      "name": "File",
+      "id": 1,
+      "versions": [
+        {
+          "fields": [
+            {
+              "name": "path",
+              "type": {
+                "op": "text"
+              }
+            },
+            {
+              "name": "mime",
+              "type": {
+                "op": "text"
+              }
+            },
+            {
+              "name": "data",
+              "type": {
+                "op": "bytes"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "record",
+      "name": "Metadata",
+      "id": 2,
+      "versions": [
+        {
+          "fields": [
+            {
+              "name": "title",
+              "type": {
+                "op": "record",
+                "id": 3
+              }
+            },
+            {
+              "name": "release",
+              "type": {
+                "op": "record",
+                "id": 4
+              }
+            },
+            {
+              "name": "rating",
+              "type": {
+                "op": "record",
+                "id": 5
+              }
+            },
+            {
+              "name": "play",
+              "type": {
+                "op": "record",
+                "id": 6
+              }
+            },
+            {
+              "name": "security",
+              "type": {
+                "op": "record",
+                "id": 8
+              }
+            },
+            {
+              "name": "extras",
+              "type": {
+                "op": "array",
+                "items": {
+                  "op": "union",
+                  "id": 7
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "record",
+      "name": "Meta-title",
+      "id": 3,
+      "versions": [
+        {
+          "fields": [
+            {
+              "name": "author",
+              "type": {
+                "op": "text"
+              }
+            },
+            {
+              "name": "title",
+              "type": {
+                "op": "text"
+              }
+            },
+            {
+              "name": "description",
+              "type": {
+                "op": "text"
+              }
+            },
+            {
+              "name": "genre",
+              "type": {
+                "op": "array",
+                "items": {
+                  "op": "union",
+                  "id": 10
+                }
+              }
+            },
+            {
+              "name": "tags",
+              "type": {
+                "op": "array",
+                "items": {
+                  "op": "text"
+                }
+              }
+            },
+            {
+              "name": "thumbnail",
+              "type": {
+                "op": "record",
+                "id": 1
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "record",
+      "name": "Meta-release",
+      "id": 4,
+      "versions": [
+        {
+          "fields": [
+            {
+              "name": "release-type",
+              "type": {
+                "op": "union",
+                "id": 11
+              }
+            },
+            {
+              "name": "release-date",
+              "type": {
+                "op": "record",
+                "id": 14
+              }
+            },
+            {
+              "name": "version",
+              "type": {
+                "op": "record",
+                "id": 12
+              }
+            },
+            {
+              "name": "legal-notices",
+              "type": {
+                "op": "text"
+              }
+            },
+            {
+              "name": "licence-name",
+              "type": {
+                "op": "text"
+              }
+            },
+            {
+              "name": "allow-derivative",
+              "type": {
+                "op": "bool"
+              }
+            },
+            {
+              "name": "allow-commercial",
+              "type": {
+                "op": "bool"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "record",
+      "name": "Meta-rating",
+      "id": 5,
+      "versions": [
+        {
+          "fields": [
+            {
+              "name": "rating",
+              "type": {
+                "op": "union",
+                "id": 13
+              }
+            },
+            {
+              "name": "warnings",
+              "type": {
+                "op": "optional",
+                "value": {
+                  "op": "text"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "record",
+      "name": "Meta-play",
+      "id": 6,
+      "versions": [
+        {
+          "fields": [
+            {
+              "name": "input-methods",
+              "type": {
+                "op": "array",
+                "items": {
+                  "op": "union",
+                  "id": 16
+                }
+              }
+            },
+            {
+              "name": "local-multiplayer",
+              "type": {
+                "op": "optional",
+                "value": {
+                  "op": "record",
+                  "id": 17
+                }
+              }
+            },
+            {
+              "name": "online-multiplayer",
+              "type": {
+                "op": "optional",
+                "value": {
+                  "op": "record",
+                  "id": 17
+                }
+              }
+            },
+            {
+              "name": "languages",
+              "type": {
+                "op": "array",
+                "items": {
+                  "op": "record",
+                  "id": 18
+                }
+              }
+            },
+            {
+              "name": "accessibility",
+              "type": {
+                "op": "array",
+                "items": {
+                  "op": "union",
+                  "id": 19
+                }
+              }
+            },
+            {
+              "name": "average-duration",
+              "type": {
+                "op": "union",
+                "id": 15
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "union",
+      "name": "Extra",
+      "id": 7,
+      "versions": [
+        {
+          "variants": [
+            {
+              "name": "Booklet",
+              "fields": [
+                {
+                  "name": "pages",
+                  "type": {
+                    "op": "array",
+                    "items": {
+                      "op": "union",
+                      "id": 20
+                    }
+                  }
+                },
+                {
+                  "name": "custom-css",
+                  "type": {
+                    "op": "text"
+                  }
+                },
+                {
+                  "name": "language",
+                  "type": {
+                    "op": "text"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "union",
+      "name": "Capability",
+      "id": 9,
+      "versions": [
+        {
+          "variants": [
+            {
+              "name": "Network",
+              "fields": [
+                {
+                  "name": "allow",
+                  "type": {
+                    "op": "array",
+                    "items": {
+                      "op": "text"
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "union",
+      "name": "Genre",
+      "id": 10,
+      "versions": [
+        {
+          "variants": [
+            {
+              "name": "Not-specified",
+              "fields": []
+            },
+            {
+              "name": "Action",
+              "fields": []
+            },
+            {
+              "name": "Figthing",
+              "fields": []
+            },
+            {
+              "name": "Interactive-fiction",
+              "fields": []
+            },
+            {
+              "name": "Platformer",
+              "fields": []
+            },
+            {
+              "name": "Puzzle",
+              "fields": []
+            },
+            {
+              "name": "Racing",
+              "fields": []
+            },
+            {
+              "name": "Rhythm",
+              "fields": []
+            },
+            {
+              "name": "RPG",
+              "fields": []
+            },
+            {
+              "name": "Simulation",
+              "fields": []
+            },
+            {
+              "name": "Shooter",
+              "fields": []
+            },
+            {
+              "name": "Sports",
+              "fields": []
+            },
+            {
+              "name": "Strategy",
+              "fields": []
+            },
+            {
+              "name": "Tool",
+              "fields": []
+            },
+            {
+              "name": "Other",
+              "fields": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "union",
+      "name": "Release-type",
+      "id": 11,
+      "versions": [
+        {
+          "variants": [
+            {
+              "name": "Prototype",
+              "fields": []
+            },
+            {
+              "name": "Early-access",
+              "fields": []
+            },
+            {
+              "name": "Beta",
+              "fields": []
+            },
+            {
+              "name": "Demo",
+              "fields": []
+            },
+            {
+              "name": "Full",
+              "fields": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "record",
+      "name": "Version",
+      "id": 12,
+      "versions": [
+        {
+          "fields": [
+            {
+              "name": "major",
+              "type": {
+                "op": "uint32"
+              }
+            },
+            {
+              "name": "minor",
+              "type": {
+                "op": "uint32"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "union",
+      "name": "Content-rating",
+      "id": 13,
+      "versions": [
+        {
+          "variants": [
+            {
+              "name": "General",
+              "fields": []
+            },
+            {
+              "name": "Teen-and-up",
+              "fields": []
+            },
+            {
+              "name": "Mature",
+              "fields": []
+            },
+            {
+              "name": "Explicit",
+              "fields": []
+            },
+            {
+              "name": "Unknown",
+              "fields": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "record",
+      "name": "Date",
+      "id": 14,
+      "versions": [
+        {
+          "fields": [
+            {
+              "name": "year",
+              "type": {
+                "op": "uint32"
+              }
+            },
+            {
+              "name": "month",
+              "type": {
+                "op": "uint8"
+              }
+            },
+            {
+              "name": "day",
+              "type": {
+                "op": "uint8"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "union",
+      "name": "Duration",
+      "id": 15,
+      "versions": [
+        {
+          "variants": [
+            {
+              "name": "Seconds",
+              "fields": []
+            },
+            {
+              "name": "Few-minutes",
+              "fields": []
+            },
+            {
+              "name": "Half-hour",
+              "fields": []
+            },
+            {
+              "name": "One-hour",
+              "fields": []
+            },
+            {
+              "name": "Few-hours",
+              "fields": []
+            },
+            {
+              "name": "Several-hours",
+              "fields": []
+            },
+            {
+              "name": "Unknown",
+              "fields": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "union",
+      "name": "Input-method",
+      "id": 16,
+      "versions": [
+        {
+          "variants": [
+            {
+              "name": "Kate-buttons",
+              "fields": []
+            },
+            {
+              "name": "Touch",
+              "fields": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "record",
+      "name": "Player-range",
+      "id": 17,
+      "versions": [
+        {
+          "fields": [
+            {
+              "name": "minimum",
+              "type": {
+                "op": "uint32"
+              }
+            },
+            {
+              "name": "maximum",
+              "type": {
+                "op": "uint32"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "record",
+      "name": "Language",
+      "id": 18,
+      "versions": [
+        {
+          "fields": [
+            {
+              "name": "iso-code",
+              "type": {
+                "op": "text"
+              }
+            },
+            {
+              "name": "interface",
+              "type": {
+                "op": "bool"
+              }
+            },
+            {
+              "name": "audio",
+              "type": {
+                "op": "bool"
+              }
+            },
+            {
+              "name": "text",
+              "type": {
+                "op": "bool"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "union",
+      "name": "Accessibility",
+      "id": 19,
+      "versions": [
+        {
+          "variants": [
+            {
+              "name": "High-contrast",
+              "fields": []
+            },
+            {
+              "name": "Subtitles",
+              "fields": []
+            },
+            {
+              "name": "Image-captions",
+              "fields": []
+            },
+            {
+              "name": "Voiced-text",
+              "fields": []
+            },
+            {
+              "name": "Configurable-difficulty",
+              "fields": []
+            },
+            {
+              "name": "Skippable-content",
+              "fields": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "union",
+      "name": "Booklet-expr",
+      "id": 20,
+      "versions": [
+        {
+          "variants": [
+            {
+              "name": "BE-text",
+              "fields": [
+                {
+                  "name": "value",
+                  "type": {
+                    "op": "text"
+                  }
+                }
+              ]
+            },
+            {
+              "name": "BE-image",
+              "fields": [
+                {
+                  "name": "path",
+                  "type": {
+                    "op": "text"
+                  }
+                }
+              ]
+            },
+            {
+              "name": "BE-bold",
+              "fields": [
+                {
+                  "name": "value",
+                  "type": {
+                    "op": "union",
+                    "id": 20
+                  }
+                }
+              ]
+            },
+            {
+              "name": "BE-italic",
+              "fields": [
+                {
+                  "name": "value",
+                  "type": {
+                    "op": "union",
+                    "id": 20
+                  }
+                }
+              ]
+            },
+            {
+              "name": "BE-title",
+              "fields": [
+                {
+                  "name": "value",
+                  "type": {
+                    "op": "union",
+                    "id": 20
+                  }
+                }
+              ]
+            },
+            {
+              "name": "BE-subtitle",
+              "fields": [
+                {
+                  "name": "value",
+                  "type": {
+                    "op": "union",
+                    "id": 20
+                  }
+                }
+              ]
+            },
+            {
+              "name": "BE-subtitle2",
+              "fields": [
+                {
+                  "name": "value",
+                  "type": {
+                    "op": "union",
+                    "id": 20
+                  }
+                }
+              ]
+            },
+            {
+              "name": "BE-font",
+              "fields": [
+                {
+                  "name": "family",
+                  "type": {
+                    "op": "text"
+                  }
+                },
+                {
+                  "name": "size",
+                  "type": {
+                    "op": "uint32"
+                  }
+                },
+                {
+                  "name": "value",
+                  "type": {
+                    "op": "union",
+                    "id": 20
+                  }
+                }
+              ]
+            },
+            {
+              "name": "BE-color",
+              "fields": [
+                {
+                  "name": "r",
+                  "type": {
+                    "op": "uint8"
+                  }
+                },
+                {
+                  "name": "g",
+                  "type": {
+                    "op": "uint8"
+                  }
+                },
+                {
+                  "name": "b",
+                  "type": {
+                    "op": "uint8"
+                  }
+                },
+                {
+                  "name": "value",
+                  "type": {
+                    "op": "union",
+                    "id": 20
+                  }
+                }
+              ]
+            },
+            {
+              "name": "BE-background",
+              "fields": [
+                {
+                  "name": "r",
+                  "type": {
+                    "op": "uint8"
+                  }
+                },
+                {
+                  "name": "g",
+                  "type": {
+                    "op": "uint8"
+                  }
+                },
+                {
+                  "name": "b",
+                  "type": {
+                    "op": "uint8"
+                  }
+                },
+                {
+                  "name": "value",
+                  "type": {
+                    "op": "union",
+                    "id": 20
+                  }
+                }
+              ]
+            },
+            {
+              "name": "BE-columns",
+              "fields": [
+                {
+                  "name": "columns",
+                  "type": {
+                    "op": "uint8"
+                  }
+                },
+                {
+                  "name": "value",
+                  "type": {
+                    "op": "union",
+                    "id": 20
+                  }
+                }
+              ]
+            },
+            {
+              "name": "BE-fixed",
+              "fields": [
+                {
+                  "name": "x",
+                  "type": {
+                    "op": "uint32"
+                  }
+                },
+                {
+                  "name": "y",
+                  "type": {
+                    "op": "uint32"
+                  }
+                },
+                {
+                  "name": "value",
+                  "type": {
+                    "op": "union",
+                    "id": 20
+                  }
+                }
+              ]
+            },
+            {
+              "name": "BE-row",
+              "fields": [
+                {
+                  "name": "gap",
+                  "type": {
+                    "op": "uint32"
+                  }
+                },
+                {
+                  "name": "align",
+                  "type": {
+                    "op": "union",
+                    "id": 23
+                  }
+                },
+                {
+                  "name": "value",
+                  "type": {
+                    "op": "union",
+                    "id": 20
+                  }
+                }
+              ]
+            },
+            {
+              "name": "BE-column",
+              "fields": [
+                {
+                  "name": "gap",
+                  "type": {
+                    "op": "uint32"
+                  }
+                },
+                {
+                  "name": "align",
+                  "type": {
+                    "op": "union",
+                    "id": 23
+                  }
+                },
+                {
+                  "name": "value",
+                  "type": {
+                    "op": "union",
+                    "id": 20
+                  }
+                }
+              ]
+            },
+            {
+              "name": "BE-stack",
+              "fields": [
+                {
+                  "name": "values",
+                  "type": {
+                    "op": "array",
+                    "items": {
+                      "op": "union",
+                      "id": 20
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "BE-table",
+              "fields": [
+                {
+                  "name": "headers",
+                  "type": {
+                    "op": "array",
+                    "items": {
+                      "op": "union",
+                      "id": 20
+                    }
+                  }
+                },
+                {
+                  "name": "rows",
+                  "type": {
+                    "op": "record",
+                    "id": 21
+                  }
+                }
+              ]
+            },
+            {
+              "name": "BE-class",
+              "fields": [
+                {
+                  "name": "name",
+                  "type": {
+                    "op": "text"
+                  }
+                },
+                {
+                  "name": "value",
+                  "type": {
+                    "op": "union",
+                    "id": 20
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "record",
+      "name": "Booklet-row",
+      "id": 21,
+      "versions": [
+        {
+          "fields": [
+            {
+              "name": "row-span",
+              "type": {
+                "op": "uint32"
+              }
+            },
+            {
+              "name": "cells",
+              "type": {
+                "op": "array",
+                "items": {
+                  "op": "record",
+                  "id": 22
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "record",
+      "name": "Booklet-cell",
+      "id": 22,
+      "versions": [
+        {
+          "fields": [
+            {
+              "name": "cell-span",
+              "type": {
+                "op": "uint32"
+              }
+            },
+            {
+              "name": "value",
+              "type": {
+                "op": "union",
+                "id": 20
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "union",
+      "name": "Booklet-align",
+      "id": 23,
+      "versions": [
+        {
+          "variants": [
+            {
+              "name": "Start",
+              "fields": []
+            },
+            {
+              "name": "Center",
+              "fields": []
+            },
+            {
+              "name": "End",
+              "fields": []
+            },
+            {
+              "name": "Justify",
+              "fields": []
+            },
+            {
+              "name": "Space-evenly",
+              "fields": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "union",
+      "name": "Platform",
+      "id": 24,
+      "versions": [
+        {
+          "variants": [
+            {
+              "name": "Web-archive",
+              "fields": [
+                {
+                  "name": "html",
+                  "type": {
+                    "op": "text"
+                  }
+                },
+                {
+                  "name": "bridges",
+                  "type": {
+                    "op": "array",
+                    "items": {
+                      "op": "union",
+                      "id": 25
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "union",
+      "name": "Bridge",
+      "id": 25,
+      "versions": [
+        {
+          "variants": [
+            {
+              "name": "Network-proxy",
+              "fields": []
+            },
+            {
+              "name": "Local-storage-proxy",
+              "fields": []
+            },
+            {
+              "name": "Input-proxy",
+              "fields": [
+                {
+                  "name": "mapping",
+                  "type": {
+                    "op": "map",
+                    "keys": {
+                      "op": "union",
+                      "id": 26
+                    },
+                    "values": {
+                      "op": "record",
+                      "id": 27
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Preserve-webgl-render",
+              "fields": []
+            },
+            {
+              "name": "Capture-canvas",
+              "fields": [
+                {
+                  "name": "selector",
+                  "type": {
+                    "op": "text"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "union",
+      "name": "VirtualKey",
+      "id": 26,
+      "versions": [
+        {
+          "variants": [
+            {
+              "name": "Up",
+              "fields": []
+            },
+            {
+              "name": "Right",
+              "fields": []
+            },
+            {
+              "name": "Down",
+              "fields": []
+            },
+            {
+              "name": "Left",
+              "fields": []
+            },
+            {
+              "name": "Menu",
+              "fields": []
+            },
+            {
+              "name": "Capture",
+              "fields": []
+            },
+            {
+              "name": "X",
+              "fields": []
+            },
+            {
+              "name": "O",
+              "fields": []
+            },
+            {
+              "name": "L-trigger",
+              "fields": []
+            },
+            {
+              "name": "R-trigger",
+              "fields": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "record",
+      "name": "KeyboardKey",
+      "id": 27,
+      "versions": [
+        {
+          "fields": [
+            {
+              "name": "key",
+              "type": {
+                "op": "text"
+              }
+            },
+            {
+              "name": "code",
+              "type": {
+                "op": "text"
+              }
+            },
+            {
+              "name": "key-code",
+              "type": {
+                "op": "uint32"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
