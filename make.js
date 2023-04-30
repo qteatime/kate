@@ -247,7 +247,7 @@ w.task("glomp:make-npm-package", ["glomp:clean", "glomp:build"], () => {
 });
 
 // -- LJT
-w.task("ljt:compile", [], () => {
+w.task("ljt:compile", ["util:build"], () => {
   tsc("packages/ljt-vm");
 });
 

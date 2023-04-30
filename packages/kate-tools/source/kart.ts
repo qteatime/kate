@@ -146,7 +146,7 @@ const meta = T.spec({
   ),
 });
 
-const bridges: (_: any) => Bridge = T.tagged_choice({
+const bridges: (_: any) => Bridge = T.tagged_choice("type", {
   "network-proxy": T.spec({
     type: T.constant("network-proxy"),
   }),
