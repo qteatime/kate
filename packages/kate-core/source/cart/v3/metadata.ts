@@ -1,6 +1,6 @@
-import { Cart_v2 } from "./v2";
-import { unreachable } from "../utils";
-import { str, list, chars_in_mb, regex } from "./parser-utils";
+import { Cart_v3 } from "./v3";
+import { unreachable } from "../../utils";
+import { str, list, chars_in_mb, regex } from "../parser-utils";
 
 export type Metadata = {
   id: string;
@@ -97,7 +97,7 @@ export function version_string(meta: Metadata) {
   return `${meta.release.version.major}.${meta.release.version.minor}`;
 }
 
-export function parse_metadata(cart: Cart_v2.Cartridge): Metadata {
+export function parse_metadata(cart: Cart_v3.Cartridge): Metadata {
   const version = {
     major: Math.floor(cart.metadata.release.version.major),
     minor: Math.floor(cart.metadata.release.version.minor),
@@ -118,13 +118,16 @@ export function parse_metadata(cart: Cart_v2.Cartridge): Metadata {
       ),
     },
     release: {
-      kind: release_kind(cart.metadata.release.release_type),
-      date: date(cart.metadata.release.release_date),
+      kind: release_kind(cart.metadata.release["release-type"]),
+      date: date(cart.metadata.release["release-date"]),
       version: version,
-      licence_name: str(cart.metadata.release.licence_name, 255),
-      allow_commercial: cart.metadata.release.allow_commercial,
-      allow_derivative: cart.metadata.release.allow_derivative,
-      legal_notices: str(cart.metadata.release.legal_notices, chars_in_mb(5)),
+      licence_name: str(cart.metadata.release["licence-name"], 255),
+      allow_commercial: cart.metadata.release["allow-commercial"],
+      allow_derivative: cart.metadata.release["allow-derivative"],
+      legal_notices: str(
+        cart.metadata.release["legal-notices"],
+        chars_in_mb(5)
+      ),
     },
     rating: {
       rating: content_rating(cart.metadata.rating.rating),
@@ -136,133 +139,135 @@ export function parse_metadata(cart: Cart_v2.Cartridge): Metadata {
       accessibility: new Set(
         cart.metadata.play.accessibility.map(accessibility)
       ),
-      average_duration: duration(cart.metadata.play.average_duration),
+      average_duration: duration(cart.metadata.play["average-duration"]),
       input_methods: new Set(
-        cart.metadata.play.input_methods.map(input_method)
+        cart.metadata.play["input-methods"].map(input_method)
       ),
       languages: list(cart.metadata.play.languages.map(language), 255),
-      local_multiplayer: player_range(cart.metadata.play.local_multiplayer),
-      online_multiplayer: player_range(cart.metadata.play.online_multiplayer),
+      local_multiplayer: player_range(cart.metadata.play["local-multiplayer"]),
+      online_multiplayer: player_range(
+        cart.metadata.play["online-multiplayer"]
+      ),
     },
   };
 }
 
-function genre(x: Cart_v2.Genre): Genre {
-  switch (x.$tag) {
-    case Cart_v2.Genre.$Tags.Action:
+function genre(x: Cart_v3.Genre): Genre {
+  switch (x["@variant"]) {
+    case Cart_v3.Genre.$Tags.Action:
       return "action";
-    case Cart_v2.Genre.$Tags.Figthing:
+    case Cart_v3.Genre.$Tags.Figthing:
       return "fighting";
-    case Cart_v2.Genre.$Tags.Interactive_fiction:
+    case Cart_v3.Genre.$Tags.Interactive_fiction:
       return "interactive-fiction";
-    case Cart_v2.Genre.$Tags.Platformer:
+    case Cart_v3.Genre.$Tags.Platformer:
       return "platformer";
-    case Cart_v2.Genre.$Tags.Puzzle:
+    case Cart_v3.Genre.$Tags.Puzzle:
       return "puzzle";
-    case Cart_v2.Genre.$Tags.Racing:
+    case Cart_v3.Genre.$Tags.Racing:
       return "racing";
-    case Cart_v2.Genre.$Tags.Rhythm:
+    case Cart_v3.Genre.$Tags.Rhythm:
       return "rhythm";
-    case Cart_v2.Genre.$Tags.RPG:
+    case Cart_v3.Genre.$Tags.RPG:
       return "rpg";
-    case Cart_v2.Genre.$Tags.Simulation:
+    case Cart_v3.Genre.$Tags.Simulation:
       return "simulation";
-    case Cart_v2.Genre.$Tags.Shooter:
+    case Cart_v3.Genre.$Tags.Shooter:
       return "shooter";
-    case Cart_v2.Genre.$Tags.Sports:
+    case Cart_v3.Genre.$Tags.Sports:
       return "sports";
-    case Cart_v2.Genre.$Tags.Strategy:
+    case Cart_v3.Genre.$Tags.Strategy:
       return "strategy";
-    case Cart_v2.Genre.$Tags.Tool:
+    case Cart_v3.Genre.$Tags.Tool:
       return "tool";
-    case Cart_v2.Genre.$Tags.Other:
+    case Cart_v3.Genre.$Tags.Other:
       return "other";
-    case Cart_v2.Genre.$Tags.Not_specified:
+    case Cart_v3.Genre.$Tags.Not_specified:
       return "not-specified";
     default:
       throw unreachable(x);
   }
 }
 
-function release_kind(x: Cart_v2.Release_type): ReleaseType {
-  switch (x.$tag) {
-    case Cart_v2.Release_type.$Tags.Beta:
+function release_kind(x: Cart_v3.Release_type): ReleaseType {
+  switch (x["@variant"]) {
+    case Cart_v3.Release_type.$Tags.Beta:
       return "beta";
-    case Cart_v2.Release_type.$Tags.Demo:
+    case Cart_v3.Release_type.$Tags.Demo:
       return "demo";
-    case Cart_v2.Release_type.$Tags.Early_access:
+    case Cart_v3.Release_type.$Tags.Early_access:
       return "early-access";
-    case Cart_v2.Release_type.$Tags.Full:
+    case Cart_v3.Release_type.$Tags.Full:
       return "full";
-    case Cart_v2.Release_type.$Tags.Prototype:
+    case Cart_v3.Release_type.$Tags.Prototype:
       return "prototype";
     default:
       throw unreachable(x);
   }
 }
 
-function content_rating(x: Cart_v2.Content_rating) {
-  switch (x.$tag) {
-    case Cart_v2.Content_rating.$Tags.General:
+function content_rating(x: Cart_v3.Content_rating) {
+  switch (x["@variant"]) {
+    case Cart_v3.Content_rating.$Tags.General:
       return "general";
-    case Cart_v2.Content_rating.$Tags.Teen_and_up:
+    case Cart_v3.Content_rating.$Tags.Teen_and_up:
       return "teen-and-up";
-    case Cart_v2.Content_rating.$Tags.Mature:
+    case Cart_v3.Content_rating.$Tags.Mature:
       return "mature";
-    case Cart_v2.Content_rating.$Tags.Explicit:
+    case Cart_v3.Content_rating.$Tags.Explicit:
       return "explicit";
-    case Cart_v2.Content_rating.$Tags.Unknown:
+    case Cart_v3.Content_rating.$Tags.Unknown:
       return "unknown";
     default:
       throw unreachable(x);
   }
 }
 
-function accessibility(x: Cart_v2.Accessibility) {
-  switch (x.$tag) {
-    case Cart_v2.Accessibility.$Tags.Configurable_difficulty:
+function accessibility(x: Cart_v3.Accessibility) {
+  switch (x["@variant"]) {
+    case Cart_v3.Accessibility.$Tags.Configurable_difficulty:
       return "configurable-difficulty";
-    case Cart_v2.Accessibility.$Tags.High_contrast:
+    case Cart_v3.Accessibility.$Tags.High_contrast:
       return "high-contrast";
-    case Cart_v2.Accessibility.$Tags.Image_captions:
+    case Cart_v3.Accessibility.$Tags.Image_captions:
       return "image-captions";
-    case Cart_v2.Accessibility.$Tags.Skippable_content:
+    case Cart_v3.Accessibility.$Tags.Skippable_content:
       return "skippable-content";
-    case Cart_v2.Accessibility.$Tags.Subtitles:
+    case Cart_v3.Accessibility.$Tags.Subtitles:
       return "subtitles";
-    case Cart_v2.Accessibility.$Tags.Voiced_text:
+    case Cart_v3.Accessibility.$Tags.Voiced_text:
       return "voiced-text";
     default:
       throw unreachable(x);
   }
 }
 
-function duration(x: Cart_v2.Duration) {
-  switch (x.$tag) {
-    case Cart_v2.Duration.$Tags.Seconds:
+function duration(x: Cart_v3.Duration) {
+  switch (x["@variant"]) {
+    case Cart_v3.Duration.$Tags.Seconds:
       return "seconds";
-    case Cart_v2.Duration.$Tags.Few_minutes:
+    case Cart_v3.Duration.$Tags.Few_minutes:
       return "few-minutes";
-    case Cart_v2.Duration.$Tags.Half_hour:
+    case Cart_v3.Duration.$Tags.Half_hour:
       return "half-hour";
-    case Cart_v2.Duration.$Tags.One_hour:
+    case Cart_v3.Duration.$Tags.One_hour:
       return "one-hour";
-    case Cart_v2.Duration.$Tags.Few_hours:
+    case Cart_v3.Duration.$Tags.Few_hours:
       return "few-hours";
-    case Cart_v2.Duration.$Tags.Several_hours:
+    case Cart_v3.Duration.$Tags.Several_hours:
       return "several-hours";
-    case Cart_v2.Duration.$Tags.Unknown:
+    case Cart_v3.Duration.$Tags.Unknown:
       return "unknown";
     default:
       throw unreachable(x);
   }
 }
 
-function input_method(x: Cart_v2.Input_method) {
-  switch (x.$tag) {
-    case Cart_v2.Input_method.$Tags.Kate_buttons:
+function input_method(x: Cart_v3.Input_method) {
+  switch (x["@variant"]) {
+    case Cart_v3.Input_method.$Tags.Kate_buttons:
       return "kate-buttons";
-    case Cart_v2.Input_method.$Tags.Touch:
+    case Cart_v3.Input_method.$Tags.Touch:
       return "touch";
     default:
       throw unreachable(x);
@@ -274,11 +279,11 @@ const valid_language = regex(
   /^[a-z]{2}(?:[\-_][a-zA-Z_]{2,})?$/
 );
 
-function language(x: Cart_v2.Language): Language {
+function language(x: Cart_v3.Language): Language {
   return {
-    iso_code: valid_language(str(x.iso_code, 255)),
+    iso_code: valid_language(str(x["iso-code"], 255)),
     audio: x.audio,
-    interface: x._interface,
+    interface: x.interface,
     text: x.text,
   };
 }
@@ -291,7 +296,7 @@ function player_range(x: PlayerRange | null) {
   }
 }
 
-function date(x: Cart_v2.Date): Date {
+function date(x: Cart_v3.Date): Date {
   return new Date(x.year, x.month - 1, x.day, 0, 0, 0, 0);
 }
 

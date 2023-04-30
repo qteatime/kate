@@ -1,6 +1,7 @@
-import { parse_v2 } from "./v2";
+import { parse_v2 } from "./v2/v2";
+import { parse_v3 } from "./v3/v3";
 
-const parsers = [parse_v2];
+const parsers = [parse_v3, parse_v2];
 
 export function try_parse(data: Uint8Array) {
   for (const parser of parsers) {

@@ -1,6 +1,6 @@
-import * as Metadata from "./metadata";
-import * as Runtime from "./runtime";
-import * as Files from "./files";
+import * as Metadata from "./v2/metadata";
+import * as Runtime from "./v2/runtime";
+import * as Files from "./v2/files";
 
 export type Cart = {
   metadata: Metadata.Metadata;

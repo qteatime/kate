@@ -1,7 +1,7 @@
 import { Cart_v2 } from "./v2";
-import { unreachable } from "../utils";
-import { InputKey } from "../kernel";
-import { chars_in_mb } from "./parser-utils";
+import { unreachable } from "../../utils";
+import { InputKey } from "../../kernel";
+import { chars_in_mb } from "../parser-utils";
 
 export type Runtime = WebArchiveRuntime;
 

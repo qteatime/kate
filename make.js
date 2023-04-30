@@ -120,9 +120,9 @@ function tsc_file(source, target) {
   exec_file("node", [file, "--declaration", "--outDir", target, source]);
 }
 
-function ljtc(file, target) {
+function ljtc(kind, file, target) {
   const cmd = OS.platform() === "win32" ? "crochet.cmd" : "crochet";
-  const result = exec_file_capture(cmd, ["ljtc", "--", "ts", file]);
+  const result = exec_file_capture(cmd, ["ljtc", "--", kind, file]);
   FS.writeFileSync(target, result);
 }
 
@@ -246,15 +246,28 @@ w.task("glomp:make-npm-package", ["glomp:clean", "glomp:build"], () => {
   });
 });
 
+// -- LJT
+w.task("ljt:compile", [], () => {
+  tsc("packages/ljt-vm");
+});
+
+w.task("ljt:build", ["ljt:compile"], () => {});
+
 // -- Schema
 w.task("schema:generate", [], () => {
   ljtc(
+    "json",
     "packages/schema/cartridge.ljt",
-    "packages/schema/generated/cartridge.ts"
+    "packages/schema/generated/cartridge.json"
+  );
+  ljtc(
+    "ts-types",
+    "packages/schema/cartridge.ljt",
+    "packages/schema/generated/cartridge-schema.ts"
   );
 });
 
-w.task("schema:compile", [], () => {
+w.task("schema:compile", ["ljt:build"], () => {
   tsc("packages/schema");
 });
 
@@ -305,7 +318,13 @@ w.task("bridges:build", ["bridges:generate"], () => {});
 // -- Core
 w.task(
   "core:compile",
-  ["schema:build", "bridges:build", "util:build", "db-schema:build"],
+  [
+    "schema:build",
+    "bridges:build",
+    "util:build",
+    "db-schema:build",
+    "ljt:build",
+  ],
   () => {
     tsc("packages/kate-core");
   }
@@ -575,6 +594,7 @@ w.task(
   [
     "glomp:build",
     "util:build",
+    "ljt:build",
     "schema:build",
     "db-schema:build",
     "api:build",

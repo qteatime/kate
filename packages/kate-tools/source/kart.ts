@@ -1,6 +1,6 @@
 import * as Path from "path";
 import * as FS from "fs";
-import { Cart, add_fingerprint } from "./deps/schema";
+import { Cart } from "./deps/schema";
 import { unreachable } from "./deps/util";
 import * as Glob from "glob";
 import { Spec as T } from "./deps/util";
@@ -320,100 +320,106 @@ function maybe_load_text_file(
 }
 
 function metadata(x: Kart["metadata"], root: string, base_dir: string) {
-  const game = new Cart.Meta_title(
-    x.game.author,
-    x.game.title,
-    x.game.description,
-    x.game.genre.map(make_genre),
-    x.game.tags,
-    new Cart.File(
-      "thumbnail.png",
-      "image/png",
-      x.game.thumbnail_path
+  const game = Cart.Meta_title({
+    author: x.game.author,
+    title: x.game.title,
+    description: x.game.description,
+    genre: x.game.genre.map(make_genre),
+    tags: x.game.tags,
+    thumbnail: Cart.File({
+      path: "thumbnail.png",
+      mime: "image/png",
+      data: x.game.thumbnail_path
         ? load_file(x.game.thumbnail_path, root, base_dir)
         : new Uint8Array(
             FS.readFileSync(
               Path.join(__dirname, "../assets/default-thumbnail.png")
             )
-          )
-    )
-  );
+          ),
+    }),
+  });
 
-  const release = x.release
-    ? new Cart.Meta_release(
-        make_release_type(x.release.kind),
-        make_date(x.release.date),
-        make_version(x.release.version),
-        maybe_load_text_file(x.release.legal_notices_path, root, base_dir),
-        x.release.licence_name,
-        x.release.allow_derivative,
-        x.release.allow_commercial
-      )
-    : new Cart.Meta_release(
-        make_release_type("full"),
-        make_date(today()),
-        make_version({ major: 1, minor: 0 }),
-        "",
-        "",
-        false,
-        false
-      );
+  const release = Cart.Meta_release({
+    "release-type": make_release_type(x.release?.kind ?? "full"),
+    "release-date": make_date(x.release?.date ?? today()),
+    version: make_version(x.release?.version ?? { major: 1, minor: 0 }),
+    "legal-notices": maybe_load_text_file(
+      x.release?.legal_notices_path ?? null,
+      root,
+      base_dir
+    ),
+    "licence-name": x.release?.licence_name ?? "Proprietary",
+    "allow-commercial": x.release?.allow_commercial ?? false,
+    "allow-derivative": x.release?.allow_derivative ?? false,
+  });
 
-  const rating = x.rating
-    ? new Cart.Meta_rating(make_rating(x.rating.rating), x.rating.warnings)
-    : new Cart.Meta_rating(make_rating("unknown"), null);
+  const rating = Cart.Meta_rating({
+    rating: make_rating(x.rating?.rating ?? "unknown"),
+    warnings: x.rating?.warnings ?? null,
+  });
 
-  const play = x.play_style
-    ? new Cart.Meta_play(
-        x.play_style.input_methods.map(make_input_method),
-        make_player_range(x.play_style.local_multiplayer),
-        make_player_range(x.play_style.online_multiplayer),
-        x.play_style.languages.map(make_language),
-        x.play_style.accessibility.map(make_accessibility),
-        make_duration(x.play_style.average_duration)
-      )
-    : new Cart.Meta_play([], null, null, [], [], make_duration("unknown"));
+  const play = Cart.Meta_play({
+    "input-methods": x.play_style?.input_methods.map(make_input_method) ?? [],
+    "local-multiplayer": x.play_style?.local_multiplayer
+      ? make_player_range(x.play_style.local_multiplayer)
+      : null,
+    "online-multiplayer": x.play_style?.online_multiplayer
+      ? make_player_range(x.play_style.online_multiplayer)
+      : null,
+    languages: x.play_style?.languages.map(make_language) ?? [],
+    accessibility: x.play_style?.accessibility.map(make_accessibility) ?? [],
+    "average-duration": make_duration(
+      x.play_style?.average_duration ?? "unknown"
+    ),
+  });
 
   const extras: any[] = [];
 
-  const security = new Cart.Meta_security([]);
+  const security = Cart.Meta_security({ capabilities: [] });
 
-  return new Cart.Metadata(game, release, rating, play, security, extras);
+  return Cart.Metadata({
+    title: game,
+    release,
+    rating,
+    play,
+    security,
+    extras,
+  });
 }
 
 function make_genre(x: Genre): Cart.Genre {
   if (x == null) {
-    return new Cart.Genre.Not_specified();
+    return Cart.Genre.Not_specified({});
   } else {
     switch (x) {
       case "action":
-        return new Cart.Genre.Action();
+        return Cart.Genre.Action({});
       case "fighting":
-        return new Cart.Genre.Figthing();
+        return Cart.Genre.Figthing({});
       case "interactive-fiction":
-        return new Cart.Genre.Interactive_fiction();
+        return Cart.Genre.Interactive_fiction({});
       case "platformer":
-        return new Cart.Genre.Platformer();
+        return Cart.Genre.Platformer({});
       case "other":
-        return new Cart.Genre.Other();
+        return Cart.Genre.Other({});
       case "puzzle":
-        return new Cart.Genre.Puzzle();
+        return Cart.Genre.Puzzle({});
       case "racing":
-        return new Cart.Genre.Racing();
+        return Cart.Genre.Racing({});
       case "rhythm":
-        return new Cart.Genre.Rhythm();
+        return Cart.Genre.Rhythm({});
       case "rpg":
-        return new Cart.Genre.RPG();
+        return Cart.Genre.RPG({});
       case "shooter":
-        return new Cart.Genre.Shooter();
+        return Cart.Genre.Shooter({});
       case "simulation":
-        return new Cart.Genre.Simulation();
+        return Cart.Genre.Simulation({});
       case "sports":
-        return new Cart.Genre.Sports();
+        return Cart.Genre.Sports({});
       case "strategy":
-        return new Cart.Genre.Strategy();
+        return Cart.Genre.Strategy({});
       case "tool":
-        return new Cart.Genre.Tool();
+        return Cart.Genre.Tool({});
       default:
         throw unreachable(x);
     }
@@ -423,40 +429,40 @@ function make_genre(x: Genre): Cart.Genre {
 function make_release_type(x: ReleaseType): Cart.Release_type {
   switch (x) {
     case "prototype":
-      return new Cart.Release_type.Prototype();
+      return Cart.Release_type.Prototype({});
     case "early-access":
-      return new Cart.Release_type.Early_access();
+      return Cart.Release_type.Early_access({});
     case "beta":
-      return new Cart.Release_type.Beta();
+      return Cart.Release_type.Beta({});
     case "demo":
-      return new Cart.Release_type.Demo();
+      return Cart.Release_type.Demo({});
     case "full":
-      return new Cart.Release_type.Full();
+      return Cart.Release_type.Full({});
     default:
       throw unreachable(x);
   }
 }
 
 function make_date(x: CartDate) {
-  return new Cart.Date(x.year, x.month, x.day);
+  return Cart.Date({ year: x.year, month: x.month, day: x.day });
 }
 
 function make_version(x: Version) {
-  return new Cart.Version(x.major, x.minor);
+  return Cart.Version({ major: x.major, minor: x.minor });
 }
 
 function make_rating(x: ContentRating) {
   switch (x) {
     case "general":
-      return new Cart.Content_rating.General();
+      return Cart.Content_rating.General({});
     case "teen-and-up":
-      return new Cart.Content_rating.Teen_and_up();
+      return Cart.Content_rating.Teen_and_up({});
     case "mature":
-      return new Cart.Content_rating.Mature();
+      return Cart.Content_rating.Mature({});
     case "explicit":
-      return new Cart.Content_rating.Explicit();
+      return Cart.Content_rating.Explicit({});
     case "unknown":
-      return new Cart.Content_rating.Unknown();
+      return Cart.Content_rating.Unknown({});
     default:
       throw unreachable(x);
   }
@@ -465,9 +471,9 @@ function make_rating(x: ContentRating) {
 function make_input_method(x: InputMethod) {
   switch (x) {
     case "kate-buttons":
-      return new Cart.Input_method.Kate_buttons();
+      return Cart.Input_method.Kate_buttons({});
     case "touch":
-      return new Cart.Input_method.Touch();
+      return Cart.Input_method.Touch({});
     default:
       throw unreachable(x);
   }
@@ -477,28 +483,33 @@ function make_player_range(x: PlayerRange | null) {
   if (x == null) {
     return null;
   } else {
-    return new Cart.Player_range(x.minimum, x.maximum);
+    return Cart.Player_range({ minimum: x.minimum, maximum: x.maximum });
   }
 }
 
 function make_language(x: Language) {
-  return new Cart.Language(x.iso_code, x.interface, x.audio, x.text);
+  return Cart.Language({
+    "iso-code": x.iso_code,
+    interface: x.interface,
+    audio: x.audio,
+    text: x.text,
+  });
 }
 
 function make_accessibility(x: Accessibility) {
   switch (x) {
     case "configurable-difficulty":
-      return new Cart.Accessibility.Configurable_difficulty();
+      return Cart.Accessibility.Configurable_difficulty({});
     case "high-contrast":
-      return new Cart.Accessibility.High_contrast();
+      return Cart.Accessibility.High_contrast({});
     case "image-captions":
-      return new Cart.Accessibility.Image_captions();
+      return Cart.Accessibility.Image_captions({});
     case "skippable-content":
-      return new Cart.Accessibility.Skippable_content();
+      return Cart.Accessibility.Skippable_content({});
     case "subtitles":
-      return new Cart.Accessibility.Subtitles();
+      return Cart.Accessibility.Subtitles({});
     case "voiced-text":
-      return new Cart.Accessibility.Voiced_text();
+      return Cart.Accessibility.Voiced_text({});
     default:
       throw unreachable(x);
   }
@@ -507,19 +518,19 @@ function make_accessibility(x: Accessibility) {
 function make_duration(x: Duration) {
   switch (x) {
     case "seconds":
-      return new Cart.Duration.Seconds();
+      return Cart.Duration.Seconds({});
     case "few-minutes":
-      return new Cart.Duration.Few_minutes();
+      return Cart.Duration.Few_minutes({});
     case "half-hour":
-      return new Cart.Duration.Half_hour();
+      return Cart.Duration.Half_hour({});
     case "one-hour":
-      return new Cart.Duration.One_hour();
+      return Cart.Duration.One_hour({});
     case "few-hours":
-      return new Cart.Duration.Few_hours();
+      return Cart.Duration.Few_hours({});
     case "several-hours":
-      return new Cart.Duration.Several_hours();
+      return Cart.Duration.Several_hours({});
     case "unknown":
-      return new Cart.Duration.Unknown();
+      return Cart.Duration.Unknown({});
     default:
       throw unreachable(x);
   }
@@ -542,11 +553,11 @@ function files(patterns: Kart["files"], root: string, base_dir: string) {
       const ext = Path.extname(path);
       const mime = mime_table[ext] ?? "application/octet-stream";
       return [
-        new Cart.File(
-          make_absolute(path),
-          mime,
-          load_file(path, root, base_dir)
-        ),
+        Cart.File({
+          path: make_absolute(path),
+          mime: mime,
+          data: load_file(path, root, base_dir),
+        }),
       ];
     } else {
       return [];
@@ -555,35 +566,36 @@ function files(patterns: Kart["files"], root: string, base_dir: string) {
 }
 
 function save(cart: Cart.Cartridge, output: string) {
-  const encoder = new Cart._Encoder();
-  cart.encode(encoder);
-  FS.writeFileSync(output, add_fingerprint(encoder.to_bytes()));
+  const bytes = Cart.encode(cart);
+  FS.writeFileSync(output, bytes);
 }
 
 function make_bridge(x: Bridge): Cart.Bridge[] {
   switch (x.type) {
     case "network-proxy": {
-      return [new Cart.Bridge.Network_proxy()];
+      return [Cart.Bridge.Network_proxy({})];
     }
 
     case "local-storage-proxy": {
-      return [new Cart.Bridge.Local_storage_proxy()];
+      return [Cart.Bridge.Local_storage_proxy({})];
     }
 
     case "input-proxy": {
       return [
-        new Cart.Bridge.Input_proxy(
-          new Map(Object.entries(get_mapping(x.mapping)).map(make_key_pair))
-        ),
+        Cart.Bridge.Input_proxy({
+          mapping: new Map(
+            Object.entries(get_mapping(x.mapping)).map(make_key_pair)
+          ),
+        }),
       ];
     }
 
     case "preserve-webgl-render": {
-      return [new Cart.Bridge.Preserve_webgl_render()];
+      return [Cart.Bridge.Preserve_webgl_render({})];
     }
 
     case "capture-canvas": {
-      return [new Cart.Bridge.Capture_canvas(x.selector)];
+      return [Cart.Bridge.Capture_canvas({ selector: x.selector })];
     }
 
     default:
@@ -637,32 +649,36 @@ function make_key_pair([virtual, key_id]: [string, string]): [
   const { key, code, key_code } = keymap[key_id];
   return [
     make_virtual_key(virtual),
-    new Cart.KeyboardKey(key, code, Math.floor(key_code)),
+    Cart.KeyboardKey({
+      key: key,
+      code: code,
+      "key-code": Math.floor(key_code),
+    }),
   ];
 }
 
 function make_virtual_key(key: string) {
   switch (key) {
     case "up":
-      return new Cart.VirtualKey.Up();
+      return Cart.VirtualKey.Up({});
     case "right":
-      return new Cart.VirtualKey.Right();
+      return Cart.VirtualKey.Right({});
     case "down":
-      return new Cart.VirtualKey.Down();
+      return Cart.VirtualKey.Down({});
     case "left":
-      return new Cart.VirtualKey.Left();
+      return Cart.VirtualKey.Left({});
     case "menu":
-      return new Cart.VirtualKey.Menu();
+      return Cart.VirtualKey.Menu({});
     case "capture":
-      return new Cart.VirtualKey.Capture();
+      return Cart.VirtualKey.Capture({});
     case "x":
-      return new Cart.VirtualKey.X();
+      return Cart.VirtualKey.X({});
     case "o":
-      return new Cart.VirtualKey.O();
+      return Cart.VirtualKey.O({});
     case "l":
-      return new Cart.VirtualKey.L_trigger();
+      return Cart.VirtualKey.L_trigger({});
     case "r":
-      return new Cart.VirtualKey.R_trigger();
+      return Cart.VirtualKey.R_trigger({});
     default:
       throw new Error(`Unknown virtual key ${key}`);
   }
@@ -686,15 +702,15 @@ export function make_cartridge(path: string, output: string) {
   switch (x.type) {
     case "web-archive": {
       save(
-        new Cart.Cartridge(
-          json.id,
-          meta,
-          archive,
-          new Cart.Platform.Web_archive(
-            load_text_file(x.html, dir_root, base_dir),
-            x.bridges.flatMap(make_bridge)
-          )
-        ),
+        Cart.Cartridge({
+          id: json.id,
+          metadata: meta,
+          files: archive,
+          platform: Cart.Platform.Web_archive({
+            html: load_text_file(x.html, dir_root, base_dir),
+            bridges: x.bridges.flatMap(make_bridge),
+          }),
+        }),
         output
       );
       break;
