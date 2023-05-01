@@ -510,17 +510,6 @@ w.task("desktop:run", ["desktop:generate"], () => {
   exec_file(electron_path, [Path.join(__dirname, "packages/kate-desktop")]);
 });
 
-w.task("desktop:make-npm-package", ["desktop:clean", "desktop:build"], () => {
-  make_npm_package({
-    source: "kate-desktop",
-    build: (b) => {
-      b.copy_tree("app");
-      b.copy_tree("bin");
-      copy("README.md", Path.join(b.to, "README.md"));
-    },
-  });
-});
-
 // -- Workspace maintenance
 w.task("chore:clean-tsc-cache", [], () => {
   const files = glob("**/tsconfig.tsbuildinfo", {
