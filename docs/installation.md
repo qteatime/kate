@@ -14,7 +14,7 @@ From most recommended to least recommended:
 - [Pre-built binaries](#pre-built-binaries) (available on Linux and Windows);
 - [Building from source](#building-from-source) (available on Linux and Windows);
 
-See the [compåatibility matrix](#compatibility-matrix) for all available options in each platform.
+See the [compatibility matrix](#compatibility-matrix) for all available options in each platform.
 
 > **NOTE:**<br>
 > The web version should be compatible with MacOS, ChromeOS, and other platforms with a modern browser. However those devices are not currently part of the testing pipeline. Once they are they will be added to the list, too.
@@ -51,7 +51,7 @@ On Windows 10 or more recent (Windows 8 and earlier are not supported, but you c
   - Intel/AMD 32-bit processors: `kate-win32-ia32.zip`;
   - ARM 64-bit processors (e.g.: Microsoft SQ1): `kate-win32-arm64.zip`;
 - Extract the zip somewhere in your computer;
-  - You can right-click the folder and choose `Extract all...`;
+  - You can right-click the file and choose `Extract all...`;
 - Run `Kate.exe`.
 
 On Linux:
@@ -103,20 +103,20 @@ $ node make all
 
 After this you should have a working Kate. You can either use `node make desktop:run` to run it as an Electron app, or start a server on the `www` folder and point a modern browser there.
 
-You should see a screen similar to the screenshot in this page, but without any cartridges. Drag the `hello.kart` file from the `examples/` folder and drop it over the console to install it. Then either click the game or use the keyboard/virtual buttons to play.
+You should see a screen similar to the screenshot in the README, but without any cartridges. Download the `hello.kart` file from [the Kate releases page](https://github.com/qteatime/kate/releases), then drag-and-drop it over the console to install it. Click the game or use the keyboard/virtual buttons to play.
 
 ### Generating a release from source
 
 Under Windows, you can run the following to generate a Kate release:
 
 ```shell
-$ node make release:win64
+$ node make release:win:x64
 ```
 
 Under Linux, you can run the following to generate a Kate release:
 
 ```shell
-$ node make release:linux64
+$ node make release:linux:x64
 ```
 
 Both of these will download Electron from [the Electron releases page on GitHub](https://github.com/electron/electron/releases). If you'd rather do that manually, either download the zip file or compile Electron from source yourself, then place the zip in the `.cache` folder.
@@ -159,6 +159,6 @@ Testing of the native version has been done on the following operating systems:
   - Windows 11 (x64);
 - Linux:
   - Ubuntu 20.04 (x64);
-  - Raspbery Pi OS 11 (ARMv7L);
+  - Raspbery Pi OS (based on Debian 11) (ARMv7L);
 
 Pre-built binaries do not work on Windows 8 and earlier because Google has stopped supporting those versions in Chromium.
