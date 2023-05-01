@@ -85,3 +85,9 @@
     top: -50px;
   }
 }
+
+@keyframes kate-focus-in {
+  from {
+    outline-width: 8px;
+  }
+}

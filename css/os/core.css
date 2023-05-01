@@ -16,6 +16,9 @@
   --color-primary-l1: #dcdcda;
   --color-primary-l2: #ececea;
 
+  --color-button-primary: #5f5f5f;
+  --color-button-primary-text: #fafafa;
+
   --color-text: var(--color-black);
   --color-text-inverted: var(--color-white);
   --color-text-muted: var(--color-black-l1);
@@ -55,4 +58,12 @@
 
 .kate-hud {
   position: absolute;
+}
+
+.kate-os-entering {
+  animation: kate-os-fade-in 0.2s ease-out forwards;
+}
+
+.kate-os-leaving {
+  animation: kate-os-fade-out 0.2s linear forwards;
 }

@@ -9,3 +9,7 @@ old-tree/
 games/
 dist/
 design/
+electron/
+.cache/
+asset-source/
+ignore/

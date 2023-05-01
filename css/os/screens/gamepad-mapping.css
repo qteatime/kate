@@ -1,0 +1,197 @@
+.kate-gamepad-mapping {
+  height: 100%;
+  overflow: clip;
+}
+
+.kate-gamepad-mapping-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 100%;
+}
+
+.kate-gamepad-layout-container {
+  position: relative;
+  flex-grow: 1;
+  height: 100%;
+}
+
+.kate-gamepad-mapping-actions {
+  height: 100%;
+  border-left: 1px solid var(--color-border-d1);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 1rem;
+}
+
+.kate-gamepad-layout-frame {
+  position: absolute;
+  translate: -50% -50%;
+  top: 50%;
+  left: 50%;
+  transform-origin: 0 0;
+}
+
+.kate-gamepad-layout-map {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+}
+
+.gamepad-settings-remap-container .focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 1px;
+}
+
+.gamepad-settings-remap-container .inactive {
+  opacity: 0.3;
+}
+
+.standard-gamepad-button .gamepad-pressed-mapping {
+  font-size: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  position: relative;
+}
+
+.standard-gamepad-special .gamepad-pressed-mapping,
+.standard-gamepad-shoulder .gamepad-pressed-mapping,
+.standard-gamepad-joystick .gamepad-pressed-mapping {
+  font-size: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  position: relative;
+}
+
+.gamepad-remap-dialog .kate-hud-dialog-container {
+  width: 720px;
+  min-width: unset;
+  max-width: unset;
+}
+
+.gamepad-remap-dialog-contents {
+  padding: 1rem;
+}
+
+.gamepad-remap-kate-buttons {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.kate-key-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  overflow: hidden;
+}
+
+.kate-key-button:not(.active) {
+  opacity: 0.5;
+}
+
+.kate-key-button.active {
+  outline: 2px solid var(--color-border-d1);
+  font-weight: bold;
+}
+
+.kate-key-button.focus {
+  outline: 2px solid var(--color-primary);
+}
+
+.kate-key-button-title {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 14px;
+  height: 20px;
+  line-height: 20px;
+}
+
+.kate-key-button-icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 20px;
+  flex-grow: 1;
+}
+
+.gamepad-settings-remap-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 100%;
+}
+
+.gamepad-settings-remap-frame {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-grow: 1;
+}
+
+.gamepad-settings-remap-actions {
+  padding: 1rem;
+  border-left: 1px solid var(--color-border-d1);
+  height: 100%;
+  flex-direction: column-reverse;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.standard-gamepad-joystick-up {
+  position: absolute;
+  top: 0px;
+  left: 50%;
+  translate: -50% 0;
+  width: 30px;
+  height: 30px;
+}
+
+.standard-gamepad-joystick-down {
+  position: absolute;
+  bottom: 0px;
+  left: 50%;
+  translate: -50% 0;
+  width: 30px;
+  height: 30px;
+}
+
+.standard-gamepad-joystick-left {
+  position: absolute;
+  left: 0px;
+  top: 50%;
+  translate: 0 -50%;
+  width: 30px;
+  height: 30px;
+}
+
+.standard-gamepad-joystick-right {
+  position: absolute;
+  right: 0px;
+  top: 50%;
+  translate: 0 -50%;
+  width: 30px;
+  height: 30px;
+}
+
+.standard-gamepad-joystick-press {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  translate: -50% -50%;
+  width: 30px;
+  height: 30px;
+}

@@ -13,3 +13,11 @@
 .kate-ui-button {
   white-space: nowrap;
 }
+
+button {
+  color: var(--color-text);
+}
+
+button:disabled {
+  color: var(--color-text-muted);
+}
