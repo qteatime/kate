@@ -3,7 +3,7 @@ type Dict = { [key: string]: string };
 declare var KATE_LOCAL_STORAGE: Dict | null;
 
 const { store } = KateAPI;
-let contents = KATE_LOCAL_STORAGE ?? Object.create(null);
+let contents = { ...(KATE_LOCAL_STORAGE ?? {}) };
 const unversioned_store = store.unversioned();
 
 let timer: any = null;
@@ -87,5 +87,5 @@ function proxy_storage(storage: KateStorage, key: string) {
 const storage = new KateStorage(contents, true);
 proxy_storage(storage, "localStorage");
 
-const session_storage = new KateStorage(Object.create(null), false);
+const session_storage = new KateStorage({}, false);
 proxy_storage(session_storage, "sessionStorage");
