@@ -79,6 +79,13 @@ XMLHttpRequest.prototype.open = function (this: XMLHttpRequestE, method, url) {
   }
 };
 
+XMLHttpRequest.prototype.setRequestHeader = function (
+  name: string,
+  value: string
+) {
+  // Do nothing, there's no HTTP server handling these.
+};
+
 XMLHttpRequest.prototype.send = function (this: XMLHttpRequestE) {
   if (this.__waiting_open) {
     this.__waiting_send = true;
