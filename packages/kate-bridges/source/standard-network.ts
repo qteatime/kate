@@ -12,6 +12,20 @@ function is_data_url(x: any) {
   }
 }
 
+function fix_url(url0: string) {
+  if (is_data_url(url0)) {
+    return url0;
+  }
+
+  const url = new URL(url0, "https://cartridge.kate.qteati.me");
+  if (url.hostname !== "cartridge.kate.qteati.me") {
+    console.warn(`[Kate] Non-proxyable URL:`, url0);
+    return url0;
+  } else {
+    return url.pathname;
+  }
+}
+
 // -- Arbitrary fetching
 const old_fetch = window.fetch;
 window.fetch = async function (request: any, options) {
@@ -19,10 +33,10 @@ window.fetch = async function (request: any, options) {
   let method: any;
 
   if (Object(request) === request && request.url) {
-    url = request.url;
+    url = fix_url(request.url);
     method = request.method;
   } else {
-    url = request;
+    url = fix_url(request);
     method = options?.method ?? "GET";
   }
 
@@ -61,7 +75,7 @@ XMLHttpRequest.prototype.open = function (this: XMLHttpRequestE, method, url) {
 
   void (async () => {
     try {
-      const real_url = await cart_fs.get_file_url(String(url));
+      const real_url = await cart_fs.get_file_url(fix_url(String(url)));
       old_xhr_open.call(this, "GET", real_url, true);
       this.__maybe_send();
     } catch (error) {
@@ -106,7 +120,9 @@ Object.defineProperty(HTMLImageElement.prototype, "src", {
   get() {
     return this.__src ?? old_img_src.get!.call(this);
   },
-  set(url) {
+  set(url0) {
+    const url = fix_url(url0);
+
     this.__src = url;
     if (is_data_url(url)) {
       old_img_src.set!.call(this, url);
@@ -135,7 +151,9 @@ Object.defineProperty(HTMLMediaElement.prototype, "src", {
   get() {
     return this.__src ?? old_media_src.get!.call(this);
   },
-  set(url) {
+  set(url0) {
+    const url = fix_url(url0);
+
     this.__src = url;
     if (is_data_url(url)) {
       old_media_src.set!.call(this, url);
