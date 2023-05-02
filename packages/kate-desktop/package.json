@@ -1,6 +1,6 @@
 {
   "name": "@qteatime/kate-desktop",
-  "version": "0.23.6",
+  "version": "0.23.6-a1",
   "description": "Electron-based desktop application for the fantasy handheld console Kate.",
   "author": "Q.",
   "main": "app/index.js",
