@@ -32,6 +32,53 @@ export function make_thumbnail(
   canvas.width = width;
   canvas.height = height;
   const context = canvas.getContext("2d")!;
-  context.drawImage(image, 0, 0, width, height);
+  const rect = fit_media(image, { width, height });
+  context.fillStyle = "#2f2f2f";
+  context.fillRect(0, 0, width, height);
+  context.drawImage(image, rect.x, rect.y, rect.width, rect.height);
   return canvas.toDataURL("image/png");
+}
+
+type Dimensions = { width: number; height: number };
+type Rect = { x: number; y: number } & Dimensions;
+
+function fit_media(
+  media: HTMLImageElement | HTMLVideoElement,
+  canvas: Dimensions
+) {
+  if (media instanceof HTMLImageElement) {
+    return fit_image(media, canvas);
+  } else if (media instanceof HTMLVideoElement) {
+    return fit_video(media, canvas);
+  } else {
+    throw new Error(`Unsupported media`);
+  }
+}
+
+function fit_image(img: HTMLImageElement, canvas: Dimensions) {
+  const width = img.naturalWidth;
+  const height = img.naturalHeight;
+  return fit({ width, height }, canvas);
+}
+
+function fit_video(video: HTMLVideoElement, canvas: Dimensions) {
+  const width = video.videoWidth;
+  const height = video.videoHeight;
+  return fit({ width, height }, canvas);
+}
+
+function fit(box: Dimensions, target: Dimensions): Rect {
+  const wscale = target.width / box.width;
+  const hscale = target.height / box.height;
+  const scale = Math.min(wscale, hscale);
+
+  const width = Math.floor(scale * box.width);
+  const height = Math.floor(scale * box.height);
+
+  return {
+    width,
+    height,
+    x: Math.floor((target.width - width) / 2),
+    y: Math.floor((target.height - height) / 2),
+  };
 }
