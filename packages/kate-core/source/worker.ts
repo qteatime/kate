@@ -2,14 +2,6 @@ interface ExtendableEvent extends Event {
   waitUntil(promise: Promise<any>): void;
 }
 
-let version: string | null = null;
-
-self.addEventListener("message", (ev) => {
-  if (ev.data?.type === "set-version") {
-    version = ev.data?.version;
-  }
-});
-
 async function cache_version(version: string) {
   const cache_name = "kate-cache-v1";
   const app_files = [
@@ -69,7 +61,6 @@ async function cache_version(version: string) {
     "/fonts/roboto-mono/RobotoMono-Regular.ttf",
     // Images
     "/img/buttons/cancel.png",
-    "/img/buttons/cancel.png",
     "/img/buttons/dpad-down.png",
     "/img/buttons/dpad-fill.png",
     "/img/buttons/dpad-horizontal.png",
@@ -106,18 +97,30 @@ async function cache_version(version: string) {
   try {
     const cache = await caches.open(cache_name);
     await cache.addAll(app_files);
+    console.log("[Kate] Updated cache to version", version);
   } catch (e) {
-    console.error("[Kate] cache unavailable");
+    console.error("[Kate] cache unavailable", e);
   }
 }
+
+const original_version =
+  new URL(location.href).searchParams.get("version") ?? null;
+
+self.addEventListener("message", (ev) => {
+  if (ev.data?.type === "set-version") {
+    const version = ev.data?.version ?? null;
+    if (version != null) {
+      cache_version(version);
+    }
+  }
+});
 
 self.addEventListener("install", (ev0: any) => {
   const ev = ev0 as ExtendableEvent;
   ev.waitUntil(
     (async () => {
-      if (version != null) {
-        const version_id = JSON.parse(version).version;
-        await cache_version(version_id);
+      if (original_version != null) {
+        await cache_version(original_version);
       }
     })()
   );

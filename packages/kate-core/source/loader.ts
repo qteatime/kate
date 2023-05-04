@@ -72,16 +72,21 @@ async function main() {
     await load_kate(version);
   }
 
-  const worker = await navigator.serviceWorker
-    ?.register("worker.js")
-    .catch((e) => {
-      console.error("[Kate] failed to register Kate worker", e);
-    });
-  if (worker != null) {
-    worker.active?.postMessage({
+  let worker: null | ServiceWorker;
+  if (navigator.serviceWorker?.controller) {
+    worker = navigator.serviceWorker.controller;
+    worker?.postMessage({
       type: "set-version",
       version: version.version,
     });
+  } else {
+    const registration = await navigator.serviceWorker
+      ?.register(`worker.js?version=${encodeURIComponent(version.version)}`)
+      .catch((e) => {
+        console.error("[Kate] failed to register Kate worker", e);
+        return null;
+      });
+    worker = registration?.active ?? null;
   }
 
   // Run Kate
