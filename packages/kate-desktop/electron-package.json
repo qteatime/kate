@@ -1,3 +1,16 @@
 {
-  "main": "index.js"
+  "name": "@qteatime/kate-desktop",
+  "version": "0.23.6-a1",
+  "description": "A fantasy handheld console for small visual novels, 2d RPGs, and other story-rich games!",
+  "author": "Q.",
+  "main": "index.js",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/qteatime/kate.git"
+  },
+  "bugs": {
+    "url": "https://github.com/qteatime/kate/issues"
+  },
+  "homepage": "https://github.com/qteatime/kate#readme"
 }
