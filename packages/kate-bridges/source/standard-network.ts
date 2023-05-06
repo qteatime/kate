@@ -54,6 +54,7 @@ void (function () {
         const result = await old_fetch(file);
         resolve(result);
       } catch (error) {
+        console.error(`[Kate] failed to fetch ${url}`);
         reject(error);
       }
     });
@@ -82,6 +83,7 @@ void (function () {
         old_xhr_open.call(this, "GET", real_url, true);
         this.__maybe_send();
       } catch (error) {
+        console.error(`[Kate] failed to fetch with XHR ${url}`);
         old_xhr_open.call(this, "GET", "not-found", true);
         this.__maybe_send();
       }
@@ -137,7 +139,39 @@ void (function () {
           const real_url = await cart_fs.get_file_url(String(url));
           old_img_src.set!.call(this, real_url);
         } catch (error) {
+          console.error(`[Kate] failed to load image ${url}`);
           old_img_src.set!.call(this, "not-found");
+        }
+      })();
+    },
+  });
+
+  // -- Script loading
+  const old_script_src = Object.getOwnPropertyDescriptor(
+    HTMLScriptElement.prototype,
+    "src"
+  )!;
+  Object.defineProperty(HTMLScriptElement.prototype, "src", {
+    enumerable: old_script_src.enumerable,
+    configurable: old_script_src.configurable,
+    get() {
+      return this.__src ?? old_script_src.get!.call(this);
+    },
+    set(url0) {
+      const url = fix_url(url0);
+      this.__src = url;
+      if (is_data_url(url)) {
+        old_script_src.set!.call(this, url);
+        return;
+      }
+
+      void (async () => {
+        try {
+          const real_url = await cart_fs.get_file_url(String(url));
+          old_script_src.set!.call(this, real_url);
+        } catch (error) {
+          console.error(`[Kate] failed to load script ${url}`);
+          old_script_src.set!.call(this, "not-found");
         }
       })();
     },
@@ -160,6 +194,7 @@ void (function () {
       this.__src = url;
       if (is_data_url(url)) {
         old_media_src.set!.call(this, url);
+        return;
       }
 
       void (async () => {
@@ -167,6 +202,7 @@ void (function () {
           const real_url = await cart_fs.get_file_url(String(url));
           old_media_src.set!.call(this, real_url);
         } catch (error) {
+          console.error(`[Kate] failed to load media ${url}`);
           old_media_src.set!.call(this, "not-found");
         }
       })();
