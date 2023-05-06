@@ -624,7 +624,6 @@ function get_mapping(x: KeyMapping) {
           x: "Escape",
           o: "Enter",
           menu: "ShiftLeft",
-          capture: "ControlLeft",
           l: "PageUp",
           r: "PageDown",
         };
@@ -638,7 +637,6 @@ function get_mapping(x: KeyMapping) {
           x: "KeyX",
           o: "KeyZ",
           menu: "ShiftLeft",
-          capture: "ControlLeft",
           l: "KeyA",
           r: "KeyS",
         };
@@ -678,8 +676,6 @@ function make_virtual_key(key: string) {
       return Cart.VirtualKey.Left({});
     case "menu":
       return Cart.VirtualKey.Menu({});
-    case "capture":
-      return Cart.VirtualKey.Capture({});
     case "x":
       return Cart.VirtualKey.X({});
     case "o":
