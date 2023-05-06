@@ -1,12 +1,12 @@
 import type { KateTimer } from "./timer";
 import { EventStream } from "./util";
 
-type PointerLocation = {
+export type PointerLocation = {
   x: number;
   y: number;
 };
 
-type PointerClick = {
+export type PointerClick = {
   location: PointerLocation;
   button: number;
 };

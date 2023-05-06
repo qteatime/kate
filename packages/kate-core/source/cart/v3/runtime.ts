@@ -16,7 +16,8 @@ export type Bridge =
   | { type: "local-storage-proxy" }
   | { type: "input-proxy"; mapping: Map<InputKey, Key> }
   | { type: "preserve-render" }
-  | { type: "capture-canvas"; selector: string };
+  | { type: "capture-canvas"; selector: string }
+  | { type: "pointer-input-proxy"; selector: string };
 
 export type Key = {
   key: string;
@@ -59,6 +60,9 @@ function bridge(x: Cart_v3.Bridge): Bridge {
     }
     case Cart_v3.Bridge.$Tags.Capture_canvas: {
       return { type: "capture-canvas", selector: str(x.selector, 255) };
+    }
+    case Cart_v3.Bridge.$Tags.Pointer_input_proxy: {
+      return { type: "pointer-input-proxy", selector: str(x.selector, 255) };
     }
     default:
       throw unreachable(x);

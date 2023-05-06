@@ -1961,7 +1961,7 @@ export namespace Platform {
 
 
 
-export type Bridge = Bridge.Network_proxy | Bridge.Local_storage_proxy | Bridge.Input_proxy | Bridge.Preserve_webgl_render | Bridge.Capture_canvas;
+export type Bridge = Bridge.Network_proxy | Bridge.Local_storage_proxy | Bridge.Input_proxy | Bridge.Preserve_webgl_render | Bridge.Capture_canvas | Bridge.Pointer_input_proxy;
 
 export namespace Bridge {
  export const tag = 25;
@@ -1971,7 +1971,8 @@ export namespace Bridge {
     Local_storage_proxy = 1,
     Input_proxy = 2,
     Preserve_webgl_render = 3,
-    Capture_canvas = 4
+    Capture_canvas = 4,
+    Pointer_input_proxy = 5
  }
 
  
@@ -2080,6 +2081,28 @@ export namespace Bridge {
    readonly '@version': 0;
    readonly '@variant': $Tags.Capture_canvas;
    readonly '@variant-name': 'Capture-canvas';
+   readonly 'selector': string
+ }
+
+
+  
+ export function Pointer_input_proxy(x: {readonly 'selector': string}): Bridge {
+   return {
+     '@name': 'Bridge',
+     '@tag': 25,
+     '@version': 0,
+     '@variant': $Tags.Pointer_input_proxy,
+     '@variant-name': 'Pointer-input-proxy',
+     ...x
+   }
+ }
+
+ export interface Pointer_input_proxy {
+   readonly '@name': 'Bridge';
+   readonly '@tag': 25;
+   readonly '@version': 0;
+   readonly '@variant': $Tags.Pointer_input_proxy;
+   readonly '@variant-name': 'Pointer-input-proxy';
    readonly 'selector': string
  }
 

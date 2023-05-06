@@ -145,6 +145,17 @@ function apply_bridge(
       break;
     }
 
+    case "pointer-input-proxy": {
+      const code = bridges["pointer-input.js"];
+      const full_source = `const SELECTOR = ${JSON.stringify(
+        bridge.selector
+      )};\n${code}`;
+      const script = document.createElement("script");
+      script.textContent = wrap(full_source);
+      dom.body.appendChild(script);
+      break;
+    }
+
     default:
       throw unreachable(bridge, "kate bridge");
   }

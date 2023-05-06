@@ -222,6 +222,9 @@ union Bridge {
   type Capture-canvas {
     field selector: Text;
   }
+  type Pointer-input-proxy {
+    field selector: Text;
+  }
 }
 
 union VirtualKey {

@@ -146,27 +146,31 @@ const meta = T.spec({
   ),
 });
 
-const bridges: (_: any) => Bridge = T.tagged_choice("type", {
+const bridges = T.tagged_choice<Bridge, Bridge["type"]>("type", {
   "network-proxy": T.spec({
-    type: T.constant("network-proxy"),
+    type: T.constant("network-proxy" as const),
   }),
   "local-storage-proxy": T.spec({
-    type: T.constant("local-storage-proxy"),
+    type: T.constant("local-storage-proxy" as const),
   }),
   "input-proxy": T.spec({
-    type: T.constant("input-proxy"),
+    type: T.constant("input-proxy" as const),
     mapping: T.or3(
-      T.constant("defaults"),
-      T.constant("kate"),
+      T.constant("defaults" as const),
+      T.constant("kate" as const),
       T.dictionary(T.str)
     ),
   }),
   "preserve-webgl-render": T.spec({
-    type: T.constant("preserve-webgl-render"),
+    type: T.constant("preserve-webgl-render" as const),
   }),
   "capture-canvas": T.spec({
-    type: T.constant("capture-canvas"),
-    selector: T.short_str(1_000),
+    type: T.constant("capture-canvas" as const),
+    selector: T.short_str(255),
+  }),
+  "pointer-input-proxy": T.spec({
+    type: T.constant("pointer-input-proxy" as const),
+    selector: T.short_str(255),
   }),
 }) as any;
 
@@ -273,7 +277,8 @@ type Bridge =
       mapping: KeyMapping;
     }
   | { type: "preserve-webgl-render" }
-  | { type: "capture-canvas"; selector: string };
+  | { type: "capture-canvas"; selector: string }
+  | { type: "pointer-input-proxy"; selector: string };
 
 const mime_table = Object.assign(Object.create(null), {
   ".png": "image/png",
@@ -596,6 +601,10 @@ function make_bridge(x: Bridge): Cart.Bridge[] {
 
     case "capture-canvas": {
       return [Cart.Bridge.Capture_canvas({ selector: x.selector })];
+    }
+
+    case "pointer-input-proxy": {
+      return [Cart.Bridge.Pointer_input_proxy({ selector: x.selector })];
     }
 
     default:

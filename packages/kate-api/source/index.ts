@@ -4,7 +4,11 @@ import { KateCartFS } from "./cart-fs";
 import { KateIPC } from "./channel";
 import { InputKey, ExtendedInputKey, KateInput } from "./input";
 import { KateObjectStore } from "./object-store";
-import { KatePointerInput } from "./pointer-input";
+import {
+  KatePointerInput,
+  PointerClick,
+  PointerLocation,
+} from "./pointer-input";
 import { KateTimer } from "./timer";
 
 declare var KATE_SECRET: string;
@@ -81,6 +85,8 @@ declare global {
       ExtendedInputKey,
       KateTimer,
       KateObjectStore,
+      PointerLocation,
+      PointerClick,
     };
   }
 }
