@@ -26,13 +26,16 @@ As a developer, by making a game for Kate you get to:
 
 - Have the option of packaging the emulator with your game as a webpage, which can then be used to provide a web-playable version in a platform like Itch.io, or on your own site;
 
-- Use the same game making tools you're already familiar with, as long as they have an option to make a web export; and
+- Use the same game making tools you're already familiar with, as long as they have an option to make a web export\*; and
 
 - Avoid having to deal with optimising download sizes for your files so players don't have to wait a long time to start the game.
 
 On top of the APIs that the are provided in the web platform, Kate adds its own game-specific APIs that have a baseline expectation among players, so you don't have to keep re-explaining yourself.
 
 These APIs include things like safe additional storage for your save data, support for screenshot and video capture of game-play, simplified input handling where you don't need to care if the player is using a touch-screen, a keyboard, a gamepad, or another device, etc.
+
+> **NOTE**<br>
+> Kate is not a web browser; it does not run web games directly, so even if your game runs in a web browser, it's not a guarantee that it will run on Kate (which is a more restricted platform). Kate can inject emulated APIs (called Bridges) that make porting games from the web to Kate easier, but support for various engines is still a work in progress.
 
 ### What will I need?
 
@@ -42,11 +45,10 @@ You'll also need to be familiar with [the command line](https://en.wikipedia.org
 
 There's a planned tool called Kate Studio which will allow you to build games for Kate directly from your browser, but that tool is not here yet.
 
-Once you have Node.js installed, you can install the set of tools for building and running Kate games from the command line:
+Once you have Node.js installed, you can install the set of tools for building Kate games from the command line:
 
 ```shell
 $ npm install -g @qteatime/kate-tools@experimental
-$ npm install -g @qteatime/kate-desktop@experimental
 ```
 
 > **NOTE:**  
@@ -58,7 +60,8 @@ After you run these commands you should have three new applications available in
 
 - **kart** is used for packaging your games into a single `.kart` file that you can distribute to players;
 - **kate-dist** is used for bundling a `.kart` file and the Kate emulator into a web page, which you can then upload to a platform like Itch.io. You'll need to zip the contents of the generated folder separately.
-- **kate-desktop** is the native version of the Kate emulator, which you'll use to test your games. You can also test it by accessing the online version at https://kate.qteati.me, which is useful if you want to check how your game runs on an iPhone, iPad, or Android device.
+
+For the emulator, please see the regular [Kate installation instructions](./installation.md). You can use the online version at https://kate.qteati.me/ to test any cartridge, in any platform with a modern web browser.
 
 ## Getting started
 
@@ -149,7 +152,7 @@ $ kart kate.json --output my-first-cartridge.kart
 >
 > Arbitrarily running applications in an unsandboxed system, like Windows, can easily get your computer compromised (and risks damaging your reputation if that ends up with you distributing malware to your users unknowingly). Kate is a secure platform, and part of that security also comes from knowing what your applications are doing :)
 
-This should create a `my-first-cartridge.kart` file in the same folder as your `kate.json` and `index.html` files. Drag and drop it on your Kate emulator (either by accessing https://kate.qteati.me/ or by running `kate-desktop` in the command line) to install. Your emulator should look like this:
+This should create a `my-first-cartridge.kart` file in the same folder as your `kate.json` and `index.html` files. Drag and drop it on your Kate emulator (either by accessing https://kate.qteati.me/ or by running the native Kate emulator) to install. Your emulator should look like this:
 
 ![](./img/dev/demo2.png)
 
@@ -161,7 +164,7 @@ From here you can try [porting a game you already have to Kate](#porting-to-kate
 
 ## Porting to Kate
 
-Chances are you already have a game that runs on Kate—if it runs on a web browser, there are high chances it's supported in Kate as well. Just note that if you use more dangerous/privacy-concerning APIs (like geolocation), then Kate does not offer support for it currently.
+Chances are you already have a game that can run on Kate—if it runs on a web browser, there are high chances you can make it run in Kate as well. Just note that Kate is not a web browser; if your game relies on being online or uses dangerous APIs (such as geolocation or camera), you won't be able to run it in the emulator.
 
 So, what goes into porting a game for Kate? Here's a small checklist:
 
@@ -169,17 +172,17 @@ So, what goes into porting a game for Kate? Here's a small checklist:
 
   Touch support is coming in a future version, but that'll take a while.
 
-- **Does your game work offline?** — If your game can't work with just the files you add to the cartridge, and needs to download or upload additional content elsewhere, Kate does not support it currently. Restricted network access is coming in a future version, but it'll still be heavily policed to protect players' privacy and security.
+- **Does your game work offline?** — If your game can't work with just the files you add to the cartridge, and needs to download or upload additional content elsewhere, you won't be able to run it on Kate. Restricted network access is coming in a future version, but it'll still be heavily policed to protect players' privacy and security.
 
 - **Does your game look reasonable in 800x480?** — Kate has a 800x480 (5:3) screen. Many games can be upscaled or downscaled to that size, then padded with black bars on the side. But if your game is designed for portrait mode, it might not have enough real screen space to make the text and graphics readable.
 
 - **Does your game work without dangerous APIs?** — Kate currently does not support access to microphone, camera, geolocation, and any other API that poses a privacy risk if misused. Some of these are planned for future versions, but there's significant work needed on ensuring that they respect players privacy and mitigate as much potential damage as possible.
 
-If you can answer yes to all those questions, then porting your game to Kate is reasonably straightforward. Kate offers two porting modes:
+If you can answer yes to all those questions, then porting your game to Kate should be possible. Kate offers two porting modes:
 
-- **Bridge-based porting**: If you have a game using standard web technologies, you can specify Bridges in your configuration and Kate will automatically patch your cartridge to translate Web API calls into Kate API calls. No additional effort required from you.
+- **Bridge-based porting**: If you have a game using standard web technologies, you can specify Bridges in your configuration and Kate will automatically patch your cartridge to translate Web API calls into Kate API calls. So long as the existing Bridges cover all of your Web API uses, there's no additional effort required from you.
 
-- **Manual porting**: Some Web APIs are more powerful than the ones Kate offers, or they don't map 1:1. In some cases, you might need to write code that calls the Kate APIs directly, rather than the respective Web APIs.
+- **Manual porting**: Some Web APIs are more powerful than the ones Kate offers, or they don't map 1:1. In some cases, you might need to write code that calls the Kate APIs directly, rather than the respective Web APIs. Or you might need to make changes to your game's code to remove a particular API usage.
 
 ### Basics of porting
 
@@ -228,7 +231,7 @@ A few important parts of this configuration file are:
 
   It's very important to note that, for security reasons, Kart does not allow you to refer to files that are outside of your game directory. That is, something like `../thumbnail.png` is not allowed. If it were, then building a cartridge from source could potentially include privacy or security-sensitive data without any warning.
 
-- `platform`: This describes how Kate should run your cartridge. The only supported runtime is `web-archive`, in which Kate expects you to provide an HTML page for it to load (the page is loaded locally and sandboxed, it will have no access to making network requests).
+- `platform`: This describes how Kate should run your cartridge. The only supported runtime currently is `web-archive`, in which Kate expects you to provide an HTML page for it to load (the page is loaded locally and sandboxed, it will have no access to making network requests).
 
   You can also provide a list of Bridges, which are small internal scripts that Kate can inject in your page when running it to automatically translate between standard Web APIs (like `fetch`) and the APIs that Kate provides.
 
@@ -251,7 +254,7 @@ making a network request to the server and asking for the data for
 requests, so the cartridge would crash right at that line.
 
 You'd have to go through your code and change all such instances to use the
-`KateAPI.cart_fs.read_file` call instead. Bridges just save you from that
+`KateAPI.cart_fs.read_file` call instead. Bridges save you from that
 manual work. By specifying the Network Proxy bridge, for example, Kate
 would automatically translate the image loading into a call to
 `KateAPI.cart_fs.read_file`, and your game would work on Kate **and** on
@@ -395,5 +398,20 @@ The bridge configuration for Ren'Py looks like this:
 ]
 ```
 
+Make sure you're using Ren'Py 7.5+ or 8.1+, as older versions do not have reliable web support.
+
 > **CURRENT LIMITATIONS:**
 > Ren'Py uses [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API) to store save files. Kate does not provide a bridge for IndexedDB yet, so Ren'Py games will run on Kate without support for saving/loading the player's progress.
+
+### Bitsy
+
+Games made with [Bitsy](https://bitsy.org/) can run on Kate by adding a few [Bridges](#using-bridges) to the configuration. A complete configuration for a Bitsy game looks like this:
+
+```json
+"bridges": [
+  {"type": "input-proxy", "mapping": "kate"},
+  {"type": "capture-canvas", "selector": "#game"}
+]
+```
+
+If you're using [Bitsy hacks](https://github.com/seleb/bitsy-hacks) then you'll need to figure out on a case-by-case basis which additional bridges or modifications to the code you need, as they're not currently tested.
