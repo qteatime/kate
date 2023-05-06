@@ -17,7 +17,11 @@ export async function translate_html(html: string, context: RuntimeEnv) {
 async function load_all_media(dom: Document, context: RuntimeEnv) {
   for (const img of Array.from(dom.querySelectorAll("img"))) {
     const maybe_path = img.getAttribute("src");
-    if (maybe_path == null) {
+    if (
+      maybe_path == null ||
+      maybe_path.trim() === "" ||
+      is_non_local(maybe_path)
+    ) {
       continue;
     }
     const path = Pathname.from_string(maybe_path);
@@ -263,5 +267,14 @@ async function get_data_url(real_path: string, env: RuntimeEnv) {
     return file_to_dataurl(file);
   } else {
     throw new Error(`File not found: ${real_path}`);
+  }
+}
+
+function is_non_local(url: string) {
+  try {
+    new URL(url);
+    return true;
+  } catch (_) {
+    return false;
   }
 }
