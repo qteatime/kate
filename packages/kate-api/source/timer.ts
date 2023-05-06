@@ -1,4 +1,4 @@
-import { EventStream } from "../../util/build/events";
+import { EventStream } from "./util";
 
 export class KateTimer {
   readonly on_tick = new EventStream<number>();

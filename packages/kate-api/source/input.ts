@@ -1,4 +1,4 @@
-import { EventStream } from "../../util/build/events";
+import { EventStream } from "./util";
 import type { KateIPC } from "./channel";
 import type { KateTimer } from "./timer";
 

@@ -1245,6 +1245,17 @@
                   }
                 }
               ]
+            },
+            {
+              "name": "Pointer-input-proxy",
+              "fields": [
+                {
+                  "name": "selector",
+                  "type": {
+                    "op": "text"
+                  }
+                }
+              ]
             }
           ]
         }

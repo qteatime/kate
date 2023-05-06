@@ -325,6 +325,23 @@ The supported key identifiers can be seen in Kart's [keymap.json](../packages/ka
 
 The input proxy translates Kate input (keyboard, gamepad, and virtual buttons) into keyboard events dispatched on the Window or Document objects, depending on where your game listens to them.
 
+#### Pointer input proxy
+
+If your game uses mouse/touch/pen input, then you can use the pointer input proxy to forward those events to one of your page's elements. Specify it as:
+
+```json
+"bridges": [
+  {
+    "type": "pointer-input-proxy",
+    "selector": "#my-canvas"
+  }
+]
+```
+
+The selector is a [CSS Selector](https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/Selectors) that tells Kate which element in the page will receive the pointer events. This is usually your game's canvas.
+
+Kate will actually poll for the selector, so this bridge also works with elements that are added dynamically to the page from a script. However, it will give up if the element is not found in the page after 1 minute.
+
 #### Local storage proxy
 
 Specify it as:
@@ -393,10 +410,13 @@ The bridge configuration for Ren'Py looks like this:
 "bridges": [
   {"type": "network-proxy"},
   {"type": "input-proxy", "mapping": "defaults"},
+  {"type": "pointer-input-proxy", "selector": "#canvas"},
   {"type": "preserve-webgl-render"},
   {"type": "capture-canvas", "selector": "#canvas"}
 ]
 ```
+
+If your visual novel does not need mouse/touch support (i.e.: if players can use the keyboard/Kate buttons for everything), you can leave out the `pointer-input-proxy` bridge to avoid the running unnecessary code for mouse/touch events.
 
 Make sure you're using Ren'Py 7.5+ or 8.1+, as older versions do not have reliable web support.
 

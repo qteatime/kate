@@ -1,5 +1,4 @@
-import { EventStream } from "../../util/build/events";
-import { defer, Deferred } from "../../util/build/promise";
+import { EventStream, defer, Deferred } from "./util";
 import type { ExtendedInputKey, InputKey } from "./input";
 
 type Payload = { [key: string]: any };
