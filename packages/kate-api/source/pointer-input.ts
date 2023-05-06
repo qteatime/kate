@@ -77,7 +77,7 @@ export class KatePointerInput {
     });
 
     cover.addEventListener("mouseup", (ev) => {
-      this._buttons.set(ev.button, 1);
+      this._buttons.set(ev.button, -1);
       this.on_up.emit({
         location: this.location,
         button: ev.button,
