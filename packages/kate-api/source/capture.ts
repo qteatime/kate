@@ -1,4 +1,4 @@
-import { defer } from "../../util/build/promise";
+import { defer } from "./util";
 import type { KateIPC } from "./channel";
 import type { ExtendedInputKey, KateInput } from "./input";
 

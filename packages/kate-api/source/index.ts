@@ -4,6 +4,7 @@ import { KateCartFS } from "./cart-fs";
 import { KateIPC } from "./channel";
 import { InputKey, ExtendedInputKey, KateInput } from "./input";
 import { KateObjectStore } from "./object-store";
+import { KatePointerInput } from "./pointer-input";
 import { KateTimer } from "./timer";
 
 declare var KATE_SECRET: string;
@@ -24,6 +25,8 @@ timer.setup();
 
 export const input = new KateInput(channel, timer);
 input.setup();
+
+export const pointer_input = new KatePointerInput(timer);
 
 export const capture = new KateCapture(channel, input);
 capture.setup();
@@ -52,11 +55,14 @@ window.addEventListener("load", () => {
   }, 1_000);
 });
 
+pointer_input.monitor(cover);
+
 export type KateAPI = {
   events: typeof events;
   cart_fs: typeof cart_fs;
   store: typeof store;
   input: typeof input;
+  pointer_input: typeof pointer_input;
   audio: typeof audio;
   timer: typeof timer;
   capture: typeof capture;
@@ -71,6 +77,7 @@ declare global {
       KateAudioChannel,
       InputKey,
       KateInput,
+      KatePointerInput,
       ExtendedInputKey,
       KateTimer,
       KateObjectStore,
