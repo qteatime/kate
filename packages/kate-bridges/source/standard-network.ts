@@ -21,7 +21,7 @@ void (function () {
       console.warn(`[Kate] Non-proxyable URL:`, url0);
       return url0;
     } else {
-      return url.pathname;
+      return decodeURIComponent(url.pathname);
     }
   }
 

@@ -1,4 +1,5 @@
 import type { KateIPC } from "./channel";
+import { Pathname } from "./util";
 
 interface File {
   mime: string;
@@ -13,7 +14,7 @@ export class KateCartFS {
   }
 
   read_file(path0: string): Promise<File> {
-    const path = new URL(path0, "http://localhost").pathname;
+    const path = Pathname.from_string(path0).normalise().as_string();
     return this.#channel.call("kate:cart.read-file", { path });
   }
 
