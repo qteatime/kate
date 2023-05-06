@@ -172,6 +172,10 @@ const bridges = T.tagged_choice<Bridge, Bridge["type"]>("type", {
     type: T.constant("pointer-input-proxy" as const),
     selector: T.short_str(255),
   }),
+  "indexeddb-proxy": T.spec({
+    type: T.constant("indexeddb-proxy" as const),
+    versioned: T.bool,
+  }),
 }) as any;
 
 const platform_web = T.spec({
@@ -278,7 +282,8 @@ type Bridge =
     }
   | { type: "preserve-webgl-render" }
   | { type: "capture-canvas"; selector: string }
-  | { type: "pointer-input-proxy"; selector: string };
+  | { type: "pointer-input-proxy"; selector: string }
+  | { type: "indexeddb-proxy"; versioned: boolean };
 
 const mime_table = Object.assign(Object.create(null), {
   ".png": "image/png",
@@ -605,6 +610,10 @@ function make_bridge(x: Bridge): Cart.Bridge[] {
 
     case "pointer-input-proxy": {
       return [Cart.Bridge.Pointer_input_proxy({ selector: x.selector })];
+    }
+
+    case "indexeddb-proxy": {
+      return [Cart.Bridge.IndexedDB_proxy({ versioned: x.versioned })];
     }
 
     default:

@@ -160,6 +160,16 @@ function apply_bridge(
       break;
     }
 
+    case "indexeddb-proxy": {
+      const code = bridges["indexeddb.js"];
+      const full_source = `
+        const VERSIONED = ${JSON.stringify(bridge.versioned)};
+        ${code}
+      `;
+      append_proxy(full_source);
+      break;
+    }
+
     default:
       throw unreachable(bridge, "kate bridge");
   }

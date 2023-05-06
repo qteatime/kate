@@ -1961,7 +1961,7 @@ export namespace Platform {
 
 
 
-export type Bridge = Bridge.Network_proxy | Bridge.Local_storage_proxy | Bridge.Input_proxy | Bridge.Preserve_webgl_render | Bridge.Capture_canvas | Bridge.Pointer_input_proxy;
+export type Bridge = Bridge.Network_proxy | Bridge.Local_storage_proxy | Bridge.Input_proxy | Bridge.Preserve_webgl_render | Bridge.Capture_canvas | Bridge.Pointer_input_proxy | Bridge.IndexedDB_proxy;
 
 export namespace Bridge {
  export const tag = 25;
@@ -1972,7 +1972,8 @@ export namespace Bridge {
     Input_proxy = 2,
     Preserve_webgl_render = 3,
     Capture_canvas = 4,
-    Pointer_input_proxy = 5
+    Pointer_input_proxy = 5,
+    IndexedDB_proxy = 6
  }
 
  
@@ -2104,6 +2105,28 @@ export namespace Bridge {
    readonly '@variant': $Tags.Pointer_input_proxy;
    readonly '@variant-name': 'Pointer-input-proxy';
    readonly 'selector': string
+ }
+
+
+  
+ export function IndexedDB_proxy(x: {readonly 'versioned': boolean}): Bridge {
+   return {
+     '@name': 'Bridge',
+     '@tag': 25,
+     '@version': 0,
+     '@variant': $Tags.IndexedDB_proxy,
+     '@variant-name': 'IndexedDB-proxy',
+     ...x
+   }
+ }
+
+ export interface IndexedDB_proxy {
+   readonly '@name': 'Bridge';
+   readonly '@tag': 25;
+   readonly '@version': 0;
+   readonly '@variant': $Tags.IndexedDB_proxy;
+   readonly '@variant-name': 'IndexedDB-proxy';
+   readonly 'versioned': boolean
  }
 
 }
