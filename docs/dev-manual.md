@@ -396,6 +396,32 @@ Tells Kate which canvas to capture as the game screen. The `selector` option is 
 
 Kate will actually poll for the selector, so this bridge also works with elements that are added dynamically to the page from a script. However, it will give up if the element is not found in the page after 1 minute.
 
+#### IndexedDB proxy
+
+This proxy handles simple uses of IndexedDB that are likely to happen in video games. It does however not cover the entire IndexedDB API. Specify it as:
+
+```json
+"bridges": [
+  {
+    "type": "indexeddb-proxy",
+    "versioned": true
+  }
+]
+```
+
+The `versioned` argument describes whether the data will be associated only with the current cartridge version, or with all cartridges under the same id. See the [Object Storage API](./design/0101-object-store.md) for details on versioning and migrations. Most uses of IndexedDB will handle migrations themselves so disabling versioning can be an option.
+
+> **IMPORTANT SEMANTICS NOTE:**
+> This proxy does not implement the IndexedDB API, only a subset of it.
+> Operations provided are not transactional, only a subset of queries and
+> storage are supported, and performance does not scale to hundreds of
+> records (the proxy uses a linear search for all operations).
+>
+> It works with things like Emscripten's IDBFS and Ren'Py's save data, and
+> it's meant only to provide a way of saving game data in games ported to
+> Kate, which are likely to store little data and have less
+> concurrency/transactional requirements.
+
 ## Porting from specific engines
 
 If your game was written using a game engine that exports for the web, it's generally easier to follow a cookbook process of how to configure Kart to repackage that game for Kate. This section provides common configurations for common engines Kate supports.
@@ -412,16 +438,14 @@ The bridge configuration for Ren'Py looks like this:
   {"type": "input-proxy", "mapping": "defaults"},
   {"type": "pointer-input-proxy", "selector": "#canvas"},
   {"type": "preserve-webgl-render"},
-  {"type": "capture-canvas", "selector": "#canvas"}
+  {"type": "capture-canvas", "selector": "#canvas"},
+  {"type": "indexeddb-proxy", "versioned": false}
 ]
 ```
 
 If your visual novel does not need mouse/touch support (i.e.: if players can use the keyboard/Kate buttons for everything), you can leave out the `pointer-input-proxy` bridge to avoid the running unnecessary code for mouse/touch events.
 
 Make sure you're using Ren'Py 7.5+ or 8.1+, as older versions do not have reliable web support.
-
-> **CURRENT LIMITATIONS:**
-> Ren'Py uses [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API) to store save files. Kate does not provide a bridge for IndexedDB yet, so Ren'Py games will run on Kate without support for saving/loading the player's progress.
 
 ### Bitsy
 
