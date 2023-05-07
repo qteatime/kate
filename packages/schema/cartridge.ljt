@@ -225,6 +225,9 @@ union Bridge {
   type Pointer-input-proxy {
     field selector: Text;
   }
+  type IndexedDB-proxy {
+    field versioned: Boolean;
+  }
 }
 
 union VirtualKey {

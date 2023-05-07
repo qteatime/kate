@@ -1256,6 +1256,17 @@
                   }
                 }
               ]
+            },
+            {
+              "name": "IndexedDB-proxy",
+              "fields": [
+                {
+                  "name": "versioned",
+                  "type": {
+                    "op": "bool"
+                  }
+                }
+              ]
             }
           ]
         }

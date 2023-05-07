@@ -56,14 +56,7 @@ export class CartridgeObjectStore {
   }
 
   async ensure_bucket(name: string) {
-    const bucket = await this.transaction("readonly", async (storage) =>
-      storage.partitions.try_get([this.cartridge_id, this.version, name])
-    );
-    if (bucket != null) {
-      return new CartridgeBucket(this, bucket);
-    } else {
-      return await this.add_bucket(name);
-    }
+    return this.add_bucket(name).catch((e) => this.get_bucket(name));
   }
 
   async get_bucket(name: string) {
@@ -252,7 +245,23 @@ function estimate(value: unknown): number {
   }
 
   if (Array.isArray(value)) {
-    let size = 0;
+    let size = 8;
+    for (const x of value) {
+      size += estimate(x);
+    }
+    return size;
+  }
+
+  if (value instanceof Map) {
+    let size = 8;
+    for (const [k, v] of value.entries()) {
+      size += estimate(k) + estimate(v);
+    }
+    return size;
+  }
+
+  if (value instanceof Set) {
+    let size = 8;
     for (const x of value) {
       size += estimate(x);
     }
@@ -267,7 +276,8 @@ function estimate(value: unknown): number {
     value instanceof BigUint64Array ||
     value instanceof Int16Array ||
     value instanceof Int32Array ||
-    value instanceof Int8Array
+    value instanceof Int8Array ||
+    value instanceof ArrayBuffer
   ) {
     return value.byteLength;
   }

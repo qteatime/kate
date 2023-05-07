@@ -78,7 +78,7 @@ Planned features:
   - Exporting/synchronising save data across devices;
 - **Supporting games not designed for Kate**:
   - Proxying HTML Audio/Web Audio APIs;
-  - Proxying IndexedDB API;
+  - ~~Proxying IndexedDB API;~~
   - Full support for common game engines through bridges;
 - **Supporting tooling**:
   - Kate Studio, a fully integrated game maker for Kate games;
