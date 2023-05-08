@@ -788,7 +788,6 @@ void (function () {
     return names;
   }
 
-  debugger;
   Object.defineProperty(window, "indexedDB", {
     configurable: true,
     value: new KDBFactory(),
