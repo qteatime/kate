@@ -235,6 +235,14 @@ A few important parts of this configuration file are:
 
   You can also provide a list of Bridges, which are small internal scripts that Kate can inject in your page when running it to automatically translate between standard Web APIs (like `fetch`) and the APIs that Kate provides.
 
+### The cartridge file system
+
+When you package a game for Kate you get back a `.kart` cartridge file. This file, like a zip, includes all files that make up your game and that you've specified in the `files` attribute of the cartridge build configuration.
+
+If you're using Windows or MacOS, one very important difference is that the cartridge file system is case sensitive. That is, for Kate, `menu.png` and `menu.PNG` are completely different, unrelated files. While on Windows you can save a file as `menu.PNG` and later load it as `menu.png`, trying to do this in Kate will result in your game crashing or not loading the image, because there's no file named specifically `menu.png` in the cartridge.
+
+This is also the behaviour on Linux. A good rule of thumb when making games that you intend to release on multiple platforms is to keep your file names written all in lower case ASCII characters and without spaces in them.
+
 ### Using bridges
 
 A bridge is a small script that gets injected in your cartridge to translate
@@ -424,13 +432,39 @@ The `versioned` argument describes whether the data will be associated only with
 
 ## Porting from specific engines
 
-If your game was written using a game engine that exports for the web, it's generally easier to follow a cookbook process of how to configure Kart to repackage that game for Kate. This section provides common configurations for common engines Kate supports.
+If your game was written using a game engine that exports for the web, it's generally easier to follow a cookbook process of how to configure Kart to repackage that game for Kate. The KART command line tool supports these common configurations through the `recipe` attribute, and this section provides minimal configurations for each engine.
 
 ### Ren'Py
 
 Games exported with [Ren'Py web](https://www.renpy.org/) can run on Kate by adding a few [Bridges](#using-bridges) to the configuration. For an example, see the [code for the sound of rain.](https://github.com/qteatime/games/blob/main/the-sound-of-rain).
 
-The bridge configuration for Ren'Py looks like this:
+A minimal `kate.json` will generally live outside of the `*-1.0-web` directory that Ren'Py generates when you create a web build, and will look like this:
+
+```json
+{
+  "id": "my-namespace/my-game",
+  "root": "my-game-1.0-web",
+  "metadata": {
+    "game": {
+      "author": "Me",
+      "title": "My Game"
+    }
+  },
+  "platform": {
+    "type": "web-archive",
+    "html": "index.html",
+    "recipe": {
+      "type": "renpy",
+      "save_data": "unversioned",
+      "pointer_support": true
+    }
+  }
+}
+```
+
+You can turn off `pointer_support` if your game can be fully played with a gamepad. Also note that [Kate's file system is case sensitive](#the-cartridge-file-system), so if you have file names with capital letters in them, they might not load properly in Kate. The recipe only includes files with lower-case file extensions (i.e.: something like `menu.PNG` will not be added to the cartridge, unless you define additional file patterns yourself)!
+
+This recipe will include common Ren'Py files and use the following bridges:
 
 ```json
 "bridges": [
@@ -443,13 +477,32 @@ The bridge configuration for Ren'Py looks like this:
 ]
 ```
 
-If your visual novel does not need mouse/touch support (i.e.: if players can use the keyboard/Kate buttons for everything), you can leave out the `pointer-input-proxy` bridge to avoid the running unnecessary code for mouse/touch events.
-
 Make sure you're using Ren'Py 7.5+ or 8.1+, as older versions do not have reliable web support.
 
 ### Bitsy
 
-Games made with [Bitsy](https://bitsy.org/) can run on Kate by adding a few [Bridges](#using-bridges) to the configuration. A complete configuration for a Bitsy game looks like this:
+Games made with [Bitsy](https://bitsy.org/) can run on Kate by adding a few [Bridges](#using-bridges) to the configuration. A minimal configuration for a Bitsy game lives in the same directory as your HTML and looks like this:
+
+```json
+{
+  "id": "my-namespace/my-game",
+  "metadata": {
+    "game": {
+      "author": "Me",
+      "title": "My Game"
+    }
+  },
+  "platform": {
+    "type": "web-archive",
+    "html": "my_game.html",
+    "recipe": {
+      "type": "bitsy"
+    }
+  }
+}
+```
+
+This will include any HTML file in the same directory and the following bridges:
 
 ```json
 "bridges": [
@@ -458,4 +511,4 @@ Games made with [Bitsy](https://bitsy.org/) can run on Kate by adding a few [Bri
 ]
 ```
 
-If you're using [Bitsy hacks](https://github.com/seleb/bitsy-hacks) then you'll need to figure out on a case-by-case basis which additional bridges or modifications to the code you need, as they're not currently tested.
+If you're using [Bitsy hacks](https://github.com/seleb/bitsy-hacks), or including external images and music, then you'll need to figure out on a case-by-case basis which additional bridges or modifications to the code you need; they're not currently tested.
