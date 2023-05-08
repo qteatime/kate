@@ -479,6 +479,13 @@ This recipe will include common Ren'Py files and use the following bridges:
 
 Make sure you're using Ren'Py 7.5+ or 8.1+, as older versions do not have reliable web support.
 
+> **STARTUP PERFORMANCE NOTE**<br>
+> Ren'Py web export supports [progressive downloads](https://www.renpy.org/dev-doc/html/web.html#progressive-downloading), where part of the game is added to a zip file loaded upfront, and parts of it are downloaded as needed while the player is playing.
+>
+> When you package your game as a Kate cartridge, there's no download happening—the player already has all the game files in their computer. However, you want to _turn on_ all progressive downloading, so Ren'Py keeps those files **outside** of the `game.zip` package. Having more data in the zip file increases startup time because Ren'Py will need to decompress all of the files before the game starts, and this is a very time-consuming and processing-intensive thing to do.
+>
+> However, note that loading a file from the Kate file system still has a little bit of latency, so it might be useful to keep very small sound effect files in the `game.zip` package none the less, just so they are loaded in memory by the time e.g.: the player focuses a button that has a hover sound effect (this will ensure it plays correctly and without delay the first time, not just the second time onwards).
+
 ### Bitsy
 
 Games made with [Bitsy](https://bitsy.org/) can run on Kate by adding a few [Bridges](#using-bridges) to the configuration. A minimal configuration for a Bitsy game lives in the same directory as your HTML and looks like this:
