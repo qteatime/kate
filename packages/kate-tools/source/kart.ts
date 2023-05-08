@@ -1,7 +1,7 @@
 import * as Path from "path";
 import * as FS from "fs";
 import { Cart } from "./deps/schema";
-import { unreachable } from "./deps/util";
+import { enumerate, unreachable } from "./deps/util";
 import * as Glob from "glob";
 import { Spec as T } from "./deps/util";
 const keymap = require("../assets/keymap.json") as {
@@ -176,19 +176,34 @@ const bridges = T.tagged_choice<Bridge, Bridge["type"]>("type", {
     type: T.constant("indexeddb-proxy" as const),
     versioned: T.bool,
   }),
-}) as any;
+});
+
+const recipe = T.tagged_choice<Recipe, Recipe["type"]>("type", {
+  identity: T.spec({
+    type: T.constant("identity" as const),
+  }),
+  bitsy: T.spec({
+    type: T.constant("bitsy" as const),
+  }),
+  renpy: T.spec({
+    type: T.constant("renpy" as const),
+    pointer_support: T.bool,
+    save_data: T.one_of(["versioned" as const, "unversioned" as const]),
+  }),
+});
 
 const platform_web = T.spec({
   type: T.constant("web-archive"),
   html: T.str,
   bridges: T.optional([], T.list_of(bridges)),
+  recipe: T.optional({ type: "identity" }, recipe),
 });
 
 const config = T.spec({
   id: T.seq2(T.short_str(255), valid_id),
   root: T.nullable(T.str),
   metadata: meta,
-  files: T.list_of(T.str),
+  files: T.optional([], T.list_of(T.str)),
   platform: platform_web,
 });
 
@@ -285,16 +300,53 @@ type Bridge =
   | { type: "pointer-input-proxy"; selector: string }
   | { type: "indexeddb-proxy"; versioned: boolean };
 
+type Recipe =
+  | { type: "identity" }
+  | {
+      type: "renpy";
+      pointer_support: boolean;
+      save_data: "versioned" | "unversioned";
+    }
+  | { type: "bitsy" };
+
 const mime_table = Object.assign(Object.create(null), {
-  ".png": "image/png",
-  ".json": "application/json",
+  // Text/code
   ".html": "text/html",
-  ".m4a": "audio/mp4",
+  ".xml": "application/xml",
   ".js": "text/javascript",
   ".css": "text/css",
-  ".txt": "text/plain",
-  ".zip": "application/zip",
   ".wasm": "application/wasm",
+  ".txt": "text/plain",
+  ".md": "text/markdown",
+  ".json": "application/json",
+  // Packaging
+  ".zip": "application/zip",
+  // Audio
+  ".wav": "audio/wav",
+  ".oga": "audio/ogg",
+  ".mp3": "audio/mpeg",
+  ".m4a": "audio/mp4",
+  ".flac": "audio/x-flac",
+  ".opus": "audio/opus",
+  ".weba": "audio/webm",
+  // Video
+  ".mp4": "video/mp4",
+  ".mpeg": "video/mpeg",
+  ".ogv": "video/ogg",
+  ".webm": "video/webm",
+  // Image
+  ".png": "image/png",
+  ".bmp": "image/bmp",
+  ".gif": "image/gif",
+  ".jpeg": "image/jpeg",
+  ".jpg": "image/jpg",
+  ".svg": "image/svg+xml",
+  ".webp": "image/webp",
+  // Fonts
+  ".ttf": "font/ttf",
+  ".woff": "font/woff",
+  ".woff2": "font/woff2",
+  ".otf": "font/otf",
 });
 
 function assert_base(path: string, root: string) {
@@ -698,11 +750,115 @@ function make_virtual_key(key: string) {
   }
 }
 
+function apply_recipe(json: ReturnType<typeof config>) {
+  const recipe = json.platform.recipe;
+  switch (recipe.type) {
+    case "identity": {
+      return json;
+    }
+    case "bitsy": {
+      return {
+        ...json,
+        files: ["**/*.html", ...json.files],
+        platform: {
+          type: "web-archive",
+          html: json.platform.html,
+          bridges: select_bridges([
+            { type: "input-proxy", mapping: "kate" },
+            { type: "capture-canvas", selector: "#game" },
+            ...json.platform.bridges,
+          ]),
+        },
+      };
+    }
+    case "renpy": {
+      return {
+        ...json,
+        files: [
+          // Text/code
+          "**/*.html",
+          "**/*.xml",
+          "**/*.js",
+          "**/*.css",
+          "**/*.wasm",
+          "**/*.txt",
+          "**/*.md",
+          "**/*.json",
+          // Packaging
+          "**/*.data",
+          "**/*.zip",
+          // Audio
+          "**/*.wav",
+          "**/*.ogg",
+          "**/*.oga",
+          "**/*.mp3",
+          "**/*.m4a",
+          "**/*.opus",
+          "**/*.flac",
+          "**/*.weba",
+          // Video
+          "**/*.webm",
+          "**/*.ogv",
+          "**/*.mp4",
+          "**/*.mpeg",
+          // Image
+          "**/*.webp",
+          "**/*.png",
+          "**/*.jpg",
+          "**/*.jpeg",
+          "**/*.bmp",
+          "**/*.gif",
+          // Font
+          "**/*.ttf",
+          "**/*.tga",
+          "**/*.dds",
+        ],
+        platform: {
+          type: "web-archive",
+          html: json.platform.html,
+          bridges: select_bridges([
+            { type: "network-proxy" },
+            { type: "input-proxy", mapping: "defaults" },
+            ...(recipe.pointer_support
+              ? [{ type: "pointer-input-proxy" as const, selector: "#canvas" }]
+              : []),
+            { type: "preserve-webgl-render" },
+            { type: "capture-canvas", selector: "#canvas" },
+            {
+              type: "indexeddb-proxy",
+              versioned: recipe.save_data === "versioned",
+            },
+            ...json.platform.bridges,
+          ]),
+        },
+      };
+    }
+    default:
+      throw unreachable(recipe, "Recipe");
+  }
+}
+
+function select_bridges(bridges: Bridge[]) {
+  const indexes = new Map<string, number>();
+  const result: Bridge[] = [];
+  for (const bridge of bridges) {
+    const old_index = indexes.get(bridge.type) ?? null;
+    if (old_index == null) {
+      const new_index = result.push(bridge) - 1;
+      indexes.set(bridge.type, new_index);
+    } else {
+      result.splice(old_index, 1, bridge);
+    }
+  }
+  return result;
+}
+
 export function make_cartridge(path: string, output: string) {
   let base_dir = Path.dirname(Path.resolve(path));
   const dir_root = base_dir;
   const json0: unknown = JSON.parse(FS.readFileSync(path, "utf-8"));
-  const json = T.parse(config, json0);
+  const json1 = T.parse(config, json0);
+  const json = apply_recipe(json1);
   const x = json.platform;
   if (json.root != null) {
     const new_base_dir = Path.resolve(base_dir, json.root);
