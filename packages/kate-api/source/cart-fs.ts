@@ -14,7 +14,10 @@ export class KateCartFS {
   }
 
   read_file(path0: string): Promise<File> {
-    const path = Pathname.from_string(path0).normalise().as_string();
+    const path = Pathname.from_string(path0)
+      .normalise()
+      .make_absolute()
+      .as_string();
     return this.#channel.call("kate:cart.read-file", { path });
   }
 

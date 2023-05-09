@@ -24,7 +24,7 @@ async function load_all_media(dom: Document, context: RuntimeEnv) {
     ) {
       continue;
     }
-    const path = Pathname.from_string(maybe_path);
+    const path = Pathname.from_string(maybe_path).normalise().make_absolute();
     const file = await try_get_file(path.as_string(), context);
     if (file == null) {
       continue;
@@ -187,7 +187,10 @@ async function inline_all_scripts(dom: Document, context: RuntimeEnv) {
   for (const script of Array.from(dom.querySelectorAll("script"))) {
     const src = script.getAttribute("src");
     if (src != null && src.trim() !== "") {
-      const real_path = Pathname.from_string(src).make_absolute().as_string();
+      const real_path = Pathname.from_string(src)
+        .normalise()
+        .make_absolute()
+        .as_string();
       const contents = await get_text_file(real_path, context);
       script.removeAttribute("src");
       script.removeAttribute("type");
@@ -199,7 +202,7 @@ async function inline_all_scripts(dom: Document, context: RuntimeEnv) {
 async function inline_all_links(dom: Document, context: RuntimeEnv) {
   for (const link of Array.from(dom.querySelectorAll("link"))) {
     const href = link.getAttribute("href") ?? "";
-    const path = Pathname.from_string(href).make_absolute();
+    const path = Pathname.from_string(href).normalise().make_absolute();
     if (link.rel === "stylesheet") {
       await inline_css(link, path, dom, context);
     } else {
