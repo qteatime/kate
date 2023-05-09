@@ -477,7 +477,7 @@ This recipe will include common Ren'Py files and use the following bridges:
 ]
 ```
 
-Make sure you're using Ren'Py 7.5+ or 8.1+, as older versions do not have reliable web support.
+Make sure you're using Ren'Py 7.5, as older versions do not have reliable web support, and 8.1 introduced new features that do not yet work with Kate's sandbox.
 
 > **STARTUP PERFORMANCE NOTE**<br>
 > Ren'Py web export supports [progressive downloads](https://www.renpy.org/dev-doc/html/web.html#progressive-downloading), where part of the game is added to a zip file loaded upfront, and parts of it are downloaded as needed while the player is playing.
