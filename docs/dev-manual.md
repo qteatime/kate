@@ -486,6 +486,11 @@ Make sure you're using Ren'Py 7.5+ or 8.1+, as older versions do not have reliab
 >
 > However, note that loading a file from the Kate file system still has a little bit of latency, so it might be useful to keep very small sound effect files in the `game.zip` package none the less, just so they are loaded in memory by the time e.g.: the player focuses a button that has a hover sound effect (this will ensure it plays correctly and without delay the first time, not just the second time onwards).
 
+> **STORAGE USAGE NOTE**<br>
+> Kate cartridges can store up to 64 MB of data, but Ren'Py save files are quite sizable and the default configuration is not very economical. It's recommended to reduce `config.autosave_slots` and `config.quicksave_slots` variables to a smaller number (e.g.: 3), as well as offer less save slots to the player.
+>
+> Without much happening, 3 auto-save slots can already take up to 2 MB of storage, which doesn't leave much room for user-created save slots. If a cartridge goes over its storage quota there's currently no way of extending it, and the emulator will refuse to store additional data until the cartridge deletes some of it to make more room; so keep those save slots reasonably small.
+
 ### Bitsy
 
 Games made with [Bitsy](https://bitsy.org/) can run on Kate by adding a few [Bridges](#using-bridges) to the configuration. A minimal configuration for a Bitsy game lives in the same directory as your HTML and looks like this:
