@@ -1,7 +1,7 @@
 import * as Path from "path";
 import * as FS from "fs";
 import { Cart } from "./deps/schema";
-import { enumerate, unreachable } from "./deps/util";
+import { enumerate, from_bytes, unreachable } from "./deps/util";
 import * as Glob from "glob";
 import { Spec as T } from "./deps/util";
 const keymap = require("../assets/keymap.json") as {
@@ -629,6 +629,7 @@ function files(patterns: Kart["files"], root: string, base_dir: string) {
 
 function save(cart: Cart.Cartridge, output: string) {
   const bytes = Cart.encode(cart);
+  console.log(`> Total size: ${from_bytes(bytes.byteLength)}`);
   FS.writeFileSync(output, bytes);
 }
 
@@ -859,6 +860,8 @@ export function make_cartridge(path: string, output: string) {
   const json0: unknown = JSON.parse(FS.readFileSync(path, "utf-8"));
   const json1 = T.parse(config, json0);
   const json = apply_recipe(json1);
+  show_details(json);
+
   const x = json.platform;
   if (json.root != null) {
     const new_base_dir = Path.resolve(base_dir, json.root);
@@ -868,6 +871,7 @@ export function make_cartridge(path: string, output: string) {
 
   const meta = metadata(json.metadata, dir_root, base_dir);
   const archive = files(json.files, dir_root, base_dir);
+  show_archive(archive);
 
   switch (x.type) {
     case "web-archive": {
@@ -889,4 +893,16 @@ export function make_cartridge(path: string, output: string) {
     default:
       throw new Error(`Unsupported type ${(x as any).type}`);
   }
+}
+
+function show_details(json: unknown) {
+  console.log(`> Cartridge build rules:\n${JSON.stringify(json, null, 2)}\n`);
+}
+
+function show_archive(archive: Cart.File[]) {
+  console.log(`> Cartridge contents:\n`);
+  for (const file of archive) {
+    console.log(`:: ${file.path} (${from_bytes(file.data.byteLength)})`);
+  }
+  console.log("");
 }
