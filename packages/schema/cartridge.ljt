@@ -228,6 +228,9 @@ union Bridge {
   type IndexedDB-proxy {
     field versioned: Boolean;
   }
+  type Renpy-web-tweaks {
+    field version: Version;
+  }
 }
 
 union VirtualKey {

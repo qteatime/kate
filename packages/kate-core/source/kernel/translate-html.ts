@@ -170,6 +170,18 @@ function apply_bridge(
       break;
     }
 
+    case "renpy-web-tweaks": {
+      const code = bridges["renpy-web-tweaks.js"];
+      const full_source = `
+        const VERSION = ${JSON.stringify(bridge.version)};
+        ${code}
+      `;
+      const script = document.createElement("script");
+      script.textContent = wrap(full_source);
+      dom.body.appendChild(script);
+      break;
+    }
+
     default:
       throw unreachable(bridge, "kate bridge");
   }

@@ -18,7 +18,8 @@ export type Bridge =
   | { type: "preserve-render" }
   | { type: "capture-canvas"; selector: string }
   | { type: "pointer-input-proxy"; selector: string }
-  | { type: "indexeddb-proxy"; versioned: boolean };
+  | { type: "indexeddb-proxy"; versioned: boolean }
+  | { type: "renpy-web-tweaks"; version: { major: number; minor: number } };
 
 export type Key = {
   key: string;
@@ -67,6 +68,9 @@ function bridge(x: Cart_v3.Bridge): Bridge {
     }
     case Cart_v3.Bridge.$Tags.IndexedDB_proxy: {
       return { type: "indexeddb-proxy", versioned: x.versioned };
+    }
+    case Cart_v3.Bridge.$Tags.Renpy_web_tweaks: {
+      return { type: "renpy-web-tweaks", version: x.version };
     }
     default:
       throw unreachable(x);

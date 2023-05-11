@@ -176,6 +176,13 @@ const bridges = T.tagged_choice<Bridge, Bridge["type"]>("type", {
     type: T.constant("indexeddb-proxy" as const),
     versioned: T.bool,
   }),
+  "renpy-web-tweaks": T.spec({
+    type: T.constant("renpy-web-tweaks" as const),
+    version: T.spec({
+      major: T.int,
+      minor: T.int,
+    }),
+  }),
 });
 
 const recipe = T.tagged_choice<Recipe, Recipe["type"]>("type", {
@@ -189,6 +196,7 @@ const recipe = T.tagged_choice<Recipe, Recipe["type"]>("type", {
     type: T.constant("renpy" as const),
     pointer_support: T.bool,
     save_data: T.one_of(["versioned" as const, "unversioned" as const]),
+    renpy_version: T.one_of(["7.5" as const]),
   }),
 });
 
@@ -298,7 +306,8 @@ type Bridge =
   | { type: "preserve-webgl-render" }
   | { type: "capture-canvas"; selector: string }
   | { type: "pointer-input-proxy"; selector: string }
-  | { type: "indexeddb-proxy"; versioned: boolean };
+  | { type: "indexeddb-proxy"; versioned: boolean }
+  | { type: "renpy-web-tweaks"; version: { major: number; minor: number } };
 
 type Recipe =
   | { type: "identity" }
@@ -306,6 +315,7 @@ type Recipe =
       type: "renpy";
       pointer_support: boolean;
       save_data: "versioned" | "unversioned";
+      renpy_version: "7.5";
     }
   | { type: "bitsy" };
 
@@ -669,6 +679,12 @@ function make_bridge(x: Bridge): Cart.Bridge[] {
       return [Cart.Bridge.IndexedDB_proxy({ versioned: x.versioned })];
     }
 
+    case "renpy-web-tweaks": {
+      return [
+        Cart.Bridge.Renpy_web_tweaks({ version: Cart.Version(x.version) }),
+      ];
+    }
+
     default:
       throw unreachable(x, `Unknown bridge: ${(x as any).type}`);
   }
@@ -829,6 +845,10 @@ function apply_recipe(json: ReturnType<typeof config>) {
               type: "indexeddb-proxy",
               versioned: recipe.save_data === "versioned",
             },
+            {
+              type: "renpy-web-tweaks",
+              version: renpy_version(recipe.renpy_version),
+            },
             ...json.platform.bridges,
           ]),
         },
@@ -837,6 +857,13 @@ function apply_recipe(json: ReturnType<typeof config>) {
     default:
       throw unreachable(recipe, "Recipe");
   }
+}
+
+function renpy_version(x: "7.5") {
+  return {
+    major: 7,
+    minor: 5,
+  };
 }
 
 function select_bridges(bridges: Bridge[]) {

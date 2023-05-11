@@ -1267,6 +1267,18 @@
                   }
                 }
               ]
+            },
+            {
+              "name": "Renpy-web-tweaks",
+              "fields": [
+                {
+                  "name": "version",
+                  "type": {
+                    "op": "record",
+                    "id": 12
+                  }
+                }
+              ]
             }
           ]
         }

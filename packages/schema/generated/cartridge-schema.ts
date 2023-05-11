@@ -1961,7 +1961,7 @@ export namespace Platform {
 
 
 
-export type Bridge = Bridge.Network_proxy | Bridge.Local_storage_proxy | Bridge.Input_proxy | Bridge.Preserve_webgl_render | Bridge.Capture_canvas | Bridge.Pointer_input_proxy | Bridge.IndexedDB_proxy;
+export type Bridge = Bridge.Network_proxy | Bridge.Local_storage_proxy | Bridge.Input_proxy | Bridge.Preserve_webgl_render | Bridge.Capture_canvas | Bridge.Pointer_input_proxy | Bridge.IndexedDB_proxy | Bridge.Renpy_web_tweaks;
 
 export namespace Bridge {
  export const tag = 25;
@@ -1973,7 +1973,8 @@ export namespace Bridge {
     Preserve_webgl_render = 3,
     Capture_canvas = 4,
     Pointer_input_proxy = 5,
-    IndexedDB_proxy = 6
+    IndexedDB_proxy = 6,
+    Renpy_web_tweaks = 7
  }
 
  
@@ -2127,6 +2128,28 @@ export namespace Bridge {
    readonly '@variant': $Tags.IndexedDB_proxy;
    readonly '@variant-name': 'IndexedDB-proxy';
    readonly 'versioned': boolean
+ }
+
+
+  
+ export function Renpy_web_tweaks(x: {readonly 'version': Version}): Bridge {
+   return {
+     '@name': 'Bridge',
+     '@tag': 25,
+     '@version': 0,
+     '@variant': $Tags.Renpy_web_tweaks,
+     '@variant-name': 'Renpy-web-tweaks',
+     ...x
+   }
+ }
+
+ export interface Renpy_web_tweaks {
+   readonly '@name': 'Bridge';
+   readonly '@tag': 25;
+   readonly '@version': 0;
+   readonly '@variant': $Tags.Renpy_web_tweaks;
+   readonly '@variant-name': 'Renpy-web-tweaks';
+   readonly 'version': Version
  }
 
 }
