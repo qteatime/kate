@@ -457,7 +457,8 @@ A minimal `kate.json` will generally live outside of the `*-1.0-web` directory t
       "type": "renpy",
       "save_data": "unversioned",
       "pointer_support": true,
-      "renpy_version": "7.5"
+      "renpy_version": "7.5",
+      "hide_cursor": false
     }
   }
 }
@@ -471,7 +472,7 @@ This recipe will include common Ren'Py files and use the following bridges:
 "bridges": [
   {"type": "network-proxy"},
   {"type": "input-proxy", "mapping": "defaults"},
-  {"type": "pointer-input-proxy", "selector": "#canvas"},
+  {"type": "pointer-input-proxy", "selector": "#canvas", "hide_cursor": false},
   {"type": "preserve-webgl-render"},
   {"type": "capture-canvas", "selector": "#canvas"},
   {"type": "indexeddb-proxy", "versioned": false},

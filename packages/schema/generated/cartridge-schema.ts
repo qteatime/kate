@@ -2088,7 +2088,7 @@ export namespace Bridge {
 
 
   
- export function Pointer_input_proxy(x: {readonly 'selector': string}): Bridge {
+ export function Pointer_input_proxy(x: {readonly 'selector': string,readonly 'hide-cursor': boolean}): Bridge {
    return {
      '@name': 'Bridge',
      '@tag': 25,
@@ -2106,6 +2106,7 @@ export namespace Bridge {
    readonly '@variant': $Tags.Pointer_input_proxy;
    readonly '@variant-name': 'Pointer-input-proxy';
    readonly 'selector': string
+    readonly 'hide-cursor': boolean
  }
 
 

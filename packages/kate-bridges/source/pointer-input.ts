@@ -2,6 +2,7 @@
 // into regular web pointer events. You provide an element that will
 // receive the events.
 declare var SELECTOR: string;
+declare var HIDE_CURSOR: boolean;
 
 void (function () {
   const MAX_RETRIES = 60;
@@ -49,6 +50,10 @@ void (function () {
         clientY: loc.y,
         button: ev0.button,
       });
+    }
+
+    if (HIDE_CURSOR) {
+      element.style.cursor = "none";
     }
 
     pointer.on_moved.listen((ev0) => {

@@ -171,6 +171,7 @@ const bridges = T.tagged_choice<Bridge, Bridge["type"]>("type", {
   "pointer-input-proxy": T.spec({
     type: T.constant("pointer-input-proxy" as const),
     selector: T.short_str(255),
+    hide_cursor: T.optional(false, T.bool),
   }),
   "indexeddb-proxy": T.spec({
     type: T.constant("indexeddb-proxy" as const),
@@ -197,6 +198,7 @@ const recipe = T.tagged_choice<Recipe, Recipe["type"]>("type", {
     pointer_support: T.bool,
     save_data: T.one_of(["versioned" as const, "unversioned" as const]),
     renpy_version: T.one_of(["7.5" as const]),
+    hide_cursor: T.optional(false, T.bool),
   }),
 });
 
@@ -305,7 +307,7 @@ type Bridge =
     }
   | { type: "preserve-webgl-render" }
   | { type: "capture-canvas"; selector: string }
-  | { type: "pointer-input-proxy"; selector: string }
+  | { type: "pointer-input-proxy"; selector: string; hide_cursor: boolean }
   | { type: "indexeddb-proxy"; versioned: boolean }
   | { type: "renpy-web-tweaks"; version: { major: number; minor: number } };
 
@@ -315,6 +317,7 @@ type Recipe =
       type: "renpy";
       pointer_support: boolean;
       save_data: "versioned" | "unversioned";
+      hide_cursor: boolean;
       renpy_version: "7.5";
     }
   | { type: "bitsy" };
@@ -672,7 +675,12 @@ function make_bridge(x: Bridge): Cart.Bridge[] {
     }
 
     case "pointer-input-proxy": {
-      return [Cart.Bridge.Pointer_input_proxy({ selector: x.selector })];
+      return [
+        Cart.Bridge.Pointer_input_proxy({
+          selector: x.selector,
+          "hide-cursor": x.hide_cursor,
+        }),
+      ];
     }
 
     case "indexeddb-proxy": {
@@ -837,7 +845,13 @@ function apply_recipe(json: ReturnType<typeof config>) {
             { type: "network-proxy" },
             { type: "input-proxy", mapping: "defaults" },
             ...(recipe.pointer_support
-              ? [{ type: "pointer-input-proxy" as const, selector: "#canvas" }]
+              ? [
+                  {
+                    type: "pointer-input-proxy" as const,
+                    selector: "#canvas",
+                    hide_cursor: recipe.hide_cursor,
+                  },
+                ]
               : []),
             { type: "preserve-webgl-render" },
             { type: "capture-canvas", selector: "#canvas" },

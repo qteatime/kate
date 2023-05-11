@@ -224,6 +224,7 @@ union Bridge {
   }
   type Pointer-input-proxy {
     field selector: Text;
+    field hide-cursor: Boolean;
   }
   type IndexedDB-proxy {
     field versioned: Boolean;

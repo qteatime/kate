@@ -151,9 +151,11 @@ function apply_bridge(
 
     case "pointer-input-proxy": {
       const code = bridges["pointer-input.js"];
-      const full_source = `const SELECTOR = ${JSON.stringify(
-        bridge.selector
-      )};\n${code}`;
+      const full_source = `
+        const SELECTOR = ${JSON.stringify(bridge.selector)};
+        const HIDE_CURSOR = ${JSON.stringify(bridge.hide_cursor)};
+        ${code}
+      `;
       const script = document.createElement("script");
       script.textContent = wrap(full_source);
       dom.body.appendChild(script);

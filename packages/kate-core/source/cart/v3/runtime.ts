@@ -17,7 +17,7 @@ export type Bridge =
   | { type: "input-proxy"; mapping: Map<InputKey, Key> }
   | { type: "preserve-render" }
   | { type: "capture-canvas"; selector: string }
-  | { type: "pointer-input-proxy"; selector: string }
+  | { type: "pointer-input-proxy"; selector: string; hide_cursor: boolean }
   | { type: "indexeddb-proxy"; versioned: boolean }
   | { type: "renpy-web-tweaks"; version: { major: number; minor: number } };
 
@@ -64,7 +64,11 @@ function bridge(x: Cart_v3.Bridge): Bridge {
       return { type: "capture-canvas", selector: str(x.selector, 255) };
     }
     case Cart_v3.Bridge.$Tags.Pointer_input_proxy: {
-      return { type: "pointer-input-proxy", selector: str(x.selector, 255) };
+      return {
+        type: "pointer-input-proxy",
+        selector: str(x.selector, 255),
+        hide_cursor: x["hide-cursor"],
+      };
     }
     case Cart_v3.Bridge.$Tags.IndexedDB_proxy: {
       return { type: "indexeddb-proxy", versioned: x.versioned };
