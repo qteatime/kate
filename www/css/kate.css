@@ -11,6 +11,7 @@ body {
 .kate {
   --screen-bevel: 10px;
   --case-scale: 1;
+  --case-downscale: 1;
   --screen-scale: 1;
   --base-screen-width: 800px;
   --base-screen-height: 480px;
@@ -36,7 +37,7 @@ body {
   border-radius: 20px;
   box-shadow: -1px -1px 1px rgb(255 255 255 / 50%), 0px 10px 1px #c99;
   user-select: none;
-  transform: scale(1);
+  transform: scale(var(--case-downscale));
 }
 
 .kate-body.scale-to-fit {
