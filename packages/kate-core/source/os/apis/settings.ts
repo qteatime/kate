@@ -1,6 +1,6 @@
 import * as Db from "../../data";
 import type { Database } from "../../db-schema";
-import type { GamepadMapping, InputKey } from "../../kernel";
+import type { ConsoleCase, GamepadMapping, InputKey } from "../../kernel";
 import { EventStream } from "../../utils";
 
 export type PlayHabits = {
@@ -25,6 +25,7 @@ export type Input = {
 export type UI = {
   sound_feedback: boolean;
   animation_effects: boolean;
+  case_type: ConsoleCase;
 };
 
 export type SettingsData = {
@@ -39,6 +40,9 @@ const defaults: SettingsData = {
   ui: {
     sound_feedback: true,
     animation_effects: true,
+    case_type: {
+      type: "handheld",
+    },
   },
   play_habits: {
     recently_played: true,

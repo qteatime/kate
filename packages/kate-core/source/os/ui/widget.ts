@@ -105,7 +105,7 @@ export class HBox extends Widget {
   render() {
     return h(
       "div",
-      { class: "kate-ui-hbox", style: `gap: ${this.gap}px` },
+      { class: "kate-ui-hbox", style: `gap: ${this.gap}rem` },
       this.children
     );
   }
@@ -123,7 +123,7 @@ export class VBox extends Widget {
   render() {
     return h(
       "div",
-      { class: "kate-ui-vbox", style: `gap: ${this.gap}px` },
+      { class: "kate-ui-vbox", style: `gap: ${this.gap}rem` },
       this.children
     );
   }
@@ -290,19 +290,23 @@ export function link(
   );
 }
 
+export function image(src: string) {
+  return h("img", { src: src }, []);
+}
+
 export function icon_button(icon: InputKey | InputKey[], text: string) {
   if (typeof icon === "string") {
-    return new Button([new HBox(5, [new Icon(icon), text])]).focus_target(
+    return new Button([new HBox(0.5, [new Icon(icon), text])]).focus_target(
       false
     );
   } else {
     return new Button([
-      new HBox(5, [...icon.map((x) => new Icon(x)), text]),
+      new HBox(0.5, [...icon.map((x) => new Icon(x)), text]),
     ]).focus_target(false);
   }
 }
 
-export function fa_icon_button(name: string, text: string, spacing = 10) {
+export function fa_icon_button(name: string, text: string, spacing = 0.5) {
   return new Button([new HBox(spacing, [fa_icon(name), text])]);
 }
 

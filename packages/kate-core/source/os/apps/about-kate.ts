@@ -77,7 +77,7 @@ export class SceneAboutKate extends SimpleScene {
             "Copyright (c) 2023 Q. (MIT licensed)",
           ]),
           UI.vspace(32),
-          UI.vbox(10, [
+          UI.vbox(0.5, [
             UI.text_button(this.os, "Third-party notices", {
               status_label: "Open",
               on_click: this.handle_third_party,
@@ -196,7 +196,9 @@ export class SceneAboutKate extends SimpleScene {
 
         h("h3", {}, ["Host"]),
         UI.info_line("Browser", [
-          new UI.VBox(5, [...x.host.browser.map((x) => UI.h("div", {}, [x]))]),
+          new UI.VBox(0.5, [
+            ...x.host.browser.map((x) => UI.h("div", {}, [x])),
+          ]),
         ]),
         UI.info_line("OS", [x.host.os]),
         UI.info_line("Architecture", [x.host.architecture]),
@@ -250,8 +252,8 @@ export class SceneAboutKate extends SimpleScene {
         container.textContent = "";
         container.append(
           h("div", {}, [
-            UI.vbox(5, [
-              UI.hbox(5, [
+            UI.vbox(0.5, [
+              UI.hbox(0.5, [
                 `Version ${latest.version} is available!`,
                 UI.link(this.os, "(Release Notes)", {
                   status_label: "Open",

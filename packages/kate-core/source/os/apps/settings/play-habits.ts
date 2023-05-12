@@ -96,7 +96,7 @@ export class ScenePlayHabitsSettings extends UI.SimpleScene {
         )
       );
     }
-    UI.append(new UI.VBox(20, [...items]), container);
+    UI.append(new UI.VBox(1, [...items]), container);
   }
 
   handle_play_entry_options = async (
