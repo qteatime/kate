@@ -110,7 +110,7 @@ export class HUD_Dialog extends Scene {
   readonly FADE_OUT_TIME_MS = 250;
 
   constructor(readonly manager: KateDialog) {
-    super(manager.os);
+    super(manager.os, false);
     (this as any).canvas = UI.h("div", { class: "kate-hud-dialog" }, []);
   }
 

@@ -57,7 +57,7 @@ export class HUD_ContextMenu extends Scene {
   readonly on_close = new EventStream<void>();
 
   constructor(readonly os: KateOS, readonly context: KateContextMenu) {
-    super(os);
+    super(os, true);
   }
 
   render() {

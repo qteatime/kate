@@ -162,7 +162,7 @@ export class KateOS {
     os.set_os_animation(settings.get("ui").animation_effects);
 
     const min_boot_time = wait(1000);
-    const boot_screen = new SceneBoot(os);
+    const boot_screen = new SceneBoot(os, true);
 
     // Perform boot operations (migrations, etc)
     await request_persistent_storage(os);

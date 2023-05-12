@@ -428,6 +428,7 @@ abstract class Case {
     const screen_scale = this.screen_height / Case.BASE_HEIGHT;
 
     root.setAttribute("data-case-type", this.case_type);
+    root.setAttribute("data-resolution", String(this.screen_height));
     root.style.setProperty("--case-scale", String(scale));
     root.style.setProperty("--screen-scale", String(screen_scale));
     root.style.setProperty("--screen-width", `${this.screen_width}px`);

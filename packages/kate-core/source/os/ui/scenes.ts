@@ -14,8 +14,12 @@ import {
 
 export abstract class Scene {
   readonly canvas: HTMLElement;
-  constructor(protected os: KateOS) {
-    this.canvas = h("div", { class: "kate-os-screen" }, []);
+  constructor(protected os: KateOS, upscaled: boolean) {
+    this.canvas = h(
+      "div",
+      { class: `kate-os-screen ${upscaled ? "upscaled" : ""}` },
+      []
+    );
   }
 
   async attach(to: HTMLElement) {
@@ -55,6 +59,10 @@ export abstract class SimpleScene extends Scene {
     },
   ];
   private _previous_traps: FocusInteraction | null = null;
+
+  constructor(os: KateOS) {
+    super(os, true);
+  }
 
   on_return = () => {
     this.os.pop_scene();

@@ -11,7 +11,7 @@ export class SceneTextFile extends Scene {
     readonly app_title: string,
     readonly text: string
   ) {
-    super(os);
+    super(os, true);
   }
 
   render() {

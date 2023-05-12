@@ -44,7 +44,7 @@ export class HUD_Toaster extends Scene {
   readonly FADE_OUT_TIME_MS = 250;
 
   constructor(readonly manager: KateNotification) {
-    super(manager.os);
+    super(manager.os, true);
     (this as any).canvas = UI.h("div", { class: "kate-hud-notifications" }, []);
   }
 

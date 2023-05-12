@@ -12,6 +12,8 @@ body {
   --screen-bevel: 10px;
   --case-scale: 1;
   --screen-scale: 1;
+  --base-screen-width: 800px;
+  --base-screen-height: 480px;
   --screen-width: 800px;
   --screen-height: 480px;
 }
@@ -369,8 +371,8 @@ body {
 }
 
 .kate-game-frame-defaults {
-  width: 800px;
-  height: 480px;
+  width: var(--screen-width);
+  height: var(--screen-height);
 }
 
 /* Electron */

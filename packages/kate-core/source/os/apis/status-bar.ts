@@ -22,7 +22,7 @@ export class HUD_StatusBar extends Scene {
   readonly STATUS_LINE_TIME_MS = 5000;
 
   constructor(readonly manager: KateStatusBar) {
-    super(manager.os);
+    super(manager.os, true);
     (this as any).canvas = h("div", { class: "kate-hud-status-bar" }, []);
   }
 

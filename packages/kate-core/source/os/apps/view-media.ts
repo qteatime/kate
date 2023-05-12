@@ -15,7 +15,7 @@ export class SceneViewMedia extends Scene {
     readonly media_list: SceneMedia,
     readonly media: Db.Media
   ) {
-    super(os);
+    super(os, true);
   }
 
   render() {

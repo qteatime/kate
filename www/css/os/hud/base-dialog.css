@@ -1,3 +1,15 @@
+.kate-hud-dialog {
+  transform-origin: 0 0;
+  transform: scale(var(--screen-scale));
+  position: absolute;
+  width: var(--base-screen-width);
+  height: var(--base-screen-height);
+}
+
+.kate-hud-dialog:empty {
+  display: none;
+}
+
 .kate-hud-dialog-root {
   position: absolute;
   top: 0px;
@@ -24,4 +36,12 @@
   max-width: 70%;
   min-width: 50%;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.kate-hud-dialog-container > * {
+  width: 100%;
 }
