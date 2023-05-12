@@ -6,6 +6,9 @@ const createWindow = () => {
   const win = new BrowserWindow({
     width: 1316,
     height: 600,
+    minWidth: 884,
+    minHeight: 574,
+    resizable: false,
     frame: false,
     transparent: true,
     icon: Path.join(__dirname, "icons/icon256.png"),
@@ -15,15 +18,25 @@ const createWindow = () => {
   });
 
   win.loadFile(Path.join(__dirname, "www/index.html"));
+  return win;
 };
 
-ipcMain.handle("kate:get-system-info", async (_ev) => {
-  const info = await SystemInformation.get_system_info();
-  return info;
-});
-
 app.whenReady().then(() => {
-  createWindow();
+  const win = createWindow();
+
+  ipcMain.handle("kate:get-system-info", async (_ev) => {
+    const info = await SystemInformation.get_system_info();
+    return info;
+  });
+
+  ipcMain.handle(
+    "kate:resize",
+    async (_ev, { width, height }: { width: number; height: number }) => {
+      const w = Math.max(884, width);
+      const h = Math.max(574, height);
+      win.setContentSize(w, h);
+    }
+  );
 });
 
 app.on("window-all-closed", () => {

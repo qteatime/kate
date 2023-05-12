@@ -31,6 +31,10 @@ body {
   height: 100vh;
 }
 
+.kate-native .kate {
+  display: block;
+}
+
 .kate-body {
   position: relative;
   background: #faaaaa;

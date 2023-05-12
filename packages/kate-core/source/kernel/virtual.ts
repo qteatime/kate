@@ -438,6 +438,10 @@ abstract class Case {
     root.style.setProperty("--screen-scale", String(screen_scale));
     root.style.setProperty("--screen-width", `${this.screen_width}px`);
     root.style.setProperty("--screen-height", `${this.screen_height}px`);
+
+    if (KateNative != null) {
+      KateNative.resize({ width, height });
+    }
   }
 }
 
@@ -469,7 +473,7 @@ class HandheldCase extends Case {
 class TvCase extends Case {
   readonly case_type = "tv";
   readonly screen_bevel = 10;
-  readonly case_padding = 30;
+  readonly case_padding = 32;
   readonly depth_padding = 10;
   readonly scale: number;
 

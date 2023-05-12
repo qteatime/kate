@@ -4,6 +4,10 @@ declare var Kate: {
   os: typeof os;
 };
 
+if (!("KateNative" in window)) {
+  (window as any).KateNative = null;
+}
+
 const DEFAULT_CHANNEL =
   location.hostname === "kate.qteati.me" ? "preview" : "latest";
 

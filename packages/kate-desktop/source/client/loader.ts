@@ -5,6 +5,8 @@ declare var Kate: {
   os: typeof os;
 };
 
+document.body.classList.add("kate-native");
+
 async function load_script(url: string) {
   return new Promise<void>((resolve, reject) => {
     const script = document.createElement("script");

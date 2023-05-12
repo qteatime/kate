@@ -105,7 +105,7 @@ export class SceneAboutKate extends SimpleScene {
   }
 
   async native_info() {
-    return await KateNative.get_system_information();
+    return await KateNative!.get_system_information();
   }
 
   async system_info() {
