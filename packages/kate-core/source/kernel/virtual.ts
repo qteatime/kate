@@ -230,7 +230,11 @@ export class VirtualConsole {
     this.body
       .querySelector(".kate-engraving")
       ?.addEventListener("click", () => {
-        this.request_fullscreen();
+        this.set_case(
+          this._case.type === "handheld"
+            ? { type: "tv", resolution: 720 }
+            : { type: "handheld" }
+        );
       });
 
     const listen_button = (button: HTMLElement, key: InputKey) => {
