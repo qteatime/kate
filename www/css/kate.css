@@ -10,6 +10,10 @@ body {
 
 .kate {
   --screen-bevel: 10px;
+  --case-scale: 1;
+  --screen-scale: 1;
+  --screen-width: 800px;
+  --screen-height: 480px;
 }
 
 .kate * {
@@ -25,13 +29,26 @@ body {
 }
 
 .kate-body {
-  position: fixed;
+  position: relative;
   background: #faaaaa;
-  width: 1310px;
-  height: 550px;
   border-radius: 20px;
   box-shadow: -1px -1px 1px rgb(255 255 255 / 50%), 0px 10px 1px #c99;
   user-select: none;
+  transform: scale(1);
+}
+
+.kate-body.scale-to-fit {
+  transform: scale(var(--case-scale));
+}
+
+.kate[data-case-type="handheld"] .kate-body {
+  position: absolute;
+  width: 1310px;
+  height: 550px;
+}
+
+.kate[data-case-type="tv"] .kate-body {
+  padding: 32px;
 }
 
 .kate-body.drag * {
@@ -106,16 +123,24 @@ body {
 }
 
 .kate-screen {
-  position: absolute;
-  top: 20px;
-  left: 250px;
-  width: calc(800px + var(--screen-bevel) * 2);
-  height: calc(480px + var(--screen-bevel) * 2);
+  position: relative;
+  width: calc(var(--screen-width) + var(--screen-bevel) * 2);
+  height: calc(var(--screen-height) + var(--screen-bevel) * 2);
   background: #2f2f2f;
   border: var(--screen-bevel) solid #4f4f4f;
   border-radius: var(--screen-bevel);
   overflow: hidden;
   user-select: text;
+}
+
+.kate[data-case-type="handheld"] .kate-screen {
+  position: absolute;
+  left: 250px;
+  top: 20px;
+}
+
+.kate[data-case-type="tv"] .kate-screen {
+  transform: scale(--screen-scale);
 }
 
 .trusted-mode .kate-screen {
@@ -428,4 +453,29 @@ body {
   color: #fafafa;
   font-size: 24px;
   font-weight: bold;
+}
+
+.kate[data-case-type="tv"] .kate-trigger,
+.kate[data-case-type="tv"] .kate-dpad,
+.kate[data-case-type="tv"] .kate-action,
+.kate[data-case-type="tv"] .kate-special-button,
+.kate[data-case-type="tv"] .kate-whiskers {
+  display: none;
+}
+
+.kate[data-case-type="tv"] .kate-version {
+  left: 30px;
+  bottom: 0px;
+  height: 30px;
+  line-height: 30px;
+}
+
+.kate[data-case-type="tv"] .kate-resources {
+  right: 30px;
+}
+
+.kate[data-case-type="tv"] .kate-engraving {
+  bottom: 0px;
+  height: 30px;
+  line-height: 30px;
 }

@@ -1,4 +1,4 @@
-import { EventStream } from "../utils";
+import { EventStream, unreachable } from "../utils";
 const pkg = require("../../package.json");
 
 declare global {
@@ -28,9 +28,21 @@ export type ExtendedInputKey = InputKey | `long_${SpecialInputKey}`;
 
 export type Resource = "screen-recording" | "transient-storage";
 
+export type ConsoleCase = ConsoleCaseHandheld | ConsoleCaseTV;
+
+export type ConsoleCaseHandheld = {
+  type: "handheld";
+};
+
+export type ConsoleCaseTV = {
+  type: "tv";
+  resolution: 480 | 720 | 960;
+};
+
 export type ConsoleOptions = {
   mode: "native" | "web" | "single";
   persistent_storage: boolean;
+  case: ConsoleCase;
 };
 
 export class VirtualConsole {
@@ -45,7 +57,7 @@ export class VirtualConsole {
   private ltrigger_button: HTMLElement;
   private rtrigger_button: HTMLElement;
   private is_listening = false;
-  private _scale: number = 1;
+  private _case: ConsoleCase;
   readonly body: HTMLElement;
   readonly device_display: HTMLElement;
   readonly hud: HTMLElement;
@@ -63,7 +75,6 @@ export class VirtualConsole {
   }>();
   readonly on_virtual_button_touched = new EventStream<InputKey>();
   readonly on_tick = new EventStream<number>();
-  readonly on_scale_changed = new EventStream<number>();
   readonly audio_context = new AudioContext();
   readonly resources = new Map<Resource, number>();
 
@@ -88,7 +99,9 @@ export class VirtualConsole {
   ];
   private special_keys: InputKey[] = ["menu", "capture"];
 
-  constructor(root: HTMLElement, readonly options: ConsoleOptions) {
+  constructor(readonly root: HTMLElement, readonly options: ConsoleOptions) {
+    this._case = options.case;
+
     this.up_button = root.querySelector(".kate-dpad-up")!;
     this.right_button = root.querySelector(".kate-dpad-right")!;
     this.down_button = root.querySelector(".kate-dpad-down")!;
@@ -176,8 +189,8 @@ export class VirtualConsole {
     }
   };
 
-  get scale() {
-    return this._scale;
+  get case() {
+    return Case.from_configuration(this._case);
   }
 
   get active() {
@@ -206,13 +219,13 @@ export class VirtualConsole {
     }
     this.is_listening = true;
 
-    window.addEventListener("load", () => this.update_scale(true));
-    window.addEventListener("resize", () => this.update_scale(true));
-    window.addEventListener("orientationchange", () => this.update_scale(true));
+    window.addEventListener("load", () => this.update_scale());
+    window.addEventListener("resize", () => this.update_scale());
+    window.addEventListener("orientationchange", () => this.update_scale());
     (screen as any).addEventListener?.("orientationchange", () =>
-      this.update_scale(true)
+      this.update_scale()
     );
-    this.update_scale(true);
+    this.update_scale();
 
     this.body
       .querySelector(".kate-engraving")
@@ -259,27 +272,15 @@ export class VirtualConsole {
     this.on_tick.listen(this.key_update_loop);
   }
 
-  private update_scale(force: boolean) {
-    const width = 1312;
-    const ww = window.innerWidth;
-    const wh = window.innerHeight;
-    let zoom = Math.min(1, ww / width);
-    if (zoom === this._scale && !force) {
-      return;
-    }
+  set_case(kase: ConsoleCase) {
+    this._case = kase;
+    this.update_scale();
+  }
 
-    const x = Math.round(ww - this.body.offsetWidth * zoom) / 2;
-    const y = Math.round(wh - this.body.offsetHeight * zoom) / 2;
-
-    this.body.style.transform = `scale(${zoom})`;
-    this.body.style.transformOrigin = `0 0`;
-    this.body.style.left = `${x}px`;
-    this.body.style.top = `${y}px`;
+  private update_scale() {
+    this.case.resize(this.root);
     window.scrollTo({ left: 0, top: 0 });
     document.body.scroll({ left: 0, top: 0 });
-
-    this._scale = zoom;
-    this.on_scale_changed.emit(zoom);
   }
 
   async request_fullscreen() {
@@ -393,5 +394,102 @@ export class VirtualConsole {
         this.resources_container.append(e);
       }
     }
+  }
+}
+
+abstract class Case {
+  static readonly BASE_HEIGHT = 480;
+  static readonly BASE_WIDTH = 800;
+  abstract case_type: "handheld" | "tv";
+  abstract width: number;
+  abstract height: number;
+  abstract screen_width: number;
+  abstract screen_height: number;
+
+  static from_configuration(kase: ConsoleCase) {
+    switch (kase.type) {
+      case "handheld":
+        return new HandheldCase();
+
+      case "tv":
+        return new TvCase(kase.resolution);
+
+      default:
+        throw unreachable(kase, "console case type");
+    }
+  }
+
+  resize(root: HTMLElement) {
+    const width = this.width;
+    const height = this.height;
+    const ww = window.innerWidth;
+    const wh = window.innerHeight;
+    const scale = Math.min(ww / width, wh / height);
+    const screen_scale = this.screen_height / Case.BASE_HEIGHT;
+
+    root.setAttribute("data-case-type", this.case_type);
+    root.style.setProperty("--case-scale", String(scale));
+    root.style.setProperty("--screen-scale", String(screen_scale));
+    root.style.setProperty("--screen-width", `${this.screen_width}px`);
+    root.style.setProperty("--screen-height", `${this.screen_height}px`);
+  }
+}
+
+class HandheldCase extends Case {
+  readonly case_type = "handheld";
+  readonly screen_bevel = 10;
+  readonly case_padding = 25;
+  readonly side_padding = 250;
+  readonly screen_width = 800;
+  readonly screen_height = 480;
+  readonly depth_padding = 10;
+  readonly shoulder_padding = 20;
+
+  get width() {
+    return this.screen_width + this.screen_bevel * 2 + this.side_padding * 2;
+  }
+
+  get height() {
+    return (
+      this.screen_height +
+      this.screen_bevel * 2 +
+      this.case_padding * 2 +
+      this.depth_padding +
+      this.shoulder_padding
+    );
+  }
+}
+
+class TvCase extends Case {
+  readonly case_type = "tv";
+  readonly screen_bevel = 10;
+  readonly case_padding = 30;
+  readonly depth_padding = 10;
+  readonly scale: number;
+
+  get width() {
+    return this.screen_width + this.screen_bevel * 2 + this.case_padding * 2;
+  }
+
+  get height() {
+    return (
+      this.screen_height +
+      this.screen_bevel * 2 +
+      this.case_padding * 2 +
+      this.depth_padding
+    );
+  }
+
+  get screen_width() {
+    return Case.BASE_WIDTH * this.scale;
+  }
+
+  get screen_height() {
+    return Case.BASE_HEIGHT * this.scale;
+  }
+
+  constructor(resolution: ConsoleCaseTV["resolution"]) {
+    super();
+    this.scale = resolution / TvCase.BASE_HEIGHT;
   }
 }
