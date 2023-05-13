@@ -1,5 +1,5 @@
 import type { ConsoleCase } from "../../../kernel";
-import { Observable } from "../../../utils";
+import { Observable, unreachable } from "../../../utils";
 import { SettingsData } from "../../apis/settings";
 import * as UI from "../../ui";
 
@@ -69,17 +69,21 @@ export class SceneUISettings extends UI.SimpleScene {
         },
       }),
 
-      UI.toggle_cell(this.os, {
-        title: "Scale to fit screen",
-        description:
-          "Scale Kate up to fit the whole screen, might result in blurry images",
-        value: kase.value.scale_to_fit,
-        on_label: "Yes",
-        off_label: "No",
-        on_changed: (x) => {
-          this.set_case(kase, { ...kase.value, scale_to_fit: x });
-        },
-      }),
+      UI.dynamic(
+        kase.map<UI.Widgetable>((x) => {
+          return UI.toggle_cell(this.os, {
+            title: "Scale to fit screen",
+            description:
+              "Scale Kate up to fit the whole screen, might result in blurry images",
+            value: x.scale_to_fit,
+            on_label: "Yes",
+            off_label: "No",
+            on_changed: (x) => {
+              this.set_case(kase, { ...kase.value, scale_to_fit: x });
+            },
+          });
+        })
+      ),
     ];
   }
 
@@ -87,7 +91,7 @@ export class SceneUISettings extends UI.SimpleScene {
     const available =
       current.value.type === "handheld"
         ? ([480] as const)
-        : ([480, 720] as const);
+        : ([480, 720, 960, 1080] as const);
     const result = await this.os.dialog.pop_menu(
       "kate:settings",
       "Display resolution",
@@ -144,11 +148,7 @@ export class SceneUISettings extends UI.SimpleScene {
       {
         selected: kase.map((k) => k.type === x.mode),
         on_select: () => {
-          this.set_case(kase, {
-            ...kase.value,
-            type: x.mode,
-            resolution: x.mode === "handheld" ? 480 : kase.value.resolution,
-          });
+          this.set_case(kase, case_defaults(x.mode));
         },
       }
     );
@@ -161,4 +161,23 @@ function friendly_resolution(height: number) {
   const factor = height / BASE_HEIGHT;
 
   return `${BASE_WIDTH * factor} x ${BASE_HEIGHT * factor}`;
+}
+
+function case_defaults(type: ConsoleCase["type"]): ConsoleCase {
+  switch (type) {
+    case "handheld": {
+      return { type: "handheld", resolution: 480, scale_to_fit: false };
+    }
+
+    case "tv": {
+      return { type: "tv", resolution: 720, scale_to_fit: false };
+    }
+
+    case "fullscreen": {
+      return { type: "fullscreen", resolution: 720, scale_to_fit: true };
+    }
+
+    default:
+      throw unreachable(type, "case type");
+  }
 }
