@@ -62,9 +62,11 @@ export class HUD_ContextMenu extends Scene {
 
   render() {
     const fullscreen_button = () =>
-      UI.fa_icon_button("expand", "Fullscreen").on_clicked(
-        this.on_toggle_fullscreen
-      );
+      UI.when(emulator.options.mode !== "native", [
+        UI.fa_icon_button("expand", "Fullscreen").on_clicked(
+          this.on_toggle_fullscreen
+        ),
+      ]);
     const emulator = this.os.kernel.console;
 
     return UI.h("div", { class: "kate-os-hud-context-menu" }, [
