@@ -81,6 +81,17 @@ export function append(child: Widgetable, to: Node) {
   }
 }
 
+export function to_node(x: Widgetable) {
+  let content = x instanceof Widget ? render(x) : x;
+  if (typeof content === "string") {
+    return document.createTextNode(content);
+  } else if (content != null) {
+    return content;
+  } else {
+    return document.createDocumentFragment();
+  }
+}
+
 export class WithClass extends Widget {
   constructor(readonly classes: string[], readonly child: Widget) {
     super();

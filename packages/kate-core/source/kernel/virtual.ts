@@ -188,6 +188,10 @@ export class VirtualConsole {
     return Case.from_configuration(this._case);
   }
 
+  get raw_case() {
+    return this._case;
+  }
+
   get active() {
     return (
       this.options.mode === "native" ||

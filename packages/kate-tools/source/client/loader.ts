@@ -47,6 +47,10 @@ async function main() {
       set_case_mode: false,
     });
 
+    if (config.case_mode != null) {
+      kate.console.set_case(config.case_mode);
+    }
+
     await Kate.data.ObjectStorage.transaction(
       kate_os.db,
       "readwrite",

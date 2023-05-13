@@ -7,9 +7,33 @@ export class SceneUISettings extends UI.SimpleScene {
   icon = "window-maximize";
   title = ["User Interface"];
 
-  body() {
+  async can_change_display_mode() {
+    switch (this.os.kernel.console.options.mode) {
+      case "native":
+        return !(await KateNative?.is_fullscreen());
+
+      case "single":
+        return false;
+
+      case "web":
+        return true;
+    }
+  }
+
+  get supports_fullscreen() {
+    return this.os.kernel.console.options.mode !== "native";
+  }
+
+  get supports_scale_to_fit() {
+    return this.os.kernel.console.options.mode !== "native";
+  }
+
+  async body() {
     const data = this.os.settings.get("ui");
-    const kase = new Observable(data.case_type);
+    const configurable_display = await this.can_change_display_mode();
+    const kase = new Observable(
+      configurable_display ? data.case_type : this.os.kernel.console.raw_case
+    );
 
     return [
       UI.toggle_cell(this.os, {
@@ -34,27 +58,32 @@ export class SceneUISettings extends UI.SimpleScene {
 
       UI.vspace(32),
       UI.h("h3", {}, ["Display mode"]),
-      UI.h("div", { class: "kate-os-mode-choices" }, [
-        UI.hchoices(1, [
-          this.mode_button(kase, {
-            mode: "handheld",
-            title: "Handheld mode",
-            image: "img/handheld-mode.png",
-          }),
-          this.mode_button(kase, {
-            mode: "tv",
-            title: "TV mode",
-            image: "img/tv-mode.png",
-          }),
-          this.mode_button(kase, {
-            mode: "fullscreen",
-            title: "Fullscreen mode",
-            image: "img/fullscreen-mode.png",
-          }),
-        ]),
-      ]),
 
-      UI.vspace(16),
+      UI.when(configurable_display, [
+        UI.h("div", { class: "kate-os-mode-choices" }, [
+          UI.hchoices(3, [
+            this.mode_button(kase, {
+              mode: "handheld",
+              title: "Handheld mode",
+              image: "img/handheld-mode.png",
+            }),
+            this.mode_button(kase, {
+              mode: "tv",
+              title: "TV mode",
+              image: "img/tv-mode.png",
+            }),
+            UI.when(this.supports_fullscreen, [
+              this.mode_button(kase, {
+                mode: "fullscreen",
+                title: "Fullscreen mode",
+                image: "img/fullscreen-mode.png",
+              }),
+            ]),
+          ]),
+        ]),
+
+        UI.vspace(16),
+      ]),
 
       UI.link_card(this.os, {
         arrow: "pencil",
@@ -69,17 +98,19 @@ export class SceneUISettings extends UI.SimpleScene {
         },
       }),
 
-      UI.toggle_cell(this.os, {
-        title: "Scale to fit screen",
-        description:
-          "Scale Kate up to fit the whole screen, might result in blurry images",
-        value: kase.map((x) => x.scale_to_fit),
-        on_label: "Yes",
-        off_label: "No",
-        on_changed: (x) => {
-          this.set_case(kase, { ...kase.value, scale_to_fit: x });
-        },
-      }),
+      UI.when(this.supports_scale_to_fit, [
+        UI.toggle_cell(this.os, {
+          title: "Scale to fit screen",
+          description:
+            "Scale Kate up to fit the whole screen, might result in blurry images",
+          value: kase.map((x) => x.scale_to_fit),
+          on_label: "Yes",
+          off_label: "No",
+          on_changed: (x) => {
+            this.set_case(kase, { ...kase.value, scale_to_fit: x });
+          },
+        }),
+      ]),
     ];
   }
 
@@ -110,14 +141,16 @@ export class SceneUISettings extends UI.SimpleScene {
   async set_case(current: Observable<ConsoleCase>, kase: ConsoleCase) {
     this.os.kernel.console.set_case(kase);
     current.value = kase;
-    await this.os.settings.update("ui", (x) => {
-      return { ...x, case_type: kase };
-    });
-    await this.os.notifications.log(
-      "kate:settings",
-      "Updated display mode",
-      `${JSON.stringify(kase)}`
-    );
+    if (await this.can_change_display_mode()) {
+      await this.os.settings.update("ui", (x) => {
+        return { ...x, case_type: kase };
+      });
+      await this.os.notifications.log(
+        "kate:settings",
+        "Updated display mode",
+        `${JSON.stringify(kase)}`
+      );
+    }
   }
 
   async change<K extends keyof SettingsData["ui"]>(
