@@ -1,4 +1,4 @@
-import type { ConsoleCase, ConsoleCaseTV } from "../../../kernel";
+import type { ConsoleCase } from "../../../kernel";
 import { Observable } from "../../../utils";
 import { SettingsData } from "../../apis/settings";
 import * as UI from "../../ui";
@@ -9,9 +9,7 @@ export class SceneUISettings extends UI.SimpleScene {
 
   body() {
     const data = this.os.settings.get("ui");
-    const resolution = new Observable(
-      data.case_type.type === "handheld" ? 480 : data.case_type.resolution
-    );
+    const kase = new Observable(data.case_type);
 
     return [
       UI.toggle_cell(this.os, {
@@ -34,64 +32,59 @@ export class SceneUISettings extends UI.SimpleScene {
         },
       }),
 
+      UI.vspace(32),
       UI.h("h3", {}, ["Display mode"]),
-      UI.hbox(2, [
-        UI.interactive(
-          this.os,
-          UI.vbox(1, [UI.image("img/handheld.png"), "Handheld mode"]),
-          [
-            {
-              key: ["o"],
-              label: "Select",
-              on_click: true,
-              handler: (key, is_repeat) => {
-                this.set_case(resolution, { type: "handheld" });
-              },
-            },
-          ]
-        ),
-        UI.interactive(
-          this.os,
-          UI.vbox(1, [UI.image("img/tv.png"), "TV mode"]),
-          [
-            {
-              key: ["o"],
-              label: "Select",
-              on_click: true,
-              handler: (key, is_repeat) => {
-                this.set_case(resolution, { type: "tv", resolution: 720 });
-              },
-            },
-          ]
-        ),
+      UI.h("div", { class: "kate-os-mode-choices" }, [
+        UI.hchoices(1, [
+          this.mode_button(kase, {
+            mode: "handheld",
+            title: "Handheld mode",
+            image: "img/handheld-mode.png",
+          }),
+          this.mode_button(kase, {
+            mode: "tv",
+            title: "TV mode",
+            image: "img/tv-mode.png",
+          }),
+          this.mode_button(kase, {
+            mode: "fullscreen",
+            title: "Fullscreen mode",
+            image: "img/fullscreen-mode.png",
+          }),
+        ]),
       ]),
-      UI.interactive(
-        this.os,
-        UI.info_line(
-          "Resolution",
-          [UI.dynamic(resolution.map<UI.Widgetable>(friendly_resolution))],
-          { interactive: false }
+
+      UI.vspace(16),
+
+      UI.link_card(this.os, {
+        arrow: "pencil",
+        click_label: "Change",
+        title: "Resolution",
+        description: "The size Kate's contents are rendered in",
+        value: UI.dynamic(
+          kase.map<UI.Widgetable>((x) => friendly_resolution(x.resolution))
         ),
-        [
-          {
-            key: ["o"],
-            label: "Select",
-            on_click: true,
-            handler: () => {
-              this.select_resolution(resolution);
-            },
-          },
-        ]
-      ),
+        on_click: () => {
+          this.select_resolution(kase);
+        },
+      }),
+
+      UI.toggle_cell(this.os, {
+        title: "Scale to fit screen",
+        description:
+          "Scale Kate up to fit the whole screen, might result in blurry images",
+        value: kase.value.scale_to_fit,
+        on_label: "Yes",
+        off_label: "No",
+        on_changed: (x) => {
+          this.set_case(kase, { ...kase.value, scale_to_fit: x });
+        },
+      }),
     ];
   }
 
-  async select_resolution(current: Observable<ConsoleCaseTV["resolution"]>) {
-    const case_type = this.os.settings.get("ui").case_type;
-    const available =
-      case_type.type === "handheld"
-        ? ([480] as const)
-        : ([480, 720, 960] as const);
+  async select_resolution(current: Observable<ConsoleCase>) {
+    const available = [480, 720] as const;
     const result = await this.os.dialog.pop_menu(
       "kate:settings",
       "Display resolution",
@@ -104,15 +97,16 @@ export class SceneUISettings extends UI.SimpleScene {
     if (result == null) {
       return;
     }
-    this.set_case(current, { type: case_type.type, resolution: result });
+    this.set_case(current, {
+      type: current.value.type,
+      resolution: result,
+      scale_to_fit: current.value.scale_to_fit,
+    });
   }
 
-  async set_case(
-    resolution: Observable<ConsoleCaseTV["resolution"]>,
-    kase: ConsoleCase
-  ) {
+  async set_case(current: Observable<ConsoleCase>, kase: ConsoleCase) {
     this.os.kernel.console.set_case(kase);
-    resolution.value = kase.type === "handheld" ? 480 : kase.resolution;
+    current.value = kase;
     await this.os.settings.update("ui", (x) => {
       return { ...x, case_type: kase };
     });
@@ -136,6 +130,22 @@ export class SceneUISettings extends UI.SimpleScene {
       `${key}: ${value}`
     );
   }
+
+  private mode_button(
+    kase: Observable<ConsoleCase>,
+    x: { mode: ConsoleCase["type"]; title: string; image: string }
+  ) {
+    return UI.choice_button(
+      this.os,
+      UI.vbox(1, [UI.image(x.image), UI.h("div", {}, [x.title])]),
+      {
+        selected: kase.map((k) => k.type === x.mode),
+        on_select: () => {
+          this.set_case(kase, { ...kase.value, type: x.mode });
+        },
+      }
+    );
+  }
 }
 
 function friendly_resolution(height: number) {
@@ -143,5 +153,5 @@ function friendly_resolution(height: number) {
   const BASE_HEIGHT = 480;
   const factor = height / BASE_HEIGHT;
 
-  return `${BASE_WIDTH * factor} x ${BASE_HEIGHT * factor} (5:3)`;
+  return `${BASE_WIDTH * factor} x ${BASE_HEIGHT * factor}`;
 }

@@ -601,6 +601,8 @@ export function link_card(
     arrow?: string;
     title: Widgetable;
     description?: Widgetable;
+    value?: Widgetable;
+    click_label?: string;
     on_click?: () => void;
   }
 ) {
@@ -617,11 +619,19 @@ export function link_card(
           x.description ?? null,
         ]),
       ]),
-      h("div", { class: "kate-ui-link-card-arrow" }, [
-        x.arrow != null
-          ? fa_icon(x.arrow, "xl")
-          : fa_icon("chevron-right", "xl"),
-      ]),
+      h("div", { class: "kate-ui-link-card-value" }, [x.value ?? null]),
+      h(
+        "div",
+        {
+          class: "kate-ui-link-card-arrow",
+          "data-value-suffix": x.value != null,
+        },
+        [
+          x.arrow != null
+            ? fa_icon(x.arrow, x.value == null ? "xl" : "1x")
+            : fa_icon("chevron-right", x.value == null ? "xl" : "1x"),
+        ]
+      ),
     ]
   );
   if (x.on_click) {
@@ -631,7 +641,7 @@ export function link_card(
       {
         key: ["o"],
         on_click: true,
-        label: "Ok",
+        label: x.click_label ?? "Ok",
         handler: () => x.on_click?.(),
       },
     ]);
@@ -827,4 +837,34 @@ export function dynamic(x: Observable<Widgetable>) {
   });
 
   return canvas;
+}
+
+export function hchoices(gap: number, choices: Widgetable[]) {
+  return h(
+    "div",
+    { class: "kate-ui-hchoices", style: `gap: ${gap}rem` },
+    choices
+  );
+}
+
+export function choice_button(
+  os: KateOS,
+  content: Widgetable,
+  x?: { selected?: Observable<boolean>; on_select?: () => void }
+) {
+  const element = h("div", { class: "kate-ui-choice-button" }, [content]);
+  element.classList.toggle("active", x?.selected?.value ?? false);
+  x?.selected?.stream.listen((active) => {
+    element.classList.toggle("active", active);
+  });
+  return interactive(os, element, [
+    {
+      key: ["o"],
+      on_click: true,
+      label: "Select",
+      handler: () => {
+        x?.on_select?.();
+      },
+    },
+  ]);
 }

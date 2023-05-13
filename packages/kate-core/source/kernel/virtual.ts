@@ -28,15 +28,10 @@ export type ExtendedInputKey = InputKey | `long_${SpecialInputKey}`;
 
 export type Resource = "screen-recording" | "transient-storage";
 
-export type ConsoleCase = ConsoleCaseHandheld | ConsoleCaseTV;
-
-export type ConsoleCaseHandheld = {
-  type: "handheld";
-};
-
-export type ConsoleCaseTV = {
-  type: "tv";
-  resolution: 480 | 720 | 960;
+export type ConsoleCase = {
+  type: "handheld" | "tv" | "fullscreen";
+  resolution: 480 | 720;
+  scale_to_fit: boolean;
 };
 
 export type ConsoleOptions = {
@@ -232,8 +227,16 @@ export class VirtualConsole {
       ?.addEventListener("click", () => {
         this.set_case(
           this._case.type === "handheld"
-            ? { type: "tv", resolution: 720 }
-            : { type: "handheld" }
+            ? {
+                type: "tv",
+                resolution: 720,
+                scale_to_fit: this._case.scale_to_fit,
+              }
+            : {
+                type: "handheld",
+                resolution: 480,
+                scale_to_fit: this._case.scale_to_fit,
+              }
         );
       });
 
@@ -278,6 +281,7 @@ export class VirtualConsole {
 
   set_case(kase: ConsoleCase) {
     this._case = kase;
+    this.body.classList.toggle("scale-to-fit", kase.scale_to_fit);
     this.update_scale();
   }
 
@@ -418,8 +422,11 @@ abstract class Case {
       case "tv":
         return new TvCase(kase.resolution);
 
+      case "fullscreen":
+        throw new Error("todo");
+
       default:
-        throw unreachable(kase, "console case type");
+        throw unreachable(kase.type, "console case type");
     }
   }
 
@@ -498,7 +505,7 @@ class TvCase extends Case {
     return Case.BASE_HEIGHT * this.scale;
   }
 
-  constructor(resolution: ConsoleCaseTV["resolution"]) {
+  constructor(resolution: ConsoleCase["resolution"]) {
     super();
     this.scale = resolution / TvCase.BASE_HEIGHT;
   }

@@ -42,6 +42,8 @@ const defaults: SettingsData = {
     animation_effects: true,
     case_type: {
       type: "handheld",
+      resolution: 480,
+      scale_to_fit: false,
     },
   },
   play_habits: {
