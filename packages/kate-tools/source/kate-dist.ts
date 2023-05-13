@@ -13,11 +13,36 @@ function copy(root: string, from: string, out: string) {
   FS.copyFileSync(Path.join(root, from), Path.join(out, from));
 }
 
+function copy_template(
+  root: string,
+  from: string,
+  out: string,
+  template: { [key: string]: string }
+) {
+  console.log("-> Copying template", from);
+  FS.mkdirSync(Path.dirname(Path.join(out, from)), { recursive: true });
+  const contents0 = FS.readFileSync(Path.join(root, from), "utf-8");
+  const contents1 = contents0.replace(/{{([\w_]+)}}/g, (_, id) => {
+    if (!(id in template)) {
+      throw new Error(`Missing value for template variable: ${id}`);
+    }
+    return template[id];
+  });
+  FS.writeFileSync(Path.join(out, from), contents1);
+}
+
 export async function generate(
   cart: string,
   out: string,
   kind: string,
-  overwrite: boolean
+  overwrite: boolean,
+  config: {
+    case_mode: {
+      type: "handheld" | "tv" | "fullscreen";
+      resolution: 480 | 720;
+      scale_to_fit: boolean;
+    };
+  }
 ) {
   switch (kind) {
     case "web": {
@@ -33,7 +58,9 @@ export async function generate(
         }
         copy(www_root, file, out);
       }
-      copy(asset_root, "index.html", out);
+      copy_template(asset_root, "index.html", out, {
+        config: JSON.stringify(config),
+      });
       console.log(`-> Copying cartridge (${cart})`);
       FS.copyFileSync(cart, Path.join(out, "game.kart"));
       break;

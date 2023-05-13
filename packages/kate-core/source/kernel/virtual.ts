@@ -536,16 +536,18 @@ class FullscreenCase extends Case {
   async enter() {
     if (document.fullscreenEnabled) {
       await KateNative?.toggle_fullscreen(true);
-      await document.documentElement.requestFullscreen({
-        navigationUI: "hide",
-      });
+      await document.documentElement
+        .requestFullscreen({
+          navigationUI: "hide",
+        })
+        .catch(() => {});
     }
   }
 
   async exit() {
     if (document.fullscreenElement != null) {
       await KateNative?.toggle_fullscreen(false);
-      await document.exitFullscreen();
+      await document.exitFullscreen().catch(() => {});
     }
   }
 }

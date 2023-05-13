@@ -7,12 +7,36 @@ declare var Kate: {
   data: typeof data;
 };
 
+type Config = {
+  case_mode?: kernel.ConsoleCase;
+};
+
+(window as any).KateNative = null;
+
+const default_config: Config = {
+  case_mode: {
+    type: "handheld",
+    resolution: 480,
+    scale_to_fit: false,
+  },
+};
+
 async function main() {
   try {
+    const config0 = JSON.parse(
+      document.querySelector("#kate-config")!.textContent!
+    );
+    const config: Config = Object.assign({}, default_config, config0);
+    if (config.case_mode != null) {
+      Kate.os.KateSettings.defaults.ui.case_type = config.case_mode;
+    }
+
     const kate = Kate.kernel.KateKernel.from_root(
       document.querySelector(".kate")!,
       {
         mode: "single",
+        persistent_storage: false,
+        case: config.case_mode,
       }
     );
 

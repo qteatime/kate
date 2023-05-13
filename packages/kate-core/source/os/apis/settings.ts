@@ -175,10 +175,12 @@ export class KateSettings {
     ChangedSetting<keyof SettingsData>
   >();
 
+  static defaults = defaults;
+
   constructor(readonly db: Database) {}
 
   get defaults() {
-    return defaults;
+    return KateSettings.defaults;
   }
 
   static async load(db: Database) {
