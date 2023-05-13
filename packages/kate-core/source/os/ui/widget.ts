@@ -512,13 +512,17 @@ export function toggle_cell(
   x: {
     title: Widgetable;
     description: Widgetable;
-    value: boolean;
+    value: boolean | Observable<boolean>;
     on_label?: Widgetable;
     off_label?: Widgetable;
     on_changed?: (value: boolean) => void;
   }
 ) {
-  let checked = x.value;
+  const checked = Observable.from(x.value);
+  const mutate =
+    typeof x.value === "boolean"
+      ? (v: boolean) => (checked.value = v)
+      : () => {};
   const container = h("div", { class: "kate-ui-toggle-container" }, [
     h("div", { class: "kate-ui-toggle-view" }, [
       h("div", { class: "kate-ui-toggle-bullet" }, []),
@@ -527,7 +531,10 @@ export function toggle_cell(
     h("div", { class: "kate-ui-toggle-label-no" }, [x.off_label ?? "OFF"]),
   ]);
 
-  container.classList.toggle("active", checked);
+  container.classList.toggle("active", checked.value);
+  checked.stream.listen((x) => {
+    container.classList.toggle("active", x);
+  });
 
   return interactive(
     os,
@@ -543,9 +550,9 @@ export function toggle_cell(
         label: "Toggle",
         on_click: true,
         handler: () => {
-          checked = !checked;
-          container.classList.toggle("active", checked);
-          x.on_changed?.(checked);
+          const value = !checked.value;
+          x.on_changed?.(value);
+          mutate(value);
         },
       },
     ]

@@ -69,21 +69,17 @@ export class SceneUISettings extends UI.SimpleScene {
         },
       }),
 
-      UI.dynamic(
-        kase.map<UI.Widgetable>((x) => {
-          return UI.toggle_cell(this.os, {
-            title: "Scale to fit screen",
-            description:
-              "Scale Kate up to fit the whole screen, might result in blurry images",
-            value: x.scale_to_fit,
-            on_label: "Yes",
-            off_label: "No",
-            on_changed: (x) => {
-              this.set_case(kase, { ...kase.value, scale_to_fit: x });
-            },
-          });
-        })
-      ),
+      UI.toggle_cell(this.os, {
+        title: "Scale to fit screen",
+        description:
+          "Scale Kate up to fit the whole screen, might result in blurry images",
+        value: kase.map((x) => x.scale_to_fit),
+        on_label: "Yes",
+        off_label: "No",
+        on_changed: (x) => {
+          this.set_case(kase, { ...kase.value, scale_to_fit: x });
+        },
+      }),
     ];
   }
 
