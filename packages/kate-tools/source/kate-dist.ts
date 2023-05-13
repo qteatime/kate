@@ -60,6 +60,7 @@ export async function generate(
       }
       copy_template(asset_root, "index.html", out, {
         config: JSON.stringify(config),
+        case_type: config.case_mode.type,
       });
       console.log(`-> Copying cartridge (${cart})`);
       FS.copyFileSync(cart, Path.join(out, "game.kart"));
