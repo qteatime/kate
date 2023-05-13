@@ -32,6 +32,12 @@ body {
   image-rendering: pixelated;
 }
 
+.kate img {
+  image-rendering: pixelated;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+
 .kate-native .kate {
   display: block;
 }
