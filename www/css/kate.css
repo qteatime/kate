@@ -571,3 +571,9 @@ body {
 .kate[data-case-type="fullscreen"] .trusted-mode .kate-resources {
   background: #ffb7b2;
 }
+
+.kate[data-case-type="fullscreen"] .kate-resources > *,
+.kate[data-case-type="fullscreen"] .kate-resources > *::before,
+.kate[data-case-type="fullscreen"] .kate-resources > *::after {
+  line-height: 1em;
+}
