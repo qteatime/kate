@@ -417,6 +417,7 @@ body {
   align-items: center;
   gap: 8px;
   overflow: hidden;
+  --resources-background: #faaaaa;
 }
 
 .kate-resources .kate-resource {
@@ -452,7 +453,8 @@ body {
   position: absolute;
   bottom: 0px;
   right: 0px;
-  text-shadow: -1px -1px 0 #faaaaa, 0px -1px 0 #faaaaa, -1px 0 0 #faaaaa;
+  text-shadow: -1px -1px 0 var(--resources-background),
+    0px -1px 0 var(--resources-background), -1px 0 0 var(--resources-background);
 }
 
 #kate-loading {
@@ -551,6 +553,7 @@ body {
   width: auto;
   padding: 16px 8px 16px 24px;
   overflow: visible;
+  --resources-background: #ffffff;
 }
 
 .kate[data-case-type="fullscreen"] .kate-resources::before {
