@@ -12,18 +12,19 @@ For information on how to make games for Kate, see [Making games for Kate!](./de
 
 ## Hardware specification
 
-|                      |                                                                                               |
-| -------------------- | --------------------------------------------------------------------------------------------- |
-| **Console case**     | 16cm width x 7cm height x 3cm depth<br><small>(1310px x 570px in the emulator)</small>        |
-| **Display**          | capacitive touch screen, 4" (86x51 mm)<br><small>(a 5:3 screen at 800x480 resolution)</small> |
-| **CPU**              | 1GHz\*                                                                                        |
-| **RAM**              | 512 MB\*                                                                                      |
-| **Internal storage** | 128 GB\* (8 GB reserved for OS)                                                               |
-| **Cartridge limit**  | 512 MB                                                                                        |
-| **Digital input**    | D-pad, 6-buttons (O, X, L, R, Menu, Capture)                                                  |
-| **Sensors**          | Accelerometer\*\*, Gyroscope\*\*                                                              |
-| **Sound**            | Stereo speakers, 3.5mm headphone jack, bluetooth\*\*                                          |
-| **Programming**      | Web technologies (JavaScript, HTML, CSS, WebAssembly)                                         |
+|                        |                                                                                               |
+| ---------------------- | --------------------------------------------------------------------------------------------- |
+| **Console case**       | 16cm width x 7cm height x 3cm depth<br><small>(1310px x 570px in the emulator)</small>        |
+| **Display**            | capacitive touch screen, 4" (86x51 mm, 5:3 aspect ratio)<br>                                  |
+| **Display resolution** | 800x480 in handheld mode;<br>800x480, 1200x720, 1600x960, and 1800x1080 in TV/fullscreen mode |
+| **CPU**                | 1GHz\*                                                                                        |
+| **RAM**                | 512 MB\*                                                                                      |
+| **Internal storage**   | 128 GB\* (8 GB reserved for OS)                                                               |
+| **Cartridge limit**    | 512 MB                                                                                        |
+| **Digital input**      | D-pad, 6-buttons (O, X, L, R, Menu, Capture)                                                  |
+| **Sensors**            | Accelerometer\*\*, Gyroscope\*\*                                                              |
+| **Sound**              | Stereo speakers, 3.5mm headphone jack, bluetooth\*\*                                          |
+| **Programming**        | Web technologies (JavaScript, HTML, CSS, WebAssembly)                                         |
 
 **Note**:
 
@@ -115,7 +116,7 @@ Kate cartridges are sandboxed for security. This means that, by default, cartrid
 - Play sounds through your device's audio output;
 - Display things on the small 800x480 piece of screen made available to them by the emulator;
 - React to your input, provided to the cartridge in terms of Kate buttons pressed or released;
-- And store very small amounts of data, of up to 32MB, used for save files.
+- And store very small amounts of data, of up to 64MB, used for save files.
 
 For anything else, the game will need to ask you for permission, and you may choose to allow them to do it (if you trust the cartridge enough), or not. This is not much different from how your phone requires applications to ask for permission to use the camera or microphone, Kate just takes it a bit further to protect privacy as well.
 
@@ -125,6 +126,49 @@ By doing this Kate makes it possible for you to download a `.kart` file from any
 
 > **IMPORTANT NOTE:**  
 > In the **Single Application** mode there are no security or privacy guarantees that Kate can make. That's because whoever is distributing the Kate emulator to you controls those guarantees instead. You'd have to trust that they're upholding all of the guarantees we describe here first.
+
+## Case modes
+
+The emulator supports a few different case modes, which you might want to change depending on your device's screen size and input device.
+
+You can change the emulator's case mode at any point by going to `Applications -> Settings -> User Interface`, and then picking one of the three available modes (and maybe changing the screen resolution).
+
+### Handheld mode
+
+![](./img/user/handheld-mode.png)
+
+This is the default case mode for the Kate emulator. It includes virtual buttons on the sides and on the top, which can be used as a replacement for a physical gamepad in a device with touchscreen capabilities.
+
+In handheld mode, the screen resolution is locked to 800x480.
+
+### TV mode
+
+![](./img/user/tv-mode.png)
+
+Similar to the handheld mode case, but without any virtual buttons. This case is appropriate for running the emulator in laptop, or when connected to an external display or TV. You'll need a connected gamepad or keyboard to be able to control the emulator and play games.
+
+In TV mode you can choose between 800x480, 1200x720, 1600x960, and 1800x1080 as the screen resolution.
+
+### Fullscreen mode
+
+![](./img/user/fullscreen-mode.png)
+
+In this mode there's no emulator chrome (i.e.: no case around the screen), and the emulator takes up the entire available screen space.
+
+Because Kate needs some space to display [security indicators](#resource-indicators), in this mode 3 pixels at the top of the screen are used by Kate for the trust mode indicator, and resources are always displayed on the top-right. These are displayed above the game screen, so might partially cover some of the game's content. Since it's a security mechanism, there's no way to disable it.
+
+The resolutions available to fullscreen mode are the same as the TV mode ones.
+
+> **NOTE**<br>
+> For Kate's Native Mode distribution it's not possible to switch between windowed and fullscreen mode from the console's settings. Instead, if you want to run Kate in fullscreen mode you'll need to launch the emulator with the fullscreen flag (`--fullscreen`).
+
+### Screen resolution and scale
+
+The screen resolution you can configure in the UI settings is the size Kate applications and games render the contents in, but not necessarily the size you see on your screen.
+
+If you choose a resolution that's higher than the amount of space available in the screen, Kate will down-scale the screen and the emulator to make it fit in the screen. This is useful for phones and other mobile devices, where it's harder to guarantee that there will be available space for the emulator.
+
+Conversely, if you choose a resolution that's much smaller than your available screen size, Kate will not up-scale the emulator to fit the screen by default. You'll need to explicitly turn on this option in the UI settings. The reason for this is that up-scaling can produce blurry images.
 
 ## KateOS applications
 
@@ -148,6 +192,10 @@ The About Kate screen displays the version of Kate you're running and other info
 
 This page also contains the "Third Party licences", which tells you what software and assets are included in Kate, and how they're licensed to you; as well as the "Release Notes" for the version you're running, which tells you what features were added, changed, or removed, and what bugs were addressed in it.
 
+### Settings
+
+The settings screen allows you to view and change many of the aspects of the Kate emulator, such as display resolution, gamepad and keyboard input mapping, or what data gets recorded when you play games.
+
 ## Storage and privacy
 
 In Kate, data is only ever stored locally, on your device. The Kate emulator itself never sends any of your data over the internet, although cartridges might **if** you give them network access, which is disabled by default.
@@ -160,7 +208,7 @@ There's four kinds of data about the cartridges you run that are stored:
 
   Cartridge data is never modified; it is a read-only format. It might, however, be deleted if you choose to uninstall a cartridge.
 
-- **The additional cartridge data**: these are things like save files and other pieces of data associated with a particular cartridge. Games can store any piece of data up to their storage quota (by default, 32 MB), and they may ask you to increase their quota as well.
+- **The additional cartridge data**: these are things like save files and other pieces of data associated with a particular cartridge. Games can store any piece of data up to their storage quota (by default, 64 MB), and they may ask you to increase their quota as well.
 
   Each cartridge can read, modify, and delete its own additional data, but never other cartridge's data.
 
@@ -190,9 +238,12 @@ There are two kinds of resource indicators today:
 
 Sometimes the Kate emulator will prompt you for dangerous actions (e.g.: removing files or granting permissions). To make sure these requests are truly coming from the Kate emulator, and not from a malicious cartridge, Kate will have a distinctive border around the screen during such requests.
 
-With the default theme, this is a red-ish borderthat surrounds the screen, so you should see no black borders between the console's case and the screen. The screenshot below illustrates this:
+With the default theme, this is a red-ish border that surrounds the screen, so you should see no black borders between the console's case and the screen. The screenshot below illustrates this:
 
-![](./icons/trust-frame.png)
+![](./img/user/trust-frame.png)
+
+> **NOTE**<br>
+> In Fullscreen display mode, the trust frame is a little line at the very top of the screen, and has a lighter pink colour. In this mode you can tell that you're looking at a trusted dialog if there's a pink line with no white line above it at the very top of the screen.
 
 ### The resource indicators
 
@@ -202,7 +253,10 @@ The way Kate deals with this is through the Resource Indicator band, a small sec
 
 Note that dangerous actions are _always_ auditable independently, by looking at the audit log in the console. The resource indicators just provide a quick view of what's happening.
 
-![](./icons/resource-indicator.png)
+![](./img/user/resource-indicator.png)
+
+> **NOTE**<br>
+> In Fullscreen display mode, the resource indicators are displayed at the top-right of the screen.
 
 Kate currently uses the following resource icons:
 
