@@ -4,8 +4,16 @@ import { app, BrowserWindow, ipcMain } from "electron";
 import * as SystemInformation from "./system-information";
 
 const args = parseArgs({
-  options: { fullscreen: { type: "boolean", default: false } },
+  options: {
+    fullscreen: { type: "boolean", default: false },
+    resolution: { type: "string", default: "720" },
+  },
 });
+
+const is_fullscreen = args.values.fullscreen ?? false;
+const resolution = ["480", "720"].includes(args.values.resolution ?? "720")
+  ? Number(args.values.resolution ?? "720")
+  : 720;
 
 const createWindow = (fullscreen: boolean) => {
   const win = new BrowserWindow({
@@ -13,7 +21,7 @@ const createWindow = (fullscreen: boolean) => {
     height: 600,
     minWidth: 884,
     minHeight: 574,
-    resizable: false,
+    resizable: fullscreen,
     fullscreen: fullscreen,
     frame: false,
     transparent: !fullscreen,
@@ -28,7 +36,7 @@ const createWindow = (fullscreen: boolean) => {
 };
 
 app.whenReady().then(() => {
-  const win = createWindow(args.values.fullscreen ?? false);
+  const win = createWindow(is_fullscreen);
 
   ipcMain.handle("kate:get-system-info", async (_ev) => {
     const info = await SystemInformation.get_system_info();
@@ -45,14 +53,12 @@ app.whenReady().then(() => {
     }
   );
 
-  ipcMain.handle("kate:toggle-fullscreen", async (_ev, flag: boolean) => {
-    win.setResizable(flag);
-    if (flag) {
-      win.maximize();
-    } else {
-      win.unmaximize();
-      win.center();
-    }
+  ipcMain.handle("kate:is-fullscreen", async (_ev) => {
+    return is_fullscreen;
+  });
+
+  ipcMain.handle("kate:screen-resolution", async (_ev) => {
+    return resolution;
   });
 });
 

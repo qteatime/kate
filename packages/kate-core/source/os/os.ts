@@ -146,7 +146,10 @@ export class KateOS {
     this.display.classList.toggle("disable-animation", !enabled);
   }
 
-  static async boot(kernel: KateKernel, x: { database?: string } = {}) {
+  static async boot(
+    kernel: KateKernel,
+    x: { database?: string; set_case_mode?: boolean } = {}
+  ) {
     // Setup OS
     const sfx = await KateSfx.make(kernel);
     const { db, old_version } = await KateDb.kate.open(x.database);
@@ -160,7 +163,9 @@ export class KateOS {
     kernel.gamepad.pair(settings.get("input").paired_gamepad);
     sfx.set_enabled(settings.get("ui").sound_feedback);
     os.set_os_animation(settings.get("ui").animation_effects);
-    kernel.console.set_case(settings.get("ui").case_type);
+    if (x.set_case_mode !== false) {
+      kernel.console.set_case(settings.get("ui").case_type);
+    }
 
     const min_boot_time = wait(1000);
     const boot_screen = new SceneBoot(os, true);

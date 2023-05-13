@@ -534,8 +534,7 @@ class FullscreenCase extends Case {
   }
 
   async enter() {
-    if (document.fullscreenEnabled) {
-      await KateNative?.toggle_fullscreen(true);
+    if (KateNative == null && document.fullscreenEnabled) {
       await document.documentElement
         .requestFullscreen({
           navigationUI: "hide",
@@ -545,8 +544,7 @@ class FullscreenCase extends Case {
   }
 
   async exit() {
-    if (document.fullscreenElement != null) {
-      await KateNative?.toggle_fullscreen(false);
+    if (KateNative == null && document.fullscreenElement != null) {
       await document.exitFullscreen().catch(() => {});
     }
   }

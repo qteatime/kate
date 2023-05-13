@@ -27,9 +27,6 @@ async function main() {
       document.querySelector("#kate-config")!.textContent!
     );
     const config: Config = Object.assign({}, default_config, config0);
-    if (config.case_mode != null) {
-      Kate.os.KateSettings.defaults.ui.case_type = config.case_mode;
-    }
 
     const kate = Kate.kernel.KateKernel.from_root(
       document.querySelector(".kate")!,
@@ -47,6 +44,7 @@ async function main() {
 
     const kate_os = await Kate.os.KateOS.boot(kate, {
       database: `kate/${cart.metadata.id}`,
+      set_case_mode: false,
     });
 
     await Kate.data.ObjectStorage.transaction(

@@ -26,11 +26,12 @@ export const KateNative = {
     });
   },
 
-  async toggle_fullscreen(value: boolean): Promise<void> {
-    if (typeof value !== "boolean") {
-      throw new Error(`invalid flag`);
-    }
-    await ipcRenderer.invoke("kate:toggle-fullscreen", value);
+  async is_fullscreen(): Promise<boolean> {
+    return ipcRenderer.invoke("kate:is-fullscreen");
+  },
+
+  async screen_resolution(): Promise<480 | 720> {
+    return ipcRenderer.invoke("kate:screen-resolution");
   },
 };
 
