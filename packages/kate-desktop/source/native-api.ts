@@ -10,6 +10,8 @@ export const KateNative = {
 
   async resize(size: { width: number; height: number }): Promise<void> {
     if (
+      typeof size.width !== "number" ||
+      typeof size.height !== "number" ||
       !isFinite(size.width) ||
       !isFinite(size.height) ||
       size.width < 1 ||
@@ -19,9 +21,16 @@ export const KateNative = {
     }
 
     await ipcRenderer.invoke("kate:resize", {
-      width: Number(size.width),
-      height: Number(size.height),
+      width: size.width,
+      height: size.height,
     });
+  },
+
+  async toggle_fullscreen(value: boolean): Promise<void> {
+    if (typeof value !== "boolean") {
+      throw new Error(`invalid flag`);
+    }
+    await ipcRenderer.invoke("kate:toggle-fullscreen", value);
   },
 };
 

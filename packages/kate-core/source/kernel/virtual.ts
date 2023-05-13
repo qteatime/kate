@@ -214,13 +214,13 @@ export class VirtualConsole {
     }
     this.is_listening = true;
 
-    window.addEventListener("load", () => this.update_scale());
-    window.addEventListener("resize", () => this.update_scale());
-    window.addEventListener("orientationchange", () => this.update_scale());
+    window.addEventListener("load", () => this.update_scale(null));
+    window.addEventListener("resize", () => this.update_scale(null));
+    window.addEventListener("orientationchange", () => this.update_scale(null));
     (screen as any).addEventListener?.("orientationchange", () =>
-      this.update_scale()
+      this.update_scale(null)
     );
-    this.update_scale();
+    this.update_scale(null);
 
     this.body
       .querySelector(".kate-engraving")
@@ -280,13 +280,14 @@ export class VirtualConsole {
   }
 
   set_case(kase: ConsoleCase) {
+    const old_case = this.case;
     this._case = kase;
     this.body.classList.toggle("scale-to-fit", kase.scale_to_fit);
-    this.update_scale();
+    this.update_scale(old_case);
   }
 
-  private update_scale() {
-    this.case.resize(this.root);
+  private update_scale(old_case: Case | null) {
+    this.case.transition(old_case, this.root);
     window.scrollTo({ left: 0, top: 0 });
     document.body.scroll({ left: 0, top: 0 });
   }
@@ -449,6 +450,14 @@ abstract class Case {
     }
   }
 
+  async transition(old: Case | null, root: HTMLElement) {
+    if (old != null) {
+      await old.exit();
+    }
+    await this.enter();
+    this.resize(root);
+  }
+
   resize(root: HTMLElement) {
     const width = this.width;
     const height = this.height;
@@ -469,6 +478,10 @@ abstract class Case {
       KateNative.resize({ width, height });
     }
   }
+
+  async enter() {}
+
+  async exit() {}
 }
 
 class HandheldCase extends Case {
@@ -518,5 +531,21 @@ class FullscreenCase extends Case {
       horizontal: 0,
       vertical: 0,
     };
+  }
+
+  async enter() {
+    if (document.fullscreenEnabled) {
+      await KateNative?.toggle_fullscreen(true);
+      await document.documentElement.requestFullscreen({
+        navigationUI: "hide",
+      });
+    }
+  }
+
+  async exit() {
+    if (document.fullscreenElement != null) {
+      await KateNative?.toggle_fullscreen(false);
+      await document.exitFullscreen();
+    }
   }
 }

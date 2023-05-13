@@ -54,6 +54,10 @@ body {
   height: 550px;
 }
 
+.kate-native .kate[data-case-type="handheld"] .kate-body {
+  top: 20px;
+}
+
 .kate[data-case-type="tv"] .kate-body {
   padding: 32px;
 }
