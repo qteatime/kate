@@ -462,6 +462,7 @@ body {
   font-weight: bold;
 }
 
+/* TV mode */
 .kate[data-case-type="tv"] .kate-trigger,
 .kate[data-case-type="tv"] .kate-dpad,
 .kate[data-case-type="tv"] .kate-action,
@@ -485,4 +486,77 @@ body {
   bottom: 0px;
   height: 30px;
   line-height: 30px;
+}
+
+/* Fullscreen mode */
+.kate[data-case-type="fullscreen"] .kate-trigger,
+.kate[data-case-type="fullscreen"] .kate-dpad,
+.kate[data-case-type="fullscreen"] .kate-action,
+.kate[data-case-type="fullscreen"] .kate-special-button,
+.kate[data-case-type="fullscreen"] .kate-whiskers {
+  display: none;
+}
+
+.kate[data-case-type="fullscreen"] .kate-body {
+  box-shadow: none;
+  border-radius: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.kate[data-case-type="fullscreen"] .kate-screen {
+  border: none;
+  width: var(--screen-width);
+  height: var(--screen-height);
+  border-radius: 0;
+}
+
+.kate[data-case-type="fullscreen"] .scale-to-fit .kate-screen {
+  transform: scale(var(--case-scale));
+}
+
+.kate[data-case-type="fullscreen"] .kate-version,
+.kate[data-case-type="fullscreen"] .kate-engraving {
+  display: none;
+}
+
+.kate[data-case-type="fullscreen"] .scale-to-fit {
+  transform: scale(1);
+}
+
+.kate[data-case-type="fullscreen"] .kate-resources {
+  top: 0px;
+  right: 0px;
+  bottom: unset;
+  left: unset;
+  background: #fff;
+  border-bottom-left-radius: 32px;
+  height: 32px;
+  line-height: 32px;
+  width: auto;
+  padding: 16px 8px 16px 24px;
+  overflow: visible;
+}
+
+.kate[data-case-type="fullscreen"] .kate-resources::before {
+  position: absolute;
+  content: "";
+  display: block;
+  width: 100vw;
+  height: 2px;
+  background: #fff;
+  top: 0px;
+  right: 0px;
+}
+
+.kate[data-case-type="fullscreen"] .trusted-mode .kate-resources::before {
+  background: #933;
+}
+
+.kate[data-case-type="fullscreen"] .trusted-mode .kate-resources {
+  background: #ffb7b2;
 }

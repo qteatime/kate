@@ -408,22 +408,41 @@ export class VirtualConsole {
 abstract class Case {
   static readonly BASE_HEIGHT = 480;
   static readonly BASE_WIDTH = 800;
-  abstract case_type: "handheld" | "tv";
-  abstract width: number;
-  abstract height: number;
-  abstract screen_width: number;
-  abstract screen_height: number;
+  abstract case_type: ConsoleCase["type"];
+  abstract padding: { horizontal: number; vertical: number };
+
+  constructor(readonly resolution: ConsoleCase["resolution"]) {}
+
+  get screen_scale() {
+    return this.resolution / Case.BASE_HEIGHT;
+  }
+
+  get screen_width() {
+    return Case.BASE_WIDTH * this.screen_scale;
+  }
+
+  get screen_height() {
+    return Case.BASE_HEIGHT * this.screen_scale;
+  }
+
+  get width() {
+    return this.screen_width + this.padding.horizontal;
+  }
+
+  get height() {
+    return this.screen_height + this.padding.vertical;
+  }
 
   static from_configuration(kase: ConsoleCase) {
     switch (kase.type) {
       case "handheld":
-        return new HandheldCase();
+        return new HandheldCase(kase.resolution);
 
       case "tv":
         return new TvCase(kase.resolution);
 
       case "fullscreen":
-        throw new Error("todo");
+        return new FullscreenCase(kase.resolution);
 
       default:
         throw unreachable(kase.type, "console case type");
@@ -457,23 +476,22 @@ class HandheldCase extends Case {
   readonly screen_bevel = 10;
   readonly case_padding = 25;
   readonly side_padding = 250;
-  readonly screen_width = 800;
-  readonly screen_height = 480;
   readonly depth_padding = 10;
   readonly shoulder_padding = 20;
 
-  get width() {
-    return this.screen_width + this.screen_bevel * 2 + this.side_padding * 2;
+  get screen_scale() {
+    return Case.BASE_HEIGHT / this.resolution;
   }
 
-  get height() {
-    return (
-      this.screen_height +
-      this.screen_bevel * 2 +
-      this.case_padding * 2 +
-      this.depth_padding +
-      this.shoulder_padding
-    );
+  get padding() {
+    return {
+      horizontal: this.screen_bevel * 2 + this.side_padding * 2,
+      vertical:
+        this.screen_bevel * 2 +
+        this.case_padding * 2 +
+        this.depth_padding +
+        this.shoulder_padding,
+    };
   }
 }
 
@@ -482,31 +500,23 @@ class TvCase extends Case {
   readonly screen_bevel = 10;
   readonly case_padding = 32;
   readonly depth_padding = 10;
-  readonly scale: number;
 
-  get width() {
-    return this.screen_width + this.screen_bevel * 2 + this.case_padding * 2;
+  get padding() {
+    return {
+      horizontal: this.screen_bevel * 2 + this.case_padding * 2,
+      vertical:
+        this.screen_bevel * 2 + this.case_padding * 2 + this.depth_padding,
+    };
   }
+}
 
-  get height() {
-    return (
-      this.screen_height +
-      this.screen_bevel * 2 +
-      this.case_padding * 2 +
-      this.depth_padding
-    );
-  }
+class FullscreenCase extends Case {
+  readonly case_type = "fullscreen";
 
-  get screen_width() {
-    return Case.BASE_WIDTH * this.scale;
-  }
-
-  get screen_height() {
-    return Case.BASE_HEIGHT * this.scale;
-  }
-
-  constructor(resolution: ConsoleCase["resolution"]) {
-    super();
-    this.scale = resolution / TvCase.BASE_HEIGHT;
+  get padding() {
+    return {
+      horizontal: 0,
+      vertical: 0,
+    };
   }
 }
