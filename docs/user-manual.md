@@ -12,19 +12,19 @@ For information on how to make games for Kate, see [Making games for Kate!](./de
 
 ## Hardware specification
 
-|                        |                                                                                               |
-| ---------------------- | --------------------------------------------------------------------------------------------- |
-| **Console case**       | 16cm width x 7cm height x 3cm depth<br><small>(1310px x 570px in the emulator)</small>        |
-| **Display**            | capacitive touch screen, 4" (86x51 mm, 5:3 aspect ratio)<br>                                  |
-| **Display resolution** | 800x480 in handheld mode;<br>800x480, 1200x720, 1600x960, and 1800x1080 in TV/fullscreen mode |
-| **CPU**                | 1GHz\*                                                                                        |
-| **RAM**                | 512 MB\*                                                                                      |
-| **Internal storage**   | 128 GB\* (8 GB reserved for OS)                                                               |
-| **Cartridge limit**    | 512 MB                                                                                        |
-| **Digital input**      | D-pad, 6-buttons (O, X, L, R, Menu, Capture)                                                  |
-| **Sensors**            | Accelerometer\*\*, Gyroscope\*\*                                                              |
-| **Sound**              | Stereo speakers, 3.5mm headphone jack, bluetooth\*\*                                          |
-| **Programming**        | Web technologies (JavaScript, HTML, CSS, WebAssembly)                                         |
+|                        |                                                                                        |
+| ---------------------- | -------------------------------------------------------------------------------------- |
+| **Console case**       | 16cm width x 7cm height x 3cm depth<br><small>(1310px x 570px in the emulator)</small> |
+| **Display**            | capacitive touch screen, 4" (86x51 mm, 5:3 aspect ratio)<br>                           |
+| **Display resolution** | 800x480 in handheld mode;<br>800x480 and 1200x720 in TV/fullscreen mode                |
+| **CPU**                | 1GHz\*                                                                                 |
+| **RAM**                | 512 MB\*                                                                               |
+| **Internal storage**   | 128 GB\* (8 GB reserved for OS)                                                        |
+| **Cartridge limit**    | 512 MB                                                                                 |
+| **Digital input**      | D-pad, 6-buttons (O, X, L, R, Menu, Capture)                                           |
+| **Sensors**            | Accelerometer\*\*, Gyroscope\*\*                                                       |
+| **Sound**              | Stereo speakers, 3.5mm headphone jack, bluetooth\*\*                                   |
+| **Programming**        | Web technologies (JavaScript, HTML, CSS, WebAssembly)                                  |
 
 **Note**:
 
@@ -147,7 +147,7 @@ In handheld mode, the screen resolution is locked to 800x480.
 
 Similar to the handheld mode case, but without any virtual buttons. This case is appropriate for running the emulator in laptop, or when connected to an external display or TV. You'll need a connected gamepad or keyboard to be able to control the emulator and play games.
 
-In TV mode you can choose between 800x480, 1200x720, 1600x960, and 1800x1080 as the screen resolution.
+In TV mode you can choose between 800x480 and 1200x720 as the screen resolution.
 
 ### Fullscreen mode
 

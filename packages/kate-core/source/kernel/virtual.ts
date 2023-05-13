@@ -30,7 +30,7 @@ export type Resource = "screen-recording" | "transient-storage";
 
 export type ConsoleCase = {
   type: "handheld" | "tv" | "fullscreen";
-  resolution: 480 | 720 | 960 | 1080;
+  resolution: 480 | 720;
   scale_to_fit: boolean;
 };
 

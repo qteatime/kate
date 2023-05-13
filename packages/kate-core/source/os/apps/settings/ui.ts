@@ -87,7 +87,7 @@ export class SceneUISettings extends UI.SimpleScene {
     const available =
       current.value.type === "handheld"
         ? ([480] as const)
-        : ([480, 720, 960, 1080] as const);
+        : ([480, 720] as const);
     const result = await this.os.dialog.pop_menu(
       "kate:settings",
       "Display resolution",
