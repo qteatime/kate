@@ -70,7 +70,7 @@
 /* #Info line */
 .kate-ui-info-line {
   border-bottom: 1px solid var(--color-border);
-  padding: 0.5em;
+  padding: 1rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -103,9 +103,10 @@
 
 /* #Link card */
 .kate-ui-link-card {
-  padding: 1em;
+  padding: 1rem;
   display: flex;
   flex-direction: row;
+  align-items: center;
   border-bottom: 1px solid var(--color-border);
 }
 
@@ -127,6 +128,10 @@
   justify-content: center;
   align-items: center;
   color: var(--color-text-very-muted);
+}
+
+.kate-ui-link-card-arrow[data-value-suffix] {
+  width: 32px;
 }
 
 .kate-ui-link-card-text,
@@ -152,6 +157,10 @@
   color: var(--color-text-muted);
   font-size: 0.9em;
   font-weight: normal;
+}
+
+.kate-ui-link-card-value {
+  color: var(--color-text-very-muted);
 }
 
 /* #Toggle */
@@ -258,4 +267,23 @@
 
 .hidden {
   display: none !important;
+}
+
+.kate-ui-hchoices {
+  display: flex;
+  align-items: center;
+}
+
+.kate-os-mode-choices img {
+  width: 160px;
+  height: auto;
+}
+
+.kate-os-mode-choices .kate-ui-vbox {
+  align-items: center;
+  font-weight: 500;
+}
+
+.kate-ui-choice-button:not(.active) {
+  opacity: 0.5;
 }

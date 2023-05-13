@@ -1,4 +1,4 @@
-import { EventStream } from "../utils";
+import { EventStream, unreachable } from "../utils";
 const pkg = require("../../package.json");
 
 declare global {
@@ -28,9 +28,16 @@ export type ExtendedInputKey = InputKey | `long_${SpecialInputKey}`;
 
 export type Resource = "screen-recording" | "transient-storage";
 
+export type ConsoleCase = {
+  type: "handheld" | "tv" | "fullscreen";
+  resolution: 480 | 720;
+  scale_to_fit: boolean;
+};
+
 export type ConsoleOptions = {
   mode: "native" | "web" | "single";
   persistent_storage: boolean;
+  case: ConsoleCase;
 };
 
 export class VirtualConsole {
@@ -45,7 +52,7 @@ export class VirtualConsole {
   private ltrigger_button: HTMLElement;
   private rtrigger_button: HTMLElement;
   private is_listening = false;
-  private _scale: number = 1;
+  private _case: ConsoleCase;
   readonly body: HTMLElement;
   readonly device_display: HTMLElement;
   readonly hud: HTMLElement;
@@ -63,7 +70,6 @@ export class VirtualConsole {
   }>();
   readonly on_virtual_button_touched = new EventStream<InputKey>();
   readonly on_tick = new EventStream<number>();
-  readonly on_scale_changed = new EventStream<number>();
   readonly audio_context = new AudioContext();
   readonly resources = new Map<Resource, number>();
 
@@ -88,7 +94,9 @@ export class VirtualConsole {
   ];
   private special_keys: InputKey[] = ["menu", "capture"];
 
-  constructor(root: HTMLElement, readonly options: ConsoleOptions) {
+  constructor(readonly root: HTMLElement, readonly options: ConsoleOptions) {
+    this._case = options.case;
+
     this.up_button = root.querySelector(".kate-dpad-up")!;
     this.right_button = root.querySelector(".kate-dpad-right")!;
     this.down_button = root.querySelector(".kate-dpad-down")!;
@@ -176,8 +184,12 @@ export class VirtualConsole {
     }
   };
 
-  get scale() {
-    return this._scale;
+  get case() {
+    return Case.from_configuration(this._case);
+  }
+
+  get raw_case() {
+    return this._case;
   }
 
   get active() {
@@ -206,18 +218,30 @@ export class VirtualConsole {
     }
     this.is_listening = true;
 
-    window.addEventListener("load", () => this.update_scale(true));
-    window.addEventListener("resize", () => this.update_scale(true));
-    window.addEventListener("orientationchange", () => this.update_scale(true));
+    window.addEventListener("load", () => this.update_scale(null));
+    window.addEventListener("resize", () => this.update_scale(null));
+    window.addEventListener("orientationchange", () => this.update_scale(null));
     (screen as any).addEventListener?.("orientationchange", () =>
-      this.update_scale(true)
+      this.update_scale(null)
     );
-    this.update_scale(true);
+    this.update_scale(null);
 
     this.body
       .querySelector(".kate-engraving")
       ?.addEventListener("click", () => {
-        this.request_fullscreen();
+        this.set_case(
+          this._case.type === "handheld"
+            ? {
+                type: "tv",
+                resolution: 720,
+                scale_to_fit: this._case.scale_to_fit,
+              }
+            : {
+                type: "handheld",
+                resolution: 480,
+                scale_to_fit: this._case.scale_to_fit,
+              }
+        );
       });
 
     const listen_button = (button: HTMLElement, key: InputKey) => {
@@ -259,27 +283,17 @@ export class VirtualConsole {
     this.on_tick.listen(this.key_update_loop);
   }
 
-  private update_scale(force: boolean) {
-    const width = 1312;
-    const ww = window.innerWidth;
-    const wh = window.innerHeight;
-    let zoom = Math.min(1, ww / width);
-    if (zoom === this._scale && !force) {
-      return;
-    }
+  set_case(kase: ConsoleCase) {
+    const old_case = this.case;
+    this._case = kase;
+    this.body.classList.toggle("scale-to-fit", kase.scale_to_fit);
+    this.update_scale(old_case);
+  }
 
-    const x = Math.round(ww - this.body.offsetWidth * zoom) / 2;
-    const y = Math.round(wh - this.body.offsetHeight * zoom) / 2;
-
-    this.body.style.transform = `scale(${zoom})`;
-    this.body.style.transformOrigin = `0 0`;
-    this.body.style.left = `${x}px`;
-    this.body.style.top = `${y}px`;
+  private update_scale(old_case: Case | null) {
+    this.case.transition(old_case, this.root);
     window.scrollTo({ left: 0, top: 0 });
     document.body.scroll({ left: 0, top: 0 });
-
-    this._scale = zoom;
-    this.on_scale_changed.emit(zoom);
   }
 
   async request_fullscreen() {
@@ -392,6 +406,150 @@ export class VirtualConsole {
         e.className = `kate-resource kate-resource-${resource}`;
         this.resources_container.append(e);
       }
+    }
+  }
+}
+
+abstract class Case {
+  static readonly BASE_HEIGHT = 480;
+  static readonly BASE_WIDTH = 800;
+  abstract case_type: ConsoleCase["type"];
+  abstract padding: { horizontal: number; vertical: number };
+
+  constructor(readonly resolution: ConsoleCase["resolution"]) {}
+
+  get screen_scale() {
+    return this.resolution / Case.BASE_HEIGHT;
+  }
+
+  get screen_width() {
+    return Case.BASE_WIDTH * this.screen_scale;
+  }
+
+  get screen_height() {
+    return Case.BASE_HEIGHT * this.screen_scale;
+  }
+
+  get width() {
+    return this.screen_width + this.padding.horizontal;
+  }
+
+  get height() {
+    return this.screen_height + this.padding.vertical;
+  }
+
+  static from_configuration(kase: ConsoleCase) {
+    switch (kase.type) {
+      case "handheld":
+        return new HandheldCase(kase.resolution);
+
+      case "tv":
+        return new TvCase(kase.resolution);
+
+      case "fullscreen":
+        return new FullscreenCase(kase.resolution);
+
+      default:
+        throw unreachable(kase.type, "console case type");
+    }
+  }
+
+  async transition(old: Case | null, root: HTMLElement) {
+    if (old != null) {
+      await old.exit();
+      await this.enter();
+    }
+    this.resize(root);
+  }
+
+  resize(root: HTMLElement) {
+    const width = this.width;
+    const height = this.height;
+    const ww = window.innerWidth;
+    const wh = window.innerHeight;
+    const scale = Math.min(ww / width, wh / height);
+    const screen_scale = this.screen_height / Case.BASE_HEIGHT;
+
+    root.setAttribute("data-case-type", this.case_type);
+    root.setAttribute("data-resolution", String(this.screen_height));
+    root.style.setProperty("--case-scale", String(scale));
+    root.style.setProperty("--case-downscale", String(Math.min(1, scale)));
+    root.style.setProperty("--screen-scale", String(screen_scale));
+    root.style.setProperty("--screen-width", `${this.screen_width}px`);
+    root.style.setProperty("--screen-height", `${this.screen_height}px`);
+
+    if (KateNative != null) {
+      KateNative.resize({ width, height });
+    }
+  }
+
+  async enter() {}
+
+  async exit() {}
+}
+
+class HandheldCase extends Case {
+  readonly case_type = "handheld";
+  readonly screen_bevel = 10;
+  readonly case_padding = 25;
+  readonly side_padding = 250;
+  readonly depth_padding = 10;
+  readonly shoulder_padding = 20;
+
+  get screen_scale() {
+    return Case.BASE_HEIGHT / this.resolution;
+  }
+
+  get padding() {
+    return {
+      horizontal: this.screen_bevel * 2 + this.side_padding * 2,
+      vertical:
+        this.screen_bevel * 2 +
+        this.case_padding * 2 +
+        this.depth_padding +
+        this.shoulder_padding,
+    };
+  }
+}
+
+class TvCase extends Case {
+  readonly case_type = "tv";
+  readonly screen_bevel = 10;
+  readonly case_padding = 32;
+  readonly depth_padding = 10;
+
+  get padding() {
+    return {
+      horizontal: this.screen_bevel * 2 + this.case_padding * 2,
+      vertical:
+        this.screen_bevel * 2 + this.case_padding * 2 + this.depth_padding,
+    };
+  }
+}
+
+class FullscreenCase extends Case {
+  readonly case_type = "fullscreen";
+
+  get padding() {
+    return {
+      horizontal: 0,
+      vertical: 0,
+    };
+  }
+
+  async enter() {
+    if (KateNative == null && document.fullscreenEnabled) {
+      await document.documentElement
+        .requestFullscreen({
+          navigationUI: "hide",
+        })
+        .catch(() => {});
+    }
+  }
+
+  async exit() {
+    if (KateNative == null && document.fullscreenElement != null) {
+      await document.exitFullscreen().catch(() => {});
     }
   }
 }

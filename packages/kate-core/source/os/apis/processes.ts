@@ -29,6 +29,7 @@ export class KateProcesses {
       .cartridge(cart, false)
       .get_local_storage();
     const runtime = this.os.kernel.runtimes.from_cartridge(cart, {
+      console: this.os.kernel.console,
       cart: cart,
       local_storage: storage,
       async read_file(path): Promise<Cart.File> {
@@ -76,6 +77,7 @@ export class KateProcesses {
         .cartridge(cart, false)
         .get_local_storage();
       const runtime = this.os.kernel.runtimes.from_cartridge(cart, {
+        console: this.os.kernel.console,
         cart: cart,
         local_storage: storage,
         read_file: async (path) => {

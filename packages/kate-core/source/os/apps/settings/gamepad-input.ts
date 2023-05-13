@@ -441,7 +441,7 @@ export class RemapStandardSettings extends UI.SimpleScene {
 
   icon = "gamepad";
   title = ["Remap buttons"];
-  subtitle = UI.hbox(8, [
+  subtitle = UI.hbox(0.5, [
     UI.icon("ltrigger"),
     UI.dynamic(this.mode.map<UI.Widgetable>((x) => x.title)),
     UI.icon("rtrigger"),

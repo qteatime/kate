@@ -260,7 +260,7 @@ export class KeyboardInputSettings extends UI.SimpleScene {
       { class: "kate-screen-dialog kate-screen-kbd-dialog" },
       [
         UI.h("div", { class: "kate-screen-dialog-container" }, [
-          UI.hbox(8, [
+          UI.hbox(0.5, [
             UI.h("span", {}, [
               "Press a key in your keyboard to associate with ",
             ]),

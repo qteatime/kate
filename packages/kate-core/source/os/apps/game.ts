@@ -6,7 +6,7 @@ import { Scene } from "../ui/scenes";
 
 export class SceneGame extends Scene {
   constructor(os: KateOS, readonly process: KateProcess) {
-    super(os);
+    super(os, false);
   }
 
   on_attached(): void {

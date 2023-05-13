@@ -7,12 +7,33 @@ declare var Kate: {
   data: typeof data;
 };
 
+type Config = {
+  case_mode?: kernel.ConsoleCase;
+};
+
+(window as any).KateNative = null;
+
+const default_config: Config = {
+  case_mode: {
+    type: "handheld",
+    resolution: 480,
+    scale_to_fit: false,
+  },
+};
+
 async function main() {
   try {
+    const config0 = JSON.parse(
+      document.querySelector("#kate-config")!.textContent!
+    );
+    const config: Config = Object.assign({}, default_config, config0);
+
     const kate = Kate.kernel.KateKernel.from_root(
       document.querySelector(".kate")!,
       {
         mode: "single",
+        persistent_storage: false,
+        case: config.case_mode,
       }
     );
 
@@ -23,7 +44,12 @@ async function main() {
 
     const kate_os = await Kate.os.KateOS.boot(kate, {
       database: `kate/${cart.metadata.id}`,
+      set_case_mode: false,
     });
+
+    if (config.case_mode != null) {
+      kate.console.set_case(config.case_mode);
+    }
 
     await Kate.data.ObjectStorage.transaction(
       kate_os.db,

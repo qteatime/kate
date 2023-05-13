@@ -354,6 +354,8 @@ export function seq2<A, B, C>(a: (_: A) => B, b: (_: B) => C) {
   };
 }
 
+export const map = seq2;
+
 export function seq3<A, B, C, D>(
   a: (_: A) => B,
   b: (_: B) => C,

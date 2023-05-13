@@ -4,6 +4,10 @@ declare var Kate: {
   os: typeof os;
 };
 
+if (!("KateNative" in window)) {
+  (window as any).KateNative = null;
+}
+
 const DEFAULT_CHANNEL =
   location.hostname === "kate.qteati.me" ? "preview" : "latest";
 
@@ -98,6 +102,8 @@ async function main() {
     }
   );
   const kate_os = await Kate.os.KateOS.boot(kate);
+  (window as any).kate = kate;
+  (window as any).kate_os = kate_os;
 }
 
 main();

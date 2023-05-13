@@ -5,6 +5,7 @@ import { translate_html } from "./translate-html";
 import * as Cart from "../cart";
 
 export type RuntimeEnvConfig = {
+  console: VirtualConsole;
   cart: Cart.CartMeta;
   read_file: (path: string) => Promise<Cart.File>;
   local_storage: unknown;

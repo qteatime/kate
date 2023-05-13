@@ -10,12 +10,17 @@ import {
   scroll,
   icon_button,
   stringify,
+  to_node,
 } from "./widget";
 
 export abstract class Scene {
   readonly canvas: HTMLElement;
-  constructor(protected os: KateOS) {
-    this.canvas = h("div", { class: "kate-os-screen" }, []);
+  constructor(protected os: KateOS, upscaled: boolean) {
+    this.canvas = h(
+      "div",
+      { class: `kate-os-screen ${upscaled ? "upscaled" : ""}` },
+      []
+    );
   }
 
   async attach(to: HTMLElement) {
@@ -46,7 +51,7 @@ export abstract class SimpleScene extends Scene {
   abstract icon: string;
   abstract title: Widgetable[];
   subtitle: Widgetable | null = null;
-  abstract body(): Widgetable[];
+  abstract body(): Widgetable[] | Promise<Widgetable[]>;
   readonly actions: Action[] = [
     {
       key: ["x"],
@@ -56,18 +61,39 @@ export abstract class SimpleScene extends Scene {
   ];
   private _previous_traps: FocusInteraction | null = null;
 
+  constructor(os: KateOS) {
+    super(os, true);
+  }
+
   on_return = () => {
     this.os.pop_scene();
   };
 
   render() {
-    return simple_screen({
+    const body = this.body();
+    const body_element = body instanceof Promise ? [h("div", {}, [])] : body;
+    const canvas = simple_screen({
       icon: this.icon,
       title: this.title,
       subtitle: this.subtitle,
-      body: this.body_container(this.body()),
+      body: this.body_container(body_element),
       status: [...this.actions.map((x) => this.render_action(x))],
     });
+
+    if (body instanceof Promise) {
+      const container = body_element[0] as HTMLElement;
+      body.then(
+        (els) => {
+          container.replaceWith(...els.map((x) => to_node(x)));
+        },
+        (error) => {
+          console.error(`(Error rendering screen)`, error);
+          container.replaceWith(`(Error rendering screen)`);
+        }
+      );
+    }
+
+    return canvas;
   }
 
   body_container(body: Widgetable[]) {

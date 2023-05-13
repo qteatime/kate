@@ -74,6 +74,20 @@ function add_preamble(dom: Document, context: RuntimeEnv) {
       `Cannot sandbox HTML: aborting insecure cartridge instantiation`
     );
   }
+
+  const kase = context.console.case;
+  const style = dom.createElement("style");
+  style.textContent = `
+    :root {
+      --kate-screen-scale: ${Math.max(1, kase.screen_scale)};
+      --kate-screen-width: ${kase.screen_width};
+      --kate-screen-width-px: ${kase.screen_width}px;
+      --kate-screen-height: ${kase.screen_height};
+      --kate-screen-height-px: ${kase.screen_height}px;
+    }
+  `;
+  dom.head.appendChild(style);
+
   return script;
 }
 

@@ -223,7 +223,7 @@ A few important parts of this configuration file are:
 
 - `metadata`: This is a section where you can describe different aspects of your game, such as genre, description, release date, etc. You must specify, at the very least, an `author` name, a `title`, and a `thumbnail_path`, which are used to show your cartridge to the player.
 
-  Note that the thumbnail image should be 200x350 pixels. Kate will still scale up or down any other resolution while maintaining that same aspect-ratio, but it might end up not looking great.
+  Note that the thumbnail image should have a 4:7 aspect ratio, with minimum of 200x350 pixels. The recommended size is 400x700 pixels. Kate will still scale up or down any other resolution while maintaining that same aspect-ratio, but scaling upwards might result in blurry images.
 
   Meta-data is used for different things in the emulator, but mostly to allow players to filter cartridges and to display the cartridges in the library (and other screens, like storage settings);
 

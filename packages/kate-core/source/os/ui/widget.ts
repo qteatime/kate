@@ -81,6 +81,17 @@ export function append(child: Widgetable, to: Node) {
   }
 }
 
+export function to_node(x: Widgetable) {
+  let content = x instanceof Widget ? render(x) : x;
+  if (typeof content === "string") {
+    return document.createTextNode(content);
+  } else if (content != null) {
+    return content;
+  } else {
+    return document.createDocumentFragment();
+  }
+}
+
 export class WithClass extends Widget {
   constructor(readonly classes: string[], readonly child: Widget) {
     super();
@@ -105,7 +116,7 @@ export class HBox extends Widget {
   render() {
     return h(
       "div",
-      { class: "kate-ui-hbox", style: `gap: ${this.gap}px` },
+      { class: "kate-ui-hbox", style: `gap: ${this.gap}rem` },
       this.children
     );
   }
@@ -123,7 +134,7 @@ export class VBox extends Widget {
   render() {
     return h(
       "div",
-      { class: "kate-ui-vbox", style: `gap: ${this.gap}px` },
+      { class: "kate-ui-vbox", style: `gap: ${this.gap}rem` },
       this.children
     );
   }
@@ -290,19 +301,23 @@ export function link(
   );
 }
 
+export function image(src: string) {
+  return h("img", { src: src }, []);
+}
+
 export function icon_button(icon: InputKey | InputKey[], text: string) {
   if (typeof icon === "string") {
-    return new Button([new HBox(5, [new Icon(icon), text])]).focus_target(
+    return new Button([new HBox(0.5, [new Icon(icon), text])]).focus_target(
       false
     );
   } else {
     return new Button([
-      new HBox(5, [...icon.map((x) => new Icon(x)), text]),
+      new HBox(0.5, [...icon.map((x) => new Icon(x)), text]),
     ]).focus_target(false);
   }
 }
 
-export function fa_icon_button(name: string, text: string, spacing = 10) {
+export function fa_icon_button(name: string, text: string, spacing = 0.5) {
   return new Button([new HBox(spacing, [fa_icon(name), text])]);
 }
 
@@ -508,13 +523,17 @@ export function toggle_cell(
   x: {
     title: Widgetable;
     description: Widgetable;
-    value: boolean;
+    value: boolean | Observable<boolean>;
     on_label?: Widgetable;
     off_label?: Widgetable;
     on_changed?: (value: boolean) => void;
   }
 ) {
-  let checked = x.value;
+  const checked = Observable.from(x.value);
+  const mutate =
+    typeof x.value === "boolean"
+      ? (v: boolean) => (checked.value = v)
+      : () => {};
   const container = h("div", { class: "kate-ui-toggle-container" }, [
     h("div", { class: "kate-ui-toggle-view" }, [
       h("div", { class: "kate-ui-toggle-bullet" }, []),
@@ -523,7 +542,10 @@ export function toggle_cell(
     h("div", { class: "kate-ui-toggle-label-no" }, [x.off_label ?? "OFF"]),
   ]);
 
-  container.classList.toggle("active", checked);
+  container.classList.toggle("active", checked.value);
+  checked.stream.listen((x) => {
+    container.classList.toggle("active", x);
+  });
 
   return interactive(
     os,
@@ -539,9 +561,9 @@ export function toggle_cell(
         label: "Toggle",
         on_click: true,
         handler: () => {
-          checked = !checked;
-          container.classList.toggle("active", checked);
-          x.on_changed?.(checked);
+          const value = !checked.value;
+          x.on_changed?.(value);
+          mutate(value);
         },
       },
     ]
@@ -597,6 +619,8 @@ export function link_card(
     arrow?: string;
     title: Widgetable;
     description?: Widgetable;
+    value?: Widgetable;
+    click_label?: string;
     on_click?: () => void;
   }
 ) {
@@ -613,11 +637,19 @@ export function link_card(
           x.description ?? null,
         ]),
       ]),
-      h("div", { class: "kate-ui-link-card-arrow" }, [
-        x.arrow != null
-          ? fa_icon(x.arrow, "xl")
-          : fa_icon("chevron-right", "xl"),
-      ]),
+      h("div", { class: "kate-ui-link-card-value" }, [x.value ?? null]),
+      h(
+        "div",
+        {
+          class: "kate-ui-link-card-arrow",
+          "data-value-suffix": x.value != null,
+        },
+        [
+          x.arrow != null
+            ? fa_icon(x.arrow, x.value == null ? "xl" : "1x")
+            : fa_icon("chevron-right", x.value == null ? "xl" : "1x"),
+        ]
+      ),
     ]
   );
   if (x.on_click) {
@@ -627,7 +659,7 @@ export function link_card(
       {
         key: ["o"],
         on_click: true,
-        label: "Ok",
+        label: x.click_label ?? "Ok",
         handler: () => x.on_click?.(),
       },
     ]);
@@ -823,4 +855,34 @@ export function dynamic(x: Observable<Widgetable>) {
   });
 
   return canvas;
+}
+
+export function hchoices(gap: number, choices: Widgetable[]) {
+  return h(
+    "div",
+    { class: "kate-ui-hchoices", style: `gap: ${gap}rem` },
+    choices
+  );
+}
+
+export function choice_button(
+  os: KateOS,
+  content: Widgetable,
+  x?: { selected?: Observable<boolean>; on_select?: () => void }
+) {
+  const element = h("div", { class: "kate-ui-choice-button" }, [content]);
+  element.classList.toggle("active", x?.selected?.value ?? false);
+  x?.selected?.stream.listen((active) => {
+    element.classList.toggle("active", active);
+  });
+  return interactive(os, element, [
+    {
+      key: ["o"],
+      on_click: true,
+      label: "Select",
+      handler: () => {
+        x?.on_select?.();
+      },
+    },
+  ]);
 }

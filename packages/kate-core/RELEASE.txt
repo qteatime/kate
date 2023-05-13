@@ -19,6 +19,36 @@ making sure things like captures and the media gallery store
 and display media in the correct aspect ratio.
 
 
+Case modes
+----------
+
+By default Kate runs in handheld mode, with virtual buttons meant
+for touch-based devices and a 800x480 resolution. This release
+adds a new TV mode and a Full-screen mode, which support a
+resolution of 1200x720. The new modes are meant for running Kate
+in a laptop or with an external display or TV, and taking advantage
+of the additional screen space, similar to how other handhelds can
+increase their resolution when docked.
+
+
+Pointer input support
+---------------------
+
+This release has added an API for basic pointer support, so games
+that use a mouse or a single touch point should be supported in Kate.
+There's still work in the roadmap to support multi-touch games and
+games that use a stylus (e.g.: where stylus pressure and tilt angle
+can affect the behaviour of the game).
+
+
+Functional Ren'Py support
+-------------------------
+
+With this release Kate is functionally compatible with games
+exported in Ren'Py 7.5. There's some work to do in order to
+make Kate also compatible with games exported in Ren'Py 8.
+
+
 Fixed bugs
 ----------
 
@@ -28,3 +58,12 @@ Fixed bugs
   - The network proxy now properly handles cases where more arbitrary
     URLs are given to be loaded, as long as we can still resolve it
     to a valid cartridge file path.
+
+  - Paths are now normalised before Kate attempts to read them from
+    the cartridge. This should result in less surprises for games
+    ported through Bridges.
+
+  - Resources are now properly cached when installing Kate as a
+    web app, meaning you should be able to run the web version of
+    Kate offline if you install it on an iPhone, Android, or
+    Windows 10+.

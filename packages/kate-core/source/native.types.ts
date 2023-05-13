@@ -33,5 +33,8 @@ declare global {
   var KateNative: {
     is_native: boolean;
     get_system_information(): Promise<SystemInfo>;
-  };
+    resize(size: { width: number; height: number }): Promise<void>;
+    is_fullscreen(): Promise<boolean>;
+    screen_resolution(): Promise<480 | 720>;
+  } | null;
 }
