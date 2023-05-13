@@ -84,7 +84,10 @@ export class SceneUISettings extends UI.SimpleScene {
   }
 
   async select_resolution(current: Observable<ConsoleCase>) {
-    const available = [480, 720] as const;
+    const available =
+      current.value.type === "handheld"
+        ? ([480] as const)
+        : ([480, 720] as const);
     const result = await this.os.dialog.pop_menu(
       "kate:settings",
       "Display resolution",
@@ -141,7 +144,11 @@ export class SceneUISettings extends UI.SimpleScene {
       {
         selected: kase.map((k) => k.type === x.mode),
         on_select: () => {
-          this.set_case(kase, { ...kase.value, type: x.mode });
+          this.set_case(kase, {
+            ...kase.value,
+            type: x.mode,
+            resolution: x.mode === "handheld" ? 480 : kase.value.resolution,
+          });
         },
       }
     );

@@ -36,7 +36,7 @@ body {
 }
 
 .kate-body {
-  position: relative;
+  position: absolute;
   background: #faaaaa;
   border-radius: 20px;
   box-shadow: -1px -1px 1px rgb(255 255 255 / 50%), 0px 10px 1px #c99;
