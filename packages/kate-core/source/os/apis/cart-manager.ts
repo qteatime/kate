@@ -5,8 +5,8 @@ import { make_id, make_thumbnail_from_bytes } from "../../utils";
 
 export class CartManager {
   readonly CARTRIDGE_SIZE_LIMIT = 1024 * 1024 * 512; // 512MB
-  readonly THUMBNAIL_WIDTH = 200;
-  readonly THUMBNAIL_HEIGHT = 350;
+  readonly THUMBNAIL_WIDTH = 400;
+  readonly THUMBNAIL_HEIGHT = 700;
 
   constructor(readonly os: KateOS) {}
 
