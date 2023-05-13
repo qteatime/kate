@@ -18,6 +18,8 @@
   justify-content: center;
   align-items: center;
   background: #ececea;
+  transform-origin: 0 0;
+  transform: scale(var(--kate-screen-scale));
 }
 
 .title {
