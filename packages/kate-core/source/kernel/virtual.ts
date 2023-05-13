@@ -453,8 +453,8 @@ abstract class Case {
   async transition(old: Case | null, root: HTMLElement) {
     if (old != null) {
       await old.exit();
+      await this.enter();
     }
-    await this.enter();
     this.resize(root);
   }
 
