@@ -48,41 +48,68 @@ Kate does not accept source contributions currently, since it has not reached a 
 - Tell other people about Kate;
 - Report things that don't work for you, or that you feel are too cumbersome or unsafe;
 
-## Roadmap
+## Roadmap (to Kate stable release)
 
-For the current work, see [the Kate Preview meta-issue](https://github.com/qteatime/kate/issues/1).
+- ~~Running local sandboxed cartridges;~~
+- ~~Keyboard input support;~~
+- ~~Gamepad input support;~~ _(0.23.4)_
+- ~~Screenshot and video capture support;~~
+- ~~Save data support;~~ _(0.23.5)_
+- ~~Pointer input support;~~
+- ~~Higher resolution with external displays;~~
+- **Visualising and managing device storage;** _(<- we're here now)_
+- Digital OSTs and artbooks as cartridges;
+- Decentralised stores (a community-driven form of curation);
+- Arbitrary text input;
+- Game collections and library filtering;
+- Exporting and synchronising data across devices;
+- Auditing action logs in the console;
+- Native app support (Android, ChromeOS, SteamOS, Linux, Windows);
+- Accessibility options (TTS, contrast, sizes, etc);
+- Formal semantics and security proofs;
 
-Planned features:
+### Planned features (post stable release)
 
-- **Game APIs**:
-  - Multi-touch input;
-  - Keyboard and virtual keyboard input for arbitrary text;
+- **APIs**
   - Gyroscope input support;
-  - Haptic feedback/vibration (console and gamepad);
-  - ~~Object store API (flat, tag-based);~~
-  - Object database API (IndexedDB-like);
-  - Improved audio API (graph-based);
-  - Improved screen recording API (audio support);
-  - Networking API (http, p2p);
-  - Badges/achievements API;
-- **KateOS improvements**
-  - ~~Reconfiguring keybindings;~~
-  - ~~Tracking play times locally;~~
-  - Game collections and filtering;
-  - Support for game booklets and OSTs;
-  - "Store" for finding games in connected distributed repositories;
-  - "Audit" for auditing security logs/actions in the console;
-  - Visualising and managing storage usage per cartridge;
-  - Notification preferences;
-  - Custom emulator themes;
-  - Exporting/synchronising save data across devices;
-- **Supporting games not designed for Kate**:
-  - Proxying HTML Audio/Web Audio APIs;
-  - ~~Proxying IndexedDB API;~~
-  - Full support for common game engines through bridges;
-- **Supporting tooling**:
-  - Kate Studio, a fully integrated game maker for Kate games;
-  - Kate SDK, a lower-level set of tools/libraries for building games;
+  - Kate's own virtual keyboard (for devices like the Raspberry Pi);
+  - Multi-touch and stylus input support;
+  - Haptic feedback (device and gamepad vibration);
+  - Badges/Achievements API;
+  - Networking API (HTTP and P2P for online multi-player games);
+  - Audio support in video recording;
+- **OS**
+  - Custom theming support;
+  - OS mods (for cases where changing OS behaviour is desired);
+- **Tooling**
+  - Kate SDK (low-level API for making Kate games);
+  - Kate Studio (game-maker-style app for making 2d VNs/Adventures/RPGs);
+  - Kart as a cartridge (to improve security);
+  - Kate-dist as a cartridge (to improve security);
+  - Native app support for MacOS;
+
+### Game engine support
+
+We aim to support all reasonable web-exports of common game engines. The list below is the ones that are being tested and actively worked on (as the games people make with them fit Kate's general goals).
+
+- ✔️ **Bitsy** (full support as of Kate v23.5);
+- ✔️ **Ren'Py** (full support for Ren'Py web export 7.5 as of Kate v23.6; Ren'Py 8 requires more work);
+- ✔️ **GB Studio** (web emulators work with existing bridges, but no recipe provided yet);
+- ✔️ **Pico-8** (web export works with existing bridges, but no recipe provided yet);
+- ➖ RPG Maker MV (requires minor code changes in the game);
+- ➖ Unity (requires minor code changes in the game);
+- ✖️ Twine (requires changes to Kate's sandboxing);
+- ✖️ Godot (requires changes to Kate's sandboxing);
+- ✖️ Construct 3 (requires changes to Kate's sandboxing);
+- ✖️ TyranoBuilder (requires changes to Kate's sandboxing);
+
+<br>
+
+**Legend**
+
+- ✔️ full support with bridges
+- ➖ partial support/requires code changes
+- ✖️ requires changes to Kate itself
 
 ## Licence
 
