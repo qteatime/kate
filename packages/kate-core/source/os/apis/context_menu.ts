@@ -84,10 +84,10 @@ export class HUD_ContextMenu extends Scene {
               UI.fa_icon_button("circle-info", "Legal notices").on_clicked(
                 this.on_legal_notices
               ),
-              UI.menu_separator(),
               UI.fa_icon_button("images", "Media gallery").on_clicked(
                 this.on_media_gallery
               ),
+              UI.menu_separator(),
               UI.fa_icon_button("cat", "About Kate").on_clicked(
                 this.on_about_kate
               ),
