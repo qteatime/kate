@@ -84,17 +84,16 @@ export class HUD_ContextMenu extends Scene {
               UI.fa_icon_button("circle-info", "Legal notices").on_clicked(
                 this.on_legal_notices
               ),
+              UI.menu_separator(),
               UI.fa_icon_button("images", "Media gallery").on_clicked(
                 this.on_media_gallery
               ),
-              UI.when(emulator.options.mode === "single", [
-                UI.fa_icon_button("cat", "About Kate").on_clicked(
-                  this.on_about_kate
-                ),
-                UI.fa_icon_button("gear", "Settings").on_clicked(
-                  this.on_settings
-                ),
-              ]),
+              UI.fa_icon_button("cat", "About Kate").on_clicked(
+                this.on_about_kate
+              ),
+              UI.fa_icon_button("gear", "Settings").on_clicked(
+                this.on_settings
+              ),
             ]),
             else: new UI.Menu_list([
               UI.when(emulator.options.mode === "native", [
@@ -106,6 +105,15 @@ export class HUD_ContextMenu extends Scene {
               UI.fa_icon_button("download", "Install cartridge").on_clicked(
                 this.on_install_from_file
               ),
+              UI.fa_icon_button("images", "Media gallery").on_clicked(() => {
+                this.on_media_gallery();
+              }),
+              UI.fa_icon_button("cat", "About Kate").on_clicked(() => {
+                this.on_about_kate();
+              }),
+              UI.fa_icon_button("gear", "Settings").on_clicked(() => {
+                this.on_settings();
+              }),
             ]),
           }),
         ]),
@@ -146,12 +154,17 @@ export class HUD_ContextMenu extends Scene {
   };
 
   on_media_gallery = async () => {
-    const process = this.os.processes.running!;
-    const media = new SceneMedia(this.os, {
-      id: process.cart.metadata.id,
-      title: process.cart.metadata.game.title,
-    });
-    this.os.push_scene(media);
+    const process = this.os.processes.running;
+    if (process != null) {
+      const media = new SceneMedia(this.os, {
+        id: process.cart.metadata.id,
+        title: process.cart.metadata.game.title,
+      });
+      this.os.push_scene(media);
+    } else {
+      const media = new SceneMedia(this.os, null);
+      this.os.push_scene(media);
+    }
   };
 
   on_legal_notices = () => {

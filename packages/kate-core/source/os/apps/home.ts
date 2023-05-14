@@ -3,7 +3,6 @@ import * as UI from "../ui/widget";
 import * as Db from "../../data";
 import { unreachable } from "../../utils";
 import { Action, SimpleScene } from "../ui/scenes";
-import { SceneApps } from "./applications";
 import { SceneTextFile } from "./text-file";
 import { HUD_LoadIndicator } from "./load-screen";
 
@@ -12,15 +11,7 @@ export class SceneHome extends SimpleScene {
   title = ["Start"];
   subtitle = "Recently played and favourites";
 
-  readonly actions: Action[] = [
-    {
-      key: ["ltrigger"],
-      label: "Applications",
-      handler: () => {
-        this.os.push_scene(new SceneApps(this.os));
-      },
-    },
-  ];
+  readonly actions: Action[] = [];
 
   private cart_map = new Map<Element, Db.CartMeta>();
 

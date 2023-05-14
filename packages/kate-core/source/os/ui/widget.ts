@@ -886,3 +886,7 @@ export function choice_button(
     },
   ]);
 }
+
+export function menu_separator() {
+  return h("div", { class: "kate-ui-menu-separator" }, []);
+}
