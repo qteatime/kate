@@ -41,7 +41,6 @@
 }
 
 .kate-ui-menu-list > .kate-ui-button {
-  border-bottom: 1px solid var(--color-border);
   padding: 0 16px;
   font-size: 20px;
   height: 48px;
@@ -286,4 +285,10 @@
 
 .kate-ui-choice-button:not(.active) {
   opacity: 0.5;
+}
+
+.kate-ui-menu-separator {
+  margin: 0.5rem 0;
+  height: 1px;
+  background: var(--color-border-d1);
 }

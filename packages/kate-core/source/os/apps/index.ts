@@ -1,5 +1,4 @@
 export * from "./about-kate";
-export * from "./applications";
 export * from "./boot";
 export * from "./game";
 export * from "./home";

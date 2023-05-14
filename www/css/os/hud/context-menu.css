@@ -5,8 +5,8 @@
 .kate-os-hud-context-menu-backdrop {
   position: absolute;
   background: var(--color-backdrop);
-  width: var(--screen-width);
-  height: var(--screen-height);
+  width: var(--base-screen-width);
+  height: var(--base-screen-height);
   backdrop-filter: blur(5px);
 }
 
