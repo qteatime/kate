@@ -41,7 +41,6 @@
 }
 
 .kate-ui-menu-list > .kate-ui-button {
-  border-bottom: 1px solid var(--color-border);
   padding: 0 16px;
   font-size: 20px;
   height: 48px;
