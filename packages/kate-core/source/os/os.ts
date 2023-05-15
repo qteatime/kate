@@ -21,6 +21,7 @@ import { KateCapture } from "./apis/capture";
 import { KateSfx } from "./sfx";
 import { KateSettings } from "./apis/settings";
 import { InputKey } from "../kernel";
+import { KateStorageManager } from "./apis/storage-manager";
 
 export class KateOS {
   private _scene_stack: Scene[] = [];
@@ -37,6 +38,7 @@ export class KateOS {
   readonly ipc: KateIPCServer;
   readonly dialog: KateDialog;
   readonly capture: KateCapture;
+  readonly storage_manager: KateStorageManager;
   readonly events = {
     on_cart_inserted: new EventStream<Cart.CartMeta>(),
     on_cart_removed: new EventStream<{ id: string; title: string }>(),
@@ -66,6 +68,7 @@ export class KateOS {
     this.dialog = new KateDialog(this);
     this.dialog.setup();
     this.capture = new KateCapture(this);
+    this.storage_manager = new KateStorageManager(this);
   }
 
   get display() {

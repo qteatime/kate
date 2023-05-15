@@ -11,6 +11,7 @@ import {
   icon_button,
   stringify,
   to_node,
+  fa_icon,
 } from "./widget";
 
 export abstract class Scene {
@@ -71,7 +72,15 @@ export abstract class SimpleScene extends Scene {
 
   render() {
     const body = this.body();
-    const body_element = body instanceof Promise ? [h("div", {}, [])] : body;
+    const body_element =
+      body instanceof Promise
+        ? [
+            h("div", { class: "kate-ui-screen-loading-indicator" }, [
+              fa_icon("circle-notch", "2x", "solid", "spin"),
+              "Loading...",
+            ]),
+          ]
+        : body;
     const canvas = simple_screen({
       icon: this.icon,
       title: this.title,

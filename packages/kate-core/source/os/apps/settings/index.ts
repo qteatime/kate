@@ -2,6 +2,7 @@ import * as UI from "../../ui";
 import { SceneInputSettings } from "./input";
 import { ScenePlayHabitsSettings } from "./play-habits";
 import { SceneRecovery } from "./recovery";
+import { SceneStorageSettings } from "./storage";
 import { SceneUISettings } from "./ui";
 
 export class SceneSettings extends UI.SimpleScene {
@@ -47,6 +48,15 @@ export class SceneSettings extends UI.SimpleScene {
         description: "Troubleshoot and reset parts of the console",
         on_click: () => {
           this.os.push_scene(new SceneRecovery(this.os));
+        },
+      }),
+
+      UI.link_card(this.os, {
+        icon: "hard-drive",
+        title: "Storage",
+        description: "Visualise and manage storage usage",
+        on_click: () => {
+          this.os.push_scene(new SceneStorageSettings(this.os));
         },
       }),
     ];

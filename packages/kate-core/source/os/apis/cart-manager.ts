@@ -194,6 +194,7 @@ export class CartManager {
           files: nodes,
           installed_at: old_meta?.installed_at ?? now,
           updated_at: now,
+          status: "active",
         });
         const play_habits = (await habits.try_get(cart.metadata.id)) ?? {
           id: cart.metadata.id,
@@ -215,6 +216,37 @@ export class CartManager {
     );
     this.os.events.on_cart_inserted.emit(cart);
     return true;
+  }
+
+  // Usage estimation
+  async usage_estimates() {
+    const cartridges = await this.list();
+    const result = new Map<
+      string,
+      {
+        status: Db.CartridgeStatus;
+        thumbnail_url: string;
+        meta: Cart.CartMeta;
+        version: string;
+        size: number;
+      }[]
+    >();
+    for (const cart of cartridges) {
+      const previous = result.get(cart.meta.id) ?? [];
+      const size = cart.meta.files.reduce(
+        (total, file) => total + file.size,
+        0
+      );
+      previous.push({
+        meta: cart.meta,
+        version: cart.meta.metadata.version_id,
+        status: cart.meta.status,
+        thumbnail_url: cart.meta.thumbnail_dataurl,
+        size: size,
+      });
+      result.set(cart.meta.id, previous);
+    }
+    return result;
   }
 
   // -- Playing habits

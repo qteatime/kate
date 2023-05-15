@@ -155,6 +155,25 @@ export class KateCapture {
     );
   }
 
+  async usage_estimates() {
+    return await this.os.db.transaction(
+      [Db.media_store],
+      "readonly",
+      async (t) => {
+        const store = t.get_index1(Db.idx_media_store_by_cart);
+        const result = new Map<string, { size: number; count: number }>();
+        for (const entry of await store.get_all()) {
+          const previous = result.get(entry.cart_id) ?? { size: 0, count: 0 };
+          result.set(entry.cart_id, {
+            size: previous.size + entry.size,
+            count: previous.count + 1,
+          });
+        }
+        return result;
+      }
+    );
+  }
+
   private async make_thumbnail(
     data: Uint8Array,
     type: string,

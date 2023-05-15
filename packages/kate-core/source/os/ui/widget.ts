@@ -890,3 +890,61 @@ export function choice_button(
 export function menu_separator() {
   return h("div", { class: "kate-ui-menu-separator" }, []);
 }
+
+export function section(x: { title: Widgetable; contents: Widgetable[] }) {
+  return h("div", { class: "kate-ui-section" }, [
+    h("h3", { class: "kate-ui-section-heading" }, [x.title]),
+    h("div", { class: "kate-ui-section-contents" }, x.contents),
+  ]);
+}
+
+export function stack_bar(x: {
+  total: number;
+  minimum_component_size?: number;
+  free?: { title: string; display_value: string };
+  components: { title: string; value: number; display_value: string }[];
+}) {
+  const colours = ["#f00", "#ff0", "#0f0", "#00f", "#f0f"];
+  return h("div", { class: "kate-ui-stack-bar-container stack-horizontal" }, [
+    h("div", { class: "kate-ui-stack-bar" }, [
+      ...x.components.map((a, i) =>
+        h(
+          "div",
+          {
+            class: "kate-ui-stack-bar-component",
+            style: `--stack-bar-color: ${
+              colours[i % colours.length]
+            }; --stack-bar-size: ${Math.max(
+              x.minimum_component_size ?? 0,
+              a.value / x.total
+            )};`,
+            title: a.title,
+          },
+          []
+        )
+      ),
+    ]),
+    h("div", { class: "kate-ui-stack-bar-legend" }, [
+      ...x.components.map((a, i) =>
+        h(
+          "div",
+          {
+            class: "kate-ui-stack-bar-legend-item",
+            style: `--stack-bar-color: ${colours[i % colours.length]};`,
+          },
+          [`${a.title} (${a.display_value})`]
+        )
+      ),
+      x.free
+        ? h(
+            "div",
+            {
+              class: "kate-ui-stack-bar-legend-item",
+              style: `--stack-bar-color: var(--color-border-d1)`,
+            },
+            [`${x.free.title} (${x.free.display_value})`]
+          )
+        : null,
+    ]),
+  ]);
+}

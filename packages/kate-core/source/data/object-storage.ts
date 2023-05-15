@@ -117,6 +117,14 @@ export const cartridge_quota = kate.table2<
   auto_increment: false,
 });
 
+export const idx_os_quota_by_cartridge = cartridge_quota.index1({
+  since: 10,
+  name: "by_cartridge",
+  path: ["cartridge_id"],
+  multi_entry: false,
+  unique: false,
+});
+
 // -- Errors -------------------------------------------------------------------
 export class EQuotaExceeded extends Error {
   constructor(

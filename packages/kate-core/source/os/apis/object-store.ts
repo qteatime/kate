@@ -22,6 +22,23 @@ export class KateObjectStore {
       versioned ? cart.metadata.version_id : "<unversioned>"
     );
   }
+
+  async usage_estimates() {
+    return this.os.db.transaction(
+      [Db.cartridge_quota],
+      "readonly",
+      async (t) => {
+        const quota = t.get_index1(Db.idx_os_quota_by_cartridge);
+        const result = new Map<string, Db.CartridgeQuota[]>();
+        for (const entry of await quota.get_all()) {
+          const versions = result.get(entry.cartridge_id) ?? [];
+          versions.push(entry);
+          result.set(entry.cartridge_id, versions);
+        }
+        return result;
+      }
+    );
+  }
 }
 
 export class CartridgeObjectStore {

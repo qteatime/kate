@@ -2,6 +2,8 @@ import * as CartMetadata from "../cart/v3/metadata";
 import * as CartRuntime from "../cart/v3/runtime";
 import { kate } from "./db";
 
+export type CartridgeStatus = "active" | "inactive" | "archived";
+
 export type CartMeta = {
   id: string;
   thumbnail_dataurl: string;
@@ -10,6 +12,7 @@ export type CartMeta = {
   files: { path: string; id: string; size: number }[];
   installed_at: Date;
   updated_at: Date;
+  status: CartridgeStatus;
 };
 export const cart_meta = kate.table1<CartMeta, "id">({
   since: 3,

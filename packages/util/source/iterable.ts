@@ -5,3 +5,15 @@ export function* enumerate<A>(xs: Iterable<A>) {
     index += 1;
   }
 }
+
+export function foldl<A, B>(
+  xs: Iterable<A>,
+  z: B,
+  f: (acc: B, value: A) => B
+): B {
+  let result = z;
+  for (const x of xs) {
+    result = f(result, x);
+  }
+  return result;
+}
