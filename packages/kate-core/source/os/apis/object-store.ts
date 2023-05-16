@@ -12,6 +12,7 @@ export class KateObjectStore {
   };
   static readonly SPECIAL_BUCKET_KEY = "kate:special";
   static readonly LOCAL_STORAGE_KEY = "kate:local-storage";
+  static readonly UNVERSIONED_KEY = "<unversioned>";
 
   constructor(readonly os: KateOS) {}
 
@@ -19,7 +20,7 @@ export class KateObjectStore {
     return new CartridgeObjectStore(
       this,
       cart.metadata.id,
-      versioned ? cart.metadata.version_id : "<unversioned>"
+      versioned ? cart.metadata.version_id : KateObjectStore.UNVERSIONED_KEY
     );
   }
 

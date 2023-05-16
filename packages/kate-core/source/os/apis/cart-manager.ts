@@ -225,26 +225,26 @@ export class CartManager {
       string,
       {
         status: Db.CartridgeStatus;
+        habits: Db.PlayHabits;
         thumbnail_url: string;
-        meta: Cart.CartMeta;
-        version: string;
+        meta: Db.CartMeta;
+        version_id: string;
         size: number;
-      }[]
+      }
     >();
     for (const cart of cartridges) {
-      const previous = result.get(cart.meta.id) ?? [];
       const size = cart.meta.files.reduce(
         (total, file) => total + file.size,
         0
       );
-      previous.push({
+      result.set(cart.meta.id, {
         meta: cart.meta,
-        version: cart.meta.metadata.version_id,
+        habits: cart.habits,
+        version_id: cart.meta.metadata.version_id,
         status: cart.meta.status,
         thumbnail_url: cart.meta.thumbnail_dataurl,
         size: size,
       });
-      result.set(cart.meta.id, previous);
     }
     return result;
   }

@@ -358,6 +358,22 @@ export function text_button(
   );
 }
 
+export function text(x: Widgetable[]) {
+  return h("div", { class: "kate-ui-text" }, x);
+}
+
+export function meta_text(x: Widgetable[]) {
+  return h("div", { class: "kate-ui-meta-text" }, x);
+}
+
+export function mono_text(x: Widgetable[]) {
+  return h("div", { class: "kate-ui-mono-text" }, x);
+}
+
+export function strong(x: Widgetable[]) {
+  return h("strong", {}, x);
+}
+
 export class Icon extends Widget {
   constructor(readonly type: InputKey) {
     super();
@@ -615,7 +631,7 @@ export function legible_bg(children: Widgetable[]) {
 export function link_card(
   os: KateOS,
   x: {
-    icon?: string;
+    icon?: string | Widgetable;
     arrow?: string;
     title: Widgetable;
     description?: Widgetable;
@@ -629,7 +645,11 @@ export function link_card(
     { class: "kate-ui-link-card kate-ui-focus-target" },
     [
       h("div", { class: "kate-ui-link-card-icon" }, [
-        x.icon ? fa_icon(x.icon, "2x") : null,
+        x.icon == null
+          ? null
+          : typeof x.icon === "string"
+          ? fa_icon(x.icon, "2x")
+          : x.icon,
       ]),
       h("div", { class: "kate-ui-link-card-text" }, [
         h("div", { class: "kate-ui-link-card-title" }, [x.title]),
@@ -905,9 +925,10 @@ export function stack_bar(x: {
   components: { title: string; value: number; display_value: string }[];
 }) {
   const colours = ["#f00", "#ff0", "#0f0", "#00f", "#f0f"];
+  const components = x.components.filter((x) => x.value > 0);
   return h("div", { class: "kate-ui-stack-bar-container stack-horizontal" }, [
     h("div", { class: "kate-ui-stack-bar" }, [
-      ...x.components.map((a, i) =>
+      ...components.map((a, i) =>
         h(
           "div",
           {
@@ -925,7 +946,7 @@ export function stack_bar(x: {
       ),
     ]),
     h("div", { class: "kate-ui-stack-bar-legend" }, [
-      ...x.components.map((a, i) =>
+      ...components.map((a, i) =>
         h(
           "div",
           {

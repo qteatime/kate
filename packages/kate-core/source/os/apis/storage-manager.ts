@@ -1,31 +1,40 @@
 import { foldl } from "../../utils";
 import * as Db from "../../data";
 import type { KateOS } from "../os";
+import { KateObjectStore } from "./object-store";
 
-type ApplicationVersion = {
-  version_id: string | null;
-  cartridge_in_bytes: number;
-  usage: {
-    data_in_bytes: number;
-    buckets: number;
-    entries: number;
-  };
-  quota: {
-    data_in_bytes: number;
-    buckets: number;
-    entries: number;
-  };
-};
-
-type Application = {
+export type AppStorageDetails = {
   id: string;
   title: string;
   icon_url: string;
-  media_usage: {
-    size_in_bytes: number;
-    count: number;
+  version_id: string;
+  status: Db.CartridgeStatus;
+  dates: {
+    last_used: Date | null;
+    play_time: number | null;
+    installed: Date;
+    last_modified: Date;
   };
-  versions: ApplicationVersion[];
+  usage: {
+    cartridge_size_in_bytes: number;
+    media: {
+      size_in_bytes: number;
+      count: number;
+    };
+    data: {
+      size_in_bytes: number;
+      buckets: number;
+      entries: number;
+    };
+    total_in_bytes: number;
+  };
+  quota: {
+    data: {
+      size_in_bytes: number;
+      buckets: number;
+      entries: number;
+    };
+  };
 };
 
 export class KateStorageManager {
@@ -67,60 +76,78 @@ export class KateStorageManager {
     const applications_usage = foldl(
       applications.values(),
       0,
-      (total, versions) =>
-        total + versions.reduce((x, version) => x + version.size, 0)
+      (total, app) => total + app.size
     );
 
     const totals = {
       quota: device.quota ?? device.usage,
-      system:
-        device.usage - (media_usage + save_data_usage + applications_usage),
       media: media_usage,
       save_data: save_data_usage,
       applications: applications_usage,
+      used: device.usage,
+      get system() {
+        return device.usage - this.user;
+      },
+      get user() {
+        return this.media + this.save_data + this.applications;
+      },
     };
 
-    const cartridges = new Map<string, Application>();
-    for (const [id, app_versions] of applications.entries()) {
+    const cartridges = new Map<string, AppStorageDetails>();
+    for (const [id, app] of applications.entries()) {
       const media_usage = media.get(id) ?? { count: 0, size: 0 };
       const save_data_usage = save_data.get(id) ?? [];
       const save_versions = new Map<string, Db.CartridgeQuota>(
         save_data_usage.map((x) => [x.version_id, x])
       );
-      const current_version: (typeof app_versions)[0] | null =
-        app_versions.find((x) => x.status === "active") ??
-        app_versions[0] ??
-        null;
-
-      const versions = new Map<string, ApplicationVersion>();
-      for (const version of app_versions) {
-        const save_data_version = save_versions.get(version.version) ?? null;
-
-        versions.set(version.version, {
-          version_id: version.version,
-          cartridge_in_bytes: version.size,
-          usage: {
-            data_in_bytes: save_data_version?.current_size_in_bytes ?? 0,
-            buckets: save_data_version?.current_buckets_in_storage ?? 0,
-            entries: save_data_version?.current_items_in_storage ?? 0,
-          },
-          quota: {
-            data_in_bytes: save_data_version?.maximum_size_in_bytes ?? 0,
-            buckets: save_data_version?.maximum_buckets_in_storage ?? 0,
-            entries: save_data_version?.maximum_items_in_storage ?? 0,
-          },
-        });
-      }
+      const unversioned =
+        save_versions.get(KateObjectStore.UNVERSIONED_KEY) ?? null;
+      const versioned = save_versions.get(app.version_id) ?? null;
 
       cartridges.set(id, {
         id: id,
-        icon_url: current_version?.thumbnail_url ?? null,
-        media_usage: {
-          size_in_bytes: media_usage.size,
-          count: media_usage.count,
+        title: app.meta.metadata.game.title,
+        icon_url: app.thumbnail_url,
+        version_id: app.version_id,
+        status: app.status,
+        dates: {
+          last_used: app.habits.last_played ?? null,
+          play_time: app.habits.play_time ?? null,
+          installed: app.meta.installed_at,
+          last_modified: app.meta.updated_at,
         },
-        title: current_version?.meta.metadata.game.title ?? id,
-        versions: [...versions.values()],
+        usage: {
+          cartridge_size_in_bytes: app.size,
+          media: {
+            size_in_bytes: media_usage.size,
+            count: media_usage.count,
+          },
+          data: {
+            size_in_bytes:
+              (versioned?.current_size_in_bytes ?? 0) +
+              (unversioned?.current_size_in_bytes ?? 0),
+            buckets:
+              (versioned?.current_buckets_in_storage ?? 0) +
+              (unversioned?.current_buckets_in_storage ?? 0),
+            entries:
+              (versioned?.current_items_in_storage ?? 0) +
+              (unversioned?.current_items_in_storage ?? 0),
+          },
+          get total_in_bytes(): number {
+            return (
+              this.cartridge_size_in_bytes +
+              this.media.size_in_bytes +
+              this.data.size_in_bytes
+            );
+          },
+        },
+        quota: {
+          data: {
+            size_in_bytes: versioned?.maximum_size_in_bytes ?? 0,
+            buckets: versioned?.maximum_buckets_in_storage ?? 0,
+            entries: versioned?.maximum_items_in_storage ?? 0,
+          },
+        },
       });
     }
 
