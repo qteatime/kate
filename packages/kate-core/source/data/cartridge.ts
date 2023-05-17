@@ -1,5 +1,6 @@
 import * as CartMetadata from "../cart/v3/metadata";
 import * as CartRuntime from "../cart/v3/runtime";
+import type { Database, Transaction } from "../db-schema";
 import { kate } from "./db";
 
 export type CartridgeStatus = "active" | "inactive" | "archived";
@@ -33,3 +34,40 @@ export const cart_files = kate.table2<CartFile, "id", "file_id">({
   path: ["id", "file_id"],
   auto_increment: false,
 });
+
+export class CartStore {
+  constructor(readonly transaction: Transaction) {}
+
+  static transaction<A>(
+    db: Database,
+    mode: IDBTransactionMode,
+    fn: (store: CartStore) => Promise<A>
+  ) {
+    return db.transaction(CartStore.tables, mode, async (txn) => {
+      return await fn(new CartStore(txn));
+    });
+  }
+
+  static tables = [cart_meta, cart_files];
+
+  get meta() {
+    return this.transaction.get_table1(cart_meta);
+  }
+
+  get files() {
+    return this.transaction.get_table2(cart_files);
+  }
+
+  async archive(cart_id: string) {
+    const meta = await this.meta.get(cart_id);
+    for (const file of meta.files) {
+      await this.files.delete([cart_id, file.id]);
+    }
+    await this.meta.put({
+      ...meta,
+      files: [],
+      updated_at: new Date(),
+      status: "archived",
+    });
+  }
+}

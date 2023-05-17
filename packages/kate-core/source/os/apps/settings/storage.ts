@@ -8,10 +8,32 @@ import {
 import type { AppStorageDetails } from "../../apis/storage-manager";
 import type { KateOS } from "../../os";
 import * as UI from "../../ui";
+import { SceneMedia } from "../media";
 
 export class SceneStorageSettings extends UI.SimpleScene {
   icon = "hard-drive";
   title = ["Storage"];
+
+  on_attached(): void {
+    super.on_attached();
+    this.os.events.on_cart_archived.listen(this.reload);
+    this.os.events.on_cart_inserted.listen(this.reload);
+    this.os.events.on_cart_removed.listen(this.reload);
+  }
+
+  on_detached(): void {
+    this.os.events.on_cart_archived.remove(this.reload);
+    this.os.events.on_cart_inserted.remove(this.reload);
+    this.os.events.on_cart_removed.remove(this.reload);
+    super.on_detached();
+  }
+
+  reload = async () => {
+    const body = await this.body();
+    const container = this.canvas.querySelector(".kate-os-screen-body")!;
+    container.textContent = "";
+    container.append(UI.fragment(body));
+  };
 
   async body() {
     const estimates = await this.os.storage_manager.estimate();
@@ -72,13 +94,167 @@ export class SceneStorageSettings extends UI.SimpleScene {
         x.dates.last_used
       )} | Last updated: ${relative_date(x.dates.last_modified)}`,
       on_click: () => {
-        this.os.push_scene(new SceneCartridgeStorage(this.os, x));
+        this.os.push_scene(new SceneCartridgeStorageSettings(this.os, x));
       },
     });
   }
 }
 
-export class SceneCartridgeStorage extends UI.SimpleScene {
+export class SceneCartridgeStorageSettings extends UI.SimpleScene {
+  icon = "hard-drive";
+  get title() {
+    return [this.app.title];
+  }
+
+  on_attached(): void {
+    super.on_attached();
+    this.os.events.on_cart_archived.listen(this.reload);
+    this.os.events.on_cart_inserted.listen(this.reload);
+    this.os.events.on_cart_removed.listen(this.reload);
+  }
+
+  on_detached(): void {
+    this.os.events.on_cart_archived.remove(this.reload);
+    this.os.events.on_cart_inserted.remove(this.reload);
+    this.os.events.on_cart_removed.remove(this.reload);
+    super.on_detached();
+  }
+
+  reload = async () => {
+    const estimates = await this.os.storage_manager.estimate();
+    const app = estimates.cartridges.get(this.app.id);
+    let body: UI.Widgetable[];
+    if (app != null) {
+      this.app = app;
+      body = this.body();
+    } else {
+      this.app = { ...this.app, status: "inactive" };
+      body = [cartridge_summary(this.app, "deleted")];
+    }
+    const container = this.canvas.querySelector(".kate-os-screen-body")!;
+    container.textContent = "";
+    container.append(UI.fragment(body));
+  };
+
+  constructor(os: KateOS, private app: AppStorageDetails) {
+    super(os);
+  }
+
+  body() {
+    return [
+      cartridge_summary(this.app),
+      UI.vspace(16),
+      UI.focusable_container([this.storage_summary()]),
+      UI.vspace(16),
+      UI.link_card(this.os, {
+        icon: "images",
+        title: "Manage videos and screenshots",
+        description: `${this.app.usage.media.count} files (${from_bytes(
+          this.app.usage.media.size_in_bytes
+        )})`,
+        click_label: "Manage",
+        on_click: () => {
+          this.os.push_scene(
+            new SceneMedia(this.os, { id: this.app.id, title: this.app.title })
+          );
+        },
+      }),
+      UI.link_card(this.os, {
+        icon: "hard-drive",
+        title: "Manage save data",
+        description: `${from_bytes(
+          this.app.usage.data.size_in_bytes +
+            this.app.usage.shared_data.size_in_bytes
+        )}`,
+        click_label: "Manage",
+        on_click: () => {
+          this.os.push_scene(
+            new SceneCartridgeSaveDataSettings(this.os, this.app)
+          );
+        },
+      }),
+      UI.vspace(32),
+      this.data_actions(),
+    ];
+  }
+
+  data_actions() {
+    return UI.section({
+      title: "Actions",
+      contents: [
+        UI.meta_text([
+          "Here you can remove the cartridge files to free up space. ",
+          "If you want to delete only save data, or only captured media, ",
+          "you can do it from one of the screens above.",
+        ]),
+        UI.when(this.app.status === "active", [
+          UI.vspace(16),
+          UI.button_panel(this.os, {
+            title: "Archive cartridge",
+            description: `Cartridge files will be deleted, save data and media will be kept. Reinstalling the cartridge will bring it back to the current state`,
+            dangerous: true,
+            on_click: () => this.archive_cartridge(),
+          }),
+        ]),
+        UI.when(this.app.status !== "inactive", [
+          UI.vspace(16),
+          UI.button_panel(this.os, {
+            title: "Delete all data",
+            description: `Cartridge files and save data will be deleted, media will be kept. Reinstalling will not restore the save data.`,
+            dangerous: true,
+            on_click: () => this.delete_all_data(),
+          }),
+        ]),
+      ],
+    });
+  }
+
+  async archive_cartridge() {
+    const ok = await this.os.dialog.confirm("kate:settings", {
+      title: `Archive ${this.app.title}?`,
+      message: `This will delete all cartridge files for it, and hide the
+                cartridge from the Start screen. Save data and media
+                will be kept, and you can re-install the cartridge
+                later to play it again.`,
+      dangerous: true,
+      cancel: "Cancel",
+      ok: "Archive cartridge",
+    });
+    if (ok) {
+      await this.os.cart_manager.archive(this.app.id);
+      await this.os.notifications.push(
+        "kate:settings",
+        "Archived cartridge",
+        `Archived ${this.app.id} v${this.app.version_id}`
+      );
+    }
+  }
+
+  async delete_all_data() {}
+
+  storage_summary() {
+    return UI.section({
+      title: `Storage summary (${from_bytes(this.app.usage.total_in_bytes)})`,
+      contents: [
+        UI.stack_bar({
+          total: this.app.usage.total_in_bytes,
+          minimum_component_size: 0.01,
+          components: [
+            component("Cartridge", this.app.usage.cartridge_size_in_bytes),
+            component(
+              "Saves",
+              this.app.usage.data.size_in_bytes +
+                this.app.usage.shared_data.size_in_bytes
+            ),
+            component("Media", this.app.usage.media.size_in_bytes),
+          ],
+        }),
+      ],
+    });
+  }
+}
+
+class SceneCartridgeSaveDataSettings extends UI.SimpleScene {
   icon = "hard-drive";
   get title() {
     return [this.app.title];
@@ -89,35 +265,77 @@ export class SceneCartridgeStorage extends UI.SimpleScene {
   }
 
   body() {
-    return [this.cartridge_summary(), UI.vspace(16), this.storage_summary()];
+    return [
+      cartridge_summary(this.app),
+      UI.vspace(16),
+      this.save_data_summary(),
+      UI.vspace(32),
+      UI.button_panel(this.os, {
+        title: "Delete all save data",
+        description:
+          "The cartridge will work as a freshly installed one after this.",
+        on_click: this.delete_save_data,
+        dangerous: true,
+      }),
+    ];
   }
 
-  cartridge_summary() {
-    return UI.hbox(0.5, [
-      UI.mono_text([this.app.id]),
-      UI.meta_text(["|"]),
-      UI.mono_text([`v${this.app.version_id}`]),
-      UI.meta_text(["|"]),
-      UI.mono_text([`${this.app.status}`]),
-    ]);
-  }
-
-  storage_summary() {
+  save_data_summary() {
     return UI.section({
-      title: `Storage summary (${from_bytes(this.app.usage.total_in_bytes)})`,
+      title: `Summary`,
       contents: [
-        UI.stack_bar({
-          total: this.app.usage.total_in_bytes,
-          minimum_component_size: 0.01,
-          components: [
-            component("Cartridges", this.app.usage.cartridge_size_in_bytes),
-            component("Saves", this.app.usage.data.size_in_bytes),
-            component("Media", this.app.usage.media.size_in_bytes),
-          ],
-        }),
+        UI.focusable_container([
+          UI.strong([`Specific to this version (${this.app.version_id})`]),
+          UI.vspace(4),
+          UI.stack_bar({
+            total: this.app.quota.data.size_in_bytes,
+            skip_zero_value: false,
+            free: {
+              title: "Free",
+              display_value: from_bytes(
+                this.app.quota.data.size_in_bytes -
+                  this.app.usage.data.size_in_bytes
+              ),
+            },
+            components: [
+              component("In use", this.app.usage.data.size_in_bytes),
+            ],
+          }),
+        ]),
+        UI.vspace(16),
+        UI.focusable_container([
+          UI.strong(["Shared by all versions"]),
+          UI.vspace(4),
+          UI.stack_bar({
+            total: this.app.quota.shared_data.size_in_bytes,
+            skip_zero_value: false,
+            free: {
+              title: "Free",
+              display_value: from_bytes(
+                this.app.quota.shared_data.size_in_bytes -
+                  this.app.usage.shared_data.size_in_bytes
+              ),
+            },
+            components: [
+              component("In use", this.app.usage.shared_data.size_in_bytes),
+            ],
+          }),
+        ]),
       ],
     });
   }
+
+  async delete_save_data() {}
+}
+
+function cartridge_summary(app: AppStorageDetails, override_status?: string) {
+  return UI.hbox(0.5, [
+    UI.mono_text([app.id]),
+    UI.meta_text(["|"]),
+    UI.mono_text([`v${app.version_id}`]),
+    UI.meta_text(["|"]),
+    UI.mono_text([`${override_status ?? app.status}`]),
+  ]);
 }
 
 function component(title: string, bytes: number) {

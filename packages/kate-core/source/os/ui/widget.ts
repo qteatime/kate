@@ -171,7 +171,10 @@ export class Title_bar extends Widget {
 }
 
 export class Space extends Widget {
-  constructor(readonly x: { width?: number; height?: number }) {
+  constructor(
+    readonly x: { width?: number; height?: number },
+    readonly display: string
+  ) {
     super();
   }
 
@@ -180,7 +183,9 @@ export class Space extends Widget {
       "div",
       {
         class: "kate-ui-space",
-        style: `width: ${this.x.width ?? 0}px; height: ${this.x.height ?? 0}px`,
+        style: `width: ${this.x.width ?? 0}px; height: ${
+          this.x.height ?? 0
+        }px; display: ${this.display}`,
       },
       []
     );
@@ -756,11 +761,11 @@ export function button(
 }
 
 export function vspace(x: number) {
-  return new Space({ height: x });
+  return new Space({ height: x }, "block");
 }
 
 export function hspace(x: number) {
-  return new Space({ width: x });
+  return new Space({ width: x }, "inline-block");
 }
 
 export function vdivider() {
@@ -923,9 +928,13 @@ export function stack_bar(x: {
   minimum_component_size?: number;
   free?: { title: string; display_value: string };
   components: { title: string; value: number; display_value: string }[];
+  skip_zero_value?: boolean;
 }) {
   const colours = ["#f00", "#ff0", "#0f0", "#00f", "#f0f"];
-  const components = x.components.filter((x) => x.value > 0);
+  const skip_zero = x.skip_zero_value !== false;
+  const components = x.components.filter((x) =>
+    skip_zero ? x.value > 0 : true
+  );
   return h("div", { class: "kate-ui-stack-bar-container stack-horizontal" }, [
     h("div", { class: "kate-ui-stack-bar" }, [
       ...components.map((a, i) =>

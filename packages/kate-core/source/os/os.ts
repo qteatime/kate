@@ -42,6 +42,7 @@ export class KateOS {
   readonly events = {
     on_cart_inserted: new EventStream<Cart.CartMeta>(),
     on_cart_removed: new EventStream<{ id: string; title: string }>(),
+    on_cart_archived: new EventStream<string>(),
   };
 
   private constructor(

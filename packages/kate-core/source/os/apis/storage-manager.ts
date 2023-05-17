@@ -26,10 +26,20 @@ export type AppStorageDetails = {
       buckets: number;
       entries: number;
     };
+    shared_data: {
+      size_in_bytes: number;
+      buckets: number;
+      entries: number;
+    };
     total_in_bytes: number;
   };
   quota: {
     data: {
+      size_in_bytes: number;
+      buckets: number;
+      entries: number;
+    };
+    shared_data: {
       size_in_bytes: number;
       buckets: number;
       entries: number;
@@ -123,21 +133,21 @@ export class KateStorageManager {
             count: media_usage.count,
           },
           data: {
-            size_in_bytes:
-              (versioned?.current_size_in_bytes ?? 0) +
-              (unversioned?.current_size_in_bytes ?? 0),
-            buckets:
-              (versioned?.current_buckets_in_storage ?? 0) +
-              (unversioned?.current_buckets_in_storage ?? 0),
-            entries:
-              (versioned?.current_items_in_storage ?? 0) +
-              (unversioned?.current_items_in_storage ?? 0),
+            size_in_bytes: versioned?.current_size_in_bytes ?? 0,
+            buckets: versioned?.current_buckets_in_storage ?? 0,
+            entries: versioned?.current_items_in_storage ?? 0,
+          },
+          shared_data: {
+            size_in_bytes: unversioned?.current_size_in_bytes ?? 0,
+            buckets: unversioned?.current_buckets_in_storage ?? 0,
+            entries: unversioned?.current_items_in_storage ?? 0,
           },
           get total_in_bytes(): number {
             return (
               this.cartridge_size_in_bytes +
               this.media.size_in_bytes +
-              this.data.size_in_bytes
+              this.data.size_in_bytes +
+              this.shared_data.size_in_bytes
             );
           },
         },
@@ -146,6 +156,11 @@ export class KateStorageManager {
             size_in_bytes: versioned?.maximum_size_in_bytes ?? 0,
             buckets: versioned?.maximum_buckets_in_storage ?? 0,
             entries: versioned?.maximum_items_in_storage ?? 0,
+          },
+          shared_data: {
+            size_in_bytes: unversioned?.maximum_size_in_bytes ?? 0,
+            buckets: unversioned?.maximum_buckets_in_storage ?? 0,
+            entries: unversioned?.maximum_items_in_storage ?? 0,
           },
         },
       });

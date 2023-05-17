@@ -218,6 +218,13 @@ export class CartManager {
     return true;
   }
 
+  async archive(cartridge_id: string) {
+    await Db.CartStore.transaction(this.os.db, "readwrite", async (store) => {
+      await store.archive(cartridge_id);
+    });
+    this.os.events.on_cart_archived.emit(cartridge_id);
+  }
+
   // Usage estimation
   async usage_estimates() {
     const cartridges = await this.list();
