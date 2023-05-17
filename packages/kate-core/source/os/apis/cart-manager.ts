@@ -218,11 +218,32 @@ export class CartManager {
     return true;
   }
 
-  async archive(cartridge_id: string) {
+  async archive(cart_id: string) {
     await Db.CartStore.transaction(this.os.db, "readwrite", async (store) => {
-      await store.archive(cartridge_id);
+      await store.archive(cart_id);
     });
-    this.os.events.on_cart_archived.emit(cartridge_id);
+    this.os.events.on_cart_archived.emit(cart_id);
+  }
+
+  async delete_all_data(cart_id: string) {
+    const meta = await this.read_metadata(cart_id);
+    await this.os.db.transaction(
+      [
+        ...Db.CartStore.tables,
+        ...Db.ObjectStorage.tables,
+        ...Db.PlayHabitsStore.tables,
+      ],
+      "readwrite",
+      async (txn) => {
+        await new Db.CartStore(txn).remove(cart_id);
+        await new Db.ObjectStorage(txn).delete_all_data(cart_id);
+        await new Db.PlayHabitsStore(txn).remove(cart_id);
+      }
+    );
+    this.os.events.on_cart_removed.emit({
+      id: cart_id,
+      title: meta.metadata.game.title,
+    });
   }
 
   // Usage estimation

@@ -70,4 +70,9 @@ export class CartStore {
       status: "archived",
     });
   }
+
+  async remove(cart_id: string) {
+    await this.archive(cart_id);
+    await this.meta.delete(cart_id);
+  }
 }

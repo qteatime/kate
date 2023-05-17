@@ -230,7 +230,25 @@ export class SceneCartridgeStorageSettings extends UI.SimpleScene {
     }
   }
 
-  async delete_all_data() {}
+  async delete_all_data() {
+    const ok = await this.os.dialog.confirm("kate:settings", {
+      title: `Delete ${this.app.title}?`,
+      message: `This will delete all cartridge files and save data. This is
+                an irreversible operation; save data cannot be restored.
+                Media files will not be removed.`,
+      dangerous: true,
+      cancel: "Cancel",
+      ok: "Delete all cartridge data",
+    });
+    if (ok) {
+      await this.os.cart_manager.delete_all_data(this.app.id);
+      await this.os.notifications.push(
+        "kate:settings",
+        "Deleted cartridge",
+        `Deleted ${this.app.id} v${this.app.version_id}`
+      );
+    }
+  }
 
   storage_summary() {
     return UI.section({
