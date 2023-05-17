@@ -24,6 +24,21 @@ export class KateObjectStore {
     );
   }
 
+  async delete_cartridge_data(cart_id: string, version_id: string) {
+    await Db.ObjectStorage.transaction(
+      this.os.db,
+      "readwrite",
+      async (store) => {
+        await store.delete_partitions_and_quota(cart_id);
+        await store.initialise_partitions(cart_id, version_id);
+      }
+    );
+    this.os.events.on_cart_changed.emit({
+      id: cart_id,
+      reason: "save-data-changed",
+    });
+  }
+
   async usage_estimates() {
     return this.os.db.transaction(
       [Db.cartridge_quota],
@@ -139,7 +154,7 @@ export class CartridgeBucket {
   async list_metadata(count?: number) {
     return await this.transaction("readonly", async (storage) => {
       return storage.entries_by_bucket.get_all(
-        this.bucket.unique_bucket_id,
+        [this.bucket.unique_bucket_id],
         count
       );
     });
@@ -147,7 +162,7 @@ export class CartridgeBucket {
 
   async count() {
     return await this.transaction("readonly", async (storage) => {
-      return storage.entries_by_bucket.count(this.bucket.unique_bucket_id);
+      return storage.entries_by_bucket.count([this.bucket.unique_bucket_id]);
     });
   }
 

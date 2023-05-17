@@ -203,7 +203,7 @@ export class CartManager {
         };
         await habits.put(play_habits);
 
-        await new Db.ObjectStorage(t).initialise(
+        await new Db.ObjectStorage(t).initialise_partitions(
           cart.metadata.id,
           cart.metadata.version_id
         );
@@ -223,6 +223,7 @@ export class CartManager {
       await store.archive(cart_id);
     });
     this.os.events.on_cart_archived.emit(cart_id);
+    this.os.events.on_cart_changed.emit({ id: cart_id, reason: "archived" });
   }
 
   async delete_all_data(cart_id: string) {
@@ -236,7 +237,7 @@ export class CartManager {
       "readwrite",
       async (txn) => {
         await new Db.CartStore(txn).remove(cart_id);
-        await new Db.ObjectStorage(txn).delete_all_data(cart_id);
+        await new Db.ObjectStorage(txn).delete_partitions_and_quota(cart_id);
         await new Db.PlayHabitsStore(txn).remove(cart_id);
       }
     );
@@ -244,6 +245,7 @@ export class CartManager {
       id: cart_id,
       title: meta.metadata.game.title,
     });
+    this.os.events.on_cart_changed.emit({ id: cart_id, reason: "removed" });
   }
 
   // Usage estimation

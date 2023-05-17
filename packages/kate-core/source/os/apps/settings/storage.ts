@@ -6,7 +6,7 @@ import {
   relative_date,
 } from "../../../utils";
 import type { AppStorageDetails } from "../../apis/storage-manager";
-import type { KateOS } from "../../os";
+import type { CartChangeReason, KateOS } from "../../os";
 import * as UI from "../../ui";
 import { SceneMedia } from "../media";
 
@@ -16,19 +16,15 @@ export class SceneStorageSettings extends UI.SimpleScene {
 
   on_attached(): void {
     super.on_attached();
-    this.os.events.on_cart_archived.listen(this.reload);
-    this.os.events.on_cart_inserted.listen(this.reload);
-    this.os.events.on_cart_removed.listen(this.reload);
+    this.os.events.on_cart_changed.listen(this.reload);
   }
 
   on_detached(): void {
-    this.os.events.on_cart_archived.remove(this.reload);
-    this.os.events.on_cart_inserted.remove(this.reload);
-    this.os.events.on_cart_removed.remove(this.reload);
+    this.os.events.on_cart_changed.remove(this.reload);
     super.on_detached();
   }
 
-  reload = async () => {
+  reload = async (x: { id: string; reason: CartChangeReason }) => {
     const body = await this.body();
     const container = this.canvas.querySelector(".kate-os-screen-body")!;
     container.textContent = "";
@@ -108,19 +104,19 @@ export class SceneCartridgeStorageSettings extends UI.SimpleScene {
 
   on_attached(): void {
     super.on_attached();
-    this.os.events.on_cart_archived.listen(this.reload);
-    this.os.events.on_cart_inserted.listen(this.reload);
-    this.os.events.on_cart_removed.listen(this.reload);
+    this.os.events.on_cart_changed.listen(this.reload);
   }
 
   on_detached(): void {
-    this.os.events.on_cart_archived.remove(this.reload);
-    this.os.events.on_cart_inserted.remove(this.reload);
-    this.os.events.on_cart_removed.remove(this.reload);
+    this.os.events.on_cart_changed.remove(this.reload);
     super.on_detached();
   }
 
-  reload = async () => {
+  reload = async (x: { id: string }) => {
+    if (x.id !== this.app.id) {
+      return;
+    }
+
     const estimates = await this.os.storage_manager.estimate();
     const app = estimates.cartridges.get(this.app.id);
     let body: UI.Widgetable[];
@@ -278,7 +274,37 @@ class SceneCartridgeSaveDataSettings extends UI.SimpleScene {
     return [this.app.title];
   }
 
-  constructor(os: KateOS, readonly app: AppStorageDetails) {
+  on_attached(): void {
+    super.on_attached();
+    this.os.events.on_cart_changed.listen(this.reload);
+  }
+
+  on_detached(): void {
+    this.os.events.on_cart_changed.remove(this.reload);
+    super.on_detached();
+  }
+
+  reload = async (x: { id: string }) => {
+    if (x.id !== this.app.id) {
+      return;
+    }
+
+    const estimates = await this.os.storage_manager.estimate();
+    const app = estimates.cartridges.get(this.app.id);
+    let body: UI.Widgetable[];
+    if (app != null) {
+      this.app = app;
+      body = this.body();
+    } else {
+      this.app = { ...this.app, status: "inactive" };
+      body = [cartridge_summary(this.app, "deleted")];
+    }
+    const container = this.canvas.querySelector(".kate-os-screen-body")!;
+    container.textContent = "";
+    container.append(UI.fragment(body));
+  };
+
+  constructor(os: KateOS, private app: AppStorageDetails) {
     super(os);
   }
 
@@ -292,7 +318,7 @@ class SceneCartridgeSaveDataSettings extends UI.SimpleScene {
         title: "Delete all save data",
         description:
           "The cartridge will work as a freshly installed one after this.",
-        on_click: this.delete_save_data,
+        on_click: () => this.delete_save_data(),
         dangerous: true,
       }),
     ];
@@ -343,7 +369,27 @@ class SceneCartridgeSaveDataSettings extends UI.SimpleScene {
     });
   }
 
-  async delete_save_data() {}
+  async delete_save_data() {
+    const ok = await this.os.dialog.confirm("kate:settings", {
+      title: `Delete save data for ${this.app.title}?`,
+      message: `This will remove all save data for the cartridge. Save data
+                cannot be recovered.`,
+      dangerous: true,
+      cancel: "Cancel",
+      ok: "Delete save data",
+    });
+    if (ok) {
+      await this.os.object_store.delete_cartridge_data(
+        this.app.id,
+        this.app.version_id
+      );
+      await this.os.notifications.push(
+        "kate:settings",
+        "Deleted save data",
+        `Deleted save data for ${this.app.title}`
+      );
+    }
+  }
 }
 
 function cartridge_summary(app: AppStorageDetails, override_status?: string) {

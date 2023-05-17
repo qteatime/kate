@@ -140,7 +140,7 @@ export class Transaction {
 
   get_index1<I extends IndexSchema1<any, any>>(index: I) {
     const store = this.trans.objectStore(index.table.name);
-    return new Index<I["__schema1"], I["__kt1"], I["__k1"]>(
+    return new Index<I["__schema1"], [I["__kt1"]], [I["__k1"]]>(
       store.index(index.name)
     );
   }

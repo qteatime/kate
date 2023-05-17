@@ -113,7 +113,7 @@ export class KateCapture {
       "readonly",
       async (t) => {
         const media = t.get_index1(Db.idx_media_store_by_cart);
-        return media.get_all(id);
+        return media.get_all([id]);
       }
     );
     return files;

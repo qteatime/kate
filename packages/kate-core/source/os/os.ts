@@ -23,6 +23,12 @@ import { KateSettings } from "./apis/settings";
 import { InputKey } from "../kernel";
 import { KateStorageManager } from "./apis/storage-manager";
 
+export type CartChangeReason =
+  | "installed"
+  | "removed"
+  | "archived"
+  | "save-data-changed";
+
 export class KateOS {
   private _scene_stack: Scene[] = [];
   private _active_hud: Scene[] = [];
@@ -43,6 +49,10 @@ export class KateOS {
     on_cart_inserted: new EventStream<Cart.CartMeta>(),
     on_cart_removed: new EventStream<{ id: string; title: string }>(),
     on_cart_archived: new EventStream<string>(),
+    on_cart_changed: new EventStream<{
+      id: string;
+      reason: CartChangeReason;
+    }>(),
   };
 
   private constructor(
