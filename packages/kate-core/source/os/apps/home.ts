@@ -5,6 +5,7 @@ import { unreachable } from "../../utils";
 import { Action, SimpleScene } from "../ui/scenes";
 import { SceneTextFile } from "./text-file";
 import { HUD_LoadIndicator } from "./load-screen";
+import { SceneCartridgeStorageSettings } from "./settings/storage";
 
 export class SceneHome extends SimpleScene {
   icon = "diamond";
@@ -88,25 +89,14 @@ export class SceneHome extends SimpleScene {
       cart.metadata.game.title,
       [
         { label: "Legal notices", value: "legal" as const },
-        { label: "Uninstall", value: "uninstall" as const },
+        { label: "Manage data", value: "manage-data" as const },
       ],
       "close"
     );
     switch (result) {
-      case "uninstall": {
-        const should_uninstall = await this.os.dialog.confirm("kate:home", {
-          title: `Uninstall ${cart.metadata.game.title}?`,
-          message: `This will remove the cartridge files, but not save data.`,
-          cancel: "Keep game",
-          ok: "Uninstall game",
-          dangerous: true,
-        });
-        if (should_uninstall) {
-          this.os.cart_manager.uninstall({
-            id: cart.metadata.id,
-            title: cart.metadata.game.title,
-          });
-        }
+      case "manage-data": {
+        const app = await this.os.storage_manager.estimate_cartridge(cart.id);
+        this.os.push_scene(new SceneCartridgeStorageSettings(this.os, app));
         break;
       }
 
@@ -115,26 +105,13 @@ export class SceneHome extends SimpleScene {
       }
 
       case "legal": {
-        const loading = new HUD_LoadIndicator(this.os);
-        this.os.show_hud(loading);
-        try {
-          const legal = new SceneTextFile(
-            this.os,
-            `Legal Notices`,
-            cart.metadata.game.title,
-            cart.metadata.release.legal_notices
-          );
-          this.os.push_scene(legal);
-        } catch (error) {
-          console.error(`Failed to show legal notices for ${cart.id}`, error);
-          await this.os.notifications.push(
-            "kate:os",
-            "Failed to open",
-            "Cartridge may be corrupted or not compatible with this version"
-          );
-        } finally {
-          this.os.hide_hud(loading);
-        }
+        const legal = new SceneTextFile(
+          this.os,
+          `Legal Notices`,
+          cart.metadata.game.title,
+          cart.metadata.release.legal_notices
+        );
+        this.os.push_scene(legal);
         break;
       }
 

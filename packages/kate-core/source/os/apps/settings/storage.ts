@@ -117,8 +117,7 @@ export class SceneCartridgeStorageSettings extends UI.SimpleScene {
       return;
     }
 
-    const estimates = await this.os.storage_manager.estimate();
-    const app = estimates.cartridges.get(this.app.id);
+    const app = await this.os.storage_manager.estimate_cartridge(this.app.id);
     let body: UI.Widgetable[];
     if (app != null) {
       this.app = app;
@@ -289,8 +288,7 @@ class SceneCartridgeSaveDataSettings extends UI.SimpleScene {
       return;
     }
 
-    const estimates = await this.os.storage_manager.estimate();
-    const app = estimates.cartridges.get(this.app.id);
+    const app = await this.os.storage_manager.estimate_cartridge(this.app.id);
     let body: UI.Widgetable[];
     if (app != null) {
       this.app = app;

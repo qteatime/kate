@@ -70,6 +70,15 @@ export class KateStorageManager {
     return this.os.cart_manager.usage_estimates();
   }
 
+  async estimate_cartridge(cart_id: string) {
+    const estimate = await this.estimate();
+    const cart = estimate.cartridges.get(cart_id);
+    if (cart == null) {
+      throw new Error(`Unknown cartridge ${cart_id}`);
+    }
+    return cart;
+  }
+
   async estimate() {
     const media = await this.estimate_media();
     const save_data = await this.estimate_save_data();
