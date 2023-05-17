@@ -76,11 +76,17 @@ export class DatabaseSchema {
     path: K;
     auto_increment: boolean;
     deprecated_since?: number;
+    deleted_since?: number;
   }) {
-    const table = new TableSchema1<S, K>(x.since, x.name, {
-      path: x.path,
-      auto_increment: x.auto_increment,
-    });
+    const table = new TableSchema1<S, K>(
+      x.since,
+      x.name,
+      {
+        path: x.path,
+        auto_increment: x.auto_increment,
+      },
+      x.deleted_since
+    );
     this.tables.push(table);
     return table;
   }
@@ -91,11 +97,17 @@ export class DatabaseSchema {
     path: [K1, K2];
     auto_increment: boolean;
     deprecated_since?: number;
+    deleted_since?: number;
   }) {
-    const table = new TableSchema2<S, K1, K2>(x.since, x.name, {
-      path: x.path,
-      auto_increment: x.auto_increment,
-    });
+    const table = new TableSchema2<S, K1, K2>(
+      x.since,
+      x.name,
+      {
+        path: x.path,
+        auto_increment: x.auto_increment,
+      },
+      x.deleted_since
+    );
     this.tables.push(table);
     return table;
   }
@@ -106,11 +118,17 @@ export class DatabaseSchema {
     path: [K1, K2, K3];
     auto_increment: boolean;
     deprecated_since?: number;
+    deleted_since?: number;
   }) {
-    const table = new TableSchema3<S, K1, K2, K3>(x.since, x.name, {
-      path: x.path,
-      auto_increment: x.auto_increment,
-    });
+    const table = new TableSchema3<S, K1, K2, K3>(
+      x.since,
+      x.name,
+      {
+        path: x.path,
+        auto_increment: x.auto_increment,
+      },
+      x.deleted_since
+    );
     this.tables.push(table);
     return table;
   }
@@ -122,7 +140,8 @@ export abstract class TableSchema<S> {
   constructor(
     readonly version: number,
     readonly name: string,
-    readonly key: { path: any; auto_increment: boolean }
+    readonly key: { path: any; auto_increment: boolean },
+    readonly deleted_since?: number
   ) {}
 
   upgrade(db: IDBDatabase, transaction: IDBTransaction, old_version: number) {
@@ -136,6 +155,10 @@ export abstract class TableSchema<S> {
     for (const index of this.indexes) {
       index.upgrade(transaction, old_version);
     }
+
+    if (this.deleted_since != null && this.deleted_since >= db.version) {
+      db.deleteObjectStore(this.name);
+    }
   }
 
   index1<K1 extends keyof S>(x: {
@@ -144,11 +167,20 @@ export abstract class TableSchema<S> {
     path: [K1];
     unique?: boolean;
     multi_entry?: boolean;
+    deprecated_since?: number;
+    deleted_since?: number;
   }) {
-    const id = new IndexSchema1<S, K1>(this as any, x.since, x.name, x.path, {
-      unique: x.unique ?? true,
-      multi_entry: x.multi_entry ?? false,
-    });
+    const id = new IndexSchema1<S, K1>(
+      this as any,
+      x.since,
+      x.name,
+      x.path,
+      {
+        unique: x.unique ?? true,
+        multi_entry: x.multi_entry ?? false,
+      },
+      x.deleted_since
+    );
     this.indexes.push(id);
     return id;
   }
@@ -159,6 +191,8 @@ export abstract class TableSchema<S> {
     path: [K1, K2];
     unique?: boolean;
     multi_entry?: boolean;
+    deprecated_since?: number;
+    deleted_since?: number;
   }) {
     const id = new IndexSchema2<S, K1, K2>(
       this as any,
@@ -168,7 +202,8 @@ export abstract class TableSchema<S> {
       {
         unique: x.unique ?? true,
         multi_entry: x.multi_entry ?? false,
-      }
+      },
+      x.deleted_since
     );
     this.indexes.push(id);
     return id;
@@ -186,9 +221,10 @@ export class TableSchema1<
   constructor(
     version: number,
     name: string,
-    key: { path: Id; auto_increment: boolean }
+    key: { path: Id; auto_increment: boolean },
+    deleted_since?: number
   ) {
-    super(version, name, key);
+    super(version, name, key, deleted_since);
   }
 }
 
@@ -206,9 +242,10 @@ export class TableSchema2<
   constructor(
     version: number,
     name: string,
-    key: { path: [K1, K2]; auto_increment: boolean }
+    key: { path: [K1, K2]; auto_increment: boolean },
+    deleted_since?: number
   ) {
-    super(version, name, key);
+    super(version, name, key, deleted_since);
   }
 }
 
@@ -229,9 +266,10 @@ export class TableSchema3<
   constructor(
     version: number,
     name: string,
-    key: { path: [K1, K2, K3]; auto_increment: boolean }
+    key: { path: [K1, K2, K3]; auto_increment: boolean },
+    deleted_since?: number
   ) {
-    super(version, name, key);
+    super(version, name, key, deleted_since);
   }
 }
 
@@ -241,7 +279,8 @@ abstract class IndexSchema {
     readonly version: number,
     readonly name: string,
     readonly key: any[],
-    readonly options: { unique: boolean; multi_entry: boolean }
+    readonly options: { unique: boolean; multi_entry: boolean },
+    readonly deleted_since?: number
   ) {}
 
   upgrade(transaction: IDBTransaction, old_version: number) {
@@ -251,6 +290,13 @@ abstract class IndexSchema {
         unique: this.options.unique,
         multiEntry: this.options.multi_entry,
       });
+    }
+    if (
+      this.deleted_since != null &&
+      this.deleted_since >= transaction.db.version
+    ) {
+      const store = transaction.objectStore(this.table.name);
+      store.deleteIndex(this.name);
     }
   }
 }
@@ -265,9 +311,10 @@ export class IndexSchema1<S, K1 extends keyof S> extends IndexSchema {
     version: number,
     name: string,
     key: [K1],
-    options: { unique: boolean; multi_entry: boolean }
+    options: { unique: boolean; multi_entry: boolean },
+    deleted_since?: number
   ) {
-    super(table, version, name, key, options);
+    super(table, version, name, key, options, deleted_since);
   }
 }
 
@@ -287,9 +334,10 @@ export class IndexSchema2<
     version: number,
     name: string,
     key: [K1, K2],
-    options: { unique: boolean; multi_entry: boolean }
+    options: { unique: boolean; multi_entry: boolean },
+    deleted_since?: number
   ) {
-    super(table, version, name, key, options);
+    super(table, version, name, key, options, deleted_since);
   }
 }
 
