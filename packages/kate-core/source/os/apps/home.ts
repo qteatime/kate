@@ -62,7 +62,7 @@ export class SceneHome extends SimpleScene {
       const habits = await this.os.play_habits.try_get_all(
         carts0.map((x) => x.id)
       );
-      const carts = (await this.os.cart_manager.list_by_status()).sort(
+      const carts = carts0.sort(
         (a, b) => recency(b, habits) - recency(a, habits)
       );
       list.textContent = "";
@@ -156,20 +156,18 @@ export class SceneHome extends SimpleScene {
     super.on_attached();
 
     this.update_carts();
-    this.os.events.on_cart_inserted.listen(this.update_carts);
-    this.os.events.on_cart_removed.listen(this.update_carts);
+    this.os.events.on_cart_changed.listen(this.update_carts);
   }
 
   on_detached() {
-    this.os.events.on_cart_inserted.remove(this.update_carts);
-    this.os.events.on_cart_removed.remove(this.update_carts);
+    this.os.events.on_cart_changed.remove(this.update_carts);
     super.on_detached();
   }
 
-  private update_carts = () => {
+  private update_carts = async () => {
     const home = this.canvas!;
     const carts = home.querySelector(".kate-os-carts")! as HTMLElement;
-    this.show_carts(carts);
+    await this.show_carts(carts);
   };
 
   async play(id: string) {
