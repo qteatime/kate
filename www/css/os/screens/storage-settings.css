@@ -37,6 +37,10 @@
   flex-shrink: 1;
 }
 
+.kate-ui-stack-bar-component:not(:last-child) {
+  border-right: 1px solid var(--color-border-d1);
+}
+
 .kate-ui-stack-bar-legend {
   display: flex;
   flex-direction: row;

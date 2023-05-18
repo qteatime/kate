@@ -85,10 +85,16 @@ export class Database {
       let result: A;
 
       request.onerror = (ev) => {
-        reject(new Error(`cannot start transaction`));
+        const error = (ev as any).target?.error ?? null;
+        const message = error?.toString() ?? "Unknown error";
+        console.error(`[Kate] transaction aborted:`, error);
+        reject(new Error(`cannot start transaction: ${message}`));
       };
       request.onabort = (ev) => {
-        reject(new Error(`transaction aborted`));
+        const error = (ev as any).target?.error ?? null;
+        const message = error?.toString() ?? "Unknown error";
+        console.error(`[Kate] transaction aborted:`, error);
+        reject(new Error(`transaction aborted: ${message}`));
       };
       request.oncomplete = (ev) => {
         resolve(result);

@@ -87,11 +87,16 @@ export class CartStore {
     return this.transaction.get_table2(cart_files);
   }
 
-  async archive(cart_id: string) {
+  private async remove_files(cart_id: string) {
     const meta = await this.meta.get(cart_id);
     for (const file of meta.files) {
       await this.files.delete([cart_id, file.id]);
     }
+    return meta;
+  }
+
+  async archive(cart_id: string) {
+    const meta = await this.remove_files(cart_id);
     await this.meta.put({
       ...meta,
       files: [],
@@ -136,7 +141,7 @@ export class CartStore {
   }
 
   async remove(cart_id: string) {
-    await this.archive(cart_id);
+    await this.remove_files(cart_id);
     await this.meta.delete(cart_id);
   }
 

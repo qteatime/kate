@@ -103,8 +103,18 @@ export class SceneHome extends SimpleScene {
     );
     switch (result) {
       case "manage-data": {
-        const app = await this.os.storage_manager.estimate_cartridge(cart.id);
-        this.os.push_scene(new SceneCartridgeStorageSettings(this.os, app));
+        const app = await this.os.storage_manager.try_estimate_cartridge(
+          cart.id
+        );
+        if (app != null) {
+          this.os.push_scene(new SceneCartridgeStorageSettings(this.os, app));
+        } else {
+          await this.os.dialog.message("kate:home", {
+            title: "Failed to read cartridge",
+            message:
+              "An unknown error happened while reading the cartridge details.",
+          });
+        }
         break;
       }
 

@@ -930,7 +930,13 @@ export function stack_bar(x: {
   components: { title: string; value: number; display_value: string }[];
   skip_zero_value?: boolean;
 }) {
-  const colours = ["#f00", "#ff0", "#0f0", "#00f", "#f0f"];
+  const colours = [
+    "var(--color-1)",
+    "var(--color-2)",
+    "var(--color-3)",
+    "var(--color-4)",
+    "var(--color-5)",
+  ];
   const skip_zero = x.skip_zero_value !== false;
   const components = x.components.filter((x) =>
     skip_zero ? x.value > 0 : true
