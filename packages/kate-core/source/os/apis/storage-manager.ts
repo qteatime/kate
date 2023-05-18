@@ -114,6 +114,7 @@ export class KateStorageManager {
 
     const cartridges = new Map<string, AppStorageDetails>();
     for (const [id, app] of applications.entries()) {
+      const habits = await this.os.play_habits.try_get(id);
       const media_usage = media.get(id) ?? { count: 0, size: 0 };
       const save_data_usage = save_data.get(id) ?? [];
       const save_versions = new Map<string, Db.CartridgeQuota>(
@@ -130,8 +131,8 @@ export class KateStorageManager {
         version_id: app.version_id,
         status: app.status,
         dates: {
-          last_used: app.habits.last_played ?? null,
-          play_time: app.habits.play_time ?? null,
+          last_used: habits?.last_played ?? null,
+          play_time: habits?.play_time ?? null,
           installed: app.meta.installed_at,
           last_modified: app.meta.updated_at,
         },

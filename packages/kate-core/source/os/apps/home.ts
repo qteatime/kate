@@ -46,22 +46,30 @@ export class SceneHome extends SimpleScene {
   }
 
   async show_carts(list: HTMLElement) {
-    const recency = (x: { meta: Db.CartMeta; habits: Db.PlayHabits }) => {
+    const recency = (
+      cart: Db.CartMeta,
+      habits_map: Map<string, Db.PlayHabits>
+    ) => {
+      const habits = habits_map.get(cart.id);
       return Math.max(
-        x.habits.last_played?.getTime() ?? 0,
-        x.meta.updated_at.getTime()
+        habits?.last_played?.getTime() ?? 0,
+        cart.updated_at.getTime()
       );
     };
 
     try {
-      const carts = (await this.os.cart_manager.list()).sort(
-        (a, b) => recency(b) - recency(a)
+      const carts0 = await this.os.cart_manager.list_by_status("active");
+      const habits = await this.os.play_habits.try_get_all(
+        carts0.map((x) => x.id)
+      );
+      const carts = (await this.os.cart_manager.list_by_status()).sort(
+        (a, b) => recency(b, habits) - recency(a, habits)
       );
       list.textContent = "";
       this.cart_map = new Map();
       for (const x of carts) {
-        const child = this.render_cart(x.meta);
-        this.cart_map.set(child, x.meta);
+        const child = this.render_cart(x);
+        this.cart_map.set(child, x);
         list.appendChild(child);
       }
       this.os.focus_handler.focus(

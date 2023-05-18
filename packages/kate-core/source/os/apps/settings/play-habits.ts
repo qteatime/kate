@@ -58,7 +58,20 @@ export class ScenePlayHabitsSettings extends UI.SimpleScene {
   async load_history(container: HTMLElement) {
     container.textContent = "";
     const items = [];
-    const history = await this.os.cart_manager.habit_history();
+    const carts = new Map(
+      (await this.os.cart_manager.list_all()).map((x) => [x.id, x])
+    );
+    const all_habits = await this.os.play_habits.all_in_database();
+    const history = all_habits.map((x) => {
+      const cart = carts.get(x.id) ?? null;
+      return {
+        id: x.id,
+        installed: cart != null,
+        title: cart?.metadata.game.title ?? x.id,
+        play_time: x.play_time,
+        last_played: x.last_played,
+      };
+    });
     for (const entry of history) {
       items.push(
         UI.interactive(
@@ -116,10 +129,7 @@ export class ScenePlayHabitsSettings extends UI.SimpleScene {
     );
     switch (result) {
       case "delete": {
-        await this.os.cart_manager.delete_single_play_habits(
-          entry.id,
-          !entry.installed
-        );
+        await this.os.play_habits.remove_one(entry.id, !entry.installed);
         await this.os.notifications.log(
           "kate:settings",
           "Play habits deleted",
@@ -143,7 +153,7 @@ export class ScenePlayHabitsSettings extends UI.SimpleScene {
       dangerous: true,
     });
     if (should_delete) {
-      await this.os.cart_manager.delete_play_habits();
+      await this.os.play_habits.remove_all();
       await this.os.notifications.log(
         "kate:settings",
         "Play habits deleted",

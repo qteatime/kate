@@ -35,4 +35,29 @@ export class PlayHabitsStore {
   async remove(cart_id: string) {
     await this.habits.delete(cart_id);
   }
+
+  async reset(cart_id: string) {
+    await this.habits.put({
+      id: cart_id,
+      last_played: null,
+      play_time: 0,
+    });
+  }
+
+  async reset_all() {
+    for (const habit of await this.habits.get_all()) {
+      await this.reset(habit.id);
+    }
+  }
+
+  async initialise(cart_id: string) {
+    const old_habits = await this.habits.try_get(cart_id);
+    if (old_habits == null) {
+      await this.habits.add({
+        id: cart_id,
+        last_played: null,
+        play_time: 0,
+      });
+    }
+  }
 }

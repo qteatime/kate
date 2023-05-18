@@ -89,10 +89,10 @@ export class KateProcesses {
           return { mime: file.mime, data: file.data, path: path };
         },
         on_playtime_update: async (time) => {
-          await this.os.cart_manager.increase_play_time(id, time);
+          await this.os.play_habits.increase_play_time(id, time);
         },
       });
-      await this.os.cart_manager.update_last_played(id, new Date());
+      await this.os.play_habits.update_last_played(id, new Date());
       return this.display_process(cart, runtime);
     } catch (error) {
       this._running = null;
