@@ -57,8 +57,8 @@ Kate does not accept source contributions currently, since it has not reached a 
 - ~~Save data support;~~ _(0.23.5)_
 - ~~Pointer input support;~~
 - ~~Higher resolution with external displays;~~
-- **Visualising and managing device storage;** _(<- we're here now)_
-- Digital OSTs and artbooks as cartridges;
+- ~~Visualising and managing device storage;~~
+- **Digital OSTs and artbooks as cartridges;** _(<- we're here now)_
 - Decentralised stores (a community-driven form of curation);
 - Arbitrary text input;
 - Game collections and library filtering;
