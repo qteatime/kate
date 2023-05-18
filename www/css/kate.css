@@ -457,6 +457,32 @@ body {
     0px -1px 0 var(--resources-background), -1px 0 0 var(--resources-background);
 }
 
+.kate-resource-low-storage {
+  font-family: "Font Awesome 6 Free";
+  font-size: 16px;
+  position: relative;
+}
+
+.kate-resource-low-storage::before {
+  content: "\f0a0";
+  display: block;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  font-size: 14px;
+}
+
+.kate-resource-low-storage::after {
+  content: "\f071";
+  display: block;
+  font-size: 9px;
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  text-shadow: -1px -1px 0 var(--resources-background),
+    0px -1px 0 var(--resources-background), -1px 0 0 var(--resources-background);
+}
+
 #kate-loading {
   position: absolute;
   top: 0px;

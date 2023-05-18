@@ -48,16 +48,28 @@ export type AppStorageDetails = {
 };
 
 export class KateStorageManager {
-  static SYSTEM_PADDING = mb(256);
+  static MINIMUM_FREE_SPACE = mb(256);
+  static ALERT_USAGE_PERCENT = 0.8;
+  private _setup: boolean = false;
 
   constructor(readonly os: KateOS) {}
+
+  setup() {
+    if (this._setup) {
+      throw new Error(`setup() called twice`);
+    }
+    this._setup = true;
+    this.os.events.on_cart_changed.listen(() => this.check_storage_health());
+    setInterval(() => this.check_storage_health(), 1_000 * 60 * 30);
+    this.check_storage_health();
+  }
 
   async storage_summary() {
     const estimate = await navigator.storage.estimate();
     return {
       quota: estimate.quota ?? null,
       usage: estimate.usage ?? 0,
-      reserved: KateStorageManager.SYSTEM_PADDING,
+      reserved: KateStorageManager.MINIMUM_FREE_SPACE,
     };
   }
 
@@ -68,8 +80,28 @@ export class KateStorageManager {
     } else {
       return (
         estimate.usage + size <
-        estimate.quota - KateStorageManager.SYSTEM_PADDING
+        estimate.quota - KateStorageManager.MINIMUM_FREE_SPACE
       );
+    }
+  }
+
+  async check_storage_health() {
+    const estimate = await this.storage_summary();
+    if (estimate.quota == null) {
+      return;
+    }
+    const usage =
+      estimate.usage / (estimate.quota - KateStorageManager.MINIMUM_FREE_SPACE);
+    if (
+      usage >= KateStorageManager.ALERT_USAGE_PERCENT &&
+      !this.os.kernel.console.is_resource_taken("low-storage")
+    ) {
+      await this.os.notifications.push_transient(
+        "kate:storage-manager",
+        "Low storage space",
+        `Your device is running out of storage space. Kate may not be fully operational.`
+      );
+      this.os.kernel.console.take_resource("low-storage");
     }
   }
 

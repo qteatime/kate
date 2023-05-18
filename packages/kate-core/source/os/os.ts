@@ -81,8 +81,9 @@ export class KateOS {
     this.dialog = new KateDialog(this);
     this.dialog.setup();
     this.capture = new KateCapture(this);
-    this.storage_manager = new KateStorageManager(this);
     this.play_habits = new KatePlayHabits(this);
+    this.storage_manager = new KateStorageManager(this);
+    this.storage_manager.setup();
   }
 
   get display() {
