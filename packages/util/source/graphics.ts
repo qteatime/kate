@@ -7,6 +7,13 @@ export function load_image(url: string) {
   });
 }
 
+export async function make_empty_thumbnail(width: number, height: number) {
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  return canvas.toDataURL();
+}
+
 export async function make_thumbnail_from_bytes(
   width: number,
   height: number,

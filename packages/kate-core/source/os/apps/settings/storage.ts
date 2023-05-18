@@ -170,8 +170,10 @@ export class SceneCartridgeStorageSettings extends UI.SimpleScene {
           );
         },
       }),
-      UI.vspace(32),
-      this.data_actions(),
+      UI.when(this.os.kernel.console.options.mode !== "single", [
+        UI.vspace(32),
+        this.data_actions(),
+      ]),
     ];
   }
 

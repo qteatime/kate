@@ -1,7 +1,13 @@
-import { foldl, mb } from "../../utils";
+import {
+  foldl,
+  make_empty_thumbnail,
+  make_thumbnail_from_bytes,
+  mb,
+} from "../../utils";
 import * as Db from "../../data";
 import type { KateOS } from "../os";
 import { KateObjectStore } from "./object-store";
+import { Cart, CartMeta } from "../../cart";
 
 export type AppStorageDetails = {
   id: string;
@@ -120,6 +126,77 @@ export class KateStorageManager {
   async try_estimate_cartridge(cart_id: string) {
     const estimate = await this.estimate();
     return estimate.cartridges.get(cart_id) ?? null;
+  }
+
+  async try_estimate_live_cartridge(
+    cart: CartMeta
+  ): Promise<AppStorageDetails> {
+    const { cartridges } = await this.estimate();
+    const maybe_cart = cartridges.get(cart.metadata.id) ?? null;
+    const media = await this.estimate_media();
+    const cart_media = media.get(cart.metadata.id) ?? {
+      size: 0,
+      count: 0,
+    };
+    const saves = (await this.estimate_save_data()).get(cart.metadata.id) ?? [];
+    const save_versions = new Map<string, Db.CartridgeQuota>(
+      saves.map((x) => [x.version_id, x])
+    );
+    const unversioned =
+      save_versions.get(KateObjectStore.UNVERSIONED_KEY) ?? null;
+    const versioned = save_versions.get(cart.metadata.version_id) ?? null;
+
+    const thumbnail = await make_empty_thumbnail(1, 1);
+    return {
+      id: cart.metadata.id,
+      title: cart.metadata.game.title,
+      icon_url: thumbnail,
+      version_id: cart.metadata.version_id,
+      status: "active",
+      dates: {
+        last_used: null,
+        play_time: null,
+        installed: new Date(),
+        last_modified: new Date(),
+      },
+      usage: {
+        cartridge_size_in_bytes: maybe_cart?.usage.cartridge_size_in_bytes ?? 0,
+        media: {
+          size_in_bytes: cart_media.size,
+          count: cart_media.count,
+        },
+        data: {
+          size_in_bytes: versioned?.current_size_in_bytes ?? 0,
+          buckets: versioned?.current_buckets_in_storage ?? 0,
+          entries: versioned?.current_items_in_storage ?? 0,
+        },
+        shared_data: {
+          size_in_bytes: unversioned?.current_size_in_bytes ?? 0,
+          buckets: unversioned?.current_buckets_in_storage ?? 0,
+          entries: unversioned?.current_items_in_storage ?? 0,
+        },
+        get total_in_bytes(): number {
+          return (
+            this.cartridge_size_in_bytes +
+            this.media.size_in_bytes +
+            this.data.size_in_bytes +
+            this.shared_data.size_in_bytes
+          );
+        },
+      },
+      quota: {
+        data: {
+          size_in_bytes: versioned?.maximum_size_in_bytes ?? 0,
+          buckets: versioned?.maximum_buckets_in_storage ?? 0,
+          entries: versioned?.maximum_items_in_storage ?? 0,
+        },
+        shared_data: {
+          size_in_bytes: unversioned?.maximum_size_in_bytes ?? 0,
+          buckets: unversioned?.maximum_buckets_in_storage ?? 0,
+          entries: unversioned?.maximum_items_in_storage ?? 0,
+        },
+      },
+    };
   }
 
   async estimate() {
