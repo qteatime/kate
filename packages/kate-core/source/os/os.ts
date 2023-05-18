@@ -109,33 +109,32 @@ export class KateOS {
     this.focus_handler.push_root(scene.canvas);
   }
 
-  pop_scene() {
-    if (this._current_scene != null) {
-      this.focus_handler.pop_root(this._current_scene.canvas);
-      const scene = this._current_scene;
-      scene.canvas.classList.remove("kate-os-entering");
-      scene.canvas.classList.add("kate-os-leaving");
-      wait(250).then(() => {
-        scene.detach();
-      });
+  pop_scene(scene0: Scene) {
+    const popped_scene =
+      this._current_scene === scene0
+        ? this._current_scene
+        : this._scene_stack.find((x) => x === scene0);
+    if (popped_scene == null) {
+      console.warn(`[Kate] pop_scene() called with inactive scene`, scene0);
+      return;
     }
-    this._current_scene = this._scene_stack.pop() ?? null;
-    if (
-      this._current_scene != null &&
-      this.focus_handler.current_root !== this._current_scene.canvas
-    ) {
-      console.warn(
-        `[Kate] incorrect focus root when moving scenes`,
-        "Expected:",
-        this._current_scene.canvas,
-        "Got:",
-        this.focus_handler.current_root
-      );
+
+    this.focus_handler.pop_root(popped_scene.canvas);
+    if (this._current_scene === popped_scene) {
+      popped_scene.canvas.classList.remove("kate-os-entering");
+      popped_scene.canvas.classList.add("kate-os-leaving");
+      wait(250).then(() => {
+        popped_scene.detach();
+      });
+      this._current_scene = this._scene_stack.pop() ?? null;
+    } else {
+      popped_scene.detach();
+      this._scene_stack = this._scene_stack.filter((x) => x !== popped_scene);
     }
   }
 
-  replace_scene(scene: Scene) {
-    this.pop_scene();
+  replace_scene(old: Scene, scene: Scene) {
+    this.pop_scene(old);
     this.push_scene(scene);
   }
 
@@ -205,7 +204,7 @@ export class KateOS {
     boot_screen.set_message("");
 
     await min_boot_time;
-    os.pop_scene();
+    boot_screen.close();
 
     // Show start screen
     os.push_scene(new SceneHome(os));

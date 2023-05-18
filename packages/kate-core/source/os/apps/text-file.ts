@@ -66,6 +66,6 @@ export class SceneTextFile extends Scene {
   };
 
   handle_close = () => {
-    this.os.pop_scene();
+    this.close();
   };
 }

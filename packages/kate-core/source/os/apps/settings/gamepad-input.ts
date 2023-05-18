@@ -120,7 +120,7 @@ export class TestStandardMappingSettings extends UI.SimpleScene {
         this._pressed.set(index, previous);
         if (time - previous > 1_000) {
           this._pressed = new Map();
-          this.os.pop_scene();
+          this.close();
           return;
         }
       }
@@ -142,7 +142,7 @@ export class TestStandardMappingSettings extends UI.SimpleScene {
   };
 
   on_cancel = () => {
-    this.os.pop_scene();
+    this.close();
   };
 
   on_save = () => {};
@@ -681,10 +681,10 @@ export class RemapStandardSettings extends UI.SimpleScene {
         dangerous: true,
       });
       if (discard_confirm) {
-        this.os.pop_scene();
+        this.close();
       }
     } else {
-      this.os.pop_scene();
+      this.close();
     }
   };
 
@@ -699,7 +699,7 @@ export class RemapStandardSettings extends UI.SimpleScene {
       JSON.stringify(this._mapping)
     );
     this.os.kernel.gamepad.remap(this._mapping);
-    this.os.pop_scene();
+    this.close();
   };
 
   on_attached(): void {
@@ -961,7 +961,7 @@ export class ChooseActiveGamepadSettings extends UI.SimpleScene {
       JSON.stringify(paired.id)
     );
     this.os.kernel.gamepad.pair(paired.id);
-    this.os.pop_scene();
+    this.close();
   };
 
   private _last_update: number | null = null;

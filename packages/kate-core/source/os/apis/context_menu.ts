@@ -211,7 +211,7 @@ export class HUD_ContextMenu extends Scene {
   };
 
   close() {
-    this.os.pop_scene();
+    super.close();
     this.on_close.emit();
   }
 

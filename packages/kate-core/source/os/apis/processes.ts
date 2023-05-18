@@ -3,6 +3,7 @@ import type { CR_Process, CartRuntime } from "../../kernel/cart-runtime";
 import type { KateOS } from "../os";
 import { SceneGame } from "../apps/game";
 import { HUD_LoadIndicator } from "../apps/load-screen";
+import type { Scene } from "../ui";
 
 export class KateProcesses {
   private _running: KateProcess | null = null;
@@ -45,9 +46,15 @@ export class KateProcesses {
   }
 
   private async display_process(cart: Cart.CartMeta, runtime: CartRuntime) {
-    const process = new KateProcess(this, cart, await runtime.run(this.os));
+    const scene = new SceneGame(this.os, () => process);
+    const process: KateProcess = new KateProcess(
+      this,
+      cart,
+      await runtime.run(this.os),
+      scene
+    );
     this._running = process;
-    this.os.push_scene(new SceneGame(this.os, process));
+    this.os.push_scene(scene);
     return process;
   }
 
@@ -114,7 +121,7 @@ export class KateProcesses {
   notify_exit(process: KateProcess) {
     if (process === this._running) {
       this._running = null;
-      this.os.pop_scene();
+      process.scene.close();
     }
   }
 }
@@ -125,7 +132,8 @@ export class KateProcess {
   constructor(
     readonly manager: KateProcesses,
     readonly cart: Cart.CartMeta,
-    readonly runtime: CR_Process
+    readonly runtime: CR_Process,
+    readonly scene: Scene
   ) {}
 
   async pause() {

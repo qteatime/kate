@@ -17,7 +17,7 @@ export type FocusInteraction = {
 };
 
 export class KateFocusHandler {
-  private _stack: (HTMLElement | null)[] = [];
+  private _stack: HTMLElement[] = [];
   private _current_root: HTMLElement | null = null;
   private _previous_traps: FocusInteraction | null = null;
   private _handlers: {
@@ -66,8 +66,10 @@ export class KateFocusHandler {
     return this._current_root?.querySelector(".focus") ?? null;
   }
 
-  push_root(element: HTMLElement | null) {
-    this._stack.push(this._current_root);
+  push_root(element: HTMLElement) {
+    if (this._current_root != null) {
+      this._stack.push(this._current_root);
+    }
     this._current_root = element;
     this.on_focus_changed.emit(element);
     if (element != null && element.querySelector(".focus") == null) {
@@ -75,20 +77,18 @@ export class KateFocusHandler {
     }
   }
 
-  pop_root(expected: HTMLElement | null) {
-    if (expected != this._current_root) {
-      console.warn(`pop_root() with unexpected root`, {
-        expected,
-        current: this._current_root,
-      });
-      return;
-    }
-    if (this._stack.length > 0) {
-      this._current_root = this._stack.pop()!;
+  pop_root(expected: HTMLElement) {
+    if (expected === this._current_root) {
+      this._current_root = this._stack.pop() ?? null;
       this.on_focus_changed.emit(this._current_root);
       this.focus(this.current_focus);
     } else {
-      throw new Error(`pop_root() on an empty focus stack`);
+      const popped = this._stack.findIndex((x) => x === expected);
+      if (popped === -1) {
+        console.warn(`[Kate] pop_root() called with inactive root.`, expected);
+        return;
+      }
+      this._stack.splice(popped, 1);
     }
   }
 

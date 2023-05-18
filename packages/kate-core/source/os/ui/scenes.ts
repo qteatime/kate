@@ -40,6 +40,10 @@ export abstract class Scene {
 
   on_attached() {}
   on_detached() {}
+
+  close() {
+    this.os.pop_scene(this);
+  }
 }
 
 export type Action = {
@@ -67,7 +71,7 @@ export abstract class SimpleScene extends Scene {
   }
 
   on_return = () => {
-    this.os.pop_scene();
+    this.close();
   };
 
   render() {
