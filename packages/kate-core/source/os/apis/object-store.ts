@@ -14,6 +14,10 @@ export class KateObjectStore {
   static readonly LOCAL_STORAGE_KEY = "kate:local-storage";
   static readonly UNVERSIONED_KEY = "<unversioned>";
 
+  get default_quota() {
+    return KateObjectStore.DEFAULT_QUOTA;
+  }
+
   constructor(readonly os: KateOS) {}
 
   cartridge(cart: Cart.CartMeta, versioned: boolean) {

@@ -1,4 +1,4 @@
-import { foldl } from "../../utils";
+import { foldl, mb } from "../../utils";
 import * as Db from "../../data";
 import type { KateOS } from "../os";
 import { KateObjectStore } from "./object-store";
@@ -48,6 +48,8 @@ export type AppStorageDetails = {
 };
 
 export class KateStorageManager {
+  static SYSTEM_PADDING = mb(256);
+
   constructor(readonly os: KateOS) {}
 
   async storage_summary() {
@@ -55,7 +57,20 @@ export class KateStorageManager {
     return {
       quota: estimate.quota ?? null,
       usage: estimate.usage ?? 0,
+      reserved: KateStorageManager.SYSTEM_PADDING,
     };
+  }
+
+  async can_fit(size: number) {
+    const estimate = await this.storage_summary();
+    if (estimate.quota == null) {
+      return true;
+    } else {
+      return (
+        estimate.usage + size <
+        estimate.quota - KateStorageManager.SYSTEM_PADDING
+      );
+    }
   }
 
   async estimate_media() {
@@ -95,7 +110,7 @@ export class KateStorageManager {
     );
 
     const totals = {
-      quota: device.quota ?? device.usage,
+      quota: device.quota ? device.quota - device.reserved : device.usage,
       media: media_usage,
       save_data: save_data_usage,
       applications: applications_usage,

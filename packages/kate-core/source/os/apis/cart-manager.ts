@@ -1,7 +1,12 @@
 import * as Cart from "../../cart";
 import type { KateOS } from "../os";
 import * as Db from "../../data";
-import { make_id, make_thumbnail_from_bytes, mb } from "../../utils";
+import {
+  from_bytes,
+  make_id,
+  make_thumbnail_from_bytes,
+  mb,
+} from "../../utils";
 
 export class CartManager {
   readonly CARTRIDGE_SIZE_LIMIT = mb(512);
@@ -86,7 +91,22 @@ export class CartManager {
       this.os.notifications.push_transient(
         "kate:cart-manager",
         "Installation failed",
-        `${file.name} exceeds the 512MB cartridge size limit.`
+        `${file.name} (${from_bytes(
+          file.size
+        )}) exceeds the 512MB cartridge size limit.`
+      );
+      return;
+    }
+
+    const estimated_unpacked_size =
+      file.size + this.os.object_store.default_quota.maximum_size * 2;
+    if (!(await this.os.storage_manager.can_fit(estimated_unpacked_size))) {
+      this.os.notifications.push_transient(
+        "kate:cart-manager",
+        "Installation failed",
+        `${file.name} (${from_bytes(
+          estimated_unpacked_size
+        )}) exceeds the storage capacity.`
       );
       return;
     }
