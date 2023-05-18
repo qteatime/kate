@@ -55,7 +55,10 @@ async function main() {
       kate_os.db,
       "readwrite",
       async (storage) => {
-        await storage.initialise(cart.metadata.id, cart.metadata.version_id);
+        await storage.initialise_partitions(
+          cart.metadata.id,
+          cart.metadata.version_id
+        );
       }
     );
 
