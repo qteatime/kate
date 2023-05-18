@@ -338,23 +338,17 @@ class SceneCartridgeSaveDataSettings extends UI.SimpleScene {
       UI.vspace(16),
       this.save_data_summary(),
       UI.vspace(32),
-      UI.when(this.os.processes.is_running(this.app.id), [
-        UI.meta_text([
-          `
-          The cartridge is currently running. To manage this cartridge's
-          data you'll need to close the cartridge first.
-        `,
-        ]),
-      ]),
-      UI.when(!this.os.processes.is_running(this.app.id), [
-        UI.button_panel(this.os, {
-          title: "Delete all save data",
-          description:
-            "The cartridge will work as a freshly installed one after this.",
-          on_click: () => this.delete_save_data(),
-          dangerous: true,
-        }),
-      ]),
+      UI.button_panel(this.os, {
+        title: "Delete all save data",
+        description: [
+          `The cartridge will work as a freshly installed one after this.`,
+          this.os.processes.is_running(this.app.id)
+            ? " The cartridge is running, so it will be restarted."
+            : "",
+        ].join(""),
+        on_click: () => this.delete_save_data(),
+        dangerous: true,
+      }),
     ];
   }
 
@@ -413,6 +407,11 @@ class SceneCartridgeSaveDataSettings extends UI.SimpleScene {
       ok: "Delete save data",
     });
     if (ok) {
+      await this.os.processes.terminate(
+        this.app.id,
+        "kate:settings",
+        "Deleted save data."
+      );
       await this.os.object_store.delete_cartridge_data(
         this.app.id,
         this.app.version_id
@@ -422,6 +421,9 @@ class SceneCartridgeSaveDataSettings extends UI.SimpleScene {
         "Deleted save data",
         `Deleted save data for ${this.app.title}`
       );
+      if (this.os.kernel.console.options.mode === "single") {
+        location.reload();
+      }
     }
   }
 }
