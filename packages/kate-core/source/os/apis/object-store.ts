@@ -25,6 +25,12 @@ export class KateObjectStore {
   }
 
   async delete_cartridge_data(cart_id: string, version_id: string) {
+    if (this.os.processes.is_running(cart_id)) {
+      throw new Error(
+        `delete_cartridge_data() called while the cartridge is running.`
+      );
+    }
+
     await Db.ObjectStorage.transaction(
       this.os.db,
       "readwrite",

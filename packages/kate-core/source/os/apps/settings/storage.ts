@@ -177,29 +177,49 @@ export class SceneCartridgeStorageSettings extends UI.SimpleScene {
     return UI.section({
       title: "Actions",
       contents: [
-        UI.meta_text([
-          "Here you can remove the cartridge files to free up space. ",
-          "If you want to delete only save data, or only captured media, ",
-          "you can do it from one of the screens above.",
+        UI.when(!this.os.processes.is_running(this.app.id), [
+          UI.meta_text([
+            `Here you can remove the cartridge files to free up space.
+             If you want to delete only save data, or only captured media,
+             you can do it from one of the screens above.`,
+          ]),
         ]),
-        UI.when(this.app.status === "active", [
-          UI.vspace(16),
-          UI.button_panel(this.os, {
-            title: "Archive cartridge",
-            description: `Cartridge files will be deleted, save data and media will be kept. Reinstalling the cartridge will bring it back to the current state`,
-            dangerous: true,
-            on_click: () => this.archive_cartridge(),
-          }),
+        UI.when(this.os.processes.is_running(this.app.id), [
+          UI.meta_text([
+            `
+            The cartridge is currently running. To manage this cartridge's
+            data you'll need to close the cartridge first.
+          `,
+          ]),
         ]),
-        UI.when(this.app.status !== "inactive", [
-          UI.vspace(16),
-          UI.button_panel(this.os, {
-            title: "Delete all data",
-            description: `Cartridge files and save data will be deleted, media will be kept. Reinstalling will not restore the save data.`,
-            dangerous: true,
-            on_click: () => this.delete_all_data(),
-          }),
-        ]),
+        UI.when(
+          this.app.status === "active" &&
+            !this.os.processes.is_running(this.app.id),
+          [
+            UI.vspace(16),
+            UI.button_panel(this.os, {
+              title: "Archive cartridge",
+              description: `Cartridge files will be deleted, save data and media will be kept.
+                            Reinstalling the cartridge will bring it back to the current state`,
+              dangerous: true,
+              on_click: () => this.archive_cartridge(),
+            }),
+          ]
+        ),
+        UI.when(
+          this.app.status !== "inactive" &&
+            !this.os.processes.is_running(this.app.id),
+          [
+            UI.vspace(16),
+            UI.button_panel(this.os, {
+              title: "Delete all data",
+              description: `Cartridge files and save data will be deleted, media will be kept.
+                            Reinstalling will not restore the save data.`,
+              dangerous: true,
+              on_click: () => this.delete_all_data(),
+            }),
+          ]
+        ),
       ],
     });
   }
@@ -312,13 +332,23 @@ class SceneCartridgeSaveDataSettings extends UI.SimpleScene {
       UI.vspace(16),
       this.save_data_summary(),
       UI.vspace(32),
-      UI.button_panel(this.os, {
-        title: "Delete all save data",
-        description:
-          "The cartridge will work as a freshly installed one after this.",
-        on_click: () => this.delete_save_data(),
-        dangerous: true,
-      }),
+      UI.when(this.os.processes.is_running(this.app.id), [
+        UI.meta_text([
+          `
+          The cartridge is currently running. To manage this cartridge's
+          data you'll need to close the cartridge first.
+        `,
+        ]),
+      ]),
+      UI.when(!this.os.processes.is_running(this.app.id), [
+        UI.button_panel(this.os, {
+          title: "Delete all save data",
+          description:
+            "The cartridge will work as a freshly installed one after this.",
+          on_click: () => this.delete_save_data(),
+          dangerous: true,
+        }),
+      ]),
     ];
   }
 

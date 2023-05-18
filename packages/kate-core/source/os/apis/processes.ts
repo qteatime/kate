@@ -51,6 +51,10 @@ export class KateProcesses {
     return process;
   }
 
+  is_running(cart_id: string) {
+    return this.running?.cart.metadata.id === cart_id;
+  }
+
   async terminate(id: string, requester: string, reason: string) {
     if (this._running != null && this._running.cart.metadata.id === id) {
       await this.os.notifications.push(

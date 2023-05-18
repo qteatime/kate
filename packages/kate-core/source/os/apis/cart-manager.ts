@@ -182,6 +182,9 @@ export class CartManager {
   }
 
   async archive(cart_id: string) {
+    if (this.os.processes.is_running(cart_id)) {
+      throw new Error(`archive() called while cartridge is running.`);
+    }
     await Db.CartStore.transaction(
       this.os.db,
       "all",
@@ -195,6 +198,10 @@ export class CartManager {
   }
 
   async delete_all_data(cart_id: string) {
+    if (this.os.processes.is_running(cart_id)) {
+      throw new Error(`delete_all_data() called while cartridge is running.`);
+    }
+
     const meta = await this.read_metadata(cart_id);
     await this.os.db.transaction(
       [
