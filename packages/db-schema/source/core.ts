@@ -9,7 +9,7 @@ import type {
 
 function lift_request<A>(req: IDBRequest<A>): Promise<A> {
   return new Promise<A>((resolve, reject) => {
-    req.onerror = (_: any) => reject(new Error(`failed`));
+    req.onerror = (_: any) => reject(req.error);
     req.onsuccess = (_: any) => resolve(req.result);
   });
 }
@@ -85,14 +85,14 @@ export class Database {
       let result: A;
 
       request.onerror = (ev) => {
-        const error = (ev as any).target?.error ?? null;
-        const message = error?.toString() ?? "Unknown error";
+        const error = request.error ?? null;
+        const message = error?.stack ?? String(error ?? "Unknown error");
         console.error(`[Kate] transaction aborted:`, error);
         reject(new Error(`cannot start transaction: ${message}`));
       };
       request.onabort = (ev) => {
-        const error = (ev as any).target?.error ?? null;
-        const message = error?.toString() ?? "Unknown error";
+        const error = request.error ?? null;
+        const message = error?.stack ?? String(error ?? "Unknown error");
         console.error(`[Kate] transaction aborted:`, error);
         reject(new Error(`transaction aborted: ${message}`));
       };
@@ -105,6 +105,10 @@ export class Database {
         trans.commit();
       } catch (error) {
         trans.abort();
+        console.error(
+          `[Kate] internal error while running transaction:`,
+          error
+        );
         reject(error);
       }
     });

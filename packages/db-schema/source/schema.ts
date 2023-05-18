@@ -14,7 +14,7 @@ export class DatabaseSchema {
         let old_version: number = this.version;
 
         request.onerror = (ev) => {
-          console.error(`[Kate] failed to open database`, ev);
+          console.error(`[Kate] failed to open database`, request.error);
           reject(new Error(`Unable to open database`));
         };
         request.onsuccess = (ev) => {
