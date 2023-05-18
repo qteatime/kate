@@ -197,7 +197,10 @@ const recipe = T.tagged_choice<Recipe, Recipe["type"]>("type", {
     type: T.constant("renpy" as const),
     pointer_support: T.bool,
     save_data: T.one_of(["versioned" as const, "unversioned" as const]),
-    renpy_version: T.one_of(["7.5" as const]),
+    renpy_version: T.regex(
+      "version in the form MM.NN (e.g.: 7.5, 8.1)",
+      /^\d+\.\d+$/
+    ),
     hide_cursor: T.optional(false, T.bool),
   }),
 });
@@ -318,7 +321,7 @@ type Recipe =
       pointer_support: boolean;
       save_data: "versioned" | "unversioned";
       hide_cursor: boolean;
-      renpy_version: "7.5";
+      renpy_version: string;
     }
   | { type: "bitsy" };
 
@@ -873,11 +876,9 @@ function apply_recipe(json: ReturnType<typeof config>) {
   }
 }
 
-function renpy_version(x: "7.5") {
-  return {
-    major: 7,
-    minor: 5,
-  };
+function renpy_version(x: string) {
+  const [_, major, minor] = x.match(/^(\d+)\.(\d+)$/)!;
+  return { major: Number(major), minor: Number(minor) };
 }
 
 function select_bridges(bridges: Bridge[]) {

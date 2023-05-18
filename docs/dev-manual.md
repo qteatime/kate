@@ -480,7 +480,7 @@ This recipe will include common Ren'Py files and use the following bridges:
 ]
 ```
 
-Make sure you're using Ren'Py 7.5, as older versions do not have reliable web support, and 8.1 introduced new features that do not yet work with Kate's sandbox.
+Make sure you're using Ren'Py 7.5 or 8.1, as older versions do not have reliable web support.
 
 > **STARTUP PERFORMANCE NOTE**<br>
 > Ren'Py web export supports [progressive downloads](https://www.renpy.org/dev-doc/html/web.html#progressive-downloading), where part of the game is added to a zip file loaded upfront, and parts of it are downloaded as needed while the player is playing.
@@ -488,6 +488,11 @@ Make sure you're using Ren'Py 7.5, as older versions do not have reliable web su
 > When you package your game as a Kate cartridge, there's no download happening—the player already has all the game files in their computer. However, you want to _turn on_ all progressive downloading, so Ren'Py keeps those files **outside** of the `game.zip` package. Having more data in the zip file increases startup time because Ren'Py will need to decompress all of the files before the game starts, and this is a very time-consuming and processing-intensive thing to do.
 >
 > However, note that loading a file from the Kate file system still has a little bit of latency, so it might be useful to keep very small sound effect files in the `game.zip` package none the less, just so they are loaded in memory by the time e.g.: the player focuses a button that has a hover sound effect (this will ensure it plays correctly and without delay the first time, not just the second time onwards).
+
+> **Ren'Py 8.1 STARTUP PERFORMANCE**<br>
+> Ren'Py 8.1 runs using Python 3.11 in the web, but that might not be the one running locally to produce a cached bytecode, so you might find that your game has to recompile at startup (e.g.: you get a very long "Loading game script..." message).
+>
+> Follow the [instructions in the Ren'Py documentation](https://www.renpy.org/doc/html/web.html#bytecode-cache), by launching the web version from the Ren'Py launcher, in order to improve this.
 
 > **STORAGE USAGE NOTE**<br>
 > Kate cartridges can store up to 64 MB of data, but Ren'Py save files are quite sizable and the default configuration is not very economical. It's recommended to reduce `config.autosave_slots` and `config.quicksave_slots` variables to a smaller number (e.g.: 3), as well as offer less save slots to the player.

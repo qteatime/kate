@@ -92,8 +92,8 @@ Kate does not accept source contributions currently, since it has not reached a 
 
 We aim to support all reasonable web-exports of common game engines. The list below is the ones that are being tested and actively worked on (as the games people make with them fit Kate's general goals).
 
-- ✔️ **Bitsy** (full support as of Kate v23.5);
-- ✔️ **Ren'Py** (full support for Ren'Py web export 7.5 as of Kate v23.6; Ren'Py 8 requires more work);
+- ✔️ **Bitsy** (full support as of Kate v0.23.5);
+- ✔️ **Ren'Py** (full support for Ren'Py web export 7.5 and 8.1 as of Kate v0.23.6);
 - ✔️ **GB Studio** (web emulators work with existing bridges, but no recipe provided yet);
 - ✔️ **Pico-8** (web export works with existing bridges, but no recipe provided yet);
 - ➖ RPG Maker MV (requires minor code changes in the game);

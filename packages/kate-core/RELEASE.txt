@@ -45,8 +45,7 @@ Functional Ren'Py support
 -------------------------
 
 With this release Kate is functionally compatible with games
-exported in Ren'Py 7.5. There's some work to do in order to
-make Kate also compatible with games exported in Ren'Py 8.
+exported in Ren'Py 7.5 and Ren'Py 8.1.
 
 
 Storage visualisation
@@ -90,3 +89,6 @@ Fixed bugs
 
   - The network bridge now handles blob: urls, so Ren'Py 7.5
     pre-splashes work correctly.
+
+  - Fixed an issue with the indexedDB bridge that caused Ren'Py 8
+    games to not load when reconciling save data.

@@ -31,6 +31,17 @@ void (function () {
   class JobQueue {
     readonly _jobs: Job<any>[] = [];
     private _busy: boolean = false;
+    private on_emptied_listeners: (() => void)[] = [];
+
+    on_emptied(fn: () => void) {
+      setTimeout(() => {
+        if (this._jobs.length === 0) {
+          fn();
+        } else {
+          this.on_emptied_listeners.push(fn);
+        }
+      });
+    }
 
     async submit<A>(job: Job<A>): Promise<A> {
       const result = defer<A>();
@@ -65,6 +76,11 @@ void (function () {
         await job().catch((error) => {
           console.error(`[Kate][IDBBridge] job failed`, error);
         });
+      }
+      const listeners = this.on_emptied_listeners.slice();
+      this.on_emptied_listeners = [];
+      for (const fn of listeners) {
+        fn();
       }
       this._busy = false;
     }
@@ -286,10 +302,12 @@ void (function () {
       if (!stores.every((x) => x != null)) {
         throw new DOMException(`Some stores not found`, "NotFoundError");
       }
-      return new KDBTransaction(
+      const transaction = new KDBTransaction(
         this,
         stores.map((x) => new KDBObjectStore(this, x!))
       );
+      queue.on_emptied(() => transaction.commit());
+      return transaction;
     }
 
     async _flush() {
@@ -343,7 +361,7 @@ void (function () {
       for (const _ of search(query, this._meta.data)) {
         result += 1;
       }
-      return request(new KDBRequest(), async (_) => result);
+      return queue.submit_request(new KDBRequest(), async (_) => result);
     }
 
     delete(query: any) {
@@ -358,28 +376,28 @@ void (function () {
 
     get(query: any) {
       const item = [...search(query, this._meta.data)][0];
-      return request(new KDBRequest(), async (req) => {
+      return queue.submit_request(new KDBRequest(), async (req) => {
         return item?.value;
       });
     }
 
     getAll(query: any, count: number = 2 ** 32 - 1) {
       const items = [...search(query, this._meta.data)].slice(0, count);
-      return request(new KDBRequest(), async (req) => {
+      return queue.submit_request(new KDBRequest(), async (req) => {
         return items.map((x) => x.value);
       });
     }
 
     getAllKeys(query: any, count: number = 2 ** 32 - 1) {
       const items = [...search(query, this._meta.data)].slice(0, count);
-      return request(new KDBRequest(), async (req) => {
+      return queue.submit_request(new KDBRequest(), async (req) => {
         return items.map((x) => x.key);
       });
     }
 
     getKey(query: any) {
       const item = [...search(query, this._meta.data)][0];
-      return request(new KDBRequest(), async (req) => {
+      return queue.submit_request(new KDBRequest(), async (req) => {
         return item?.key;
       });
     }
@@ -515,14 +533,14 @@ void (function () {
 
     count(query: any) {
       const items = linear_search(query, this._make_index());
-      return request(new KDBRequest(), async (req) => {
+      return queue.submit_request(new KDBRequest(), async (req) => {
         return [...items].length;
       });
     }
 
     get(query: any) {
       const item = [...linear_search(query, this._make_index())][0];
-      return request(new KDBRequest(), async (req) => {
+      return queue.submit_request(new KDBRequest(), async (req) => {
         return item?.value;
       });
     }
@@ -532,7 +550,7 @@ void (function () {
         0,
         count
       );
-      return request(new KDBRequest(), async (req) => {
+      return queue.submit_request(new KDBRequest(), async (req) => {
         return items.map((x) => x.value);
       });
     }
@@ -542,14 +560,14 @@ void (function () {
         0,
         count
       );
-      return request(new KDBRequest(), async (req) => {
+      return queue.submit_request(new KDBRequest(), async (req) => {
         return items.map((x) => x.key);
       });
     }
 
     getKey(query: any) {
       const item = [...linear_search(query, this._make_index())][0];
-      return request(new KDBRequest(), async (req) => {
+      return queue.submit_request(new KDBRequest(), async (req) => {
         return item?.key;
       });
     }
@@ -696,6 +714,8 @@ void (function () {
   }
 
   class KDBTransaction extends EventTarget {
+    private resolved = false;
+
     constructor(readonly _db: KDBDatabase, readonly _stores: KDBObjectStore[]) {
       super();
     }
@@ -717,12 +737,20 @@ void (function () {
     }
 
     abort() {
+      if (this.resolved) {
+        return;
+      }
+      this.resolved = true;
       console.warn(
         `[Kate][IDBBridge] Kate's IndexedDB bridge is not transactional!`
       );
     }
 
     commit() {
+      if (this.resolved) {
+        return;
+      }
+      this.resolved = true;
       const ev = new CustomEvent("complete");
       this.dispatchEvent(ev);
     }
