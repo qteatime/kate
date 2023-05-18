@@ -7,7 +7,7 @@ void (function () {
     if (typeof x !== "string") {
       return false;
     } else {
-      return /^data:\w+\/\w+;base64,/.test(x);
+      return /^data:\w+\/\w+;base64,/.test(x) || /^blob:/.test(x);
     }
   }
 

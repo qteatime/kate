@@ -87,3 +87,6 @@ Fixed bugs
   - Errors resulting from storage quota being exceeded are now
     handled more gracefully. There's some reserved system space
     to avoid being locked into unrecoverable storage states.
+
+  - The network bridge now handles blob: urls, so Ren'Py 7.5
+    pre-splashes work correctly.
