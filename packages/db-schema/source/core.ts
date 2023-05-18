@@ -87,13 +87,11 @@ export class Database {
       request.onerror = (ev) => {
         const error = request.error ?? null;
         const message = error?.stack ?? String(error ?? "Unknown error");
-        console.error(`[Kate] transaction aborted:`, error);
         reject(new Error(`cannot start transaction: ${message}`));
       };
       request.onabort = (ev) => {
         const error = request.error ?? null;
         const message = error?.stack ?? String(error ?? "Unknown error");
-        console.error(`[Kate] transaction aborted:`, error);
         reject(new Error(`transaction aborted: ${message}`));
       };
       request.oncomplete = (ev) => {
@@ -107,7 +105,8 @@ export class Database {
         trans.abort();
         console.error(
           `[Kate] internal error while running transaction:`,
-          error
+          error,
+          request.error
         );
         reject(error);
       }

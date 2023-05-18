@@ -93,7 +93,19 @@ export class CartridgeObjectStore {
   }
 
   async ensure_bucket(name: string) {
-    return this.add_bucket(name).catch((e) => this.get_bucket(name));
+    const bucket = await this.transaction("readwrite", async (storage) => {
+      const bucket = await storage.partitions.try_get([
+        this.cartridge_id,
+        this.version,
+        name,
+      ]);
+      if (bucket == null) {
+        return storage.add_bucket(this.cartridge_id, this.version, name);
+      } else {
+        return bucket;
+      }
+    });
+    return new CartridgeBucket(this, bucket);
   }
 
   async get_bucket(name: string) {
