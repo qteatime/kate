@@ -42,14 +42,16 @@ export class SceneSettings extends UI.SimpleScene {
         },
       }),
 
-      UI.link_card(this.os, {
-        icon: "hard-drive",
-        title: "Storage",
-        description: "Visualise and manage storage usage",
-        on_click: () => {
-          this.os.push_scene(new SceneStorageSettings(this.os));
-        },
-      }),
+      UI.when(this.os.kernel.console.options.mode !== "single", [
+        UI.link_card(this.os, {
+          icon: "hard-drive",
+          title: "Storage",
+          description: "Visualise and manage storage usage",
+          on_click: () => {
+            this.os.push_scene(new SceneStorageSettings(this.os));
+          },
+        }),
+      ]),
 
       UI.link_card(this.os, {
         icon: "stethoscope",
