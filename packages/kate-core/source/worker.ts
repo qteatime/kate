@@ -43,6 +43,7 @@ async function cache_version(version: string) {
     "/css/os/screens/loading.css",
     "/css/os/screens/logo.css",
     "/css/os/screens/media.css",
+    "/css/os/screens/storage-settings.css",
     "/css/os/themes/candy-pop.css",
     // Fonts
     "/fonts/fontawesome/css/fontawesome.css",

@@ -9,7 +9,7 @@ import type {
 
 function lift_request<A>(req: IDBRequest<A>): Promise<A> {
   return new Promise<A>((resolve, reject) => {
-    req.onerror = (_: any) => reject(new Error(`failed`));
+    req.onerror = (_: any) => reject(req.error);
     req.onsuccess = (_: any) => resolve(req.result);
   });
 }
@@ -85,10 +85,16 @@ export class Database {
       let result: A;
 
       request.onerror = (ev) => {
-        reject(new Error(`cannot start transaction`));
+        const error = request.error ?? null;
+        const message = error?.stack ?? String(error ?? "Unknown error");
+        console.error(`[Kate] transaction aborted:`, error);
+        reject(new Error(`cannot start transaction: ${message}`));
       };
       request.onabort = (ev) => {
-        reject(new Error(`transaction aborted`));
+        const error = request.error ?? null;
+        const message = error?.stack ?? String(error ?? "Unknown error");
+        console.error(`[Kate] transaction aborted:`, error);
+        reject(new Error(`transaction aborted: ${message}`));
       };
       request.oncomplete = (ev) => {
         resolve(result);
@@ -99,6 +105,10 @@ export class Database {
         trans.commit();
       } catch (error) {
         trans.abort();
+        console.error(
+          `[Kate] internal error while running transaction:`,
+          error
+        );
         reject(error);
       }
     });
@@ -140,7 +150,7 @@ export class Transaction {
 
   get_index1<I extends IndexSchema1<any, any>>(index: I) {
     const store = this.trans.objectStore(index.table.name);
-    return new Index<I["__schema1"], I["__kt1"], I["__k1"]>(
+    return new Index<I["__schema1"], [I["__kt1"]], [I["__k1"]]>(
       store.index(index.name)
     );
   }

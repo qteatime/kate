@@ -3,6 +3,7 @@ import type { CR_Process, CartRuntime } from "../../kernel/cart-runtime";
 import type { KateOS } from "../os";
 import { SceneGame } from "../apps/game";
 import { HUD_LoadIndicator } from "../apps/load-screen";
+import type { Scene } from "../ui";
 
 export class KateProcesses {
   private _running: KateProcess | null = null;
@@ -45,10 +46,20 @@ export class KateProcesses {
   }
 
   private async display_process(cart: Cart.CartMeta, runtime: CartRuntime) {
-    const process = new KateProcess(this, cart, await runtime.run(this.os));
+    const scene = new SceneGame(this.os, () => process);
+    const process: KateProcess = new KateProcess(
+      this,
+      cart,
+      await runtime.run(this.os),
+      scene
+    );
     this._running = process;
-    this.os.push_scene(new SceneGame(this.os, process));
+    this.os.push_scene(scene);
     return process;
+  }
+
+  is_running(cart_id: string) {
+    return this.running?.cart.metadata.id === cart_id;
   }
 
   async terminate(id: string, requester: string, reason: string) {
@@ -89,10 +100,10 @@ export class KateProcesses {
           return { mime: file.mime, data: file.data, path: path };
         },
         on_playtime_update: async (time) => {
-          await this.os.cart_manager.increase_play_time(id, time);
+          await this.os.play_habits.increase_play_time(id, time);
         },
       });
-      await this.os.cart_manager.update_last_played(id, new Date());
+      await this.os.play_habits.update_last_played(id, new Date());
       return this.display_process(cart, runtime);
     } catch (error) {
       this._running = null;
@@ -110,7 +121,7 @@ export class KateProcesses {
   notify_exit(process: KateProcess) {
     if (process === this._running) {
       this._running = null;
-      this.os.pop_scene();
+      process.scene.close();
     }
   }
 }
@@ -121,7 +132,8 @@ export class KateProcess {
   constructor(
     readonly manager: KateProcesses,
     readonly cart: Cart.CartMeta,
-    readonly runtime: CR_Process
+    readonly runtime: CR_Process,
+    readonly scene: Scene
   ) {}
 
   async pause() {

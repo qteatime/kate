@@ -49,6 +49,22 @@ exported in Ren'Py 7.5. There's some work to do in order to
 make Kate also compatible with games exported in Ren'Py 8.
 
 
+Storage visualisation
+---------------------
+
+There's a new settings screen for visualising and managing
+different parts of the storage. This includes:
+
+  - Archiving cartridges (deleting the cartridge files, but keeping
+    save data and screenshots/video captures);
+  - Deleting all save data; and
+  - Deleting all cartridge-related data (except for screenshots/captures).
+
+This should make Kate a bit more usable around managing what's
+stored locally and allowing people to remove data they no longer
+need to keep around.
+
+
 Fixed bugs
 ----------
 
@@ -67,3 +83,7 @@ Fixed bugs
     web app, meaning you should be able to run the web version of
     Kate offline if you install it on an iPhone, Android, or
     Windows 10+.
+
+  - Errors resulting from storage quota being exceeded are now
+    handled more gracefully. There's some reserved system space
+    to avoid being locked into unrecoverable storage states.

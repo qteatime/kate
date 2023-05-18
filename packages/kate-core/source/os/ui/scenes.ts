@@ -11,6 +11,7 @@ import {
   icon_button,
   stringify,
   to_node,
+  fa_icon,
 } from "./widget";
 
 export abstract class Scene {
@@ -39,6 +40,10 @@ export abstract class Scene {
 
   on_attached() {}
   on_detached() {}
+
+  close() {
+    this.os.pop_scene(this);
+  }
 }
 
 export type Action = {
@@ -66,12 +71,20 @@ export abstract class SimpleScene extends Scene {
   }
 
   on_return = () => {
-    this.os.pop_scene();
+    this.close();
   };
 
   render() {
     const body = this.body();
-    const body_element = body instanceof Promise ? [h("div", {}, [])] : body;
+    const body_element =
+      body instanceof Promise
+        ? [
+            h("div", { class: "kate-ui-screen-loading-indicator" }, [
+              fa_icon("circle-notch", "2x", "solid", "spin"),
+              "Loading...",
+            ]),
+          ]
+        : body;
     const canvas = simple_screen({
       icon: this.icon,
       title: this.title,

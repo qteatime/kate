@@ -21,6 +21,14 @@ import { KateCapture } from "./apis/capture";
 import { KateSfx } from "./sfx";
 import { KateSettings } from "./apis/settings";
 import { InputKey } from "../kernel";
+import { KateStorageManager } from "./apis/storage-manager";
+import { KatePlayHabits } from "./apis/play-habits";
+
+export type CartChangeReason =
+  | "installed"
+  | "removed"
+  | "archived"
+  | "save-data-changed";
 
 export class KateOS {
   private _scene_stack: Scene[] = [];
@@ -37,9 +45,16 @@ export class KateOS {
   readonly ipc: KateIPCServer;
   readonly dialog: KateDialog;
   readonly capture: KateCapture;
+  readonly storage_manager: KateStorageManager;
+  readonly play_habits: KatePlayHabits;
   readonly events = {
     on_cart_inserted: new EventStream<Cart.CartMeta>(),
     on_cart_removed: new EventStream<{ id: string; title: string }>(),
+    on_cart_archived: new EventStream<string>(),
+    on_cart_changed: new EventStream<{
+      id: string;
+      reason: CartChangeReason;
+    }>(),
   };
 
   private constructor(
@@ -66,6 +81,9 @@ export class KateOS {
     this.dialog = new KateDialog(this);
     this.dialog.setup();
     this.capture = new KateCapture(this);
+    this.play_habits = new KatePlayHabits(this);
+    this.storage_manager = new KateStorageManager(this);
+    this.storage_manager.setup();
   }
 
   get display() {
@@ -91,33 +109,32 @@ export class KateOS {
     this.focus_handler.push_root(scene.canvas);
   }
 
-  pop_scene() {
-    if (this._current_scene != null) {
-      this.focus_handler.pop_root(this._current_scene.canvas);
-      const scene = this._current_scene;
-      scene.canvas.classList.remove("kate-os-entering");
-      scene.canvas.classList.add("kate-os-leaving");
-      wait(250).then(() => {
-        scene.detach();
-      });
+  pop_scene(scene0: Scene) {
+    const popped_scene =
+      this._current_scene === scene0
+        ? this._current_scene
+        : this._scene_stack.find((x) => x === scene0);
+    if (popped_scene == null) {
+      console.warn(`[Kate] pop_scene() called with inactive scene`, scene0);
+      return;
     }
-    this._current_scene = this._scene_stack.pop() ?? null;
-    if (
-      this._current_scene != null &&
-      this.focus_handler.current_root !== this._current_scene.canvas
-    ) {
-      console.warn(
-        `[Kate] incorrect focus root when moving scenes`,
-        "Expected:",
-        this._current_scene.canvas,
-        "Got:",
-        this.focus_handler.current_root
-      );
+
+    this.focus_handler.pop_root(popped_scene.canvas);
+    if (this._current_scene === popped_scene) {
+      popped_scene.canvas.classList.remove("kate-os-entering");
+      popped_scene.canvas.classList.add("kate-os-leaving");
+      wait(250).then(() => {
+        popped_scene.detach();
+      });
+      this._current_scene = this._scene_stack.pop() ?? null;
+    } else {
+      popped_scene.detach();
+      this._scene_stack = this._scene_stack.filter((x) => x !== popped_scene);
     }
   }
 
-  replace_scene(scene: Scene) {
-    this.pop_scene();
+  replace_scene(old: Scene, scene: Scene) {
+    this.pop_scene(old);
     this.push_scene(scene);
   }
 
@@ -187,7 +204,7 @@ export class KateOS {
     boot_screen.set_message("");
 
     await min_boot_time;
-    os.pop_scene();
+    boot_screen.close();
 
     // Show start screen
     os.push_scene(new SceneHome(os));

@@ -26,7 +26,7 @@ export type SpecialInputKey = "menu" | "capture";
 
 export type ExtendedInputKey = InputKey | `long_${SpecialInputKey}`;
 
-export type Resource = "screen-recording" | "transient-storage";
+export type Resource = "screen-recording" | "transient-storage" | "low-storage";
 
 export type ConsoleCase = {
   type: "handheld" | "tv" | "fullscreen";
@@ -390,6 +390,10 @@ export class VirtualConsole {
     const refs = this.resources.get(resource) ?? 0;
     this.resources.set(resource, refs + 1);
     this.update_resource_display();
+  }
+
+  is_resource_taken(resource: Resource) {
+    return (this.resources.get(resource) ?? 0) > 0;
   }
 
   release_resource(resource: Resource) {

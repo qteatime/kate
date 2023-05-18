@@ -7,6 +7,7 @@ import { SceneTextFile } from "../apps/text-file";
 import * as UI from "../ui";
 import { EventStream } from "../../utils";
 import { SceneSettings } from "../apps";
+import { SceneCartridgeStorageSettings } from "../apps/settings/storage";
 
 declare global {
   function showOpenFilePicker(options: {
@@ -86,6 +87,9 @@ export class HUD_ContextMenu extends Scene {
               ),
               UI.fa_icon_button("images", "Media gallery").on_clicked(
                 this.on_media_gallery
+              ),
+              UI.fa_icon_button("hard-drive", "Manage data").on_clicked(
+                this.on_manage_data
               ),
               UI.menu_separator(),
               UI.fa_icon_button("cat", "About Kate").on_clicked(
@@ -167,6 +171,17 @@ export class HUD_ContextMenu extends Scene {
     }
   };
 
+  on_manage_data = async () => {
+    const process = this.os.processes.running;
+    if (process == null) {
+      throw new Error(`on_manage_data() called without a running process`);
+    }
+    const app = await this.os.storage_manager.try_estimate_live_cartridge(
+      process.cart
+    );
+    this.os.push_scene(new SceneCartridgeStorageSettings(this.os, app));
+  };
+
   on_legal_notices = () => {
     const process = this.os.processes.running!;
     const legal = new SceneTextFile(
@@ -196,7 +211,7 @@ export class HUD_ContextMenu extends Scene {
   };
 
   close() {
-    this.os.pop_scene();
+    super.close();
     this.on_close.emit();
   }
 

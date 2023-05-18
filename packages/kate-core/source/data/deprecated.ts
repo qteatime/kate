@@ -10,6 +10,8 @@ export const quota_usage_v1 = kate.table1<QuotaUsage_v1, "cart_id">({
   name: "quota_usage",
   path: "cart_id",
   auto_increment: false,
+  deprecated_since: 8,
+  deleted_since: 10,
 });
 
 export type ObjectStore_v1 = {
@@ -24,6 +26,7 @@ export const object_store_v1 = kate.table2<ObjectStore_v1, "cart_id", "id">({
   path: ["cart_id", "id"],
   auto_increment: false,
   deprecated_since: 8,
+  deleted_since: 10,
 });
 
 export type ObjectStore_v2 = {
@@ -43,16 +46,22 @@ export const object_store_v2 = kate.table3<
   name: "object_store_v2",
   path: ["cart_id", "bucket_id", "id"],
   auto_increment: false,
+  deprecated_since: 9,
+  deleted_since: 10,
 });
 export const idx_cart_object_store_by_cart_v1 = object_store_v2.index1({
   since: 8,
   name: "by_cart",
   path: ["cart_id"],
   unique: false,
+  deprecated_since: 9,
+  deleted_since: 10,
 });
 export const idx_cart_object_store_by_bucket_v1 = object_store_v2.index2({
   since: 8,
   name: "by_bucket",
   path: ["cart_id", "bucket_id"],
   unique: true,
+  deprecated_since: 9,
+  deleted_since: 10,
 });

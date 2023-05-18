@@ -5,6 +5,7 @@ import { unreachable } from "../../utils";
 import { Action, SimpleScene } from "../ui/scenes";
 import { SceneTextFile } from "./text-file";
 import { HUD_LoadIndicator } from "./load-screen";
+import { SceneCartridgeStorageSettings } from "./settings/storage";
 
 export class SceneHome extends SimpleScene {
   icon = "diamond";
@@ -45,22 +46,30 @@ export class SceneHome extends SimpleScene {
   }
 
   async show_carts(list: HTMLElement) {
-    const recency = (x: { meta: Db.CartMeta; habits: Db.PlayHabits }) => {
+    const recency = (
+      cart: Db.CartMeta,
+      habits_map: Map<string, Db.PlayHabits>
+    ) => {
+      const habits = habits_map.get(cart.id);
       return Math.max(
-        x.habits.last_played?.getTime() ?? 0,
-        x.meta.updated_at.getTime()
+        habits?.last_played?.getTime() ?? 0,
+        cart.updated_at.getTime()
       );
     };
 
     try {
-      const carts = (await this.os.cart_manager.list()).sort(
-        (a, b) => recency(b) - recency(a)
+      const carts0 = await this.os.cart_manager.list_by_status("active");
+      const habits = await this.os.play_habits.try_get_all(
+        carts0.map((x) => x.id)
+      );
+      const carts = carts0.sort(
+        (a, b) => recency(b, habits) - recency(a, habits)
       );
       list.textContent = "";
       this.cart_map = new Map();
       for (const x of carts) {
-        const child = this.render_cart(x.meta);
-        this.cart_map.set(child, x.meta);
+        const child = this.render_cart(x);
+        this.cart_map.set(child, x);
         list.appendChild(child);
       }
       this.os.focus_handler.focus(
@@ -88,23 +97,22 @@ export class SceneHome extends SimpleScene {
       cart.metadata.game.title,
       [
         { label: "Legal notices", value: "legal" as const },
-        { label: "Uninstall", value: "uninstall" as const },
+        { label: "Manage data", value: "manage-data" as const },
       ],
       "close"
     );
     switch (result) {
-      case "uninstall": {
-        const should_uninstall = await this.os.dialog.confirm("kate:home", {
-          title: `Uninstall ${cart.metadata.game.title}?`,
-          message: `This will remove the cartridge files, but not save data.`,
-          cancel: "Keep game",
-          ok: "Uninstall game",
-          dangerous: true,
-        });
-        if (should_uninstall) {
-          this.os.cart_manager.uninstall({
-            id: cart.metadata.id,
-            title: cart.metadata.game.title,
+      case "manage-data": {
+        const app = await this.os.storage_manager.try_estimate_cartridge(
+          cart.id
+        );
+        if (app != null) {
+          this.os.push_scene(new SceneCartridgeStorageSettings(this.os, app));
+        } else {
+          await this.os.dialog.message("kate:home", {
+            title: "Failed to read cartridge",
+            message:
+              "An unknown error happened while reading the cartridge details.",
           });
         }
         break;
@@ -115,26 +123,13 @@ export class SceneHome extends SimpleScene {
       }
 
       case "legal": {
-        const loading = new HUD_LoadIndicator(this.os);
-        this.os.show_hud(loading);
-        try {
-          const legal = new SceneTextFile(
-            this.os,
-            `Legal Notices`,
-            cart.metadata.game.title,
-            cart.metadata.release.legal_notices
-          );
-          this.os.push_scene(legal);
-        } catch (error) {
-          console.error(`Failed to show legal notices for ${cart.id}`, error);
-          await this.os.notifications.push(
-            "kate:os",
-            "Failed to open",
-            "Cartridge may be corrupted or not compatible with this version"
-          );
-        } finally {
-          this.os.hide_hud(loading);
-        }
+        const legal = new SceneTextFile(
+          this.os,
+          `Legal Notices`,
+          cart.metadata.game.title,
+          cart.metadata.release.legal_notices
+        );
+        this.os.push_scene(legal);
         break;
       }
 
@@ -171,20 +166,18 @@ export class SceneHome extends SimpleScene {
     super.on_attached();
 
     this.update_carts();
-    this.os.events.on_cart_inserted.listen(this.update_carts);
-    this.os.events.on_cart_removed.listen(this.update_carts);
+    this.os.events.on_cart_changed.listen(this.update_carts);
   }
 
   on_detached() {
-    this.os.events.on_cart_inserted.remove(this.update_carts);
-    this.os.events.on_cart_removed.remove(this.update_carts);
+    this.os.events.on_cart_changed.remove(this.update_carts);
     super.on_detached();
   }
 
-  private update_carts = () => {
+  private update_carts = async () => {
     const home = this.canvas!;
     const carts = home.querySelector(".kate-os-carts")! as HTMLElement;
-    this.show_carts(carts);
+    await this.show_carts(carts);
   };
 
   async play(id: string) {

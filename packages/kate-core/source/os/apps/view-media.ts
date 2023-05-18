@@ -179,12 +179,12 @@ export class SceneViewMedia extends Scene {
       await this.os.capture.delete(this.media.id!);
       await this.os.notifications.push("kate:media", `Media deleted`, "");
       this.media_list.mark_deleted(this.media.id!);
-      this.os.pop_scene();
+      this.close();
     }
   };
 
   handle_close = () => {
-    this.os.pop_scene();
+    this.close();
   };
 
   handle_download = () => {

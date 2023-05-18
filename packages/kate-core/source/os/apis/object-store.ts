@@ -12,6 +12,11 @@ export class KateObjectStore {
   };
   static readonly SPECIAL_BUCKET_KEY = "kate:special";
   static readonly LOCAL_STORAGE_KEY = "kate:local-storage";
+  static readonly UNVERSIONED_KEY = "<unversioned>";
+
+  get default_quota() {
+    return KateObjectStore.DEFAULT_QUOTA;
+  }
 
   constructor(readonly os: KateOS) {}
 
@@ -19,7 +24,39 @@ export class KateObjectStore {
     return new CartridgeObjectStore(
       this,
       cart.metadata.id,
-      versioned ? cart.metadata.version_id : "<unversioned>"
+      versioned ? cart.metadata.version_id : KateObjectStore.UNVERSIONED_KEY
+    );
+  }
+
+  async delete_cartridge_data(cart_id: string, version_id: string) {
+    await Db.ObjectStorage.transaction(
+      this.os.db,
+      "readwrite",
+      async (store) => {
+        await store.delete_partitions_and_quota(cart_id);
+        await store.initialise_partitions(cart_id, version_id);
+      }
+    );
+    this.os.events.on_cart_changed.emit({
+      id: cart_id,
+      reason: "save-data-changed",
+    });
+  }
+
+  async usage_estimates() {
+    return this.os.db.transaction(
+      [Db.cartridge_quota],
+      "readonly",
+      async (t) => {
+        const quota = t.get_index1(Db.idx_os_quota_by_cartridge);
+        const result = new Map<string, Db.CartridgeQuota[]>();
+        for (const entry of await quota.get_all()) {
+          const versions = result.get(entry.cartridge_id) ?? [];
+          versions.push(entry);
+          result.set(entry.cartridge_id, versions);
+        }
+        return result;
+      }
     );
   }
 }
@@ -121,7 +158,7 @@ export class CartridgeBucket {
   async list_metadata(count?: number) {
     return await this.transaction("readonly", async (storage) => {
       return storage.entries_by_bucket.get_all(
-        this.bucket.unique_bucket_id,
+        [this.bucket.unique_bucket_id],
         count
       );
     });
@@ -129,7 +166,7 @@ export class CartridgeBucket {
 
   async count() {
     return await this.transaction("readonly", async (storage) => {
-      return storage.entries_by_bucket.count(this.bucket.unique_bucket_id);
+      return storage.entries_by_bucket.count([this.bucket.unique_bucket_id]);
     });
   }
 

@@ -17,21 +17,41 @@ export class KateNotification {
   }
 
   async push(process_id: string, title: string, message: string) {
-    await this.log(process_id, title, message);
+    await this.log(process_id, title, message, true);
     this.hud.show(title, message);
   }
 
-  async log(process_id: string, title: string, message: string) {
-    await this.os.db.transaction([Db.notifications], "readwrite", async (t) => {
-      const notifications = t.get_table1(Db.notifications);
-      await notifications.put({
-        type: "basic",
+  async log(
+    process_id: string,
+    title: string,
+    message: string,
+    allow_failures: boolean = false
+  ) {
+    try {
+      await this.os.db.transaction(
+        [Db.notifications],
+        "readwrite",
+        async (t) => {
+          const notifications = t.get_table1(Db.notifications);
+          await notifications.put({
+            type: "basic",
+            process_id,
+            time: new Date(),
+            title,
+            message,
+          });
+        }
+      );
+    } catch (error) {
+      console.error(`[Kate] failed to store audit log:`, error, {
         process_id,
-        time: new Date(),
         title,
         message,
       });
-    });
+      if (!allow_failures) {
+        throw error;
+      }
+    }
   }
 
   async push_transient(process_id: string, title: string, message: string) {

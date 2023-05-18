@@ -117,6 +117,14 @@ export const cartridge_quota = kate.table2<
   auto_increment: false,
 });
 
+export const idx_os_quota_by_cartridge = cartridge_quota.index1({
+  since: 10,
+  name: "by_cartridge",
+  path: ["cartridge_id"],
+  multi_entry: false,
+  unique: false,
+});
+
 // -- Errors -------------------------------------------------------------------
 export class EQuotaExceeded extends Error {
   constructor(
@@ -156,6 +164,10 @@ export class ObjectStorage {
     return this.transaction.get_index2(idx_os_partition_by_version);
   }
 
+  get partitions_by_cartridge() {
+    return this.transaction.get_index1(idx_os_partition_by_cartridge);
+  }
+
   get entries() {
     return this.transaction.get_table2(os_entry);
   }
@@ -170,6 +182,10 @@ export class ObjectStorage {
 
   get quota() {
     return this.transaction.get_table2(cartridge_quota);
+  }
+
+  get quota_by_cartridge() {
+    return this.transaction.get_index1(idx_os_quota_by_cartridge);
   }
 
   async add_bucket(
@@ -207,9 +223,9 @@ export class ObjectStorage {
     name: string
   ) {
     const bucket = await this.partitions.get([cartridge_id, version_id, name]);
-    const entries = await this.entries_by_bucket.get_all(
-      bucket.unique_bucket_id
-    );
+    const entries = await this.entries_by_bucket.get_all([
+      bucket.unique_bucket_id,
+    ]);
     for (const entry of entries) {
       await this.delete_entry(
         cartridge_id,
@@ -345,7 +361,7 @@ export class ObjectStorage {
     });
   }
 
-  async initialise(cartridge_id: string, version_id: string) {
+  async initialise_partitions(cartridge_id: string, version_id: string) {
     const quota = await this.quota.try_get([cartridge_id, version_id]);
     if (quota == null) {
       this.partitions.add({
@@ -389,6 +405,27 @@ export class ObjectStorage {
         maximum_items_in_storage: 10_000,
         maximum_size_in_bytes: mb(64),
       });
+    }
+  }
+
+  async delete_partitions_and_quota(cart_id: string) {
+    const partitions = await this.partitions_by_cartridge.get_all([cart_id]);
+    for (const partition of partitions) {
+      for (const entry of await this.entries_by_bucket.get_all([
+        partition.unique_bucket_id,
+      ])) {
+        await this.entries.delete([partition.unique_bucket_id, entry.key]);
+        await this.data.delete([partition.unique_bucket_id, entry.key]);
+      }
+      await this.partitions.delete([
+        cart_id,
+        partition.version_id,
+        partition.bucket_name,
+      ]);
+    }
+
+    for (const quota of await this.quota_by_cartridge.get_all([cart_id])) {
+      await this.quota.delete([cart_id, quota.version_id]);
     }
   }
 }

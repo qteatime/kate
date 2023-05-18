@@ -171,7 +171,10 @@ export class Title_bar extends Widget {
 }
 
 export class Space extends Widget {
-  constructor(readonly x: { width?: number; height?: number }) {
+  constructor(
+    readonly x: { width?: number; height?: number },
+    readonly display: string
+  ) {
     super();
   }
 
@@ -180,7 +183,9 @@ export class Space extends Widget {
       "div",
       {
         class: "kate-ui-space",
-        style: `width: ${this.x.width ?? 0}px; height: ${this.x.height ?? 0}px`,
+        style: `width: ${this.x.width ?? 0}px; height: ${
+          this.x.height ?? 0
+        }px; display: ${this.display}`,
       },
       []
     );
@@ -356,6 +361,22 @@ export function text_button(
       enabled: x.enabled,
     }
   );
+}
+
+export function text(x: Widgetable[]) {
+  return h("div", { class: "kate-ui-text" }, x);
+}
+
+export function meta_text(x: Widgetable[]) {
+  return h("div", { class: "kate-ui-meta-text" }, x);
+}
+
+export function mono_text(x: Widgetable[]) {
+  return h("div", { class: "kate-ui-mono-text" }, x);
+}
+
+export function strong(x: Widgetable[]) {
+  return h("strong", {}, x);
 }
 
 export class Icon extends Widget {
@@ -615,7 +636,7 @@ export function legible_bg(children: Widgetable[]) {
 export function link_card(
   os: KateOS,
   x: {
-    icon?: string;
+    icon?: string | Widgetable;
     arrow?: string;
     title: Widgetable;
     description?: Widgetable;
@@ -629,7 +650,11 @@ export function link_card(
     { class: "kate-ui-link-card kate-ui-focus-target" },
     [
       h("div", { class: "kate-ui-link-card-icon" }, [
-        x.icon ? fa_icon(x.icon, "2x") : null,
+        x.icon == null
+          ? null
+          : typeof x.icon === "string"
+          ? fa_icon(x.icon, "2x")
+          : x.icon,
       ]),
       h("div", { class: "kate-ui-link-card-text" }, [
         h("div", { class: "kate-ui-link-card-title" }, [x.title]),
@@ -736,11 +761,11 @@ export function button(
 }
 
 export function vspace(x: number) {
-  return new Space({ height: x });
+  return new Space({ height: x }, "block");
 }
 
 export function hspace(x: number) {
-  return new Space({ width: x });
+  return new Space({ width: x }, "inline-block");
 }
 
 export function vdivider() {
@@ -889,4 +914,73 @@ export function choice_button(
 
 export function menu_separator() {
   return h("div", { class: "kate-ui-menu-separator" }, []);
+}
+
+export function section(x: { title: Widgetable; contents: Widgetable[] }) {
+  return h("div", { class: "kate-ui-section" }, [
+    h("h3", { class: "kate-ui-section-heading" }, [x.title]),
+    h("div", { class: "kate-ui-section-contents" }, x.contents),
+  ]);
+}
+
+export function stack_bar(x: {
+  total: number;
+  minimum_component_size?: number;
+  free?: { title: string; display_value: string };
+  components: { title: string; value: number; display_value: string }[];
+  skip_zero_value?: boolean;
+}) {
+  const colours = [
+    "var(--color-1)",
+    "var(--color-2)",
+    "var(--color-3)",
+    "var(--color-4)",
+    "var(--color-5)",
+  ];
+  const skip_zero = x.skip_zero_value !== false;
+  const components = x.components.filter((x) =>
+    skip_zero ? x.value > 0 : true
+  );
+  return h("div", { class: "kate-ui-stack-bar-container stack-horizontal" }, [
+    h("div", { class: "kate-ui-stack-bar" }, [
+      ...components.map((a, i) =>
+        h(
+          "div",
+          {
+            class: "kate-ui-stack-bar-component",
+            style: `--stack-bar-color: ${
+              colours[i % colours.length]
+            }; --stack-bar-size: ${Math.max(
+              x.minimum_component_size ?? 0,
+              a.value / x.total
+            )};`,
+            title: a.title,
+          },
+          []
+        )
+      ),
+    ]),
+    h("div", { class: "kate-ui-stack-bar-legend" }, [
+      ...components.map((a, i) =>
+        h(
+          "div",
+          {
+            class: "kate-ui-stack-bar-legend-item",
+            style: `--stack-bar-color: ${colours[i % colours.length]};`,
+          },
+          [`${a.title} (${a.display_value})`]
+        )
+      ),
+      x.free
+        ? h(
+            "div",
+            {
+              class: "kate-ui-stack-bar-legend-item",
+              style: `--stack-bar-color: var(--color-border-d1)`,
+            },
+            [`${x.free.title} (${x.free.display_value})`]
+          )
+        : null,
+    ]),
+  ]);
 }

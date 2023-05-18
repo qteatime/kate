@@ -30,10 +30,10 @@ export class KeyboardInputSettings extends UI.SimpleScene {
         dangerous: true,
       });
       if (discard_confirm) {
-        this.os.pop_scene();
+        this.close();
       }
     } else {
-      this.os.pop_scene();
+      this.close();
     }
   };
 
@@ -169,7 +169,7 @@ export class KeyboardInputSettings extends UI.SimpleScene {
       JSON.stringify(this._mapping)
     );
     this.os.kernel.keyboard.remap(this._mapping);
-    this.os.pop_scene();
+    this.close();
   };
 
   keymap(key: InputKey) {

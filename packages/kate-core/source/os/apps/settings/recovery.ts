@@ -24,7 +24,7 @@ export class SceneRecovery extends UI.SimpleScene {
       UI.button_panel(this.os, {
         title: "Delete all data",
         description: `Delete ALL data locally stored in the console. The application will reload
-        afterwards.`,
+          afterwards.`,
         on_click: this.delete_all_data,
         dangerous: true,
       }),
