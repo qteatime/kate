@@ -425,13 +425,20 @@ w.task("www:bundle", ["core:build", "glomp:build"], () => {
   copy("packages/kate-core/RELEASE.txt", `www/kate/RELEASE-latest.txt`);
 });
 
-w.task("www:release", ["www:bundle"], () => {
+w.task("www:release", ["www:bundle", "www:generate-cache-manifest"], () => {
   const version = require("./package.json").version;
   if (!/^[0-9a-z\.\-]+$/.test(version)) {
     throw new Error(`FATAL: package.json version is malformed`);
   }
   copy("www/kate/kate-latest.js", `www/kate/kate-${version}.js`);
   copy("www/kate/RELEASE-latest.txt", `www/kate/RELEASE-${version}.txt`);
+});
+
+w.task("www:generate-cache-manifest", [], () => {
+  const files0 = glob("**/*", { cwd: "www", nodir: true });
+  const exclude = new Set(["worker.js"]);
+  const files = files0.filter((x) => !exclude.has(x)).map((x) => `/${x}`);
+  FS.writeFileSync("www/cache-manifest.json", JSON.stringify(files, null, 2));
 });
 
 // -- Examples
