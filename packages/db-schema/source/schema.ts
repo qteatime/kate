@@ -156,7 +156,7 @@ export abstract class TableSchema<S> {
       index.upgrade(transaction, old_version);
     }
 
-    if (this.deleted_since != null && this.deleted_since >= db.version) {
+    if (this.deleted_since != null && old_version >= this.deleted_since) {
       db.deleteObjectStore(this.name);
     }
   }
@@ -291,10 +291,7 @@ abstract class IndexSchema {
         multiEntry: this.options.multi_entry,
       });
     }
-    if (
-      this.deleted_since != null &&
-      this.deleted_since >= transaction.db.version
-    ) {
+    if (this.deleted_since != null && old_version >= this.deleted_since) {
       const store = transaction.objectStore(this.table.name);
       store.deleteIndex(this.name);
     }
