@@ -27,3 +27,4 @@ electron/
 !packages/kate-desktop/source/electron.d.ts
 .cache
 www/worker.js
+www/cache-manifest.json
