@@ -40,7 +40,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 if (!("KateNative" in window)) {
     window.KateNative = null;
 }
-const DEFAULT_CHANNEL = location.hostname === "kate.qteati.me" ? "preview" : "latest";
+const url_args = new URL(location.href).searchParams;
+const DEFAULT_CHANNEL = url_args.get("channel") ??
+    (location.hostname === "kate.qteati.me" ? "preview" : "latest");
+if (url_args.get("reset") === "erase-all-data") {
+    if (window.confirm("Erase all data in Kate and restore it to factory defaults?")) {
+        localStorage["kate-channel"] = "";
+        localStorage["kate-version"] = "null";
+        indexedDB.deleteDatabase("kate");
+    }
+}
 async function load_script(url) {
     return new Promise((resolve, reject) => {
         const script = document.createElement("script");
