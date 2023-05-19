@@ -92,3 +92,6 @@ Fixed bugs
 
   - Fixed an issue with the indexedDB bridge that caused Ren'Py 8
     games to not load when reconciling save data.
+
+  - Screenshots and video captures are now sorted from most recent to
+    least recent (they were not sorted previously).
