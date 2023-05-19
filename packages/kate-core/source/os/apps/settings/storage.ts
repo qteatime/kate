@@ -37,20 +37,26 @@ export class SceneStorageSettings extends UI.SimpleScene {
     const cartridges = cartridges0.sort((a, b) => {
       return b.usage.total_in_bytes - a.usage.total_in_bytes;
     });
+    const used_total = estimates.totals.used;
 
     return [
       UI.section({
-        title: `Storage summary (${from_bytes(estimates.totals.quota)})`,
+        title: `Storage summary (${from_bytes(
+          estimates.totals.quota ?? used_total
+        )})`,
         contents: [
           UI.stack_bar({
-            total: estimates.totals.quota,
+            total: estimates.totals.quota ?? used_total,
             minimum_component_size: 0.005,
-            free: {
-              title: "Free",
-              display_value: from_bytes(
-                estimates.totals.quota - estimates.totals.used
-              ),
-            },
+            free:
+              estimates.totals.quota != null
+                ? {
+                    title: "Free",
+                    display_value: from_bytes(
+                      estimates.totals.quota - estimates.totals.used
+                    ),
+                  }
+                : undefined,
             components: [
               {
                 title: "System",

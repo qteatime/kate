@@ -71,17 +71,20 @@ export class KateStorageManager {
   }
 
   async storage_summary() {
-    const estimate = await navigator.storage.estimate();
+    const estimate = (await navigator.storage?.estimate()) ?? {
+      quota: null,
+      usage: null,
+    };
     return {
       quota: estimate.quota ?? null,
-      usage: estimate.usage ?? 0,
+      usage: estimate.usage ?? null,
       reserved: KateStorageManager.MINIMUM_FREE_SPACE,
     };
   }
 
   async can_fit(size: number) {
     const estimate = await this.storage_summary();
-    if (estimate.quota == null) {
+    if (estimate.quota == null || estimate.usage == null) {
       return true;
     } else {
       return (
@@ -93,7 +96,7 @@ export class KateStorageManager {
 
   async check_storage_health() {
     const estimate = await this.storage_summary();
-    if (estimate.quota == null) {
+    if (estimate.quota == null || estimate.usage == null) {
       return;
     }
     const usage =
@@ -223,9 +226,11 @@ export class KateStorageManager {
       media: media_usage,
       save_data: save_data_usage,
       applications: applications_usage,
-      used: device.usage,
+      get used() {
+        return device.usage ?? this.user;
+      },
       get system() {
-        return device.usage - this.user;
+        return device.usage == null ? 0 : device.usage - this.user;
       },
       get user() {
         return this.media + this.save_data + this.applications;
