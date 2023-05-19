@@ -3058,7 +3058,8 @@ class IndexSchema {
     upgrade(transaction, old_version) {
         if (this.version > old_version) {
             const store = transaction.objectStore(this.table.name);
-            store.createIndex(this.name, this.key, {
+            const key_path = this.key.length === 1 ? this.key[0] : this.key;
+            store.createIndex(this.name, key_path, {
                 unique: this.options.unique,
                 multiEntry: this.options.multi_entry,
             });
@@ -3280,14 +3281,17 @@ class Index {
     constructor(index) {
         this.index = index;
     }
+    fix_query(query) {
+        return Array.isArray(query) && query.length === 1 ? query[0] : query;
+    }
     async count(query) {
-        return await lift_request(this.index.count(query));
+        return await lift_request(this.index.count(this.fix_query(query)));
     }
     async get(query) {
         return await lift_request(this.index.get(query));
     }
     async get_all(query, count) {
-        return await lift_request(this.index.getAll(query, count));
+        return await lift_request(this.index.getAll(this.fix_query(query), count));
     }
 }
 exports.Index = Index;
@@ -17041,7 +17045,7 @@ class KateStorageManager {
         this.check_storage_health();
     }
     async storage_summary() {
-        const estimate = (await navigator.storage?.estimate()) ?? {
+        const estimate = (await navigator.storage?.estimate?.()) ?? {
             quota: null,
             usage: null,
         };
