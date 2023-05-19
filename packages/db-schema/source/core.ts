@@ -218,8 +218,12 @@ export class Table<Schema, Key, Props> {
 export class Index<Schema, Key, Props> {
   constructor(private index: IDBIndex) {}
 
+  private fix_query(query: QueryArray<Key> | undefined): any {
+    return Array.isArray(query) && query.length === 1 ? query[0] : query;
+  }
+
   async count(query: QueryArray<Key>) {
-    return await lift_request(this.index.count(query as any));
+    return await lift_request(this.index.count(this.fix_query(query)));
   }
 
   async get(query: Key): Promise<Schema> {
@@ -227,6 +231,6 @@ export class Index<Schema, Key, Props> {
   }
 
   async get_all(query?: QueryArray<Key>, count?: number): Promise<Schema[]> {
-    return await lift_request(this.index.getAll(query as any, count));
+    return await lift_request(this.index.getAll(this.fix_query(query), count));
   }
 }
