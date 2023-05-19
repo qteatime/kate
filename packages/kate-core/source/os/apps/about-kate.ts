@@ -244,6 +244,24 @@ export class SceneAboutKate extends SimpleScene {
     const available = versions.versions.filter((x) =>
       x.channels.includes(channel)
     );
+
+    const channel_button = UI.when(
+      this.os.kernel.console.options.mode === "web",
+      [
+        UI.link_card(this.os, {
+          arrow: "pencil",
+          title: "Release channel",
+          description: UI.vbox(0.3, [
+            "Frequency and stability of Kate's updates",
+            UI.meta_text(["(the emulator will reload when changing this)"]),
+          ]),
+          value: channel,
+          click_label: "Change",
+          on_click: () => this.handle_change_channel(container, versions),
+        }),
+      ]
+    );
+
     if (available.length > 0) {
       const current_index =
         available.findIndex((x) => x.version === current.version) ?? 0;
@@ -253,6 +271,7 @@ export class SceneAboutKate extends SimpleScene {
         container.append(
           h("div", {}, [
             UI.vbox(0.5, [
+              channel_button,
               UI.hbox(0.5, [
                 `Version ${latest.version} is available!`,
                 UI.link(this.os, "(Release Notes)", {
@@ -271,12 +290,79 @@ export class SceneAboutKate extends SimpleScene {
       }
     }
 
-    container.textContent = "You're up to date!";
+    container.textContent = "";
+    container.append(
+      h("div", {}, [UI.vbox(0.5, [channel_button, "You're up to date!"])])
+    );
+  }
+
+  async handle_change_channel(container: HTMLElement, versions: VersionMeta) {
+    const channel = await this.os.dialog.pop_menu(
+      "kate:about",
+      "Kate release channel",
+      [
+        { label: "Preview (updates monthly)", value: "preview" },
+        { label: "Nightly (untested releases)", value: "nightly" },
+      ],
+      null
+    );
+    if (channel != null) {
+      const current_channel = localStorage["kate-channel"];
+      if (current_channel === channel) {
+        return;
+      }
+
+      const current_version = JSON.parse(
+        localStorage["kate-version"]
+      ) as Version;
+      const available_versions = versions.versions.filter((x) =>
+        x.channels.includes(channel)
+      );
+      const version =
+        available_versions.find((x) => x.version === current_version.version) ??
+        available_versions.at(-1);
+      if (available_versions.length === 0 || version == null) {
+        await this.os.dialog.message("kate:about", {
+          title: "Failed to update channel",
+          message: `No releases available for channel ${channel}`,
+        });
+        return;
+      }
+      const old_version_index = versions.versions.findIndex(
+        (x) => x.version === current_version.version
+      );
+      const new_version_index = versions.versions.findIndex(
+        (x) => x.version === version.version
+      );
+      if (
+        old_version_index === -1 ||
+        new_version_index === -1 ||
+        new_version_index < old_version_index
+      ) {
+        const ok = await this.os.dialog.confirm("kate:about", {
+          title: `Downgrade to ${version.version}?`,
+          message: `Kate does not support graceful downgrades. Proceeding will erase all Kate data
+                    and then switch to the new version.`,
+          cancel: "Cancel",
+          ok: "Erase all data and downgrade",
+          dangerous: true,
+        });
+        if (!ok) {
+          return;
+        } else {
+          await this.os.db.delete_database();
+        }
+      }
+
+      localStorage["kate-channel"] = channel;
+      localStorage["kate-version"] = JSON.stringify(version);
+      location.reload();
+    }
   }
 
   async handle_release_notes_for_version(version: Version) {
     const text = await fetch(version.release_notes).then((x) => x.text());
-    await this.os.push_scene(
+    this.os.push_scene(
       new SceneTextFile(
         this.os,
         `Release notes v${version.version}`,
