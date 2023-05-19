@@ -9,7 +9,6 @@
 .kate-os-carts-scroll {
   overflow: hidden;
   padding: 5px 0;
-  margin-top: -5px;
   scroll-behavior: smooth;
   scroll-padding: 30px;
   padding-right: 250px;
@@ -21,7 +20,7 @@
 }
 
 .kate-os-carts {
-  margin: 10px 15px;
+  margin: 15px;
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
@@ -30,16 +29,14 @@
 }
 
 .kate-os-carts-box {
-  width: 200px;
-  height: 380px;
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
 .kate-os-carts-image {
-  width: 100%;
-  height: 350px;
+  width: 182px;
+  height: 317px;
   overflow: hidden;
   display: flex;
   justify-content: center;
@@ -51,7 +48,7 @@
 
 .focus .kate-os-carts-box .kate-os-carts-image {
   outline: 2px solid var(--color-primary);
-  border: 2px solid transparent;
+  border: 1px solid transparent;
   border-radius: 4px;
   transform: scale(1.04);
   animation: kate-focus-in 0.5s ease-out;
