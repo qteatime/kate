@@ -66,6 +66,7 @@ Kate does not accept source contributions currently, since it has not reached a 
 - Auditing action logs in the console;
 - Native app support (Android, ChromeOS, SteamOS, Linux, Windows);
 - Accessibility options (TTS, contrast, sizes, etc);
+- Stabilise cartridge format;
 - Formal semantics and security proofs;
 
 ### Planned features (post stable release)
