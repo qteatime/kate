@@ -35,7 +35,9 @@ export class SceneMedia extends SimpleScene {
   }
 
   private async get_media_filtered() {
-    const media0 = await this.os.capture.list();
+    const media0 = (await this.os.capture.list()).sort(
+      (a, b) => b.time.getTime() - a.time.getTime()
+    );
     const filter = this.filter;
     if (filter == null) {
       return { title: "All", media: media0 };
