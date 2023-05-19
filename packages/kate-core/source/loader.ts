@@ -8,8 +8,21 @@ if (!("KateNative" in window)) {
   (window as any).KateNative = null;
 }
 
+const url_args = new URL(location.href).searchParams;
+
 const DEFAULT_CHANNEL =
-  location.hostname === "kate.qteati.me" ? "preview" : "latest";
+  url_args.get("channel") ??
+  (location.hostname === "kate.qteati.me" ? "preview" : "latest");
+
+if (url_args.get("reset") === "erase-all-data") {
+  if (
+    window.confirm("Erase all data in Kate and restore it to factory defaults?")
+  ) {
+    localStorage["kate-channel"] = "";
+    localStorage["kate-version"] = "null";
+    indexedDB.deleteDatabase("kate");
+  }
+}
 
 type Version = {
   version: string;
