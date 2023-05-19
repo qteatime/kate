@@ -18,6 +18,7 @@ export class KateIPCServer {
   private _handlers = new Map<string, RuntimeEnv>();
   private _messages: Map<string, Handler<any, any>>;
   private _initialised = false;
+  private TRACE_MESSAGES = false;
 
   constructor(readonly os: KateOS) {
     this._messages = new Map();
@@ -72,7 +73,9 @@ export class KateIPCServer {
       typeof id === "string" &&
       typeof payload === "object"
     ) {
-      console.debug("kate-ipc <==", { type, id, payload });
+      if (this.TRACE_MESSAGES) {
+        console.debug("kate-ipc <==", { type, id, payload });
+      }
       const handler = this._handlers.get(secret);
       if (handler != null) {
         if (handler.frame.contentWindow !== ev.source) {
@@ -87,7 +90,9 @@ export class KateIPCServer {
             type: type as any,
             payload,
           });
-          console.debug("kate-ipc ==>", { id, ok: true, value: result });
+          if (this.TRACE_MESSAGES) {
+            console.debug("kate-ipc ==>", { id, ok: true, value: result });
+          }
           handler.frame.contentWindow?.postMessage(
             {
               type: "kate:reply",
