@@ -71,7 +71,7 @@ export class KateStorageManager {
   }
 
   async storage_summary() {
-    const estimate = (await navigator.storage?.estimate()) ?? {
+    const estimate = (await navigator.storage?.estimate?.()) ?? {
       quota: null,
       usage: null,
     };
