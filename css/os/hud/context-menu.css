@@ -5,8 +5,8 @@
 .kate-os-hud-context-menu-backdrop {
   position: absolute;
   background: var(--color-backdrop);
-  width: 800px;
-  height: 480px;
+  width: var(--base-screen-width);
+  height: var(--base-screen-height);
   backdrop-filter: blur(5px);
 }
 
@@ -17,7 +17,7 @@
   box-shadow: 1px 0px 2px var(--color-shadow);
   background: var(--color-background);
   width: 250px;
-  height: 480px;
+  height: var(--base-screen-height);
   animation: kate-slide-in-left 0.2s ease-out;
   display: flex;
   flex-direction: column;

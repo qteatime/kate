@@ -37,6 +37,9 @@ void function([module, exports, node_require]) {
 require.define(1, "packages\\kate-core\\build", "packages\\kate-core\\build\\loader.js", (module, exports, __dirname, __filename) => {
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+if (!("KateNative" in window)) {
+    window.KateNative = null;
+}
 const DEFAULT_CHANNEL = location.hostname === "kate.qteati.me" ? "preview" : "latest";
 async function load_script(url) {
     return new Promise((resolve, reject) => {
@@ -77,16 +80,22 @@ async function main() {
     else {
         await load_kate(version);
     }
-    const worker = await navigator.serviceWorker
-        ?.register("worker.js")
-        .catch((e) => {
-        console.error("[Kate] failed to register Kate worker", e);
-    });
-    if (worker != null) {
-        worker.active?.postMessage({
+    let worker;
+    if (navigator.serviceWorker?.controller) {
+        worker = navigator.serviceWorker.controller;
+        worker?.postMessage({
             type: "set-version",
             version: version.version,
         });
+    }
+    else {
+        const registration = await navigator.serviceWorker
+            ?.register(`worker.js?version=${encodeURIComponent(version.version)}`)
+            .catch((e) => {
+            console.error("[Kate] failed to register Kate worker", e);
+            return null;
+        });
+        worker = registration?.active ?? null;
     }
     // Run Kate
     const kate = Kate.kernel.KateKernel.from_root(document.querySelector(".kate"), {
@@ -94,6 +103,8 @@ async function main() {
         persistent_storage: true,
     });
     const kate_os = await Kate.os.KateOS.boot(kate);
+    window.kate = kate;
+    window.kate_os = kate_os;
 }
 main();
 

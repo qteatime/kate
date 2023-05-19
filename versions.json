@@ -5,7 +5,7 @@
       "main": "/kate/kate-0.23.4-a1.js",
       "breaking_change": false,
       "migration_needed": false,
-      "channels": ["preview"],
+      "channels": ["preview", "nightly"],
       "release_notes": "/kate/RELEASE-0.23.4-a1.txt"
     },
     {
@@ -13,8 +13,16 @@
       "main": "/kate/kate-0.23.5-rc1.js",
       "breaking_change": false,
       "migration_needed": false,
-      "channels": ["preview"],
+      "channels": ["preview", "nightly"],
       "release_notes": "/kate/RELEASE-0.23.5-rc1.txt"
+    },
+    {
+      "version": "0.23.6-a1",
+      "main": "/kate/kate-0.23.6-a1.js",
+      "breaking_change": true,
+      "migration_needed": true,
+      "channels": ["nightly"],
+      "release_notes": "/kate/RELEASE-0.23.6-a1.txt"
     },
     {
       "version": "latest",
@@ -27,6 +35,7 @@
   ],
   "channels": {
     "preview": "0.23.5-rc1",
+    "nightly": "0.23.6-a1",
     "latest": "latest"
   }
 }
