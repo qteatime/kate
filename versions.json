@@ -21,7 +21,7 @@
       "main": "/kate/kate-0.23.6-a1.js",
       "breaking_change": true,
       "migration_needed": true,
-      "channels": ["nightly"],
+      "channels": ["preview", "nightly"],
       "release_notes": "/kate/RELEASE-0.23.6-a1.txt"
     },
     {
