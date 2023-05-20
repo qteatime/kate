@@ -13149,9 +13149,11 @@ class SceneAboutKate extends scenes_1.SimpleScene {
             if (current_channel === channel) {
                 return;
             }
+            const channel_pointer = versions.channels[current_channel];
             const current_version = JSON.parse(localStorage["kate-version"]);
             const available_versions = versions.versions.filter((x) => x.channels.includes(channel));
             const version = available_versions.find((x) => x.version === current_version.version) ??
+                available_versions.find((x) => x.version === channel_pointer) ??
                 available_versions.at(-1);
             if (available_versions.length === 0 || version == null) {
                 await this.os.dialog.message("kate:about", {
