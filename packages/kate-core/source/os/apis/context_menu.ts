@@ -218,7 +218,7 @@ export class HUD_ContextMenu extends Scene {
   on_install_from_file = async () => {
     this.close();
 
-    return new Promise<void>((resolve, reject) => {
+    await new Promise<void>((resolve, reject) => {
       const installer = document.querySelector(
         "#kate-installer"
       ) as HTMLInputElement;
@@ -228,14 +228,18 @@ export class HUD_ContextMenu extends Scene {
         installer.onabort = () => {};
       };
       installer.onchange = async (ev) => {
+        const status = this.os.status_bar.show("");
         try {
           const file = installer.files!.item(0)!;
+          status.update(`Installing ${file.name}...`);
           await this.os.cart_manager.install_from_file(file);
           teardown();
           resolve();
         } catch (error) {
           teardown();
           reject(error);
+        } finally {
+          status.hide();
         }
       };
       installer.onerror = async () => {
