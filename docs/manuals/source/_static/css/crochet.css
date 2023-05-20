@@ -1,0 +1,37 @@
+.highlight {
+  border: 1px solid #ececea;
+  border-left-width: 10px;
+  box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.1);
+  font-size: 1.1em;
+}
+
+h1,
+h2,
+h3 {
+  margin-top: 2rem;
+}
+
+h3 {
+  border-bottom: 1px solid #ececea;
+}
+
+.admonition {
+  border: 1px solid #ececea;
+  box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.1);
+  border-left-width: 5px;
+}
+
+.admonition-title {
+  text-transform: uppercase;
+  font-size: 0.9em;
+}
+
+.field-list dt,
+.option-list dt,
+dl.footnote dt,
+dl.glossary dt,
+dl.simple dt,
+dl:not([class]) dt {
+  font-weight: bold;
+  margin-top: 1.5em;
+}
