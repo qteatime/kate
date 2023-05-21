@@ -247,7 +247,7 @@ class CR_Web_archive extends CartRuntime {
         env.channel = channel;
         frame.className = "kate-game-frame kate-game-frame-defaults";
         frame.sandbox = "allow-scripts";
-        frame.allow = "";
+        frame.allow = "autoplay";
         frame.csp =
             "default-src data: blob: 'unsafe-inline' 'unsafe-eval' 'unsafe-inline' 'wasm-unsafe-eval'; navigate-to 'none'";
         this.console.on_input_changed.listen((ev) => {
@@ -3058,8 +3058,7 @@ class IndexSchema {
     upgrade(transaction, old_version) {
         if (this.version > old_version) {
             const store = transaction.objectStore(this.table.name);
-            const key_path = this.key.length === 1 ? this.key[0] : this.key;
-            store.createIndex(this.name, key_path, {
+            store.createIndex(this.name, this.key, {
                 unique: this.options.unique,
                 multiEntry: this.options.multi_entry,
             });
@@ -3281,17 +3280,14 @@ class Index {
     constructor(index) {
         this.index = index;
     }
-    fix_query(query) {
-        return Array.isArray(query) && query.length === 1 ? query[0] : query;
-    }
     async count(query) {
-        return await lift_request(this.index.count(this.fix_query(query)));
+        return await lift_request(this.index.count(query));
     }
     async get(query) {
         return await lift_request(this.index.get(query));
     }
     async get_all(query, count) {
-        return await lift_request(this.index.getAll(this.fix_query(query), count));
+        return await lift_request(this.index.getAll(query, count));
     }
 }
 exports.Index = Index;
@@ -12858,7 +12854,7 @@ class HUD_ContextMenu extends scenes_1.Scene {
     }
     on_install_from_file = async () => {
         this.close();
-        return new Promise((resolve, reject) => {
+        await new Promise((resolve, reject) => {
             const installer = document.querySelector("#kate-installer");
             const teardown = () => {
                 installer.onchange = () => { };
@@ -12866,8 +12862,10 @@ class HUD_ContextMenu extends scenes_1.Scene {
                 installer.onabort = () => { };
             };
             installer.onchange = async (ev) => {
+                const status = this.os.status_bar.show("");
                 try {
                     const file = installer.files.item(0);
+                    status.update(`Installing ${file.name}...`);
                     await this.os.cart_manager.install_from_file(file);
                     teardown();
                     resolve();
@@ -12875,6 +12873,9 @@ class HUD_ContextMenu extends scenes_1.Scene {
                 catch (error) {
                     teardown();
                     reject(error);
+                }
+                finally {
+                    status.hide();
                 }
             };
             installer.onerror = async () => {
