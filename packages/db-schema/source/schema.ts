@@ -286,8 +286,7 @@ abstract class IndexSchema {
   upgrade(transaction: IDBTransaction, old_version: number) {
     if (this.version > old_version) {
       const store = transaction.objectStore(this.table.name);
-      const key_path = this.key.length === 1 ? this.key[0] : this.key;
-      store.createIndex(this.name, key_path, {
+      store.createIndex(this.name, this.key, {
         unique: this.options.unique,
         multiEntry: this.options.multi_entry,
       });
