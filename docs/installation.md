@@ -4,7 +4,10 @@
 
 Kate is a fantasy hand-held console, the primary form of distribution is as an emulator. You can install the emulator program in any of your devices and run any Kate cartridge in it. The big advantage of Kate over native executables is that all cartridges run in a sandbox, and thus can't damage your device, even if they turn out to be malicious.
 
-The easiest way of trying out Kate is to use the online emulator. Just open https://kate.qteati.me in a modern browser in your device and install some cartridges in it. Kate is tested on and supports the latest versions of Chrome (desktop and Android), Edge, Opera, Firefox, and Safari. If you're using iOS, Safari is the recommended browser, as other browsers have restricted capabilities there.
+The easiest way of trying out Kate is to use the online emulator. Just open https://kate.qteati.me in a modern browser in your device and install some cartridges in it. Kate is tested on and supports the latest versions of Chrome (desktop and Android), Edge, Opera, and Firefox.
+
+> **NOTE**<br>
+> Kate does not fully work in iOS Safari currently, as the browser lacks many of the APIs Kate depends on. Once Apple implements these APIs, Kate should work on newer versions of Safari as well.
 
 If you would like to use Kate for more than just trying a couple of games, there are a few different options offered, each comes with different trade-offs in terms of security and effort.
 
@@ -26,8 +29,28 @@ You can install the web version of the emulator (https://kate.qteati.me) in your
 To install:
 
 - On **Windows 10+**: open the page in Microsoft Edge and choose `Apps -> Install site as an app` from the menu;
-- On **iPhone**: open the page in Safari and choose `Share -> Add to Home Screen`;
 - On **Android**: open the page in Google Chrome and choose `Install app` from the menu;
+- On **Chrome for Windows/Linux**: you'll find the "Install" button in the address bar.
+
+### Chrome on Steam Deck
+
+Chrome runs on the Steam Deck using [Flatpak](https://flatpak.org/), which adds an OS sandbox around it. This means that Chrome will not, by default, have the necessary access to create the desktop shortcuts for Kate (which you can then add as a "non-Steam game" from within Steam in Desktop mode).
+
+If you want to have a desktop shortcut you can either give Chrome access to write to `~/.local/share/applications` and `~/.local/share/icons`. Or, more conservatively, you can create the `.desktop` file yourself. Either way, you'll probably want to run Kate in true fullscreen mode, which you can do by making sure your `.desktop` file looks like this:
+
+```
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Version=1.0
+Terminal=false
+Type=Application
+Category=Game;
+Name=Kate
+Exec=flatpak run --command=/app/bin/chrome com.google.Chrome --profile-directory=Default --app=https://kate.qteati.me/ --start-fullscreen --no-default-browser-check
+TryExec=/var/lib/flatpak/exports/bin/com.google.Chrome
+```
+
+When you first run Kate, it'll launch in [Handheld case mode](./user-manual.md#handheld-mode). You can hold down `Menu`, then go to `Settings -> User interface` and change to fullscreen mode instead, since you can just use the physical Steam Deck controller.
 
 ### Caveats
 
@@ -138,15 +161,15 @@ We aim to support the latest version of all mainstream browsers. The web version
 | Firefox            | 110+              | Windows 11 x64                   |
 | Opera              | 96+               | Windows 11 x64                   |
 | Chrome for Android | 108+              | Android 9                        |
-| Safari for iOS     | 16.4 (1)          | iOS 16.4                         |
 
-(1) Due to missing features from Apple, the latest Safari on iOS does not yet support: fullscreen, video recording.
+Safari on iOS is not currently supported, and Safari on MacOS is not currently tested.
 
 Installing the web app works in the following device/OSs:
 
 - iPhone/iPad: only with Safari;
 - Android: only with Chrome for Android;
 - Windows 10+: only with Microsoft Edge;
+- Chrome on Windows/Linux;
 
 ### Native version
 

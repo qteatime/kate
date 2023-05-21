@@ -2,7 +2,7 @@
 
 > **NOTE**: This is a living document. Information here applies to Kate v0.23.4
 
-Kate is a fantasy hand-held console for small 2d applications, particularly RPGs, Visual Novels, and similar story-driven games. As a fantasy console, games are generally run in an emulator program—the current emulator can run as a native application in Windows, Linux, and MacOS, as well as in a modern web browser (supporting Android, iOS, and other devices).
+Kate is a fantasy hand-held console for small 2d applications, particularly RPGs, Visual Novels, and similar story-driven games. As a fantasy console, games are generally run in an emulator program—the current emulator can run as a native application in Windows, Linux, and MacOS, as well as in a modern web browser (supporting Android, Steam Deck, and other devices).
 
 Kate is an accessibility, security, and privacy conscious platform. We want players to be in control of their gaming experience, and we want to make sure they have a fun (and safe!) time playing regardless of what cartridge they choose to run.
 

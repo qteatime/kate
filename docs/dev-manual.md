@@ -1,10 +1,10 @@
 # Making games for Kate!
 
-> **NOTE**: This is a living document. Information here applies to Kate v0.23.4
+> **NOTE**: This is a living document. Information here applies to Kate v0.23.6
 
 Kate is a fantasy hand-held console for small 2d applications, particularly RPGs, Visual Novels, and similar story-driven games. You can build real games that run in the console, which you distribute to your players as a single `.kart` file they can install and run offline, at their convenience, in any device.
 
-Kate supports Windows, Linux, and MacOS natively, and supports many other platforms with a modern web-browser (e.g.: iOS and Android). When programming for Kate you program for a single platform, distribute a single file, and allow players to run the game anywhere, as well as synchronise their data among their devices, without any additional programming on your side.
+Kate supports Windows, Linux, and MacOS natively, and supports many other platforms with a modern web-browser (e.g.: Steam Deck and Android). When programming for Kate you program for a single platform, distribute a single file, and allow players to run the game anywhere, as well as synchronise their data among their devices, without any additional programming on your side.
 
 This manual describes how to make games for Kate with a hands-on approach, as well as diving into some of its technical details and approach to security and privacy.
 
@@ -48,7 +48,7 @@ There's a planned tool called Kate Studio which will allow you to build games fo
 Once you have Node.js installed, you can install the set of tools for building Kate games from the command line:
 
 ```shell
-$ npm install -g @qteatime/kate-tools@experimental
+$ npm install -g @qteatime/kate-tools
 ```
 
 > **NOTE:**  
