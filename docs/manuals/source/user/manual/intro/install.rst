@@ -1,5 +1,5 @@
-Getting Kate
-============
+Installing
+==========
 
 The recommended way of getting your hands on Kate is to use the web-based
 emulator. This runs directly in your browser, no installation necessary:
@@ -7,23 +7,25 @@ emulator. This runs directly in your browser, no installation necessary:
   https://kate.qteati.me
 
 To run the web-based emulator you'll need a modern browser. Kate supports
-the latest versions of Chrome (desktop and Android), Edge, Opera, Firefox,
-and Safari. On an iPhone/iPad, Safari is the recommended browser to use.
+the latest versions of Chrome (desktop and Android), Edge, Opera, and Firefox.
 
 If you want to run Kate offline, you'll need to install it. There are a
 few different options to do so (ranked from most recommended to least
 recommended):
 
-* :ref:`Web Application` (available on Windows, Linux, iOS, Android);
+* :ref:`Web Application` (available on Windows, Linux, Steam Deck, Android);
 * :ref:`Pre-built binaries` (available on Linux and Windows);
 * :ref:`Building from source` (available on Linux and Windows);
 
 .. note::
 
-   The web version should be compatible with MacOS, ChromeOS, and other
-   platforms with a modern browser, but these devices are not currently
-   part of the testing pipeline. Once they are, they will be added here
-   as officially supported as well.
+   The web version should be compatible with other platforms with a modern
+   browser, but these devices are not currently part of the testing pipeline.
+   Once they are, they will be added here as officially supported as well.
+
+   Safari on iOS is tested and known not to work with many of the features
+   Kate provides, as those are not implemented in Safari yet (or have
+   incompatible behaviour in Safari).
 
 
 .. _Web Application:
@@ -39,10 +41,45 @@ To install:
 
 * On **Windows 10+**: open the page in Microsoft Edge, then choose 
   ``Apps -> Install site as an app`` from the menu;
-* On **iPhone**: open the page in Safari, then choose
-  ``Share -> Add to Home Screen``;
 * On **Android**: open the page in Google Chrome, then choose ``Install app``
   from the menu;
+* On **Chrome for Windows/Linux**: you'll find the ``Install`` button in the
+  address bar.
+
+
+Chrome on Steam Deck
+''''''''''''''''''''
+
+Chrome runs on the Steam Deck using `Flatpak <https://flatpak.org/>`_, which
+adds an OS sandbox around it. This means that Chrome will not, by default,
+have the necessary access to create the desktop shortcuts for Kate
+(which you can then add as a "non-Steam game" from within Steam in
+Desktop mode).
+
+If you want to have a desktop shortcut you can either give Chrome access
+to write to `~/.local/share/applications` and `~/.local/share/icons`. Or,
+more conservatively, you can create the `.desktop` file yourself. Either way,
+you'll probably want to run Kate in true fullscreen mode, which you can do by
+making sure your `.desktop` file looks like this:
+
+.. code-block::
+
+   #!/usr/bin/env xdg-open
+   [Desktop Entry]
+   Version=1.0
+   Terminal=false
+   Type=Application
+   Category=Game;
+   Name=Kate
+   Exec=flatpak run --command=/app/bin/chrome com.google.Chrome --profile-directory=Default --app=https://kate.qteati.me/ --start-fullscreen --no-default-browser-check
+   TryExec=/var/lib/flatpak/exports/bin/com.google.Chrome
+
+
+When you first run Kate, it'll launch in :doc:`Handheld case mode <modes>`. You
+can hold down |btn_menu_text|, then go to ``Settings -> User interface`` and change
+to fullscreen mode instead, since you can just use the physical Steam Deck
+controller.
+
 
 Caveats
 '''''''
@@ -129,7 +166,7 @@ download the ``x64`` version of Kate.
 
 Another way of checking your processor's architecture is to open
 https://kate.qteati.me/ in a Chromium-based browser (Chrome, Opera, Edge,
-Brave, etc.), hold the ``Menu`` button for a second, then open ``About Kate``.
+Brave, etc.), hold |btn_menu_text| for a second, then open ``About Kate``.
 Your processor architecture should be listed under ``Host -> Architecture``.
 
 .. _pre-built caveats:
@@ -269,18 +306,16 @@ web version of Kate has been tested and runs on the following browsers:
 +--------------------+-------------------+----------------------------------+
 | Chrome for Android | 108+              | Android 9                        |
 +--------------------+-------------------+----------------------------------+
-| Safari for iOS     | 16.4 [#f1]_       | iOS 16.4                         |
-+--------------------+-------------------+----------------------------------+
 
-.. [#f1] Due to missing features from Apple, the latest Safari on iOS does not
-   yet support: fullscreen, playing Ogg audio/Theora video, showing free
-   space in device's storage, haptic/vibration feedback.
+Safari on iOS is not currently supported, and Safari on MacOS is not currently
+tested. Once the missing features are implemented in Safari, these will be
+added to the table above as well.
 
 Installing the web app works in the following device/OSs:
 
-* **iPhone/iPad**: only with Safari;
 * **Android**: only with Chrome for Android;
 * **Windows 10+**: only with Microsoft Edge;
+* **Chrome (Desktop)**: supported on Windows and Linux;
 
 
 Native version

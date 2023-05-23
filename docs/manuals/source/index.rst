@@ -22,8 +22,8 @@ cover aspects from how to use Kate to its philosophy and security guarantees.
    :columns: 1
 
    * :doc:`Kate's User Manual <user/manual/index>`
-         Confused about how Kate works? This explains all features in
-         the console.
+         New to Kate? Confused about how Kate works? This explains how to
+         install it and all features in the console.
 
    * :doc:`Known issues & Limitations <user/issues/index>`
          Kate is still in preview/early-access. Known issues are

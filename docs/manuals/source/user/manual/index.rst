@@ -19,12 +19,13 @@ privacy-conscious, as well as to not limit how you choose to play
 your games. We want to make sure you have a fun (and safe!) time,
 regardless of what cartridge you choose to run.
 
-To get started you should :doc:`get the Kate emulator <install/index>`. You
+To get started you should :doc:`get the Kate emulator <intro/install>`. You
 may then :doc:`find out more about Kate's features <todo>`, and
 :doc:`install some games <todo>`.
 
 .. toctree::
    :maxdepth: 2
 
-   install/index
-   hardware/index
+   intro/index
+   gaming/index
+   security/index
