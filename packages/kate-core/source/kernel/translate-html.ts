@@ -15,8 +15,18 @@ export async function translate_html(html: string, context: RuntimeEnv) {
 }
 
 async function load_all_media(dom: Document, context: RuntimeEnv) {
-  for (const img of Array.from(dom.querySelectorAll("img"))) {
-    const maybe_path = img.getAttribute("src");
+  for (const media of Array.from(dom.querySelectorAll("img, audio, video"))) {
+    const maybe_source =
+      media instanceof HTMLMediaElement
+        ? Array.from(media.querySelectorAll("source[src]"))
+            .filter(
+              (x) =>
+                !x.getAttribute("type") ||
+                media.canPlayType(x.getAttribute("type")!) !== ""
+            )
+            .map((x) => x.getAttribute("src"))
+        : [];
+    const maybe_path = media.getAttribute("src") ?? maybe_source[0] ?? null;
     if (
       maybe_path == null ||
       maybe_path.trim() === "" ||
@@ -31,11 +41,11 @@ async function load_all_media(dom: Document, context: RuntimeEnv) {
     }
     if (file.data.length < 1024 * 1024) {
       // inline 1mb or less images
-      img.setAttribute("src", await get_data_url(path.as_string(), context));
+      media.setAttribute("src", await get_data_url(path.as_string(), context));
     } else {
-      img.classList.add("kate-lazy-load");
-      img.setAttribute("data-src", path.as_string());
-      img.removeAttribute("src");
+      media.classList.add("kate-lazy-load");
+      media.setAttribute("data-src", path.as_string());
+      media.removeAttribute("src");
     }
   }
 
@@ -45,7 +55,7 @@ async function load_all_media(dom: Document, context: RuntimeEnv) {
     for (const element of Array.from(document.querySelectorAll(".kate-lazy-load"))) {
       const path = element.getAttribute("data-src");
       if (path) {
-        element.setAttribute("src", await KateAPI.cart_fs.get_file_url(path));
+        element.src = await KateAPI.cart_fs.get_file_url(path);
       }
     }
   }();
