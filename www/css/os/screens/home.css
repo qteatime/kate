@@ -67,6 +67,7 @@
   line-height: 30px;
   white-space: nowrap;
   opacity: 0;
+  text-shadow: -1px -1px 2px white, 1px 1px 2px white;
 }
 
 .focus .kate-os-carts-box .kate-os-carts-title {
