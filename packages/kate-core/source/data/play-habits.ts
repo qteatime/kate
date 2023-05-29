@@ -4,7 +4,7 @@ import { kate } from "./db";
 export type PlayHabits = {
   id: string;
   last_played: Date | null;
-  play_time: number;
+  play_time: number; // in minutes
 };
 export const play_habits = kate.table1<PlayHabits, "id">({
   since: 5,

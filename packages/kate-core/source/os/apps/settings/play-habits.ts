@@ -1,5 +1,5 @@
 import { PlayHabits } from "../../../data";
-import { coarse_time, relative_date } from "../../../utils";
+import { coarse_time_from_minutes, relative_date } from "../../../utils";
 import * as UI from "../../ui";
 
 export class ScenePlayHabitsSettings extends UI.SimpleScene {
@@ -89,7 +89,7 @@ export class ScenePlayHabitsSettings extends UI.SimpleScene {
               description: UI.fragment([
                 entry.play_time === 0
                   ? "No total play time recorded"
-                  : `Played for ${coarse_time(entry.play_time)}`,
+                  : `Played for ${coarse_time_from_minutes(entry.play_time)}`,
                 UI.h("br", {}, []),
                 entry.last_played === null
                   ? "No play date recorded"

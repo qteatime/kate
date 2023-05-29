@@ -1,10 +1,4 @@
-import {
-  coarse_time,
-  foldl,
-  from_bytes,
-  mb,
-  relative_date,
-} from "../../../utils";
+import { from_bytes, relative_date } from "../../../utils";
 import type { AppStorageDetails } from "../../apis/storage-manager";
 import type { CartChangeReason, KateOS } from "../../os";
 import * as UI from "../../ui";

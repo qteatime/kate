@@ -1,14 +1,13 @@
-export function coarse_time(x: number) {
-  const second_threshold = 1_000 * 60; // 1 minute
-  const minute_threshold = 1_000 * 60 * 15; // 15 minutes
-  const hour_threshold = 1_000 * 60 * 60; // 1 hour
+export function coarse_time_from_minutes(x: number) {
+  const minute_threshold = 15;
+  const hour_threshold = 60;
 
-  if (x < second_threshold) {
-    return "a little while";
+  if (x <= 0) {
+    return "(not recorded)";
   } else if (x < minute_threshold) {
     return "a few minutes";
   } else if (x < hour_threshold) {
-    return `${Math.round(x / (1_000 * 60))} minutes`;
+    return `${x} minutes`;
   } else {
     return plural(
       Math.round(x / hour_threshold),
@@ -42,7 +41,7 @@ export function relative_date(x: Date | null) {
     } else if (
       year === now.getFullYear() &&
       month === now.getMonth() &&
-      date === now.getDate()
+      date <= now.getDate()
     ) {
       const d = now.getDate() - date;
       switch (d) {

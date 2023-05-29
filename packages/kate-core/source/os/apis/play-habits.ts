@@ -81,7 +81,8 @@ export class KatePlayHabits {
     );
   }
 
-  async increase_play_time(cart_id: string, play_time: number) {
+  async increase_play_time(cart_id: string, play_time_ms: number) {
+    const play_time_minutes = Math.floor(play_time_ms / (1_000 * 60));
     if (!this.os.settings.get("play_habits").play_times) {
       return;
     }
@@ -91,7 +92,7 @@ export class KatePlayHabits {
       "readwrite",
       async (store) => {
         const cart = await store.habits.get(cart_id);
-        cart.play_time += play_time || 0;
+        cart.play_time += play_time_minutes || 0;
         await store.habits.put(cart);
       }
     );
