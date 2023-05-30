@@ -182,13 +182,19 @@ export class HUD_ContextMenu extends Scene {
     this.os.push_scene(new SceneCartridgeStorageSettings(this.os, app));
   };
 
-  on_legal_notices = () => {
+  on_legal_notices = async () => {
     const process = this.os.processes.running!;
+    const licence_file = await this.os.cart_manager.read_file_by_path(
+      process.cart.metadata.id,
+      process.cart.metadata.release.legal_notices
+    );
+    const decoder = new TextDecoder();
+    const licence = decoder.decode(licence_file.data);
     const legal = new SceneTextFile(
       this.os,
       "Legal Notices",
       process.cart.metadata.game.title,
-      process.cart.metadata.release.legal_notices
+      licence
     );
     this.os.push_scene(legal);
   };

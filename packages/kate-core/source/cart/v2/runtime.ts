@@ -31,7 +31,7 @@ export function parse_runtime(cart: Cart_v2.Cartridge): Runtime {
       return {
         type: "web-archive",
         bridges: platform.bridges.map(bridge),
-        html: str(platform.html, chars_in_mb(1)),
+        html: str(platform.html),
       };
     }
   }

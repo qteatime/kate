@@ -202,6 +202,9 @@ export class CR_Web_archive extends CartRuntime {
   }
 
   async proxy_html(env: RuntimeEnv) {
-    return translate_html(this.env.cart.runtime.html, env);
+    const index_file = await env.read_file(env.cart.runtime.html);
+    const decoder = new TextDecoder();
+    const index = decoder.decode(index_file.data);
+    return translate_html(index, env);
   }
 }

@@ -123,11 +123,17 @@ export class SceneHome extends SimpleScene {
       }
 
       case "legal": {
+        const licence_file = await this.os.cart_manager.read_file_by_path(
+          cart.metadata.id,
+          cart.metadata.release.legal_notices
+        );
+        const decoder = new TextDecoder();
+        const licence = decoder.decode(licence_file.data);
         const legal = new SceneTextFile(
           this.os,
           `Legal Notices`,
           cart.metadata.game.title,
-          cart.metadata.release.legal_notices
+          licence
         );
         this.os.push_scene(legal);
         break;

@@ -124,10 +124,7 @@ export function parse_metadata(cart: Cart_v3.Cartridge): Metadata {
       licence_name: str(cart.metadata.release["licence-name"], 255),
       allow_commercial: cart.metadata.release["allow-commercial"],
       allow_derivative: cart.metadata.release["allow-derivative"],
-      legal_notices: str(
-        cart.metadata.release["legal-notices"],
-        chars_in_mb(5)
-      ),
+      legal_notices: str(cart.metadata.release["legal-notices"]),
     },
     rating: {
       rating: content_rating(cart.metadata.rating.rating),

@@ -55,6 +55,22 @@ export class CartManager {
     );
   }
 
+  async read_file_by_path(cart_id: string, path: string) {
+    return await Db.CartStore.transaction(
+      this.os.db,
+      "all",
+      "readonly",
+      async (store) => {
+        const cart = await store.meta.get(cart_id);
+        const file_id = cart.files.find((x) => x.path === path)?.id;
+        if (file_id == null) {
+          throw new Error(`File not found: ${path}`);
+        }
+        return store.files.get([cart_id, file_id]);
+      }
+    );
+  }
+
   async read_file_by_id(id: string, file_id: string) {
     return await Db.CartStore.transaction(
       this.os.db,
