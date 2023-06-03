@@ -78,6 +78,7 @@ Indices and tables
    :hidden:
 
    user/manual/index
+   dev/manual/index
    etc/releases/index
    etc/licence
    glossary
