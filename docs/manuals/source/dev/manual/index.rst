@@ -13,7 +13,7 @@ build and distribute games for Kate free of charge, with no special
 devices required.
 
 The Kate :term:`emulator` runs on any device with a modern web-browser,
-providing :term:`virtual buttons` for touch-based devices, so everyone
+providing :term:`virtual buttons <virtual button>` for touch-based devices, so everyone
 experiences your game the same way. When programming for Kate, you
 write your game for a single platform, distribute it as a single file,
 and players can run the game in any device.
@@ -25,3 +25,4 @@ providing details on its approach to security and privacy.
    :maxdepth: 2
 
    intro/index
+   model/index

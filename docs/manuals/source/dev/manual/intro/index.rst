@@ -13,3 +13,4 @@ Once you've made up your mind, be sure to check out
 
    why
    setup
+   hello-world
