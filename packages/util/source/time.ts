@@ -62,7 +62,7 @@ function plural(
   single: (_: string) => string,
   plural: (_: string) => string
 ) {
-  if (n === 0) {
+  if (n === 1) {
     return single(String(n));
   } else {
     return plural(String(n));
