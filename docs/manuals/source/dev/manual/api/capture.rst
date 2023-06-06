@@ -11,9 +11,9 @@ captures, by specifying which
 should be the capture target.
 
 
-.. py:function:: set_root(element: HTMLCanvasElement or null)
+.. py:function:: set_root(element: HTMLCanvasElement | null)
   
-  :param HTMLCanvasElement or null element: The canvas to capture, or ``null`` to disable captures.
+  :param element: The canvas to capture, or ``null`` to disable captures.
   
   Defines the canvas that should be the target of screenshots and video
   captures. You can change this at any point in the cartridge, and setting

@@ -65,12 +65,10 @@ Types
 Reading files
 -------------
 
-.. py:function:: read_file(path: string) -> File promise
+.. py:function:: read_file(path: string) -> Promise[File]
    :async:
    
-   :param string path: The path identifier of the file to read.
-   :returns: The file data and metadata.
-   :rtype: Promise(File)
+   :param path: The path identifier of the file to read.
 
    Reads the file pointed by the given ``path``. This will return a
    :py:class:`File` with the binary contents of the file and its
@@ -87,12 +85,10 @@ Reading files
       canvas.getContext("2d").drawImage(sprite, 0, 0);
 
 
-.. py:function:: get_file_url(path: string) -> string promise
+.. py:function:: get_file_url(path: string) -> Promise[string]
    :async:
 
-   :param string path: The path identifier of the file to read.
-   :returns: A ``blob://`` URL for the contents of the file.
-   :rtype: Promise(string)
+   :param path: The path identifier of the file to read.
 
    This is a convenience for invoking :py:func:`read_file` and creating
    a ``blob://`` URL from its binary contents, which can then be used

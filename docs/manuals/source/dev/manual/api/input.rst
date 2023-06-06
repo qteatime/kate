@@ -158,6 +158,23 @@ repeat presses if the player presses the button and doesn't release it
 for a long period of time.
 
 
+.. py:class:: ExtendedKeyPressedEvent
+  
+  Represents an extended key pressed, so contains ``long_menu`` and ``long_capture``
+  as possible key identifiers.
+
+  .. py:property:: key
+    :type: InputKey
+
+    The key that was pressed.
+
+  .. py:property:: is_repeat
+    :type: boolean
+
+    True if the key was pressed in a previous frame, but remains pressed in
+    this one.
+
+
 Events
 ''''''
 
@@ -167,7 +184,7 @@ to any listener in the cartridge.
 
 
 .. py:property:: on_key_pressed
-   :type: EventStream(InputKey)
+   :type: EventStream[InputKey]
 
    Emitted whenever the player presses a button, without delay. Therefore
    it does not distinguish between short and long presses.
@@ -176,7 +193,7 @@ to any listener in the cartridge.
 
 
 .. py:property:: on_extended_key_pressed
-   :type: EventStream({key: InputKey, is_repeat: boolean})
+   :type: EventStream[ExtendedKeyPressedEvent]
 
    Emitted when the player presses a button (or in the case of
    |btn_menu| and |btn_capture|, when the player releases the button).
@@ -202,9 +219,7 @@ for your game fail randomly.
 
 .. py:function:: is_pressed(key: InputKey) -> boolean
    
-   :param InputKey key: The button (one of the :ref:`button identifiers`) to test.
-   :returns: Whether the button is pressed at this point in time.
-   :rtype: boolean
+   :param key: The button (one of the :ref:`button identifiers`) to test.
 
    Tests whether the button is pressed at this point in time. This function
    does not require strong synchronisation, since the main thread cannot
@@ -213,9 +228,7 @@ for your game fail randomly.
 
 .. py:function:: frames_pressed(key: InputKey) -> number
    
-   :param InputKey key: The button (one of the :ref:`button identifiers`) to query.
-   :returns: The number of frames (according to :py:mod:`KateAPI.timer`) the button has been pressed for.
-   :rtype: number
+   :param key: The button (one of the :ref:`button identifiers`) to query.
 
    Returns the number of frames that the button has been held down, fully
    pressed. This is according to the Timer API, so you must synchronise your
@@ -224,9 +237,7 @@ for your game fail randomly.
 
 .. py:function:: is_just_pressed(key: InputKey) -> boolean
 
-   :param InputKey key: The button (one of the :ref:`button identifiers`) to query.
-   :returns: Whether the button was pressed *this* frame.
-   :rtype: boolean
+   :param key: The button (one of the :ref:`button identifiers`) to query.
 
    Returns whether the button was pressed this exact frame, according to the
    :py:mod:`KateAPI.timer`. You must synchronise your queries with the Timer API.
@@ -234,9 +245,7 @@ for your game fail randomly.
 
 .. py:function:: is_just_released(key: InputKey) -> boolean
    
-   :param InputKey key: The button (one of the :ref:`button identifiers`) to query.
-   :returns: Whether the button was released *this* frame.
-   :rtype: boolean
+   :param key: The button (one of the :ref:`button identifiers`) to query.
 
    Returns whether the button was released this exact frame, according to the
    :py:mod:`KateAPI.timer`. You must synchronise your queries with the Timer API.
@@ -340,7 +349,7 @@ when handling them.
 
 
 .. py:property:: on_moved
-  :type: EventStream(PointerLocation)
+  :type: EventStream[PointerLocation]
 
   Emitted whenever the position of the pointer on the screen changes.
 
@@ -437,25 +446,25 @@ device changes. These are throttled at 30 FPS, but your cartridge can build
 your own synchronisation when listening to them.
 
 .. py:property:: on_clicked
-  :type: EventStream(PointerClick)
+  :type: EventStream[PointerClick]
 
   Emitted whenever the primary pointer button is pressed.
 
 .. py:property:: on_alternate
-  :type: EventStream(PointerClick)
+  :type: EventStream[PointerClick]
 
   Emitted whenever the alternate pointer button is pressed
   (e.g.: right mouse button).
 
 .. py:property:: on_down
-  :type: EventStream(PointerClick)
+  :type: EventStream[PointerClick]
 
   Emitted whenever one of the pointer buttons is pressed. You can use the
   :py:attr:`PointerClick.button` property to distinguish which button was
   pressed.
 
 .. py:property:: on_up
-  :type: EventStream(PointerClick)
+  :type: EventStream[PointerClick]
 
   Emitted whenever one of the pointer buttons is released. You can use the
   :py:attr:`PointerClick.button` property to distinguish which button was
@@ -470,35 +479,27 @@ synchronise your calls with the :py:mod:`KateAPI.timer` API.
 
 .. py:function:: frames_pressed(button: number) -> number
 
-  :param number button: The identifier of the button to query.
-  :returns: The number of frames the button has been pressed for.
-  :rtype: number
+  :param button: The identifier of the button to query.
 
   Returns the number of frames the button has been pressed for.
 
 .. py:function:: is_pressed(button: number) -> boolean
 
-  :param number button: The identifier of the button to query.
-  :returns: Whether the button is pressed right now.
-  :rtype: boolean
+  :param button: The identifier of the button to query.
 
-  True if the button is pressed at all at the time this is called. This
+  Returns true if the button is pressed at all at the time this is called. This
   call does not have to be synchronised with the Timer API.
 
 .. py:function:: is_just_pressed(button: number) -> boolean
 
-  :param number button: The identifier of the button to query.
-  :returns: Whether the button was pressed this frame.
-  :rtype: boolean
+  :param button: The identifier of the button to query.
 
-  True if the button was pressed during this frame. This only makes sense
+  Returns true if the button was pressed during this frame. This only makes sense
   if your update function is synchronised with the Timer API.
 
 .. py:function:: is_just_released(button: number) -> boolean
 
-  :param number button: The identifier of the button to query.
-  :returns: Whether the button was released this frame.
-  :rtype: boolean
+  :param button: The identifier of the button to query.
 
-  True if the button was released during this frame. This only makes sense
+  Returns true if the button was released during this frame. This only makes sense
   if your update function is synchronised with the Timer API.

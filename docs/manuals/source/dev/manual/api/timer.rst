@@ -18,7 +18,7 @@ state will thus be unpredictable.
 
 
 .. py:property:: on_tick
-  :type: EventStream(number)
+  :type: EventStream[number]
 
   Emitted whenever Kate is ready to refresh. The data in this event is
   a :term:`monotonic timestamp`, which you can then use to calculate

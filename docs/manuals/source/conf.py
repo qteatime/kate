@@ -15,7 +15,8 @@ release = "0.23.6"
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 extensions = [
-  "sphinx.ext.todo"
+  "sphinx.ext.todo",
+  "sphinx.ext.extlinks"
 ]
 
 templates_path = ['_templates']
@@ -83,3 +84,5 @@ html_theme_options = {
 }
 
 pygments_style = "colorful"
+
+python_display_short_literal_types = True
