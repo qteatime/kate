@@ -103,7 +103,7 @@ operations to fail with no recovery option.
 Managing buckets
 """"""""""""""""
 
-.. py:method:: list_buckets([count: number]) -> Promise[Array[OSBucket]]
+.. py:method:: OSCartridge.list_buckets([count: number]) -> Promise[Array[OSBucket]]
   :async:
 
   :param count: If provided, limit the number of buckets returned.
@@ -111,7 +111,7 @@ Managing buckets
   Retrieves a list of buckets that exist in the current partition.
 
 
-.. py:method:: add_bucket(name: string) -> Promise[OSBucket]
+.. py:method:: OSCartridge.add_bucket(name: string) -> Promise[OSBucket]
   :async:
 
   :param name: The name of the bucket, up to 255 UTF-16 characters.
@@ -127,7 +127,7 @@ Managing buckets
   :py:meth:`usage`.
 
 
-.. py:method:: get_bucket(name: string) -> Promise[OSBucket]
+.. py:method:: OSCartridge.get_bucket(name: string) -> Promise[OSBucket]
   :async:
 
   :param name: The name of the bucket.
@@ -137,7 +137,7 @@ Managing buckets
   Returns the bucket with the given name, if one exists.
 
 
-.. py:method:: ensure_bucket(name: string) -> Promise[OSBucket]
+.. py:method:: OSCartridge.ensure_bucket(name: string) -> Promise[OSBucket]
   :async:
 
   :param name: The name of the bucket, up to 255 UTF-16 characters.
@@ -152,7 +152,7 @@ Managing buckets
   buckets. See :py:meth:`usage`.
 
 
-.. py:method:: delete_bucket(name: string)
+.. py:method:: OSCartridge.delete_bucket(name: string)
   :async:
 
   :param name: The name of the bucket, up to 255 UTF-16 characters.
@@ -199,7 +199,7 @@ own quota and usage data for each partition.
     The current resource usage for the partition.
 
 
-.. py:method:: usage() -> Promise[PartitionUsage]
+.. py:method:: OSCartridge.usage() -> Promise[PartitionUsage]
   :async:
 
   Returns the current quota for the partition, and how much of the quota
@@ -289,13 +289,13 @@ To know how sizes for each of these are computed, see the
 Querying objects
 """"""""""""""""
 
-.. py:method:: count() -> Promise[number]
+.. py:method:: OSBucket.count() -> Promise[number]
   :async:
 
   Returns the number of objects in the bucket.
 
 
-.. py:method:: list([count: number]) -> Promise[Array[ObjectMetadata]]
+.. py:method:: OSBucket.list([count: number]) -> Promise[Array[ObjectMetadata]]
   :async:
 
   :param count: If provided, the returned list will contain at most this number of elements.
@@ -303,7 +303,7 @@ Querying objects
   Returns the metadata for all (or up to ``count``) objects in the bucket.
 
 
-.. py:method:: read(key: string) -> Promise[Object]
+.. py:method:: OSBucket.read(key: string) -> Promise[Object]
   :async:
 
   :param key: The unique key identifying the object.
@@ -312,7 +312,7 @@ Querying objects
   Returns the object associated with the given unique key in the bucket.
 
 
-.. py:method:: read_data(key: string) -> Promise[unknown]
+.. py:method:: OSBucket.read_data(key: string) -> Promise[unknown]
   :async:
 
   :param key: The unique key identifying the object.
@@ -324,7 +324,7 @@ Querying objects
       (await bucket.read(key)).data
 
 
-.. py:method:: try_read(key: string) -> Promise[Object | null]
+.. py:method:: OSBucket.try_read(key: string) -> Promise[Object | null]
   :async:
 
   :param key: The unique key identifying the object.
@@ -333,7 +333,7 @@ Querying objects
   if there's no such object.
 
 
-.. py:method:: try_read_data(key: string) -> Promise[unknown | null]
+.. py:method:: OSBucket.try_read_data(key: string) -> Promise[unknown | null]
   :async:
 
   :param key: The unique key identifying the object.
@@ -368,7 +368,7 @@ Updating and deleting objects
     The contents of the object, as a JavaScript structure.
 
 
-.. py:method:: write(key: string, entry: NewEntry)
+.. py:method:: OSBucket.write(key: string, entry: NewEntry)
   :async:
 
   :param key: The unique key identifying this object in the bucket. Counts towards the stored size.
@@ -378,7 +378,7 @@ Updating and deleting objects
   metadata and contents.
 
 
-.. py:method:: write_structured(key: string, data: unknown, metadata: {[key: string]: unknown})
+.. py:method:: OSBucket.write_structured(key: string, data: unknown, metadata: {[key: string]: unknown})
   :async:
 
   :param key: The unique key identifying this object in the bucket. Counts towards the stored size.
@@ -390,7 +390,7 @@ Updating and deleting objects
   the object as a JavaScript structure.
 
 
-.. py:method:: create(key: string, entry: NewEntry)
+.. py:method:: OSBucket.create(key: string, entry: NewEntry)
   :async:
 
   :param key: The unique key identifying this object in the bucket. Counts towards the stored size.
@@ -401,7 +401,7 @@ Updating and deleting objects
   key is already in use by another object.
 
 
-.. py:method:: create_structured(key: string, data: unknown, metadata: {[key: string]: unknown})
+.. py:method:: OSBucket.create_structured(key: string, data: unknown, metadata: {[key: string]: unknown})
   :async:
 
   :param key: The unique key identifying this object in the bucket. Counts towards the stored size.
@@ -417,7 +417,7 @@ Updating and deleting objects
   same key in the bucket.
 
 
-.. py:method:: delete(key: string)
+.. py:method:: OSBucket.delete(key: string)
   :async:
 
   :param key: The unique key identifying the object to delete.

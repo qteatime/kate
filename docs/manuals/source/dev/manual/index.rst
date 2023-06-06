@@ -27,3 +27,4 @@ providing details on its approach to security and privacy.
    intro/index
    model/index
    api/index
+   web/index

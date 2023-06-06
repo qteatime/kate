@@ -14,6 +14,7 @@ by Kate.
 .. toctree::
    :maxdepth: 1
 
+   events
    cart-fs
    input
    timer
