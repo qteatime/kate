@@ -132,4 +132,4 @@ to control most games. In the emulator you can:
    the Kate buttons at a similar position, with the left joystick doubling
    as a D-Pad.
 
-  .. image:: img/gamepad.png
+   .. image:: img/gamepad.png

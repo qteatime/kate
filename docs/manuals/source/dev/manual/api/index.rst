@@ -16,3 +16,6 @@ by Kate.
 
    cart-fs
    input
+   timer
+   capture
+   store

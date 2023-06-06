@@ -22,17 +22,6 @@ cover aspects from how to use Kate to its philosophy and security guarantees.
    New to Kate? Confused about how Kate works? This explains how to
    install it and all features in the console.
 
-..
-
-   * :doc:`Known issues & Limitations <user/issues/index>`
-         Kate is still in preview/early-access. Known issues are
-         documented here.
-
-   * :doc:`The Kate Threat Model <user/threats/index>`
-         Wondering how Kate protects your safety and privacy? This document
-         provides both summaries and in-depth technical explanations of what
-         you're signing up for, using real-world examples.
-
 
 Game developer books
 ====================
@@ -47,6 +36,22 @@ making games for the console, or wanting to port existing games to it.
 :doc:`Porting Ren'Py games to Kate <dev/port/renpy/index>`
    If you have an existing Ren'Py game, this will walk you through
    porting it to Kate.
+
+
+Design and implementation
+=========================
+
+Here you'll find technical books on the design, philosophy, and implementation
+of Kate. Both the physical console and the software emulator.
+
+:doc:`Design documents <design/index>`
+   Technical documents on the design of all APIs and components that make
+   up Kate, including specific security threats they consider.
+
+:doc:`The Kate Threat Model <user/threats/index>`
+   Wondering how Kate protects your safety and privacy? This document
+   provides both summaries and in-depth technical explanations of what
+   you're signing up for, using real-world examples.
 
 
 Changes, Terms, and Credits
@@ -65,20 +70,44 @@ as the terms of use for different components of the project.
 Indices and tables
 ==================
 
-.. hlist::
-   :columns: 1
+:ref:`General Index <genindex>`
+   Quick access to all terms and sections.
 
-   * :ref:`General Index <genindex>`
-         Quick access to all terms and sections.
+:ref:`Module Index <modindex>`
+   Quick access to API references for all modules.
 
-   * :doc:`Glossary <glossary>`
-         Explains all technical terms you may encounter in other books.
+:doc:`Glossary <glossary>`
+   Explains all technical terms you may encounter in other books.
 
 .. toctree::
-   :hidden:
+  :caption: End-user books
+  :hidden:
 
-   user/manual/index
-   dev/manual/index
-   etc/releases/index
-   etc/licence
-   glossary
+  user/manual/index
+
+.. toctree::
+  :caption: Game developer books
+  :hidden:
+
+  dev/manual/index
+
+.. toctree::
+  :caption: Design and implementation
+  :hidden:
+
+  design/index
+
+.. toctree::
+  :caption: Changes, Terms, and Credits
+  :hidden:
+
+  etc/releases/index
+  etc/licence
+
+.. toctree::
+  :caption: Indices and Tables
+  :hidden:
+
+  glossary
+  genindex
+  modindex

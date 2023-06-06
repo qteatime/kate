@@ -1,5 +1,5 @@
-Reading files
-=============
+``cart_fs`` — Reading files
+===========================
 
 .. py:module:: KateAPI.cart_fs
    :synopsis: Read files bundled with the cartridge.
@@ -27,6 +27,15 @@ a file may be identified by ``/images/sprite.png``, but that does
 not mean that there exists a folder called ``images``. The API
 requires that the whole ``/images/sprite.png`` match exactly
 the key that was used when packaging the cartridge.
+
+This restriction also means that paths are case-sensitive. That is,
+``/images/sprite.png``, ``/images/Sprite.png``, and ``/images/sprite.PNG``
+identify **three different resources**. This is different from file systems
+like Windows where all of those identifiers point to the same file, but
+similar to Linux file systems. If you get errors saying that a file cannot
+be found, but you know it should be in the cartridge, it's good to check
+if the spelling matches what the cartridge packager reported when providing
+the cartridge summary.
 
 Kate does, however, require a path to comply with the URL pathname
 specification (:rfc:`3986#section-3.3`). This means that Kate will
@@ -56,7 +65,7 @@ Types
 Reading files
 -------------
 
-.. py:function:: read_file(path: string) -> Promise(File)
+.. py:function:: read_file(path: string) -> File promise
    :async:
    
    :param string path: The path identifier of the file to read.
@@ -78,7 +87,7 @@ Reading files
       canvas.getContext("2d").drawImage(sprite, 0, 0);
 
 
-.. py:function:: get_file_url(path: string) -> Promise(string)
+.. py:function:: get_file_url(path: string) -> string promise
    :async:
 
    :param string path: The path identifier of the file to read.
