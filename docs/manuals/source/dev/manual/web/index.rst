@@ -14,3 +14,4 @@ engines that have a web export option.
    :maxdepth: 2
 
    basics
+   bridges/index
