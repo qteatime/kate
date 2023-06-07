@@ -68,7 +68,7 @@ down              mousedown
 up                mouseup
 clicked           click
 alternate         contextmenu
-================= ==================================
+================= ===================================
 
 .. note::
 
