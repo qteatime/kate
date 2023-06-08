@@ -8,8 +8,11 @@ code translation or dynamic emulation.
 As a developer you pick which bridges your web game needs based on the features
 it requires to run. The following bridges are available:
 
+
+Web APIs
+--------
+
 .. toctree::
-  :caption: Web APIs
   :maxdepth: 1
 
   network-proxy
@@ -18,15 +21,19 @@ it requires to run. The following bridges are available:
   local-storage-proxy
   indexeddb-proxy
 
+Kate support
+------------
+
 .. toctree::
-  :caption: Kate support
   :maxdepth: 1
 
   preserve-webgl-render
   capture-canvas
 
+Game engine support
+-------------------
+
 .. toctree::
-  :caption: Game engine support
   :maxdepth: 1
-  
+
   renpy-tweaks
