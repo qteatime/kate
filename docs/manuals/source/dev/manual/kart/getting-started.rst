@@ -10,7 +10,7 @@ once it's installed.
 Minimal configuration
 ---------------------
 
-Let's consider the `Kat'chu <https://github.com/qteatime/kate/tree/main/examples/katchu>`
+Let's consider the `Kat'chu <https://github.com/qteatime/kate/tree/main/examples/katchu>`_
 example game included with Kate. A minimal configuration file for it looks like
 the following:
 

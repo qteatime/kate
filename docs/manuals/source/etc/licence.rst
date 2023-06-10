@@ -52,14 +52,14 @@ Code dependencies
 **Kate Tools**
    The Kate Tools package uses:
 
-   * `Glob <https://www.npmjs.com/package/glob>`
+   * `Glob <https://www.npmjs.com/package/glob>`_
         | Copyright (c) 2009-2023 Isaac Z. Schlueter and Contributors
         | ISC licence
 
 **Kate Native**
    The Kate Native application uses:
 
-   * `Electron <https://www.electronjs.org/>`
+   * `Electron <https://www.electronjs.org/>`_
         | Copyright (c) Electron contributors
         | Copyright (c) 2013-2020 GitHub Inc.
         | MIT licence

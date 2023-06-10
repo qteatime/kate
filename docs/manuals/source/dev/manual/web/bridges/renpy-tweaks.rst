@@ -20,8 +20,8 @@ To add this bridge to your cartridge you specify the following in your
       {
         "type": "preserve-webgl-render",
         "version": {
-          major: 7,
-          minor: 5
+          "major": 7,
+          "minor": 5
         }
       }
     ]
