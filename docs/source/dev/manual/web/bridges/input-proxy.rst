@@ -96,7 +96,7 @@ Keyboard key identifiers
 """"""""""""""""""""""""
 
 The supported key identifiers can be seen in Kart's
-:download:`keymap.json <../../../../../../../packages/kate-tools/assets/keymap.json>`.
+:download:`keymap.json <../../../../../../packages/kate-tools/assets/keymap.json>`.
 
 
 Event emulation

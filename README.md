@@ -11,23 +11,29 @@ It's built to be secure, respect your privacy, and give you agency on how you pl
 
 ## Documentation
 
-- [The Kate Concept Paper](./docs/concept.md) — wondering why Kate was made and what drives its design? Your answers are here.
+A pre-built version of the documentation can be found on:
+https://kate.qteati.me/docs
 
-- [The Kate User Manual](./docs/user-manual.md) — confused about how Kate works, or want something to link from your game page for common things like "how controls work" and "what's this icon on the screen?". This is where you go. (work in progress)
+To build the documentation from this repository yourself you'll need to have [Python](https://www.python.org/), [Sphinx](https://www.sphinx-doc.org/en/master/), and the [Furo sphinx theme](https://github.com/pradyunsg/furo). Once you have Python you can install the other two with:
 
-- [The Kate Threat Model](./docs/threat-model.md) — wondering how Kate protects your safety and privacy? This document goes into details of what you're signing up for, using real-world examples. (work in progress, technical)
+```shell
+$ pip install sphinx furo
+```
 
-- [Making games for Kate!](./docs/dev-manual.md) — want to build a new game for Kate or port an existing web game to it? This guide will walk you through it. (work in progress, technical)
+Once you've done that you can build the documentation running the following
+at the root of this repository:
 
-- [Kate's Underlying Technology](./docs/technology.md) — curious about what's powering Kate, and what the system requirements are? This covers all that. (work in progress)
+```shell
+$ node make docs:build
+```
 
-- [Known issues & limitations](./docs/known-issues.md) — Kate is still in preview/early-access. Known issues are documented here.
+The documentation is generated in `docs/build/html`.
 
 ## Installation
 
 The current recommended way of trying out Kate is to use the Web version: https://kate.qteati.me/
 
-For alternative installation options and how to build Kate from source, please refer to the [Kate installation instructions](./docs/installation.md).
+For alternative installation options and how to build Kate from source, please refer to the [Kate installation instructions](https://kate.qteati.me/docs/user/manual/intro/install.html).
 
 ## Examples
 
@@ -43,8 +49,8 @@ See the `examples/` folder in this repository for some example games. You can bu
 
 Kate does not accept source contributions currently, since it has not reached a stable release yet. However here are some other ways you can contribute to Kate's development:
 
-- [Try Kate out](./docs/installation.md);
-- [Try porting your game to Kate](./docs/dev-manual.md);
+- [Try Kate out](https://kate.qteati.me/docs/user/manual/intro/install.html);
+- [Try porting your game to Kate](https://kate.qteati.me/docs/dev/manual/index.html);
 - Tell other people about Kate;
 - Report things that don't work for you, or that you feel are too cumbersome or unsafe;
 

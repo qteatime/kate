@@ -551,6 +551,23 @@ w.task("chore:update-versions", [], () => {
   }
 });
 
+// -- Documentation
+w.task("docs:build", [], async () => {
+  const suffix = process.platform === "win32" ? ".bat" : "";
+  exec_file(`make${suffix}`, ["html"], {
+    cwd: Path.join(__dirname, "docs"),
+  });
+});
+
+w.task("docs:clean", [], async () => {
+  const suffix = process.platform === "win32" ? ".bat" : "";
+  exec_file(`make${suffix}`, ["clean"], {
+    cwd: Path.join(__dirname, "docs"),
+  });
+});
+
+w.task("docs:clean-build", ["docs:clean", "docs:build"], async () => {});
+
 // -- Generating releases
 w.task("release:win:x64", ["desktop:clean", "desktop:build"], async () => {
   await gen_build.gen_unsigned_zip("win32", "x64");
