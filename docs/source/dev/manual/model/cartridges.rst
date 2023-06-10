@@ -45,7 +45,7 @@ but for Kate's use cases it's often good enough.
    Namespaces and names can only contain lower-case latin letters, hyphens, and
    dots. Each side must have at least one letter, and the whole identifier
    cannot exceed 255 characters. These restrictions are used
-   to prevent :term:`spoofing`, where an attacker chooses a
+   to prevent :term:`spoofing attacks <spoofing attack>`, where an attacker chooses a
    different-but-sufficiently-similar name to confuse users into granting them
    access or information that players think they're giving someone else.
 

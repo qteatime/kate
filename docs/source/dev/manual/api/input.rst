@@ -128,6 +128,8 @@ is not actively interacting with it.
       }
 
 
+.. _button identifiers:
+
 Button identifiers
 ''''''''''''''''''
 

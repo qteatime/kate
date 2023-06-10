@@ -91,12 +91,13 @@ platform, Kate provides "bridges". These are small snippets of code injected
 in the cartridge process which translate common web APIs and features into a
 Kate-compatible form.
 
-For example, the :ref:`network proxy` bridge allows one to use a regular
+For example, the :doc:`network proxy </dev/manual/web/bridges/network-proxy>` bridge allows one to use a regular
 ``<img src="bg.png">`` tag in a web page, and have that translated to load
 the file from the cartridge's binary data instead. Audio, fetch, and friends
 receive a similar treatment from this bridge.
 
-The :ref:`local storage proxy` and :ref:`indexedDB proxy` allows one to use
+The :doc:`local storage proxy </dev/manual/web/bridges/local-storage-proxy>`
+and :doc:`indexedDB proxy </dev/manual/web/bridges/indexeddb-proxy>` allows one to use
 regular web storage APIs while translating all of those calls into operations
 on the small 64 MB storage partition the cartridge has access to.
 
@@ -124,8 +125,8 @@ no permissions and need to ask the kernel to access or manipulate a
 device resource on their behalf.
 
 Because Kate runs on top of a web browser, processes are mapped to frames,
-and use the :ref:`full sandboxing capabilities of the browser`, as well
-as the appropriate :ref:`content security policy`. Browsers on the other
+and use the :ref:`full sandboxing capabilities of the browser <process sandboxing>`, as well
+as the appropriate :term:`content security policy`. Browsers on the other
 hand generally map frames to distinct processes at the OS level, but this
 varies depending on the browser's own sandboxing strategy.
 

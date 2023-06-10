@@ -133,9 +133,10 @@ dates, estimated size, mime-type), possibly a set of custom meta-data
 
 Objects in this API are stored in IndexedDB, and thus can include almost
 any value that can be stored in IndexedDB (see the
-:ref:`quota estimation section <size-estimation>` for additional restrictions
+:ref:`quota estimation section <object storage size estimation>` for additional restrictions
 Kate imposes.
 
+.. _object storage size estimation:
 
 Size and quotas
 """""""""""""""

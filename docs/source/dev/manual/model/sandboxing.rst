@@ -67,9 +67,9 @@ Save data
 ---------
 
 The cartridge loads in a "null origin", which means that it will not
-have access to any :term:`web storage`. This is because browsers
+have access to any storage API from the browser. This is because browsers
 require a secure connection and a defined origin to be able to
-properly partition things like :term:`Local Storage` and :term:`IndexedDB`.
+properly partition things like Local Storage and IndexedDB.
 
 Instead, cartridges can make use of the :py:mod:`Object Store API <KateAPI.store>`
 to save and read small amounts of data as necessary to track players' progress
@@ -80,9 +80,9 @@ Screenshots and video capture
 -----------------------------
 
 Some engines provide native support for taking screenshots or video
-captures of the game play. For example, :ref:`Ren'Py` allows one to take
+captures of the game play. For example, `Ren'Py <https://www.renpy.org/>`_ allows one to take
 a screenshot in its web export and have it automatically downloaded
-in the device. This is also true for other engines like :ref:`Pico-8`.
+in the device. This is also true for other engines like `Pico-8 <https://www.lexaloffle.com/pico-8.php>`_.
 
 Because Kate blocks any download or navigation initiated by the
 cartridge to protect players' safety, these features will not work in

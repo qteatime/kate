@@ -21,7 +21,7 @@ to be installed, so you'll need a device capable of installing it. Node.js
 supports Windows, MacOS, and Linux.
 
 You'll also need to be familiar with the :term:`command line`, and with the
-basics of :term:`web development`.
+`basics of web development <https://developer.mozilla.org/en-US/docs/Learn>`.
 
 Once you have Node.js installed, you can install all tools necessary for
 building Kate games from the command line:

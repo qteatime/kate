@@ -251,7 +251,7 @@ rating *(recommended)*
   * ``explicit`` — 18+;
   * ``unknown`` — not rated, but same as ``explicit``.
 
-  See :ref:`Cartridge Content Rating` for details.
+  See :ref:`Cartridge Content Rating <cartridge rating>` for details.
 
 warnings *(recommended)*
   | ``string``
@@ -261,9 +261,9 @@ warnings *(recommended)*
     will be shown as-is to players on the store and on the cartridge details
     page, as well as before installing or playing it for the first time.
   
-  We expect at least warnings for :term:`common triggers`, as these can start a
+  We expect at least warnings for common triggers, as these can start a
   panic attack episode on players suffering from some form of trauma, or lead
-  to other medical emergencies such as :term:`epileptic seizures`.
+  to other medical emergencies such as epileptic seizures.
 
 
 Play style
@@ -340,7 +340,7 @@ average_duration *(recommended)*
   
 .. rubric:: Footnotes
 
-.. [#f2] Kart counts the :term:`UTF-16 codepoints`. So one character might
+.. [#f2] Kart counts the UTF-16 codepoints. So one character might
   count as multiple ones (e.g.: Japanese characters and emojis often count
   as two or more characters).
 
@@ -348,7 +348,7 @@ average_duration *(recommended)*
 Files
 -----
 
-The files section is a list of :term:`glob patterns` that define which
+The files section is a list of :term:`glob patterns <glob pattern>` that define which
 files should be included in the cartridge. The root directory for searching
 these files is the one specified for the cartridge configuration.
 

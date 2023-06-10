@@ -43,12 +43,12 @@ emulator, there are two ways you can install a cartridge:
 Your library
 ------------
 
-Cartridges that you install are available in your game library. The `Start`_
+Cartridges that you install are available in your game library. The Start
 screen lists your library games by recency. Here, recency is defined by
 either when you last played a cartridge, or when you last installed it.
 
 Sorting your library by when you last played requires that you enable the
-`Play Habits`_ feature, which records this information locally. You can
+:doc:`Play Habits <play-habits>` feature, which records this information locally. You can
 enable or disable the play habits tracking from the ``Settings``.
 
 You can play cartridges from your library by clicking them, tapping them,

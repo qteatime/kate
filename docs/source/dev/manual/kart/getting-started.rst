@@ -49,7 +49,7 @@ and search their library (and the upcoming stores). You should provide at
 least ``title`` and ``thumbnail``, as these are used everywhere
 the cartridge is displayed.
 
-The ``files`` section includes a list of :term:`glob patterns` that match
+The ``files`` section includes a list of :term:`glob patterns <glob pattern>` that match
 files that will be included in the cartridge (and thus usable when running
 the game). Here the game includes ``.html``, ``.js``, ``.css``, ``.png``,
 and ``.wav`` files.

@@ -7,7 +7,7 @@ made for a web browser in Kate by using a combination of :term:`emulation` and
 game can be found in the cartridge.
 
 A game using the ``web-archive`` runtime must provide at least one
-:term:`HTML page` for Kate to load when the player runs the cartridge.
+:term:`HTML` page for Kate to load when the player runs the cartridge.
 From there Kate figures out how to run the rest of the game. The rest
 of this page describes all these processes in details.
 
@@ -21,7 +21,7 @@ browser to navigate to some location on the internet, say
 at the end of this address for the contents it needs to load, and
 then proceeds to display the contents to you.
 
-The contents are likely a :term:`HTML page`; a structured documentent
+The contents are likely a :term:`HTML` page; a structured documentent
 that contains text, and may contain code and other interactive elements.
 Most HTML pages are not self-contained, but rather include references
 to external resources within it. For example, a page that includes
@@ -74,7 +74,7 @@ Static code translation
 When Kate loads the web page described by the cartridge as the game's
 entry point it needs to do two things:
 
-* Make sure the page has access to all :ref:`Kate APIs`. If we don't do
+* Make sure the page has access to all :doc:`Kate APIs </dev/manual/api/index>`. If we don't do
   this then players wouldn't even be able to interact with the game, because
   the cartridge's screen never gets "real" focus.
 
@@ -141,10 +141,10 @@ The resolution of external references is a bit more involved. Kate will:
   Firefox).
 
 
-* Inline all non-CSS external ``link`` tags using :term:`Data URLs`;
+* Inline all non-CSS external ``link`` tags using :term:`Data URLs <data url>`;
 
 * Inline all small (less than 1 MB) images, audio, and videos using
-  :term:`Data URLs`;
+  :term:`Data URLs <data url>`;
 
 * Inject code to lazily load all large (more than 1 MB) images, audio,
   and videos using the :py:mod:`Cartridge File System API <KateAPI.cart_fs>`.
@@ -170,11 +170,11 @@ these behaviours when running the cartridge.
 Emulation is done by injecting in the cartridge, during the initial static
 code translation phase, additional code snippets that replaces the standard
 web APIs with an implementation of similar behaviour using Kate's APIs instead.
-These code snippets are called :ref:`Bridges`, and cartridges must opt-in
+These code snippets are called :doc:`Bridges </dev/manual/web/bridges/index>`, and cartridges must opt-in
 for them, since they impact performance in general.
 
-For example, if a cartridge opts in for the :ref:`Network Proxy` bridge,
-Kate will inject code that allows APIs such as :ref:`fetch`, or dynamically
+For example, if a cartridge opts in for the :doc:`Network Proxy </dev/manual/web/bridges/network-proxy>` bridge,
+Kate will inject code that allows APIs such as `fetch <https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API>`, or dynamically
 setting the ``src`` property of an image, to read data from the cartridge
 file system instead of making a network request.
 
