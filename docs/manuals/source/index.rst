@@ -33,8 +33,8 @@ making games for the console, or wanting to port existing games to it.
    Want to build a new game for Kate or port an existing one? This book
    will cover all the basics.
 
-:doc:`Porting Ren'Py games to Kate <dev/port/renpy/index>`
-   If you have an existing Ren'Py game, this will walk you through
+:doc:`Kate Porting Recipes <dev/port/index>`
+   If you have an existing Ren'Py or Bitsy game, this will walk you through
    porting it to Kate.
 
 
@@ -90,6 +90,7 @@ Indices and tables
   :hidden:
 
   dev/manual/index
+  dev/port/index
 
 .. toctree::
   :caption: Design and implementation

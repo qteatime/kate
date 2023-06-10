@@ -21,6 +21,7 @@ Cartridges are made out of four main sections:
 * The **Runtime**, which provides Kate with information about how to run the
   cartridge.
 
+.. _cartridge identification:
 
 Identification
 --------------
@@ -79,6 +80,8 @@ The meta-data is itself divided into further sections:
   accessibility and translation provisions;
 
 
+.. _cartridge versioning:
+
 Versioning
 ----------
 
@@ -96,6 +99,8 @@ already installed, they will be prompted about upgrading or downgrading
 the cartridge. When using versioned save data, downgrades are always
 safe.
 
+
+.. _cartridge usage terms:
 
 Usage terms
 -----------
@@ -116,6 +121,8 @@ modifications are allowed by default is that players with particular
 accessibility needs may need to make modifications to be able to play at
 all.
 
+
+.. _cartridge rating:
 
 Rating
 ------
