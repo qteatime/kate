@@ -1,0 +1,442 @@
+{
+  "ArrowLeft": {
+    "key": "ArrowLeft",
+    "code": "ArrowLeft",
+    "key_code": 37
+  },
+  "ArrowUp": {
+    "key": "ArrowUp",
+    "code": "ArrowUp",
+    "key_code": 38
+  },
+  "ArrowRight": {
+    "key": "ArrowRight",
+    "code": "ArrowRight",
+    "key_code": 39
+  },
+  "ArrowDown": {
+    "key": "ArrowDown",
+    "code": "ArrowDown",
+    "key_code": 40
+  },
+  "KeyQ": {
+    "key": "q",
+    "code": "KeyQ",
+    "key_code": 81
+  },
+  "KeyW": {
+    "key": "w",
+    "code": "KeyW",
+    "key_code": 87
+  },
+  "KeyE": {
+    "key": "e",
+    "code": "KeyE",
+    "key_code": 69
+  },
+  "KeyR": {
+    "key": "r",
+    "code": "KeyR",
+    "key_code": 82
+  },
+  "KeyT": {
+    "key": "t",
+    "code": "KeyT",
+    "key_code": 84
+  },
+  "KeyY": {
+    "key": "y",
+    "code": "KeyY",
+    "key_code": 89
+  },
+  "KeyU": {
+    "key": "u",
+    "code": "KeyU",
+    "key_code": 85
+  },
+  "KeyI": {
+    "key": "i",
+    "code": "KeyI",
+    "key_code": 73
+  },
+  "KeyO": {
+    "key": "o",
+    "code": "KeyO",
+    "key_code": 79
+  },
+  "KeyP": {
+    "key": "p",
+    "code": "KeyP",
+    "key_code": 80
+  },
+  "KeyA": {
+    "key": "a",
+    "code": "KeyA",
+    "key_code": 65
+  },
+  "KeyS": {
+    "key": "s",
+    "code": "KeyS",
+    "key_code": 83
+  },
+  "KeyD": {
+    "key": "d",
+    "code": "KeyD",
+    "key_code": 68
+  },
+  "KeyF": {
+    "key": "f",
+    "code": "KeyF",
+    "key_code": 70
+  },
+  "KeyG": {
+    "key": "g",
+    "code": "KeyG",
+    "key_code": 71
+  },
+  "KeyH": {
+    "key": "h",
+    "code": "KeyH",
+    "key_code": 72
+  },
+  "KeyJ": {
+    "key": "j",
+    "code": "KeyJ",
+    "key_code": 74
+  },
+  "KeyL": {
+    "key": "l",
+    "code": "KeyL",
+    "key_code": 76
+  },
+  "KeyK": {
+    "key": "k",
+    "code": "KeyK",
+    "key_code": 75
+  },
+  "Enter": {
+    "key": "Enter",
+    "code": "Enter",
+    "key_code": 13
+  },
+  "Backspace": {
+    "key": "Backspace",
+    "code": "Backspace",
+    "key_code": 8
+  },
+  "Digit0": {
+    "key": "0",
+    "code": "Digit0",
+    "key_code": 48
+  },
+  "Digit9": {
+    "key": "9",
+    "code": "Digit9",
+    "key_code": 57
+  },
+  "Digit8": {
+    "key": "8",
+    "code": "Digit8",
+    "key_code": 56
+  },
+  "Digit7": {
+    "key": "7",
+    "code": "Digit7",
+    "key_code": 55
+  },
+  "Digit6": {
+    "key": "6",
+    "code": "Digit6",
+    "key_code": 54
+  },
+  "Digit5": {
+    "key": "5",
+    "code": "Digit5",
+    "key_code": 53
+  },
+  "Digit4": {
+    "key": "4",
+    "code": "Digit4",
+    "key_code": 52
+  },
+  "Digit3": {
+    "key": "3",
+    "code": "Digit3",
+    "key_code": 51
+  },
+  "Digit2": {
+    "key": "2",
+    "code": "Digit2",
+    "key_code": 50
+  },
+  "Digit1": {
+    "key": "1",
+    "code": "Digit1",
+    "key_code": 49
+  },
+  "Tab": {
+    "key": "Tab",
+    "code": "Tab",
+    "key_code": 9
+  },
+  "CapsLock": {
+    "key": "CapsLock",
+    "code": "CapsLock",
+    "key_code": 20
+  },
+  "ShiftLeft": {
+    "key": "Shift",
+    "code": "ShiftLeft",
+    "key_code": 16
+  },
+  "ControlLeft": {
+    "key": "Control",
+    "code": "ControlLeft",
+    "key_code": 17
+  },
+  "MetaLeft": {
+    "key": "Meta",
+    "code": "MetaLeft",
+    "key_code": 91
+  },
+  "AltLeft": {
+    "key": "Alt",
+    "code": "AltLeft",
+    "key_code": 18
+  },
+  "Space": {
+    "key": " ",
+    "code": "Space",
+    "key_code": 32
+  },
+  "AltRight": {
+    "key": "AltGraph",
+    "code": "AltRight",
+    "key_code": 18
+  },
+  "ControlRight": {
+    "key": "Control",
+    "code": "ControlRight",
+    "key_code": 17
+  },
+  "ContextMenu": {
+    "key": "ContextMenu",
+    "code": "ContextMenu",
+    "key_code": 93
+  },
+  "ShiftRight": {
+    "key": "Shift",
+    "code": "ShiftRight",
+    "key_code": 16
+  },
+  "KeyN": {
+    "key": "n",
+    "code": "KeyN",
+    "key_code": 78
+  },
+  "KeyM": {
+    "key": "m",
+    "code": "KeyM",
+    "key_code": 77
+  },
+  "KeyB": {
+    "key": "b",
+    "code": "KeyB",
+    "key_code": 66
+  },
+  "KeyV": {
+    "key": "v",
+    "code": "KeyV",
+    "key_code": 86
+  },
+  "KeyC": {
+    "key": "c",
+    "code": "KeyC",
+    "key_code": 67
+  },
+  "KeyX": {
+    "key": "x",
+    "code": "KeyX",
+    "key_code": 88
+  },
+  "KeyZ": {
+    "key": "z",
+    "code": "KeyZ",
+    "key_code": 90
+  },
+  "Delete": {
+    "key": "Delete",
+    "code": "Delete",
+    "key_code": 46
+  },
+  "End": {
+    "key": "End",
+    "code": "End",
+    "key_code": 35
+  },
+  "PageDown": {
+    "key": "PageDown",
+    "code": "PageDown",
+    "key_code": 34
+  },
+  "Insert": {
+    "key": "Insert",
+    "code": "Insert",
+    "key_code": 45
+  },
+  "Home": {
+    "key": "Home",
+    "code": "Home",
+    "key_code": 36
+  },
+  "PageUp": {
+    "key": "PageUp",
+    "code": "PageUp",
+    "key_code": 33
+  },
+  "Numpad0": {
+    "key": "0",
+    "code": "Numpad0",
+    "key_code": 96
+  },
+  "NumpadDecimal": {
+    "key": ",",
+    "code": "NumpadDecimal",
+    "key_code": 110
+  },
+  "Numpad1": {
+    "key": "1",
+    "code": "Numpad1",
+    "key_code": 97
+  },
+  "Numpad2": {
+    "key": "2",
+    "code": "Numpad2",
+    "key_code": 98
+  },
+  "Numpad3": {
+    "key": "3",
+    "code": "Numpad3",
+    "key_code": 99
+  },
+  "NumpadEnter": {
+    "key": "Enter",
+    "code": "NumpadEnter",
+    "key_code": 13
+  },
+  "Numpad4": {
+    "key": "4",
+    "code": "Numpad4",
+    "key_code": 100
+  },
+  "Numpad5": {
+    "key": "5",
+    "code": "Numpad5",
+    "key_code": 101
+  },
+  "Numpad6": {
+    "key": "6",
+    "code": "Numpad6",
+    "key_code": 102
+  },
+  "NumpadAdd": {
+    "key": "+",
+    "code": "NumpadAdd",
+    "key_code": 107
+  },
+  "Numpad7": {
+    "key": "7",
+    "code": "Numpad7",
+    "key_code": 103
+  },
+  "Numpad8": {
+    "key": "8",
+    "code": "Numpad8",
+    "key_code": 104
+  },
+  "Numpad9": {
+    "key": "9",
+    "code": "Numpad9",
+    "key_code": 105
+  },
+  "NumpadDivide": {
+    "key": "/",
+    "code": "NumpadDivide",
+    "key_code": 111
+  },
+  "NumpadMultiply": {
+    "key": "*",
+    "code": "NumpadMultiply",
+    "key_code": 106
+  },
+  "NumpadSubtract": {
+    "key": "-",
+    "code": "NumpadSubtract",
+    "key_code": 109
+  },
+  "F1": {
+    "key": "F1",
+    "code": "F1",
+    "key_code": 112
+  },
+  "F2": {
+    "key": "F2",
+    "code": "F2",
+    "key_code": 113
+  },
+  "F3": {
+    "key": "F3",
+    "code": "F3",
+    "key_code": 114
+  },
+  "F4": {
+    "key": "F4",
+    "code": "F4",
+    "key_code": 115
+  },
+  "F5": {
+    "key": "F5",
+    "code": "F5",
+    "key_code": 116
+  },
+  "F6": {
+    "key": "F6",
+    "code": "F6",
+    "key_code": 117
+  },
+  "F7": {
+    "key": "F7",
+    "code": "F7",
+    "key_code": 118
+  },
+  "F8": {
+    "key": "F8",
+    "code": "F8",
+    "key_code": 119
+  },
+  "F9": {
+    "key": "F9",
+    "code": "F9",
+    "key_code": 120
+  },
+  "F10": {
+    "key": "F10",
+    "code": "F10",
+    "key_code": 121
+  },
+  "F11": {
+    "key": "F11",
+    "code": "F11",
+    "key_code": 122
+  },
+  "F12": {
+    "key": "F12",
+    "code": "F12",
+    "key_code": 123
+  },
+  "Escape": {
+    "key": "Escape",
+    "code": "Escape",
+    "key_code": 27
+  }
+}

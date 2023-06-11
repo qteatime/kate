@@ -1,0 +1,523 @@
+<!doctype html>
+<html class="no-js" lang="en">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+<link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Cartridges" href="cartridges.html" /><link rel="prev" title="Programming model" href="index.html" />
+
+    <!-- Generated with Sphinx 6.2.1 and Furo 2023.03.27 -->
+        <title>Overview - Kate 0.23.6 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?digest=fad236701ea90a88636c2a8c73b44ae642ed2a53" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #ffffff;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+<div class="announcement">
+  <aside class="announcement-content">
+     Both Kate and this documentation are a work in progress and may change at any time. 
+  </aside>
+</div>
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../../index.html"><div class="brand">Kate 0.23.6 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../index.html">
+  
+  
+  <span class="sidebar-brand-text">Kate 0.23.6 documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">End-user books</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../user/manual/index.html">The Kate User Manual</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../user/manual/intro/index.html">Getting started</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../user/manual/intro/hardware.html">Tech specs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../user/manual/intro/emulator.html">Emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../user/manual/intro/install.html">Installing</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../user/manual/gaming/index.html">Playing games</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../user/manual/gaming/cartridges.html">ROM Cartridges</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../user/manual/gaming/captures.html">Screen recording</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../user/manual/gaming/save-data.html">Save data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../user/manual/gaming/play-habits.html">Play habits</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../user/manual/gaming/storage.html">Stored data</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../user/manual/security/index.html">Security and privacy</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../user/manual/security/philosophy.html">Safety philosophy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../user/manual/security/sandboxing.html">Sandboxing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../user/manual/security/privacy.html">Privacy policy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../user/manual/security/trust.html">Trust and consent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../user/manual/security/indicators.html">Resource indicators</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Game developer books</span></p>
+<ul class="current">
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../index.html">Making games for Kate!</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2 has-children"><a class="reference internal" href="../intro/index.html">Getting started</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../intro/why.html">Why make games for Kate?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../intro/setup.html">What will you need?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../intro/hello-world.html">Hello, World</a></li>
+</ul>
+</li>
+<li class="toctree-l2 current has-children"><a class="reference internal" href="index.html">Programming model</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l3 current current-page"><a class="current reference internal" href="#">Overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cartridges.html">Cartridges</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sandboxing.html">Sandboxing and APIs</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../api/index.html">Kate API</a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" role="switch" type="checkbox"/><label for="toctree-checkbox-8"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../api/events.html"><code class="docutils literal notranslate"><span class="pre">events</span></code> — Event handling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/cart-fs.html"><code class="docutils literal notranslate"><span class="pre">cart_fs</span></code> — Reading files</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/input.html"><code class="docutils literal notranslate"><span class="pre">*_input</span></code> — Reacting to player input</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/timer.html"><code class="docutils literal notranslate"><span class="pre">timer</span></code> — Scheduling updates</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/capture.html"><code class="docutils literal notranslate"><span class="pre">capture</span></code> — Screenshots and video recording</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/store.html"><code class="docutils literal notranslate"><span class="pre">store</span></code> — Saving state</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../web/index.html">Web game support</a><input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" role="switch" type="checkbox"/><label for="toctree-checkbox-9"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../web/basics.html">Basics of porting</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../web/bridges/index.html">Bridges</a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" role="switch" type="checkbox"/><label for="toctree-checkbox-10"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../web/bridges/network-proxy.html">Network proxy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../web/bridges/input-proxy.html">Button input proxy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../web/bridges/pointer-input-proxy.html">Pointer input proxy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../web/bridges/local-storage-proxy.html">Local storage proxy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../web/bridges/indexeddb-proxy.html">IndexedDB proxy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../web/bridges/preserve-webgl-render.html">Preserve WebGL Render</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../web/bridges/capture-canvas.html">Capture canvas</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../web/bridges/renpy-tweaks.html">Ren’Py tweaks</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../kart/index.html">Kart — Packing cartridges</a><input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" role="switch" type="checkbox"/><label for="toctree-checkbox-11"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../kart/getting-started.html">Getting started</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../kart/configuration.html">Configuration files</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../port/index.html">Kate Porting Recipes</a><input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" role="switch" type="checkbox"/><label for="toctree-checkbox-12"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../port/bitsy.html">Bitsy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../port/renpy.html">Ren’Py</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Design and implementation</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../design/index.html">Kate’s Design Documents</a><input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" role="switch" type="checkbox"/><label for="toctree-checkbox-13"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../design/0101-object-storage.html">#0101 — Object Store API</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Changes, Terms, and Credits</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../etc/releases/index.html">Release notes</a><input class="toctree-checkbox" id="toctree-checkbox-14" name="toctree-checkbox-14" role="switch" type="checkbox"/><label for="toctree-checkbox-14"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../etc/releases/0.23.6.html">Kate v0.23.6  (June 2023)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../etc/releases/0.23.5.html">Kate v0.23.5  (May 2023)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../etc/releases/0.23.4.html">Kate v0.23.4  (April 2023)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../etc/licence.html">Terms of use</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Indices and Tables</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../genindex.html">Index</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../py-modindex.html">Module Index</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/qteatime/kate/edit/main/docs/manual/dev/manual/model/overview.rst" title="Edit this page">
+    <svg aria-hidden="true" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <path d="M4 20h4l10.5 -10.5a1.5 1.5 0 0 0 -4 -4l-10.5 10.5v4" />
+      <line x1="13.5" y1="6.5" x2="17.5" y2="10.5" />
+    </svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          <section id="overview">
+<h1>Overview<a class="headerlink" href="#overview" title="Permalink to this heading">#</a></h1>
+<p>Kate is a security-oriented platform. In order to protect users safety and
+privacy, it makes heavy use of <a class="reference internal" href="../../../glossary.html#term-Capabilities"><span class="xref std std-term">capabilities</span></a> and <a class="reference internal" href="../../../glossary.html#term-Sandboxing"><span class="xref std std-term">sandboxing</span></a>,
+as well as isolating components to prevent a faulty component from compromising
+the entire system.</p>
+<p>On top of that, Kate runs on top of a web browser. This means that
+Kate runs in any platform that has a web browser, often with similar
+behaviour, but it also means Kate does not have access to any of the
+device’s native functionality directly. Likewise, nor does your cartridge.</p>
+<p>This design helps protect both developers and players, but it also has
+implications to how you write games for Kate, and how they run on the
+device or emulator.</p>
+<section id="principle-of-least-authority">
+<h2>Principle of Least Authority<a class="headerlink" href="#principle-of-least-authority" title="Permalink to this heading">#</a></h2>
+<p>Like mobile operating systems, Kate runs your cartridge
+(and other Kate processes) with the least amount of privilege possible.
+But Kate is far more restrictive than popular OSs on phones. Your cartridge
+cannot:</p>
+<ul class="simple">
+<li><p>Access dangerous APIs such as camera, microphone, geolocation, etc;</p></li>
+<li><p>Make any network requests, or require internet connection in any way;</p></li>
+<li><p>Navigate to or link to a different web page;</p></li>
+<li><p>Have direct access to any peripheral device;</p></li>
+<li><p>Access the device’s or Kate’s data in any way (with the sole exception of
+data bundled in your cartridge);</p></li>
+</ul>
+<p>A game that requires any of these features cannot run on Kate. This, of course,
+excludes all games made for the web, or that are exported using an engine’s
+web export option.</p>
+<p>To address this harsh restriction and have games playable safely Kate
+introduces ways for cartridges to, in a very controlled environment, gain
+access to additional features. These are <a class="reference internal" href="../../../glossary.html#term-Capabilities"><span class="xref std std-term">capabilities</span></a>.</p>
+</section>
+<section id="capabilities">
+<h2>Capabilities<a class="headerlink" href="#capabilities" title="Permalink to this heading">#</a></h2>
+<p>In access-list-based operating systems, like Linux, MacOS, and Windows, what
+an application can do depends on which user is running the application. Thus,
+applications can do anything the user can do—that includes deleting or
+modifying any file in the device. Security is achieved by creating restricted
+users and running applications with these restricted users; however, managing
+multiple users is often cumbersome, so hardly any end-user does it.</p>
+<p>In capability-based operating systems, like Android or iOS, what an application
+can do depends on what the OS considers “universally accessible”, and any
+additional features the user grants that specific application. An application
+that has not been granted the “read photos” feature cannot read the photos in
+the device, even though the user can. Likewise, not granting “use camera” means
+you don’t have to worry about an application using the camera in a way you
+don’t want it to.</p>
+<p>Kate is a capability-based system, but it has less universally accessible
+features than phone operating systems. This is because we encourage players
+to download and run any cartridge they find on the internet, without having
+to do any risk assessment before running it. So, by default, cartridges can:</p>
+<ul class="simple">
+<li><p>Display things on the screen;</p></li>
+<li><p>Play audio (from local data);</p></li>
+<li><p>Play videos (from local data);</p></li>
+<li><p>Read data bundled with the cartridge, but not modify anything;</p></li>
+<li><p>Read Kate gamepad or pointer input (this is not the device’s gamepad/pointer!);</p></li>
+<li><p>Store up to 64 MB in an isolated storage partition for that specific cartridge;</p></li>
+</ul>
+<p>Anything other than this requires the cartridge to ask the player for
+permission first. That includes storing more data in the storage partition,
+or downloading/sending data over the internet. And even things like
+opening another page when the player clicks a link.</p>
+</section>
+<section id="bridges">
+<h2>Bridges<a class="headerlink" href="#bridges" title="Permalink to this heading">#</a></h2>
+<p>Due to these heavy restrictions, no web game can run in Kate as a cartridge
+as-is. Even simple hypertext fiction, that would work as a local HTML page,
+would fail to run in Kate because having a link open a different HTML page
+is not allowed (to avoid phishing attacks). Likewise, having an image in
+an HTML page that points to a specific file isn’t possible because there
+are no URLs or files involved when running a cartridge.</p>
+<p>To lessen the burden of porting games not meant to run in Kate to the
+platform, Kate provides “bridges”. These are small snippets of code injected
+in the cartridge process which translate common web APIs and features into a
+Kate-compatible form.</p>
+<p>For example, the <a class="reference internal" href="../web/bridges/network-proxy.html"><span class="doc">network proxy</span></a> bridge allows one to use a regular
+<code class="docutils literal notranslate"><span class="pre">&lt;img</span> <span class="pre">src=&quot;bg.png&quot;&gt;</span></code> tag in a web page, and have that translated to load
+the file from the cartridge’s binary data instead. Audio, fetch, and friends
+receive a similar treatment from this bridge.</p>
+<p>The <a class="reference internal" href="../web/bridges/local-storage-proxy.html"><span class="doc">local storage proxy</span></a>
+and <a class="reference internal" href="../web/bridges/indexeddb-proxy.html"><span class="doc">indexedDB proxy</span></a> allows one to use
+regular web storage APIs while translating all of those calls into operations
+on the small 64 MB storage partition the cartridge has access to.</p>
+<p>Bridges are likely the place where things can go awry. If things work when
+you run it in a web browser, but not as a Kate cartridge, it might be that
+you’re missing a bridge, or the bridge doesn’t offer support for the specific
+usage that your web game expects.</p>
+<p>For example, some engines load additional JavaScript code by creating a
+synchronous <code class="docutils literal notranslate"><span class="pre">&lt;script&gt;</span></code> tag and expecting that, after that tag is added
+to the document, execution will only proceed when the browser finishes
+parsing and executing the code. This can’t work in Kate because we first
+need to read the code from the cartridge, and there’s no way of doing that
+synchronously.</p>
+</section>
+<section id="process-topology">
+<h2>Process topology<a class="headerlink" href="#process-topology" title="Permalink to this heading">#</a></h2>
+<p>Kate runs trusted and sandboxed processes. The only trusted
+process is the Kate Kernel, which controls the untrusted processes,
+accesses and manipulates device resources, and runs with wider permissions.
+Sandboxed processes, such as the process running cartridges, run with
+no permissions and need to ask the kernel to access or manipulate a
+device resource on their behalf.</p>
+<p>Because Kate runs on top of a web browser, processes are mapped to frames,
+and use the <a class="reference internal" href="../../../user/manual/security/sandboxing.html#process-sandboxing"><span class="std std-ref">full sandboxing capabilities of the browser</span></a>, as well
+as the appropriate <a class="reference internal" href="../../../glossary.html#term-Content-Security-Policy"><span class="xref std std-term">content security policy</span></a>. Browsers on the other
+hand generally map frames to distinct processes at the OS level, but this
+varies depending on the browser’s own sandboxing strategy.</p>
+<p>In summary, the topology looks like this:</p>
+<img alt="The Kernel process (a trusted process) reads and modifies data in the device's storage. The cartridge process (a sandboxed process) must use the IPC channel between itself and ther Kernel to ask for any operation that is not drawing on the screen." src="../../../_images/cartridge-topology.svg" /><p>The only operations that happen in the cartridge process are displaying
+things on the screen (using the cartridge’s own isolated screen buffer, which
+is later layered on Kate’s real screen), and playing audio through the
+current device’s audio output. Everything else goes through the IPC channel.</p>
+<p>For example, let’s say a cartridge wants to read <code class="docutils literal notranslate"><span class="pre">sprite.png</span></code>, which they
+have bundled in the cartridge binary. To do so it first needs to send a
+message to the Kernel process asking to read that file. The Kernel resolves
+the file-reading capability of the requesting process to figure out where
+to look for the file, then replies with the binary data and file metadata
+if the file is found. This operation is always asynchronous.</p>
+<p>Messages can be initiated from both sides. The Kate Kernel also sends the
+cartridge events through this same IPC channel. For example, when the player
+presses a button, Kate sends the active process an event about it. This allows
+the cartridge to query the gamepad state synchronously.</p>
+<p>The Kernel keeps all the capability metadata on its side. Since these
+capabilities never leave the device’s memory, and cartridge processes
+have no access to writing to it, the capabilities are unforgeable without
+any need for cryptographic verification.</p>
+</section>
+<section id="in-short">
+<h2>In short<a class="headerlink" href="#in-short" title="Permalink to this heading">#</a></h2>
+<p>Cartridges run in a very restricted environment with no internet access, even
+though Kate itself runs on a web browser. This means that your game needs to be
+able to run entirely with the data included in your cartridge for it to run
+on Kate. You also need to ensure your game does not depend on being loaded
+from a particular URL on the internet—since internet URLs don’t exist in Kate.</p>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="cartridges.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Cartridges</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="index.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Programming model</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2023, Q.
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Overview</a><ul>
+<li><a class="reference internal" href="#principle-of-least-authority">Principle of Least Authority</a></li>
+<li><a class="reference internal" href="#capabilities">Capabilities</a></li>
+<li><a class="reference internal" href="#bridges">Bridges</a></li>
+<li><a class="reference internal" href="#process-topology">Process topology</a></li>
+<li><a class="reference internal" href="#in-short">In short</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/scripts/furo.js"></script>
+    </body>
+</html>

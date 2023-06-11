@@ -287,7 +287,10 @@ class CR_Web_archive extends CartRuntime {
         return process;
     }
     async proxy_html(env) {
-        return (0, translate_html_1.translate_html)(this.env.cart.runtime.html, env);
+        const index_file = await env.read_file(env.cart.runtime.html);
+        const decoder = new TextDecoder();
+        const index = decoder.decode(index_file.data);
+        return (0, translate_html_1.translate_html)(index, env);
     }
 }
 exports.CR_Web_archive = CR_Web_archive;
@@ -1490,25 +1493,24 @@ exports.clamp = clamp;
 require.define(21, "packages\\util\\build", "packages\\util\\build\\time.js", (module, exports, __dirname, __filename) => {
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.relative_date = exports.coarse_time = void 0;
-function coarse_time(x) {
-    const second_threshold = 1_000 * 60; // 1 minute
-    const minute_threshold = 1_000 * 60 * 15; // 15 minutes
-    const hour_threshold = 1_000 * 60 * 60; // 1 hour
-    if (x < second_threshold) {
-        return "a little while";
+exports.relative_date = exports.coarse_time_from_minutes = void 0;
+function coarse_time_from_minutes(x) {
+    const minute_threshold = 15;
+    const hour_threshold = 60;
+    if (x <= 0) {
+        return "(not recorded)";
     }
     else if (x < minute_threshold) {
         return "a few minutes";
     }
     else if (x < hour_threshold) {
-        return `${Math.round(x / (1_000 * 60))} minutes`;
+        return `${x} minutes`;
     }
     else {
         return plural(Math.round(x / hour_threshold), (_) => "1 hour", (n) => `${n} hours`);
     }
 }
-exports.coarse_time = coarse_time;
+exports.coarse_time_from_minutes = coarse_time_from_minutes;
 function relative_date(x) {
     if (x == null) {
         return "never";
@@ -1526,7 +1528,7 @@ function relative_date(x) {
         }
         else if (year === now.getFullYear() &&
             month === now.getMonth() &&
-            date === now.getDate()) {
+            date <= now.getDate()) {
             const d = now.getDate() - date;
             switch (d) {
                 case 0:
@@ -1542,7 +1544,7 @@ function relative_date(x) {
 }
 exports.relative_date = relative_date;
 function plural(n, single, plural) {
-    if (n === 0) {
+    if (n === 1) {
         return single(String(n));
     }
     else {
@@ -1570,8 +1572,14 @@ async function translate_html(html, context) {
 }
 exports.translate_html = translate_html;
 async function load_all_media(dom, context) {
-    for (const img of Array.from(dom.querySelectorAll("img"))) {
-        const maybe_path = img.getAttribute("src");
+    for (const media of Array.from(dom.querySelectorAll("img, audio, video"))) {
+        const maybe_source = media instanceof HTMLMediaElement
+            ? Array.from(media.querySelectorAll("source[src]"))
+                .filter((x) => !x.getAttribute("type") ||
+                media.canPlayType(x.getAttribute("type")) !== "")
+                .map((x) => x.getAttribute("src"))
+            : [];
+        const maybe_path = media.getAttribute("src") ?? maybe_source[0] ?? null;
         if (maybe_path == null ||
             maybe_path.trim() === "" ||
             is_non_local(maybe_path)) {
@@ -1584,12 +1592,12 @@ async function load_all_media(dom, context) {
         }
         if (file.data.length < 1024 * 1024) {
             // inline 1mb or less images
-            img.setAttribute("src", await get_data_url(path.as_string(), context));
+            media.setAttribute("src", await get_data_url(path.as_string(), context));
         }
         else {
-            img.classList.add("kate-lazy-load");
-            img.setAttribute("data-src", path.as_string());
-            img.removeAttribute("src");
+            media.classList.add("kate-lazy-load");
+            media.setAttribute("data-src", path.as_string());
+            media.removeAttribute("src");
         }
     }
     const loader = dom.createElement("script");
@@ -1598,7 +1606,7 @@ async function load_all_media(dom, context) {
     for (const element of Array.from(document.querySelectorAll(".kate-lazy-load"))) {
       const path = element.getAttribute("data-src");
       if (path) {
-        element.setAttribute("src", await KateAPI.cart_fs.get_file_url(path));
+        element.src = await KateAPI.cart_fs.get_file_url(path);
       }
     }
   }();
@@ -3999,8 +4007,10 @@ db_1.kate.data_migration({
 require.define(47, "packages\\kate-core\\build\\data\\migrations", "packages\\kate-core\\build\\data\\migrations\\v10.js", (module, exports, __dirname, __filename) => {
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const utils_1 = require(5);
 const cartridge_1 = require(37);
 const db_1 = require(32);
+const play_habits_1 = require(40);
 db_1.kate.data_migration({
     id: 5,
     since: 10,
@@ -4010,6 +4020,67 @@ db_1.kate.data_migration({
             const meta = t.get_table1(cartridge_1.cart_meta);
             for (const cart of await meta.get_all()) {
                 cart.status = "active";
+                await meta.put(cart);
+            }
+        });
+    },
+});
+db_1.kate.data_migration({
+    id: 6,
+    since: 10,
+    description: "Store less fine-grained play times",
+    process: async (db) => {
+        await db.transaction([play_habits_1.play_habits], "readwrite", async (t) => {
+            const habits = t.get_table1(play_habits_1.play_habits);
+            for (const habit of await habits.get_all()) {
+                habit.play_time = Math.floor(habit.play_time / (1_000 * 60));
+                await habits.put(habit);
+            }
+        });
+    },
+});
+db_1.kate.data_migration({
+    id: 7,
+    since: 10,
+    description: "Update database for cartridge format changes",
+    process: async (db) => {
+        await db.transaction([cartridge_1.cart_meta, cartridge_1.cart_files], "readwrite", async (t) => {
+            const meta = t.get_table1(cartridge_1.cart_meta);
+            const files = t.get_table2(cartridge_1.cart_files);
+            const text_encoder = new TextEncoder();
+            for (const cart of await meta.get_all()) {
+                if (cart.runtime.html !== "kate:index") {
+                    const id = (0, utils_1.make_id)();
+                    const data = text_encoder.encode(cart.runtime.html);
+                    await files.put({
+                        id: cart.metadata.id,
+                        file_id: id,
+                        mime: "text/html",
+                        data: data,
+                    });
+                    cart.files.push({
+                        path: "kate:index",
+                        id: id,
+                        size: data.byteLength,
+                    });
+                    cart.runtime.html = "kate:index";
+                }
+                if (cart.metadata.release.legal_notices !== "kate:licence") {
+                    const id = (0, utils_1.make_id)();
+                    const data = text_encoder.encode(cart.metadata.release.legal_notices);
+                    await files.put({
+                        id: cart.metadata.id,
+                        file_id: id,
+                        mime: "text/html",
+                        data: data,
+                    });
+                    cart.files.push({
+                        path: "kate:licence",
+                        id: id,
+                        size: data.byteLength,
+                    });
+                    cart.metadata.release.legal_notices = "kate:licence";
+                }
                 await meta.put(cart);
             }
         });
@@ -5033,7 +5104,10 @@ class SceneHome extends scenes_1.SimpleScene {
                 break;
             }
             case "legal": {
-                const legal = new text_file_1.SceneTextFile(this.os, `Legal Notices`, cart.metadata.game.title, cart.metadata.release.legal_notices);
+                const licence_file = await this.os.cart_manager.read_file_by_path(cart.metadata.id, cart.metadata.release.legal_notices);
+                const decoder = new TextDecoder();
+                const licence = decoder.decode(licence_file.data);
+                const legal = new text_file_1.SceneTextFile(this.os, `Legal Notices`, cart.metadata.game.title, licence);
                 this.os.push_scene(legal);
                 break;
             }
@@ -5903,6 +5977,16 @@ class CartManager {
             return new Map(cart_files);
         });
     }
+    async read_file_by_path(cart_id, path) {
+        return await Db.CartStore.transaction(this.os.db, "all", "readonly", async (store) => {
+            const cart = await store.meta.get(cart_id);
+            const file_id = cart.files.find((x) => x.path === path)?.id;
+            if (file_id == null) {
+                throw new Error(`File not found: ${path}`);
+            }
+            return store.files.get([cart_id, file_id]);
+        });
+    }
     async read_file_by_id(id, file_id) {
         return await Db.CartStore.transaction(this.os.db, "files", "readonly", async (store) => {
             return store.files.get([id, file_id]);
@@ -6064,7 +6148,7 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require(60), exports);
 __exportStar(require(73), exports);
-__exportStar(require(75), exports);
+__exportStar(require(74), exports);
 __exportStar(require(76), exports);
 __exportStar(require(77), exports);
 
@@ -6077,7 +6161,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.parse_metadata = exports.version_string = void 0;
 const v3_1 = require(61);
 const utils_1 = require(5);
-const parser_utils_1 = require(74);
+const parser_utils_1 = require(75);
 function version_string(meta) {
     return `${meta.release.version.major}.${meta.release.version.minor}`;
 }
@@ -6104,7 +6188,7 @@ function parse_metadata(cart) {
             licence_name: (0, parser_utils_1.str)(cart.metadata.release["licence-name"], 255),
             allow_commercial: cart.metadata.release["allow-commercial"],
             allow_derivative: cart.metadata.release["allow-derivative"],
-            legal_notices: (0, parser_utils_1.str)(cart.metadata.release["legal-notices"], (0, parser_utils_1.chars_in_mb)(5)),
+            legal_notices: (0, parser_utils_1.str)(cart.metadata.release["legal-notices"]),
         },
         rating: {
             rating: content_rating(cart.metadata.rating.rating),
@@ -6273,7 +6357,7 @@ const Cart_v3 = require(62);
 exports.Cart_v3 = Cart_v3;
 const Metadata = require(60);
 const Runtime = require(73);
-const Files = require(75);
+const Files = require(74);
 const MAGIC = Number("0x" +
     "KART"
         .split("")
@@ -6286,11 +6370,27 @@ function parse_v3(x) {
         return null;
     }
     const cart = Cart_v3.decode(x, Cart_v3.Cartridge.tag);
+    const meta = Metadata.parse_metadata(cart);
+    const runtime = Runtime.parse_runtime(cart);
+    const files = Files.parse_files(cart);
+    const text_encoder = new TextEncoder();
+    files.push({
+        path: "kate:licence",
+        mime: "text/plain",
+        data: text_encoder.encode(meta.release.legal_notices),
+    });
+    meta.release.legal_notices = "kate:licence";
+    files.push({
+        path: "kate:index",
+        mime: "text/html",
+        data: text_encoder.encode(runtime.html),
+    });
+    runtime.html = "kate:index";
     return {
-        metadata: Metadata.parse_metadata(cart),
-        runtime: Runtime.parse_runtime(cart),
+        metadata: meta,
+        runtime: runtime,
         thumbnail: Files.parse_file(cart.metadata.title.thumbnail),
-        files: Files.parse_files(cart),
+        files: files,
     };
 }
 exports.parse_v3 = parse_v3;
@@ -8454,7 +8554,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.parse_runtime = void 0;
 const v3_1 = require(61);
 const utils_1 = require(5);
-const parser_utils_1 = require(74);
 function parse_runtime(cart) {
     const platform = cart.platform;
     switch (platform["@variant"]) {
@@ -8462,7 +8561,7 @@ function parse_runtime(cart) {
             return {
                 type: "web-archive",
                 bridges: platform.bridges.map(bridge),
-                html: str(platform.html, (0, parser_utils_1.chars_in_mb)(1)),
+                html: str(platform.html),
             };
         }
     }
@@ -8561,8 +8660,28 @@ function str(x, size = Infinity) {
 
 });
 
+// packages\kate-core\build\cart\v3\files.js
+require.define(74, "packages\\kate-core\\build\\cart\\v3", "packages\\kate-core\\build\\cart\\v3\\files.js", (module, exports, __dirname, __filename) => {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.parse_file = exports.parse_files = void 0;
+function parse_files(cart) {
+    return cart.files.map(parse_file);
+}
+exports.parse_files = parse_files;
+function parse_file(file) {
+    return {
+        path: file.path,
+        mime: file.mime,
+        data: file.data,
+    };
+}
+exports.parse_file = parse_file;
+
+});
+
 // packages\kate-core\build\cart\parser-utils.js
-require.define(74, "packages\\kate-core\\build\\cart", "packages\\kate-core\\build\\cart\\parser-utils.js", (module, exports, __dirname, __filename) => {
+require.define(75, "packages\\kate-core\\build\\cart", "packages\\kate-core\\build\\cart\\parser-utils.js", (module, exports, __dirname, __filename) => {
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.chars_in_mb = exports.list = exports.regex = exports.str = void 0;
@@ -8599,26 +8718,6 @@ function chars_in_mb(n) {
     return 2 * 1024 * 1024 * n;
 }
 exports.chars_in_mb = chars_in_mb;
-
-});
-
-// packages\kate-core\build\cart\v3\files.js
-require.define(75, "packages\\kate-core\\build\\cart\\v3", "packages\\kate-core\\build\\cart\\v3\\files.js", (module, exports, __dirname, __filename) => {
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.parse_file = exports.parse_files = void 0;
-function parse_files(cart) {
-    return cart.files.map(parse_file);
-}
-exports.parse_files = parse_files;
-function parse_file(file) {
-    return {
-        path: file.path,
-        mime: file.mime,
-        data: file.data,
-    };
-}
-exports.parse_file = parse_file;
 
 });
 
@@ -8681,11 +8780,27 @@ function parse_v2(x) {
     }
     const decoder = new Cart_v2._Decoder(view);
     cart = Cart_v2.Cartridge.decode(decoder);
+    const meta = Metadata.parse_metadata(cart);
+    const runtime = Runtime.parse_runtime(cart);
+    const files = Files.parse_files(cart);
+    const text_encoder = new TextEncoder();
+    files.push({
+        path: "kate:licence",
+        mime: "text/plain",
+        data: text_encoder.encode(meta.release.legal_notices),
+    });
+    meta.release.legal_notices = "kate:licence";
+    files.push({
+        path: "kate:index",
+        mime: "text/html",
+        data: text_encoder.encode(runtime.html),
+    });
+    runtime.html = "kate:index";
     return {
-        metadata: Metadata.parse_metadata(cart),
-        runtime: Runtime.parse_runtime(cart),
+        metadata: meta,
+        runtime: runtime,
         thumbnail: Files.parse_file(cart.metadata.title.thumbnail),
-        files: Files.parse_files(cart),
+        files: files,
     };
 }
 exports.parse_v2 = parse_v2;
@@ -12164,7 +12279,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.parse_metadata = exports.version_string = void 0;
 const v2_1 = require(78);
 const utils_1 = require(5);
-const parser_utils_1 = require(74);
+const parser_utils_1 = require(75);
 function version_string(meta) {
     return `${meta.release.version.major}.${meta.release.version.minor}`;
 }
@@ -12191,7 +12306,7 @@ function parse_metadata(cart) {
             licence_name: (0, parser_utils_1.str)(cart.metadata.release.licence_name, 255),
             allow_commercial: cart.metadata.release.allow_commercial,
             allow_derivative: cart.metadata.release.allow_derivative,
-            legal_notices: (0, parser_utils_1.str)(cart.metadata.release.legal_notices, (0, parser_utils_1.chars_in_mb)(5)),
+            legal_notices: (0, parser_utils_1.str)(cart.metadata.release.legal_notices),
         },
         rating: {
             rating: content_rating(cart.metadata.rating.rating),
@@ -12358,7 +12473,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.parse_runtime = void 0;
 const v2_1 = require(78);
 const utils_1 = require(5);
-const parser_utils_1 = require(74);
 function parse_runtime(cart) {
     const platform = cart.platform;
     switch (platform.$tag) {
@@ -12366,7 +12480,7 @@ function parse_runtime(cart) {
             return {
                 type: "web-archive",
                 bridges: platform.bridges.map(bridge),
-                html: str(platform.html, (0, parser_utils_1.chars_in_mb)(1)),
+                html: str(platform.html),
             };
         }
     }
@@ -12828,9 +12942,12 @@ class HUD_ContextMenu extends scenes_1.Scene {
         const app = await this.os.storage_manager.try_estimate_live_cartridge(process.cart);
         this.os.push_scene(new storage_1.SceneCartridgeStorageSettings(this.os, app));
     };
-    on_legal_notices = () => {
+    on_legal_notices = async () => {
         const process = this.os.processes.running;
-        const legal = new text_file_1.SceneTextFile(this.os, "Legal Notices", process.cart.metadata.game.title, process.cart.metadata.release.legal_notices);
+        const licence_file = await this.os.cart_manager.read_file_by_path(process.cart.metadata.id, process.cart.metadata.release.legal_notices);
+        const decoder = new TextDecoder();
+        const licence = decoder.decode(licence_file.data);
+        const legal = new text_file_1.SceneTextFile(this.os, "Legal Notices", process.cart.metadata.game.title, licence);
         this.os.push_scene(legal);
     };
     on_about_kate = () => {
@@ -13229,7 +13346,7 @@ require.define(90, "", "", (module, exports, __dirname, __filename) => {
 
 // packages\kate-core\RELEASE.txt
 require.define(91, "", "", (module, exports, __dirname, __filename) => {
-  module.exports = "=======================================================================\r\nKate v0.23.6  (June 2023)\r\n=======================================================================\r\n\r\nThe v0.23.6 is June's experimental release of Kate with a focus on\r\nmaking it usable for common open source engines for small indie games.\r\n\r\n\r\nMore flexible resolution\r\n------------------------\r\n\r\nKate uses a 800x480 resolution in hand-held mode, but that doesn't\r\nmean games _have_ to use this resolution. Bitsy games use a square\r\naspect ratio, and many Ren'Py games use 16:9, or even 4:3, but they\r\nall scale accordingly to fit within the 800x480 window.\r\n\r\nSo this release improves the support for different resolutions,\r\nmaking sure things like captures and the media gallery store\r\nand display media in the correct aspect ratio.\r\n\r\n\r\nCase modes\r\n----------\r\n\r\nBy default Kate runs in handheld mode, with virtual buttons meant\r\nfor touch-based devices and a 800x480 resolution. This release\r\nadds a new TV mode and a Full-screen mode, which support a\r\nresolution of 1200x720. The new modes are meant for running Kate\r\nin a laptop or with an external display or TV, and taking advantage\r\nof the additional screen space, similar to how other handhelds can\r\nincrease their resolution when docked.\r\n\r\n\r\nPointer input support\r\n---------------------\r\n\r\nThis release has added an API for basic pointer support, so games\r\nthat use a mouse or a single touch point should be supported in Kate.\r\nThere's still work in the roadmap to support multi-touch games and\r\ngames that use a stylus (e.g.: where stylus pressure and tilt angle\r\ncan affect the behaviour of the game).\r\n\r\n\r\nFunctional Ren'Py support\r\n-------------------------\r\n\r\nWith this release Kate is functionally compatible with games\r\nexported in Ren'Py 7.5 and Ren'Py 8.1.\r\n\r\n\r\nStorage visualisation\r\n---------------------\r\n\r\nThere's a new settings screen for visualising and managing\r\ndifferent parts of the storage. This includes:\r\n\r\n  - Archiving cartridges (deleting the cartridge files, but keeping\r\n    save data and screenshots/video captures);\r\n  - Deleting all save data; and\r\n  - Deleting all cartridge-related data (except for screenshots/captures).\r\n\r\nThis should make Kate a bit more usable around managing what's\r\nstored locally and allowing people to remove data they no longer\r\nneed to keep around.\r\n\r\n\r\nFixed bugs\r\n----------\r\n\r\n  - The local storage proxy now accounts for engines that may expect\r\n    it to behave like a regular JavaScript object;\r\n\r\n  - The network proxy now properly handles cases where more arbitrary\r\n    URLs are given to be loaded, as long as we can still resolve it\r\n    to a valid cartridge file path.\r\n\r\n  - Paths are now normalised before Kate attempts to read them from\r\n    the cartridge. This should result in less surprises for games\r\n    ported through Bridges.\r\n\r\n  - Resources are now properly cached when installing Kate as a\r\n    web app, meaning you should be able to run the web version of\r\n    Kate offline if you install it on an iPhone, Android, or\r\n    Windows 10+.\r\n\r\n  - Errors resulting from storage quota being exceeded are now\r\n    handled more gracefully. There's some reserved system space\r\n    to avoid being locked into unrecoverable storage states.\r\n\r\n  - The network bridge now handles blob: urls, so Ren'Py 7.5\r\n    pre-splashes work correctly.\r\n\r\n  - Fixed an issue with the indexedDB bridge that caused Ren'Py 8\r\n    games to not load when reconciling save data.\r\n\r\n  - Screenshots and video captures are now sorted from most recent to\r\n    least recent (they were not sorted previously)."
+  module.exports = "=======================================================================\r\nKate v0.23.6  (June 2023)\r\n=======================================================================\r\n\r\nThe v0.23.6 is June's experimental release of Kate with a focus on\r\nmaking it usable for common open source engines for small indie games.\r\n\r\n\r\nMore flexible resolution\r\n------------------------\r\n\r\nKate uses a 800x480 resolution in hand-held mode, but that doesn't\r\nmean games *have* to use this resolution. Bitsy games use a square\r\naspect ratio, and many Ren'Py games use 16:9, or even 4:3, but they\r\nall scale accordingly to fit within the 800x480 window.\r\n\r\nSo this release improves the support for different resolutions,\r\nmaking sure things like captures and the media gallery store\r\nand display media in the correct aspect ratio.\r\n\r\n\r\nCase modes\r\n----------\r\n\r\nBy default Kate runs in handheld mode, with virtual buttons meant\r\nfor touch-based devices and a 800x480 resolution. This release\r\nadds a new TV mode and a Full-screen mode, which support a\r\nresolution of 1200x720. The new modes are meant for running Kate\r\nin a laptop or with an external display or TV, and taking advantage\r\nof the additional screen space, similar to how other handhelds can\r\nincrease their resolution when docked.\r\n\r\n\r\nPointer input support\r\n---------------------\r\n\r\nThis release has added an API for basic pointer support, so games\r\nthat use a mouse or a single touch point should be supported in Kate.\r\nThere's still work in the roadmap to support multi-touch games and\r\ngames that use a stylus (e.g.: where stylus pressure and tilt angle\r\ncan affect the behaviour of the game).\r\n\r\n\r\nFunctional Ren'Py support\r\n-------------------------\r\n\r\nWith this release Kate is functionally compatible with games\r\nexported in Ren'Py 7.5 and Ren'Py 8.1.\r\n\r\n\r\nStorage visualisation\r\n---------------------\r\n\r\nThere's a new settings screen for visualising and managing\r\ndifferent parts of the storage. This includes:\r\n\r\n  * Archiving cartridges (deleting the cartridge files, but keeping\r\n    save data and screenshots/video captures);\r\n\r\n  * Deleting all save data; and\r\n\r\n  * Deleting all cartridge-related data (except for screenshots/captures).\r\n\r\nThis should make Kate a bit more usable around managing what's\r\nstored locally and allowing people to remove data they no longer\r\nneed to keep around.\r\n\r\n\r\nFixed bugs\r\n----------\r\n\r\n  * The local storage proxy now accounts for engines that may expect\r\n    it to behave like a regular JavaScript object;\r\n\r\n  * The network proxy now properly handles cases where more arbitrary\r\n    URLs are given to be loaded, as long as we can still resolve it\r\n    to a valid cartridge file path.\r\n\r\n  * Paths are now normalised before Kate attempts to read them from\r\n    the cartridge. This should result in less surprises for games\r\n    ported through Bridges.\r\n\r\n  * Resources are now properly cached when installing Kate as a\r\n    web app, meaning you should be able to run the web version of\r\n    Kate offline if you install it on an iPhone, Android, or\r\n    Windows 10+.\r\n\r\n  * Errors resulting from storage quota being exceeded are now\r\n    handled more gracefully. There's some reserved system space\r\n    to avoid being locked into unrecoverable storage states.\r\n\r\n  * The network bridge now handles blob: urls, so Ren'Py 7.5\r\n    pre-splashes work correctly.\r\n\r\n  * Fixed an issue with the indexedDB bridge that caused Ren'Py 8\r\n    games to not load when reconciling save data.\r\n\r\n  * Screenshots and video captures are now sorted from most recent to\r\n    least recent (they were not sorted previously)."
 })
 
 // packages\kate-core\build\os\apps\index.js
@@ -15094,7 +15211,7 @@ class ScenePlayHabitsSettings extends UI.SimpleScene {
                     description: UI.fragment([
                         entry.play_time === 0
                             ? "No total play time recorded"
-                            : `Played for ${(0, utils_1.coarse_time)(entry.play_time)}`,
+                            : `Played for ${(0, utils_1.coarse_time_from_minutes)(entry.play_time)}`,
                         UI.h("br", {}, []),
                         entry.last_played === null
                             ? "No play date recorded"
@@ -17718,13 +17835,14 @@ class KatePlayHabits {
             await store.habits.put(cart);
         });
     }
-    async increase_play_time(cart_id, play_time) {
+    async increase_play_time(cart_id, play_time_ms) {
+        const play_time_minutes = Math.floor(play_time_ms / (1_000 * 60));
         if (!this.os.settings.get("play_habits").play_times) {
             return;
         }
         await Db.PlayHabitsStore.transaction(this.os.db, "readwrite", async (store) => {
             const cart = await store.habits.get(cart_id);
-            cart.play_time += play_time || 0;
+            cart.play_time += play_time_minutes || 0;
             await store.habits.put(cart);
         });
     }

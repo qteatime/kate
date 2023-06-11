@@ -1,0 +1,748 @@
+<!doctype html>
+<html class="no-js" lang="en">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="prev" title="Terms of use" href="etc/licence.html" />
+
+    <!-- Generated with Sphinx 6.2.1 and Furo 2023.03.27 -->
+        <title>Glossary - Kate 0.23.6 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=fad236701ea90a88636c2a8c73b44ae642ed2a53" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
+    <link rel="stylesheet" type="text/css" href="_static/css/custom.css" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #ffffff;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+<div class="announcement">
+  <aside class="announcement-content">
+     Both Kate and this documentation are a work in progress and may change at any time. 
+  </aside>
+</div>
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">Kate 0.23.6 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+  
+  
+  <span class="sidebar-brand-text">Kate 0.23.6 documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">End-user books</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="user/manual/index.html">The Kate User Manual</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="user/manual/intro/index.html">Getting started</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="user/manual/intro/hardware.html">Tech specs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="user/manual/intro/emulator.html">Emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="user/manual/intro/install.html">Installing</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="user/manual/gaming/index.html">Playing games</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="user/manual/gaming/cartridges.html">ROM Cartridges</a></li>
+<li class="toctree-l3"><a class="reference internal" href="user/manual/gaming/captures.html">Screen recording</a></li>
+<li class="toctree-l3"><a class="reference internal" href="user/manual/gaming/save-data.html">Save data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="user/manual/gaming/play-habits.html">Play habits</a></li>
+<li class="toctree-l3"><a class="reference internal" href="user/manual/gaming/storage.html">Stored data</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="user/manual/security/index.html">Security and privacy</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="user/manual/security/philosophy.html">Safety philosophy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="user/manual/security/sandboxing.html">Sandboxing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="user/manual/security/privacy.html">Privacy policy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="user/manual/security/trust.html">Trust and consent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="user/manual/security/indicators.html">Resource indicators</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Game developer books</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="dev/manual/index.html">Making games for Kate!</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="dev/manual/intro/index.html">Getting started</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="dev/manual/intro/why.html">Why make games for Kate?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dev/manual/intro/setup.html">What will you need?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dev/manual/intro/hello-world.html">Hello, World</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="dev/manual/model/index.html">Programming model</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="dev/manual/model/overview.html">Overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dev/manual/model/cartridges.html">Cartridges</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dev/manual/model/sandboxing.html">Sandboxing and APIs</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="dev/manual/api/index.html">Kate API</a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" role="switch" type="checkbox"/><label for="toctree-checkbox-8"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="dev/manual/api/events.html"><code class="docutils literal notranslate"><span class="pre">events</span></code> — Event handling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dev/manual/api/cart-fs.html"><code class="docutils literal notranslate"><span class="pre">cart_fs</span></code> — Reading files</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dev/manual/api/input.html"><code class="docutils literal notranslate"><span class="pre">*_input</span></code> — Reacting to player input</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dev/manual/api/timer.html"><code class="docutils literal notranslate"><span class="pre">timer</span></code> — Scheduling updates</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dev/manual/api/capture.html"><code class="docutils literal notranslate"><span class="pre">capture</span></code> — Screenshots and video recording</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dev/manual/api/store.html"><code class="docutils literal notranslate"><span class="pre">store</span></code> — Saving state</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="dev/manual/web/index.html">Web game support</a><input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" role="switch" type="checkbox"/><label for="toctree-checkbox-9"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="dev/manual/web/basics.html">Basics of porting</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="dev/manual/web/bridges/index.html">Bridges</a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" role="switch" type="checkbox"/><label for="toctree-checkbox-10"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="dev/manual/web/bridges/network-proxy.html">Network proxy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dev/manual/web/bridges/input-proxy.html">Button input proxy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dev/manual/web/bridges/pointer-input-proxy.html">Pointer input proxy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dev/manual/web/bridges/local-storage-proxy.html">Local storage proxy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dev/manual/web/bridges/indexeddb-proxy.html">IndexedDB proxy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dev/manual/web/bridges/preserve-webgl-render.html">Preserve WebGL Render</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dev/manual/web/bridges/capture-canvas.html">Capture canvas</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dev/manual/web/bridges/renpy-tweaks.html">Ren’Py tweaks</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="dev/manual/kart/index.html">Kart — Packing cartridges</a><input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" role="switch" type="checkbox"/><label for="toctree-checkbox-11"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="dev/manual/kart/getting-started.html">Getting started</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dev/manual/kart/configuration.html">Configuration files</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="dev/port/index.html">Kate Porting Recipes</a><input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" role="switch" type="checkbox"/><label for="toctree-checkbox-12"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="dev/port/bitsy.html">Bitsy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dev/port/renpy.html">Ren’Py</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Design and implementation</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="design/index.html">Kate’s Design Documents</a><input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" role="switch" type="checkbox"/><label for="toctree-checkbox-13"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="design/0101-object-storage.html">#0101 — Object Store API</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Changes, Terms, and Credits</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="etc/releases/index.html">Release notes</a><input class="toctree-checkbox" id="toctree-checkbox-14" name="toctree-checkbox-14" role="switch" type="checkbox"/><label for="toctree-checkbox-14"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="etc/releases/0.23.6.html">Kate v0.23.6  (June 2023)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etc/releases/0.23.5.html">Kate v0.23.5  (May 2023)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="etc/releases/0.23.4.html">Kate v0.23.4  (April 2023)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="etc/licence.html">Terms of use</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Indices and Tables</span></p>
+<ul class="current">
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="genindex.html">Index</a></li>
+<li class="toctree-l1"><a class="reference internal" href="py-modindex.html">Module Index</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/qteatime/kate/edit/main/docs/manual/glossary.rst" title="Edit this page">
+    <svg aria-hidden="true" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <path d="M4 20h4l10.5 -10.5a1.5 1.5 0 0 0 -4 -4l-10.5 10.5v4" />
+      <line x1="13.5" y1="6.5" x2="17.5" y2="10.5" />
+    </svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          <section id="glossary">
+<h1>Glossary<a class="headerlink" href="#glossary" title="Permalink to this heading">#</a></h1>
+<section id="a">
+<h2>A<a class="headerlink" href="#a" title="Permalink to this heading">#</a></h2>
+<dl class="simple glossary">
+<dt id="term-Analog-button">Analog button<a class="headerlink" href="#term-Analog-button" title="Permalink to this term">#</a></dt><dd><p>A button that also reports “how pressed” it is. Kate has two analog
+buttons: <a class="reference internal" href="_images/l_24.png"><img alt="Left trigger" class="align-middle" src="_images/l_24.png" style="height: 1em;" /></a> and <a class="reference internal" href="_images/r_24.png"><img alt="Right trigger" class="align-middle" src="_images/r_24.png" style="height: 1em;" /></a>. They’re also known as “triggers”.
+Analog input allows games to support things like “press it gradually
+to zoom”, where the zoom level would be based on how much the button
+is pressed.</p>
+</dd>
+<dt id="term-Archiving">Archiving<a class="headerlink" href="#term-Archiving" title="Permalink to this term">#</a></dt><dt id="term-Archiving-a-cartridge">Archiving (a cartridge)<a class="headerlink" href="#term-Archiving-a-cartridge" title="Permalink to this term">#</a></dt><dd><p>Removing the cartridge files from the local database to free up space,
+but keeping enough information around to re-install it at a later point
+and continue from where you left off. Similar to the same feature in
+phones and other consoles.</p>
+</dd>
+</dl>
+</section>
+<section id="c">
+<h2>C<a class="headerlink" href="#c" title="Permalink to this heading">#</a></h2>
+<dl class="glossary">
+<dt id="term-Capabilities">Capabilities<a class="headerlink" href="#term-Capabilities" title="Permalink to this term">#</a></dt><dt id="term-Capability-security">Capability security<a class="headerlink" href="#term-Capability-security" title="Permalink to this term">#</a></dt><dd><p>A computer security model where programs can only do things that users
+have explicitly allowed them to—by assigning “capabilities” to them.
+For example, a program that wants to access the device’s camera would
+need to ask the user to grant it the “camera-access” capability first.</p>
+</dd>
+<dt id="term-Code-translation">Code translation<a class="headerlink" href="#term-Code-translation" title="Permalink to this term">#</a></dt><dt id="term-Compilation">Compilation<a class="headerlink" href="#term-Compilation" title="Permalink to this term">#</a></dt><dd><p>A process that translates code intended to be interpreted by one platform
+into code that will be interpreted by another platform, while preserving
+the meaning and behaviour of the code (its semantics). In Kate this
+often happens when running a cartridge containing code meant to run
+in a web browser—the Kate code translator will go through that cartridge’s
+code and automatically change it to fit what works in the Kate platform.</p>
+<p>Contrast with <a class="reference internal" href="#term-Runtime-emulation"><span class="xref std std-term">runtime emulation</span></a>.</p>
+</dd>
+<dt id="term-Codec">Codec<a class="headerlink" href="#term-Codec" title="Permalink to this term">#</a></dt><dd><p>Encoder/Decoder. A piece of software or hardware that enables storing
+and reading information in a specific format. The term is often used
+when discussing video formats, and there it refers to what algorithm
+is used to store and read information in the video file.</p>
+</dd>
+<dt id="term-Command-line">Command line<a class="headerlink" href="#term-Command-line" title="Permalink to this term">#</a></dt><dt id="term-Command-line-interface">Command-line interface<a class="headerlink" href="#term-Command-line-interface" title="Permalink to this term">#</a></dt><dd><p>A form of interacting with a computer by typing issuing text-based commands.
+Command-line interfaces are still in heavy use in programming tools,
+particularly due to their flexibility and ease of automating processes
+that combine many of them together.</p>
+</dd>
+<dt id="term-Copy-protection">Copy-protection<a class="headerlink" href="#term-Copy-protection" title="Permalink to this term">#</a></dt><dd><p>A mechanism designed to prevent digital content from being copied
+and shared, usually present in console games and digital videos.
+Kate does not have any form of copy-protection; Kate cartridges
+can be copied freely, however we expect players to respect
+developers’ wishes regarding sharing of their games.</p>
+</dd>
+<dt id="term-CSP">CSP<a class="headerlink" href="#term-CSP" title="Permalink to this term">#</a></dt><dt id="term-Content-Security-Policy">Content Security Policy<a class="headerlink" href="#term-Content-Security-Policy" title="Permalink to this term">#</a></dt><dd><p>A directive that sites can provide to browsers when being loaded in order
+to <em>reduce and restrict</em> their privileges, in order to prevent third-party
+code that’s loaded with them to have access to—and abuse—these powers.
+See the <a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP">MDN docs on CSP</a>
+for a more detailed treatise.</p>
+</dd>
+<dt id="term-CSS">CSS<a class="headerlink" href="#term-CSS" title="Permalink to this term">#</a></dt><dd><p>Cascading Style Sheets. A programming language that allows one to
+describe the presentation aspects of elements in a <a class="reference internal" href="#term-HTML"><span class="xref std std-term">HTML</span></a> page.
+See the <a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/CSS">MDN docs on CSS</a>
+for a more detailed treatise.</p>
+</dd>
+<dt id="term-CSS-selector">CSS selector<a class="headerlink" href="#term-CSS-selector" title="Permalink to this term">#</a></dt><dd><p>A program in the <a class="reference internal" href="#term-CSS"><span class="xref std std-term">CSS</span></a> language which allows one to search a
+web page for specific elements. For example, the selector
+<code class="docutils literal notranslate"><span class="pre">article</span> <span class="pre">img</span></code> finds all image elements within article elements.</p>
+<p>See the
+<a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors">MDN docs on CSS selectors</a>
+for a detailed treatise.</p>
+</dd>
+</dl>
+</section>
+<section id="d">
+<h2>D<a class="headerlink" href="#d" title="Permalink to this heading">#</a></h2>
+<dl class="simple glossary">
+<dt id="term-Data-URL">Data URL<a class="headerlink" href="#term-Data-URL" title="Permalink to this term">#</a></dt><dd><p>A format for encoding any piece of data or file as regular URLs that
+are used by web browsers. Because the URL already contains the entirety
+of the data that the browser needs to load, there’s no need for the
+browser to reach out to any server to ask for more data. See the
+<a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URLs">MDN docs on data URLs</a>
+for a more detailed treatise.</p>
+</dd>
+<dt id="term-Digital-button">Digital button<a class="headerlink" href="#term-Digital-button" title="Permalink to this term">#</a></dt><dd><p>A button that has exactly two states: “pressed” and “not pressed”. Most
+buttons in the Kate gamepad are digital.</p>
+</dd>
+<dt id="term-DOM">DOM<a class="headerlink" href="#term-DOM" title="Permalink to this term">#</a></dt><dd><p>Document Object Model. A model constructed from an HTML text through
+which programs can interact with the elements that make up a web page.
+See the <a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model">MDN page on DOM</a>
+for details.</p>
+</dd>
+<dt id="term-DOM-keyboard-events">DOM keyboard events<a class="headerlink" href="#term-DOM-keyboard-events" title="Permalink to this term">#</a></dt><dd><p>Events related to the activity in a keyboard device (physical or virtual).
+The keyboard events cover keys being pressed or released. See the
+<a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent">MDN docs on keyboard events</a>
+for details.</p>
+</dd>
+<dt id="term-DOM-pointer-events">DOM pointer events<a class="headerlink" href="#term-DOM-pointer-events" title="Permalink to this term">#</a></dt><dd><p>Events related to activity in a pointing device, such as a mouse. The
+DOM pointer events cover movement of the pointer and pressing/releasing
+of buttons in the pointing device. See the
+<a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/API/Pointer_events">MDN page on pointer events</a>
+for details.</p>
+</dd>
+<dt id="term-DOM-trusted-events">DOM trusted events<a class="headerlink" href="#term-DOM-trusted-events" title="Permalink to this term">#</a></dt><dd><p>Events that are emitted by the browser itself in response to an user
+action, as opposed to an event emitted by the web page’s script.</p>
+</dd>
+</dl>
+</section>
+<section id="e">
+<h2>E<a class="headerlink" href="#e" title="Permalink to this heading">#</a></h2>
+<dl class="simple glossary">
+<dt id="term-Emulator">Emulator<a class="headerlink" href="#term-Emulator" title="Permalink to this term">#</a></dt><dd><p>An application that can run applications made for different devices,
+by tricking the application into thinking it’s running in the device
+it was made for. Kate’s emulator allows playing games made for Kate’s
+hardware on a web browser, Windows, Linux, MacOS, Raspberry Pi,
+SteamDeck, and more.</p>
+</dd>
+</dl>
+</section>
+<section id="f">
+<h2>F<a class="headerlink" href="#f" title="Permalink to this heading">#</a></h2>
+<dl class="simple glossary">
+<dt id="term-Fantasy-console">Fantasy console<a class="headerlink" href="#term-Fantasy-console" title="Permalink to this term">#</a></dt><dd><p>A gaming console that could exist, but for which there’s no hardware
+you can just walk into a store and buy. Though you could build the
+console yourself from the technical specification, games are generally
+played on an <a class="reference internal" href="#term-Emulator"><span class="xref std std-term">emulator</span></a> for the console.</p>
+</dd>
+<dt id="term-File-system">File system<a class="headerlink" href="#term-File-system" title="Permalink to this term">#</a></dt><dd><p>A form of organising data that is based on the idea of files. Generally
+these are organised in an hierarchy of folders, as commonly seen in
+Windows, MacOS, and Linux. In Kate, file systems do not contain any
+concept of folders, but rather have these files managed through
+a unique identifier, closer to <a class="reference internal" href="#term-Object-storage"><span class="xref std std-term">object storage</span></a> systems.</p>
+</dd>
+<dt id="term-Formal-model">Formal model<a class="headerlink" href="#term-Formal-model" title="Permalink to this term">#</a></dt><dd><p>A mathematical model of a software. Kate uses these mathematical
+models to help design a system that is secure, by making sure
+features in the emulator can only interact in few known ways;
+and verify that security, by having a specification of all the
+things that are allowed to happen and when, which can then be
+used as a comparison point when testing.</p>
+</dd>
+<dt id="term-Formal-proof">Formal proof<a class="headerlink" href="#term-Formal-proof" title="Permalink to this term">#</a></dt><dd><p>A form of <a class="reference internal" href="#term-Formal-model"><span class="xref std std-term">formal model</span></a> that focuses on describing particular
+properties. Kate’s use of formal proofs is aimed at checking that
+the emulator does deliver on the security promises that it makes.</p>
+</dd>
+</dl>
+</section>
+<section id="g">
+<h2>G<a class="headerlink" href="#g" title="Permalink to this heading">#</a></h2>
+<dl class="glossary">
+<dt id="term-Glob-pattern">Glob pattern<a class="headerlink" href="#term-Glob-pattern" title="Permalink to this term">#</a></dt><dd><p>A pattern for recognising file names that can use placeholder characters
+(called wildcard) to stand in for portions of the name, that way allowing
+one to refer to many different files by specifying only the parts of the
+name that are common among them.</p>
+<p>Kate supports <code class="docutils literal notranslate"><span class="pre">*</span></code> as a wildcard character that matches anything in the
+name of a file or directory, and <code class="docutils literal notranslate"><span class="pre">**</span></code> as a wildcard character that
+matches any number of directories. For example, <code class="docutils literal notranslate"><span class="pre">**/*.wav</span></code> matches
+<code class="docutils literal notranslate"><span class="pre">click.wav</span></code>, <code class="docutils literal notranslate"><span class="pre">audio/close.wav</span></code>, and <code class="docutils literal notranslate"><span class="pre">gui/sfx/chapter1/start.wav</span></code>,
+but not <code class="docutils literal notranslate"><span class="pre">open.wave</span></code>, since the wildcard only applies to the text before
+the <code class="docutils literal notranslate"><span class="pre">.wav</span></code> suffix.</p>
+</dd>
+</dl>
+</section>
+<section id="h">
+<h2>H<a class="headerlink" href="#h" title="Permalink to this heading">#</a></h2>
+<dl class="simple glossary">
+<dt id="term-HTML">HTML<a class="headerlink" href="#term-HTML" title="Permalink to this term">#</a></dt><dd><p>A programming language that allows one to describe an interactive
+document comprised of smaller elements, such as text, videos,
+forms, and programs in other programming languages such as <a class="reference internal" href="#term-CSS"><span class="xref std std-term">CSS</span></a>
+or JavaScript. See the <a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/HTML">MDN docs on HTML</a>
+for a more detailed treatise.</p>
+</dd>
+</dl>
+</section>
+<section id="m">
+<h2>M<a class="headerlink" href="#m" title="Permalink to this heading">#</a></h2>
+<dl class="glossary">
+<dt id="term-Malicious-cartridge">Malicious cartridge<a class="headerlink" href="#term-Malicious-cartridge" title="Permalink to this term">#</a></dt><dd><p>A cartridge that contains a computer program meant to cause harm
+to its users. E.g.: it could try to tamper with your files,
+trick you into providing sensitive information, or scam you out of
+money.</p>
+<p>Kate uses <a class="reference internal" href="#term-Sandboxing"><span class="xref std std-term">sandboxing</span></a> to prevent material damage a malicious
+cartridge could cause, even if you end up installing and running one
+on accident.</p>
+</dd>
+<dt id="term-Mechanical-verification">Mechanical verification<a class="headerlink" href="#term-Mechanical-verification" title="Permalink to this term">#</a></dt><dd><p>A way of verifying that a <a class="reference internal" href="#term-Formal-proof"><span class="xref std std-term">formal proof</span></a> looks correct by using
+a computer. Note that mechanical verification only tells that the proof
+is consistent with its mathematical definition, but not that the proof
+<em>makes sense</em>. Human oversight will always be needed to verify that
+what is being verified is sensible and useful.</p>
+</dd>
+<dt id="term-Media-type">Media type<a class="headerlink" href="#term-Media-type" title="Permalink to this term">#</a></dt><dt id="term-MIME-type">MIME type<a class="headerlink" href="#term-MIME-type" title="Permalink to this term">#</a></dt><dd><p>An identifier that describes the format of a piece of data, consisting
+of a type and a subtype. E.g.: <code class="docutils literal notranslate"><span class="pre">audio/wav</span></code> has type “audio” and
+subtype “wav”. Applications handling data can rely on this description
+to decide how to interpret the contents.</p>
+<p>Many media types are registered as standard and published by the
+Internet Assigned Numbers Authority (IANA).</p>
+</dd>
+<dt id="term-Monotonic-timestamp">Monotonic timestamp<a class="headerlink" href="#term-Monotonic-timestamp" title="Permalink to this term">#</a></dt><dd><p>A value representing an instant in time that only moves forward. Date
+and time in computer generally models social notions of time, where
+one needs to care about things such as Daylight Savings Time,
+or any other event where synchronising the computer’s clock with
+everyone else’s requires us to move the clock backwards.</p>
+<p>Because monotonic timestamps never move backwards (i.e.: they don’t
+represent an actual time such as “13:29 on 10th May 2023”, but rather
+a more abstract notion of a point in time), they can be better used
+for calculating the relative duration of something. In Kate this is
+often used to know how many milliseconds a frame took to render in
+order to properly schedule updates in a game.</p>
+</dd>
+</dl>
+</section>
+<section id="o">
+<h2>O<a class="headerlink" href="#o" title="Permalink to this heading">#</a></h2>
+<dl class="simple glossary">
+<dt id="term-Object-storage">Object storage<a class="headerlink" href="#term-Object-storage" title="Permalink to this term">#</a></dt><dd><p>A form of data storage where data is managed as objects—in this context,
+a piece of data that is identified by some unique reference, and possibly
+has some meta-data associated with it. This is different from a hierarchical
+file system storage, where data is organised in a hierarchy of folders
+and files.</p>
+</dd>
+<dt id="term-Open-Source">Open-Source<a class="headerlink" href="#term-Open-Source" title="Permalink to this term">#</a></dt><dd><p>A computer program that has its program source available for anyone
+to read, as well as the freedom to redistribute and build upon it.
+The OSI has a <a class="reference external" href="https://opensource.org/osd/">long definition of Open-Source</a>.
+Kate and all third-party components that Kate uses are open-source,
+and we consider this
+<a class="reference internal" href="user/manual/security/philosophy.html"><span class="doc">a very important part of Kate’s security</span></a>.</p>
+</dd>
+<dt id="term-Origin">Origin<a class="headerlink" href="#term-Origin" title="Permalink to this term">#</a></dt><dd><p>A identification of the provenance of some content on the web. This is
+made out of the scheme (e.g.: <code class="docutils literal notranslate"><span class="pre">https</span></code>),
+the hostname (e.g.: <code class="docutils literal notranslate"><span class="pre">qteati.me</span></code>), and the port used to load the
+resource. For example, for the web version of the Kate emulator, the
+origin would be <code class="docutils literal notranslate"><span class="pre">https://kate.qteati.me</span></code>.</p>
+</dd>
+</dl>
+</section>
+<section id="p">
+<h2>P<a class="headerlink" href="#p" title="Permalink to this heading">#</a></h2>
+<dl class="glossary">
+<dt id="term-Personally-identifiable-information">Personally identifiable information<a class="headerlink" href="#term-Personally-identifiable-information" title="Permalink to this term">#</a></dt><dd><p>Any piece of data that can be used to identify a single individual.
+Things like your name or where you live count as
+“personally identifiable information”.</p>
+</dd>
+<dt id="term-Play-habits">Play habits<a class="headerlink" href="#term-Play-habits" title="Permalink to this term">#</a></dt><dd><p>Information about what and how you play your cartridges. Kate stores
+this locally in your device if you have the feature enabled, and
+uses the information to sort games in your library.</p>
+<p>The <a class="reference internal" href="user/manual/gaming/play-habits.html"><span class="doc">play habits section</span></a>
+describes it in details.</p>
+</dd>
+<dt id="term-Pointer-input">Pointer (input)<a class="headerlink" href="#term-Pointer-input" title="Permalink to this term">#</a></dt><dd><p>An input device that allows one to interact with a portion of the screen
+that the device is “pointing” to. Common examples include mouse,
+trackpads, and styluses. Less common ones include assistive technology
+such as eye tracking. Kate also supports touch input as a form of
+pointer input.</p>
+</dd>
+<dt id="term-Sandboxed-IFrame">Sandboxed IFrame<a class="headerlink" href="#term-Sandboxed-IFrame" title="Permalink to this term">#</a></dt><dd><p>A browser security mechanism that allows iframes loaded in a web site
+to have less privileges than normal, or to dissociate them completely
+from the site even if their <a class="reference internal" href="#term-Origin"><span class="xref std std-term">origins</span></a> match. Kate uses
+this extensively to make sure cartridge processes cannot do anything
+with the data entrusted to Kate.</p>
+</dd>
+</dl>
+</section>
+<section id="r">
+<h2>R<a class="headerlink" href="#r" title="Permalink to this heading">#</a></h2>
+<dl class="glossary">
+<dt id="term-Resource-indicator-band">Resource indicator band<a class="headerlink" href="#term-Resource-indicator-band" title="Permalink to this term">#</a></dt><dd><p>A small area of the screen used by the Kate emulator to show
+security/privacy-impacting things happening at the moment in
+the console, such as having your screen recorded.</p>
+<p>See <a class="reference internal" href="user/manual/security/indicators.html"><span class="doc">the resource indicators section</span></a>
+for details.</p>
+</dd>
+<dt id="term-Responsible-security-disclosure">Responsible security disclosure<a class="headerlink" href="#term-Responsible-security-disclosure" title="Permalink to this term">#</a></dt><dd><p>A process for communicating security-impacting bugs that aims to mitigate
+harm from having more people know about the bugs before users can
+update to a version where the bug is fixed. Kate has a responsible
+security disclosure policy where security-impacting bugs should be
+reported privately to the developers, and only made public after
+the bug is fixed and a new version is released.</p>
+</dd>
+<dt id="term-ROM">ROM<a class="headerlink" href="#term-ROM" title="Permalink to this term">#</a></dt><dd><p>Read-Only Memory. A bunch of data that you can read, but not modify.
+In Kate this generally refers to a
+<a class="reference internal" href="user/manual/gaming/cartridges.html"><span class="doc">ROM cartridge file</span></a>.</p>
+</dd>
+<dt id="term-Runtime">Runtime<a class="headerlink" href="#term-Runtime" title="Permalink to this term">#</a></dt><dd><p>A program that is responsible for providing features used by another
+program at the time it’s running. In Kate, runtimes generally describe
+a broad set of APIs and supporting functionality that allows cartridges
+to run.</p>
+</dd>
+<dt id="term-Runtime-emulation">Runtime emulation<a class="headerlink" href="#term-Runtime-emulation" title="Permalink to this term">#</a></dt><dd><p>A process of running programs made for a different platform without
+changing the code of the program. Runtime emulation instead changes
+the current platform to resemble the one the program expects to run
+on.</p>
+<p>Contrast with <a class="reference internal" href="#term-Code-translation"><span class="xref std std-term">code translation</span></a>.</p>
+</dd>
+</dl>
+</section>
+<section id="s">
+<h2>S<a class="headerlink" href="#s" title="Permalink to this heading">#</a></h2>
+<dl class="glossary">
+<dt id="term-Sandboxing">Sandboxing<a class="headerlink" href="#term-Sandboxing" title="Permalink to this term">#</a></dt><dd><p>Running a computer program in a “restricted area”. The intent of
+sandboxing is to limit damage (both accidental and intentional) that
+a computer program may cause. Kate has
+<a class="reference internal" href="user/manual/security/sandboxing.html"><span class="doc">multiple levels of sandboxing</span></a>
+to provide a secure gaming experience.</p>
+</dd>
+<dt id="term-Save-data">Save data<a class="headerlink" href="#term-Save-data" title="Permalink to this term">#</a></dt><dd><p>Any data that a cartridge stores while running.
+See the <a class="reference internal" href="user/manual/gaming/save-data.html"><span class="doc">save data section</span></a> for
+details.</p>
+</dd>
+<dt id="term-Spoofing-attack">Spoofing attack<a class="headerlink" href="#term-Spoofing-attack" title="Permalink to this term">#</a></dt><dd><p>In the context of Kate, a type of attack where a malicious cartridge
+gains access and privileges to the victim’s device by tricking them
+into believing they’re granting access and privileges to someone
+they trust. E.g.: a malicious cartridge might choose a name
+like <code class="docutils literal notranslate"><span class="pre">6reath</span></code> in the hopes that users will be distracted enough
+to mistake the <code class="docutils literal notranslate"><span class="pre">6</span></code> for the <code class="docutils literal notranslate"><span class="pre">b</span></code> in the trustworthy cartridge
+<code class="docutils literal notranslate"><span class="pre">breath</span></code>.</p>
+<p>Kate relies on players being able to distinguish things like
+cartridge identifiers to be able to assign privileges to them, and
+mitigates this type of attack by reducing the possible symbols
+attackers can use to trick people based on their visual similarity.</p>
+</dd>
+<dt id="term-Standard-gamepad">Standard gamepad<a class="headerlink" href="#term-Standard-gamepad" title="Permalink to this term">#</a></dt><dd><p>A gamepad with, at least, a d-pad, four digital buttons on the right
+(e.g.: A, B, X, Y), two joysticks, four shoulder buttons
+(e.g.: L1, L2, R1, R2), and three center buttons
+(e.g.: Menu and Capture).</p>
+<p>The term is defined by <a class="reference external" href="https://www.w3.org/TR/gamepad/#dfn-standard-gamepad">the W3 gamepad specification</a>.</p>
+</dd>
+<dt id="term-Storage-partition">Storage partition<a class="headerlink" href="#term-Storage-partition" title="Permalink to this term">#</a></dt><dd><p>Save data in Kate is divided into partitions. A partition is an area
+where data can live, and Kate uses these divisions both for security
+and safety. For example, cartridges cannot access data from a different
+cartridge because it’s stored in another partition, which it has no
+access to. Even within a cartridge, there are partitions for each
+version, so you can safely upgrade or downgrade a cartridge without
+worrying about your data being corrupted, or without being able
+to change your mind and going back to the previous version.</p>
+</dd>
+</dl>
+</section>
+<section id="t">
+<h2>T<a class="headerlink" href="#t" title="Permalink to this heading">#</a></h2>
+<dl class="glossary">
+<dt id="term-Threat-model">Threat model<a class="headerlink" href="#term-Threat-model" title="Permalink to this term">#</a></dt><dd><p>A document that outlines all known risks of using a software, from
+multiple perspectives, and describes how the software mitigates
+those risks. If a risk is accepted, it also describes why the risk
+is accepted.</p>
+<p>A threat model is a technical document, in general, but Kate’s threat
+model is written with examples to make it more accessible to the
+general public.</p>
+</dd>
+<dt id="term-Trust-frame">Trust frame<a class="headerlink" href="#term-Trust-frame" title="Permalink to this term">#</a></dt><dd><p>A distinct visual element that Kate uses to tell players when a
+potentially dangerous dialog comes from the Kate emulator itself,
+rather than a malicious cartridge trying to trick players.</p>
+<p>See the <a class="reference internal" href="user/manual/security/trust.html"><span class="doc">trust and consent section</span></a>
+for details.</p>
+</dd>
+</dl>
+</section>
+<section id="v">
+<h2>V<a class="headerlink" href="#v" title="Permalink to this heading">#</a></h2>
+<dl class="simple glossary">
+<dt id="term-Virtual-button">Virtual button<a class="headerlink" href="#term-Virtual-button" title="Permalink to this term">#</a></dt><dd><p>A button that is shown on a touch screen to stand-in for what would be
+a physical button. The Kate emulator provides virtual buttons for all
+of the Kate gamepad, allowing it to be used in a smartphone or similar
+touch-only device.</p>
+</dd>
+</dl>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          <a class="prev-page" href="etc/licence.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Terms of use</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2023, Q.
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Glossary</a><ul>
+<li><a class="reference internal" href="#a">A</a></li>
+<li><a class="reference internal" href="#c">C</a></li>
+<li><a class="reference internal" href="#d">D</a></li>
+<li><a class="reference internal" href="#e">E</a></li>
+<li><a class="reference internal" href="#f">F</a></li>
+<li><a class="reference internal" href="#g">G</a></li>
+<li><a class="reference internal" href="#h">H</a></li>
+<li><a class="reference internal" href="#m">M</a></li>
+<li><a class="reference internal" href="#o">O</a></li>
+<li><a class="reference internal" href="#p">P</a></li>
+<li><a class="reference internal" href="#r">R</a></li>
+<li><a class="reference internal" href="#s">S</a></li>
+<li><a class="reference internal" href="#t">T</a></li>
+<li><a class="reference internal" href="#v">V</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/scripts/furo.js"></script>
+    </body>
+</html>

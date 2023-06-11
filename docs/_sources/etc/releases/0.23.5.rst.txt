@@ -1,0 +1,107 @@
+Kate v0.23.5  (May 2023)
+========================
+
+The v0.23.5 is May's experimental release of Kate with a focus on
+improving the storage and input APIs as well as how we communicate
+risks to players, but also includes a handful of assorted bugfixes
+and small improvements in other areas.
+
+
+Adding buckets to Storage API
+-----------------------------
+
+This version adds buckets to the storage API, which brings the API a
+bit closer to IndexedDB in order to make it possible to bridge it
+adequately.
+
+It's a breaking change on the API level; unbucketed keys stored
+previously are now moved to a "special bucket", and the code must
+always acquire a reference to a bucket to operate on the key/value
+pairs stored there.
+
+Previous data is automatically migrated on boot, so it's not a
+breaking change from players' perspective.
+
+
+Improved input handling
+-----------------------
+
+Much of this release focused on improving Kate's input handling.
+Here are some of the things landing:
+
+  * Haptic feedback for virtual buttons: touch screens make terrible controllers,
+    but when that's all you have (often the case with a phone), this version
+    lets you have a bit more feedback when hitting an input button;
+
+  * Reworked how interactive elements are communicated: the status bar will
+    now be more principled in communicating what actions are available and
+    how they map to console buttons, even when changing the focus changes
+    the actions available;
+
+  * Fixed many issues with focus handling: the focus now usually does what
+    you expect when moving between elements in the screen. There are some
+    issues with elements in different rows/columns to be worked on still.
+
+  * Added settings screens to configure keyboard and gamepad inputs: this
+    allows you to use your own button mappings rather than the default ones.
+    However, there's still a restriction that one gamepad/keyboard button
+    must map to one Kate button. This will change in the future.
+
+  * All-around better support for gamepads: you can now change which gamepad
+    Kate will consider as the paired one, as well as view how Kate reads your
+    gamepad (in cases where it differs from the standard layout). There's
+    still a limit of a single gamepad paired at any moment, but that will
+    be lifted in the future.
+
+
+Improved communication for dangerous actions
+--------------------------------------------
+
+Some of the actions in Kate are irreversible. This version increases the
+number of channels where this is communicated by improving button colours
+and using additional channels (e.g.: the "danger" label).
+
+We're also more consistent with providing confirmation dialogs when you
+try an immediately irreversible/dangerous action, so you have less worry
+about accidentally deleting your data.
+
+
+Recovery options
+----------------
+
+With more ways of configuring Kate comes more ways of making Kate unusable.
+This version adds a "Diagnostics & Recovery" screen that can be used to
+revert faulty changes.
+
+Note that settings in Kate are not versioned, so the only supported action
+is always to revert to the default settings, then reconfigure.
+
+
+Pre-built binaries
+------------------
+
+This version is the first to feature pre-built native binaries (based on
+Electron v24). Binaries are still unsigned and themselves unsandboxed
+(though the Kate kernel and cartridges are subject to the Chromium
+sandbox, as usual), but sandboxing the emulator binary is the next
+step in shipping a safe Kate emulator that works for archival purposes.
+
+
+Fixed bugs
+----------
+
+  * The prompt for updating a cartridge used to display the new
+    cartridge details instead of the installed ones. It now
+    correctly identifies what you're updating from, and what
+    you're updating to.
+
+
+Small improvements
+------------------
+
+  * The Single Cartridge mode now won't copy files intended for
+    the Web Application mode, meaning you can just zip everything
+    in the folder and upload to your web server/Itch.io.
+
+  * Lots of small phrasing changes to make it clearer what you're
+    signing up for when enabling or disabling a configuration option.

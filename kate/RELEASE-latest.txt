@@ -10,7 +10,7 @@ More flexible resolution
 ------------------------
 
 Kate uses a 800x480 resolution in hand-held mode, but that doesn't
-mean games _have_ to use this resolution. Bitsy games use a square
+mean games *have* to use this resolution. Bitsy games use a square
 aspect ratio, and many Ren'Py games use 16:9, or even 4:3, but they
 all scale accordingly to fit within the 800x480 window.
 
@@ -54,10 +54,12 @@ Storage visualisation
 There's a new settings screen for visualising and managing
 different parts of the storage. This includes:
 
-  - Archiving cartridges (deleting the cartridge files, but keeping
+  * Archiving cartridges (deleting the cartridge files, but keeping
     save data and screenshots/video captures);
-  - Deleting all save data; and
-  - Deleting all cartridge-related data (except for screenshots/captures).
+
+  * Deleting all save data; and
+
+  * Deleting all cartridge-related data (except for screenshots/captures).
 
 This should make Kate a bit more usable around managing what's
 stored locally and allowing people to remove data they no longer
@@ -67,31 +69,31 @@ need to keep around.
 Fixed bugs
 ----------
 
-  - The local storage proxy now accounts for engines that may expect
+  * The local storage proxy now accounts for engines that may expect
     it to behave like a regular JavaScript object;
 
-  - The network proxy now properly handles cases where more arbitrary
+  * The network proxy now properly handles cases where more arbitrary
     URLs are given to be loaded, as long as we can still resolve it
     to a valid cartridge file path.
 
-  - Paths are now normalised before Kate attempts to read them from
+  * Paths are now normalised before Kate attempts to read them from
     the cartridge. This should result in less surprises for games
     ported through Bridges.
 
-  - Resources are now properly cached when installing Kate as a
+  * Resources are now properly cached when installing Kate as a
     web app, meaning you should be able to run the web version of
     Kate offline if you install it on an iPhone, Android, or
     Windows 10+.
 
-  - Errors resulting from storage quota being exceeded are now
+  * Errors resulting from storage quota being exceeded are now
     handled more gracefully. There's some reserved system space
     to avoid being locked into unrecoverable storage states.
 
-  - The network bridge now handles blob: urls, so Ren'Py 7.5
+  * The network bridge now handles blob: urls, so Ren'Py 7.5
     pre-splashes work correctly.
 
-  - Fixed an issue with the indexedDB bridge that caused Ren'Py 8
+  * Fixed an issue with the indexedDB bridge that caused Ren'Py 8
     games to not load when reconciling save data.
 
-  - Screenshots and video captures are now sorted from most recent to
+  * Screenshots and video captures are now sorted from most recent to
     least recent (they were not sorted previously).
