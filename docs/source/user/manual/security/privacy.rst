@@ -71,7 +71,7 @@ Information stored locally includes:
 **Cartridges and save data**
    This includes cartridges you install, and any data they store in your device.
    You can remove this data by going to ``Settings -> Storage`` and using one
-   of the :ref:`cartridge data management options`.
+   of the :doc:`cartridge data management options </user/manual/gaming/storage>`.
 
 **Play habits**
    This includes things like when you last ran a cartridge and how much you've

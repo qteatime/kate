@@ -47,6 +47,7 @@ Cartridges do not have access to this overlay to modify it, and
 anything they paint on the screen at that position will simply
 be covered by Kate's resource indicator overlay.
 
+.. _resource indicator icons:
 
 Resource icons
 --------------
@@ -68,13 +69,13 @@ Resource icons
 |                       |    "Persistent Storage" permission to the page.     |
 +-----------------------+-----------------------------------------------------+
 | |icon_low_storage|    | **Low storage**                                     |
-|                       |    Used to indicate that the device's storage has   |
-|                       |    very little free space, which might impact all   |
-|                       |    of Kate's functions that store data.             |
+|                       |   Used to indicate that the device's storage has    |
+|                       |   very little free space, which might impact all    |
+|                       |   of Kate's functions that store data.              |
 |                       |                                                     |
-|                       |    :ref:`Archiving`                                 |
-|                       |    or :ref:`deleting data`                          |
-|                       |    is advised.                                      |
+|                       |   :term:`Archiving` or                              |
+|                       |   :doc:`deleting data </user/manual/gaming/storage>`|
+|                       |   is advised.                                       |
 +-----------------------+-----------------------------------------------------+
 | |icon_recording|      | **Recording screen**                                |
 |                       |    Used to indicate when a cartridge is currently   |

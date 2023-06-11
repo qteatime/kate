@@ -48,10 +48,11 @@ of Kate. Both the physical console and the software emulator.
    Technical documents on the design of all APIs and components that make
    up Kate, including specific security threats they consider.
 
-:doc:`The Kate Threat Model <user/threats/index>`
-   Wondering how Kate protects your safety and privacy? This document
-   provides both summaries and in-depth technical explanations of what
-   you're signing up for, using real-world examples.
+..
+  :doc:`The Kate Threat Model <user/threats/index>`
+    Wondering how Kate protects your safety and privacy? This document
+    provides both summaries and in-depth technical explanations of what
+    you're signing up for, using real-world examples.
 
 
 Changes, Terms, and Credits

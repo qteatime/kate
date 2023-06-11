@@ -24,7 +24,7 @@ To add this bridge to your cartridge you specify the following in your
     ]
   }
 
-The ``selector`` is a :ref:`CSS selector` that must resolve to a canvas element
+The ``selector`` is a :term:`CSS selector` that must resolve to a canvas element
 when the page is loaded. Kate will poll for this selector for up to 1 minute,
 so dynamically inserted canvases will still be found, granted they're added
 to the page in a timely manner.

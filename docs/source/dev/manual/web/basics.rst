@@ -2,7 +2,7 @@ Basics of porting
 =================
 
 The ``web-archive`` :term:`runtime` supports running games originally
-made for a web browser in Kate by using a combination of :term:`emulation` and
+made for a web browser in Kate by using a combination of :term:`emulation <runtime emulation>` and
 :term:`code translation`, as long as all the data required to run the
 game can be found in the cartridge.
 

@@ -171,9 +171,8 @@ context at the moment.
 
 For more details you can check the section on
 :doc:`Kate's hardware versions <../intro/hardware>` and how it relates
-to the :doc:`emulator requirements <../intro/emulator>`. Mods are described
-in the :ref:`Kate's Modding Guide` book. Accessibility is further discussed in
-the :ref:`Accessible Gaming Guide` book.
+to the :doc:`emulator requirements <../intro/emulator>`. Mods and
+accessibility support guidelines are still not implemented.
 
 
 The safety for your data

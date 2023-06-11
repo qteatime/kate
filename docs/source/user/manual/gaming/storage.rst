@@ -115,7 +115,8 @@ provides this information, you'll see the remaining space Kate can use under
 ``Free`` in the storage summary.
 
 When you're running out of space, you may get a notification alert about it,
-along with a :ref:`low-space indicator` in the resource indicator bar.
+along with a :ref:`low-space indicator <resource indicator icons>`
+in the resource indicator bar.
 
 .. important::
 

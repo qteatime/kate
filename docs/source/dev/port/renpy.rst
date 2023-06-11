@@ -126,8 +126,9 @@ Startup performance
 -------------------
 
 Ren'Py web is optimised for streaming your game every time the player accesses
-a website. It does so by using the :ref:`Progressive Downloads` feature, where
-only a small part of your game is kept on a ZIP file that's loaded before the
+a website. It does so by using the
+`Progressive Downloads <https://www.renpy.org/doc/html/web.html#progressive-downloading>`_
+feature, where only a small part of your game is kept on a ZIP file that's loaded before the
 game starts, and all other parts are downloaded when they're needed.
 
 This means that Ren'Py web games can reduce the amount of data downloaded

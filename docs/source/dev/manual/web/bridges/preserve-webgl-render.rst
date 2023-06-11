@@ -28,7 +28,8 @@ Why and how
 -----------
 
 Kate's screenshot and video capture runs on its own process, and as such
-it's not synchronised with your game's drawing loop. The :ref:`WebGL API`
+it's not synchronised with your game's drawing loop. The
+`WebGL API <https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API>`_
 offers a rendering optimisation where the contents drawn to the screen
 are not always available to this separate process Kate runs, and in that
 case the player might capture a screenshot that ends up blank because

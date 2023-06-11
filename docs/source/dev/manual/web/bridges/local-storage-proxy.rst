@@ -30,7 +30,8 @@ API emulation
 
 This bridge works by replacing the global ``localStorage`` and ``sessionStorage``
 objects with the bridge's own implementation. It relies on JavaScript's
-:ref:`Proxy` to handle cases where these global objects are directly mutated
+`Proxy <https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy>`_
+to handle cases where these global objects are directly mutated
 by the code.
 
 That is, the following idiom is supported by this bridge:

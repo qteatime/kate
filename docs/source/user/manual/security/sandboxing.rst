@@ -47,7 +47,7 @@ expecting you to predict all possible risks.
    Kate can't do much about the *content* of the cartridge, however. There we
    rely on developers properly communicating what you can expect from a game,
    e.g.: by providing the appropriate rating and content warnings,
-   and in trying to foster a community that cares about :ref:`accessibility`.
+   and in trying to foster a community that cares about accessibility.
 
 
 Component sandboxing

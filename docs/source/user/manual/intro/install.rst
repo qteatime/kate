@@ -75,7 +75,7 @@ making sure your `.desktop` file looks like this:
    TryExec=/var/lib/flatpak/exports/bin/com.google.Chrome
 
 
-When you first run Kate, it'll launch in :doc:`Handheld case mode <modes>`. You
+When you first run Kate, it'll launch in :ref:`Handheld case mode <emulator hand-held mode>`. You
 can hold down |btn_menu_text|, then go to ``Settings -> User interface`` and change
 to fullscreen mode instead, since you can just use the physical Steam Deck
 controller.

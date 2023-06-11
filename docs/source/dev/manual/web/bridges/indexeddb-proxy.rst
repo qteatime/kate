@@ -1,7 +1,7 @@
 IndexedDB proxy
 ===============
 
-If your game relies on :ref:`IndexedDB` in order to persist data, this bridge
+If your game relies on `IndexedDB <https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API>`_ in order to persist data, this bridge
 will allow it to work in Kate by converting IndexedDB operations to work on the
 :py:mod:`Object Storage API <KateAPI.store>`. You need to choose whether you'll
 use the versioned or unversioned partition when instantiating this bridge.

@@ -20,8 +20,8 @@ your games. We want to make sure you have a fun (and safe!) time,
 regardless of what cartridge you choose to run.
 
 To get started you should :doc:`get the Kate emulator <intro/install>`. You
-may then :doc:`find out more about Kate's features <todo>`, and
-:doc:`install some games <todo>`.
+may then :doc:`find out more about Kate's features <gaming/index>` and
+:doc:`its approach to security and privacy <security/index>`.
 
 .. toctree::
    :maxdepth: 2

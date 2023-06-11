@@ -3,8 +3,10 @@ Button input proxy
 
 The button input proxy translates input coming from the Kate gamepad into
 keyboard keys being pressed in the cartridge process. These are turned
-into regular :ref:`DOM keyboard events` dispatched from the :ref:`Window`
-or :ref:`Document`.
+into regular :term:`DOM keyboard events` dispatched from the
+`Window <https://developer.mozilla.org/en-US/docs/Web/API/Window>`_
+or
+`Document <https://developer.mozilla.org/en-US/docs/Web/API/Document>`_.
 
 You configure what keyboard keys each button maps to, however this bridge
 only supports mapping one Kate button press to one keyboard key press.

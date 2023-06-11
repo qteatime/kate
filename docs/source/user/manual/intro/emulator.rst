@@ -32,6 +32,8 @@ emulator uses by holding down |btn_menu_text|, then selecting
 available modes.
 
 
+.. _emulator hand-held mode:
+
 Handheld Mode
 '''''''''''''
 
@@ -70,8 +72,8 @@ Fullscreen Mode
 .. image:: img/fullscreen-mode.png
 
 In fullscreen mode the screen takes the whole space available for the
-emulator. Kate also overlays its :ref:`security indicators` on top
-of it: a contiguous line of 3 pixels at the very top of the screen
+emulator. Kate also overlays its :doc:`security indicators </user/manual/security/indicators>`
+on top of it: a contiguous line of 3 pixels at the very top of the screen
 is used to display the trust mode and the resource indicators. This
 means that, on smaller resolutions, the game screen might be slightly
 covered, but there is no way to disable this overlay, as it's a

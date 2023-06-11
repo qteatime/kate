@@ -63,7 +63,7 @@ your device, so you can run it offline and without needing the original
 cartridge file at any time.
 
 If you need to delete data to make space up for new games, you may
-consider :ref:`archiving the cartridge <storage archiving>`. You can do
+consider :term:`archiving the cartridge <archiving>`. You can do
 so from the cartridge's storage page (from the home screen, press |btn_menu_text|
 and select ``Manage data``).
 
@@ -78,7 +78,7 @@ Storage details are discussed in the :doc:`Storage section <storage>`.
 Privacy & safety
 ----------------
 
-Kate cartridges are fully :term:`sandboxed`. This means that a cartridge
+Kate cartridges are fully :term:`sandboxed <sandboxing>`. This means that a cartridge
 cannot access data on your device or use the internet in any way. By
 sandboxing all cartridges Kate greatly limits the possible impacts to
 your device or data, even if you end up running a malicious cartridge.
@@ -87,8 +87,8 @@ In the future, cartridges will be able to request special permissions
 to do things with your device or data, which puts you in control of what
 you're comfortable or not in letting the cartridge do.
 
-Security and privacy details are discussed in the
-:doc:`Threat Modelling book <../../threats/index>`.
+Details are discussed in the
+:doc:`Security and Privacy <../security/index>` section.
 
 
 Credits and licences

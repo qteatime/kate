@@ -14,6 +14,7 @@ A
     to zoom", where the zoom level would be based on how much the button
     is pressed.
 
+  Archiving
   Archiving (a cartridge)
     Removing the cartridge files from the local database to free up space,
     but keeping enough information around to re-install it at a later point
@@ -77,6 +78,17 @@ C
     in a web browser—the Kate code translator will go through that cartridge's
     code and automatically change it to fit what works in the Kate platform.
 
+    Contrast with :term:`runtime emulation`.
+
+  CSS selector
+    A program in the :term:`CSS` language which allows one to search a
+    web page for specific elements. For example, the selector
+    ``article img`` finds all image elements within article elements.
+    
+    See the
+    `MDN docs on CSS selectors <https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors>`_
+    for a detailed treatise.
+
 
 D
 -
@@ -100,6 +112,12 @@ D
     DOM pointer events cover movement of the pointer and pressing/releasing
     of buttons in the pointing device. See the
     `MDN page on pointer events <https://developer.mozilla.org/en-US/docs/Web/API/Pointer_events>`_
+    for details.
+
+  DOM keyboard events
+    Events related to the activity in a keyboard device (physical or virtual).
+    The keyboard events cover keys being pressed or released. See the
+    `MDN docs on keyboard events <https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent>`_
     for details.
 
   DOM trusted events
@@ -139,7 +157,7 @@ F
     A gaming console that could exist, but for which there's no hardware
     you can just walk into a store and buy. Though you could build the
     console yourself from the technical specification, games are generally
-    played on an :term:`emulator`` for the console.
+    played on an :term:`emulator` for the console.
 
   Formal model
     A mathematical model of a software. Kate uses these mathematical
@@ -233,7 +251,7 @@ M
   Monotonic timestamp
     A value representing an instant in time that only moves forward. Date
     and time in computer generally models social notions of time, where
-    one needs to care about things such as :term:`Daylight Savings Time <DST>`,
+    one needs to care about things such as Daylight Savings Time,
     or any other event where synchronising the computer's clock with
     everyone else's requires us to move the clock backwards.
 
@@ -340,6 +358,14 @@ R
     program at the time it's running. In Kate, runtimes generally describe
     a broad set of APIs and supporting functionality that allows cartridges
     to run.
+
+  Runtime emulation
+    A process of running programs made for a different platform without
+    changing the code of the program. Runtime emulation instead changes
+    the current platform to resemble the one the program expects to run
+    on.
+
+    Contrast with :term:`code translation`.
 
 S
 -

@@ -108,6 +108,8 @@ CC0 1.0 Universal Licence
    :literal:
 
 
+.. _mit licence:
+
 MIT licence
 '''''''''''
 
