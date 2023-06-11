@@ -27,7 +27,7 @@ emulator, there are two ways you can install a cartridge:
 
    .. raw:: html
 
-      <video src="/_static/video/kate-dnd.webm" controls>
+      <video src="../../../_static/video/kate-dnd.webm" controls>
 
 
 **Use the "Install cartridge" button**
@@ -37,7 +37,7 @@ emulator, there are two ways you can install a cartridge:
 
    .. raw:: html
 
-      <video src="/_static/video/kate-install-cartridge.webm" controls>
+      <video src="../../../_static/video/kate-install-cartridge.webm" controls>
 
 
 Your library
