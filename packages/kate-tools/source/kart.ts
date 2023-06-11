@@ -113,7 +113,7 @@ const meta = T.spec({
         })
       ),
       legal_notices_path: T.nullable(T.str),
-      licence_name: T.optional("All rights reserved", T.short_str(1_000)),
+      licence_name: T.optional("proprietary", T.short_str(1_000)),
       allow_derivative: T.optional(false, T.bool),
       allow_commercial: T.optional(false, T.bool),
     })
@@ -195,8 +195,11 @@ const recipe = T.tagged_choice<Recipe, Recipe["type"]>("type", {
   }),
   renpy: T.spec({
     type: T.constant("renpy" as const),
-    pointer_support: T.bool,
-    save_data: T.one_of(["versioned" as const, "unversioned" as const]),
+    pointer_support: T.optional(true, T.bool),
+    save_data: T.optional(
+      "versioned",
+      T.one_of(["versioned" as const, "unversioned" as const])
+    ),
     renpy_version: T.regex(
       "version in the form MM.NN (e.g.: 7.5, 8.1)",
       /^\d+\.\d+$/
@@ -815,10 +818,12 @@ function apply_recipe(json: ReturnType<typeof config>) {
           // Packaging
           "**/*.data",
           "**/*.zip",
+          "**/*.rpa",
           // Audio
           "**/*.wav",
           "**/*.ogg",
           "**/*.oga",
+          "**/*.mp2",
           "**/*.mp3",
           "**/*.m4a",
           "**/*.opus",
@@ -829,6 +834,8 @@ function apply_recipe(json: ReturnType<typeof config>) {
           "**/*.ogv",
           "**/*.mp4",
           "**/*.mpeg",
+          "**/*.mkv",
+          "**/*.avi",
           // Image
           "**/*.webp",
           "**/*.png",
@@ -836,6 +843,8 @@ function apply_recipe(json: ReturnType<typeof config>) {
           "**/*.jpeg",
           "**/*.bmp",
           "**/*.gif",
+          "**/*.avif",
+          "**/*.svg",
           // Font
           "**/*.ttf",
           "**/*.tga",

@@ -1,0 +1,5 @@
+Kate v0.23.6  (June 2023)
+==========================
+
+.. include:: ../../../../packages/kate-core/RELEASE.txt
+  :start-line: 3
