@@ -80,7 +80,7 @@ html_theme_options = {
   "announcement": "Both Kate and this documentation are a work in progress and may change at any time.",
   "source_repository": "https://github.com/qteatime/kate",
   "source_branch": "main",
-  "source_directory": "docs/manual"
+  "source_directory": "docs/source"
 }
 
 pygments_style = "colorful"
