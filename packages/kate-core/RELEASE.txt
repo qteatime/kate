@@ -44,8 +44,10 @@ can affect the behaviour of the game).
 Functional Ren'Py support
 -------------------------
 
-With this release Kate is functionally compatible with games
-exported in Ren'Py 7.5 and Ren'Py 8.1.
+With this release Kate is functionally compatible with most games
+exported in Ren'Py 7.5 and Ren'Py 8.1. There are a couple of things
+that we don't yet handle, like Ren'Py's new text input support in
+8.1, but that will be landing soon as well.
 
 
 Storage visualisation
@@ -64,6 +66,30 @@ different parts of the storage. This includes:
 This should make Kate a bit more usable around managing what's
 stored locally and allowing people to remove data they no longer
 need to keep around.
+
+
+Dropping support for Safari
+---------------------------
+
+Since Safari is far behind in implementing some of the APIs that Kate needs
+to work, and implements some of them with inconsistent behaviour compared to
+other browsers, this release drops support for Safari for the time being.
+
+This will be revisited once a stable release is out. But there's only so much
+Kate can paper over without Apple implementing the missing features in Safari.
+
+
+New documentation
+-----------------
+
+This release features properly organised documentation instead of an
+assorted collection of text files in a directory. The previous documentation
+was heavily edited and expanded upon, but the documentation is nowhere near
+complete still—nor is Kate.
+
+We're aiming for proper documentation by the time the stable release drops,
+which includes all the missing formal documentation on the core security and
+privacy properties for Kate.
 
 
 Fixed bugs
@@ -95,5 +121,32 @@ Fixed bugs
   * Fixed an issue with the indexedDB bridge that caused Ren'Py 8
     games to not load when reconciling save data.
 
+  * Fixed the display of play time and last played date so it doesn't
+    just say "played a month ago" when you've played it yesterday.
+
+  * Cartridge titles are now more readable against the start screen
+    background. Cartridges are also properly centred.
+
+  * Video and audio are now handled in the initial preparation of the
+    cartridge HTML, so games using some of the Bitsy hacks work properly
+    with audio.
+
+  * There's proper feedback about cartridge installation now when using
+    the ``Install cartridge...`` button.
+
+
+Minor improvements
+------------------
+
   * Screenshots and video captures are now sorted from most recent to
     least recent (they were not sorted previously).
+
+  * Removed size limitations for legal notices and web-archive HTMLs, which
+    some Bitsy games go way over as they have too much data embedded in the
+    page.
+
+  * Play time is now recorded at minute-granularity. This doesn't change
+    much, but there was no need to record it in milliseconds, so this moves
+    things more in line with Kate's general approach to privacy—not recording
+    what we don't absolutely need.
+
