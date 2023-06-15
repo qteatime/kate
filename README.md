@@ -64,15 +64,15 @@ Kate does not accept source contributions currently, since it has not reached a 
 - ~~Pointer input support;~~
 - ~~Higher resolution with external displays;~~
 - ~~Visualising and managing device storage;~~
-- **Digital OSTs and artbooks as cartridges;** _(<- we're here now)_
+- **Exporting and synchronising data across devices;** _(<- we're here now)_
 - Decentralised stores (a community-driven form of curation);
 - Arbitrary text input;
 - Game collections and library filtering;
-- Exporting and synchronising data across devices;
 - Auditing action logs in the console;
 - Native app support (Android, ChromeOS, SteamOS, Linux, Windows);
 - Accessibility options (TTS, contrast, sizes, etc);
 - Stabilise cartridge format;
+- Digital OSTs and artbooks as cartridges;
 - Formal semantics and security proofs;
 
 ### Planned features (post stable release)
