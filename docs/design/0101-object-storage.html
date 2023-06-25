@@ -1,0 +1,982 @@
+<!doctype html>
+<html class="no-js" lang="en">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Release notes" href="../etc/releases/index.html" /><link rel="prev" title="Kate’s Design Documents" href="index.html" />
+
+    <!-- Generated with Sphinx 6.2.1 and Furo 2023.03.27 -->
+        <title>#0101 — Object Store API - Kate 0.23.6 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=fad236701ea90a88636c2a8c73b44ae642ed2a53" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #ffffff;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+<div class="announcement">
+  <aside class="announcement-content">
+     Both Kate and this documentation are a work in progress and may change at any time. 
+  </aside>
+</div>
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">Kate 0.23.6 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  
+  
+  <span class="sidebar-brand-text">Kate 0.23.6 documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">End-user books</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../user/manual/index.html">The Kate User Manual</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../user/manual/intro/index.html">Getting started</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../user/manual/intro/hardware.html">Tech specs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../user/manual/intro/emulator.html">Emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../user/manual/intro/install.html">Installing</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../user/manual/gaming/index.html">Playing games</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../user/manual/gaming/cartridges.html">ROM Cartridges</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../user/manual/gaming/captures.html">Screen recording</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../user/manual/gaming/save-data.html">Save data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../user/manual/gaming/play-habits.html">Play habits</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../user/manual/gaming/storage.html">Stored data</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../user/manual/security/index.html">Security and privacy</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../user/manual/security/philosophy.html">Safety philosophy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../user/manual/security/sandboxing.html">Sandboxing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../user/manual/security/privacy.html">Privacy policy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../user/manual/security/trust.html">Trust and consent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../user/manual/security/indicators.html">Resource indicators</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Game developer books</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../dev/manual/index.html">Making games for Kate!</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../dev/manual/intro/index.html">Getting started</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../dev/manual/intro/why.html">Why make games for Kate?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../dev/manual/intro/setup.html">What will you need?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../dev/manual/intro/hello-world.html">Hello, World</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../dev/manual/model/index.html">Programming model</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../dev/manual/model/overview.html">Overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../dev/manual/model/cartridges.html">Cartridges</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../dev/manual/model/sandboxing.html">Sandboxing and APIs</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../dev/manual/api/index.html">Kate API</a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" role="switch" type="checkbox"/><label for="toctree-checkbox-8"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../dev/manual/api/events.html"><code class="docutils literal notranslate"><span class="pre">events</span></code> — Event handling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../dev/manual/api/cart-fs.html"><code class="docutils literal notranslate"><span class="pre">cart_fs</span></code> — Reading files</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../dev/manual/api/input.html"><code class="docutils literal notranslate"><span class="pre">*_input</span></code> — Reacting to player input</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../dev/manual/api/timer.html"><code class="docutils literal notranslate"><span class="pre">timer</span></code> — Scheduling updates</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../dev/manual/api/capture.html"><code class="docutils literal notranslate"><span class="pre">capture</span></code> — Screenshots and video recording</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../dev/manual/api/store.html"><code class="docutils literal notranslate"><span class="pre">store</span></code> — Saving state</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../dev/manual/web/index.html">Web game support</a><input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" role="switch" type="checkbox"/><label for="toctree-checkbox-9"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../dev/manual/web/basics.html">Basics of porting</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../dev/manual/web/bridges/index.html">Bridges</a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" role="switch" type="checkbox"/><label for="toctree-checkbox-10"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../dev/manual/web/bridges/network-proxy.html">Network proxy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../dev/manual/web/bridges/input-proxy.html">Button input proxy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../dev/manual/web/bridges/pointer-input-proxy.html">Pointer input proxy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../dev/manual/web/bridges/local-storage-proxy.html">Local storage proxy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../dev/manual/web/bridges/indexeddb-proxy.html">IndexedDB proxy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../dev/manual/web/bridges/preserve-webgl-render.html">Preserve WebGL Render</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../dev/manual/web/bridges/capture-canvas.html">Capture canvas</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../dev/manual/web/bridges/renpy-tweaks.html">Ren’Py tweaks</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../dev/manual/kart/index.html">Kart — Packing cartridges</a><input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" role="switch" type="checkbox"/><label for="toctree-checkbox-11"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../dev/manual/kart/getting-started.html">Getting started</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../dev/manual/kart/configuration.html">Configuration files</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../dev/port/index.html">Kate Porting Recipes</a><input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" role="switch" type="checkbox"/><label for="toctree-checkbox-12"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../dev/port/bitsy.html">Bitsy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../dev/port/renpy.html">Ren’Py</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Design and implementation</span></p>
+<ul class="current">
+<li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">Kate’s Design Documents</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" role="switch" type="checkbox"/><label for="toctree-checkbox-13"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">#0101 — Object Store API</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Changes, Terms, and Credits</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../etc/releases/index.html">Release notes</a><input class="toctree-checkbox" id="toctree-checkbox-14" name="toctree-checkbox-14" role="switch" type="checkbox"/><label for="toctree-checkbox-14"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../etc/releases/0.23.6.html">Kate v0.23.6  (June 2023)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../etc/releases/0.23.5.html">Kate v0.23.5  (May 2023)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../etc/releases/0.23.4.html">Kate v0.23.4  (April 2023)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../etc/licence.html">Terms of use</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Indices and Tables</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../genindex.html">Index</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../py-modindex.html">Module Index</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/qteatime/kate/edit/main/docs/source/design/0101-object-storage.rst" title="Edit this page">
+    <svg aria-hidden="true" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <path d="M4 20h4l10.5 -10.5a1.5 1.5 0 0 0 -4 -4l-10.5 10.5v4" />
+      <line x1="13.5" y1="6.5" x2="17.5" y2="10.5" />
+    </svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          <section id="object-store-api">
+<h1>#0101 — Object Store API<a class="headerlink" href="#object-store-api" title="Permalink to this heading">#</a></h1>
+<dl class="field-list simple">
+<dt class="field-odd">Author<span class="colon">:</span></dt>
+<dd class="field-odd"><ol class="upperalpha simple" start="17">
+<li></li>
+</ol>
+</dd>
+<dt class="field-even">Last updated<span class="colon">:</span></dt>
+<dd class="field-even"><p>18th April 2023</p>
+</dd>
+</dl>
+<section id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Permalink to this heading">#</a></h2>
+<p>Kate Cartridges work as a read-only file system; the applications contained
+in them are free to read any of the files packaged with the cartridge, but
+they cannot modify those files, nor store any additional data.</p>
+<p>There are two distinct scenarios where this is an issue:</p>
+<ul class="simple">
+<li><p>Longer games need to store information about the user progress, so players
+can play through the game in many shorter sessions;</p></li>
+<li><p>Tools packaged for Kate might need to store arbitrary user content in the
+same way desktop applications do.</p></li>
+</ul>
+<p>To address both of these use cases, this document proposes a securely
+partitioned object store, much resembling a flat, tag-based file system.</p>
+</section>
+<section id="the-object-store">
+<h2>The object store<a class="headerlink" href="#the-object-store" title="Permalink to this heading">#</a></h2>
+<p>The Kate Object Store API is a bucket-based API, similar to many other recent
+<a class="reference internal" href="../glossary.html#term-Object-storage"><span class="xref std std-term">cloud object storages</span></a>, however we still have to contend with
+the fact that the same object store (the same underlying storage location)
+needs to be exposed to each Kate Cartridge in a way that one cartridge cannot
+see the data of another cartridge. In this sense, the storage API must employ
+a secure, stable partitioning scheme.</p>
+<p>Kate uses the following partitioning strategy:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Root</span> <span class="o">&gt;</span> <span class="n">Cartridge</span> <span class="n">ID</span> <span class="o">&gt;</span> <span class="n">Cartridge</span> <span class="n">Version</span> <span class="o">&gt;</span> <span class="n">Bucket</span> <span class="o">&gt;</span> <span class="n">Object</span>
+</pre></div>
+</div>
+<p>The Kate emulator can manipulate anything from Root and below. A cartridge can
+manipulate anything below its id and version. A bucket pointer can manipulate
+any object inside that specific bucket. And an object pointer can manipulate
+anything in that specific object. This gives us a nice object-capability
+property where we can always restrict the powers we grant, but never escalate
+them; there’s no way to go from a bucket pointer to a cartridge id pointer,
+for example, access flows in exactly one direction.</p>
+<p>If we look at this partitioning as a textual path, then an example could be
+the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span> <span class="s2">&quot;qteati.me/hello&quot;</span> <span class="o">/</span> <span class="s2">&quot;1.0&quot;</span> <span class="o">/</span> <span class="s2">&quot;data&quot;</span> <span class="o">/</span> <span class="s2">&quot;high-scores&quot;</span>
+</pre></div>
+</div>
+<p>It’s still important to note that, while the partitioning <em>may</em> be expressed
+as a textual path, in a similar vein to hierarchical file system paths,
+there’s no textual representation you can use to access data. That is,
+there is no API like <code class="docutils literal notranslate"><span class="pre">storage.read(&quot;/cartridge/1.0/data/high-scores&quot;)</span></code>,
+and this API will never exist. Instead, cartridges are handed a strong
+capability-secure object that provide access to a specific partition,
+and through calling methods in this object they may access subpartitions;
+but partition access can never be constructed directly from cartridge code.</p>
+<section id="why-a-versioned-storage">
+<h3>Why a versioned storage?<a class="headerlink" href="#why-a-versioned-storage" title="Permalink to this heading">#</a></h3>
+<p>The first incarnation of the object storage did not include the Cartridge
+Version partition. This works up to the point that all version upgrades are
+successful and fully backwards compatible, but it’s a hard requirement to
+impose on all cartridges.</p>
+<p>Ideally, players should be able to upgrade to a new version, and safely
+downgrade if things do not go according to their expectations. No upgrades
+should result in corrupted or unusable data lingering in the system.</p>
+<p>A version partition gives cartridges a way of performing data migrations
+safely as well, since the object store by itself does not provide any
+transactional guarantees. This would be much harder to do in an unversioned
+store, as each cartridge would need to re-invent transactional migration
+in their own way.</p>
+<p>Lastly, there’s still a special <strong>Unversioned</strong> partition. Cartridges may
+choose to store data in the unversioned partition for things that are not
+expected to change from one version to another, and that they wish to share
+between versions. For example, this could be user-generated data that is not
+really tied to a specific cartridge version.</p>
+</section>
+<section id="upgrades-and-migrations">
+<h3>Upgrades and migrations<a class="headerlink" href="#upgrades-and-migrations" title="Permalink to this heading">#</a></h3>
+<p>Because the storage is partitioned by versions, we need to allow cartridges
+to upgrade from one version to another. When a cartridge is ran, it can
+register a handler for the Storage Upgrade event. Kate will call this handler
+providing the old version, a read-only reference to the old version’s
+partition, and a migration assiting object.</p>
+<p>Cartridges can either implement their own migration strategy, or use the
+migration assisting object if they do not need to perform any custom migration
+policies. The assisting object provides methods for copying one or all buckets
+from the previous version to the current one, unchanged, as well as discarding
+all data from the previous version.</p>
+<p>Once a cartridge performs a successful migration, the Storage Upgrade event
+will not fire again. Cartridges can check if a migration needs to be performed
+before registering a handler for it with a separate method of the object
+storage API.</p>
+</section>
+<section id="notes-on-the-cartridge-identifier">
+<h3>Notes on the cartridge identifier<a class="headerlink" href="#notes-on-the-cartridge-identifier" title="Permalink to this heading">#</a></h3>
+<p>The Kate Object Storage API needs a stable and unforgeable identifier for its
+partitioning system to work. In Kate, cartridge identifiers are mandated to be
+unique and stable (i.e.: only one cartridge with a given identifier can be
+installed in the console at any given time). However, cartridge identifiers
+are likewise public: each cartridge announces its identifier to everyone in
+plain text.</p>
+<p>Kate makes this work by relying on the Kernel being the only piece of software
+that has the ability to turn a cartridge identifier into a pointer to that
+specific partition. This way we don’t have to worry about cartridges forging
+access to other cartridges’ partitions, however we require the Kernel to be
+a trusted overseer of all operations on the object storage.</p>
+</section>
+<section id="what-s-in-an-object">
+<h3>What’s in an object?<a class="headerlink" href="#what-s-in-an-object" title="Permalink to this heading">#</a></h3>
+<p>An object consists of a bag of well-known meta-data (creation and modification
+dates, estimated size, mime-type), possibly a set of custom meta-data
+(arbitrarily specified by the cartridge), and the stored data.</p>
+<p>Objects in this API are stored in IndexedDB, and thus can include almost
+any value that can be stored in IndexedDB (see the
+<a class="reference internal" href="#object-storage-size-estimation"><span class="std std-ref">quota estimation section</span></a> for additional restrictions
+Kate imposes.</p>
+</section>
+<section id="size-and-quotas">
+<span id="object-storage-size-estimation"></span><h3>Size and quotas<a class="headerlink" href="#size-and-quotas" title="Permalink to this heading">#</a></h3>
+<p>Usage of the object storage API is subject to specific quotas, which means
+that cartridges have a specific amount of data they’re allowed to store, and
+any requests to store more data than that limit will be blocked by the
+Kernel process.</p>
+<p>A restricted storage is necessary to prevent cartridges (intentionally or not)
+from hogging the entire storage in the device. Each cartridge gets 64 MB of
+storage that is not gated through any capability, and it may ask for a larger
+storage space through a storage capability. This gives users a better idea of
+what they’re signing up for by using the cartridge, particularly if they use
+a more limited device.</p>
+<section id="limits">
+<h4>Limits<a class="headerlink" href="#limits" title="Permalink to this heading">#</a></h4>
+<p>To ensure that each cartridge has a fair amount of access to the storage
+resources, Kate imposes usage quotas on them. By default, cartridges can store:</p>
+<ul class="simple">
+<li><p>Up to 64MB of data (estimated when writing);</p></li>
+<li><p>Up to 10000 (ten thousand) entries across all buckets;</p></li>
+</ul>
+<p>These restrictions sound fairly harsh, but they’re based on the fact that save
+data for most games that would target Kate as a platform (small indie
+RPGs/VNs/story-games) are not excessively larger than this.</p>
+<p>From the author’s personal experience, the largest Unity-based visual novel
+(size-wise) is ~27 MB counting all save files; the largest Ren’Py-based
+visual novel (size-wise) is ~5 MB counting all save files; and the game
+with the largest file count for save data the author has includes ~1800 XML
+files (~10 MB).</p>
+<p>Though defaults can be calibrated (upwards) at any point in time, games that
+do wish to request more storage resources than the default ones can do so
+through a storage capability:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">custom-storage-quota</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">max-size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">&lt;bytes&gt;</span>
+<span class="w">  </span><span class="nt">max-records</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">&lt;positive integer&gt;</span>
+</pre></div>
+</div>
+<p>Each field is optional, a cartridge may ask just for a size increase, just
+for a record count increase, or for both; along with providing a reason
+for the request. Kate should not actually show the reason directly to users,
+as that would be possibly misleading (intentionally or not), rather it should
+allow users to look at the reason as additional information, but only after
+they’re properly informed of the change and its associated performance impacts.</p>
+</section>
+</section>
+</section>
+<section id="technical-implementation">
+<h2>Technical implementation<a class="headerlink" href="#technical-implementation" title="Permalink to this heading">#</a></h2>
+<p>Kate uses a single IndexedDB store for all cartridges, with a compound index
+for partitioning. The Kernel maintains a single <code class="docutils literal notranslate"><span class="pre">ObjectStore</span></code> service that
+handles all operations on this store, and must ensure that they adhere
+to the security properties established in this document.</p>
+<p>Because the Kernel (which includes the ObjectStore) and each cartridge run
+in different processes, cartridges cannot interact with the ObjectStore
+directly. Instead, a proxy object is injected in the cartridge’s process
+as one of the client Kate APIs, and this proxy sends requests to the Kernel
+process in order to operate on the object store on the cartridge’s behalf</p>
+<p>In the Kernel process, such messages are handled by first identifying the
+originating cartridge process, and then resolving its
+<code class="docutils literal notranslate"><span class="pre">Cartridge</span> <span class="pre">ID</span> <span class="pre">&gt;</span> <span class="pre">Cartridge</span> <span class="pre">Version</span></code> partition pointers based on the process
+metadata, rather than any information provided by the cartridge in the message.
+This guarantees that the Kernel only hands partitions that the sender of the
+message rightfully possesses a right to access.</p>
+<p>Any result of the operation is sent back to the cartridge process as a
+separate message. The client Kate API takes care of matching the Kernel
+reply with the original request through the message identifier it generated
+to make the request. This implies that all operations in the object storage
+are inherently asynchronous.</p>
+</section>
+<section id="how-is-this-api-dangerous">
+<h2>How is this API dangerous?<a class="headerlink" href="#how-is-this-api-dangerous" title="Permalink to this heading">#</a></h2>
+<p>For the Kate Object Storage API we deal with seven main dangers, looking
+at cartridges’, Kate’s, and users’ perspectives:</p>
+<dl>
+<dt><strong>Breaking isolation</strong>:</dt><dd><p>Because all cartridges share the same underlying storage, there’s an inherent
+threat that they might be able to affect other cartridge’s data.</p>
+<p>We mitigate this through the partitioning scheme described in this document,
+and an enforcement of strong capabilities for accessing each partition.
+Barring bugs in the Kate kernel, a cartridge shouldn’t be able to get a
+reference for a partition it doesn’t own.</p>
+</dd>
+<dt><strong>Degrading Kate resources</strong>:</dt><dd><p>Because all cartridges share the same object storage resource, there’s a
+threat that some cartridges may use it poorly (intentionally or not)
+and affect every other cartridge’s performance.</p>
+<p>We mitigate this with storage quotas. Cartridges have a set amount of
+resources (storage space, keys) allocated to them for using the shared
+storage, and they may request more resources from the user through storage
+capabilities, but their harm potential is bounded by such quotas.</p>
+</dd>
+<dt><strong>Degrading the host system</strong>:</dt><dd><p>Because storage is shared between Kate and the host system, there’s a
+threat that Kate cartridges may unfairly (intentionally or not) occupy
+a significant amount of the host system’s storage, causing slowdown or
+issues with the host system’s common operation.</p>
+<p>We mitigate this with storage quotas as well. Kate cannot guarantee that
+the host system’s usage is fair, however when running in Web Mode browsers
+will have a smaller quota of the system resources allocated to the page
+which further mitigates this.</p>
+</dd>
+<dt><strong>Incompatible data</strong>:</dt><dd><p>When a user upgrades a cartridge from one version to another, there’s a
+threat that the new version cannot work on the data stored by the old
+version. In such case, the user might be unable to run the cartridge at all.</p>
+<p>We mitigate this by versioning storages, so each cartridge version gets
+its own isolated partition. And we provide a migration process where
+a cartridge can manage its own data upgrade in a controlled manner.</p>
+</dd>
+<dt><strong>Data inconsistency</strong>:</dt><dd><p>Because storage is handled by the Kernel process, there may be
+inconsistencies in the cartridge’s view of the storage and the
+contents of the storage.</p>
+<p>We mitigate this by making all storage operations atomic on the Kernel
+side, and ensuring that they’re ordered through the use of transactions
+and the serialisation of requests in the main IPC channel.</p>
+<p>There’s one further disconnect between the Kernel and the underlying
+storage as Kate uses relaxed durability for the object storage, so there
+may be edge cases where a success is reported to the cartridge before
+data is written to the disk.</p>
+</dd>
+<dt><strong>Lack of granular boundaries in cartridges</strong>:</dt><dd><p>Because Kate treats a cartridge as a single trust boundary, third party
+libraries included in it could be independently compromised and in turn
+attempt to compromise or exfiltrate the data in the cartridge’s partitions.</p>
+<p>We partly mitigate this by fully sandboxing the cartridge and not giving
+it network access by default. Many of the interesting attacks
+(e.g.: data exfiltration) become inviable with the default capabilities.</p>
+<p>Because we don’t track provenance, there’s no way of properly
+mitigating data in the object storage from being modified by a malicious
+third party included in the cartridge, however. The only thing Kate
+mitigates is the possibility of such malicious third party causing damage
+to other cartridges’ data, through full isolation.</p>
+</dd>
+<dt><strong>Unwanted data stored</strong>:</dt><dd><p>Because each cartridge partition is fully managed by the cartridge,
+there’s no realistic way for Kate to know if the player has given
+any meaningful consent to the data being stored.</p>
+<p>We partly mitigate this by specifying quotas for cartridges, but that
+cannot cover the cases where the content being stored is in itself
+unwanted (or unlawful). There’s not enough information tracked in
+metadata to trace it back to a specific operation, however each entry
+will at least be linked back to the cartridge+version with a timestamp.</p>
+</dd>
+</dl>
+</section>
+<section id="the-api">
+<h2>The API<a class="headerlink" href="#the-api" title="Permalink to this heading">#</a></h2>
+<p>The object storage API is divided in two aspects: the Core Language and the
+Surface API. We’ll cover the two separately, as only the Core Language is
+given a formal semantics in this document (the Surface API is derived from it,
+and semantics are trivially extended there by its compositional nature).</p>
+<section id="core-language">
+<h3>Core Language<a class="headerlink" href="#core-language" title="Permalink to this heading">#</a></h3>
+<p>The core language for object storage deals with partitions, objects,
+queries, and primitive operations on objects. We assume that all values are
+represented by strong, unforgeable references, and expect queries to support
+narrowing privileges, but not escalating them.</p>
+<p>A formal definition of this language is as follows:</p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span class="kr">type</span><span class="w"> </span><span class="nx">Reference</span><span class="w"> </span><span class="nx">r</span><span class="p">;</span>
+<span class="kr">type</span><span class="w"> </span><span class="nx">Partition</span><span class="w"> </span><span class="nx">p</span><span class="w"> </span><span class="o">::</span><span class="w"> </span><span class="nx">Branch</span><span class="w"> </span><span class="p">{</span><span class="nx">Children</span><span class="w"> </span><span class="o">::</span><span class="w"> </span><span class="p">[</span><span class="nx">p1</span><span class="p">,</span><span class="w"> </span><span class="p">...,</span><span class="w"> </span><span class="nx">pN</span><span class="p">]}</span>
+<span class="w">                  </span><span class="o">|</span><span class="w"> </span><span class="nx">Leaf</span><span class="w"> </span><span class="p">{</span><span class="nx">Children</span><span class="w"> </span><span class="o">::</span><span class="w"> </span><span class="p">[</span><span class="nx">o1</span><span class="p">,</span><span class="w"> </span><span class="p">...,</span><span class="w"> </span><span class="nx">oN</span><span class="p">]};</span>
+<span class="kr">type</span><span class="w"> </span><span class="nb">Object</span><span class="w"> </span><span class="nx">o</span><span class="w"> </span><span class="o">::</span><span class="w"> </span><span class="p">{</span><span class="nx">Id</span><span class="w"> </span><span class="o">::</span><span class="w"> </span><span class="nx">r</span><span class="p">,</span><span class="w"> </span><span class="nx">Metadata</span><span class="p">,</span><span class="w"> </span><span class="nx">Data</span><span class="p">};</span>
+
+<span class="nx">Query</span><span class="w"> </span><span class="nx">q</span><span class="w"> </span><span class="o">::</span>
+<span class="w">  </span><span class="o">|</span><span class="w"> </span><span class="nx">pA</span><span class="p">.</span><span class="nx">sub</span><span class="o">-</span><span class="nx">partitions</span><span class="p">()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">[</span><span class="nx">pB1</span><span class="p">,</span><span class="w"> </span><span class="p">...,</span><span class="w"> </span><span class="nx">pBN</span><span class="p">]</span><span class="w">      </span><span class="p">(</span><span class="k">if</span><span class="w"> </span><span class="nx">pA</span><span class="w"> </span><span class="nx">is</span><span class="w"> </span><span class="nx">Branch</span><span class="p">)</span>
+<span class="w">  </span><span class="o">|</span><span class="w"> </span><span class="nx">p</span><span class="p">.</span><span class="nx">objects</span><span class="p">()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">[</span><span class="nx">o1</span><span class="p">,</span><span class="w"> </span><span class="p">...,</span><span class="w"> </span><span class="nx">oN</span><span class="p">]</span><span class="w">                </span><span class="p">(</span><span class="k">if</span><span class="w"> </span><span class="nx">p</span><span class="w"> </span><span class="nx">is</span><span class="w"> </span><span class="nx">Leaf</span><span class="p">)</span>
+
+<span class="nx">Manipulate</span><span class="w"> </span><span class="nx">m</span><span class="w"> </span><span class="o">::</span>
+<span class="w">  </span><span class="o">|</span><span class="w"> </span><span class="nx">p1</span><span class="p">.</span><span class="nx">partition</span><span class="p">(</span><span class="nx">p2</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="nx">p3</span><span class="w">                      </span><span class="p">(</span><span class="k">if</span><span class="w"> </span><span class="nx">p1</span><span class="w"> </span><span class="nx">is</span><span class="w"> </span><span class="nx">Branch</span><span class="p">)</span>
+<span class="w">  </span><span class="o">|</span><span class="w"> </span><span class="nx">p1</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="nx">o1</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="nx">o2</span><span class="w">                            </span><span class="p">(</span><span class="k">if</span><span class="w"> </span><span class="nx">p1</span><span class="w"> </span><span class="nx">is</span><span class="w"> </span><span class="nx">Leaf</span><span class="p">)</span>
+<span class="w">  </span><span class="o">|</span><span class="w"> </span><span class="nx">p1</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span><span class="nx">o1</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="nx">o2</span><span class="w">                         </span><span class="p">(</span><span class="k">if</span><span class="w"> </span><span class="nx">p1</span><span class="w"> </span><span class="nx">is</span><span class="w"> </span><span class="nx">Leaf</span><span class="p">)</span>
+<span class="w">  </span><span class="o">|</span><span class="w"> </span><span class="nx">p1</span><span class="p">.</span><span class="ow">delete</span><span class="p">(</span><span class="nx">r1</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="nx">nothing</span><span class="w">                    </span><span class="p">(</span><span class="k">if</span><span class="w"> </span><span class="nx">p1</span><span class="w"> </span><span class="nx">is</span><span class="w"> </span><span class="nx">Leaf</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Essentially, we have two sorts of partitions: a “Branch” partition can
+only have sub-partitions (e.g.: the root or cartridge partitions). Meanwhile a
+“Leaf” partition can only have sub-objects (in this document, that’s only the
+bucket partitions). Note that here the notation <code class="docutils literal notranslate"><span class="pre">[a1,</span> <span class="pre">...,</span> <span class="pre">aN]</span></code> denotes an
+<strong>unordered set</strong>, not a sequence, so no duplicate <code class="docutils literal notranslate"><span class="pre">a</span></code> values are allowed.</p>
+<p>An object is a bag consisting of an unique reference, a set of arbitrary
+metadata, and a set of arbitrary data. Objects can only exist within leaf
+partitions. Note that real objects <em>do</em> have more properties than what’s
+specified above, the formal model however only cares about describing
+enough to talk about the security properties we outline in this document.</p>
+<p>Query operations are how we go from one partition to another partition
+or object. Queries work only on partitions, thus there’s no way of taking
+one object and reaching one of its containing partitions. Query operations
+are also partial, with <em>sub-partitions</em> only working on Branch partitions,
+and <em>objects</em> only working on Leaf partitions.</p>
+<p>Manipulate operations allow us to modify partitions and objects. All
+manipulations likewise originate from partitions, and all operations are
+partial, with <em>partition</em> requiring a Branch partition, and all other
+operations that deal with objects requiring a Leaf partition.</p>
+</section>
+<section id="invariants">
+<h3>Invariants<a class="headerlink" href="#invariants" title="Permalink to this heading">#</a></h3>
+<p>Besides the global invariants we inherit from sets, the storage also requires
+that object ids be unique <em>within a Leaf partition</em>. That is, two distinct
+partitions P1 and P2 might house an object with id R1, and different contents,
+however there may not be two objects in the object set of P1 sharing the
+same reference id.</p>
+<p>There’s also global invariants regarding to fairness of use of the shared
+storage. The number of leaf partitions within a cartridge version bucket
+cannot exceed 1000 (one thousand). And the number of entries within a
+cartridge version bucket (counting all leaf partitions) cannot exceed
+10000 (ten thousand). These limits may be configurable in the future.</p>
+</section>
+<section id="semantics-for-the-core-language">
+<h3>Semantics for the Core Language<a class="headerlink" href="#semantics-for-the-core-language" title="Permalink to this heading">#</a></h3>
+<p>Here we provide operational semantics for the operations above.</p>
+<p><code class="docutils literal notranslate"><span class="pre">p.sub-partitions()</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Branch</span><span class="p">{[</span><span class="n">p1</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="n">pN</span><span class="p">]}</span><span class="o">.</span><span class="n">sub</span><span class="o">-</span><span class="n">partitions</span><span class="p">()</span> <span class="o">=</span> <span class="p">[</span><span class="n">p1</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="n">pN</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Given a strong reference to a Branch partition we may access any partition below it.</p>
+<p><code class="docutils literal notranslate"><span class="pre">p.objects()</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Leaf</span><span class="p">{[</span><span class="n">o1</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="n">oN</span><span class="p">]}</span><span class="o">.</span><span class="n">objects</span><span class="p">()</span> <span class="o">=</span> <span class="p">[</span><span class="n">o1</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="n">oN</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Given a strong reference to a Leaf partition we may access any object below it.</p>
+<p><code class="docutils literal notranslate"><span class="pre">p.partition(p2)</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Branch</span><span class="p">{[</span><span class="n">pA1</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="n">pAN</span><span class="p">]}</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="n">pB</span><span class="p">)</span> <span class="o">=</span> <span class="n">Branch</span><span class="p">{[</span><span class="n">pA1</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="n">pAN</span><span class="p">,</span> <span class="n">pB</span><span class="p">]}</span>
+</pre></div>
+</div>
+<p>Given a strong reference to a Branch partition, whose set of sub-partitions
+does not contain <code class="docutils literal notranslate"><span class="pre">pB</span></code>, we produce a new Branch partition that includes <code class="docutils literal notranslate"><span class="pre">pB</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">p.add(o)</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Leaf</span><span class="p">{[</span><span class="n">oA1</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="n">oAN</span><span class="p">]}</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">oB</span><span class="p">)</span> <span class="o">=</span> <span class="n">Leaf</span><span class="p">{[</span><span class="n">oA1</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="n">oAN</span><span class="p">,</span> <span class="n">oB</span><span class="p">]}</span>
+</pre></div>
+</div>
+<p>Given a strong reference to a Leaf partition, whose set of sub-objects does
+not contain <code class="docutils literal notranslate"><span class="pre">oB</span></code>, we produce a new Leaf partition that includes <code class="docutils literal notranslate"><span class="pre">oB</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">p.update(o)</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Leaf</span><span class="p">{[{</span><span class="n">rA1</span><span class="p">,</span> <span class="n">mA1</span><span class="p">,</span> <span class="n">dA1</span><span class="p">},</span> <span class="o">...</span><span class="p">,</span> <span class="p">{</span><span class="n">rAN</span><span class="p">,</span> <span class="n">mAN</span><span class="p">,</span> <span class="n">dAN</span><span class="p">}]}</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">rA1</span><span class="p">,</span> <span class="n">mB1</span><span class="p">,</span> <span class="n">dB1</span><span class="p">})</span> <span class="o">=</span>
+  <span class="n">Leaf</span><span class="p">{[{</span><span class="n">rA1</span><span class="p">,</span> <span class="n">mB1</span><span class="p">,</span> <span class="n">dB1</span><span class="p">},</span> <span class="o">...</span><span class="p">,</span> <span class="p">{</span><span class="n">rAN</span><span class="p">,</span> <span class="n">mAN</span><span class="p">,</span> <span class="n">dAN</span><span class="p">}]};</span>
+</pre></div>
+</div>
+<p>Given a strong reference to a Leaf partition, if its set of sub-objects
+already includes one with the same unique reference of the object we have,
+then we replace the previous object at that unique reference with the new
+one in the set.</p>
+<p><code class="docutils literal notranslate"><span class="pre">p.delete(r)</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Leaf</span><span class="p">{[{</span><span class="n">r1</span><span class="p">,</span> <span class="n">m1</span><span class="p">,</span> <span class="n">d1</span><span class="p">},</span> <span class="p">{</span><span class="n">r2</span><span class="p">,</span> <span class="n">m2</span><span class="p">,</span> <span class="n">d2</span><span class="p">},</span> <span class="o">...</span><span class="p">,</span> <span class="p">{</span><span class="n">rN</span><span class="p">,</span> <span class="n">mN</span><span class="p">,</span> <span class="n">dN</span><span class="p">}]}</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">r1</span><span class="p">)</span> <span class="o">=</span>
+  <span class="n">Leaf</span><span class="p">{[{</span><span class="n">r2</span><span class="p">,</span> <span class="n">m2</span><span class="p">,</span> <span class="n">d2</span><span class="p">},</span> <span class="o">...</span><span class="p">,</span> <span class="p">{</span><span class="n">rN</span><span class="p">,</span> <span class="n">mN</span><span class="p">,</span> <span class="n">dN</span><span class="p">}]}</span>
+</pre></div>
+</div>
+<p>Given a strong reference to a Leaf partition, if its set of sub-objects
+includes one with the same unique reference we have, then we produce a
+new Leaf partition that does not contain the object with that reference.</p>
+</section>
+<section id="a-note-on-the-partition-requirements">
+<h3>A note on the partition requirements<a class="headerlink" href="#a-note-on-the-partition-requirements" title="Permalink to this heading">#</a></h3>
+<p>One may think the requirement that you’d need a partition for operating on
+an object may be too weak; going from the semantics above, there is no way
+of giving one mutable access to a single object within a partition.</p>
+<p>However, in the context of Kate, cartridges already get handed a Branch
+partition one level above all of its Leaf partitions (i.e.: they get the
+whole Cartridge Version partition). There’s no further boundaries that
+Kate can realistically draw where a stricter access policy would be
+feasible. However, cartridge code is free to use its own language
+abstractions to create more restrictive access capabilities; it’s just
+that Kate cannot enforce that restriction.</p>
+</section>
+<section id="surface-api">
+<h3>Surface API<a class="headerlink" href="#surface-api" title="Permalink to this heading">#</a></h3>
+<p>The surface API is a high-level TypeScript API built on top of the Core
+Language semantics specified above. We only cover the client part of it,
+which is exposed to the cartridge under the Kate APIs. It’s defined as follows:</p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span class="kr">type</span><span class="w"> </span><span class="nx">StableId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
+<span class="kr">type</span><span class="w"> </span><span class="nx">UniqueId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">string</span><span class="p">;</span>
+
+<span class="c1">// A CartridgeVersion partition</span>
+<span class="kr">type</span><span class="w"> </span><span class="nx">CartridgeStorage</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">get_bucket</span><span class="p">(</span><span class="nx">id</span><span class="o">:</span><span class="w"> </span><span class="kt">StableId</span><span class="p">)</span><span class="o">:</span><span class="w"> </span><span class="nx">Bucket</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nx">the</span><span class="w"> </span><span class="nx">partition</span><span class="w"> </span><span class="nx">exists</span><span class="o">:</span><span class="w"> </span><span class="kt">return</span><span class="w"> </span><span class="nx">it</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="nx">sub</span><span class="o">-</span><span class="nx">partitions</span><span class="p">()</span>
+<span class="w">    </span><span class="nx">otherwise</span><span class="o">:</span><span class="w"> </span><span class="kt">create</span><span class="w"> </span><span class="nx">a</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">one</span><span class="w"> </span><span class="kd">with</span><span class="w"> </span><span class="nx">partition</span><span class="p">(</span><span class="ow">new</span><span class="w"> </span><span class="nx">bucket</span><span class="p">)</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">class</span><span class="w"> </span><span class="nx">Bucket</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">clear</span><span class="p">()</span><span class="o">:</span><span class="w"> </span><span class="nx">Bucket</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="nx">each</span><span class="w"> </span><span class="nx">object</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="nx">objects</span><span class="p">()</span><span class="o">:</span><span class="w"> </span><span class="ow">delete</span><span class="p">(</span><span class="nx">object</span><span class="p">.</span><span class="nx">id</span><span class="p">)</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="w">  </span><span class="nx">list</span><span class="p">()</span><span class="o">:</span><span class="w"> </span><span class="nb">Object</span><span class="p">[]</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nx">the</span><span class="w"> </span><span class="nx">set</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nx">objects</span><span class="p">()</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="w">  </span><span class="nx">get</span><span class="p">(</span><span class="nx">id</span><span class="o">:</span><span class="w"> </span><span class="kt">UniqueId</span><span class="p">)</span><span class="o">:</span><span class="w"> </span><span class="nb">Object</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nx">id</span><span class="w"> </span><span class="nx">exists</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="nx">objects</span><span class="p">()</span><span class="o">:</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="nx">that</span><span class="w"> </span><span class="nx">object</span>
+<span class="w">    </span><span class="nx">otherwise</span><span class="p">,</span><span class="w"> </span><span class="nx">halt</span><span class="p">.</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="w">  </span><span class="nx">try_get</span><span class="p">(</span><span class="nx">id</span><span class="o">:</span><span class="w"> </span><span class="kt">UniqueId</span><span class="p">)</span><span class="o">:</span><span class="w"> </span><span class="nb">Object</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nx">id</span><span class="w"> </span><span class="nx">exists</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="nx">objects</span><span class="p">()</span><span class="o">:</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="nx">that</span><span class="w"> </span><span class="nx">object</span>
+<span class="w">    </span><span class="nx">otherwise</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="kc">null</span><span class="p">.</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="w">  </span><span class="nx">add</span><span class="p">(</span><span class="nx">id</span><span class="o">:</span><span class="w"> </span><span class="kt">UniqueId</span><span class="p">,</span><span class="w"> </span><span class="nx">meta</span><span class="o">:</span><span class="w"> </span><span class="kt">Metadata</span><span class="p">,</span><span class="w"> </span><span class="nx">data</span><span class="o">:</span><span class="w"> </span><span class="kt">any</span><span class="p">)</span><span class="o">:</span><span class="w"> </span><span class="nb">Object</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nx">id</span><span class="w"> </span><span class="nx">exists</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="nx">objects</span><span class="p">()</span><span class="o">:</span><span class="w"> </span><span class="nx">halt</span>
+<span class="w">    </span><span class="nx">otherwise</span><span class="o">:</span><span class="w"> </span><span class="kt">add</span><span class="p">({</span><span class="nx">id</span><span class="p">,</span><span class="w"> </span><span class="nx">meta</span><span class="p">,</span><span class="w"> </span><span class="nx">data</span><span class="p">})</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="w">  </span><span class="nx">put</span><span class="p">(</span><span class="nx">id</span><span class="o">:</span><span class="w"> </span><span class="kt">UniqueId</span><span class="p">,</span><span class="w"> </span><span class="nx">meta</span><span class="o">:</span><span class="w"> </span><span class="kt">Metadata</span><span class="p">,</span><span class="w"> </span><span class="nx">data</span><span class="o">:</span><span class="w"> </span><span class="kt">any</span><span class="p">)</span><span class="o">:</span><span class="w"> </span><span class="nb">Object</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nx">id</span><span class="w"> </span><span class="nx">exists</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="nx">objects</span><span class="p">()</span><span class="o">:</span><span class="w"> </span><span class="nx">update</span><span class="p">({</span><span class="nx">id</span><span class="p">,</span><span class="w"> </span><span class="nx">meta</span><span class="p">,</span><span class="w"> </span><span class="nx">data</span><span class="p">})</span>
+<span class="w">    </span><span class="nx">otherwise</span><span class="o">:</span><span class="w"> </span><span class="kt">add</span><span class="p">({</span><span class="nx">id</span><span class="p">,</span><span class="w"> </span><span class="nx">meta</span><span class="p">,</span><span class="w"> </span><span class="nx">data</span><span class="p">})</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="w">  </span><span class="ow">delete</span><span class="p">(</span><span class="nx">id</span><span class="o">:</span><span class="w"> </span><span class="kt">UniqueId</span><span class="p">)</span><span class="o">:</span><span class="w"> </span><span class="ow">void</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="nx">id</span><span class="w"> </span><span class="nx">exists</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="nx">objects</span><span class="p">()</span><span class="o">:</span><span class="w"> </span><span class="ow">delete</span><span class="p">(</span><span class="nx">id</span><span class="p">)</span>
+<span class="w">    </span><span class="nx">otherwise</span><span class="w"> </span><span class="k">do</span><span class="w"> </span><span class="nx">nothing</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>All operations above are atomic from the Cartridge’s perspective, even if
+they’re composed of multiple Core Language operations. That is, if a
+cartridge issues <code class="docutils literal notranslate"><span class="pre">bucket.clear()</span></code>, there is no way to observe a
+partial deletion of objects in the bucket, either the cartridge will
+see all objects before that call, or no objects.</p>
+</section>
+<section id="size-estimation">
+<h3>Size estimation<a class="headerlink" href="#size-estimation" title="Permalink to this heading">#</a></h3>
+<p>When objects are inserted in the object storage, Kate needs to make sure
+the whole cartridge storage weights less than the quota assigned to that
+cartridge. This document proposes that sizes be tracked at insertion time
+and cached. That is, every time an object is inserted in the store we estimate
+its size, look if it will fit according to the currently cached quota usage,
+and then update the quota usage if we can insert the object.</p>
+<p>Essentially, this cache is maintained as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">let</span> <span class="n">U</span> <span class="n">be</span> <span class="n">the</span> <span class="n">usage</span> <span class="n">cache</span> <span class="k">as</span> <span class="n">the</span> <span class="nb">tuple</span> <span class="p">{</span><span class="n">size</span> <span class="p">(</span><span class="ow">in</span> <span class="nb">bytes</span><span class="p">),</span> <span class="n">count</span> <span class="p">(</span><span class="ow">in</span> <span class="n">objects</span><span class="p">)}</span>
+<span class="n">let</span> <span class="n">Q</span> <span class="n">be</span> <span class="n">the</span> <span class="n">quota</span> <span class="n">limits</span> <span class="k">as</span> <span class="n">the</span> <span class="nb">tuple</span> <span class="p">{</span><span class="n">size</span> <span class="p">(</span><span class="ow">in</span> <span class="nb">bytes</span><span class="p">),</span> <span class="n">count</span> <span class="p">(</span><span class="ow">in</span> <span class="n">objects</span><span class="p">)}</span>
+<span class="n">let</span> <span class="n">the</span> <span class="n">cache</span> <span class="n">context</span> <span class="n">be</span> <span class="n">the</span> <span class="nb">tuple</span> <span class="p">{</span><span class="n">U</span><span class="p">,</span> <span class="n">Q</span><span class="p">}</span>
+
+<span class="p">({</span><span class="n">US1</span><span class="p">,</span> <span class="n">UC1</span><span class="p">},</span> <span class="p">{</span><span class="n">QS1</span><span class="p">,</span> <span class="n">QC1</span><span class="p">})</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">O</span><span class="p">)</span> <span class="o">=</span>
+  <span class="n">let</span> <span class="n">S</span> <span class="o">=</span> <span class="n">estimate</span><span class="p">(</span><span class="n">O</span><span class="p">);</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">US1</span> <span class="o">+</span> <span class="n">S</span> <span class="o">&lt;</span> <span class="n">QS1</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">UC1</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">&lt;</span> <span class="n">QC1</span><span class="p">):</span> <span class="p">{</span><span class="n">US1</span> <span class="o">+</span> <span class="n">S</span><span class="p">,</span> <span class="n">UC1</span> <span class="o">+</span> <span class="mi">1</span><span class="p">}</span>
+  <span class="n">otherwise</span><span class="p">:</span> <span class="n">halt</span> <span class="n">due</span> <span class="n">to</span> <span class="ow">not</span> <span class="n">enough</span> <span class="n">storage</span>
+
+<span class="p">({</span><span class="n">US1</span><span class="p">,</span> <span class="n">UC1</span><span class="p">},</span> <span class="p">{</span><span class="n">QS1</span><span class="p">,</span> <span class="n">QC1</span><span class="p">})</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">O2</span><span class="p">)</span> <span class="o">=</span>
+  <span class="n">let</span> <span class="n">O1</span> <span class="o">=</span> <span class="n">previous</span> <span class="nb">object</span> <span class="k">with</span> <span class="n">the</span> <span class="n">same</span> <span class="nb">id</span> <span class="k">as</span> <span class="n">O2</span><span class="p">;</span>
+  <span class="n">let</span> <span class="n">SCurrent</span> <span class="o">=</span> <span class="n">estimate</span><span class="p">(</span><span class="n">O2</span><span class="p">);</span>
+  <span class="n">let</span> <span class="n">SPrevious</span> <span class="o">=</span> <span class="n">estimate</span><span class="p">(</span><span class="n">O1</span><span class="p">);</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">US1</span> <span class="o">-</span> <span class="n">SPrevious</span> <span class="o">+</span> <span class="n">SCurrent</span> <span class="o">&lt;</span> <span class="n">QS1</span><span class="p">):</span> <span class="p">{</span><span class="n">US1</span> <span class="o">-</span> <span class="n">SPrevious</span> <span class="o">+</span> <span class="n">SCurrent</span><span class="p">,</span> <span class="n">UC1</span><span class="p">}</span>
+  <span class="n">otherwise</span><span class="p">:</span> <span class="n">halt</span> <span class="n">due</span> <span class="n">to</span> <span class="ow">not</span> <span class="n">enough</span> <span class="n">storage</span>
+
+<span class="p">({</span><span class="n">US1</span><span class="p">,</span> <span class="n">UC1</span><span class="p">},</span> <span class="p">{</span><span class="n">QS1</span><span class="p">,</span> <span class="n">QC1</span><span class="p">})</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">Id</span><span class="p">)</span> <span class="o">=</span>
+  <span class="n">let</span> <span class="n">O</span> <span class="o">=</span> <span class="n">the</span> <span class="nb">object</span> <span class="k">with</span> <span class="n">the</span> <span class="n">given</span> <span class="nb">id</span><span class="p">;</span>
+  <span class="p">{</span><span class="n">US1</span> <span class="o">-</span> <span class="n">estimate</span><span class="p">(</span><span class="n">O</span><span class="p">),</span> <span class="n">UC1</span> <span class="o">-</span> <span class="mi">1</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>Because Kate ultimately does not control the underlying storage or the value
+serialisation, an accurate disk usage cannot be provided here. We use the
+following algorithm as a best-effort estimate instead:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">//</span> <span class="k">for</span> <span class="n">scalar</span> <span class="n">types</span> <span class="n">we</span> <span class="n">just</span> <span class="n">use</span> <span class="n">assume</span> <span class="n">the</span> <span class="n">value</span><span class="s1">&#39;s size</span>
+<span class="n">estimate</span><span class="p">(</span><span class="n">x</span> <span class="p">::</span> <span class="n">number</span><span class="p">)</span> <span class="o">=</span> <span class="mi">8</span><span class="p">;</span>
+<span class="n">estimate</span><span class="p">(</span><span class="n">x</span> <span class="p">::</span> <span class="n">boolean</span><span class="p">)</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+<span class="n">estimate</span><span class="p">(</span><span class="n">x</span> <span class="p">::</span> <span class="n">null</span><span class="p">)</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+<span class="n">estimate</span><span class="p">(</span><span class="n">x</span> <span class="p">::</span> <span class="n">undefined</span><span class="p">)</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+<span class="n">estimate</span><span class="p">(</span><span class="n">x</span> <span class="p">::</span> <span class="n">Date</span><span class="p">)</span> <span class="o">=</span> <span class="mi">8</span><span class="p">;</span>
+
+<span class="o">//</span> <span class="k">for</span> <span class="n">bigints</span> <span class="n">we</span> <span class="n">do</span> <span class="n">a</span> <span class="n">naive</span> <span class="n">estimation</span> <span class="n">based</span> <span class="n">on</span> <span class="n">the</span> <span class="n">number</span> <span class="n">of</span> <span class="nb">bytes</span> <span class="kn">from</span>
+<span class="o">//</span> <span class="n">a</span> <span class="nb">hex</span> <span class="n">representation</span>
+<span class="n">estimate</span><span class="p">(</span><span class="n">x</span> <span class="p">::</span> <span class="n">bigint</span><span class="p">)</span> <span class="o">=</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+<span class="o">//</span> <span class="k">for</span> <span class="n">strings</span> <span class="n">we</span> <span class="n">do</span> <span class="n">a</span> <span class="n">very</span> <span class="n">naive</span> <span class="n">estimation</span> <span class="n">based</span> <span class="n">on</span> <span class="n">UTC16</span><span class="o">.</span> <span class="n">We</span> <span class="n">do</span> <span class="n">the</span> <span class="n">same</span>
+<span class="o">//</span> <span class="k">with</span> <span class="n">regexes</span>
+<span class="n">estimate</span><span class="p">(</span><span class="n">x</span> <span class="p">::</span> <span class="n">string</span><span class="p">)</span> <span class="o">=</span> <span class="n">length</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span><span class="p">;</span>
+<span class="n">estimate</span><span class="p">(</span><span class="n">x</span> <span class="p">::</span> <span class="n">RegExp</span><span class="p">)</span> <span class="o">=</span> <span class="n">length</span><span class="p">(</span><span class="n">string</span><span class="p">(</span><span class="n">x</span><span class="p">))</span> <span class="o">*</span> <span class="mi">2</span><span class="p">;</span>
+
+<span class="o">//</span> <span class="k">for</span> <span class="n">arrays</span> <span class="n">we</span> <span class="nb">sum</span> <span class="nb">all</span> <span class="n">value</span> <span class="n">estimations</span><span class="p">,</span> <span class="n">but</span> <span class="n">ignore</span> <span class="nb">any</span> <span class="n">possible</span> <span class="n">headers</span>
+<span class="n">estimate</span><span class="p">(</span><span class="n">x</span> <span class="p">::</span> <span class="n">A</span><span class="p">[])</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">estimate</span><span class="p">));</span>
+
+<span class="o">//</span> <span class="k">for</span> <span class="n">objects</span> <span class="n">we</span> <span class="nb">sum</span> <span class="n">key</span> <span class="ow">and</span> <span class="n">value</span> <span class="n">estimations</span><span class="p">,</span> <span class="n">but</span> <span class="n">ignore</span> <span class="n">possible</span> <span class="n">headers</span>
+<span class="n">estimate</span><span class="p">(</span><span class="n">x</span> <span class="p">::</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="p">})</span> <span class="o">=</span>
+  <span class="nb">sum</span><span class="p">(</span><span class="n">keys</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">estimate</span><span class="p">))</span> <span class="o">+</span> <span class="nb">sum</span><span class="p">(</span><span class="n">values</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">estimate</span><span class="p">));</span>
+
+<span class="o">//</span> <span class="k">for</span> <span class="n">byte</span> <span class="n">arrays</span> <span class="n">we</span> <span class="k">return</span> <span class="n">whatever</span> <span class="n">byte</span><span class="o">-</span><span class="n">length</span> <span class="n">it</span> <span class="n">reports</span>
+<span class="n">estimate</span><span class="p">(</span><span class="n">x</span> <span class="p">::</span> <span class="n">TypedArray</span><span class="p">)</span> <span class="o">=</span> <span class="n">byte</span><span class="o">-</span><span class="n">length</span><span class="p">(</span><span class="n">x</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>We do not support serialisation of blobs or file handles currently in this
+schema, but that’s something that can be investigated in the future if the
+need arises.</p>
+</section>
+</section>
+<section id="migrations">
+<h2>Migrations<a class="headerlink" href="#migrations" title="Permalink to this heading">#</a></h2>
+<p>To deal with version upgrades, Kate provides cartridges with a form of
+transactional and controlled migration. A cartridge can check if a storage
+upgrade is needed (by checking the old storage version), and then register
+an upgrade transaction. The upgrade transaction offers atomic methods for
+common operations such as “copy all data unchanged”.</p>
+<p>The root object in the storage API (<a class="reference internal" href="../dev/manual/api/store.html#module-KateAPI.store" title="KateAPI.store: Allows saving and reading cartridge state."><code class="xref py py-mod docutils literal notranslate"><span class="pre">KateAPI.store</span></code></a>) is then defined
+thus:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">KateStorage</span> <span class="p">{</span>
+  <span class="n">unversioned</span><span class="p">():</span> <span class="n">CartridgeStorage</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">the</span> <span class="n">unversioned</span> <span class="n">partition</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">cartridge</span> <span class="n">partition</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="n">current_version</span><span class="p">():</span> <span class="n">CartridgeStorage</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">the</span> <span class="n">versioned</span> <span class="n">partition</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">cartridge</span> <span class="n">partition</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="o">//</span> <span class="n">a</span> <span class="n">StorageMigration</span> <span class="k">if</span> <span class="n">this</span> <span class="n">cartridge</span> <span class="n">has</span> <span class="n">replaced</span> <span class="n">another</span> <span class="n">cartridge</span>
+  <span class="o">//</span> <span class="n">AND</span> <span class="n">it</span> <span class="n">has</span> <span class="ow">not</span> <span class="n">performed</span> <span class="n">a</span> <span class="n">migration</span> <span class="n">yet</span>
+  <span class="n">previous_version</span><span class="p">():</span> <span class="n">null</span> <span class="o">|</span> <span class="n">StorageMigration</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">class</span> <span class="nc">StorageMigration</span> <span class="p">{</span>
+  <span class="o">//</span> <span class="n">The</span> <span class="n">version</span> <span class="n">of</span> <span class="n">the</span> <span class="n">cartridge</span> <span class="n">we</span> <span class="n">replaced</span>
+  <span class="n">version</span><span class="p">:</span> <span class="p">{</span> <span class="n">major</span><span class="p">:</span> <span class="n">positive</span> <span class="n">integer</span><span class="p">,</span> <span class="n">minor</span><span class="p">:</span> <span class="n">positive</span> <span class="n">integer</span> <span class="p">};</span>
+
+  <span class="o">//</span> <span class="n">Happens</span> <span class="n">atomically</span>
+  <span class="n">migrate</span><span class="p">(</span><span class="n">process</span><span class="p">:</span> <span class="p">(</span><span class="n">MigrationTransaction</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="n">Promise</span><span class="o">&lt;</span><span class="n">void</span><span class="o">&gt;</span><span class="p">):</span> <span class="n">Promise</span><span class="o">&lt;</span><span class="n">void</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">class</span> <span class="nc">MigrationTransaction</span> <span class="p">{</span>
+  <span class="o">//</span> <span class="n">a</span> <span class="n">restricted</span> <span class="n">capability</span> <span class="n">without</span> <span class="n">mutation</span> <span class="n">methods</span>
+  <span class="n">previous_storage</span><span class="p">:</span> <span class="n">ReadonlyCartridgeStorage</span><span class="p">;</span>
+
+  <span class="o">//</span> <span class="n">a</span> <span class="n">transactional</span> <span class="n">version</span> <span class="n">of</span> <span class="n">the</span> <span class="n">current</span> <span class="n">storage</span><span class="p">,</span> <span class="n">same</span> <span class="n">capabilities</span>
+  <span class="n">current_storage</span><span class="p">:</span> <span class="n">TransactionalCartridgeStorage</span><span class="p">;</span>
+
+  <span class="n">copy_all</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">for</span> <span class="n">each</span> <span class="nb">object</span><span class="p">(</span><span class="n">o</span><span class="p">)</span> <span class="ow">in</span> <span class="n">each</span> <span class="n">bucket</span><span class="p">(</span><span class="n">b</span><span class="p">):</span> <span class="n">get_bucket</span><span class="p">(</span><span class="n">b</span><span class="p">)</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+  <span class="p">}</span>
+
+  <span class="n">abort</span><span class="p">(</span><span class="n">reason</span><span class="p">:</span> <span class="n">string</span><span class="p">):</span> <span class="n">void</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Though we only provide a protocol for the migration (and not its formal
+semantics), the major part of its semantics is still defined by the Core
+Language described here. The big difference between the regular
+CartridgeStorage and the one provided in the migration is its
+transactional nature.</p>
+<p>When one calls <code class="docutils literal notranslate"><span class="pre">migrate</span></code>, the process that runs either succeeds
+and migrates all data, or fails and migrates no data. Writes from within
+the process cannot be seen from outside of the process; in that way
+it’s fully atomic.</p>
+<p>You can think of the migration process as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">let</span> <span class="n">S1</span> <span class="o">=</span> <span class="n">current</span> <span class="n">storage</span><span class="p">;</span>
+<span class="n">let</span> <span class="n">S2</span> <span class="o">=</span> <span class="n">previous</span> <span class="n">storage</span><span class="p">;</span>
+<span class="n">lock</span> <span class="n">S1</span> <span class="ow">and</span> <span class="n">S2</span><span class="p">;</span>
+<span class="n">let</span> <span class="n">MS</span> <span class="o">=</span> <span class="n">transactional</span> <span class="n">storage</span> <span class="n">of</span> <span class="n">S1</span><span class="p">;</span>
+<span class="k">if</span> <span class="n">migrate</span><span class="p">(</span><span class="n">transaction</span><span class="p">(</span><span class="n">MS</span><span class="p">,</span> <span class="n">S2</span><span class="p">))</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">aborted</span> <span class="ow">and</span> <span class="n">current</span> <span class="n">storage</span> <span class="n">matches</span> <span class="n">S1</span><span class="p">:</span>
+  <span class="n">commit</span> <span class="n">MS</span><span class="p">,</span> <span class="n">erase</span> <span class="n">S2</span><span class="p">;</span>
+<span class="n">otherwise</span><span class="p">:</span>
+  <span class="n">fail</span> <span class="n">the</span> <span class="n">migration</span><span class="p">,</span> <span class="n">discard</span> <span class="n">MS</span><span class="p">;</span>
+<span class="n">unlock</span> <span class="n">S1</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>There’s a full lock taken of the storage at the beginning, which means that
+writes outside of the migration process will fail, but reads will still see
+only the state of the storage before the migration started.</p>
+</section>
+<section id="additional-references">
+<h2>Additional references<a class="headerlink" href="#additional-references" title="Permalink to this heading">#</a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://robotlolita.me/diary/2022/12/kv-crochet/">Building a secure key/value store</a></p></li>
+<li><p><a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API">IndexedDB</a></p></li>
+</ul>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="../etc/releases/index.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Release notes</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="index.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Kate’s Design Documents</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2023, Q.
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">#0101 — Object Store API</a><ul>
+<li><a class="reference internal" href="#summary">Summary</a></li>
+<li><a class="reference internal" href="#the-object-store">The object store</a><ul>
+<li><a class="reference internal" href="#why-a-versioned-storage">Why a versioned storage?</a></li>
+<li><a class="reference internal" href="#upgrades-and-migrations">Upgrades and migrations</a></li>
+<li><a class="reference internal" href="#notes-on-the-cartridge-identifier">Notes on the cartridge identifier</a></li>
+<li><a class="reference internal" href="#what-s-in-an-object">What’s in an object?</a></li>
+<li><a class="reference internal" href="#size-and-quotas">Size and quotas</a><ul>
+<li><a class="reference internal" href="#limits">Limits</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#technical-implementation">Technical implementation</a></li>
+<li><a class="reference internal" href="#how-is-this-api-dangerous">How is this API dangerous?</a></li>
+<li><a class="reference internal" href="#the-api">The API</a><ul>
+<li><a class="reference internal" href="#core-language">Core Language</a></li>
+<li><a class="reference internal" href="#invariants">Invariants</a></li>
+<li><a class="reference internal" href="#semantics-for-the-core-language">Semantics for the Core Language</a></li>
+<li><a class="reference internal" href="#a-note-on-the-partition-requirements">A note on the partition requirements</a></li>
+<li><a class="reference internal" href="#surface-api">Surface API</a></li>
+<li><a class="reference internal" href="#size-estimation">Size estimation</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#migrations">Migrations</a></li>
+<li><a class="reference internal" href="#additional-references">Additional references</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/scripts/furo.js"></script>
+    </body>
+</html>
