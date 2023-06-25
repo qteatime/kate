@@ -11,7 +11,6 @@
   padding: 5px 0;
   scroll-behavior: smooth;
   scroll-padding: 30px;
-  padding-right: 800px;
   background: url("../../../img/kate-chan-muted.png") no-repeat fixed;
   background-size: 40%;
   background-position-x: 560px;
@@ -25,7 +24,10 @@
   flex-direction: row;
   flex-wrap: nowrap;
   gap: 10px;
-  padding-right: 800px;
+}
+
+.kate-os-carts > .kate-ui-interactive:last-child {
+  padding-right: 20px;
 }
 
 .kate-os-carts-box {
