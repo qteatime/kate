@@ -13,6 +13,21 @@ export class SceneRecovery extends UI.SimpleScene {
       ]),
       UI.vspace(16),
 
+      UI.when(
+        this.os.kernel.console.options.mode === "web" &&
+          this.os.app_resources.worker != null,
+        [
+          UI.button_panel(this.os, {
+            title: "Refresh cache",
+            description:
+              "Update all cached resources to the current version. The application will reload afterwards.",
+            on_click: this.refresh_cache,
+            dangerous: false,
+          }),
+        ]
+      ),
+      UI.vdivider(),
+
       UI.button_panel(this.os, {
         title: "Restore default settings",
         description: "Switch all settings back to the default ones.",
@@ -55,6 +70,25 @@ export class SceneRecovery extends UI.SimpleScene {
       title: "",
       message: "All settings reverted to defaults.",
     });
+  };
+
+  refresh_cache = async () => {
+    try {
+      await this.os.dialog.progress(
+        "kate:recovery",
+        "Refreshing cache",
+        async (progress) => {
+          await this.os.app_resources.refresh_cache();
+        }
+      );
+      location.reload();
+    } catch (error) {
+      console.error(`[Kate] failed to refresh cache:`, error);
+      await this.os.dialog.message("kate:recovery", {
+        title: "Failed to refresh cache",
+        message: `Kate's cache could not be refreshed.`,
+      });
+    }
   };
 
   delete_all_data = async () => {

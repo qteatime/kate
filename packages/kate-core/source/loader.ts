@@ -89,22 +89,10 @@ async function main() {
     await load_kate(version);
   }
 
-  let worker: null | ServiceWorker;
-  if (navigator.serviceWorker?.controller) {
-    worker = navigator.serviceWorker.controller;
-    worker?.postMessage({
-      type: "set-version",
-      version: version.version,
-    });
-  } else {
-    const registration = await navigator.serviceWorker
-      ?.register(`worker.js?version=${encodeURIComponent(version.version)}`)
-      .catch((e) => {
-        console.error("[Kate] failed to register Kate worker", e);
-        return null;
-      });
-    worker = registration?.active ?? null;
-  }
+  await navigator.serviceWorker?.register(`worker.js`).catch((e) => {
+    console.error("[Kate] failed to register Kate worker", e);
+    return null;
+  });
 
   // Run Kate
   const kate = Kate.kernel.KateKernel.from_root(
