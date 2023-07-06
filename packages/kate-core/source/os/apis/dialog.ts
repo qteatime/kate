@@ -144,19 +144,19 @@ export class HUD_Dialog extends Scene {
       },
       [progress.canvas]
     );
+    const result = process(progress);
+    this.canvas.textContent = "";
+    this.canvas.appendChild(element);
+    this.os.focus_handler.push_root(this.canvas);
     try {
-      const result = process(progress);
-      this.canvas.textContent = "";
-      this.canvas.appendChild(element);
-      this.os.focus_handler.push_root(this.canvas);
       await result;
+    } finally {
       this.os.focus_handler.pop_root(this.canvas);
       setTimeout(async () => {
         element.classList.add("leaving");
         await wait(this.FADE_OUT_TIME_MS);
         element.remove();
       });
-    } finally {
       this.os.kernel.console.body.classList.remove("trusted-mode");
       this.canvas.textContent = "";
     }
