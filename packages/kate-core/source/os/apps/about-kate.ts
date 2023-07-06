@@ -352,6 +352,7 @@ export class SceneAboutKate extends SimpleScene {
         if (!ok) {
           return;
         } else {
+          await this.os.app_resources.refresh_cache();
           await this.os.db.delete_database();
         }
       }
@@ -387,6 +388,7 @@ export class SceneAboutKate extends SimpleScene {
     });
 
     if (should_update) {
+      await this.os.app_resources.refresh_cache();
       await this.os.notifications.log(
         "kate:update",
         `Updated to v${version.version}`,
