@@ -5,91 +5,29 @@
     82,
     84
   ],
-  "version": 1,
+  "version": 4,
   "entities": [
     {
       "type": "record",
-      "name": "Meta-security",
+      "name": "Signed-block",
       "id": 8,
       "versions": [
         {
           "fields": [
             {
-              "name": "capabilities",
+              "name": "signature",
               "type": {
-                "op": "array",
-                "items": {
-                  "op": "union",
-                  "id": 9
-                }
-              }
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "type": "record",
-      "name": "Cartridge",
-      "id": 0,
-      "versions": [
-        {
-          "fields": [
-            {
-              "name": "id",
-              "type": {
-                "op": "text"
+                "op": "bytes"
               }
             },
             {
-              "name": "metadata",
+              "name": "integrity",
               "type": {
-                "op": "record",
-                "id": 2
+                "op": "bytes"
               }
             },
             {
-              "name": "files",
-              "type": {
-                "op": "array",
-                "items": {
-                  "op": "record",
-                  "id": 1
-                }
-              }
-            },
-            {
-              "name": "platform",
-              "type": {
-                "op": "union",
-                "id": 24
-              }
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "type": "record",
-      "name": "File",
-      "id": 1,
-      "versions": [
-        {
-          "fields": [
-            {
-              "name": "path",
-              "type": {
-                "op": "text"
-              }
-            },
-            {
-              "name": "mime",
-              "type": {
-                "op": "text"
-              }
-            },
-            {
-              "name": "data",
+              "name": "block-data",
               "type": {
                 "op": "bytes"
               }
@@ -100,54 +38,29 @@
     },
     {
       "type": "record",
-      "name": "Metadata",
-      "id": 2,
+      "name": "Identification",
+      "id": 0,
       "versions": [
         {
           "fields": [
             {
-              "name": "title",
+              "name": "cartridge-id",
               "type": {
-                "op": "record",
-                "id": 3
+                "op": "text"
               }
             },
             {
-              "name": "release",
+              "name": "version-id",
               "type": {
                 "op": "record",
-                "id": 4
+                "id": 9
               }
             },
             {
-              "name": "rating",
+              "name": "release-date",
               "type": {
                 "op": "record",
-                "id": 5
-              }
-            },
-            {
-              "name": "play",
-              "type": {
-                "op": "record",
-                "id": 6
-              }
-            },
-            {
-              "name": "security",
-              "type": {
-                "op": "record",
-                "id": 8
-              }
-            },
-            {
-              "name": "extras",
-              "type": {
-                "op": "array",
-                "items": {
-                  "op": "union",
-                  "id": 7
-                }
+                "id": 10
               }
             }
           ]
@@ -156,19 +69,19 @@
     },
     {
       "type": "record",
-      "name": "Meta-title",
-      "id": 3,
+      "name": "Meta-presentation",
+      "id": 1,
       "versions": [
         {
           "fields": [
             {
-              "name": "author",
+              "name": "title",
               "type": {
                 "op": "text"
               }
             },
             {
-              "name": "title",
+              "name": "author",
               "type": {
                 "op": "text"
               }
@@ -180,12 +93,39 @@
               }
             },
             {
+              "name": "release-type",
+              "type": {
+                "op": "union",
+                "id": 13
+              }
+            },
+            {
+              "name": "thumbnail-path",
+              "type": {
+                "op": "optional",
+                "value": {
+                  "op": "text"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "record",
+      "name": "Meta-classification",
+      "id": 2,
+      "versions": [
+        {
+          "fields": [
+            {
               "name": "genre",
               "type": {
                 "op": "array",
                 "items": {
                   "op": "union",
-                  "id": 10
+                  "id": 11
                 }
               }
             },
@@ -199,84 +139,10 @@
               }
             },
             {
-              "name": "thumbnail",
-              "type": {
-                "op": "record",
-                "id": 1
-              }
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "type": "record",
-      "name": "Meta-release",
-      "id": 4,
-      "versions": [
-        {
-          "fields": [
-            {
-              "name": "release-type",
-              "type": {
-                "op": "union",
-                "id": 11
-              }
-            },
-            {
-              "name": "release-date",
-              "type": {
-                "op": "record",
-                "id": 14
-              }
-            },
-            {
-              "name": "version",
-              "type": {
-                "op": "record",
-                "id": 12
-              }
-            },
-            {
-              "name": "legal-notices",
-              "type": {
-                "op": "text"
-              }
-            },
-            {
-              "name": "licence-name",
-              "type": {
-                "op": "text"
-              }
-            },
-            {
-              "name": "allow-derivative",
-              "type": {
-                "op": "bool"
-              }
-            },
-            {
-              "name": "allow-commercial",
-              "type": {
-                "op": "bool"
-              }
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "type": "record",
-      "name": "Meta-rating",
-      "id": 5,
-      "versions": [
-        {
-          "fields": [
-            {
               "name": "rating",
               "type": {
                 "op": "union",
-                "id": 13
+                "id": 12
               }
             },
             {
@@ -294,8 +160,44 @@
     },
     {
       "type": "record",
-      "name": "Meta-play",
-      "id": 6,
+      "name": "Meta-legal",
+      "id": 3,
+      "versions": [
+        {
+          "fields": [
+            {
+              "name": "derivative-policy",
+              "type": {
+                "op": "union",
+                "id": 14
+              }
+            },
+            {
+              "name": "licence-path",
+              "type": {
+                "op": "optional",
+                "value": {
+                  "op": "text"
+                }
+              }
+            },
+            {
+              "name": "privacy-policy-path",
+              "type": {
+                "op": "optional",
+                "value": {
+                  "op": "text"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "record",
+      "name": "Meta-accessibility",
+      "id": 4,
       "versions": [
         {
           "fields": [
@@ -305,27 +207,7 @@
                 "op": "array",
                 "items": {
                   "op": "union",
-                  "id": 16
-                }
-              }
-            },
-            {
-              "name": "local-multiplayer",
-              "type": {
-                "op": "optional",
-                "value": {
-                  "op": "record",
-                  "id": 17
-                }
-              }
-            },
-            {
-              "name": "online-multiplayer",
-              "type": {
-                "op": "optional",
-                "value": {
-                  "op": "record",
-                  "id": 17
+                  "id": 15
                 }
               }
             },
@@ -335,191 +217,33 @@
                 "op": "array",
                 "items": {
                   "op": "record",
+                  "id": 17
+                }
+              }
+            },
+            {
+              "name": "provisions",
+              "type": {
+                "op": "array",
+                "items": {
+                  "op": "union",
                   "id": 18
                 }
               }
             },
             {
-              "name": "accessibility",
-              "type": {
-                "op": "array",
-                "items": {
-                  "op": "union",
-                  "id": 19
-                }
-              }
-            },
-            {
-              "name": "average-duration",
+              "name": "average-completion",
               "type": {
                 "op": "union",
-                "id": 15
+                "id": 16
               }
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "type": "union",
-      "name": "Extra",
-      "id": 7,
-      "versions": [
-        {
-          "variants": [
-            {
-              "name": "Booklet",
-              "fields": [
-                {
-                  "name": "pages",
-                  "type": {
-                    "op": "array",
-                    "items": {
-                      "op": "union",
-                      "id": 20
-                    }
-                  }
-                },
-                {
-                  "name": "custom-css",
-                  "type": {
-                    "op": "text"
-                  }
-                },
-                {
-                  "name": "language",
-                  "type": {
-                    "op": "text"
-                  }
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "type": "union",
-      "name": "Capability",
-      "id": 9,
-      "versions": [
-        {
-          "variants": [
-            {
-              "name": "Network",
-              "fields": [
-                {
-                  "name": "allow",
-                  "type": {
-                    "op": "array",
-                    "items": {
-                      "op": "text"
-                    }
-                  }
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "type": "union",
-      "name": "Genre",
-      "id": 10,
-      "versions": [
-        {
-          "variants": [
-            {
-              "name": "Not-specified",
-              "fields": []
             },
             {
-              "name": "Action",
-              "fields": []
-            },
-            {
-              "name": "Figthing",
-              "fields": []
-            },
-            {
-              "name": "Interactive-fiction",
-              "fields": []
-            },
-            {
-              "name": "Platformer",
-              "fields": []
-            },
-            {
-              "name": "Puzzle",
-              "fields": []
-            },
-            {
-              "name": "Racing",
-              "fields": []
-            },
-            {
-              "name": "Rhythm",
-              "fields": []
-            },
-            {
-              "name": "RPG",
-              "fields": []
-            },
-            {
-              "name": "Simulation",
-              "fields": []
-            },
-            {
-              "name": "Shooter",
-              "fields": []
-            },
-            {
-              "name": "Sports",
-              "fields": []
-            },
-            {
-              "name": "Strategy",
-              "fields": []
-            },
-            {
-              "name": "Tool",
-              "fields": []
-            },
-            {
-              "name": "Other",
-              "fields": []
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "type": "union",
-      "name": "Release-type",
-      "id": 11,
-      "versions": [
-        {
-          "variants": [
-            {
-              "name": "Prototype",
-              "fields": []
-            },
-            {
-              "name": "Early-access",
-              "fields": []
-            },
-            {
-              "name": "Beta",
-              "fields": []
-            },
-            {
-              "name": "Demo",
-              "fields": []
-            },
-            {
-              "name": "Full",
-              "fields": []
+              "name": "average-session",
+              "type": {
+                "op": "union",
+                "id": 16
+              }
             }
           ]
         }
@@ -527,8 +251,96 @@
     },
     {
       "type": "record",
-      "name": "Version",
-      "id": 12,
+      "name": "Meta-security",
+      "id": 5,
+      "versions": [
+        {
+          "fields": [
+            {
+              "name": "capabilities",
+              "type": {
+                "op": "array",
+                "items": {
+                  "op": "union",
+                  "id": 19
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "union",
+      "name": "Runtime",
+      "id": 6,
+      "versions": [
+        {
+          "variants": [
+            {
+              "name": "Web-archive",
+              "fields": [
+                {
+                  "name": "html-path",
+                  "type": {
+                    "op": "text"
+                  }
+                },
+                {
+                  "name": "bridges",
+                  "type": {
+                    "op": "array",
+                    "items": {
+                      "op": "union",
+                      "id": 20
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "record",
+      "name": "File",
+      "id": 7,
+      "versions": [
+        {
+          "fields": [
+            {
+              "name": "path",
+              "type": {
+                "op": "text"
+              }
+            },
+            {
+              "name": "mime",
+              "type": {
+                "op": "text"
+              }
+            },
+            {
+              "name": "integrity",
+              "type": {
+                "op": "bytes"
+              }
+            },
+            {
+              "name": "data",
+              "type": {
+                "op": "bytes"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "record",
+      "name": "Version-id",
+      "id": 9,
       "versions": [
         {
           "fields": [
@@ -549,9 +361,117 @@
       ]
     },
     {
+      "type": "record",
+      "name": "Date",
+      "id": 10,
+      "versions": [
+        {
+          "fields": [
+            {
+              "name": "year",
+              "type": {
+                "op": "uint32"
+              }
+            },
+            {
+              "name": "month",
+              "type": {
+                "op": "uint8"
+              }
+            },
+            {
+              "name": "day",
+              "type": {
+                "op": "uint8"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "union",
+      "name": "Genre",
+      "id": 11,
+      "versions": [
+        {
+          "variants": [
+            {
+              "name": "Not-specified",
+              "fields": []
+            },
+            {
+              "name": "Action",
+              "fields": []
+            },
+            {
+              "name": "Platformer",
+              "fields": []
+            },
+            {
+              "name": "Shooter",
+              "fields": []
+            },
+            {
+              "name": "Racing",
+              "fields": []
+            },
+            {
+              "name": "Fighting",
+              "fields": []
+            },
+            {
+              "name": "Rhythm",
+              "fields": []
+            },
+            {
+              "name": "Adventure",
+              "fields": []
+            },
+            {
+              "name": "Interactive-fiction",
+              "fields": []
+            },
+            {
+              "name": "Visual-novel",
+              "fields": []
+            },
+            {
+              "name": "Puzzle",
+              "fields": []
+            },
+            {
+              "name": "RPG",
+              "fields": []
+            },
+            {
+              "name": "Simulation",
+              "fields": []
+            },
+            {
+              "name": "Strategy",
+              "fields": []
+            },
+            {
+              "name": "Sports",
+              "fields": []
+            },
+            {
+              "name": "Tool",
+              "fields": []
+            },
+            {
+              "name": "Other",
+              "fields": []
+            }
+          ]
+        }
+      ]
+    },
+    {
       "type": "union",
       "name": "Content-rating",
-      "id": 13,
+      "id": 12,
       "versions": [
         {
           "variants": [
@@ -580,29 +500,77 @@
       ]
     },
     {
-      "type": "record",
-      "name": "Date",
+      "type": "union",
+      "name": "Release-type",
+      "id": 13,
+      "versions": [
+        {
+          "variants": [
+            {
+              "name": "Prototype",
+              "fields": []
+            },
+            {
+              "name": "Early-access",
+              "fields": []
+            },
+            {
+              "name": "Beta",
+              "fields": []
+            },
+            {
+              "name": "Demo",
+              "fields": []
+            },
+            {
+              "name": "Regular",
+              "fields": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "union",
+      "name": "Derivative-policy",
       "id": 14,
       "versions": [
         {
-          "fields": [
+          "variants": [
             {
-              "name": "year",
-              "type": {
-                "op": "uint32"
-              }
+              "name": "Not-allowed",
+              "fields": []
             },
             {
-              "name": "month",
-              "type": {
-                "op": "uint8"
-              }
+              "name": "Personal-use",
+              "fields": []
             },
             {
-              "name": "day",
-              "type": {
-                "op": "uint8"
-              }
+              "name": "Non-commercial-use",
+              "fields": []
+            },
+            {
+              "name": "Commercial-use",
+              "fields": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "union",
+      "name": "Input-method",
+      "id": 15,
+      "versions": [
+        {
+          "variants": [
+            {
+              "name": "Buttons",
+              "fields": []
+            },
+            {
+              "name": "Pointer",
+              "fields": []
             }
           ]
         }
@@ -611,33 +579,42 @@
     {
       "type": "union",
       "name": "Duration",
-      "id": 15,
+      "id": 16,
       "versions": [
         {
           "variants": [
             {
               "name": "Seconds",
-              "fields": []
+              "fields": [
+                {
+                  "name": "average",
+                  "type": {
+                    "op": "uint32"
+                  }
+                }
+              ]
             },
             {
-              "name": "Few-minutes",
-              "fields": []
+              "name": "Minutes",
+              "fields": [
+                {
+                  "name": "average",
+                  "type": {
+                    "op": "uint32"
+                  }
+                }
+              ]
             },
             {
-              "name": "Half-hour",
-              "fields": []
-            },
-            {
-              "name": "One-hour",
-              "fields": []
-            },
-            {
-              "name": "Few-hours",
-              "fields": []
-            },
-            {
-              "name": "Several-hours",
-              "fields": []
+              "name": "Hours",
+              "fields": [
+                {
+                  "name": "average",
+                  "type": {
+                    "op": "uint32"
+                  }
+                }
+              ]
             },
             {
               "name": "Unknown",
@@ -648,51 +625,9 @@
       ]
     },
     {
-      "type": "union",
-      "name": "Input-method",
-      "id": 16,
-      "versions": [
-        {
-          "variants": [
-            {
-              "name": "Kate-buttons",
-              "fields": []
-            },
-            {
-              "name": "Touch",
-              "fields": []
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "type": "record",
-      "name": "Player-range",
-      "id": 17,
-      "versions": [
-        {
-          "fields": [
-            {
-              "name": "minimum",
-              "type": {
-                "op": "uint32"
-              }
-            },
-            {
-              "name": "maximum",
-              "type": {
-                "op": "uint32"
-              }
-            }
-          ]
-        }
-      ]
-    },
-    {
       "type": "record",
       "name": "Language",
-      "id": 18,
+      "id": 17,
       "versions": [
         {
           "fields": [
@@ -726,8 +661,8 @@
     },
     {
       "type": "union",
-      "name": "Accessibility",
-      "id": 19,
+      "name": "Accessibility-provision",
+      "id": 18,
       "versions": [
         {
           "variants": [
@@ -761,437 +696,14 @@
     },
     {
       "type": "union",
-      "name": "Booklet-expr",
-      "id": 20,
+      "name": "Capability",
+      "id": 19,
       "versions": [
         {
           "variants": [
             {
-              "name": "BE-text",
-              "fields": [
-                {
-                  "name": "value",
-                  "type": {
-                    "op": "text"
-                  }
-                }
-              ]
-            },
-            {
-              "name": "BE-image",
-              "fields": [
-                {
-                  "name": "path",
-                  "type": {
-                    "op": "text"
-                  }
-                }
-              ]
-            },
-            {
-              "name": "BE-bold",
-              "fields": [
-                {
-                  "name": "value",
-                  "type": {
-                    "op": "union",
-                    "id": 20
-                  }
-                }
-              ]
-            },
-            {
-              "name": "BE-italic",
-              "fields": [
-                {
-                  "name": "value",
-                  "type": {
-                    "op": "union",
-                    "id": 20
-                  }
-                }
-              ]
-            },
-            {
-              "name": "BE-title",
-              "fields": [
-                {
-                  "name": "value",
-                  "type": {
-                    "op": "union",
-                    "id": 20
-                  }
-                }
-              ]
-            },
-            {
-              "name": "BE-subtitle",
-              "fields": [
-                {
-                  "name": "value",
-                  "type": {
-                    "op": "union",
-                    "id": 20
-                  }
-                }
-              ]
-            },
-            {
-              "name": "BE-subtitle2",
-              "fields": [
-                {
-                  "name": "value",
-                  "type": {
-                    "op": "union",
-                    "id": 20
-                  }
-                }
-              ]
-            },
-            {
-              "name": "BE-font",
-              "fields": [
-                {
-                  "name": "family",
-                  "type": {
-                    "op": "text"
-                  }
-                },
-                {
-                  "name": "size",
-                  "type": {
-                    "op": "uint32"
-                  }
-                },
-                {
-                  "name": "value",
-                  "type": {
-                    "op": "union",
-                    "id": 20
-                  }
-                }
-              ]
-            },
-            {
-              "name": "BE-color",
-              "fields": [
-                {
-                  "name": "r",
-                  "type": {
-                    "op": "uint8"
-                  }
-                },
-                {
-                  "name": "g",
-                  "type": {
-                    "op": "uint8"
-                  }
-                },
-                {
-                  "name": "b",
-                  "type": {
-                    "op": "uint8"
-                  }
-                },
-                {
-                  "name": "value",
-                  "type": {
-                    "op": "union",
-                    "id": 20
-                  }
-                }
-              ]
-            },
-            {
-              "name": "BE-background",
-              "fields": [
-                {
-                  "name": "r",
-                  "type": {
-                    "op": "uint8"
-                  }
-                },
-                {
-                  "name": "g",
-                  "type": {
-                    "op": "uint8"
-                  }
-                },
-                {
-                  "name": "b",
-                  "type": {
-                    "op": "uint8"
-                  }
-                },
-                {
-                  "name": "value",
-                  "type": {
-                    "op": "union",
-                    "id": 20
-                  }
-                }
-              ]
-            },
-            {
-              "name": "BE-columns",
-              "fields": [
-                {
-                  "name": "columns",
-                  "type": {
-                    "op": "uint8"
-                  }
-                },
-                {
-                  "name": "value",
-                  "type": {
-                    "op": "union",
-                    "id": 20
-                  }
-                }
-              ]
-            },
-            {
-              "name": "BE-fixed",
-              "fields": [
-                {
-                  "name": "x",
-                  "type": {
-                    "op": "uint32"
-                  }
-                },
-                {
-                  "name": "y",
-                  "type": {
-                    "op": "uint32"
-                  }
-                },
-                {
-                  "name": "value",
-                  "type": {
-                    "op": "union",
-                    "id": 20
-                  }
-                }
-              ]
-            },
-            {
-              "name": "BE-row",
-              "fields": [
-                {
-                  "name": "gap",
-                  "type": {
-                    "op": "uint32"
-                  }
-                },
-                {
-                  "name": "align",
-                  "type": {
-                    "op": "union",
-                    "id": 23
-                  }
-                },
-                {
-                  "name": "value",
-                  "type": {
-                    "op": "union",
-                    "id": 20
-                  }
-                }
-              ]
-            },
-            {
-              "name": "BE-column",
-              "fields": [
-                {
-                  "name": "gap",
-                  "type": {
-                    "op": "uint32"
-                  }
-                },
-                {
-                  "name": "align",
-                  "type": {
-                    "op": "union",
-                    "id": 23
-                  }
-                },
-                {
-                  "name": "value",
-                  "type": {
-                    "op": "union",
-                    "id": 20
-                  }
-                }
-              ]
-            },
-            {
-              "name": "BE-stack",
-              "fields": [
-                {
-                  "name": "values",
-                  "type": {
-                    "op": "array",
-                    "items": {
-                      "op": "union",
-                      "id": 20
-                    }
-                  }
-                }
-              ]
-            },
-            {
-              "name": "BE-table",
-              "fields": [
-                {
-                  "name": "headers",
-                  "type": {
-                    "op": "array",
-                    "items": {
-                      "op": "union",
-                      "id": 20
-                    }
-                  }
-                },
-                {
-                  "name": "rows",
-                  "type": {
-                    "op": "record",
-                    "id": 21
-                  }
-                }
-              ]
-            },
-            {
-              "name": "BE-class",
-              "fields": [
-                {
-                  "name": "name",
-                  "type": {
-                    "op": "text"
-                  }
-                },
-                {
-                  "name": "value",
-                  "type": {
-                    "op": "union",
-                    "id": 20
-                  }
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "type": "record",
-      "name": "Booklet-row",
-      "id": 21,
-      "versions": [
-        {
-          "fields": [
-            {
-              "name": "row-span",
-              "type": {
-                "op": "uint32"
-              }
-            },
-            {
-              "name": "cells",
-              "type": {
-                "op": "array",
-                "items": {
-                  "op": "record",
-                  "id": 22
-                }
-              }
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "type": "record",
-      "name": "Booklet-cell",
-      "id": 22,
-      "versions": [
-        {
-          "fields": [
-            {
-              "name": "cell-span",
-              "type": {
-                "op": "uint32"
-              }
-            },
-            {
-              "name": "value",
-              "type": {
-                "op": "union",
-                "id": 20
-              }
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "type": "union",
-      "name": "Booklet-align",
-      "id": 23,
-      "versions": [
-        {
-          "variants": [
-            {
-              "name": "Start",
+              "name": "Open-URLs",
               "fields": []
-            },
-            {
-              "name": "Center",
-              "fields": []
-            },
-            {
-              "name": "End",
-              "fields": []
-            },
-            {
-              "name": "Justify",
-              "fields": []
-            },
-            {
-              "name": "Space-evenly",
-              "fields": []
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "type": "union",
-      "name": "Platform",
-      "id": 24,
-      "versions": [
-        {
-          "variants": [
-            {
-              "name": "Web-archive",
-              "fields": [
-                {
-                  "name": "html",
-                  "type": {
-                    "op": "text"
-                  }
-                },
-                {
-                  "name": "bridges",
-                  "type": {
-                    "op": "array",
-                    "items": {
-                      "op": "union",
-                      "id": 25
-                    }
-                  }
-                }
-              ]
             }
           ]
         }
@@ -1200,7 +712,7 @@
     {
       "type": "union",
       "name": "Bridge",
-      "id": 25,
+      "id": 20,
       "versions": [
         {
           "variants": [
@@ -1221,18 +733,18 @@
                     "op": "map",
                     "keys": {
                       "op": "union",
-                      "id": 26
+                      "id": 21
                     },
                     "values": {
                       "op": "record",
-                      "id": 27
+                      "id": 22
                     }
                   }
                 }
               ]
             },
             {
-              "name": "Preserve-webgl-render",
+              "name": "Preserve-WebGL-render",
               "fields": []
             },
             {
@@ -1281,7 +793,7 @@
                   "name": "version",
                   "type": {
                     "op": "record",
-                    "id": 12
+                    "id": 9
                   }
                 }
               ]
@@ -1292,8 +804,8 @@
     },
     {
       "type": "union",
-      "name": "VirtualKey",
-      "id": 26,
+      "name": "Virtual-key",
+      "id": 21,
       "versions": [
         {
           "variants": [
@@ -1343,27 +855,15 @@
     },
     {
       "type": "record",
-      "name": "KeyboardKey",
-      "id": 27,
+      "name": "Keyboard-key",
+      "id": 22,
       "versions": [
         {
           "fields": [
             {
-              "name": "key",
-              "type": {
-                "op": "text"
-              }
-            },
-            {
               "name": "code",
               "type": {
                 "op": "text"
-              }
-            },
-            {
-              "name": "key-code",
-              "type": {
-                "op": "uint32"
               }
             }
           ]
