@@ -59,15 +59,15 @@ const content_rating = T.one_of([
 const duration = T.tagged_choice<Duration, Duration["type"]>("type", {
   hours: T.spec({
     type: T.constant("hours" as const),
-    value: T.int,
+    value: T.optional(1, T.int),
   }),
   minutes: T.spec({
     type: T.constant("minutes" as const),
-    value: T.int,
+    value: T.optional(1, T.int),
   }),
   seconds: T.spec({
     type: T.constant("seconds" as const),
-    value: T.int,
+    value: T.optional(1, T.int),
   }),
   unknown: T.spec({
     type: T.constant("unknown" as const),
@@ -92,11 +92,6 @@ const accessibility = T.one_of([
   "skippable-content",
 ] as const);
 
-const player_range = T.spec({
-  minimum: T.int,
-  maximum: T.int,
-});
-
 const valid_id = T.regex(
   "valid id",
   /^[a-z0-9\-]+(\.[a-z0-9\-]+)*\/[a-z0-9\-]+(\.[a-z0-9\-]+)*$/
@@ -112,14 +107,6 @@ const meta = T.spec({
     title: T.short_str(255),
     description: T.optional("", T.short_str(10_000)),
     release_type: T.optional("regular", release_type),
-    release_date: T.lazy_optional(
-      today,
-      T.spec({
-        year: T.int,
-        month: T.int,
-        day: T.int,
-      })
-    ),
     thumbnail_path: T.nullable(T.str),
   }),
   classification: T.nullable(
@@ -146,8 +133,6 @@ const meta = T.spec({
   accessibility: T.nullable(
     T.spec({
       input_methods: T.optional([], T.list_of(input_method)),
-      local_multiplayer: T.nullable(player_range),
-      online_multiplayer: T.nullable(player_range),
       languages: T.optional(
         [],
         T.list_of(
@@ -243,7 +228,7 @@ const capability = T.tagged_choice<Capability, Capability["type"]>("type", {
 });
 
 const security = T.spec({
-  capabilities: T.list_of(capability),
+  capabilities: T.optional([], T.list_of(capability)),
 });
 
 const config = T.spec({

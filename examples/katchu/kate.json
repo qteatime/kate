@@ -1,34 +1,33 @@
 {
   "id": "qteati.me/katchu",
+  "version": {
+    "major": 1,
+    "minor": 0
+  },
+  "release": {
+    "year": 2023,
+    "month": 4,
+    "day": 7
+  },
   "metadata": {
-    "game": {
+    "presentation": {
       "author": "Q.",
       "title": "Kat'chu",
       "description": "Collect consoles and rack up the score!",
-      "genre": ["action"],
-      "tags": ["kate-sample", "arcade", "short"],
+      "release_type": "demo",
       "thumbnail_path": "thumbnail.png"
     },
-    "release": {
-      "kind": "demo",
-      "date": {
-        "year": 2023,
-        "month": 4,
-        "day": 7
-      },
-      "version": {
-        "major": 1,
-        "minor": 0
-      },
-      "licence_name": "MIT",
-      "allow_derivative": true,
-      "allow_commercial": true
-    },
-    "rating": {
+    "classification": {
+      "genre": ["action"],
+      "tags": ["kate-sample", "arcade", "short"],
       "rating": "general"
     },
-    "play_style": {
-      "input_methods": ["kate-buttons"],
+    "legal": {
+      "licence_path": "LICENCE",
+      "derivative_policy": "commercial-use"
+    },
+    "accessibility": {
+      "input_methods": ["buttons"],
       "languages": [
         {
           "iso_code": "en",
@@ -37,8 +36,12 @@
           "text": true
         }
       ],
-      "average_duration": "seconds"
+      "average_completion": { "type": "seconds" },
+      "average_session": { "type": "seconds" }
     }
+  },
+  "security": {
+    "capabilities": []
   },
   "files": [
     "www/*.html",
