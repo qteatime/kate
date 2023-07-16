@@ -45,22 +45,9 @@ const content_rating = T.one_of([
   "unknown",
 ] as const);
 
-const duration = T.tagged_choice<Duration, Duration["type"]>("type", {
-  hours: T.spec({
-    type: T.constant("hours" as const),
-    value: T.optional(1, T.int),
-  }),
-  minutes: T.spec({
-    type: T.constant("minutes" as const),
-    value: T.optional(1, T.int),
-  }),
-  seconds: T.spec({
-    type: T.constant("seconds" as const),
-    value: T.optional(1, T.int),
-  }),
-  unknown: T.spec({
-    type: T.constant("unknown" as const),
-  }),
+const duration = T.spec({
+  unit: T.one_of(["seconds", "minutes", "hours"] as const),
+  value: T.optional(1, T.int),
 });
 
 const derivative_policy = T.one_of([
@@ -135,8 +122,8 @@ const meta = T.spec({
         )
       ),
       provisions: T.optional([], T.list_of(accessibility)),
-      average_completion: T.optional({ type: "unknown" }, duration),
-      average_session: T.optional({ type: "unknown" }, duration),
+      average_completion: T.optional(null, duration),
+      average_session: T.optional(null, duration),
     })
   ),
 });
@@ -287,11 +274,10 @@ type ContentRating =
 
 type DerivativePolicy = ReturnType<typeof derivative_policy>;
 
-type Duration =
-  | { type: "seconds"; value: number }
-  | { type: "minutes"; value: number }
-  | { type: "hours"; value: number }
-  | { type: "unknown" };
+type Duration = {
+  unit: "seconds" | "minutes" | "hours";
+  value: number;
+};
 
 type InputMethod = "buttons" | "pointer";
 
@@ -473,12 +459,12 @@ function metadata(x: Kart["metadata"], root: string, base_dir: string) {
     languages: x.accessibility?.languages.map(make_language) ?? [],
     provisions:
       x.accessibility?.provisions.map(make_accessibility_provision) ?? [],
-    "average-completion": make_duration(
-      x.accessibility?.average_completion ?? { type: "unknown" }
-    ),
-    "average-session": make_duration(
-      x.accessibility?.average_session ?? { type: "unknown" }
-    ),
+    "average-completion-seconds": x.accessibility?.average_completion
+      ? make_duration(x.accessibility.average_completion)
+      : null,
+    "average-session-seconds": x.accessibility?.average_session
+      ? make_duration(x.accessibility.average_session)
+      : null,
   });
 
   return [presentation, classification, legal, accessibility];
@@ -622,17 +608,15 @@ function make_accessibility_provision(x: Accessibility) {
 }
 
 function make_duration(x: Duration) {
-  switch (x.type) {
+  switch (x.unit) {
     case "seconds":
-      return Cart.Duration.Seconds({ average: x.value });
+      return x.value;
     case "minutes":
-      return Cart.Duration.Minutes({ average: x.value });
+      return x.value * 60;
     case "hours":
-      return Cart.Duration.Hours({ average: x.value });
-    case "unknown":
-      return Cart.Duration.Unknown({});
+      return x.value * 60 * 60;
     default:
-      throw unreachable(x);
+      throw unreachable(x.unit, "duration unit");
   }
 }
 
