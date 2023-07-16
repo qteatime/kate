@@ -1,4 +1,3 @@
-import { byte_equals } from "../../../ljt-vm/source/util";
 import { Cart, File } from "./cart-type";
 import { parse_v4 } from "./v4/v4";
 
@@ -58,4 +57,16 @@ function check_file_exists(path: string | null, cart: Cart) {
       return [];
     }
   }
+}
+
+function byte_equals(a: Uint8Array, b: Uint8Array) {
+  if (a.length !== b.length) {
+    return false;
+  }
+  for (let i = 0; i < a.length; ++i) {
+    if (a[i] !== b[i]) {
+      return false;
+    }
+  }
+  return true;
 }

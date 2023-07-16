@@ -43,7 +43,7 @@ async function main() {
     const cart = Kate.cart.parse(cart_bytes);
 
     const kate_os = await Kate.os.KateOS.boot(kate, {
-      database: `kate/${cart.metadata.id}`,
+      database: `kate/${cart.id}`,
       set_case_mode: false,
     });
 
@@ -55,10 +55,7 @@ async function main() {
       kate_os.db,
       "readwrite",
       async (storage) => {
-        await storage.initialise_partitions(
-          cart.metadata.id,
-          cart.metadata.version_id
-        );
+        await storage.initialise_partitions(cart.id, cart.version);
       }
     );
 
