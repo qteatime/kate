@@ -1,34 +1,33 @@
 {
   "id": "qteati.me/hello-world",
+  "version": {
+    "major": 1,
+    "minor": 1
+  },
+  "release": {
+    "year": 2023,
+    "month": 2,
+    "day": 13
+  },
   "metadata": {
-    "game": {
+    "presentation": {
       "author": "Q.",
       "title": "Hello, from Kate",
-      "description": "A simple demo to test Kate.",
-      "genre": ["tool"],
-      "tags": ["kate-sample"],
+      "tagline": "A simple demo to test Kate.",
+      "release_type": "demo",
       "thumbnail_path": "thumbnail.png"
     },
-    "release": {
-      "kind": "demo",
-      "date": {
-        "year": 2023,
-        "month": 2,
-        "day": 13
-      },
-      "version": {
-        "major": 1,
-        "minor": 0
-      },
-      "licence_name": "MIT",
-      "allow_derivative": true,
-      "allow_commercial": true
-    },
-    "rating": {
+    "classification": {
+      "genre": ["tool"],
+      "tags": ["kate-sample"],
       "rating": "general"
     },
-    "play_style": {
-      "input_methods": ["kate-buttons"],
+    "legal": {
+      "licence_path": "LICENCE",
+      "derivative_policy": "commercial-use"
+    },
+    "accessibility": {
+      "input_methods": ["buttons"],
       "languages": [
         {
           "iso_code": "en",
@@ -37,10 +36,14 @@
           "text": true
         }
       ],
-      "average_duration": "seconds"
+      "average_completion": { "unit": "seconds" },
+      "average_session": { "unit": "seconds" }
     }
   },
-  "files": ["*.css", "*.js", "*.html"],
+  "security": {
+    "capabilities": []
+  },
+  "files": ["*.css", "*.js", "*.html", "thumbnail.png", "LICENCE"],
   "platform": {
     "type": "web-archive",
     "html": "index.html",

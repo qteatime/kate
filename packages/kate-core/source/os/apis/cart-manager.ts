@@ -1,17 +1,14 @@
 import * as Cart from "../../cart";
 import type { KateOS } from "../os";
 import * as Db from "../../data";
-import {
-  from_bytes,
-  make_id,
-  make_thumbnail_from_bytes,
-  mb,
-} from "../../utils";
+import { from_bytes, gb, make_thumbnail_from_bytes } from "../../utils";
 
 export class CartManager {
-  readonly CARTRIDGE_SIZE_LIMIT = mb(512);
+  readonly CARTRIDGE_SIZE_LIMIT = gb(1.4);
   readonly THUMBNAIL_WIDTH = 400;
   readonly THUMBNAIL_HEIGHT = 700;
+  readonly BANNER_WIDTH = 1280;
+  readonly BANNER_HEIGHT = 200;
 
   constructor(readonly os: KateOS) {}
 
@@ -107,9 +104,9 @@ export class CartManager {
       this.os.notifications.push_transient(
         "kate:cart-manager",
         "Installation failed",
-        `${file.name} (${from_bytes(
-          file.size
-        )}) exceeds the 512MB cartridge size limit.`
+        `${file.name} (${from_bytes(file.size)}) exceeds the ${from_bytes(
+          this.CARTRIDGE_SIZE_LIMIT
+        )} cartridge size limit.`
       );
       return;
     }
@@ -130,6 +127,11 @@ export class CartManager {
     try {
       const buffer = await file.arrayBuffer();
       const cart = Cart.parse(new Uint8Array(buffer));
+      const errors = await Cart.verify_integrity(cart);
+      if (errors.length !== 0) {
+        console.error(`Corrupted cartridge ${cart.id}`, errors);
+        throw new Error(`Corrupted cartridge ${cart.id}`);
+      }
       await this.install(cart);
     } catch (error) {
       console.error(`Failed to install ${file.name}:`, error);
@@ -142,24 +144,24 @@ export class CartManager {
   }
 
   async install(cart: Cart.Cart) {
-    const old_meta = await this.try_read_metadata(cart.metadata.id);
+    const old_meta = await this.try_read_metadata(cart.id);
     if (old_meta != null) {
-      const version = cart.metadata.version_id;
-      const title = cart.metadata.game.title;
-      const old_title = old_meta.metadata.game.title;
-      const old_version = old_meta.metadata.version_id;
+      const version = cart.version;
+      const title = cart.metadata.presentation.title;
+      const old_title = old_meta.metadata.presentation.title;
+      const old_version = old_meta.version;
       if (old_meta.status === "active") {
         if (old_version === version) {
           await this.os.notifications.push_transient(
             "kate:cart-manager",
             `Cartridge not installed`,
-            `${title} (${cart.metadata.id}) is already installed at version v${old_version}`
+            `${title} (${cart.id}) is already installed at version v${old_version}`
           );
           return false;
         } else {
           const should_update = await this.os.dialog.confirm("kate:installer", {
             title: `Update ${old_title}?`,
-            message: `A cartridge already exists for ${cart.metadata.id} (${old_title} v${old_version}).
+            message: `A cartridge already exists for ${cart.id} (${old_title} v${old_version}).
                       Update it to ${title} v${version}?`,
             ok: "Update",
             cancel: "Keep old version",
@@ -172,11 +174,17 @@ export class CartManager {
       }
     }
 
-    const thumbnail = await make_thumbnail_from_bytes(
+    const thumbnail = await maybe_make_file_url(
+      cart.metadata.presentation.thumbnail_path,
+      cart,
       this.THUMBNAIL_WIDTH,
-      this.THUMBNAIL_HEIGHT,
-      cart.thumbnail.mime,
-      cart.thumbnail.data
+      this.THUMBNAIL_HEIGHT
+    );
+    const banner = await maybe_make_file_url(
+      cart.metadata.presentation.banner_path,
+      cart,
+      this.BANNER_WIDTH,
+      this.BANNER_HEIGHT
     );
 
     await this.os.db.transaction(
@@ -191,27 +199,24 @@ export class CartManager {
         const habits = new Db.PlayHabitsStore(t);
         const object_store = new Db.ObjectStorage(t);
 
-        const old_meta = await carts.meta.try_get(cart.metadata.id);
+        const old_meta = await carts.meta.try_get(cart.id);
         if (old_meta != null) {
           await carts.archive(old_meta.id);
         }
-        await carts.insert(cart, thumbnail);
-        await habits.initialise(cart.metadata.id);
-        await object_store.initialise_partitions(
-          cart.metadata.id,
-          cart.metadata.version_id
-        );
+        await carts.insert(cart, thumbnail, banner);
+        await habits.initialise(cart.id);
+        await object_store.initialise_partitions(cart.id, cart.version);
       }
     );
 
     await this.os.notifications.push(
       "kate:cart-manager",
       `New game installed`,
-      `${cart.metadata.game.title} is ready to play!`
+      `${cart.metadata.presentation.title} is ready to play!`
     );
     this.os.events.on_cart_inserted.emit(cart);
     this.os.events.on_cart_changed.emit({
-      id: cart.metadata.id,
+      id: cart.id,
       reason: "installed",
     });
     return true;
@@ -254,7 +259,7 @@ export class CartManager {
     );
     this.os.events.on_cart_removed.emit({
       id: cart_id,
-      title: meta.metadata.game.title,
+      title: meta.metadata.presentation.title,
     });
     this.os.events.on_cart_changed.emit({ id: cart_id, reason: "removed" });
   }
@@ -266,7 +271,8 @@ export class CartManager {
       string,
       {
         status: Db.CartridgeStatus;
-        thumbnail_url: string;
+        thumbnail_url: string | null;
+        banner_url: string | null;
         meta: Db.CartMeta;
         version_id: string;
         size: number;
@@ -276,12 +282,30 @@ export class CartManager {
       const size = cart.files.reduce((total, file) => total + file.size, 0);
       result.set(cart.id, {
         meta: cart,
-        version_id: cart.metadata.version_id,
+        version_id: cart.version,
         status: cart.status,
         thumbnail_url: cart.thumbnail_dataurl,
+        banner_url: cart.banner_dataurl,
         size: size,
       });
     }
     return result;
+  }
+}
+
+function maybe_make_file_url(
+  path: string | null,
+  cart: Cart.Cart,
+  width: number,
+  height: number
+) {
+  if (path == null) {
+    return null;
+  } else {
+    const file = cart.files.find((x) => x.path === path);
+    if (file == null) {
+      throw new Error(`File not found: ${path}`);
+    }
+    return make_thumbnail_from_bytes(width, height, file.mime, file.data);
   }
 }

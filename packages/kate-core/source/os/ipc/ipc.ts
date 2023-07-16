@@ -142,7 +142,7 @@ export class KateIPCServer {
       });
       this._handlers.delete(handler.secret);
       await this.os.processes.terminate(
-        handler.cart.metadata.id,
+        handler.cart.id,
         "kate:ipc",
         "suspicious IPC activity"
       );

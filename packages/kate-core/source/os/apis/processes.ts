@@ -36,7 +36,7 @@ export class KateProcesses {
       async read_file(path): Promise<Cart.File> {
         const file = file_map.get(path);
         if (file == null) {
-          throw new Error(`File not found in ${cart.metadata.id}: ${path}`);
+          throw new Error(`File not found in ${cart.id}: ${path}`);
         }
         return file;
       },
@@ -59,11 +59,11 @@ export class KateProcesses {
   }
 
   is_running(cart_id: string) {
-    return this.running?.cart.metadata.id === cart_id;
+    return this.running?.cart.id === cart_id;
   }
 
   async terminate(id: string, requester: string, reason: string) {
-    if (this._running != null && this._running.cart.metadata.id === id) {
+    if (this._running != null && this._running.cart.id === id) {
       await this.os.notifications.push(
         requester,
         "Process terminated",
@@ -94,7 +94,7 @@ export class KateProcesses {
         read_file: async (path) => {
           const file_id = file_map.get(path);
           if (file_id == null) {
-            throw new Error(`File not found in ${cart.metadata.id}: ${path}`);
+            throw new Error(`File not found in ${cart.id}: ${path}`);
           }
           const file = await this.os.cart_manager.read_file_by_id(id, file_id);
           return { mime: file.mime, data: file.data, path: path };

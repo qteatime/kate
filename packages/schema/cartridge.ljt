@@ -1,111 +1,93 @@
 % ljt/0
-
-schema "KART" version 1
+schema "KART" version 4
 
 type Cartridge {
   field id: Text;
-  field metadata: Metadata;
+  field version: Version;
+  field release-date: Date;
+  field metadata: Metadata[];
+  field runtime: Runtime;
   field files: File[];
-  field platform: Platform;
 }
 
-// -- File system
+union Metadata {
+  type Presentation {
+    field title: Text;
+    field author: Text;
+    field tagline: Text;
+    field description: Text;
+    field release-type: Release-type;
+    field thumbnail-path: Text?;
+    field banner-path: Text?;
+  }
+
+  type Classification {
+    field genre: Genre[];
+    field tags: Text[];
+    field rating: Content-rating;
+    field warnings: Text?;
+  }
+
+  type Legal {
+    field derivative-policy: Derivative-policy;
+    field licence-path: Text?;
+    field privacy-policy-path: Text?;
+  }
+
+  type Accessibility {
+    field input-methods: Input-method[];
+    field languages: Language[];
+    field provisions: Accessibility-provision[];
+    field average-completion-seconds: Uint32?;
+    field average-session-seconds: Uint32?;
+  }
+}
+
+union Runtime {
+  type Web-archive {
+    field html-path: Text;
+    field bridges: Bridge[];
+  }
+}
+
 type File {
   field path: Text;
   field mime: Text;
+  field integrity: Raw-bytes;
   field data: Raw-bytes;
 }
 
-// -- Metadata
-type Metadata {
-  field title: Meta-title;
-  field release: Meta-release;
-  field rating: Meta-rating;
-  field play: Meta-play;
-  field security: Meta-security;
-  field extras: Extra[];
+
+// -- Helpers ---------------------------------------------------------
+type Version {
+  field major: Uint32;
+  field minor: Uint32;
 }
 
-type Meta-title {
-  field author: Text;
-  field title: Text;
-  field description: Text;
-  field genre: Genre[];
-  field tags: Text[];
-  field thumbnail: File;
-}
-
-type Meta-release {
-  field release-type: Release-type;
-  field release-date: Date;
-  field version: Version;
-  field legal-notices: Text;
-  field licence-name: Text;
-  field allow-derivative: Boolean;
-  field allow-commercial: Boolean;
-}
-
-type Meta-rating {
-  field rating: Content-rating;
-  field warnings: Text?;
-}
-
-type Meta-play {
-  field input-methods: Input-method[];
-  field local-multiplayer: Player-range?;
-  field online-multiplayer: Player-range?;
-  field languages: Language[];
-  field accessibility: Accessibility[];
-  field average-duration: Duration;
-}
-
-union Extra {
-  type Booklet {
-    field pages: Booklet-expr[];
-    field custom-css: Text;
-    field language: Text; // ISO code
-  }
-}
-
-type Meta-security {
-  field capabilities: Capability[];
-}
-
-union Capability {
-  type Network {
-    field allow: Text[]; // a set of glob filters for domains
-  }
+type Date {
+  field year: Uint32;
+  field month: Uint8;
+  field day: Uint8;
 }
 
 union Genre {
   type Not-specified {}
   type Action {}
-  type Figthing {}
-  type Interactive-fiction {}
   type Platformer {}
-  type Puzzle {}
+  type Shooter {}
   type Racing {}
+  type Fighting {}
   type Rhythm {}
+  type Adventure {}
+  type Interactive-fiction {}
+  type Visual-novel {}
+  type Puzzle {}
   type RPG {}
   type Simulation {}
-  type Shooter {}
-  type Sports {}
   type Strategy {}
+  type Sports {}
   type Tool {}
   type Other {}
-}
-
-union Release-type {
-  type Prototype {}
-  type Early-access {}
-  type Beta {}
-  type Demo {}
-  type Full {}
-}
-
-type Version {
-  field major: Uint32;
-  field minor: Uint32;
 }
 
 union Content-rating {
@@ -116,30 +98,24 @@ union Content-rating {
   type Unknown {}
 }
 
-type Date {
-  field year: Uint32;
-  field month: Uint8;
-  field day: Uint8;
+union Release-type {
+  type Prototype {}
+  type Early-access {}
+  type Beta {}
+  type Demo {}
+  type Regular {}
 }
 
-union Duration {
-  type Seconds {}
-  type Few-minutes {}
-  type Half-hour {}
-  type One-hour {}
-  type Few-hours {}
-  type Several-hours {}
-  type Unknown {}
+union Derivative-policy {
+  type Not-allowed {}
+  type Personal-use {}
+  type Non-commercial-use {}
+  type Commercial-use {}
 }
 
 union Input-method {
-  type Kate-buttons {}
-  type Touch {}
-}
-
-type Player-range {
-  field minimum: Uint32;
-  field maximum: Uint32;
+  type Buttons {}
+  type Pointer {}
 }
 
 type Language {
@@ -149,7 +125,7 @@ type Language {
   field text: Boolean;
 }
 
-union Accessibility {
+union Accessibility-provision {
   type High-contrast {}
   type Subtitles {}
   type Image-captions {}
@@ -158,83 +134,36 @@ union Accessibility {
   type Skippable-content {}
 }
 
-// -- Booklet
-union Booklet-expr {
-  // Primitives
-  type BE-text { field value: Text; }
-  type BE-image { field path: Text; } // must be in cart_fs
-  
-  // Formatting
-  type BE-bold { field value: Booklet-expr; }
-  type BE-italic { field value: Booklet-expr; }
-  type BE-title { field value: Booklet-expr; }
-  type BE-subtitle { field value: Booklet-expr; }
-  type BE-subtitle2 { field value: Booklet-expr; }
-  type BE-font { field family: Text; field size: Uint32; field value: Booklet-expr; } // in px
-  type BE-color { field r: Uint8; field g: Uint8; field b: Uint8; field value: Booklet-expr; }
-  type BE-background { field r: Uint8; field g: Uint8; field b: Uint8; field value: Booklet-expr; }
-  type BE-columns { field columns: Uint8; field value: Booklet-expr; }
-
-  // Layouting
-  type BE-fixed { field x: Uint32; field y: Uint32; field value: Booklet-expr; }
-  type BE-row { field gap: Uint32; field align: Booklet-align; field value: Booklet-expr; }
-  type BE-column { field gap: Uint32; field align: Booklet-align; field value: Booklet-expr; }
-  type BE-stack { field values: Booklet-expr[]; }
-  type BE-table { field headers: Booklet-expr[]; field rows: Booklet-row; }
-  
-  // Styling
-  type BE-class { field name: Text; field value: Booklet-expr; }
-}
-
-type Booklet-row {
-  field row-span: Uint32;
-  field cells: Booklet-cell[];
-}
-
-type Booklet-cell {
-  field cell-span: Uint32;
-  field value: Booklet-expr;
-}
-
-union Booklet-align {
-  type Start {}
-  type Center {}
-  type End {}
-  type Justify {}
-  type Space-evenly {}
-}
-
-// -- Supported platforms
-union Platform {
-  type Web-archive {
-    field html: Text;
-    field bridges: Bridge[];
-  }
-}
-
 union Bridge {
   type Network-proxy {}
+
   type Local-storage-proxy {}
+
   type Input-proxy {
-    field mapping: VirtualKey -> KeyboardKey;
+    field mapping: Virtual-key -> Keyboard-key;
   }
-  type Preserve-webgl-render {}
+
+  type Preserve-WebGL-render {}
+
   type Capture-canvas {
     field selector: Text;
   }
+
   type Pointer-input-proxy {
     field selector: Text;
     field hide-cursor: Boolean;
   }
+
   type IndexedDB-proxy {
     field versioned: Boolean;
   }
+
   type Renpy-web-tweaks {
     field version: Version;
   }
 }
 
-union VirtualKey {
+union Virtual-key {
   type Up {}
   type Right {}
   type Down {}
@@ -247,9 +176,6 @@ union VirtualKey {
   type R-trigger {}
 }
 
-// The fields here are the same as the ones in DOM's KeyboardEvent
-type KeyboardKey {
-  field key: Text;
+type Keyboard-key {
   field code: Text;
-  field key-code: Uint32;
 }

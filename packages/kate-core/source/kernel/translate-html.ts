@@ -213,7 +213,7 @@ function apply_bridge(
   }
 }
 
-function generate_proxied_key_mappings(map: Map<InputKey, Cart.Key>) {
+function generate_proxied_key_mappings(map: Map<InputKey, Cart.KeyboardKey>) {
   const pairs = [...map.entries()].map(([k, v]) => [
     k,
     [v.key, v.code, Number(v.key_code)],

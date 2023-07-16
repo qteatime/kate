@@ -1,5 +1,3 @@
-import * as CartMetadata from "../cart/v3/metadata";
-import * as CartRuntime from "../cart/v3/runtime";
 import * as Cart from "../cart";
 import type { Database, Transaction } from "../db-schema";
 import { make_id, unreachable } from "../utils";
@@ -9,9 +7,13 @@ export type CartridgeStatus = "active" | "inactive" | "archived";
 
 export type CartMeta = {
   id: string;
-  thumbnail_dataurl: string;
-  metadata: CartMetadata.Metadata;
-  runtime: CartRuntime.Runtime;
+  version: string;
+  release_date: Date;
+  format_version: "v4";
+  thumbnail_dataurl: string | null;
+  banner_dataurl: string | null;
+  metadata: Cart.Metadata;
+  runtime: Cart.Runtime;
   files: { path: string; id: string; size: number }[];
   installed_at: Date;
   updated_at: Date;
@@ -110,7 +112,7 @@ export class CartStore {
     for (const node of cart.files) {
       const id = make_id();
       await this.files.put({
-        id: cart.metadata.id,
+        id: cart.id,
         file_id: id,
         mime: node.mime,
         data: node.data,
@@ -124,15 +126,23 @@ export class CartStore {
     return nodes;
   }
 
-  async insert(cart: Cart.Cart, thumbnail_url: string) {
+  async insert(
+    cart: Cart.Cart,
+    thumbnail_url: string | null,
+    banner_url: string | null
+  ) {
     const now = new Date();
     const files = await this.install_files(cart);
-    const old_meta = await this.meta.try_get(cart.metadata.id);
+    const old_meta = await this.meta.try_get(cart.id);
     await this.meta.put({
-      id: cart.metadata.id,
+      id: cart.id,
+      version: cart.version,
+      release_date: cart.release_date,
+      format_version: "v4",
+      thumbnail_dataurl: thumbnail_url,
+      banner_dataurl: banner_url,
       metadata: cart.metadata,
       runtime: cart.runtime,
-      thumbnail_dataurl: thumbnail_url,
       files: files,
       installed_at: old_meta?.installed_at ?? now,
       updated_at: now,

@@ -18,7 +18,7 @@ To add this bridge to your cartridge you specify the following in your
   {
     "bridges": [
       {
-        "type": "preserve-webgl-render",
+        "type": "indexeddb-proxy",
         "versioned": true
       }
     ]

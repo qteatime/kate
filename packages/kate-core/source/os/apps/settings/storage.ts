@@ -82,7 +82,7 @@ export class SceneStorageSettings extends UI.SimpleScene {
 
   render_cartridge_summary(x: AppStorageDetails) {
     return UI.link_card(this.os, {
-      icon: UI.image(x.icon_url),
+      icon: x.icon_url ? UI.image(x.icon_url) : UI.no_thumbnail(),
       title: x.title,
       click_label: "Details",
       value: from_bytes(x.usage.total_in_bytes),

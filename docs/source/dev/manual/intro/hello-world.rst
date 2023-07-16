@@ -61,10 +61,12 @@ and give it the following contents:
 
    {
      "id": "my-namespace/my-first-cartridge",
+     "version": {"major": 1, "minor": 0},
      "metadata": {
-       "game": {
+       "presentation": {
          "author": "Your Name",
-         "title": "My First Cartridge"
+         "title": "My First Cartridge",
+         "tagline": "My first cartridge"
        }
      },
      "files": ["index.html"],
@@ -76,7 +78,8 @@ and give it the following contents:
 
 This file tells the ``kart`` tool that there's a game identified by
 ``my-namespace/my-first-cartridge``. This identification **must** be
-unique, and we'll get into what that means later.
+unique, and we'll get into what that means later. A version must also
+be provided, here the version is "1.0".
 
 We also provide a more readable title, ``My First Cartridge``. This is
 what players will see in the cartridge selection screen.
