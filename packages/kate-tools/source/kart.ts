@@ -1,5 +1,6 @@
 import * as Path from "path";
 import * as FS from "fs";
+import * as Crypto from "crypto";
 import { Cart } from "./deps/schema";
 import { enumerate, from_bytes, unreachable } from "./deps/util";
 import * as Glob from "glob";
@@ -434,8 +435,12 @@ function metadata(x: Kart["metadata"], root: string, base_dir: string) {
     author: x.presentation.author,
     description: x.presentation.description,
     "release-type": make_release_type(x.presentation.release_type),
-    "thumbnail-path": x.presentation.thumbnail_path ?? null,
-    "banner-path": x.presentation.banner_path ?? null,
+    "thumbnail-path": x.presentation.thumbnail_path
+      ? make_absolute(x.presentation.thumbnail_path)
+      : null,
+    "banner-path": x.presentation.banner_path
+      ? make_absolute(x.presentation.banner_path)
+      : null,
   });
 
   const classification = Cart.Metadata.Classification({
@@ -449,8 +454,12 @@ function metadata(x: Kart["metadata"], root: string, base_dir: string) {
     "derivative-policy": make_derivative_policy(
       x.legal?.derivative_policy ?? "personal-use"
     ),
-    "licence-path": x.legal?.licence_path ?? null,
-    "privacy-policy-path": x.legal?.privacy_policy_path ?? null,
+    "licence-path": x.legal?.licence_path
+      ? make_absolute(x.legal.licence_path)
+      : null,
+    "privacy-policy-path": x.legal?.privacy_policy_path
+      ? make_absolute(x.legal.privacy_policy_path)
+      : null,
   });
 
   const accessibility = Cart.Metadata.Accessibility({
@@ -639,15 +648,15 @@ async function files(patterns: Kart["files"], root: string, base_dir: string) {
       const ext = Path.extname(path);
       const mime = mime_table[ext] ?? "application/octet-stream";
       const data = load_file(path, root, base_dir);
-      const integrity = await crypto.subtle.digest("SHA-256", data.buffer);
-      return [
+      const integrity = await Crypto.subtle.digest("SHA-256", data.buffer);
+      result.push(
         Cart.File({
           path: make_absolute(path),
           mime: mime,
           integrity: new Uint8Array(integrity),
           data: load_file(path, root, base_dir),
-        }),
-      ];
+        })
+      );
     }
   }
 
@@ -947,7 +956,7 @@ export async function make_cartridge(path: string, output: string) {
           "release-date": make_date(json.release),
           metadata: meta,
           runtime: Cart.Runtime.Web_archive({
-            "html-path": x.html,
+            "html-path": make_absolute(x.html),
             bridges: x.bridges.flatMap(make_bridge),
           }),
           files: archive,

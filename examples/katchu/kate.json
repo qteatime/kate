@@ -36,8 +36,8 @@
           "text": true
         }
       ],
-      "average_completion": { "type": "seconds" },
-      "average_session": { "type": "seconds" }
+      "average_completion": { "unit": "seconds", "value": 30 },
+      "average_session": { "unit": "seconds", "value": 30 }
     }
   },
   "security": {
