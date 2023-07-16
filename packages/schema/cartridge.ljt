@@ -1,55 +1,47 @@
 % ljt/0
-// A block-based cartridge format
-
 schema "KART" version 4
 
-// -- Blocks ----------------------------------------------------------
-// 1
-type Identification {
-  field cartridge-id: Text;
-  field version-id: Version-id;
+type Cartridge {
+  field id: Text;
+  field version: Version;
   field release-date: Date;
+  field metadata: Metadata[];
+  field runtime: Runtime;
+  field files: File[];
 }
 
-// 0..1
-type Meta-presentation {
-  field title: Text;
-  field author: Text;
-  field description: Text;
-  field release-type: Release-type;
-  field thumbnail-path: Text?;
+union Metadata {
+  type Presentation {
+    field title: Text;
+    field author: Text;
+    field description: Text;
+    field release-type: Release-type;
+    field thumbnail-path: Text?;
+    field banner-path: Text?;
+  }
+
+  type Classification {
+    field genre: Genre[];
+    field tags: Text[];
+    field rating: Content-rating;
+    field warnings: Text?;
+  }
+
+  type Legal {
+    field derivative-policy: Derivative-policy;
+    field licence-path: Text?;
+    field privacy-policy-path: Text?;
+  }
+
+  type Accessibility {
+    field input-methods: Input-method[];
+    field languages: Language[];
+    field provisions: Accessibility-provision[];
+    field average-completion: Duration;
+    field average-session: Duration;
+  }
 }
 
-// 0..1
-type Meta-classification {
-  field genre: Genre[];
-  field tags: Text[];
-  field rating: Content-rating;
-  field warnings: Text?;
-}
-
-// 0..1
-type Meta-legal {
-  field derivative-policy: Derivative-policy;
-  field licence-path: Text?;
-  field privacy-policy-path: Text?;
-}
-
-// 0..1
-type Meta-accessibility {
-  field input-methods: Input-method[];
-  field languages: Language[];
-  field provisions: Accessibility-provision[];
-  field average-completion: Duration;
-  field average-session: Duration;
-}
-
-// 0..1
-type Meta-security {
-  field capabilities: Capability[];
-}
-
-// 1
 union Runtime {
   type Web-archive {
     field html-path: Text;
@@ -57,7 +49,6 @@ union Runtime {
   }
 }
 
-// 0..N
 type File {
   field path: Text;
   field mime: Text;
@@ -65,16 +56,9 @@ type File {
   field data: Raw-bytes;
 }
 
-// 0..N
-type Signed-block {
-  field signature: Raw-bytes;
-  field integrity: Raw-bytes;
-  field block-data: Raw-bytes;
-}
-
 
 // -- Helpers ---------------------------------------------------------
-type Version-id {
+type Version {
   field major: Uint32;
   field minor: Uint32;
 }
@@ -162,11 +146,6 @@ union Accessibility-provision {
   type Skippable-content {}
 }
 
-union Capability {
-  // Contextual: Browser.open_url
-  type Open-URLs {}
-}
-
 union Bridge {
   type Network-proxy {}
 
@@ -192,7 +171,7 @@ union Bridge {
   }
 
   type Renpy-web-tweaks {
-    field version: Version-id;
+    field version: Version;
   }
 }
 

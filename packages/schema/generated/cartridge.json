@@ -8,29 +8,31 @@
   "version": 4,
   "entities": [
     {
-      "type": "record",
-      "name": "Signed-block",
+      "type": "union",
+      "name": "Release-type",
       "id": 8,
       "versions": [
         {
-          "fields": [
+          "variants": [
             {
-              "name": "signature",
-              "type": {
-                "op": "bytes"
-              }
+              "name": "Prototype",
+              "fields": []
             },
             {
-              "name": "integrity",
-              "type": {
-                "op": "bytes"
-              }
+              "name": "Early-access",
+              "fields": []
             },
             {
-              "name": "block-data",
-              "type": {
-                "op": "bytes"
-              }
+              "name": "Beta",
+              "fields": []
+            },
+            {
+              "name": "Demo",
+              "fields": []
+            },
+            {
+              "name": "Regular",
+              "fields": []
             }
           ]
         }
@@ -38,231 +40,55 @@
     },
     {
       "type": "record",
-      "name": "Identification",
+      "name": "Cartridge",
       "id": 0,
       "versions": [
         {
           "fields": [
             {
-              "name": "cartridge-id",
+              "name": "id",
               "type": {
                 "op": "text"
               }
             },
             {
-              "name": "version-id",
+              "name": "version",
               "type": {
                 "op": "record",
-                "id": 9
+                "id": 4
               }
             },
             {
               "name": "release-date",
               "type": {
                 "op": "record",
-                "id": 10
-              }
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "type": "record",
-      "name": "Meta-presentation",
-      "id": 1,
-      "versions": [
-        {
-          "fields": [
-            {
-              "name": "title",
-              "type": {
-                "op": "text"
+                "id": 5
               }
             },
             {
-              "name": "author",
-              "type": {
-                "op": "text"
-              }
-            },
-            {
-              "name": "description",
-              "type": {
-                "op": "text"
-              }
-            },
-            {
-              "name": "release-type",
-              "type": {
-                "op": "union",
-                "id": 13
-              }
-            },
-            {
-              "name": "thumbnail-path",
-              "type": {
-                "op": "optional",
-                "value": {
-                  "op": "text"
-                }
-              }
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "type": "record",
-      "name": "Meta-classification",
-      "id": 2,
-      "versions": [
-        {
-          "fields": [
-            {
-              "name": "genre",
+              "name": "metadata",
               "type": {
                 "op": "array",
                 "items": {
                   "op": "union",
-                  "id": 11
+                  "id": 1
                 }
               }
             },
             {
-              "name": "tags",
-              "type": {
-                "op": "array",
-                "items": {
-                  "op": "text"
-                }
-              }
-            },
-            {
-              "name": "rating",
+              "name": "runtime",
               "type": {
                 "op": "union",
-                "id": 12
+                "id": 2
               }
             },
             {
-              "name": "warnings",
-              "type": {
-                "op": "optional",
-                "value": {
-                  "op": "text"
-                }
-              }
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "type": "record",
-      "name": "Meta-legal",
-      "id": 3,
-      "versions": [
-        {
-          "fields": [
-            {
-              "name": "derivative-policy",
-              "type": {
-                "op": "union",
-                "id": 14
-              }
-            },
-            {
-              "name": "licence-path",
-              "type": {
-                "op": "optional",
-                "value": {
-                  "op": "text"
-                }
-              }
-            },
-            {
-              "name": "privacy-policy-path",
-              "type": {
-                "op": "optional",
-                "value": {
-                  "op": "text"
-                }
-              }
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "type": "record",
-      "name": "Meta-accessibility",
-      "id": 4,
-      "versions": [
-        {
-          "fields": [
-            {
-              "name": "input-methods",
-              "type": {
-                "op": "array",
-                "items": {
-                  "op": "union",
-                  "id": 15
-                }
-              }
-            },
-            {
-              "name": "languages",
+              "name": "files",
               "type": {
                 "op": "array",
                 "items": {
                   "op": "record",
-                  "id": 17
-                }
-              }
-            },
-            {
-              "name": "provisions",
-              "type": {
-                "op": "array",
-                "items": {
-                  "op": "union",
-                  "id": 18
-                }
-              }
-            },
-            {
-              "name": "average-completion",
-              "type": {
-                "op": "union",
-                "id": 16
-              }
-            },
-            {
-              "name": "average-session",
-              "type": {
-                "op": "union",
-                "id": 16
-              }
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "type": "record",
-      "name": "Meta-security",
-      "id": 5,
-      "versions": [
-        {
-          "fields": [
-            {
-              "name": "capabilities",
-              "type": {
-                "op": "array",
-                "items": {
-                  "op": "union",
-                  "id": 19
+                  "id": 3
                 }
               }
             }
@@ -272,8 +98,186 @@
     },
     {
       "type": "union",
+      "name": "Metadata",
+      "id": 1,
+      "versions": [
+        {
+          "variants": [
+            {
+              "name": "Presentation",
+              "fields": [
+                {
+                  "name": "title",
+                  "type": {
+                    "op": "text"
+                  }
+                },
+                {
+                  "name": "author",
+                  "type": {
+                    "op": "text"
+                  }
+                },
+                {
+                  "name": "description",
+                  "type": {
+                    "op": "text"
+                  }
+                },
+                {
+                  "name": "release-type",
+                  "type": {
+                    "op": "union",
+                    "id": 8
+                  }
+                },
+                {
+                  "name": "thumbnail-path",
+                  "type": {
+                    "op": "optional",
+                    "value": {
+                      "op": "text"
+                    }
+                  }
+                },
+                {
+                  "name": "banner-path",
+                  "type": {
+                    "op": "optional",
+                    "value": {
+                      "op": "text"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Classification",
+              "fields": [
+                {
+                  "name": "genre",
+                  "type": {
+                    "op": "array",
+                    "items": {
+                      "op": "union",
+                      "id": 6
+                    }
+                  }
+                },
+                {
+                  "name": "tags",
+                  "type": {
+                    "op": "array",
+                    "items": {
+                      "op": "text"
+                    }
+                  }
+                },
+                {
+                  "name": "rating",
+                  "type": {
+                    "op": "union",
+                    "id": 7
+                  }
+                },
+                {
+                  "name": "warnings",
+                  "type": {
+                    "op": "optional",
+                    "value": {
+                      "op": "text"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Legal",
+              "fields": [
+                {
+                  "name": "derivative-policy",
+                  "type": {
+                    "op": "union",
+                    "id": 9
+                  }
+                },
+                {
+                  "name": "licence-path",
+                  "type": {
+                    "op": "optional",
+                    "value": {
+                      "op": "text"
+                    }
+                  }
+                },
+                {
+                  "name": "privacy-policy-path",
+                  "type": {
+                    "op": "optional",
+                    "value": {
+                      "op": "text"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Accessibility",
+              "fields": [
+                {
+                  "name": "input-methods",
+                  "type": {
+                    "op": "array",
+                    "items": {
+                      "op": "union",
+                      "id": 10
+                    }
+                  }
+                },
+                {
+                  "name": "languages",
+                  "type": {
+                    "op": "array",
+                    "items": {
+                      "op": "record",
+                      "id": 12
+                    }
+                  }
+                },
+                {
+                  "name": "provisions",
+                  "type": {
+                    "op": "array",
+                    "items": {
+                      "op": "union",
+                      "id": 13
+                    }
+                  }
+                },
+                {
+                  "name": "average-completion",
+                  "type": {
+                    "op": "union",
+                    "id": 11
+                  }
+                },
+                {
+                  "name": "average-session",
+                  "type": {
+                    "op": "union",
+                    "id": 11
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "union",
       "name": "Runtime",
-      "id": 6,
+      "id": 2,
       "versions": [
         {
           "variants": [
@@ -292,7 +296,7 @@
                     "op": "array",
                     "items": {
                       "op": "union",
-                      "id": 20
+                      "id": 14
                     }
                   }
                 }
@@ -305,7 +309,7 @@
     {
       "type": "record",
       "name": "File",
-      "id": 7,
+      "id": 3,
       "versions": [
         {
           "fields": [
@@ -339,8 +343,8 @@
     },
     {
       "type": "record",
-      "name": "Version-id",
-      "id": 9,
+      "name": "Version",
+      "id": 4,
       "versions": [
         {
           "fields": [
@@ -363,7 +367,7 @@
     {
       "type": "record",
       "name": "Date",
-      "id": 10,
+      "id": 5,
       "versions": [
         {
           "fields": [
@@ -392,7 +396,7 @@
     {
       "type": "union",
       "name": "Genre",
-      "id": 11,
+      "id": 6,
       "versions": [
         {
           "variants": [
@@ -471,7 +475,7 @@
     {
       "type": "union",
       "name": "Content-rating",
-      "id": 12,
+      "id": 7,
       "versions": [
         {
           "variants": [
@@ -501,39 +505,8 @@
     },
     {
       "type": "union",
-      "name": "Release-type",
-      "id": 13,
-      "versions": [
-        {
-          "variants": [
-            {
-              "name": "Prototype",
-              "fields": []
-            },
-            {
-              "name": "Early-access",
-              "fields": []
-            },
-            {
-              "name": "Beta",
-              "fields": []
-            },
-            {
-              "name": "Demo",
-              "fields": []
-            },
-            {
-              "name": "Regular",
-              "fields": []
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "type": "union",
       "name": "Derivative-policy",
-      "id": 14,
+      "id": 9,
       "versions": [
         {
           "variants": [
@@ -560,7 +533,7 @@
     {
       "type": "union",
       "name": "Input-method",
-      "id": 15,
+      "id": 10,
       "versions": [
         {
           "variants": [
@@ -579,7 +552,7 @@
     {
       "type": "union",
       "name": "Duration",
-      "id": 16,
+      "id": 11,
       "versions": [
         {
           "variants": [
@@ -627,7 +600,7 @@
     {
       "type": "record",
       "name": "Language",
-      "id": 17,
+      "id": 12,
       "versions": [
         {
           "fields": [
@@ -662,7 +635,7 @@
     {
       "type": "union",
       "name": "Accessibility-provision",
-      "id": 18,
+      "id": 13,
       "versions": [
         {
           "variants": [
@@ -696,23 +669,8 @@
     },
     {
       "type": "union",
-      "name": "Capability",
-      "id": 19,
-      "versions": [
-        {
-          "variants": [
-            {
-              "name": "Open-URLs",
-              "fields": []
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "type": "union",
       "name": "Bridge",
-      "id": 20,
+      "id": 14,
       "versions": [
         {
           "variants": [
@@ -733,11 +691,11 @@
                     "op": "map",
                     "keys": {
                       "op": "union",
-                      "id": 21
+                      "id": 15
                     },
                     "values": {
                       "op": "record",
-                      "id": 22
+                      "id": 16
                     }
                   }
                 }
@@ -793,7 +751,7 @@
                   "name": "version",
                   "type": {
                     "op": "record",
-                    "id": 9
+                    "id": 4
                   }
                 }
               ]
@@ -805,7 +763,7 @@
     {
       "type": "union",
       "name": "Virtual-key",
-      "id": 21,
+      "id": 15,
       "versions": [
         {
           "variants": [
@@ -856,7 +814,7 @@
     {
       "type": "record",
       "name": "Keyboard-key",
-      "id": 22,
+      "id": 16,
       "versions": [
         {
           "fields": [

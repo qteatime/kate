@@ -12,17 +12,6 @@ const keymap = require("../assets/keymap.json") as {
   };
 };
 
-type Block =
-  | Cart.Identification
-  | Cart.Meta_presentation
-  | Cart.Meta_classification
-  | Cart.Meta_legal
-  | Cart.Meta_accessibility
-  | Cart.Meta_security
-  | Cart.Runtime
-  | Cart.File
-  | Cart.Signed_block;
-
 const genre = T.one_of([
   "action",
   "fighting",
@@ -108,6 +97,7 @@ const meta = T.spec({
     description: T.optional("", T.short_str(10_000)),
     release_type: T.optional("regular", release_type),
     thumbnail_path: T.nullable(T.str),
+    banner_path: T.nullable(T.str),
   }),
   classification: T.nullable(
     T.spec({
@@ -443,6 +433,9 @@ function metadata(x: Kart["metadata"], root: string, base_dir: string) {
   if (x.presentation.thumbnail_path != null) {
     assert_file_exists(x.presentation.thumbnail_path, root, base_dir);
   }
+  if (x.presentation.banner_path != null) {
+    assert_file_exists(x.presentation.banner_path, root, base_dir);
+  }
   if (x.legal?.licence_path != null) {
     assert_file_exists(x.legal.licence_path, root, base_dir);
   }
@@ -450,22 +443,23 @@ function metadata(x: Kart["metadata"], root: string, base_dir: string) {
     assert_file_exists(x.legal.privacy_policy_path, root, base_dir);
   }
 
-  const presentation = Cart.Meta_presentation({
+  const presentation = Cart.Metadata.Presentation({
     title: x.presentation.title,
     author: x.presentation.author,
     description: x.presentation.description,
     "release-type": make_release_type(x.presentation.release_type),
     "thumbnail-path": x.presentation.thumbnail_path ?? null,
+    "banner-path": x.presentation.banner_path ?? null,
   });
 
-  const classification = Cart.Meta_classification({
+  const classification = Cart.Metadata.Classification({
     genre: x.classification?.genre.map(make_genre) ?? [],
     tags: x.classification?.tags ?? [],
     rating: make_rating(x.classification?.rating ?? "unknown"),
     warnings: x.classification?.warnings ?? null,
   });
 
-  const legal = Cart.Meta_legal({
+  const legal = Cart.Metadata.Legal({
     "derivative-policy": make_derivative_policy(
       x.legal?.derivative_policy ?? "personal-use"
     ),
@@ -473,7 +467,7 @@ function metadata(x: Kart["metadata"], root: string, base_dir: string) {
     "privacy-policy-path": x.legal?.privacy_policy_path ?? null,
   });
 
-  const accessibility = Cart.Meta_accessibility({
+  const accessibility = Cart.Metadata.Accessibility({
     "input-methods":
       x.accessibility?.input_methods.map(make_input_method) ?? [],
     languages: x.accessibility?.languages.map(make_language) ?? [],
@@ -568,7 +562,7 @@ function make_date(x: CartDate) {
 }
 
 function make_version(x: Version) {
-  return Cart.Version_id({ major: x.major, minor: x.minor });
+  return Cart.Version({ major: x.major, minor: x.minor });
 }
 
 function make_rating(x: ContentRating) {
@@ -676,17 +670,10 @@ async function files(patterns: Kart["files"], root: string, base_dir: string) {
   return result;
 }
 
-function save(blocks: Block[], output: string) {
-  let length = 0;
-  const file = FS.openSync(output, "wx");
-  for (const block of blocks) {
-    const bytes = Cart.encode(block);
-    length += bytes.byteLength;
-    FS.writeSync(file, bytes);
-  }
-  FS.fsyncSync(file);
-  FS.closeSync(file);
-  console.log(`> Total size: ${from_bytes(length)}`);
+function save(cartridge: Cart.Cartridge, output: string) {
+  const bytes = Cart.encode(cartridge);
+  console.log(`> Total size: ${from_bytes(bytes.byteLength)}`);
+  FS.writeFileSync(output, bytes);
 }
 
 function make_bridge(x: Bridge): Cart.Bridge[] {
@@ -732,7 +719,7 @@ function make_bridge(x: Bridge): Cart.Bridge[] {
 
     case "renpy-web-tweaks": {
       return [
-        Cart.Bridge.Renpy_web_tweaks({ version: Cart.Version_id(x.version) }),
+        Cart.Bridge.Renpy_web_tweaks({ version: Cart.Version(x.version) }),
       ];
     }
 
@@ -961,12 +948,6 @@ export async function make_cartridge(path: string, output: string) {
     base_dir = new_base_dir;
   }
 
-  const identification = Cart.Identification({
-    "cartridge-id": json.id,
-    "version-id": make_version(json.version),
-    "release-date": make_date(json.release),
-  });
-
   const meta = metadata(json.metadata, dir_root, base_dir);
   const archive = await files(json.files, dir_root, base_dir);
   show_archive(archive);
@@ -976,15 +957,17 @@ export async function make_cartridge(path: string, output: string) {
   switch (x.type) {
     case "web-archive": {
       save(
-        [
-          identification,
-          ...meta,
-          ...archive,
-          Cart.Runtime.Web_archive({
+        Cart.Cartridge({
+          id: json.id,
+          version: make_version(json.version),
+          "release-date": make_date(json.release),
+          metadata: meta,
+          runtime: Cart.Runtime.Web_archive({
             "html-path": x.html,
             bridges: x.bridges.flatMap(make_bridge),
           }),
-        ],
+          files: archive,
+        }),
         output
       );
       break;
