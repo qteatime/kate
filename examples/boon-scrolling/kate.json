@@ -1,34 +1,33 @@
 {
   "id": "qteati.me/boon-scrolling",
+  "version": {
+    "major": 1,
+    "minor": 1
+  },
+  "release": {
+    "year": 2023,
+    "month": 2,
+    "day": 12
+  },
   "metadata": {
-    "game": {
+    "presentation": {
       "author": "Q.",
       "title": "Boon-scrolling",
       "description": "A tiny, endless si(lly)mulation.",
-      "genre": ["simulation"],
-      "tags": ["kate-sample", "short"],
+      "release_type": "demo",
       "thumbnail_path": "thumbnail.png"
     },
-    "release": {
-      "kind": "demo",
-      "date": {
-        "year": 2023,
-        "month": 2,
-        "day": 12
-      },
-      "version": {
-        "major": 1,
-        "minor": 0
-      },
-      "licence_name": "MIT",
-      "allow_derivative": true,
-      "allow_commercial": true
-    },
-    "rating": {
+    "classification": {
+      "genre": ["simulation"],
+      "tags": ["kate-sample", "short"],
       "rating": "general"
     },
+    "legal": {
+      "licence_path": "LICENCE",
+      "derivative_policy": "commercial-use"
+    },
     "play_style": {
-      "input_methods": ["kate-buttons"],
+      "input_methods": ["buttons"],
       "languages": [
         {
           "iso_code": "en",
@@ -37,10 +36,14 @@
           "text": true
         }
       ],
-      "average_duration": "seconds"
+      "average_duration": { "unit": "seconds" },
+      "average_session": { "unit": "seconds" }
     }
   },
-  "files": ["assets/*", "www/*"],
+  "security": {
+    "capabilities": []
+  },
+  "files": ["assets/*", "www/*", "thumbnail.png", "LICENCE"],
   "platform": {
     "type": "web-archive",
     "html": "www/index.html",
