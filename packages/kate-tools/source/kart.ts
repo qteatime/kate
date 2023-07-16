@@ -82,6 +82,7 @@ const meta = T.spec({
   presentation: T.spec({
     author: T.short_str(255),
     title: T.short_str(255),
+    tagline: T.short_str(255),
     description: T.optional("", T.short_str(10_000)),
     release_type: T.optional("regular", release_type),
     thumbnail_path: T.nullable(T.str),
@@ -433,6 +434,7 @@ function metadata(x: Kart["metadata"], root: string, base_dir: string) {
   const presentation = Cart.Metadata.Presentation({
     title: x.presentation.title,
     author: x.presentation.author,
+    tagline: x.presentation.tagline,
     description: x.presentation.description,
     "release-type": make_release_type(x.presentation.release_type),
     "thumbnail-path": x.presentation.thumbnail_path

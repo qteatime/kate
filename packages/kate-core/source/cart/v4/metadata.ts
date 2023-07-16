@@ -17,6 +17,7 @@ export function default_metadata(id: string): Metadata {
     presentation: {
       title: id,
       author: "",
+      tagline: "",
       description: "",
       release_type: "regular",
       thumbnail_path: null,
@@ -79,6 +80,7 @@ function parse_presentation(
   return {
     title: str(block.title, 255),
     author: str(block.author, 255),
+    tagline: str(block.tagline, 255),
     description: str(block.description, 10_000),
     release_type: release_kind(block["release-type"]),
     thumbnail_path: block["thumbnail-path"]

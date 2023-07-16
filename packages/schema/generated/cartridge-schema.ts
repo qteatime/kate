@@ -173,7 +173,7 @@ export namespace Metadata {
  }
 
  
- export function Presentation(x: {readonly 'title': string,readonly 'author': string,readonly 'description': string,readonly 'release-type': Release_type,readonly 'thumbnail-path': (string) | null,readonly 'banner-path': (string) | null}): Metadata {
+ export function Presentation(x: {readonly 'title': string,readonly 'author': string,readonly 'tagline': string,readonly 'description': string,readonly 'release-type': Release_type,readonly 'thumbnail-path': (string) | null,readonly 'banner-path': (string) | null}): Metadata {
    return {
      '@name': 'Metadata',
      '@tag': 1,
@@ -192,6 +192,7 @@ export namespace Metadata {
    readonly '@variant-name': 'Presentation';
    readonly 'title': string
     readonly 'author': string
+    readonly 'tagline': string
     readonly 'description': string
     readonly 'release-type': Release_type
     readonly 'thumbnail-path': (string) | null

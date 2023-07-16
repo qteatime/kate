@@ -13,7 +13,7 @@
     "presentation": {
       "author": "Q.",
       "title": "Boon-scrolling",
-      "description": "A tiny, endless si(lly)mulation.",
+      "tagline": "A doom-scrolling si(lly)mulation.",
       "release_type": "demo",
       "thumbnail_path": "thumbnail.png"
     },

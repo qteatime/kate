@@ -4,6 +4,7 @@ export type Metadata = {
   presentation: {
     title: string;
     author: string;
+    tagline: string;
     description: string;
     release_type: ReleaseType;
     thumbnail_path: string | null;

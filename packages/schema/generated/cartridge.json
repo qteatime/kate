@@ -119,6 +119,12 @@
                   }
                 },
                 {
+                  "name": "tagline",
+                  "type": {
+                    "op": "text"
+                  }
+                },
+                {
                   "name": "description",
                   "type": {
                     "op": "text"

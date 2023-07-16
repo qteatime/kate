@@ -14,6 +14,7 @@ union Metadata {
   type Presentation {
     field title: Text;
     field author: Text;
+    field tagline: Text;
     field description: Text;
     field release-type: Release-type;
     field thumbnail-path: Text?;
