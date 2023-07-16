@@ -37,8 +37,8 @@ union Metadata {
     field input-methods: Input-method[];
     field languages: Language[];
     field provisions: Accessibility-provision[];
-    field average-completion: Duration;
-    field average-session: Duration;
+    field average-completion-seconds: Uint32?;
+    field average-session-seconds: Uint32?;
   }
 }
 
@@ -115,19 +115,6 @@ union Derivative-policy {
 union Input-method {
   type Buttons {}
   type Pointer {}
-}
-
-union Duration {
-  type Seconds {
-    field average: Uint32;
-  }
-  type Minutes {
-    field average: Uint32;
-  }
-  type Hours {
-    field average: Uint32;
-  }
-  type Unknown {}
 }
 
 type Language {

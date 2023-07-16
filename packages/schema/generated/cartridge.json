@@ -240,7 +240,7 @@
                     "op": "array",
                     "items": {
                       "op": "record",
-                      "id": 12
+                      "id": 11
                     }
                   }
                 },
@@ -250,22 +250,26 @@
                     "op": "array",
                     "items": {
                       "op": "union",
-                      "id": 13
+                      "id": 12
                     }
                   }
                 },
                 {
-                  "name": "average-completion",
+                  "name": "average-completion-seconds",
                   "type": {
-                    "op": "union",
-                    "id": 11
+                    "op": "optional",
+                    "value": {
+                      "op": "uint32"
+                    }
                   }
                 },
                 {
-                  "name": "average-session",
+                  "name": "average-session-seconds",
                   "type": {
-                    "op": "union",
-                    "id": 11
+                    "op": "optional",
+                    "value": {
+                      "op": "uint32"
+                    }
                   }
                 }
               ]
@@ -296,7 +300,7 @@
                     "op": "array",
                     "items": {
                       "op": "union",
-                      "id": 14
+                      "id": 13
                     }
                   }
                 }
@@ -550,57 +554,9 @@
       ]
     },
     {
-      "type": "union",
-      "name": "Duration",
-      "id": 11,
-      "versions": [
-        {
-          "variants": [
-            {
-              "name": "Seconds",
-              "fields": [
-                {
-                  "name": "average",
-                  "type": {
-                    "op": "uint32"
-                  }
-                }
-              ]
-            },
-            {
-              "name": "Minutes",
-              "fields": [
-                {
-                  "name": "average",
-                  "type": {
-                    "op": "uint32"
-                  }
-                }
-              ]
-            },
-            {
-              "name": "Hours",
-              "fields": [
-                {
-                  "name": "average",
-                  "type": {
-                    "op": "uint32"
-                  }
-                }
-              ]
-            },
-            {
-              "name": "Unknown",
-              "fields": []
-            }
-          ]
-        }
-      ]
-    },
-    {
       "type": "record",
       "name": "Language",
-      "id": 12,
+      "id": 11,
       "versions": [
         {
           "fields": [
@@ -635,7 +591,7 @@
     {
       "type": "union",
       "name": "Accessibility-provision",
-      "id": 13,
+      "id": 12,
       "versions": [
         {
           "variants": [
@@ -670,7 +626,7 @@
     {
       "type": "union",
       "name": "Bridge",
-      "id": 14,
+      "id": 13,
       "versions": [
         {
           "variants": [
@@ -691,11 +647,11 @@
                     "op": "map",
                     "keys": {
                       "op": "union",
-                      "id": 15
+                      "id": 14
                     },
                     "values": {
                       "op": "record",
-                      "id": 16
+                      "id": 15
                     }
                   }
                 }
@@ -763,7 +719,7 @@
     {
       "type": "union",
       "name": "Virtual-key",
-      "id": 15,
+      "id": 14,
       "versions": [
         {
           "variants": [
@@ -814,7 +770,7 @@
     {
       "type": "record",
       "name": "Keyboard-key",
-      "id": 16,
+      "id": 15,
       "versions": [
         {
           "fields": [

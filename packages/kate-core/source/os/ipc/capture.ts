@@ -15,7 +15,7 @@ export default [
       try {
         os.sfx.play("shutter");
         await os.capture.save_screenshot(
-          env.cart.metadata.id,
+          env.cart.id,
           payload.data,
           payload.type
         );
@@ -37,11 +37,7 @@ export default [
 
   handler("kate:capture.start-recording", TC.spec({}), async (os, env) => {
     os.kernel.console.take_resource("screen-recording");
-    await os.notifications.push(
-      env.cart.metadata.id,
-      "Screen recording started",
-      ""
-    );
+    await os.notifications.push(env.cart.id, "Screen recording started", "");
 
     return null;
   }),
@@ -58,11 +54,7 @@ export default [
 
       try {
         os.kernel.console.release_resource("screen-recording");
-        await os.capture.save_video(
-          env.cart.metadata.id,
-          payload.data,
-          payload.type
-        );
+        await os.capture.save_video(env.cart.id, payload.data, payload.type);
       } catch (error) {
         console.debug(`[Kate] failed to save recording`, error);
         os.notifications.push_transient(

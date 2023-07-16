@@ -7,7 +7,7 @@ import * as Cart from "../cart";
 export type RuntimeEnvConfig = {
   console: VirtualConsole;
   cart: Cart.CartMeta;
-  read_file: (path: string) => Promise<Cart.File>;
+  read_file: (path: string) => Promise<Cart.BasicFile>;
   local_storage: unknown;
   on_playtime_update: (time: number) => void;
 };
@@ -202,7 +202,7 @@ export class CR_Web_archive extends CartRuntime {
   }
 
   async proxy_html(env: RuntimeEnv) {
-    const index_file = await env.read_file(env.cart.runtime.html);
+    const index_file = await env.read_file(env.cart.runtime.html_path);
     const decoder = new TextDecoder();
     const index = decoder.decode(index_file.data);
     return translate_html(index, env);

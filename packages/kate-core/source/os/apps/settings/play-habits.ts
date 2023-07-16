@@ -67,7 +67,7 @@ export class ScenePlayHabitsSettings extends UI.SimpleScene {
       return {
         id: x.id,
         installed: cart != null,
-        title: cart?.metadata.game.title ?? x.id,
+        title: cart?.metadata.presentation.title ?? x.id,
         play_time: x.play_time,
         last_played: x.last_played,
       };

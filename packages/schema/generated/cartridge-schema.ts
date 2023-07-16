@@ -249,7 +249,7 @@ export namespace Metadata {
 
 
   
- export function Accessibility(x: {readonly 'input-methods': (Input_method)[],readonly 'languages': (Language)[],readonly 'provisions': (Accessibility_provision)[],readonly 'average-completion': Duration,readonly 'average-session': Duration}): Metadata {
+ export function Accessibility(x: {readonly 'input-methods': (Input_method)[],readonly 'languages': (Language)[],readonly 'provisions': (Accessibility_provision)[],readonly 'average-completion-seconds': (UInt32) | null,readonly 'average-session-seconds': (UInt32) | null}): Metadata {
    return {
      '@name': 'Metadata',
      '@tag': 1,
@@ -269,8 +269,8 @@ export namespace Metadata {
    readonly 'input-methods': (Input_method)[]
     readonly 'languages': (Language)[]
     readonly 'provisions': (Accessibility_provision)[]
-    readonly 'average-completion': Duration
-    readonly 'average-session': Duration
+    readonly 'average-completion-seconds': (UInt32) | null
+    readonly 'average-session-seconds': (UInt32) | null
  }
 
 }
@@ -1066,112 +1066,9 @@ export namespace Input_method {
 
 
 
-export type Duration = Duration.Seconds | Duration.Minutes | Duration.Hours | Duration.Unknown;
-
-export namespace Duration {
- export const tag = 11;
-
- export const enum $Tags {
-   Seconds = 0,
-    Minutes = 1,
-    Hours = 2,
-    Unknown = 3
- }
-
- 
- export function Seconds(x: {readonly 'average': UInt32}): Duration {
-   return {
-     '@name': 'Duration',
-     '@tag': 11,
-     '@version': 0,
-     '@variant': $Tags.Seconds,
-     '@variant-name': 'Seconds',
-     ...x
-   }
- }
-
- export interface Seconds {
-   readonly '@name': 'Duration';
-   readonly '@tag': 11;
-   readonly '@version': 0;
-   readonly '@variant': $Tags.Seconds;
-   readonly '@variant-name': 'Seconds';
-   readonly 'average': UInt32
- }
-
-
-  
- export function Minutes(x: {readonly 'average': UInt32}): Duration {
-   return {
-     '@name': 'Duration',
-     '@tag': 11,
-     '@version': 0,
-     '@variant': $Tags.Minutes,
-     '@variant-name': 'Minutes',
-     ...x
-   }
- }
-
- export interface Minutes {
-   readonly '@name': 'Duration';
-   readonly '@tag': 11;
-   readonly '@version': 0;
-   readonly '@variant': $Tags.Minutes;
-   readonly '@variant-name': 'Minutes';
-   readonly 'average': UInt32
- }
-
-
-  
- export function Hours(x: {readonly 'average': UInt32}): Duration {
-   return {
-     '@name': 'Duration',
-     '@tag': 11,
-     '@version': 0,
-     '@variant': $Tags.Hours,
-     '@variant-name': 'Hours',
-     ...x
-   }
- }
-
- export interface Hours {
-   readonly '@name': 'Duration';
-   readonly '@tag': 11;
-   readonly '@version': 0;
-   readonly '@variant': $Tags.Hours;
-   readonly '@variant-name': 'Hours';
-   readonly 'average': UInt32
- }
-
-
-  
- export function Unknown(x: {}): Duration {
-   return {
-     '@name': 'Duration',
-     '@tag': 11,
-     '@version': 0,
-     '@variant': $Tags.Unknown,
-     '@variant-name': 'Unknown',
-     ...x
-   }
- }
-
- export interface Unknown {
-   readonly '@name': 'Duration';
-   readonly '@tag': 11;
-   readonly '@version': 0;
-   readonly '@variant': $Tags.Unknown;
-   readonly '@variant-name': 'Unknown';
-   
- }
-
-}
-
-
-
 export interface Language {
  readonly '@name': 'Language';
- readonly '@tag': 12;
+ readonly '@tag': 11;
  readonly '@version': 0;
  readonly 'iso-code': string;
   readonly 'interface': boolean;
@@ -1182,20 +1079,20 @@ export interface Language {
 export function Language(x: {readonly 'iso-code': string,readonly 'interface': boolean,readonly 'audio': boolean,readonly 'text': boolean}): Language {
  return {
    '@name': 'Language',
-   '@tag': 12,
+   '@tag': 11,
    '@version': 0,
    ...x
  };
 }
 
-Language.tag = 12;
+Language.tag = 11;
 
 
 
 export type Accessibility_provision = Accessibility_provision.High_contrast | Accessibility_provision.Subtitles | Accessibility_provision.Image_captions | Accessibility_provision.Voiced_text | Accessibility_provision.Configurable_difficulty | Accessibility_provision.Skippable_content;
 
 export namespace Accessibility_provision {
- export const tag = 13;
+ export const tag = 12;
 
  export const enum $Tags {
    High_contrast = 0,
@@ -1210,7 +1107,7 @@ export namespace Accessibility_provision {
  export function High_contrast(x: {}): Accessibility_provision {
    return {
      '@name': 'Accessibility-provision',
-     '@tag': 13,
+     '@tag': 12,
      '@version': 0,
      '@variant': $Tags.High_contrast,
      '@variant-name': 'High-contrast',
@@ -1220,7 +1117,7 @@ export namespace Accessibility_provision {
 
  export interface High_contrast {
    readonly '@name': 'Accessibility-provision';
-   readonly '@tag': 13;
+   readonly '@tag': 12;
    readonly '@version': 0;
    readonly '@variant': $Tags.High_contrast;
    readonly '@variant-name': 'High-contrast';
@@ -1232,7 +1129,7 @@ export namespace Accessibility_provision {
  export function Subtitles(x: {}): Accessibility_provision {
    return {
      '@name': 'Accessibility-provision',
-     '@tag': 13,
+     '@tag': 12,
      '@version': 0,
      '@variant': $Tags.Subtitles,
      '@variant-name': 'Subtitles',
@@ -1242,7 +1139,7 @@ export namespace Accessibility_provision {
 
  export interface Subtitles {
    readonly '@name': 'Accessibility-provision';
-   readonly '@tag': 13;
+   readonly '@tag': 12;
    readonly '@version': 0;
    readonly '@variant': $Tags.Subtitles;
    readonly '@variant-name': 'Subtitles';
@@ -1254,7 +1151,7 @@ export namespace Accessibility_provision {
  export function Image_captions(x: {}): Accessibility_provision {
    return {
      '@name': 'Accessibility-provision',
-     '@tag': 13,
+     '@tag': 12,
      '@version': 0,
      '@variant': $Tags.Image_captions,
      '@variant-name': 'Image-captions',
@@ -1264,7 +1161,7 @@ export namespace Accessibility_provision {
 
  export interface Image_captions {
    readonly '@name': 'Accessibility-provision';
-   readonly '@tag': 13;
+   readonly '@tag': 12;
    readonly '@version': 0;
    readonly '@variant': $Tags.Image_captions;
    readonly '@variant-name': 'Image-captions';
@@ -1276,7 +1173,7 @@ export namespace Accessibility_provision {
  export function Voiced_text(x: {}): Accessibility_provision {
    return {
      '@name': 'Accessibility-provision',
-     '@tag': 13,
+     '@tag': 12,
      '@version': 0,
      '@variant': $Tags.Voiced_text,
      '@variant-name': 'Voiced-text',
@@ -1286,7 +1183,7 @@ export namespace Accessibility_provision {
 
  export interface Voiced_text {
    readonly '@name': 'Accessibility-provision';
-   readonly '@tag': 13;
+   readonly '@tag': 12;
    readonly '@version': 0;
    readonly '@variant': $Tags.Voiced_text;
    readonly '@variant-name': 'Voiced-text';
@@ -1298,7 +1195,7 @@ export namespace Accessibility_provision {
  export function Configurable_difficulty(x: {}): Accessibility_provision {
    return {
      '@name': 'Accessibility-provision',
-     '@tag': 13,
+     '@tag': 12,
      '@version': 0,
      '@variant': $Tags.Configurable_difficulty,
      '@variant-name': 'Configurable-difficulty',
@@ -1308,7 +1205,7 @@ export namespace Accessibility_provision {
 
  export interface Configurable_difficulty {
    readonly '@name': 'Accessibility-provision';
-   readonly '@tag': 13;
+   readonly '@tag': 12;
    readonly '@version': 0;
    readonly '@variant': $Tags.Configurable_difficulty;
    readonly '@variant-name': 'Configurable-difficulty';
@@ -1320,7 +1217,7 @@ export namespace Accessibility_provision {
  export function Skippable_content(x: {}): Accessibility_provision {
    return {
      '@name': 'Accessibility-provision',
-     '@tag': 13,
+     '@tag': 12,
      '@version': 0,
      '@variant': $Tags.Skippable_content,
      '@variant-name': 'Skippable-content',
@@ -1330,7 +1227,7 @@ export namespace Accessibility_provision {
 
  export interface Skippable_content {
    readonly '@name': 'Accessibility-provision';
-   readonly '@tag': 13;
+   readonly '@tag': 12;
    readonly '@version': 0;
    readonly '@variant': $Tags.Skippable_content;
    readonly '@variant-name': 'Skippable-content';
@@ -1344,7 +1241,7 @@ export namespace Accessibility_provision {
 export type Bridge = Bridge.Network_proxy | Bridge.Local_storage_proxy | Bridge.Input_proxy | Bridge.Preserve_WebGL_render | Bridge.Capture_canvas | Bridge.Pointer_input_proxy | Bridge.IndexedDB_proxy | Bridge.Renpy_web_tweaks;
 
 export namespace Bridge {
- export const tag = 14;
+ export const tag = 13;
 
  export const enum $Tags {
    Network_proxy = 0,
@@ -1361,7 +1258,7 @@ export namespace Bridge {
  export function Network_proxy(x: {}): Bridge {
    return {
      '@name': 'Bridge',
-     '@tag': 14,
+     '@tag': 13,
      '@version': 0,
      '@variant': $Tags.Network_proxy,
      '@variant-name': 'Network-proxy',
@@ -1371,7 +1268,7 @@ export namespace Bridge {
 
  export interface Network_proxy {
    readonly '@name': 'Bridge';
-   readonly '@tag': 14;
+   readonly '@tag': 13;
    readonly '@version': 0;
    readonly '@variant': $Tags.Network_proxy;
    readonly '@variant-name': 'Network-proxy';
@@ -1383,7 +1280,7 @@ export namespace Bridge {
  export function Local_storage_proxy(x: {}): Bridge {
    return {
      '@name': 'Bridge',
-     '@tag': 14,
+     '@tag': 13,
      '@version': 0,
      '@variant': $Tags.Local_storage_proxy,
      '@variant-name': 'Local-storage-proxy',
@@ -1393,7 +1290,7 @@ export namespace Bridge {
 
  export interface Local_storage_proxy {
    readonly '@name': 'Bridge';
-   readonly '@tag': 14;
+   readonly '@tag': 13;
    readonly '@version': 0;
    readonly '@variant': $Tags.Local_storage_proxy;
    readonly '@variant-name': 'Local-storage-proxy';
@@ -1405,7 +1302,7 @@ export namespace Bridge {
  export function Input_proxy(x: {readonly 'mapping': Map<Virtual_key, Keyboard_key>}): Bridge {
    return {
      '@name': 'Bridge',
-     '@tag': 14,
+     '@tag': 13,
      '@version': 0,
      '@variant': $Tags.Input_proxy,
      '@variant-name': 'Input-proxy',
@@ -1415,7 +1312,7 @@ export namespace Bridge {
 
  export interface Input_proxy {
    readonly '@name': 'Bridge';
-   readonly '@tag': 14;
+   readonly '@tag': 13;
    readonly '@version': 0;
    readonly '@variant': $Tags.Input_proxy;
    readonly '@variant-name': 'Input-proxy';
@@ -1427,7 +1324,7 @@ export namespace Bridge {
  export function Preserve_WebGL_render(x: {}): Bridge {
    return {
      '@name': 'Bridge',
-     '@tag': 14,
+     '@tag': 13,
      '@version': 0,
      '@variant': $Tags.Preserve_WebGL_render,
      '@variant-name': 'Preserve-WebGL-render',
@@ -1437,7 +1334,7 @@ export namespace Bridge {
 
  export interface Preserve_WebGL_render {
    readonly '@name': 'Bridge';
-   readonly '@tag': 14;
+   readonly '@tag': 13;
    readonly '@version': 0;
    readonly '@variant': $Tags.Preserve_WebGL_render;
    readonly '@variant-name': 'Preserve-WebGL-render';
@@ -1449,7 +1346,7 @@ export namespace Bridge {
  export function Capture_canvas(x: {readonly 'selector': string}): Bridge {
    return {
      '@name': 'Bridge',
-     '@tag': 14,
+     '@tag': 13,
      '@version': 0,
      '@variant': $Tags.Capture_canvas,
      '@variant-name': 'Capture-canvas',
@@ -1459,7 +1356,7 @@ export namespace Bridge {
 
  export interface Capture_canvas {
    readonly '@name': 'Bridge';
-   readonly '@tag': 14;
+   readonly '@tag': 13;
    readonly '@version': 0;
    readonly '@variant': $Tags.Capture_canvas;
    readonly '@variant-name': 'Capture-canvas';
@@ -1471,7 +1368,7 @@ export namespace Bridge {
  export function Pointer_input_proxy(x: {readonly 'selector': string,readonly 'hide-cursor': boolean}): Bridge {
    return {
      '@name': 'Bridge',
-     '@tag': 14,
+     '@tag': 13,
      '@version': 0,
      '@variant': $Tags.Pointer_input_proxy,
      '@variant-name': 'Pointer-input-proxy',
@@ -1481,7 +1378,7 @@ export namespace Bridge {
 
  export interface Pointer_input_proxy {
    readonly '@name': 'Bridge';
-   readonly '@tag': 14;
+   readonly '@tag': 13;
    readonly '@version': 0;
    readonly '@variant': $Tags.Pointer_input_proxy;
    readonly '@variant-name': 'Pointer-input-proxy';
@@ -1494,7 +1391,7 @@ export namespace Bridge {
  export function IndexedDB_proxy(x: {readonly 'versioned': boolean}): Bridge {
    return {
      '@name': 'Bridge',
-     '@tag': 14,
+     '@tag': 13,
      '@version': 0,
      '@variant': $Tags.IndexedDB_proxy,
      '@variant-name': 'IndexedDB-proxy',
@@ -1504,7 +1401,7 @@ export namespace Bridge {
 
  export interface IndexedDB_proxy {
    readonly '@name': 'Bridge';
-   readonly '@tag': 14;
+   readonly '@tag': 13;
    readonly '@version': 0;
    readonly '@variant': $Tags.IndexedDB_proxy;
    readonly '@variant-name': 'IndexedDB-proxy';
@@ -1516,7 +1413,7 @@ export namespace Bridge {
  export function Renpy_web_tweaks(x: {readonly 'version': Version}): Bridge {
    return {
      '@name': 'Bridge',
-     '@tag': 14,
+     '@tag': 13,
      '@version': 0,
      '@variant': $Tags.Renpy_web_tweaks,
      '@variant-name': 'Renpy-web-tweaks',
@@ -1526,7 +1423,7 @@ export namespace Bridge {
 
  export interface Renpy_web_tweaks {
    readonly '@name': 'Bridge';
-   readonly '@tag': 14;
+   readonly '@tag': 13;
    readonly '@version': 0;
    readonly '@variant': $Tags.Renpy_web_tweaks;
    readonly '@variant-name': 'Renpy-web-tweaks';
@@ -1540,7 +1437,7 @@ export namespace Bridge {
 export type Virtual_key = Virtual_key.Up | Virtual_key.Right | Virtual_key.Down | Virtual_key.Left | Virtual_key.Menu | Virtual_key.Capture | Virtual_key.X | Virtual_key.O | Virtual_key.L_trigger | Virtual_key.R_trigger;
 
 export namespace Virtual_key {
- export const tag = 15;
+ export const tag = 14;
 
  export const enum $Tags {
    Up = 0,
@@ -1559,7 +1456,7 @@ export namespace Virtual_key {
  export function Up(x: {}): Virtual_key {
    return {
      '@name': 'Virtual-key',
-     '@tag': 15,
+     '@tag': 14,
      '@version': 0,
      '@variant': $Tags.Up,
      '@variant-name': 'Up',
@@ -1569,7 +1466,7 @@ export namespace Virtual_key {
 
  export interface Up {
    readonly '@name': 'Virtual-key';
-   readonly '@tag': 15;
+   readonly '@tag': 14;
    readonly '@version': 0;
    readonly '@variant': $Tags.Up;
    readonly '@variant-name': 'Up';
@@ -1581,7 +1478,7 @@ export namespace Virtual_key {
  export function Right(x: {}): Virtual_key {
    return {
      '@name': 'Virtual-key',
-     '@tag': 15,
+     '@tag': 14,
      '@version': 0,
      '@variant': $Tags.Right,
      '@variant-name': 'Right',
@@ -1591,7 +1488,7 @@ export namespace Virtual_key {
 
  export interface Right {
    readonly '@name': 'Virtual-key';
-   readonly '@tag': 15;
+   readonly '@tag': 14;
    readonly '@version': 0;
    readonly '@variant': $Tags.Right;
    readonly '@variant-name': 'Right';
@@ -1603,7 +1500,7 @@ export namespace Virtual_key {
  export function Down(x: {}): Virtual_key {
    return {
      '@name': 'Virtual-key',
-     '@tag': 15,
+     '@tag': 14,
      '@version': 0,
      '@variant': $Tags.Down,
      '@variant-name': 'Down',
@@ -1613,7 +1510,7 @@ export namespace Virtual_key {
 
  export interface Down {
    readonly '@name': 'Virtual-key';
-   readonly '@tag': 15;
+   readonly '@tag': 14;
    readonly '@version': 0;
    readonly '@variant': $Tags.Down;
    readonly '@variant-name': 'Down';
@@ -1625,7 +1522,7 @@ export namespace Virtual_key {
  export function Left(x: {}): Virtual_key {
    return {
      '@name': 'Virtual-key',
-     '@tag': 15,
+     '@tag': 14,
      '@version': 0,
      '@variant': $Tags.Left,
      '@variant-name': 'Left',
@@ -1635,7 +1532,7 @@ export namespace Virtual_key {
 
  export interface Left {
    readonly '@name': 'Virtual-key';
-   readonly '@tag': 15;
+   readonly '@tag': 14;
    readonly '@version': 0;
    readonly '@variant': $Tags.Left;
    readonly '@variant-name': 'Left';
@@ -1647,7 +1544,7 @@ export namespace Virtual_key {
  export function Menu(x: {}): Virtual_key {
    return {
      '@name': 'Virtual-key',
-     '@tag': 15,
+     '@tag': 14,
      '@version': 0,
      '@variant': $Tags.Menu,
      '@variant-name': 'Menu',
@@ -1657,7 +1554,7 @@ export namespace Virtual_key {
 
  export interface Menu {
    readonly '@name': 'Virtual-key';
-   readonly '@tag': 15;
+   readonly '@tag': 14;
    readonly '@version': 0;
    readonly '@variant': $Tags.Menu;
    readonly '@variant-name': 'Menu';
@@ -1669,7 +1566,7 @@ export namespace Virtual_key {
  export function Capture(x: {}): Virtual_key {
    return {
      '@name': 'Virtual-key',
-     '@tag': 15,
+     '@tag': 14,
      '@version': 0,
      '@variant': $Tags.Capture,
      '@variant-name': 'Capture',
@@ -1679,7 +1576,7 @@ export namespace Virtual_key {
 
  export interface Capture {
    readonly '@name': 'Virtual-key';
-   readonly '@tag': 15;
+   readonly '@tag': 14;
    readonly '@version': 0;
    readonly '@variant': $Tags.Capture;
    readonly '@variant-name': 'Capture';
@@ -1691,7 +1588,7 @@ export namespace Virtual_key {
  export function X(x: {}): Virtual_key {
    return {
      '@name': 'Virtual-key',
-     '@tag': 15,
+     '@tag': 14,
      '@version': 0,
      '@variant': $Tags.X,
      '@variant-name': 'X',
@@ -1701,7 +1598,7 @@ export namespace Virtual_key {
 
  export interface X {
    readonly '@name': 'Virtual-key';
-   readonly '@tag': 15;
+   readonly '@tag': 14;
    readonly '@version': 0;
    readonly '@variant': $Tags.X;
    readonly '@variant-name': 'X';
@@ -1713,7 +1610,7 @@ export namespace Virtual_key {
  export function O(x: {}): Virtual_key {
    return {
      '@name': 'Virtual-key',
-     '@tag': 15,
+     '@tag': 14,
      '@version': 0,
      '@variant': $Tags.O,
      '@variant-name': 'O',
@@ -1723,7 +1620,7 @@ export namespace Virtual_key {
 
  export interface O {
    readonly '@name': 'Virtual-key';
-   readonly '@tag': 15;
+   readonly '@tag': 14;
    readonly '@version': 0;
    readonly '@variant': $Tags.O;
    readonly '@variant-name': 'O';
@@ -1735,7 +1632,7 @@ export namespace Virtual_key {
  export function L_trigger(x: {}): Virtual_key {
    return {
      '@name': 'Virtual-key',
-     '@tag': 15,
+     '@tag': 14,
      '@version': 0,
      '@variant': $Tags.L_trigger,
      '@variant-name': 'L-trigger',
@@ -1745,7 +1642,7 @@ export namespace Virtual_key {
 
  export interface L_trigger {
    readonly '@name': 'Virtual-key';
-   readonly '@tag': 15;
+   readonly '@tag': 14;
    readonly '@version': 0;
    readonly '@variant': $Tags.L_trigger;
    readonly '@variant-name': 'L-trigger';
@@ -1757,7 +1654,7 @@ export namespace Virtual_key {
  export function R_trigger(x: {}): Virtual_key {
    return {
      '@name': 'Virtual-key',
-     '@tag': 15,
+     '@tag': 14,
      '@version': 0,
      '@variant': $Tags.R_trigger,
      '@variant-name': 'R-trigger',
@@ -1767,7 +1664,7 @@ export namespace Virtual_key {
 
  export interface R_trigger {
    readonly '@name': 'Virtual-key';
-   readonly '@tag': 15;
+   readonly '@tag': 14;
    readonly '@version': 0;
    readonly '@variant': $Tags.R_trigger;
    readonly '@variant-name': 'R-trigger';
@@ -1780,7 +1677,7 @@ export namespace Virtual_key {
 
 export interface Keyboard_key {
  readonly '@name': 'Keyboard-key';
- readonly '@tag': 16;
+ readonly '@tag': 15;
  readonly '@version': 0;
  readonly 'code': string
 }
@@ -1788,12 +1685,12 @@ export interface Keyboard_key {
 export function Keyboard_key(x: {readonly 'code': string}): Keyboard_key {
  return {
    '@name': 'Keyboard-key',
-   '@tag': 16,
+   '@tag': 15,
    '@version': 0,
    ...x
  };
 }
 
-Keyboard_key.tag = 16;
+Keyboard_key.tag = 15;
 
 

@@ -6,6 +6,7 @@ import { Action, SimpleScene } from "../ui/scenes";
 import { SceneTextFile } from "./text-file";
 import { HUD_LoadIndicator } from "./load-screen";
 import { SceneCartridgeStorageSettings } from "./settings/storage";
+import { Cart } from "../../cart";
 
 export class SceneHome extends SimpleScene {
   icon = "diamond";
@@ -21,9 +22,13 @@ export class SceneHome extends SimpleScene {
       this.os,
       h("div", { class: "kate-os-carts-box" }, [
         h("div", { class: "kate-os-carts-image" }, [
-          h("img", { src: x.thumbnail_dataurl }, []),
+          x.thumbnail_dataurl
+            ? h("img", { src: x.thumbnail_dataurl }, [])
+            : UI.no_thumbnail(),
         ]),
-        h("div", { class: "kate-os-carts-title" }, [x.metadata.game.title]),
+        h("div", { class: "kate-os-carts-title" }, [
+          x.metadata.presentation.title,
+        ]),
       ]),
       [
         {
@@ -94,9 +99,14 @@ export class SceneHome extends SimpleScene {
   async show_pop_menu(cart: Db.CartMeta) {
     const result = await this.os.dialog.pop_menu(
       "kate:home",
-      cart.metadata.game.title,
+      cart.metadata.presentation.title,
       [
-        { label: "Legal notices", value: "legal" as const },
+        ...(cart.metadata.legal.licence_path != null
+          ? [{ label: "Legal notices", value: "legal" as const }]
+          : []),
+        ...(cart.metadata.legal.privacy_policy_path != null
+          ? [{ label: "Privacy policy", value: "privacy" as const }]
+          : []),
         { label: "Manage data", value: "manage-data" as const },
       ],
       "close"
@@ -123,19 +133,20 @@ export class SceneHome extends SimpleScene {
       }
 
       case "legal": {
-        const licence_file = await this.os.cart_manager.read_file_by_path(
-          cart.metadata.id,
-          cart.metadata.release.legal_notices
+        this.show_legal_notice(
+          "Legal notices",
+          cart,
+          cart.metadata.legal.licence_path
         );
-        const decoder = new TextDecoder();
-        const licence = decoder.decode(licence_file.data);
-        const legal = new SceneTextFile(
-          this.os,
-          `Legal Notices`,
-          cart.metadata.game.title,
-          licence
+        break;
+      }
+
+      case "privacy": {
+        this.show_legal_notice(
+          "Privacy policy",
+          cart,
+          cart.metadata.legal.privacy_policy_path
         );
-        this.os.push_scene(legal);
         break;
       }
 
@@ -143,6 +154,29 @@ export class SceneHome extends SimpleScene {
         throw unreachable(result);
       }
     }
+  }
+
+  private async show_legal_notice(
+    title: string,
+    cart: Db.CartMeta,
+    path: string | null
+  ) {
+    if (path == null) {
+      return;
+    }
+    const licence_file = await this.os.cart_manager.read_file_by_path(
+      cart.id,
+      path
+    );
+    const decoder = new TextDecoder();
+    const licence = decoder.decode(licence_file.data);
+    const legal = new SceneTextFile(
+      this.os,
+      title,
+      cart.metadata.presentation.title,
+      licence
+    );
+    this.os.push_scene(legal);
   }
 
   body_container(body: UI.Widgetable[]): HTMLElement {

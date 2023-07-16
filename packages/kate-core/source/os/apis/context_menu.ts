@@ -69,6 +69,7 @@ export class HUD_ContextMenu extends Scene {
         ),
       ]);
     const emulator = this.os.kernel.console;
+    const cart = this.os.processes.running?.cart;
 
     return UI.h("div", { class: "kate-os-hud-context-menu" }, [
       UI.h("div", { class: "kate-os-hud-context-menu-backdrop" }, []),
@@ -82,9 +83,24 @@ export class HUD_ContextMenu extends Scene {
                 ),
               ]),
               fullscreen_button(),
-              UI.fa_icon_button("circle-info", "Legal notices").on_clicked(
-                this.on_legal_notices
-              ),
+              UI.when(cart?.metadata.legal.licence_path != null, [
+                UI.fa_icon_button("circle-info", "Legal notices").on_clicked(
+                  () =>
+                    this.on_legal_notices(
+                      "Legal notices",
+                      cart?.metadata.legal.licence_path ?? null
+                    )
+                ),
+              ]),
+              UI.when(cart?.metadata.legal.privacy_policy_path != null, [
+                UI.fa_icon_button("circle-info", "Privacy policy").on_clicked(
+                  () =>
+                    this.on_legal_notices(
+                      "Privacy policy",
+                      cart?.metadata.legal.privacy_policy_path ?? null
+                    )
+                ),
+              ]),
               UI.fa_icon_button("images", "Media gallery").on_clicked(
                 this.on_media_gallery
               ),
@@ -161,8 +177,8 @@ export class HUD_ContextMenu extends Scene {
     const process = this.os.processes.running;
     if (process != null) {
       const media = new SceneMedia(this.os, {
-        id: process.cart.metadata.id,
-        title: process.cart.metadata.game.title,
+        id: process.cart.id,
+        title: process.cart.metadata.presentation.title,
       });
       this.os.push_scene(media);
     } else {
@@ -182,18 +198,23 @@ export class HUD_ContextMenu extends Scene {
     this.os.push_scene(new SceneCartridgeStorageSettings(this.os, app));
   };
 
-  on_legal_notices = async () => {
+  on_legal_notices = async (title: string, path: string | null) => {
     const process = this.os.processes.running!;
+    if (path == null) {
+      console.error(`Cartridge has no legal notices`);
+      return;
+    }
+
     const licence_file = await this.os.cart_manager.read_file_by_path(
-      process.cart.metadata.id,
-      process.cart.metadata.release.legal_notices
+      process.cart.id,
+      path
     );
     const decoder = new TextDecoder();
     const licence = decoder.decode(licence_file.data);
     const legal = new SceneTextFile(
       this.os,
-      "Legal Notices",
-      process.cart.metadata.game.title,
+      title,
+      process.cart.metadata.presentation.title,
       licence
     );
     this.os.push_scene(legal);

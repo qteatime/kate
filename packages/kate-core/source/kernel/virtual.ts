@@ -1,15 +1,6 @@
 import { EventStream, unreachable } from "../utils";
 const pkg = require("../../package.json");
 
-declare global {
-  interface Navigator {
-    userActivation: null | {
-      hasBeenActive: boolean;
-      isActive: boolean;
-    };
-  }
-}
-
 export type InputKey =
   | "up"
   | "right"

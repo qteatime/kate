@@ -984,3 +984,7 @@ export function stack_bar(x: {
     ]),
   ]);
 }
+
+export function no_thumbnail() {
+  return h("div", { class: "kate-no-thumbnail" }, []);
+}

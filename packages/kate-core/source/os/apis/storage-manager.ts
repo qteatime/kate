@@ -12,7 +12,7 @@ import { Cart, CartMeta } from "../../cart";
 export type AppStorageDetails = {
   id: string;
   title: string;
-  icon_url: string;
+  icon_url: string | null;
   version_id: string;
   status: Db.CartridgeStatus;
   dates: {
@@ -135,26 +135,26 @@ export class KateStorageManager {
     cart: CartMeta
   ): Promise<AppStorageDetails> {
     const { cartridges } = await this.estimate();
-    const maybe_cart = cartridges.get(cart.metadata.id) ?? null;
+    const maybe_cart = cartridges.get(cart.id) ?? null;
     const media = await this.estimate_media();
-    const cart_media = media.get(cart.metadata.id) ?? {
+    const cart_media = media.get(cart.id) ?? {
       size: 0,
       count: 0,
     };
-    const saves = (await this.estimate_save_data()).get(cart.metadata.id) ?? [];
+    const saves = (await this.estimate_save_data()).get(cart.id) ?? [];
     const save_versions = new Map<string, Db.CartridgeQuota>(
       saves.map((x) => [x.version_id, x])
     );
     const unversioned =
       save_versions.get(KateObjectStore.UNVERSIONED_KEY) ?? null;
-    const versioned = save_versions.get(cart.metadata.version_id) ?? null;
+    const versioned = save_versions.get(cart.version) ?? null;
 
     const thumbnail = await make_empty_thumbnail(1, 1);
     return {
-      id: cart.metadata.id,
-      title: cart.metadata.game.title,
+      id: cart.id,
+      title: cart.metadata.presentation.title,
       icon_url: thumbnail,
-      version_id: cart.metadata.version_id,
+      version_id: cart.version,
       status: "active",
       dates: {
         last_used: null,
@@ -251,7 +251,7 @@ export class KateStorageManager {
 
       cartridges.set(id, {
         id: id,
-        title: app.meta.metadata.game.title,
+        title: app.meta.metadata.presentation.title,
         icon_url: app.thumbnail_url,
         version_id: app.version_id,
         status: app.status,

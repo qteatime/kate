@@ -10,9 +10,7 @@ export default [
         const file = await env.read_file(path);
         return { mime: file.mime, bytes: file.data };
       } catch (error) {
-        console.error(
-          `[Kate] failed to read file ${path} from ${env.cart.metadata.id}`
-        );
+        console.error(`[Kate] failed to read file ${path} from ${env.cart.id}`);
         throw new EMessageFailed(
           "kate.cart-fs.file-not-found",
           `Failed to read file ${path}`

@@ -23,8 +23,8 @@ export class KateObjectStore {
   cartridge(cart: Cart.CartMeta, versioned: boolean) {
     return new CartridgeObjectStore(
       this,
-      cart.metadata.id,
-      versioned ? cart.metadata.version_id : KateObjectStore.UNVERSIONED_KEY
+      cart.id,
+      versioned ? cart.version : KateObjectStore.UNVERSIONED_KEY
     );
   }
 
