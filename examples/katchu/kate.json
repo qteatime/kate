@@ -48,7 +48,9 @@
     "www/*.css",
     "www/*.js",
     "images/*.png",
-    "audio/*.wav"
+    "audio/*.wav",
+    "thumbnail.png",
+    "LICENCE"
   ],
   "platform": {
     "type": "web-archive",
