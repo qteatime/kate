@@ -40,6 +40,10 @@ You can use something like ``your-username.itch.io`` if you don't own a
 top-level domain. This is a less strong guarantee for origin verification,
 but for Kate's use cases it's often good enough.
 
+The cartridge identifier is complemented by the ``version``, in the form
+``<major>.<minor>`` (e.g.: "1.4"). Only one version of a cartridge can
+be installed at any given time.
+
 .. important::
 
    Namespaces and names can only contain lower-case latin letters, hyphens, and
@@ -67,17 +71,21 @@ ones) to extract information necessary to present a cartridge.
 
 The meta-data is itself divided into further sections:
 
-* **Title**: This provides information about the cartridge presentation, such
-  as the title of the game, the thumbnail to use, etc;
+* **Presentation**: This provides information about how Kate should present
+  your cartridge to users across the console and in the store. It includes
+  the game's title, author, thumbnails, etc.
 
-* **Release**: This provides information about when the game was released, what
-  kind of stability players should expect, and any usage terms;
+* **Classification**: This provides information about the content of the
+  cartridge, such as genre, age appropriateness, and content warnings.
 
-* **Rating**: This provides information about the content of the cartridge,
-  such as age appropriateness and content warnings;
+* **Legal**: This provides information about what the user is allowed to
+  do with the cartridge, and what rights they hold. It includes information
+  on the cartridge's licence and privacy policy;
 
-* **Play**: This provides information about how the game is played, such as
-  accessibility and translation provisions;
+* **Accessibility**: This provides information about how the game can be
+  played. It contains things such as what input methods are supported,
+  which languages are offered, whether the cartridge has additional
+  accessibility provisions, etc;
 
 
 .. _cartridge versioning:
@@ -85,9 +93,9 @@ The meta-data is itself divided into further sections:
 Versioning
 ----------
 
-Each cartridge has a release version, using a ``<major>.<minor>`` format
-(e.g.: ``5.2``). Kate only allows one version of each cartridge to be
-installed at any given time.
+Like said previously, each cartridge has a release version, using a
+``<major>.<minor>`` format (e.g.: ``5.2``). Kate only allows one version
+of each cartridge to be installed at any given time.
 
 When a player tries to install a cartridge that has the same version
 as the one already installed, Kate will just skip the installation altogether,
@@ -109,17 +117,20 @@ A cartridge metadata includes the terms of using the cartridge. This comes in
 the form of a legal notices text, which is then made available to players in
 the console through the context menu.
 
-Cartridges may also include additional provisions for using the cartridge.
-Open source games can declare which open source licence applies. And games
-with relaxed usage can declare if players are allowed to modify the cartridge
-(e.g.: by making mods), and whether they're allowed to make commercial use
-of their modification.
+Any cartridge that uses the internet or includes links to internet addresses
+in any form **must** also include a privacy policy, which indicates to the
+user if any data is collected and how this data is used.
 
-The defaults are those of a restrictive proprietary
-policy, with some provisions for personal modifications. The reason personal
-modifications are allowed by default is that players with particular
-accessibility needs may need to make modifications to be able to play at
-all.
+Cartridges are also encouraged to specify their policy on derivative works
+(e.g.: game mods). The default value allows users to modify the cartridge
+strictly for personal use, however this can be changed to disallow any
+modification or to allow non-commercial or commercial sharing of derivative
+works.
+
+The reason personal modifications are allowed by default is that players
+with particular accessibility needs may need to make modifications to be
+able to play at all. While you can change the default, supporting personal
+accessibility needs is encouraged.
 
 
 .. _cartridge rating:

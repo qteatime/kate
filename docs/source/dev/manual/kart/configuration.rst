@@ -8,9 +8,14 @@ This configuration is made out of the following sections:
 
 * ``id`` — a string with the cartridge identifier. Follows rules specified
   in :ref:`Cartridge Identification`;
+* ``version`` — a unique identification for the specific cartridge release;
+* ``release`` — the date of release for the cartridge. May be used to warn
+  users about link rotting and other time-sensitive issues;
 * ``metadata`` — information used to display and filter the cartridge in the
   Kate library;
 * ``files`` — describes which files to include in the cartridge file;
+* ``security`` — describes additional capabilities for the cartridge which
+  require user consent or that might cause harm when misused/abused;
 * ``platform`` — describes how to run the cartridge;
 
 
@@ -71,31 +76,58 @@ When using this option, a configuration file looks like this:
   then access when you run it.
 
 
+Identification
+--------------
+
+Besides the ``id`` field, the top-level part of the cartridge also
+contains:
+
+release *(optional)*
+  | ``{year: integer, month: integer, day: integer}``
+  | The date in which the cartridge was released. Defaults to the current
+    date. This helps players sort store entries and their library by
+    recency, or look for releases in a particular time-frame.
+
+  E.g.: ``{year: 2023, month: 6, day: 10}``
+
+version
+  | ``{major: integer, minor: integer}``
+  | The version of the cartridge. Must be unique per release, since Kate will
+    do nothing if a player tries to install a cartridge when there's something
+    with the same id and version already installed
+    (even if the contents differ). See :ref:`Cartridge Versioning` for details.
+
+  E.g.: ``{major: 1, minor: 13}``
+
+
+
 Metadata
 --------
 
 The metadata section is further divided into several subsections:
 
-* ``game`` — provides information about the game itself, including how to
-  display and categorise it in the library;
+* ``presentation`` — provides information about how to display the game
+  throughout Kate (e.g.: in the library or in the store);
 
-* ``release`` — provides information about the distribution of the cartridge.
-  This includes the version, terms of use, and any legal notices from
-  third-party assets that the cartridge includes;
+* ``classification`` — provides information for categorising and filtering
+  the game in the store and library, this includes things like the genre
+  of the game, but also things like age rating;
 
-* ``rating`` — provides information about the appropriateness of the contents
-  of the cartridge. This includes age-appropriateness ratings and content
-  warnings;
+* ``legal`` — provides information about the usage terms of the cartridge
+  and the users' rights. This includes things like licence information,
+  third party IP notices, but also things like privacy policy;
 
-* ``play_style`` — provides information about how the game is played. This
-  includes what controls it supports, what language it offers, whether it
-  supports multi-play, accessibility provisions, etc;
+* ``accessibility`` — provides information about how the game is played. This
+  of course includes things like what accessibility provisions the game offers,
+  such as high-contrast or voiced text, but also things like what input methods
+  are supported, which languages the game offers, how long it takes to complete
+  the game, etc.
 
 
-Game
-''''
+Presentation
+''''''''''''
 
-author *(recommended)*
+author
   | ``string``
   | A descriptive name identifying who made the game. Will show up on stores
     and in the detailed cartridge information screen. Up to 255 characters [#f2]_.
@@ -106,64 +138,21 @@ title
     cartridge's thumbnail in the library, and everywhere else the cartridge
     is displayed. Up to 255 characters [#f2]_.
 
+tagline
+  | ``string``
+  | A very short description of the game. This will show up on the store and
+    in the game information screen. Up to 255 characters [#f2]_.
+
 description *(optional)*
   | ``string``
   | A free-text description of the game. Might include a summary, features
     players might expect, and similar text to what is generally found in
     game stores. Up to 10,000 (ten thousand) characters [#f2]_.
 
-genre *(recommended)*
-  | ``array of string``
-  | A list of genres that the game might be classified as, with a maximum of
-    10 items. This is used for organising the cartridge library and allow
-    players to search for things they want to play.
-
-  The list of genres is pre-defined and can be one of the following:
-
-  * ``action``
-  * ``fighting``
-  * ``interactive-fiction``
-  * ``platformer``
-  * ``puzzle``
-  * ``racing``
-  * ``rhythm``
-  * ``rpg``
-  * ``simulation``
-  * ``shooter``
-  * ``sports``
-  * ``strategy``
-  * ``tool``
-  * ``other``
-
-  The default is ``other``, if no list of genres is provided.
-
-tag *(optional)*
-  | ``array of string``
-  | A list of additional tags that help players search for cartridges and
-    organise their library.
-
-  Each tag can have up to 255 characters [#f2]_, and must consist entirely
-  of lower-case latin letters and hyphens. E.g.: ``visual-novel`` is a
-  valid tag, but ``visual novel`` is not, because of the white space.
-  Neither is ``café-simulator``, because of the accent on ``e``.
-
-thumbnail_path *(recommended)*
-  | ``string``
-  | A path to a PNG image to use as the cartridge cover when displaying
-    the cartridge across Kate. The path is relative to the root defined in
-    the configuration file.
-
-  The image should have a 4:7 aspect ratio, and the recommended resolution
-  is 400x700 pixels.
-
-
-Release
-'''''''
-
-kind *(recommended)*
+release_type *(recommended)*
   | ``string``
   | Tells players what kind of stability and polish they should expect from
-    the cartridge. The default is ``full``, which means a proper, stable and
+    the cartridge. The default is ``regular``, which means a proper, stable and
     polished release.
 
   Can be one of:
@@ -183,58 +172,66 @@ kind *(recommended)*
     complete in this release. Players should still expect a polished and stable
     experience.
 
-  * ``full`` — this is for proper stable releases. Players should expect full
+  * ``regular`` — this is for proper stable releases. Players should expect regular
     releases to be polished, complete, and stable.
 
-date *(optional)*
-  | ``{year: integer, month: integer, day: integer}``
-  | The date in which the cartridge was released. Defaults to the current
-    date. This helps players sort store entries and their library by
-    recency, or look for releases in a particular time-frame.
-
-  E.g.: ``{year: 2023, month: 6, day: 10}``
-
-version
-  | ``{major: integer, minor: integer}``
-  | The version of the cartridge. Must be unique per release, since Kate will
-    do nothing if a player tries to install a cartridge when there's something
-    with the same id and version already installed
-    (even if the contents differ). See :ref:`Cartridge Versioning` for details.
-
-  E.g.: ``{major: 1, minor: 13}``
-
-legal_notices_path *(recommended)*
+thumbnail_path *(recommended)*
   | ``string``
-  | A path to a text file describing the terms of use of the cartridge and
-    any additional credits or licences for data that the cartridge uses.
-    This is the place where you should e.g.: put licences from assets and
-    code that you use in your game, but which was not made by you.
+  | A path to a PNG image to use as the cartridge cover when displaying
+    the cartridge across Kate (e.g.: in the start screen and in the library).
+    The path is relative to the root defined in the configuration file.
 
-  Kate will allow players to read through this file from the cartridge's
-  context menu. See :ref:`Cartridge Usage Terms` for details.
+  The image should have a 4:7 aspect ratio, and the recommended resolution
+  is 400x700 pixels.
 
-licence_name *(recommended)*
+banner_path *(recommended)*
   | ``string``
-  | If the cartridge is released in an open source licence, this should
-    contain the `SPDX licence id <https://spdx.org/licenses/>`_ for the
-    licence you use. Otherwise it's ``proprietary``, which is the default.
+  | A path to a PNG image to use as a banner in the top of the game information
+    screen, and also in the game's store page.
 
-allow_derivative *(optional)*
-  | ``boolean``
-  | This tells players if they can modify the cartridge and share these
-    modifications, e.g.: by making mods. The default is ``false``, so
-    players are not allowed to make mods.
-
-allow_commercial *(optional)*
-  | ``boolean``
-  | This tells players if they can profit **from modifications** of the
-    cartridge, e.g.: by making mods and selling them. The default is
-    ``false``, so players are not allowed to profit from cartridge
-    modifications.
+  The image should have 1280x200 pixels.
 
 
-Rating
-''''''
+Classification
+''''''''''''''
+
+genre *(recommended)*
+  | ``array of string``
+  | A list of genres that the game might be classified as, with a maximum of
+    10 items. This is used for organising the cartridge library and allow
+    players to search for things they want to play.
+
+  The list of genres is pre-defined and can be one of the following:
+
+  * ``action``
+  * ``fighting``
+  * ``adventure``
+  * ``interactive-fiction``
+  * ``platformer``
+  * ``puzzle``
+  * ``racing``
+  * ``rhythm``
+  * ``rpg``
+  * ``simulation``
+  * ``shooter``
+  * ``sports``
+  * ``strategy``
+  * ``tool``
+  * ``visual-novel``
+  * ``other``
+
+  The default is ``other``, if no list of genres is provided.
+
+tag *(optional)*
+  | ``array of string``
+  | A list of additional tags that help players search for cartridges and
+    organise their library. You can specify up to 10 tags, so you shouldn't
+    use them to repeat things already conveyed by your set of genres.
+
+  Each tag can have up to 255 characters [#f2]_, and must consist entirely
+  of lower-case latin letters and hyphens. E.g.: ``visual-novel`` is a
+  valid tag, but ``visual novel`` is not, because of the white space.
+  Neither is ``café-simulator``, because of the accent on ``e``.
 
 rating *(recommended)*
   | ``string``
@@ -266,8 +263,75 @@ warnings *(recommended)*
   to other medical emergencies such as epileptic seizures.
 
 
-Play style
-''''''''''
+Legal
+'''''
+
+licence_path *(recommended)*
+  | ``string``
+  | A path to a text file describing the terms of use of the cartridge and
+    any additional credits or licences for data that the cartridge uses.
+    This is the place where you should e.g.: put licences from assets and
+    code that you use in your game, but which was not made by you.
+
+  Kate will allow players to read through this file from the cartridge's
+  context menu. See :ref:`Cartridge Usage Terms` for details.
+
+privacy_policy_path *(recommended)*
+  | ``string``
+  | A path to a text file describing what privacy guarantees the cartridge
+    provides. This **must** be provided if the cartridge requires access
+    to the internet or provides links to pages on the internet.
+
+  Privacy policy files should be written in a clear, direct, and informative
+  style. They're primarily meant to provide users with enough information to make
+  an informed consent about using the cartridge or not based on their own
+  personal risks, not to be a legal document to protect the author of the
+  cartridge of any claimed damages — keep that in the legal notices file.
+
+  Kate will allow players to read through this file from the cartridge's
+  context menu, and also from the store. See :ref:`Cartridge Usage Terms`
+  for details.
+
+derivative_policy *(recommended)*
+  | ``string``
+  | Whether the author allows derivative works (e.g.: mods) to be made of
+    the cartridge; and if so what limitations are in place for derivative
+    works.
+
+  The default is ``personal-use``, which allows players to modify the
+  cartridge *strictly* for their own personal use, but not share any
+  modifications. These provisions exist so players with special accessibility
+  needs can use a cartridge even if the cartridge was not made with them
+  in mind.
+
+  Can be one of:
+
+  * ``not-allowed`` — No derivative works or modifications are allowed, not
+    even for personal use. This is the common case for more restrictive
+    proprietary licences for games.
+
+  * ``personal-use`` — The users are allowd to modify the cartridge for their
+    own use, but they are not allowed to share any modification they make.
+
+  * ``non-commercial-use`` — The users are allowed to modify the cartridge,
+    and are allowed to share modified cartridges as long as there's no
+    commercial usage of the modified cartridge.
+
+    This is not limited to selling the cartridge directly. For example, using
+    a modified cartridge in a café or business, even if patrons are not paying
+    to play the cartridge directly, is still considered commercial use.
+
+  * ``commercial-use`` — The users are allowed to modify the cartridge, there
+    are no restrictions in the distribution of derivative works regarding
+    commercial use.
+
+  Note that regardless of how permissive a cartridge is regarding this policy,
+  derivative works are still *required* to make it clear that they are
+  unofficial works, not endorsed by the original author.
+
+
+Accessibility
+'''''''''''''
 
 input_methods *(recommended)*
   | ``array of string``
@@ -298,7 +362,7 @@ languages *(recommended)*
   voices are translated, and ``text`` means that the game offers subtitles
   and other text in the language.
 
-accessibility *(recommended)*
+provisions *(recommended)*
   | ``array of string``
   | A list of accessibility provisions that the game offers to allow more
     players to play the game. We always encourage developers to look into
@@ -319,23 +383,26 @@ accessibility *(recommended)*
   * ``skippable-content`` — helps players who may have little time to play or
     different interests in what they want out of the game.
 
-average_duration *(recommended)*
-  | ``string``
+average_completion *(recommended)*
+  | ``{unit: "seconds" | "minutes" | "hours", value: integer}``
   | An estimation of the amount of time that it takes to complete one run of
     the game, but not necessarily doing all of the things the game offers.
     This helps players looking for something to play to consider what
     their options are for the free time they have at the moment.
 
-  Can be one of:
+  For example, ``{"unit": "seconds", "value": 30}`` and
+  ``{"unit": "hours", "value": 20}`` are valid expressions of
+  "roughly a few seconds" and "roughly 20 hours".
 
-  * ``seconds``;
-  * ``few-minutes``;
-  * ``half-hour``;
-  * ``few-hours``;
-  * ``several-hours``;
-  * ``unknown``;
 
-  The default is ``unknown``.
+average_session *(recommended)*
+  | ``{unit: "seconds" | "minutes" | "hours", value: integer}``
+  | An estimation of the amount of time that it takes to complete one
+    portion of the game. What a "session" means varies greatly from
+    game to game—it could be a level, a chapter, a match, etc.
+
+  The format is the same as ``average_completion``.
+
 
   
 .. rubric:: Footnotes

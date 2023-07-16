@@ -18,7 +18,7 @@ To add this bridge to your cartridge you specify the following in your
   {
     "bridges": [
       {
-        "type": "preserve-webgl-render",
+        "type": "renpy-web-tweaks",
         "version": {
           "major": 7,
           "minor": 5

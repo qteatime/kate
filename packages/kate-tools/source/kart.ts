@@ -17,6 +17,8 @@ const genre = T.one_of([
   "action",
   "fighting",
   "interactive-fiction",
+  "adventure",
+  "visual-novel",
   "platformer",
   "puzzle",
   "racing",
