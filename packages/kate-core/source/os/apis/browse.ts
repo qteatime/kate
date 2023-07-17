@@ -15,20 +15,19 @@ export class KateBrowser {
     }
 
     const ok = await this.os.dialog.confirm("kate:browser", {
-      title: "Open URL?",
+      title: "Navigate outside of Kate?",
       message: UI.stack([
-        UI.paragraph([UI.mono_text([requestee]), " wants to open:"]),
         UI.paragraph([
-          UI.h(
-            "div",
-            { class: "kate-ui-highlight-url", title: url.toString() },
-            [shorten(url)]
-          ),
+          UI.strong([UI.mono_text([requestee])]),
+          " wants to open:",
+        ]),
+        UI.h("div", { class: "kate-ui-highlight-url", title: url.toString() }, [
+          shorten(url),
         ]),
       ]),
       dangerous: true,
       cancel: "Cancel",
-      ok: "Open website",
+      ok: "Continue to website",
     });
     if (!ok) {
       return;
@@ -70,7 +69,7 @@ function shorten_end(text: string, max: number) {
   if (chars.length > max) {
     return UI.flow([
       UI.mono_text([chars.slice(0, max).join("")]),
-      UI.chip([`...${chars.length - max} characters`]),
+      UI.chip([`...${chars.length - max} characters omitted`]),
     ]);
   } else {
     return UI.mono_text([text]);
@@ -83,7 +82,7 @@ function shorten_mid(text: string, max: number) {
     const mid = Math.floor(max / 2);
     return UI.flow([
       UI.mono_text([chars.slice(0, mid).join("")]),
-      UI.chip([`...${chars.length - max} characters...`]),
+      UI.chip([`...${chars.length - max} characters omitted...`]),
       UI.mono_text([chars.slice(chars.length - mid).join("")]),
     ]);
   } else {
