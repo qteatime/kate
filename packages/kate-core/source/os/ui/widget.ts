@@ -126,6 +126,18 @@ export function hbox(gap: number, children: Widgetable[]) {
   return new HBox(gap, children);
 }
 
+export function flow(children: Widgetable[]) {
+  return h("div", { class: "kate-ui-flow" }, children);
+}
+
+export function paragraph(children: Widgetable[]) {
+  return h("div", { class: "kate-ui-paragraph" }, [flow(children)]);
+}
+
+export function stack(children: Widgetable[]) {
+  return h("div", { class: "kate-ui-stack" }, children);
+}
+
 export class VBox extends Widget {
   constructor(readonly gap: number, readonly children: Widgetable[]) {
     super();
@@ -280,6 +292,8 @@ export function link(
   x: {
     href?: string;
     target?: string;
+    title?: string;
+    rel?: string;
     status_label?: string;
     on_click?: () => void;
   }
@@ -292,6 +306,8 @@ export function link(
         class: "kate-ui-button-link kate-ui-focus-target",
         href: x.href ?? "#",
         target: x.target ?? "",
+        title: x.title ?? "",
+        rel: x.rel ?? "",
       },
       [text]
     ),
@@ -377,6 +393,10 @@ export function mono_text(x: Widgetable[]) {
 
 export function strong(x: Widgetable[]) {
   return h("strong", {}, x);
+}
+
+export function chip(x: Widgetable[]) {
+  return h("div", { class: "kate-ui-chip" }, x);
 }
 
 export class Icon extends Widget {

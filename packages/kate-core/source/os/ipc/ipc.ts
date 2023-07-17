@@ -8,6 +8,7 @@ import CartFSMessages from "./cart_fs";
 import NotificationMessages from "./notification";
 import ObjectStorageMessages from "./object-storage";
 import SpecialMessages from "./special";
+import BrowserMessages from "./browser";
 
 type Message = {
   type: string;
@@ -28,6 +29,7 @@ export class KateIPCServer {
     this.add_handlers(NotificationMessages);
     this.add_handlers(ObjectStorageMessages);
     this.add_handlers(SpecialMessages);
+    this.add_handlers(BrowserMessages);
   }
 
   private add_handlers(handlers: Handler<any, any>[]) {

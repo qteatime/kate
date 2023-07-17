@@ -1,4 +1,5 @@
 import { KateAudio, KateAudioChannel, KateAudioSource } from "./audio";
+import { KateBrowser } from "./browser";
 import { KateCapture } from "./capture";
 import { KateCartFS } from "./cart-fs";
 import { KateIPC } from "./channel";
@@ -35,6 +36,8 @@ export const pointer_input = new KatePointerInput(timer);
 export const capture = new KateCapture(channel, input);
 capture.setup();
 
+export const browser = new KateBrowser(channel);
+
 window.addEventListener("focus", () => {
   channel.send_and_ignore_result("kate:special.focus", {});
 });
@@ -70,6 +73,7 @@ export type KateAPI = {
   audio: typeof audio;
   timer: typeof timer;
   capture: typeof capture;
+  browser: typeof browser;
 };
 
 declare global {
@@ -84,6 +88,7 @@ declare global {
       KatePointerInput,
       ExtendedInputKey,
       KateTimer,
+      KateBrowser,
       KateObjectStore,
       PointerLocation,
       PointerClick,

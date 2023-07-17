@@ -311,3 +311,26 @@
 .kate-ui-space {
   display: inline-block;
 }
+
+.kate-ui-paragraph {
+  margin-bottom: 1.5em;
+}
+
+.kate-ui-flow > * {
+  display: inline-block;
+}
+
+.kate-ui-chip {
+  margin: 0 2px;
+  background: var(--color-primary);
+  border-radius: 4px;
+  color: var(--color-text-inverted) !important;
+  padding: 0.2em 0.5em;
+  font-size: 0.7em;
+  display: inline-block;
+}
+
+.kate-ui-highlight-url,
+.kate-ui-highlight-url * {
+  color: var(--color-primary);
+}

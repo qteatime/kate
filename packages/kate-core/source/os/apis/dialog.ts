@@ -15,7 +15,7 @@ export class KateDialog {
     this.hud.setup();
   }
 
-  async message(id: string, x: { title: string; message: string }) {
+  async message(id: string, x: { title: string; message: UI.Widgetable }) {
     return await this.hud.show(
       id,
       x.title,
@@ -29,7 +29,7 @@ export class KateDialog {
     id: string,
     x: {
       title: string;
-      message: string;
+      message: UI.Widgetable;
       ok?: string;
       cancel?: string;
       dangerous?: boolean;
@@ -53,7 +53,7 @@ export class KateDialog {
 
   async progress(
     id: string,
-    message: string,
+    message: UI.Widgetable,
     process: (_: Progress) => Promise<void>
   ) {
     return await this.hud.progress(id, message, process);
@@ -85,7 +85,7 @@ export class KateDialog {
 
 export class Progress {
   readonly canvas: HTMLElement;
-  constructor(private _message: string) {
+  constructor(private _message: UI.Widgetable) {
     this.canvas = document.createElement("div");
     this.canvas.append(this.render());
   }
@@ -132,7 +132,7 @@ export class HUD_Dialog extends Scene {
 
   async progress(
     id: string,
-    message: string,
+    message: UI.Widgetable,
     process: (_: Progress) => Promise<void>
   ) {
     const progress = new Progress(message);
@@ -144,19 +144,19 @@ export class HUD_Dialog extends Scene {
       },
       [progress.canvas]
     );
-    const result = process(progress);
-    this.canvas.textContent = "";
-    this.canvas.appendChild(element);
-    this.os.focus_handler.push_root(this.canvas);
     try {
+      const result = process(progress);
+      this.canvas.textContent = "";
+      this.canvas.appendChild(element);
+      this.os.focus_handler.push_root(this.canvas);
       await result;
-    } finally {
       this.os.focus_handler.pop_root(this.canvas);
       setTimeout(async () => {
         element.classList.add("leaving");
         await wait(this.FADE_OUT_TIME_MS);
         element.remove();
       });
+    } finally {
       this.os.kernel.console.body.classList.remove("trusted-mode");
       this.canvas.textContent = "";
     }
@@ -165,7 +165,7 @@ export class HUD_Dialog extends Scene {
   async show<A>(
     id: string,
     title: string,
-    message: string,
+    message: UI.Widgetable,
     buttons: {
       label: string;
       kind?: "primary" | "dangerous" | "cancel" | "button";
