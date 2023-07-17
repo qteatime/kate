@@ -170,6 +170,9 @@ const bridges = T.tagged_choice<Bridge, Bridge["type"]>("type", {
       minor: T.int,
     }),
   }),
+  "external-url-handler": T.spec({
+    type: T.constant("external-url-handler" as const),
+  }),
 });
 
 const recipe = T.tagged_choice<Recipe, Recipe["type"]>("type", {
@@ -327,7 +330,8 @@ type Bridge =
   | { type: "capture-canvas"; selector: string }
   | { type: "pointer-input-proxy"; selector: string; hide_cursor: boolean }
   | { type: "indexeddb-proxy"; versioned: boolean }
-  | { type: "renpy-web-tweaks"; version: { major: number; minor: number } };
+  | { type: "renpy-web-tweaks"; version: { major: number; minor: number } }
+  | { type: "external-url-handler" };
 
 type Recipe =
   | { type: "identity" }
@@ -336,6 +340,7 @@ type Recipe =
       pointer_support: boolean;
       save_data: "versioned" | "unversioned";
       hide_cursor: boolean;
+      open_urls: boolean;
       renpy_version: string;
     }
   | { type: "bitsy" };
@@ -720,6 +725,10 @@ function make_bridge(x: Bridge): Cart.Bridge[] {
       ];
     }
 
+    case "external-url-handler": {
+      return [Cart.Bridge.External_URL_handler({})];
+    }
+
     default:
       throw unreachable(x, `Unknown bridge: ${(x as any).type}`);
   }
@@ -900,6 +909,13 @@ function apply_recipe(
               type: "renpy-web-tweaks",
               version: renpy_version(recipe.renpy_version),
             },
+            ...(recipe.open_urls
+              ? [
+                  {
+                    type: "external-url-handler" as const,
+                  },
+                ]
+              : []),
             ...json.platform.bridges,
           ]),
         },

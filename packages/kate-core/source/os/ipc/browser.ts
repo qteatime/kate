@@ -7,7 +7,7 @@ export default [
     TC.spec({ url: TC.url }),
     async (os, env, ipc, { url }) => {
       try {
-        await os.browser.open(env.cart.metadata.id, url);
+        await os.browser.open(env.cart.id, url);
       } catch (error) {
         throw new EMessageFailed(
           "kate.browser.not-allowed",

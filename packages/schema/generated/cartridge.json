@@ -717,6 +717,10 @@
                   }
                 }
               ]
+            },
+            {
+              "name": "External-URL-handler",
+              "fields": []
             }
           ]
         }

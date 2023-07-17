@@ -1239,7 +1239,7 @@ export namespace Accessibility_provision {
 
 
 
-export type Bridge = Bridge.Network_proxy | Bridge.Local_storage_proxy | Bridge.Input_proxy | Bridge.Preserve_WebGL_render | Bridge.Capture_canvas | Bridge.Pointer_input_proxy | Bridge.IndexedDB_proxy | Bridge.Renpy_web_tweaks;
+export type Bridge = Bridge.Network_proxy | Bridge.Local_storage_proxy | Bridge.Input_proxy | Bridge.Preserve_WebGL_render | Bridge.Capture_canvas | Bridge.Pointer_input_proxy | Bridge.IndexedDB_proxy | Bridge.Renpy_web_tweaks | Bridge.External_URL_handler;
 
 export namespace Bridge {
  export const tag = 13;
@@ -1252,7 +1252,8 @@ export namespace Bridge {
     Capture_canvas = 4,
     Pointer_input_proxy = 5,
     IndexedDB_proxy = 6,
-    Renpy_web_tweaks = 7
+    Renpy_web_tweaks = 7,
+    External_URL_handler = 8
  }
 
  
@@ -1429,6 +1430,28 @@ export namespace Bridge {
    readonly '@variant': $Tags.Renpy_web_tweaks;
    readonly '@variant-name': 'Renpy-web-tweaks';
    readonly 'version': Version
+ }
+
+
+  
+ export function External_URL_handler(x: {}): Bridge {
+   return {
+     '@name': 'Bridge',
+     '@tag': 13,
+     '@version': 0,
+     '@variant': $Tags.External_URL_handler,
+     '@variant-name': 'External-URL-handler',
+     ...x
+   }
+ }
+
+ export interface External_URL_handler {
+   readonly '@name': 'Bridge';
+   readonly '@tag': 13;
+   readonly '@version': 0;
+   readonly '@variant': $Tags.External_URL_handler;
+   readonly '@variant-name': 'External-URL-handler';
+   
  }
 
 }

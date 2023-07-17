@@ -161,6 +161,8 @@ union Bridge {
   type Renpy-web-tweaks {
     field version: Version;
   }
+
+  type External-URL-handler {}
 }
 
 union Virtual-key {

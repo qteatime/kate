@@ -54,6 +54,9 @@ function bridge(x: Cart_v4.Bridge): Bridge {
     case Cart_v4.Bridge.$Tags.Renpy_web_tweaks: {
       return { type: "renpy-web-tweaks", version: x.version };
     }
+    case Cart_v4.Bridge.$Tags.External_URL_handler: {
+      return { type: "external-url-handler" };
+    }
     default:
       throw unreachable(x);
   }

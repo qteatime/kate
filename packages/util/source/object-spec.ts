@@ -161,6 +161,14 @@ export function short_str(max_size: number = 255) {
   return seq2(str, max_length(max_size));
 }
 
+export function url(x: string) {
+  try {
+    return new URL(x);
+  } catch (_) {
+    throw new EType("URL", x);
+  }
+}
+
 export function regex(reason: string, re: RegExp) {
   return (x: string) => {
     if (re.test(x)) {

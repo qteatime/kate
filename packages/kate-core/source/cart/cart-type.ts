@@ -104,7 +104,8 @@ export type Bridge =
   | { type: "capture-canvas"; selector: string }
   | { type: "pointer-input-proxy"; selector: string; hide_cursor: boolean }
   | { type: "indexeddb-proxy"; versioned: boolean }
-  | { type: "renpy-web-tweaks"; version: { major: number; minor: number } };
+  | { type: "renpy-web-tweaks"; version: { major: number; minor: number } }
+  | { type: "external-url-handler" };
 
 export type KeyboardKey = {
   key: string;
