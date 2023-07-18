@@ -7,6 +7,7 @@ type Cartridge {
   field release-date: Date;
   field metadata: Metadata[];
   field runtime: Runtime;
+  field security: Security;
   field files: File[];
 }
 
@@ -41,6 +42,10 @@ union Metadata {
     field average-completion-seconds: Uint32?;
     field average-session-seconds: Uint32?;
   }
+}
+
+type Security {
+  field capabilities: Capability[];
 }
 
 union Runtime {
@@ -180,4 +185,16 @@ union Virtual-key {
 
 type Keyboard-key {
   field code: Text;
+}
+
+union Capability {
+  type Contextual {
+    field capability: Contextual-capability;
+    field reason: Text;
+  }
+}
+
+union Contextual-capability {
+  // medium risk: data exfiltration, privacy concerns
+  type Open-URLs {}
 }

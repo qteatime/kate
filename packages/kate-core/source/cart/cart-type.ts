@@ -126,12 +126,24 @@ export type BasicFile = Omit<
   "integrity_hash" | "integrity_hash_algorithm"
 >;
 
+export type ContextualCapabilityGrant = {
+  capability: ContextualCapability;
+  reason: string;
+};
+
+export type ContextualCapability = { type: "open-urls" };
+
+export type Security = {
+  contextual_capabilities: ContextualCapabilityGrant[];
+};
+
 export type Cart = {
   id: string;
   version: string;
   release_date: Date;
   metadata: Metadata;
   runtime: Runtime;
+  security: Security;
   files: File[];
 };
 

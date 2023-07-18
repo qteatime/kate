@@ -194,7 +194,7 @@ const recipe = T.tagged_choice<Recipe, Recipe["type"]>("type", {
       /^\d+\.\d+$/
     ),
     hide_cursor: T.optional(false, T.bool),
-    open_urls: T.optional(false, T.bool),
+    open_urls_reason: T.optional(null, T.short_str(255)),
   }),
 });
 
@@ -208,6 +208,7 @@ const platform_web = T.spec({
 const capability = T.tagged_choice<Capability, Capability["type"]>("type", {
   "open-urls": T.spec({
     type: T.constant("open-urls" as const),
+    reason: T.short_str(255),
   }),
 });
 
@@ -315,7 +316,9 @@ type KPWeb = {
 
 type KeyMapping = { [key: string]: string } | "defaults" | "kate";
 
-type Capability = {
+type Capability = ContextualCapability & { reason: string };
+
+type ContextualCapability = {
   type: "open-urls";
 };
 
@@ -340,7 +343,7 @@ type Recipe =
       pointer_support: boolean;
       save_data: "versioned" | "unversioned";
       hide_cursor: boolean;
-      open_urls: boolean;
+      open_urls_reason: string | null;
       renpy_version: string;
     }
   | { type: "bitsy" };
@@ -672,6 +675,26 @@ async function files(patterns: Kart["files"], root: string, base_dir: string) {
   return result;
 }
 
+function make_security(json: Kart["security"]) {
+  return Cart.Security({
+    capabilities: json.capabilities.map(make_capability),
+  });
+}
+
+function make_capability(json: Capability) {
+  switch (json.type) {
+    case "open-urls": {
+      return Cart.Capability.Contextual({
+        capability: Cart.Contextual_capability.Open_URLs({}),
+        reason: json.reason,
+      });
+    }
+
+    // default:
+    //   throw unreachable(json, "capability");
+  }
+}
+
 function save(cartridge: Cart.Cartridge, output: string) {
   const bytes = Cart.encode(cartridge);
   console.log(`> Total size: ${from_bytes(bytes.byteLength)}`);
@@ -883,6 +906,19 @@ function apply_recipe(
           "**/*.tga",
           "**/*.dds",
         ],
+        security: {
+          capabilities: [
+            ...(recipe.open_urls_reason != null
+              ? [
+                  {
+                    type: "open-urls" as const,
+                    reason: recipe.open_urls_reason,
+                  },
+                ]
+              : []),
+            ...json.security.capabilities,
+          ],
+        },
         platform: {
           recipe,
           type: "web-archive",
@@ -909,7 +945,7 @@ function apply_recipe(
               type: "renpy-web-tweaks",
               version: renpy_version(recipe.renpy_version),
             },
-            ...(recipe.open_urls
+            ...(recipe.open_urls_reason != null
               ? [
                   {
                     type: "external-url-handler" as const,
@@ -979,6 +1015,7 @@ export async function make_cartridge(path: string, output: string) {
             "html-path": make_absolute(x.html),
             bridges: x.bridges.flatMap(make_bridge),
           }),
+          security: make_security(json.security),
           files: archive,
         }),
         output
