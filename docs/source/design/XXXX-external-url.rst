@@ -3,10 +3,15 @@
 
 :Author: Q\.
 :Started: 25th June 2023
-:First draft: 15th July 2023
-:Published: —
 :Last updated: 15th July 2023
-:Implementation status: In implementation
+:Status: PoC in progress
+
+
+=========== ================ =====================
+First draft Proof of Concept Stable implementation
+=========== ================ =====================
+2023-07-15  —                —
+=========== ================ =====================
 
 
 Summary
