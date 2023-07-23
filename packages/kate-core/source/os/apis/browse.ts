@@ -2,11 +2,18 @@ import type { KateOS } from "../os";
 import * as UI from "../ui";
 
 export class KateBrowser {
+  private pending_request: boolean = false;
   readonly SUPPORTED_PROTOCOLS = ["http:", "https:"];
 
   constructor(readonly os: KateOS) {}
 
   async open(requestee: string, url: URL) {
+    if (this.pending_request) {
+      console.error(
+        `Blocked ${requestee} from opening URL ${url}: a request is already pending`
+      );
+      return;
+    }
     if (!this.SUPPORTED_PROTOCOLS.includes(url.protocol)) {
       console.error(
         `Blocked ${requestee} from opening URL with unsupported protocol ${url}`
@@ -20,6 +27,7 @@ export class KateBrowser {
       return;
     }
 
+    this.pending_request = true;
     const ok = await this.os.dialog.confirm("kate:browser", {
       title: "Navigate outside of Kate?",
       message: UI.stack([
@@ -35,6 +43,8 @@ export class KateBrowser {
       cancel: "Cancel",
       ok: "Continue to website",
     });
+    this.pending_request = false;
+
     if (!ok) {
       return;
     }
