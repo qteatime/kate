@@ -6,14 +6,25 @@ export default [
     "kate:browser.open",
     TC.spec({ url: TC.url }),
     async (os, env, ipc, { url }) => {
+      if (
+        !os.capability_supervisor.is_allowed(env.cart.id, "open-urls", { url })
+      ) {
+        console.error(
+          `Blocked ${env.cart.id} from opening ${url}: capability not granted`
+        );
+        return null;
+      }
+
       try {
         await os.browser.open(env.cart.id, url);
       } catch (error) {
-        throw new EMessageFailed(
-          "kate.browser.not-allowed",
-          `Failed to open ${url}`
+        console.error(
+          `Failed to open ${url} at the request of ${env.cart.id}:`,
+          error
         );
       }
+
+      return null;
     }
   ),
 ];

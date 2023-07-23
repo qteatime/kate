@@ -25,6 +25,7 @@ import { KateStorageManager } from "./apis/storage-manager";
 import { KatePlayHabits } from "./apis/play-habits";
 import { KateAppResources } from "./apis/app-resources";
 import { KateBrowser } from "./apis/browse";
+import { KateCapabilitySupervisor } from "./services/capability-supervisor";
 
 export type CartChangeReason =
   | "installed"
@@ -51,6 +52,7 @@ export class KateOS {
   readonly play_habits: KatePlayHabits;
   readonly app_resources: KateAppResources;
   readonly browser: KateBrowser;
+  readonly capability_supervisor: KateCapabilitySupervisor;
   readonly events = {
     on_cart_inserted: new EventStream<Cart.CartMeta>(),
     on_cart_removed: new EventStream<{ id: string; title: string }>(),
@@ -90,6 +92,7 @@ export class KateOS {
     this.storage_manager.setup();
     this.app_resources = new KateAppResources(this);
     this.browser = new KateBrowser(this);
+    this.capability_supervisor = new KateCapabilitySupervisor(this);
   }
 
   get display() {

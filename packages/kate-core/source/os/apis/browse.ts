@@ -2,7 +2,7 @@ import type { KateOS } from "../os";
 import * as UI from "../ui";
 
 export class KateBrowser {
-  readonly SUPPORTED_PROTOCOLS = ["http:", "https:", "mailto:"];
+  readonly SUPPORTED_PROTOCOLS = ["http:", "https:"];
 
   constructor(readonly os: KateOS) {}
 
