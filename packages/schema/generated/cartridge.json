@@ -9,29 +9,29 @@
   "entities": [
     {
       "type": "union",
-      "name": "Release-type",
+      "name": "Content-rating",
       "id": 8,
       "versions": [
         {
           "variants": [
             {
-              "name": "Prototype",
+              "name": "General",
               "fields": []
             },
             {
-              "name": "Early-access",
+              "name": "Teen-and-up",
               "fields": []
             },
             {
-              "name": "Beta",
+              "name": "Mature",
               "fields": []
             },
             {
-              "name": "Demo",
+              "name": "Explicit",
               "fields": []
             },
             {
-              "name": "Regular",
+              "name": "Unknown",
               "fields": []
             }
           ]
@@ -55,14 +55,14 @@
               "name": "version",
               "type": {
                 "op": "record",
-                "id": 4
+                "id": 5
               }
             },
             {
               "name": "release-date",
               "type": {
                 "op": "record",
-                "id": 5
+                "id": 6
               }
             },
             {
@@ -79,6 +79,13 @@
               "name": "runtime",
               "type": {
                 "op": "union",
+                "id": 3
+              }
+            },
+            {
+              "name": "security",
+              "type": {
+                "op": "record",
                 "id": 2
               }
             },
@@ -88,7 +95,7 @@
                 "op": "array",
                 "items": {
                   "op": "record",
-                  "id": 3
+                  "id": 4
                 }
               }
             }
@@ -134,7 +141,7 @@
                   "name": "release-type",
                   "type": {
                     "op": "union",
-                    "id": 8
+                    "id": 9
                   }
                 },
                 {
@@ -166,7 +173,7 @@
                     "op": "array",
                     "items": {
                       "op": "union",
-                      "id": 6
+                      "id": 7
                     }
                   }
                 },
@@ -183,7 +190,7 @@
                   "name": "rating",
                   "type": {
                     "op": "union",
-                    "id": 7
+                    "id": 8
                   }
                 },
                 {
@@ -204,7 +211,7 @@
                   "name": "derivative-policy",
                   "type": {
                     "op": "union",
-                    "id": 9
+                    "id": 10
                   }
                 },
                 {
@@ -236,7 +243,7 @@
                     "op": "array",
                     "items": {
                       "op": "union",
-                      "id": 10
+                      "id": 11
                     }
                   }
                 },
@@ -246,7 +253,7 @@
                     "op": "array",
                     "items": {
                       "op": "record",
-                      "id": 11
+                      "id": 12
                     }
                   }
                 },
@@ -256,7 +263,7 @@
                     "op": "array",
                     "items": {
                       "op": "union",
-                      "id": 12
+                      "id": 13
                     }
                   }
                 },
@@ -285,9 +292,30 @@
       ]
     },
     {
+      "type": "record",
+      "name": "Security",
+      "id": 2,
+      "versions": [
+        {
+          "fields": [
+            {
+              "name": "capabilities",
+              "type": {
+                "op": "array",
+                "items": {
+                  "op": "union",
+                  "id": 17
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
       "type": "union",
       "name": "Runtime",
-      "id": 2,
+      "id": 3,
       "versions": [
         {
           "variants": [
@@ -306,7 +334,7 @@
                     "op": "array",
                     "items": {
                       "op": "union",
-                      "id": 13
+                      "id": 14
                     }
                   }
                 }
@@ -319,7 +347,7 @@
     {
       "type": "record",
       "name": "File",
-      "id": 3,
+      "id": 4,
       "versions": [
         {
           "fields": [
@@ -354,7 +382,7 @@
     {
       "type": "record",
       "name": "Version",
-      "id": 4,
+      "id": 5,
       "versions": [
         {
           "fields": [
@@ -377,7 +405,7 @@
     {
       "type": "record",
       "name": "Date",
-      "id": 5,
+      "id": 6,
       "versions": [
         {
           "fields": [
@@ -406,7 +434,7 @@
     {
       "type": "union",
       "name": "Genre",
-      "id": 6,
+      "id": 7,
       "versions": [
         {
           "variants": [
@@ -484,29 +512,29 @@
     },
     {
       "type": "union",
-      "name": "Content-rating",
-      "id": 7,
+      "name": "Release-type",
+      "id": 9,
       "versions": [
         {
           "variants": [
             {
-              "name": "General",
+              "name": "Prototype",
               "fields": []
             },
             {
-              "name": "Teen-and-up",
+              "name": "Early-access",
               "fields": []
             },
             {
-              "name": "Mature",
+              "name": "Beta",
               "fields": []
             },
             {
-              "name": "Explicit",
+              "name": "Demo",
               "fields": []
             },
             {
-              "name": "Unknown",
+              "name": "Regular",
               "fields": []
             }
           ]
@@ -516,7 +544,7 @@
     {
       "type": "union",
       "name": "Derivative-policy",
-      "id": 9,
+      "id": 10,
       "versions": [
         {
           "variants": [
@@ -543,7 +571,7 @@
     {
       "type": "union",
       "name": "Input-method",
-      "id": 10,
+      "id": 11,
       "versions": [
         {
           "variants": [
@@ -562,7 +590,7 @@
     {
       "type": "record",
       "name": "Language",
-      "id": 11,
+      "id": 12,
       "versions": [
         {
           "fields": [
@@ -597,7 +625,7 @@
     {
       "type": "union",
       "name": "Accessibility-provision",
-      "id": 12,
+      "id": 13,
       "versions": [
         {
           "variants": [
@@ -632,7 +660,7 @@
     {
       "type": "union",
       "name": "Bridge",
-      "id": 13,
+      "id": 14,
       "versions": [
         {
           "variants": [
@@ -653,11 +681,11 @@
                     "op": "map",
                     "keys": {
                       "op": "union",
-                      "id": 14
+                      "id": 15
                     },
                     "values": {
                       "op": "record",
-                      "id": 15
+                      "id": 16
                     }
                   }
                 }
@@ -713,10 +741,14 @@
                   "name": "version",
                   "type": {
                     "op": "record",
-                    "id": 4
+                    "id": 5
                   }
                 }
               ]
+            },
+            {
+              "name": "External-URL-handler",
+              "fields": []
             }
           ]
         }
@@ -725,7 +757,7 @@
     {
       "type": "union",
       "name": "Virtual-key",
-      "id": 14,
+      "id": 15,
       "versions": [
         {
           "variants": [
@@ -776,7 +808,7 @@
     {
       "type": "record",
       "name": "Keyboard-key",
-      "id": 15,
+      "id": 16,
       "versions": [
         {
           "fields": [
@@ -785,6 +817,50 @@
               "type": {
                 "op": "text"
               }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "union",
+      "name": "Capability",
+      "id": 17,
+      "versions": [
+        {
+          "variants": [
+            {
+              "name": "Contextual",
+              "fields": [
+                {
+                  "name": "capability",
+                  "type": {
+                    "op": "union",
+                    "id": 18
+                  }
+                },
+                {
+                  "name": "reason",
+                  "type": {
+                    "op": "text"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "union",
+      "name": "Contextual-capability",
+      "id": 18,
+      "versions": [
+        {
+          "variants": [
+            {
+              "name": "Open-URLs",
+              "fields": []
             }
           ]
         }

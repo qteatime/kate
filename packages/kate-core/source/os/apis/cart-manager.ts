@@ -1,4 +1,5 @@
 import * as Cart from "../../cart";
+import * as Capability from "../../capabilities";
 import type { KateOS } from "../os";
 import * as Db from "../../data";
 import { from_bytes, gb, make_thumbnail_from_bytes } from "../../utils";
@@ -174,6 +175,8 @@ export class CartManager {
       }
     }
 
+    const grants = Capability.grants_from_cartridge(cart);
+
     const thumbnail = await maybe_make_file_url(
       cart.metadata.presentation.thumbnail_path,
       cart,
@@ -192,12 +195,14 @@ export class CartManager {
         ...Db.CartStore.tables,
         ...Db.PlayHabitsStore.tables,
         ...Db.ObjectStorage.tables,
+        ...Db.CapabilityStore.tables,
       ],
       "readwrite",
       async (t) => {
         const carts = new Db.CartStore(t);
         const habits = new Db.PlayHabitsStore(t);
         const object_store = new Db.ObjectStorage(t);
+        const capabilities = new Db.CapabilityStore(t);
 
         const old_meta = await carts.meta.try_get(cart.id);
         if (old_meta != null) {
@@ -206,6 +211,7 @@ export class CartManager {
         await carts.insert(cart, thumbnail, banner);
         await habits.initialise(cart.id);
         await object_store.initialise_partitions(cart.id, cart.version);
+        await capabilities.initialise_grants(cart.id, grants);
       }
     );
 

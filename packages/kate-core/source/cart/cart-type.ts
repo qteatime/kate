@@ -104,7 +104,8 @@ export type Bridge =
   | { type: "capture-canvas"; selector: string }
   | { type: "pointer-input-proxy"; selector: string; hide_cursor: boolean }
   | { type: "indexeddb-proxy"; versioned: boolean }
-  | { type: "renpy-web-tweaks"; version: { major: number; minor: number } };
+  | { type: "renpy-web-tweaks"; version: { major: number; minor: number } }
+  | { type: "external-url-handler" };
 
 export type KeyboardKey = {
   key: string;
@@ -125,12 +126,24 @@ export type BasicFile = Omit<
   "integrity_hash" | "integrity_hash_algorithm"
 >;
 
+export type ContextualCapabilityGrant = {
+  capability: ContextualCapability;
+  reason: string;
+};
+
+export type ContextualCapability = { type: "open-urls" };
+
+export type Security = {
+  contextual_capabilities: ContextualCapabilityGrant[];
+};
+
 export type Cart = {
   id: string;
   version: string;
   release_date: Date;
   metadata: Metadata;
   runtime: Runtime;
+  security: Security;
   files: File[];
 };
 

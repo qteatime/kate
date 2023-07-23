@@ -14,6 +14,7 @@ export type CartMeta = {
   banner_dataurl: string | null;
   metadata: Cart.Metadata;
   runtime: Cart.Runtime;
+  security: Cart.Security;
   files: { path: string; id: string; size: number }[];
   installed_at: Date;
   updated_at: Date;
@@ -57,14 +58,14 @@ export class CartStore {
     mode: IDBTransactionMode,
     fn: (store: CartStore) => Promise<A>
   ) {
-    return db.transaction(CartStore.tables, mode, async (txn) => {
+    return db.transaction(CartStore.tables_by_kind(kind), mode, async (txn) => {
       return await fn(new CartStore(txn));
     });
   }
 
   static tables = [cart_meta, cart_files];
 
-  tables_by_kind(kind: TransactionKind) {
+  static tables_by_kind(kind: TransactionKind) {
     switch (kind) {
       case "meta":
         return [cart_meta];
@@ -143,6 +144,7 @@ export class CartStore {
       banner_dataurl: banner_url,
       metadata: cart.metadata,
       runtime: cart.runtime,
+      security: cart.security,
       files: files,
       installed_at: old_meta?.installed_at ?? now,
       updated_at: now,

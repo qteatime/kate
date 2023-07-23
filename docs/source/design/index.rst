@@ -15,3 +15,4 @@ API design
    :maxdepth: 1
 
    0101-object-storage
+   XXXX-external-url

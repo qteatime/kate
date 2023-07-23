@@ -4,6 +4,7 @@ import { regex, str } from "../parser-utils";
 import * as Metadata from "./metadata";
 import * as Runtime from "./runtime";
 import * as Files from "./files";
+import * as Security from "./security";
 export { Cart_v4 };
 
 const MAGIC = Number(
@@ -37,6 +38,7 @@ export function parse_v4(x: Uint8Array): Cart | null {
   const cart = Cart_v4.decode(x, Cart_v4.Cartridge.tag);
   const meta = Metadata.parse_metadata(cart);
   const runtime = Runtime.parse_runtime(cart);
+  const security = Security.parse_security(cart);
   const files = Files.parse_files(cart);
 
   return {
@@ -44,6 +46,7 @@ export function parse_v4(x: Uint8Array): Cart | null {
     version: version_string(cart.version),
     release_date: date(cart["release-date"]),
     metadata: meta,
+    security: security,
     runtime: runtime,
     files: files,
   };

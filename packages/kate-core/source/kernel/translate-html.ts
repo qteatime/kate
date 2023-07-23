@@ -208,6 +208,11 @@ function apply_bridge(
       break;
     }
 
+    case "external-url-handler": {
+      append_proxy(bridges["external-url-handler.js"]);
+      break;
+    }
+
     default:
       throw unreachable(bridge, "kate bridge");
   }
