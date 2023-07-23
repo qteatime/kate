@@ -56,19 +56,23 @@ export class KateBrowser {
 function shorten(url: URL) {
   const MAX_LENGTH = 100;
   const MAX_DOMAIN = 70;
+  const MAX_REST = 10;
 
   switch (url.protocol) {
     case "http:":
     case "https:": {
       const domain = shorten_mid(url.hostname, MAX_DOMAIN);
       const port = url.port ? UI.mono_text([`:${url.port}`]) : null;
-      const rest = shorten_end(
-        url.pathname + url.search + url.hash,
-        MAX_LENGTH - MAX_DOMAIN
-      );
       const protocol =
         url.protocol === "http:" ? UI.mono_text(["http://"]) : "";
-      return UI.flow([protocol, domain, port, rest]);
+      return UI.flow([
+        protocol,
+        domain,
+        port,
+        shorten_end(url.pathname, MAX_REST),
+        shorten_end(url.search, MAX_REST),
+        shorten_end(url.hash, MAX_REST),
+      ]);
     }
 
     case "mailto:": {
