@@ -7,7 +7,7 @@ export class KateBrowser {
     this.#channel = channel;
   }
 
-  async open(url: URL): Promise<void> {
-    await this.#channel.call("kate:browser.open", { url: url.toString() });
+  open(url: URL): void {
+    this.#channel.call("kate:browser.open", { url: url.toString() });
   }
 }
