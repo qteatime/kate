@@ -13,6 +13,12 @@ export class KateBrowser {
       );
       return;
     }
+    if (url.username !== "" || url.password !== "") {
+      console.error(
+        `Blocked ${requestee} from opening URL with authentication details ${url}`
+      );
+      return;
+    }
 
     const ok = await this.os.dialog.confirm("kate:browser", {
       title: "Navigate outside of Kate?",
