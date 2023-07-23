@@ -1,11 +1,14 @@
-#XXXX - External URL navigation
+#XXXX — External URL navigation
 ===============================
 
 :Author: Q\.
-:Started: 25th June 2023
-:Last updated: 15th July 2023
+:Started: 2023-06-25
+:Last updated: 2023-07-23
 :Status: PoC in progress
 
+
+Timeline
+--------
 
 =========== ================ =====================
 First draft Proof of Concept Stable implementation
