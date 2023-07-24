@@ -207,8 +207,7 @@ export class HUD_ContextMenu extends Scene {
     if (process == null) {
       throw new Error(`on_permissions() called without a running process`);
     }
-    const cart = await this.os.cart_manager.read_metadata(process.cart.id);
-    this.os.push_scene(new SceneCartridgePermissions(this.os, cart));
+    this.os.push_scene(new SceneCartridgePermissions(this.os, process.cart));
   };
 
   on_legal_notices = async (title: string, path: string | null) => {

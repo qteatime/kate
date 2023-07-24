@@ -1,10 +1,11 @@
-import type { kernel, os, cart, data } from "../../../kate-core";
+import type { kernel, os, cart, data, capabilities } from "../../../kate-core";
 
 declare var Kate: {
   kernel: typeof kernel;
   os: typeof os;
   cart: typeof cart;
   data: typeof data;
+  capabilities: typeof capabilities;
 };
 
 type Config = {
@@ -41,6 +42,7 @@ async function main() {
       await (await fetch("game.kart")).arrayBuffer()
     );
     const cart = Kate.cart.parse(cart_bytes);
+    const capabilities = Kate.capabilities.grants_from_cartridge(cart);
 
     const kate_os = await Kate.os.KateOS.boot(kate, {
       database: `kate/${cart.id}`,
@@ -51,11 +53,15 @@ async function main() {
       kate.console.set_case(config.case_mode);
     }
 
-    await Kate.data.ObjectStorage.transaction(
-      kate_os.db,
+    await kate_os.db.transaction(
+      [...Kate.data.ObjectStorage.tables, ...Kate.data.CapabilityStore.tables],
       "readwrite",
-      async (storage) => {
-        await storage.initialise_partitions(cart.id, cart.version);
+      async (txn) => {
+        const object_store = new Kate.data.ObjectStorage(txn);
+        const capability_store = new Kate.data.CapabilityStore(txn);
+
+        await object_store.initialise_partitions(cart.id, cart.version);
+        await capability_store.initialise_grants(cart.id, capabilities);
       }
     );
 

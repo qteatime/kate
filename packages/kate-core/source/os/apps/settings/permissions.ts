@@ -1,4 +1,5 @@
-import { CartMeta } from "../../../data";
+import * as Db from "../../../data";
+import * as Cart from "../../../cart";
 import { Observable } from "../../../utils";
 import { Security } from "../../apis";
 import { CartChangeReason, KateOS } from "../../os";
@@ -6,7 +7,7 @@ import * as Capability from "../../../capabilities";
 import * as UI from "../../ui";
 
 type Risk = {
-  cart: CartMeta;
+  cart: Db.CartMeta;
   grants: Capability.AnyCapability[];
   risk: Capability.RiskCategory;
   potential_risk: Capability.RiskCategory;
@@ -132,7 +133,7 @@ export class SceneCartridgePermissions extends UI.SimpleScene {
     return [this.cart.metadata.presentation.title];
   }
 
-  constructor(readonly os: KateOS, readonly cart: CartMeta) {
+  constructor(readonly os: KateOS, readonly cart: Cart.CartMeta) {
     super(os);
   }
 

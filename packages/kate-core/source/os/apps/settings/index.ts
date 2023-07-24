@@ -54,15 +54,17 @@ export class SceneSettings extends UI.SimpleScene {
         }),
       ]),
 
-      UI.link_card(this.os, {
-        icon: "key",
-        title: "Permissions",
-        description:
-          "What cartridges are allowed to do with your device and data",
-        on_click: () => {
-          this.os.push_scene(new ScenePermissions(this.os));
-        },
-      }),
+      UI.when(this.os.kernel.console.options.mode !== "single", [
+        UI.link_card(this.os, {
+          icon: "key",
+          title: "Permissions",
+          description:
+            "What cartridges are allowed to do with your device and data",
+          on_click: () => {
+            this.os.push_scene(new ScenePermissions(this.os));
+          },
+        }),
+      ]),
 
       UI.link_card(this.os, {
         icon: "stethoscope",
