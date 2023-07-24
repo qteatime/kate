@@ -8,6 +8,7 @@ import * as UI from "../ui";
 import { EventStream } from "../../utils";
 import { SceneSettings } from "../apps";
 import { SceneCartridgeStorageSettings } from "../apps/settings/storage";
+import { SceneCartridgePermissions } from "../apps/settings/permissions";
 
 declare global {
   function showOpenFilePicker(options: {
@@ -104,8 +105,11 @@ export class HUD_ContextMenu extends Scene {
               UI.fa_icon_button("images", "Media gallery").on_clicked(
                 this.on_media_gallery
               ),
-              UI.fa_icon_button("hard-drive", "Manage data").on_clicked(
+              UI.fa_icon_button("hard-drive", "Storage").on_clicked(
                 this.on_manage_data
+              ),
+              UI.fa_icon_button("key", "Permissions").on_clicked(
+                this.on_permissions
               ),
               UI.menu_separator(),
               UI.fa_icon_button("cat", "About Kate").on_clicked(
@@ -196,6 +200,15 @@ export class HUD_ContextMenu extends Scene {
       process.cart
     );
     this.os.push_scene(new SceneCartridgeStorageSettings(this.os, app));
+  };
+
+  on_permissions = async () => {
+    const process = this.os.processes.running;
+    if (process == null) {
+      throw new Error(`on_permissions() called without a running process`);
+    }
+    const cart = await this.os.cart_manager.read_metadata(process.cart.id);
+    this.os.push_scene(new SceneCartridgePermissions(this.os, cart));
   };
 
   on_legal_notices = async (title: string, path: string | null) => {
