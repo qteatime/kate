@@ -1,5 +1,6 @@
 import * as UI from "../../ui";
 import { SceneInputSettings } from "./input";
+import { ScenePermissions } from "./permissions";
 import { ScenePlayHabitsSettings } from "./play-habits";
 import { SceneRecovery } from "./recovery";
 import { SceneStorageSettings } from "./storage";
@@ -52,6 +53,16 @@ export class SceneSettings extends UI.SimpleScene {
           },
         }),
       ]),
+
+      UI.link_card(this.os, {
+        icon: "key",
+        title: "Permissions",
+        description:
+          "What cartridges are allowed to do with your device and data",
+        on_click: () => {
+          this.os.push_scene(new ScenePermissions(this.os));
+        },
+      }),
 
       UI.link_card(this.os, {
         icon: "stethoscope",

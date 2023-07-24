@@ -3,22 +3,58 @@ import type {
   CapabilityGrant,
   CapabilityType,
   GrantConfiguration,
+  GrantType,
   SerialisedCapability,
 } from "../data/capability";
+import type { RiskCategory } from "./risk";
 
 export type AnyCapability = Capability<CapabilityType>;
+export type AnySwitchCapability = SwitchCapability<CapabilityType>;
 
 export abstract class Capability<T extends CapabilityType> {
   abstract type: T;
+  abstract title: string;
+  abstract description: string;
+  abstract grant_type: GrantType["type"];
+  abstract grant_configuration: GrantType["value"];
   abstract cart_id: string;
   abstract serialise(): SerialisedCapability;
   abstract is_allowed(configuration: GrantConfiguration[T]): boolean;
+  abstract risk_category(): RiskCategory;
 }
 
-export class OpenURLs extends Capability<"open-urls"> {
-  readonly type = "open-urls";
+export abstract class SwitchCapability<
+  T extends CapabilityType
+> extends Capability<T> {
+  readonly grant_type = "switch";
+  abstract grant_configuration: boolean;
+  abstract update(grant: boolean): void;
 
-  constructor(readonly cart_id: string, readonly granted: boolean) {
+  is_allowed(configuration: {}): boolean {
+    return this.grant_configuration;
+  }
+
+  serialise(): SerialisedCapability {
+    return {
+      name: this.type,
+      cart_id: this.cart_id,
+      granted: { type: "switch", value: this.grant_configuration },
+    };
+  }
+}
+
+export class OpenURLs extends SwitchCapability<"open-urls"> {
+  readonly type = "open-urls";
+  readonly title = "Navigate to external URLs";
+  readonly description = `
+    Allow the cartridge to request opening a URL on your device's browser.
+  `;
+
+  get grant_configuration() {
+    return this._grant_configuration;
+  }
+
+  constructor(readonly cart_id: string, private _grant_configuration: boolean) {
     super();
   }
 
@@ -40,15 +76,11 @@ export class OpenURLs extends Capability<"open-urls"> {
     return new OpenURLs(cart_id, granted);
   }
 
-  is_allowed(configuration: GrantConfiguration["open-urls"]): boolean {
-    return this.granted;
+  update(grant: boolean): void {
+    this._grant_configuration = grant;
   }
 
-  serialise(): SerialisedCapability {
-    return {
-      name: this.type,
-      cart_id: this.cart_id,
-      granted: { type: "switch", value: this.granted },
-    };
+  risk_category(): RiskCategory {
+    return this.grant_configuration ? "low" : "none";
   }
 }

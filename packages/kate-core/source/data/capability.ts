@@ -20,7 +20,7 @@ export type CapabilityGrant<T extends CapabilityType> = {
   cart_id: string;
   name: T;
   granted: GrantType;
-  granted_at: Date | null;
+  updated_at: Date | null;
 };
 
 export type AnyCapabilityGrant = CapabilityGrant<CapabilityType>;
@@ -96,18 +96,38 @@ export class CapabilityStore {
     }
   }
 
+  async update_grant(cart_id: string, capability: Capability.AnyCapability) {
+    if (capability.cart_id !== cart_id) {
+      throw new Error(
+        `Inconsistent cartridge for capability ${capability.type}`
+      );
+    }
+
+    const changes = capability.serialise();
+    const new_value: AnyCapabilityGrant = {
+      cart_id: cart_id,
+      name: changes.name,
+      granted: changes.granted,
+      updated_at: new Date(),
+    };
+    await this.grants.put(new_value);
+  }
+
   async initialise_grants(cart_id: string, grants: Capability.AnyCapability[]) {
     if (grants.some((x) => x.cart_id !== cart_id)) {
       throw new Error(`Some capabilities does not match cartridge`);
     }
     for (const grant of grants) {
       const serialised = grant.serialise();
-      await this.grants.add({
-        cart_id: cart_id,
-        name: serialised.name,
-        granted: serialised.granted,
-        granted_at: new Date(),
-      });
+      const old_grant = await this.grants.try_get([cart_id, grant.type]);
+      if (old_grant == null) {
+        await this.grants.add({
+          cart_id: cart_id,
+          name: serialised.name,
+          granted: serialised.granted,
+          updated_at: new Date(),
+        });
+      }
     }
   }
 }
