@@ -1,3 +1,4 @@
+import { RiskCategory } from "../../capabilities";
 import * as Db from "../../data";
 import type { Database } from "../../db-schema";
 import type { ConsoleCase, GamepadMapping, InputKey } from "../../kernel";
@@ -28,10 +29,15 @@ export type UI = {
   case_type: ConsoleCase;
 };
 
+export type Security = {
+  prompt_for: RiskCategory;
+};
+
 export type SettingsData = {
   play_habits: PlayHabits;
   input: Input;
   ui: UI;
+  security: Security;
 };
 
 export type AnySetting = SettingsData[keyof SettingsData];
@@ -45,6 +51,9 @@ const defaults: SettingsData = {
       resolution: 480,
       scale_to_fit: false,
     },
+  },
+  security: {
+    prompt_for: "medium",
   },
   play_habits: {
     recently_played: true,

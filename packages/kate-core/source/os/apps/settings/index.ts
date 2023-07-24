@@ -1,5 +1,6 @@
 import * as UI from "../../ui";
 import { SceneInputSettings } from "./input";
+import { ScenePermissions } from "./permissions";
 import { ScenePlayHabitsSettings } from "./play-habits";
 import { SceneRecovery } from "./recovery";
 import { SceneStorageSettings } from "./storage";
@@ -49,6 +50,18 @@ export class SceneSettings extends UI.SimpleScene {
           description: "Visualise and manage storage usage",
           on_click: () => {
             this.os.push_scene(new SceneStorageSettings(this.os));
+          },
+        }),
+      ]),
+
+      UI.when(this.os.kernel.console.options.mode !== "single", [
+        UI.link_card(this.os, {
+          icon: "key",
+          title: "Permissions",
+          description:
+            "What cartridges are allowed to do with your device and data",
+          on_click: () => {
+            this.os.push_scene(new ScenePermissions(this.os));
           },
         }),
       ]),

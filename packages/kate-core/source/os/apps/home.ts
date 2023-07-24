@@ -7,6 +7,7 @@ import { SceneTextFile } from "./text-file";
 import { HUD_LoadIndicator } from "./load-screen";
 import { SceneCartridgeStorageSettings } from "./settings/storage";
 import { Cart } from "../../cart";
+import { SceneCartridgePermissions } from "./settings/permissions";
 
 export class SceneHome extends SimpleScene {
   icon = "diamond";
@@ -107,7 +108,8 @@ export class SceneHome extends SimpleScene {
         ...(cart.metadata.legal.privacy_policy_path != null
           ? [{ label: "Privacy policy", value: "privacy" as const }]
           : []),
-        { label: "Manage data", value: "manage-data" as const },
+        { label: "Storage usage", value: "manage-data" as const },
+        { label: "Permissions", value: "permissions" as const },
       ],
       "close"
     );
@@ -125,6 +127,11 @@ export class SceneHome extends SimpleScene {
               "An unknown error happened while reading the cartridge details.",
           });
         }
+        break;
+      }
+
+      case "permissions": {
+        this.os.push_scene(new SceneCartridgePermissions(this.os, cart));
         break;
       }
 

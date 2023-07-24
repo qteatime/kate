@@ -8,11 +8,20 @@ and developers making Kate games who wish to have a deeper understanding
 of the platform they're developing for.
 
 
+Kernel design
+=============
+
+.. toctree::
+  :maxdepth: 1
+
+  00XX-capabilities
+
+
 API design
 ==========
 
 .. toctree::
-   :maxdepth: 1
+  :maxdepth: 1
 
-   0101-object-storage
-   XXXX-external-url
+  0101-object-storage
+  01XX-external-url
