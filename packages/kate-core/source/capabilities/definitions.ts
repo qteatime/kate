@@ -65,15 +65,11 @@ export class OpenURLs extends SwitchCapability<"open-urls"> {
     return new OpenURLs(grant.cart_id, grant.granted.value);
   }
 
-  static from_metadata(
-    cart_id: string,
-    capability: ContextualCapability,
-    granted: boolean
-  ) {
+  static from_metadata(cart_id: string, capability: ContextualCapability) {
     if (capability.type !== "open-urls") {
       throw new Error(`Unexpected capability: ${capability.type}`);
     }
-    return new OpenURLs(cart_id, granted);
+    return new OpenURLs(cart_id, true);
   }
 
   update(grant: boolean): void {

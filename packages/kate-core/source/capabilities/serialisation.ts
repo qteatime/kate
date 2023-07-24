@@ -12,19 +12,18 @@ export function parse(grant: AnyCapabilityGrant) {
 
 export function from_metadata(
   cart_id: string,
-  capability: ContextualCapability,
-  granted: boolean
+  capability: ContextualCapability
 ) {
   switch (capability.type) {
     case "open-urls": {
-      return OpenURLs.from_metadata(cart_id, capability, granted);
+      return OpenURLs.from_metadata(cart_id, capability);
     }
   }
 }
 
 export function grants_from_cartridge(cart: CartMeta) {
   const contextual = cart.security.contextual_capabilities.map((x) =>
-    from_metadata(cart.id, x.capability, true)
+    from_metadata(cart.id, x.capability)
   );
   return contextual;
 }
