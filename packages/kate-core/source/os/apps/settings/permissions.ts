@@ -174,5 +174,10 @@ export class SceneCartridgePermissions extends UI.SimpleScene {
   async grant_switch(x: Capability.AnySwitchCapability, value: boolean) {
     x.update(value);
     await this.os.capability_supervisor.update_grant(this.cart.id, x);
+    await this.os.notifications.log(
+      "kate:settings",
+      `Updated permission for ${this.cart.id}`,
+      `${x.type}: ${value}`
+    );
   }
 }

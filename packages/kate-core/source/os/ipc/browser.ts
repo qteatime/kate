@@ -7,7 +7,9 @@ export default [
     TC.spec({ url: TC.url }),
     async (os, env, ipc, { url }) => {
       if (
-        !os.capability_supervisor.is_allowed(env.cart.id, "open-urls", { url })
+        !(await os.capability_supervisor.is_allowed(env.cart.id, "open-urls", {
+          url,
+        }))
       ) {
         console.error(
           `Blocked ${env.cart.id} from opening ${url}: capability not granted`
