@@ -6,7 +6,7 @@ import { Action, SimpleScene } from "../ui/scenes";
 import { SceneTextFile } from "./text-file";
 import { HUD_LoadIndicator } from "./load-screen";
 import { SceneCartridgeStorageSettings } from "./settings/storage";
-import { Cart } from "../../cart";
+import { Cart, ContentRating, ReleaseType } from "../../cart";
 import { SceneCartridgePermissions } from "./settings/permissions";
 
 export class SceneHome extends SimpleScene {
@@ -26,6 +26,22 @@ export class SceneHome extends SimpleScene {
           x.thumbnail_dataurl
             ? h("img", { src: x.thumbnail_dataurl }, [])
             : UI.no_thumbnail(),
+          h(
+            "div",
+            {
+              class: "kate-os-carts-release-type",
+              "data-release-type": x.metadata.presentation.release_type,
+            },
+            [pretty_release_type(x.metadata.presentation.release_type)]
+          ),
+          h(
+            "div",
+            {
+              class: "kate-os-carts-rating",
+              "data-rating": x.metadata.classification.rating,
+            },
+            [rating_icon(x.metadata.classification.rating)]
+          ),
         ]),
         h("div", { class: "kate-os-carts-title" }, [
           x.metadata.presentation.title,
@@ -230,5 +246,39 @@ export class SceneHome extends SimpleScene {
   async play(id: string) {
     await this.os.processes.run(id);
     await this.update_carts();
+  }
+}
+
+function pretty_release_type(x: ReleaseType) {
+  switch (x) {
+    case "beta":
+      return "Beta";
+    case "demo":
+      return "Demo";
+    case "early-access":
+      return "Dev.";
+    case "prototype":
+      return "PoC";
+    case "regular":
+      return "Full";
+    default:
+      throw unreachable(x, "release type");
+  }
+}
+
+function rating_icon(x: ContentRating) {
+  switch (x) {
+    case "general":
+      return "G";
+    case "teen-and-up":
+      return "T";
+    case "mature":
+      return "M";
+    case "explicit":
+      return "E";
+    case "unknown":
+      return "—";
+    default:
+      throw unreachable(x, "content rating");
   }
 }
