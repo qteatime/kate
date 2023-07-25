@@ -7,7 +7,7 @@ export class KeyboardInput {
     down: "ArrowDown",
     left: "ArrowLeft",
     menu: "ShiftLeft",
-    capture: "ControlLeft",
+    capture: "KeyC",
     x: "KeyX",
     o: "KeyZ",
     ltrigger: "KeyA",

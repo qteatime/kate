@@ -83,7 +83,7 @@ const defaults: SettingsData = {
         button: "menu",
       },
       {
-        key: "ControlLeft",
+        key: "KeyC",
         button: "capture",
       },
       {

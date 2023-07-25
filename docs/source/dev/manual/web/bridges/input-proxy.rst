@@ -88,7 +88,7 @@ Button         Keyboard key
 |btn_cancel|   X
 |btn_ok|       Z
 |btn_menu|     Left Shift
-|btn_capture|  Left Control
+|btn_capture|  C
 |btn_l|        A
 |btn_r|        S
 ============== ===============================
