@@ -1,6 +1,7 @@
 import { KateUI, widget } from "../../../packages/kate-domui/build";
 import { Widget } from "../../../packages/kate-domui/source/widget";
 import { defer, Deferred } from "../../../packages/util/build/promise";
+import { AudioChannel, AudioSource, default_server } from "./audio";
 import { gen_name } from "./name_grammar";
 import { gen_text } from "./text_grammar";
 const { Box, Text, Icon, Keymap } = widget;
@@ -34,20 +35,20 @@ function gen_card() {
 async function main() {
   const like_wav = await KateAPI.cart_fs.read_file("/assets/like.wav");
   const start_wav = await KateAPI.cart_fs.read_file("/assets/start.wav");
-  const sfx = await KateAPI.audio.create_channel("sfx");
-  const like = await KateAPI.audio.load_audio(like_wav.mime, like_wav.bytes);
-  const start = await KateAPI.audio.load_audio(start_wav.mime, start_wav.bytes);
+  const sfx = new AudioChannel(default_server, 1);
+  const like = await AudioSource.from_bytes(default_server, like_wav.bytes);
+  const start = await AudioSource.from_bytes(default_server, start_wav.bytes);
 
   const [main_widget, main_screen_dismiss] = show(screen_main);
   await main_screen_dismiss;
-  await KateAPI.audio.play(sfx, start, false);
+  await sfx.play(start, {});
   await main_widget.live_node.animate([{ opacity: 1 }, { opacity: 0 }], 1000);
 
   while (true) {
     const content = gen_card();
     const [widget, promise] = show(card(content));
     const result = await promise;
-    await KateAPI.audio.play(sfx, like, false);
+    await sfx.play(like, {});
     const node = widget.live_node.select(
       result === "like" ? ".button-like" : ".button-share"
     );

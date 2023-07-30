@@ -348,13 +348,6 @@ w.task("domui:compile", ["api:build", "util:build", "domui:generate"], () => {
 
 w.task("domui:build", ["domui:compile"], () => {});
 
-// -- Kate ADV
-w.task("adv:compile", ["domui:build"], () => {
-  tsc("packages/kate-adv");
-});
-
-w.task("adv:build", ["adv:compile"], () => {});
-
 // -- Tools
 w.task("tools:dependencies", [], () => {
   npm_install("packages/kate-tools");
@@ -620,7 +613,6 @@ w.task(
     "bridges:build",
     "core:build",
     "domui:build",
-    "adv:build",
     "tools:build",
     "www:bundle",
     "example:all",

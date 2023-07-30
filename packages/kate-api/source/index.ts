@@ -1,4 +1,3 @@
-import { KateAudio, KateAudioChannel, KateAudioSource } from "./audio";
 import { KateBrowser } from "./browser";
 import { KateCapture } from "./capture";
 import { KateCartFS } from "./cart-fs";
@@ -22,8 +21,6 @@ export const events = channel.events;
 export const cart_fs = new KateCartFS(channel);
 
 export const store = new KateObjectStore(channel);
-
-export const audio = new KateAudio(channel);
 
 export const timer = new KateTimer();
 timer.setup();
@@ -70,7 +67,6 @@ export type KateAPI = {
   store: typeof store;
   input: typeof input;
   pointer_input: typeof pointer_input;
-  audio: typeof audio;
   timer: typeof timer;
   capture: typeof capture;
   browser: typeof browser;
@@ -80,9 +76,6 @@ declare global {
   var KateAPI: KateAPI;
   namespace KateTypes {
     export {
-      KateAudio,
-      KateAudioSource,
-      KateAudioChannel,
       InputKey,
       KateInput,
       KatePointerInput,

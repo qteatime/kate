@@ -2,7 +2,6 @@ import type { RuntimeEnv } from "../../kernel";
 import type { KateOS } from "../os";
 import type { Handler } from "./handlers";
 import { TC } from "../../utils";
-import AudioMessages from "./audio";
 import CaptureMessages from "./capture";
 import CartFSMessages from "./cart_fs";
 import NotificationMessages from "./notification";
@@ -23,7 +22,6 @@ export class KateIPCServer {
 
   constructor(readonly os: KateOS) {
     this._messages = new Map();
-    this.add_handlers(AudioMessages);
     this.add_handlers(CaptureMessages);
     this.add_handlers(CartFSMessages);
     this.add_handlers(NotificationMessages);

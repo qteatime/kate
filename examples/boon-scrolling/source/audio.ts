@@ -129,26 +129,3 @@ export class AudioSourceNode {
     return this;
   }
 }
-
-export class Mixer<T extends { [key: string]: AudioSource }> {
-  constructor(readonly sounds: T, readonly channel: AudioChannel) {}
-
-  async play(sound: keyof T) {
-    this.channel.play(this.sounds[sound], {});
-  }
-
-  static async with_sounds<R extends { [key: string]: string }>(sounds: R) {
-    const loaded = Object.create(null) as Record<keyof R, AudioSource>;
-    for (const [key, path] of Object.entries(sounds)) {
-      (loaded as any)[key] = await load_sound(path);
-    }
-    const channel = new AudioChannel(default_server, 1);
-    return new Mixer(loaded, channel);
-  }
-}
-
-async function load_sound(path: string) {
-  const file = await KateAPI.cart_fs.read_file(path);
-  const sound = await AudioSource.from_bytes(default_server, file.bytes);
-  return sound;
-}
