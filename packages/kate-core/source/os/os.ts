@@ -116,6 +116,7 @@ export class KateOS {
     scene.canvas.classList.remove("kate-os-leaving");
     scene.canvas.classList.add("kate-os-entering");
     this.focus_handler.push_root(scene.canvas);
+    wait(300).then((_) => scene.canvas.classList.remove("kate-os-entering"));
   }
 
   pop_scene(scene0: Scene) {
@@ -134,6 +135,7 @@ export class KateOS {
       popped_scene.canvas.classList.add("kate-os-leaving");
       wait(250).then(() => {
         popped_scene.detach();
+        popped_scene.canvas.classList.remove("kate-os-leaving");
       });
       this._current_scene = this._scene_stack.pop() ?? null;
     } else {
