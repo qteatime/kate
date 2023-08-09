@@ -6,23 +6,22 @@ import * as UI from "../ui";
 import { Scene } from "../ui/scenes";
 
 export class KateDialog {
-  readonly hud: HUD_Dialog;
-  constructor(readonly os: KateOS) {
-    this.hud = new HUD_Dialog(this);
-  }
-
-  setup() {
-    this.hud.setup();
-  }
+  constructor(readonly os: KateOS) {}
 
   async message(id: string, x: { title: string; message: UI.Widgetable }) {
-    return await this.hud.show(
-      id,
-      x.title,
-      x.message,
-      [{ label: "Ok", kind: "primary", value: null }],
-      null
-    );
+    const hud = new HUD_Dialog(this);
+    try {
+      this.os.push_scene(hud);
+      return await hud.show(
+        id,
+        x.title,
+        x.message,
+        [{ label: "Ok", kind: "primary", value: null }],
+        null
+      );
+    } finally {
+      this.os.pop_scene(hud);
+    }
   }
 
   async confirm(
@@ -35,20 +34,26 @@ export class KateDialog {
       dangerous?: boolean;
     }
   ) {
-    return await this.hud.show(
-      id,
-      x.title,
-      x.message,
-      [
-        { label: x.cancel ?? "Cancel", kind: "cancel", value: false },
-        {
-          label: x.ok ?? "Ok",
-          kind: x.dangerous === true ? "dangerous" : "primary",
-          value: true,
-        },
-      ],
-      false
-    );
+    const hud = new HUD_Dialog(this);
+    try {
+      this.os.push_scene(hud);
+      return await hud.show(
+        id,
+        x.title,
+        x.message,
+        [
+          { label: x.cancel ?? "Cancel", kind: "cancel", value: false },
+          {
+            label: x.ok ?? "Ok",
+            kind: x.dangerous === true ? "dangerous" : "primary",
+            value: true,
+          },
+        ],
+        false
+      );
+    } finally {
+      this.os.pop_scene(hud);
+    }
   }
 
   async progress(
@@ -56,7 +61,13 @@ export class KateDialog {
     message: UI.Widgetable,
     process: (_: Progress) => Promise<void>
   ) {
-    return await this.hud.progress(id, message, process);
+    const hud = new HUD_Dialog(this);
+    try {
+      this.os.push_scene(hud);
+      return await hud.progress(id, message, process);
+    } finally {
+      this.os.pop_scene(hud);
+    }
   }
 
   custom<A>(
@@ -65,12 +76,18 @@ export class KateDialog {
     contents: UI.Widgetable[],
     cancel_value: A
   ): Deferred<A> {
-    return this.hud.custom(
-      id,
-      `kate-hud-dialog-custom ${className}`,
-      contents,
-      cancel_value
-    );
+    const hud = new HUD_Dialog(this);
+    try {
+      this.os.push_scene(hud);
+      return hud.custom(
+        id,
+        `kate-hud-dialog-custom ${className}`,
+        contents,
+        cancel_value
+      );
+    } finally {
+      this.os.pop_scene(hud);
+    }
   }
 
   async pop_menu<A>(
@@ -79,7 +96,13 @@ export class KateDialog {
     buttons: { label: string; value: A }[],
     cancel_value: A
   ) {
-    return await this.hud.pop_menu(id, heading, buttons, cancel_value);
+    const hud = new HUD_Dialog(this);
+    try {
+      this.os.push_scene(hud);
+      return await hud.pop_menu(id, heading, buttons, cancel_value);
+    } finally {
+      this.os.pop_scene(hud);
+    }
   }
 }
 

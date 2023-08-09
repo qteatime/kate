@@ -85,7 +85,6 @@ export class KateOS {
     this.ipc = new KateIPCServer(this);
     this.ipc.setup();
     this.dialog = new KateDialog(this);
-    this.dialog.setup();
     this.capture = new KateCapture(this);
     this.play_habits = new KatePlayHabits(this);
     this.storage_manager = new KateStorageManager(this);
