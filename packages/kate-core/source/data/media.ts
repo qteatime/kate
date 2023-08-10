@@ -16,9 +16,9 @@ export const media_store = kate.table1<Media, "id">({
   auto_increment: false,
 });
 export const idx_media_store_by_cart = media_store.index1({
-  since: 3,
-  name: "by_cart",
-  path: ["cart_id"],
+  since: 13,
+  name: "by_cart_v2",
+  path: "cart_id",
   unique: false,
 });
 

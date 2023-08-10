@@ -29,9 +29,9 @@ export const os_partition = kate.table3<
   auto_increment: false,
 });
 export const idx_os_partition_by_cartridge = os_partition.index1({
-  since: 9,
-  name: "by_cartridge",
-  path: ["cartridge_id"],
+  since: 13,
+  name: "by_cartridge_v2",
+  path: "cartridge_id",
   unique: false,
   multi_entry: false,
 });
@@ -66,9 +66,9 @@ export const os_entry = kate.table2<OSEntry, "unique_bucket_id", "key">({
   auto_increment: false,
 });
 export const idx_entry_by_bucket = os_entry.index1<"unique_bucket_id">({
-  since: 9,
-  name: "by_bucket",
-  path: ["unique_bucket_id"],
+  since: 13,
+  name: "by_bucket_v2",
+  path: "unique_bucket_id",
   multi_entry: false,
   unique: false,
 });
@@ -118,9 +118,9 @@ export const cartridge_quota = kate.table2<
 });
 
 export const idx_os_quota_by_cartridge = cartridge_quota.index1({
-  since: 10,
-  name: "by_cartridge",
-  path: ["cartridge_id"],
+  since: 13,
+  name: "by_cartridge_v2",
+  path: "cartridge_id",
   multi_entry: false,
   unique: false,
 });
@@ -223,9 +223,9 @@ export class ObjectStorage {
     name: string
   ) {
     const bucket = await this.partitions.get([cartridge_id, version_id, name]);
-    const entries = await this.entries_by_bucket.get_all([
-      bucket.unique_bucket_id,
-    ]);
+    const entries = await this.entries_by_bucket.get_all(
+      bucket.unique_bucket_id
+    );
     for (const entry of entries) {
       await this.delete_entry(
         cartridge_id,
@@ -409,11 +409,11 @@ export class ObjectStorage {
   }
 
   async delete_partitions_and_quota(cart_id: string) {
-    const partitions = await this.partitions_by_cartridge.get_all([cart_id]);
+    const partitions = await this.partitions_by_cartridge.get_all(cart_id);
     for (const partition of partitions) {
-      for (const entry of await this.entries_by_bucket.get_all([
-        partition.unique_bucket_id,
-      ])) {
+      for (const entry of await this.entries_by_bucket.get_all(
+        partition.unique_bucket_id
+      )) {
         await this.entries.delete([partition.unique_bucket_id, entry.key]);
         await this.data.delete([partition.unique_bucket_id, entry.key]);
       }
@@ -424,7 +424,7 @@ export class ObjectStorage {
       ]);
     }
 
-    for (const quota of await this.quota_by_cartridge.get_all([cart_id])) {
+    for (const quota of await this.quota_by_cartridge.get_all(cart_id)) {
       await this.quota.delete([cart_id, quota.version_id]);
     }
   }

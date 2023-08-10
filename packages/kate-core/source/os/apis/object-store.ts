@@ -170,7 +170,7 @@ export class CartridgeBucket {
   async list_metadata(count?: number) {
     return await this.transaction("readonly", async (storage) => {
       return storage.entries_by_bucket.get_all(
-        [this.bucket.unique_bucket_id],
+        this.bucket.unique_bucket_id,
         count
       );
     });
@@ -178,7 +178,7 @@ export class CartridgeBucket {
 
   async count() {
     return await this.transaction("readonly", async (storage) => {
-      return storage.entries_by_bucket.count([this.bucket.unique_bucket_id]);
+      return storage.entries_by_bucket.count(this.bucket.unique_bucket_id);
     });
   }
 

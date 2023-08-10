@@ -37,9 +37,9 @@ export const capability_grant = kate.table2<
 });
 
 export const idx_capabilities_by_cart = capability_grant.index1({
-  since: 12,
-  name: "by_cart",
-  path: ["cart_id"],
+  since: 13,
+  name: "by_cart_v2",
+  path: "cart_id",
   multi_entry: false,
   unique: false,
 });
@@ -83,7 +83,7 @@ export class CapabilityStore {
   }
 
   async read_all_grants(cart_id: string) {
-    const grants = await this.grants_by_cartridge.get_all([cart_id]);
+    const grants = await this.grants_by_cartridge.get_all(cart_id);
     return grants.map(Capability.parse);
   }
 

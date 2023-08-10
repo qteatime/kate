@@ -136,6 +136,7 @@ export class CartManager {
       await this.install(cart);
     } catch (error) {
       console.error(`Failed to install ${file.name}:`, error);
+      alert("Failed: " + String(error));
       await this.os.notifications.push(
         "kate:cart-manager",
         "Installation failed",

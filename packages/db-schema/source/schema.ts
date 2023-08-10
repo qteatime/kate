@@ -164,7 +164,7 @@ export abstract class TableSchema<S> {
   index1<K1 extends keyof S>(x: {
     since: number;
     name: string;
-    path: [K1];
+    path: K1;
     unique?: boolean;
     multi_entry?: boolean;
     deprecated_since?: number;
@@ -278,7 +278,7 @@ abstract class IndexSchema {
     readonly table: TableSchema<any>,
     readonly version: number,
     readonly name: string,
-    readonly key: any[],
+    readonly key: any | any[],
     readonly options: { unique: boolean; multi_entry: boolean },
     readonly deleted_since?: number
   ) {}
@@ -307,7 +307,7 @@ export class IndexSchema1<S, K1 extends keyof S> extends IndexSchema {
     table: TableSchema1<S, K1>,
     version: number,
     name: string,
-    key: [K1],
+    key: K1,
     options: { unique: boolean; multi_entry: boolean },
     deleted_since?: number
   ) {

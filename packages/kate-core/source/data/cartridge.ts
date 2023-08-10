@@ -27,9 +27,9 @@ export const cart_meta = kate.table1<CartMeta, "id">({
   auto_increment: false,
 });
 export const idx_cart_by_status = cart_meta.index1({
-  since: 10,
-  name: "by_status",
-  path: ["status"],
+  since: 13,
+  name: "by_status_v2",
+  path: "status",
   multi_entry: false,
   unique: false,
 });
@@ -162,6 +162,6 @@ export class CartStore {
   }
 
   async list_by_status(status?: CartridgeStatus) {
-    return this.meta_by_status.get_all(status ? [status] : undefined);
+    return this.meta_by_status.get_all(status ? status : undefined);
   }
 }
