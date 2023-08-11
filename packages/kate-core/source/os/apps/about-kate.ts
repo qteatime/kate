@@ -354,6 +354,13 @@ export class SceneAboutKate extends SimpleScene {
         } else {
           await this.os.app_resources.refresh_cache();
           await this.os.db.delete_database();
+          await this.os.audit_supervisor.log("kate:about", {
+            risk: "low",
+            resources: ["kate:version"],
+            type: "kate.update.channel",
+            message: `Kate updated to ${version.version} (on ${channel})`,
+            extra: { channel, version: version.version },
+          });
         }
       }
 
@@ -389,11 +396,14 @@ export class SceneAboutKate extends SimpleScene {
 
     if (should_update) {
       await this.os.app_resources.refresh_cache();
-      await this.os.notifications.log(
-        "kate:update",
-        `Updated to v${version.version}`,
-        ""
-      );
+      await this.os.audit_supervisor.log("kate:about", {
+        resources: ["kate:version"],
+        risk: "low",
+        type: "kate.update.version",
+        message: `Kate updated to ${version.version}`,
+        extra: { version: version.version },
+      });
+
       localStorage["kate-version"] = JSON.stringify(version);
       window.location.reload();
     }

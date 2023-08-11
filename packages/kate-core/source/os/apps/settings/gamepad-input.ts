@@ -693,11 +693,13 @@ export class RemapStandardSettings extends UI.SimpleScene {
       const mapping = { ...x.gamepad_mapping, standard: this._mapping };
       return { ...x, gamepad_mapping: mapping };
     });
-    await this.os.notifications.log(
-      "kate:settings",
-      "Updated standard gamepad mapping",
-      JSON.stringify(this._mapping)
-    );
+    await this.os.audit_supervisor.log("kate:settings", {
+      resources: ["kate:settings"],
+      risk: "low",
+      type: "kate.settings.gamepad.updated-standard-mapping",
+      message: "Updated standard gamepad mapping",
+      extra: this._mapping,
+    });
     this.os.kernel.gamepad.remap(this._mapping);
     this.close();
   };
@@ -955,11 +957,14 @@ export class ChooseActiveGamepadSettings extends UI.SimpleScene {
     await this.os.settings.update("input", (x) => {
       return { ...x, paired_gamepad: paired.id };
     });
-    await this.os.notifications.log(
-      "kate:settings",
-      "Updated paired gamepad",
-      JSON.stringify(paired.id)
-    );
+    await this.os.audit_supervisor.log("kate:settings", {
+      resources: ["kate:settings"],
+      risk: "low",
+      type: "kate.settings.gamepad.updated-paired",
+      message: "Updated paired gamepad",
+      extra: { id: paired.id },
+    });
+
     this.os.kernel.gamepad.pair(paired.id);
     this.close();
   };

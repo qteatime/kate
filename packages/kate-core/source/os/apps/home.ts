@@ -105,8 +105,15 @@ export class SceneHome extends SimpleScene {
       qs.classList.toggle("hidden", carts.length !== 0);
     } catch (error) {
       console.error("[Kate] Failed to load cartridges", error);
-      this.os.notifications.push(
-        "kate:os",
+      this.os.audit_supervisor.log("kate:home", {
+        resources: ["kate:cartridge", "error"],
+        risk: "low",
+        type: "kate.home.load-failed",
+        message: `Failed to load games: internal error`,
+        extra: { error: error, stack: (error as any)?.stack ?? null },
+      });
+      this.os.notifications.push_transient(
+        "kate:home",
         "Failed to load games",
         `An internal error happened while loading.`
       );

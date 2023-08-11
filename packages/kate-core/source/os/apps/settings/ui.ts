@@ -145,11 +145,13 @@ export class SceneUISettings extends UI.SimpleScene {
       await this.os.settings.update("ui", (x) => {
         return { ...x, case_type: kase };
       });
-      await this.os.notifications.log(
-        "kate:settings",
-        "Updated display mode",
-        `${JSON.stringify(kase)}`
-      );
+      await this.os.audit_supervisor.log("kate:settings", {
+        resources: ["kate:settings"],
+        risk: "low",
+        type: "kate.settings.ui.updated",
+        message: "Updated display mode",
+        extra: { case_type: kase },
+      });
     }
   }
 
@@ -160,11 +162,13 @@ export class SceneUISettings extends UI.SimpleScene {
     await this.os.settings.update("ui", (x) => {
       return { ...x, [key]: value };
     });
-    await this.os.notifications.log(
-      "kate:settings",
-      `Updated UI settings`,
-      `${key}: ${value}`
-    );
+    await this.os.audit_supervisor.log("kate:settings", {
+      resources: ["kate:settings"],
+      risk: "low",
+      type: "kate.settings.ui.updated",
+      message: "Updated UI settings",
+      extra: { [key]: value },
+    });
   }
 
   private mode_button(
