@@ -4,15 +4,48 @@ import {
   fine_grained_relative_date,
   unreachable,
 } from "../../../utils";
+import { Audit } from "../../apis";
 import type { KateOS } from "../../os";
 import * as UI from "../../ui";
+
+function format_retention(days: number) {
+  if (!Number.isFinite(days)) {
+    return "forever";
+  } else if (days === 365) {
+    return "1 year";
+  } else if (days >= 365) {
+    const years = Math.floor(days / 365);
+    return `${years} years`;
+  } else {
+    return `${days} days`;
+  }
+}
 
 export class SceneAudit extends UI.SimpleScene {
   icon = "eye";
   title = ["Audit"];
 
   body() {
+    const config = new Observable(this.os.settings.get("audit"));
+
     return [
+      UI.link_card(this.os, {
+        arrow: "pencil",
+        click_label: "Change",
+        title: `Log retention period`,
+        description: `Log entries older than this will be removed automatically to save storage space.`,
+        value: UI.dynamic(
+          config.map<UI.Widgetable>((x) =>
+            format_retention(x.log_retention_days)
+          )
+        ),
+        on_click: () => {
+          this.select_retention_days(config);
+        },
+      }),
+
+      UI.vspace(32),
+
       UI.link_card(this.os, {
         icon: "eye",
         title: "Audit log",
@@ -23,6 +56,35 @@ export class SceneAudit extends UI.SimpleScene {
         },
       }),
     ];
+  }
+
+  async select_retention_days(current: Observable<Audit>) {
+    const result = await this.os.dialog.pop_menu(
+      "kate:settings",
+      "Keep logs for at least:",
+      [
+        { label: "30 days", value: 30 },
+        { label: "90 days", value: 90 },
+        { label: "1 year", value: 365 },
+        { label: "3 years", value: 365 * 3 },
+        { label: "forever", value: Infinity },
+      ],
+      null
+    );
+
+    if (result == null) {
+      return;
+    }
+
+    current.value = { ...current.value, log_retention_days: result };
+    await this.os.settings.update("audit", (_) => current.value);
+    await this.os.audit_supervisor.log("kate:settings", {
+      resources: ["kate:settings"],
+      risk: "high",
+      type: "kate.settings.audit.updated",
+      message: `Updated log retention to ${format_retention(result)}`,
+      extra: { log_retention_days: result },
+    });
   }
 }
 

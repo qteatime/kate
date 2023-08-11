@@ -117,7 +117,7 @@ export class KateCapture {
 
     const id = await this.store_file(game_id, data, type, "video");
     await this.os.audit_supervisor.log(game_id, {
-      resources: ["kate:capture", "error"],
+      resources: ["kate:capture"],
       risk: "low",
       type: "kate.capture.recording-saved",
       message: `Recording saved`,

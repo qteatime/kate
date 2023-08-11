@@ -33,11 +33,16 @@ export type Security = {
   prompt_for: RiskCategory;
 };
 
+export type Audit = {
+  log_retention_days: number;
+};
+
 export type SettingsData = {
   play_habits: PlayHabits;
   input: Input;
   ui: UI;
   security: Security;
+  audit: Audit;
 };
 
 export type AnySetting = SettingsData[keyof SettingsData];
@@ -170,6 +175,9 @@ const defaults: SettingsData = {
       ],
     },
     paired_gamepad: null,
+  },
+  audit: {
+    log_retention_days: 365,
   },
 };
 

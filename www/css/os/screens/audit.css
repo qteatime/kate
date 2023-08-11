@@ -16,6 +16,7 @@
   flex-direction: column;
   border: 1px solid var(--color-border-d1);
   border-radius: 5px 5px 0 0;
+  overflow: hidden;
 }
 
 .kate-ui-logview-entry-heading {
@@ -69,4 +70,22 @@
   font-family: var(--font-family-mono);
   font-size: 0.8em;
   white-space: pre-wrap;
+}
+
+[data-risk="medium"] .kate-ui-logview-entry-heading,
+.kate-ui-logview-entry-heading[data-risk="medium"] {
+  background: var(--blue);
+  color: var(--color-white);
+}
+
+[data-risk="high"] .kate-ui-logview-entry-heading,
+.kate-ui-logview-entry-heading[data-risk="high"] {
+  background: var(--orange);
+  color: var(--color-white);
+}
+
+[data-risk="critical"] .kate-ui-logview-entry-heading,
+.kate-ui-logview-entry-heading[data-risk="critical"] {
+  background: var(--red);
+  color: var(--color-white);
 }

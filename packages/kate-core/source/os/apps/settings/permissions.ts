@@ -124,7 +124,7 @@ export class ScenePermissions extends UI.SimpleScene {
       risk: "high",
       type: "kate.settings.security.updated",
       message: `Updated security settings`,
-      extra: current.value,
+      extra: changes,
     });
   }
 }
