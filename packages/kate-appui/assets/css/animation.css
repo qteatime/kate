@@ -1,0 +1,5 @@
+@keyframes kate-focus-in {
+  from {
+    outline-width: 8px;
+  }
+}

@@ -12,10 +12,11 @@ import { SceneCartridgePermissions } from "../apps/settings/permissions";
 
 declare global {
   function showOpenFilePicker(options: {
+    id?: string;
     types: { description: string; accept: { [key: string]: string[] } }[];
     multiple: boolean;
     excludeAcceptAllOption: boolean;
-  }): FileSystemFileHandle[];
+  }): Promise<FileSystemFileHandle[]>;
 }
 
 export class KateContextMenu {

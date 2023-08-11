@@ -348,6 +348,14 @@ w.task("domui:compile", ["api:build", "util:build", "domui:generate"], () => {
 
 w.task("domui:build", ["domui:compile"], () => {});
 
+// -- APP UI
+w.task("appui:compile", ["api:build", "util:build"], () => {
+  tsc("packages/kate-appui");
+  copy_tree("www/fonts", "packages/kate-appui/assets/fonts");
+});
+
+w.task("appui:build", ["appui:compile"], () => {});
+
 // -- Tools
 w.task("tools:dependencies", [], () => {
   npm_install("packages/kate-tools");
@@ -477,6 +485,29 @@ w.task(
   ["example:hello-world", "example:boon-scrolling", "example:katchu"],
   () => {}
 );
+
+// -- Ecosystem
+w.task(
+  "ecosystem:importer",
+  ["tools:build", "appui:build", "glomp:build"],
+  () => {
+    tsc("ecosystem/importer");
+    remove("ecosystem/importer/www", { recursive: true, force: true });
+    copy_tree("ecosystem/importer/assets", "ecosystem/importer/www");
+    glomp({
+      entry: "ecosystem/importer/build/index.js",
+      out: "ecosystem/importer/www/js/importer.js",
+      name: "KateImporter",
+    });
+    copy_tree("packages/kate-appui/assets", "ecosystem/importer/www/appui");
+    kart({
+      config: "ecosystem/importer/kate.json",
+      output: "ecosystem/importer/kate-importer.kart",
+    });
+  }
+);
+
+w.task("ecosystem:all", ["ecosystem:importer"], () => {});
 
 // -- Desktop app
 w.task("desktop:compile", [], () => {
@@ -613,9 +644,11 @@ w.task(
     "bridges:build",
     "core:build",
     "domui:build",
+    "appui:build",
     "tools:build",
     "www:bundle",
     "example:all",
+    "ecosystem:all",
     "desktop:build",
   ],
   () => {}

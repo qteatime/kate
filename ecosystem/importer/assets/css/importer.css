@@ -1,0 +1,4 @@
+#canvas {
+  transform-origin: 0 0;
+  transform: scale(var(--kate-screen-scale));
+}
