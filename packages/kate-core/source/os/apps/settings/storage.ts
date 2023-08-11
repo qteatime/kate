@@ -241,7 +241,14 @@ export class SceneCartridgeStorageSettings extends UI.SimpleScene {
     });
     if (ok) {
       await this.os.cart_manager.archive(this.app.id);
-      await this.os.notifications.push(
+      await this.os.audit_supervisor.log("kate:settings", {
+        resources: ["kate:storage"],
+        risk: "low",
+        type: "kate.storage.archived-cartridge",
+        message: `Archived cartridge ${this.app.id} v${this.app.version_id}`,
+        extra: { cartridge: this.app.id, version: this.app.version_id },
+      });
+      await this.os.notifications.push_transient(
         "kate:settings",
         "Archived cartridge",
         `Archived ${this.app.id} v${this.app.version_id}`
@@ -261,7 +268,14 @@ export class SceneCartridgeStorageSettings extends UI.SimpleScene {
     });
     if (ok) {
       await this.os.cart_manager.delete_all_data(this.app.id);
-      await this.os.notifications.push(
+      await this.os.audit_supervisor.log("kate:settings", {
+        resources: ["kate:storage"],
+        risk: "low",
+        type: "kate.storage.deleted-cartridge",
+        message: `Deleted cartridge ${this.app.id} v${this.app.version_id}`,
+        extra: { cartridge: this.app.id, version: this.app.version_id },
+      });
+      await this.os.notifications.push_transient(
         "kate:settings",
         "Deleted cartridge",
         `Deleted ${this.app.id} v${this.app.version_id}`
@@ -416,7 +430,14 @@ class SceneCartridgeSaveDataSettings extends UI.SimpleScene {
         this.app.id,
         this.app.version_id
       );
-      await this.os.notifications.push(
+      await this.os.audit_supervisor.log("kate:settings", {
+        resources: ["kate:storage"],
+        risk: "low",
+        type: "kate.storage.deleted-save-data.one",
+        message: `Deleted save data for ${this.app.title} v${this.app.version_id}`,
+        extra: { cartridge: this.app.id, version: this.app.version_id },
+      });
+      await this.os.notifications.push_transient(
         "kate:settings",
         "Deleted save data",
         `Deleted save data for ${this.app.title}`

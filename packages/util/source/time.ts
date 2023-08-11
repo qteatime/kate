@@ -17,6 +17,58 @@ export function coarse_time_from_minutes(x: number) {
   }
 }
 
+export function days_diff(x: Date, y: Date) {
+  const OneDay = 1000 * 60 * 60 * 24;
+  const toDays = (x: Date) =>
+    new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime() / OneDay;
+  return Math.floor(toDays(x) - toDays(y));
+}
+
+export function date_time_string(x: Date) {
+  return `${x.getFullYear()}-${(x.getMonth() + 1)
+    .toString()
+    .padStart(2, "0")}-${x.getDate().toString().padStart(2, "0")} ${x
+    .getHours()
+    .toString()
+    .padStart(2, "0")}:${x.getMinutes().toString().padStart(2, "0")}:${x
+    .getSeconds()
+    .toString()
+    .padStart(2, "0")}`;
+}
+
+export function relative_time(x: Date) {
+  const units = [
+    { unit: "second", limit: 1000 },
+    { unit: "minute", limit: 60 },
+    { unit: "hour", limit: 60 },
+  ];
+  let current = "millisecond";
+  let diff = new Date().getTime() - x.getTime();
+  for (const { unit, limit } of units) {
+    if (diff >= limit) {
+      diff = diff / limit;
+      current = unit;
+    } else {
+      break;
+    }
+  }
+  const suffix = Math.round(diff) === 1 ? current : current + "s";
+  return `${Math.round(diff)} ${suffix} ago`;
+}
+
+export function fine_grained_relative_date(x: Date) {
+  const days = days_diff(x, new Date());
+  if (days < 0) {
+    return date_time_string(x);
+  } else if (days === 0) {
+    return relative_time(x);
+  } else if (days > 20) {
+    return date_time_string(x);
+  } else {
+    return String(days);
+  }
+}
+
 export function relative_date(x: Date | null) {
   if (x == null) {
     return "never";

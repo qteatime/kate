@@ -119,11 +119,13 @@ export class ScenePermissions extends UI.SimpleScene {
   ) {
     current.value = { ...current.value, ...changes };
     await this.os.settings.update("security", (_) => current.value);
-    await this.os.notifications.log(
-      "kate:settings",
-      "Updated security settings",
-      JSON.stringify(current.value)
-    );
+    await this.os.audit_supervisor.log("kate:settings", {
+      resources: ["kate:settings"],
+      risk: "high",
+      type: "kate.settings.security.updated",
+      message: `Updated security settings`,
+      extra: changes,
+    });
   }
 }
 
@@ -175,10 +177,12 @@ export class SceneCartridgePermissions extends UI.SimpleScene {
   async grant_switch(x: Capability.AnySwitchCapability, value: boolean) {
     x.update(value);
     await this.os.capability_supervisor.update_grant(this.cart.id, x);
-    await this.os.notifications.log(
-      "kate:settings",
-      `Updated permission for ${this.cart.id}`,
-      `${x.type}: ${value}`
-    );
+    await this.os.audit_supervisor.log("kate:settings", {
+      resources: ["kate:permissions"],
+      risk: x.risk_category(),
+      type: "kate.security.permissions.updated",
+      message: `Updated security permissions for ${this.cart.id}`,
+      extra: { cartridge: this.cart.id, permission: x.type, granted: value },
+    });
   }
 }

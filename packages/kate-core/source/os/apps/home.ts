@@ -1,7 +1,7 @@
 import { h } from "../ui/widget";
 import * as UI from "../ui/widget";
 import * as Db from "../../data";
-import { unreachable } from "../../utils";
+import { serialise_error, unreachable } from "../../utils";
 import { Action, SimpleScene } from "../ui/scenes";
 import { SceneTextFile } from "./text-file";
 import { HUD_LoadIndicator } from "./load-screen";
@@ -105,8 +105,15 @@ export class SceneHome extends SimpleScene {
       qs.classList.toggle("hidden", carts.length !== 0);
     } catch (error) {
       console.error("[Kate] Failed to load cartridges", error);
-      this.os.notifications.push(
-        "kate:os",
+      this.os.audit_supervisor.log("kate:home", {
+        resources: ["kate:cartridge", "error"],
+        risk: "high",
+        type: "kate.home.load-failed",
+        message: `Failed to load games: internal error`,
+        extra: { error: serialise_error(error) },
+      });
+      this.os.notifications.push_transient(
+        "kate:home",
         "Failed to load games",
         `An internal error happened while loading.`
       );

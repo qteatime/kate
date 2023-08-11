@@ -2,7 +2,12 @@ import * as Cart from "../../cart";
 import * as Capability from "../../capabilities";
 import type { KateOS } from "../os";
 import * as Db from "../../data";
-import { from_bytes, gb, make_thumbnail_from_bytes } from "../../utils";
+import {
+  from_bytes,
+  gb,
+  make_thumbnail_from_bytes,
+  serialise_error,
+} from "../../utils";
 
 export class CartManager {
   readonly CARTRIDGE_SIZE_LIMIT = gb(1.4);
@@ -136,8 +141,14 @@ export class CartManager {
       await this.install(cart);
     } catch (error) {
       console.error(`Failed to install ${file.name}:`, error);
-      alert("Failed: " + String(error));
-      await this.os.notifications.push(
+      await this.os.audit_supervisor.log("kate:cart-manager", {
+        resources: ["kate:storage", "error"],
+        risk: "high",
+        type: "kate.storage.installation-failed",
+        message: `Failed to install ${file.name}`,
+        extra: { error: serialise_error(error) },
+      });
+      await this.os.notifications.push_transient(
         "kate:cart-manager",
         "Installation failed",
         `${file.name} could not be installed.`
@@ -216,7 +227,18 @@ export class CartManager {
       }
     );
 
-    await this.os.notifications.push(
+    await this.os.audit_supervisor.log("kate:cart-manager", {
+      resources: ["kate:storage"],
+      risk: "low",
+      type: "kate.storage.cartridge-installed",
+      message: `Installed cartridge ${cart.id} v${cart.version}`,
+      extra: {
+        cartridge: cart.id,
+        version: cart.version,
+        title: cart.metadata.presentation.title,
+      },
+    });
+    await this.os.notifications.push_transient(
       "kate:cart-manager",
       `New game installed`,
       `${cart.metadata.presentation.title} is ready to play!`

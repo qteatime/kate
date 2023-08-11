@@ -130,11 +130,13 @@ export class ScenePlayHabitsSettings extends UI.SimpleScene {
     switch (result) {
       case "delete": {
         await this.os.play_habits.remove_one(entry.id, !entry.installed);
-        await this.os.notifications.log(
-          "kate:settings",
-          "Play habits deleted",
-          `Deleted for ${entry.id}`
-        );
+        await this.os.audit_supervisor.log("kate:settings", {
+          resources: ["kate:habits"],
+          risk: "low",
+          type: "kate.habits.deleted.one",
+          message: `Play habits deleted for ${entry.id}`,
+          extra: { cartridge: entry.id },
+        });
         await this.load_history(
           this.canvas.querySelector(".play-habit-history")!
         );
@@ -154,11 +156,12 @@ export class ScenePlayHabitsSettings extends UI.SimpleScene {
     });
     if (should_delete) {
       await this.os.play_habits.remove_all();
-      await this.os.notifications.log(
-        "kate:settings",
-        "Play habits deleted",
-        `Deleted for all cartridges`
-      );
+      await this.os.audit_supervisor.log("kate:settings", {
+        resources: ["kate:habits"],
+        risk: "low",
+        type: "kate.habits.deleted.all",
+        message: "Play habits deleted for all cartridges",
+      });
       await this.load_history(
         this.canvas.querySelector(".play-habit-history")!
       );
@@ -170,11 +173,13 @@ export class ScenePlayHabitsSettings extends UI.SimpleScene {
       ...v,
       recently_played: x,
     }));
-    await this.os.notifications.log(
-      `kate:settings`,
-      "Updated play habits",
-      `Store cartridge's last played time: ${x}`
-    );
+    await this.os.audit_supervisor.log("kate:settings", {
+      resources: ["kate:settings"],
+      risk: "low",
+      type: "kate.settings.habits.updated",
+      message: "Updated play habits tracking settings",
+      extra: { track_recently_played: x },
+    });
   };
 
   handle_play_time_change = async (x: boolean) => {
@@ -182,10 +187,12 @@ export class ScenePlayHabitsSettings extends UI.SimpleScene {
       ...v,
       play_times: x,
     }));
-    await this.os.notifications.log(
-      `kate:settings`,
-      "Updated play habits",
-      `Store cartridge's total play time: ${x}`
-    );
+    await this.os.audit_supervisor.log("kate:settings", {
+      resources: ["kate:settings"],
+      risk: "low",
+      type: "kate.settings.habits.updated",
+      message: "Updated play habits tracking settings",
+      extra: { track_total_play_time: x },
+    });
   };
 }

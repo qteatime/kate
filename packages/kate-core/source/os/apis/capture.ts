@@ -67,7 +67,16 @@ export class KateCapture {
 
   async save_screenshot(game_id: string, data: Uint8Array, type: string) {
     if (data.length > this.MAX_SCREENSHOT_SIZE) {
-      await this.os.notifications.push(
+      await this.os.audit_supervisor.log(game_id, {
+        resources: ["kate:capture", "error"],
+        risk: "high",
+        type: "kate.capture.screenshot-failed.size-exceeded",
+        message: `Failed to save screenshot: size limit of ${from_bytes(
+          this.MAX_SCREENSHOT_SIZE
+        )} exceeded`,
+        extra: { size: data.length, max_size: this.MAX_SCREENSHOT_SIZE },
+      });
+      await this.os.notifications.push_transient(
         game_id,
         "Failed to save screenshot",
         `Size limit of ${from_bytes(this.MAX_SCREENSHOT_SIZE)} exceeded`
@@ -76,13 +85,29 @@ export class KateCapture {
     }
 
     const id = await this.store_file(game_id, data, type, "image");
-    await this.os.notifications.push(game_id, `Screenshot saved`, "");
+    await this.os.audit_supervisor.log(game_id, {
+      resources: ["kate:capture"],
+      risk: "low",
+      type: "kate.capture.screenshot-saved",
+      message: "Screenshot saved",
+      extra: { id: id },
+    });
+    await this.os.notifications.push_transient(game_id, `Screenshot saved`, "");
     return id;
   }
 
   async save_video(game_id: string, data: Uint8Array, type: string) {
     if (data.length > this.MAX_VIDEO_SIZE) {
-      await this.os.notifications.push(
+      await this.os.audit_supervisor.log(game_id, {
+        resources: ["kate:capture", "error"],
+        risk: "high",
+        type: "kate.capture.recording-failed.size-exceeded",
+        message: `Failed to save recording: size limit of ${from_bytes(
+          this.MAX_VIDEO_SIZE
+        )} exceeded`,
+        extra: { size: data.length, max_size: this.MAX_VIDEO_SIZE },
+      });
+      await this.os.notifications.push_transient(
         game_id,
         "Failed to save recording",
         `Size limit of ${from_bytes(this.MAX_VIDEO_SIZE)} exceeded`
@@ -91,7 +116,14 @@ export class KateCapture {
     }
 
     const id = await this.store_file(game_id, data, type, "video");
-    await this.os.notifications.push(game_id, `Recording saved`, "");
+    await this.os.audit_supervisor.log(game_id, {
+      resources: ["kate:capture"],
+      risk: "low",
+      type: "kate.capture.recording-saved",
+      message: `Recording saved`,
+      extra: { id },
+    });
+    await this.os.notifications.push_transient(game_id, `Recording saved`, "");
     return id;
   }
 

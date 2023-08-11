@@ -163,11 +163,13 @@ export class KeyboardInputSettings extends UI.SimpleScene {
     await this.os.settings.update("input", (x) => {
       return { ...x, keyboard_mapping: this._mapping };
     });
-    await this.os.notifications.log(
-      "kate:settings",
-      "Updated keyboard mapping",
-      JSON.stringify(this._mapping)
-    );
+    await this.os.audit_supervisor.log("kate:settings", {
+      resources: ["kate:settings"],
+      risk: "low",
+      type: "kate.settings.keyboard.updated-mapping",
+      message: "Updated keyboard mapping",
+      extra: this._mapping,
+    });
     this.os.kernel.keyboard.remap(this._mapping);
     this.close();
   };

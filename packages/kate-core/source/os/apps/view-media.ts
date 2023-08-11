@@ -177,7 +177,18 @@ export class SceneViewMedia extends Scene {
     });
     if (should_delete) {
       await this.os.capture.delete(this.media.id!);
-      await this.os.notifications.push("kate:media", `Media deleted`, "");
+      await this.os.audit_supervisor.log("kate:media", {
+        resources: ["kate:capture"],
+        risk: "low",
+        type: "kate.capture.deleted",
+        message: `Media deleted`,
+        extra: { id: this.media.id },
+      });
+      await this.os.notifications.push_transient(
+        "kate:media",
+        `Media deleted`,
+        ""
+      );
       this.media_list.mark_deleted(this.media.id!);
       this.close();
     }

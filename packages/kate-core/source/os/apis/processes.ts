@@ -4,6 +4,7 @@ import type { KateOS } from "../os";
 import { SceneGame } from "../apps/game";
 import { HUD_LoadIndicator } from "../apps/load-screen";
 import type { Scene } from "../ui";
+import { serialise_error } from "../../utils";
 
 export class KateProcesses {
   private _running: KateProcess | null = null;
@@ -64,7 +65,14 @@ export class KateProcesses {
 
   async terminate(id: string, requester: string, reason: string) {
     if (this._running != null && this._running.cart.id === id) {
-      await this.os.notifications.push(
+      await this.os.audit_supervisor.log(requester, {
+        resources: ["kate:cartridge", "error"],
+        risk: "high",
+        type: "kate.process.terminated",
+        message: `Terminated process ${id} for ${reason}`,
+        extra: { cartridge: id, reason: reason },
+      });
+      await this.os.notifications.push_transient(
         requester,
         "Process terminated",
         `${id} was terminated for ${reason}.`
@@ -108,8 +116,15 @@ export class KateProcesses {
     } catch (error) {
       this._running = null;
       console.error(`Failed to run cartridge ${id}:`, error);
-      await this.os.notifications.push(
-        "kate:os",
+      await this.os.audit_supervisor.log("kate:process", {
+        resources: ["kate:cartridge", "error"],
+        risk: "high",
+        type: "kate.process.execution-failed",
+        message: `Failed to run ${id}`,
+        extra: { error: serialise_error(error) },
+      });
+      await this.os.notifications.push_transient(
+        "kate:process",
         `Failed to run`,
         `Cartridge may be corrupted or not compatible with this version.`
       );

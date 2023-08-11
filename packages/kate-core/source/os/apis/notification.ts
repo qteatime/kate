@@ -17,7 +17,6 @@ export class KateNotification {
   }
 
   async push(process_id: string, title: string, message: string) {
-    await this.log(process_id, title, message, true);
     this.hud.show(title, message);
   }
 

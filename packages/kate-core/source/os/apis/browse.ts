@@ -49,6 +49,14 @@ export class KateBrowser {
       return;
     }
 
+    await this.os.audit_supervisor.log(requestee, {
+      resources: ["navigate"],
+      risk: "high",
+      type: "kate.browse.navigate",
+      message: `Navigated to an external URL on cartridge's request`,
+      extra: { url: url.toString() },
+    });
+
     window.open(url, "_blank", "noopener,noreferrer");
   }
 }

@@ -6,3 +6,4 @@ export * from "./pathname";
 export * from "./iterable";
 export * from "./unit";
 export * from "./time";
+export * from "./serialise";

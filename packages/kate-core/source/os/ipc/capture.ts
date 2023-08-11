@@ -37,7 +37,17 @@ export default [
 
   handler("kate:capture.start-recording", TC.spec({}), async (os, env) => {
     os.kernel.console.take_resource("screen-recording");
-    await os.notifications.push(env.cart.id, "Screen recording started", "");
+    await os.audit_supervisor.log(env.cart.id, {
+      resources: ["kate:capture"],
+      risk: "low",
+      type: "kate.capture.recording-started",
+      message: `Screen recording started`,
+    });
+    await os.notifications.push_transient(
+      env.cart.id,
+      "Screen recording started",
+      ""
+    );
 
     return null;
   }),

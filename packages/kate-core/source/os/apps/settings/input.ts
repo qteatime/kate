@@ -45,10 +45,12 @@ export class SceneInputSettings extends UI.SimpleScene {
       ...v,
       haptic_feedback_for_virtual_button: x,
     }));
-    await this.os.notifications.log(
-      "kate:settings",
-      "Updated input settings",
-      `Haptic feedback on virtual input: ${x}`
-    );
+    await this.os.audit_supervisor.log("kate:settings", {
+      resources: ["kate:settings"],
+      risk: "low",
+      type: "kate.settings.input.updated",
+      message: "Updated input settings",
+      extra: { haptic_feedback_for_virtual_button: x },
+    });
   };
 }
