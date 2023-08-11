@@ -667,7 +667,7 @@ export class RemapStandardSettings extends UI.SimpleScene {
     this._mapping =
       this.os.settings.defaults.input.gamepad_mapping.standard.slice();
     this.updated.value = true;
-    this.refresh();
+    this.refresh_mode();
   };
 
   on_return = async () => {
@@ -789,7 +789,7 @@ export class RemapStandardSettings extends UI.SimpleScene {
       );
       this._mapping = mapping.concat([current_haxis, current_vaxis]);
       this.updated.value = true;
-      this.refresh();
+      this.refresh_mode();
     }
   }
 
@@ -814,7 +814,7 @@ export class RemapStandardSettings extends UI.SimpleScene {
           key == null ? [] : [{ type: "button", index, pressed: key }];
         this._mapping = mapping.concat(addition);
         this.updated.value = true;
-        this.refresh();
+        this.refresh_mode();
       }
     }
   }
@@ -909,7 +909,7 @@ export class RemapStandardSettings extends UI.SimpleScene {
     });
   }
 
-  private refresh() {
+  private refresh_mode() {
     this.mode.value = this.mode.value;
   }
 }

@@ -1,5 +1,5 @@
 import type { ExtendedInputKey, InputKey } from "../../kernel";
-import { Sets } from "../../utils";
+import { Sets, serialise_error } from "../../utils";
 import { FocusInteraction } from "../apis";
 import type { KateOS } from "../os";
 import {
@@ -101,6 +101,13 @@ export abstract class SimpleScene extends Scene {
         },
         (error) => {
           console.error(`(Error rendering screen)`, error);
+          this.os.audit_supervisor.log("kate:ui", {
+            resources: ["kate:ui", "error"],
+            risk: "low",
+            type: "kate.ui.rendering.error",
+            message: `Error rendering screen`,
+            extra: { error: serialise_error(error) },
+          });
           container.replaceWith(`(Error rendering screen)`);
         }
       );
@@ -123,6 +130,23 @@ export abstract class SimpleScene extends Scene {
         append(child, body);
       }
     }
+  }
+
+  async refresh() {
+    const body = (async () => this.body())();
+    this.replace_body(
+      await body.catch(async (e) => {
+        console.error("Error rendering screen:", e);
+        this.os.audit_supervisor.log("kate:ui", {
+          resources: ["kate:ui", "error"],
+          risk: "low",
+          type: "kate.ui.rendering.error",
+          message: `Error rendering screen`,
+          extra: { error: serialise_error(e) },
+        });
+        return ["Error rendering screen"];
+      })
+    );
   }
 
   render_action(action: Action) {

@@ -12,10 +12,11 @@ export type AuditResource =
   | "kate:storage"
   | "kate:capture"
   | "kate:cartridge"
+  | "kate:ui"
   | "error";
 
 export type AuditMessage = {
-  id?: number;
+  id: number;
   resources: Set<AuditResource>;
   risk: RiskCategory;
   process_id: string;
@@ -63,8 +64,8 @@ export class AuditStore {
     return this.transaction.get_index1(idx_by_process);
   }
 
-  async log(message: Exclude<AuditMessage, { id: number }>) {
-    this.logs.add(message);
+  async log(message: Omit<AuditMessage, "id">) {
+    return this.logs.add(message as AuditMessage);
   }
 
   async count_all() {
@@ -73,5 +74,14 @@ export class AuditStore {
 
   async read_recent(limit: number) {
     return (await this.logs.get_all()).reverse().slice(0, limit);
+  }
+
+  async remove(id: number) {
+    const log = await this.logs.get(id);
+    await this.logs.put({
+      ...log,
+      message: "*deleted*",
+      extra: null,
+    });
   }
 }

@@ -36,4 +36,10 @@ export class KateAuditSupervisor {
       return { total, logs };
     });
   }
+
+  async remove(id: number) {
+    return AuditStore.transaction(this.os.db, "readwrite", async (store) => {
+      await store.remove(id);
+    });
+  }
 }
