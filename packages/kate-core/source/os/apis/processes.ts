@@ -4,6 +4,7 @@ import type { KateOS } from "../os";
 import { SceneGame } from "../apps/game";
 import { HUD_LoadIndicator } from "../apps/load-screen";
 import type { Scene } from "../ui";
+import { serialise_error } from "../../utils";
 
 export class KateProcesses {
   private _running: KateProcess | null = null;
@@ -120,7 +121,7 @@ export class KateProcesses {
         risk: "low",
         type: "kate.process.execution-failed",
         message: `Failed to run ${id}`,
-        extra: { error },
+        extra: { error: serialise_error(error) },
       });
       await this.os.notifications.push_transient(
         "kate:process",

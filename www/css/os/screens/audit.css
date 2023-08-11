@@ -2,8 +2,7 @@
   text-align: right;
   font-size: 0.9em;
   color: var(--color-text-muted);
-  height: 1.5em;
-  line-height: 1.5em;
+  padding-bottom: 0.5em;
 }
 
 .kate-ui-logview-data {

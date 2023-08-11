@@ -1,7 +1,7 @@
 import { h } from "../ui/widget";
 import * as UI from "../ui/widget";
 import * as Db from "../../data";
-import { unreachable } from "../../utils";
+import { serialise_error, unreachable } from "../../utils";
 import { Action, SimpleScene } from "../ui/scenes";
 import { SceneTextFile } from "./text-file";
 import { HUD_LoadIndicator } from "./load-screen";
@@ -110,7 +110,7 @@ export class SceneHome extends SimpleScene {
         risk: "low",
         type: "kate.home.load-failed",
         message: `Failed to load games: internal error`,
-        extra: { error: error, stack: (error as any)?.stack ?? null },
+        extra: { error: serialise_error(error) },
       });
       this.os.notifications.push_transient(
         "kate:home",

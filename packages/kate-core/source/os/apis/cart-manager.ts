@@ -2,7 +2,12 @@ import * as Cart from "../../cart";
 import * as Capability from "../../capabilities";
 import type { KateOS } from "../os";
 import * as Db from "../../data";
-import { from_bytes, gb, make_thumbnail_from_bytes } from "../../utils";
+import {
+  from_bytes,
+  gb,
+  make_thumbnail_from_bytes,
+  serialise_error,
+} from "../../utils";
 
 export class CartManager {
   readonly CARTRIDGE_SIZE_LIMIT = gb(1.4);
@@ -141,7 +146,7 @@ export class CartManager {
         risk: "low",
         type: "kate.storage.installation-failed",
         message: `Failed to install ${file.name}`,
-        extra: { error },
+        extra: { error: serialise_error(error) },
       });
       await this.os.notifications.push_transient(
         "kate:cart-manager",

@@ -14,3 +14,4 @@ export * from "../../util/build/observable";
 export * from "../../util/build/iterable";
 export * from "../../util/build/math";
 export * from "../../util/build/time";
+export * from "../../util/build/serialise";
