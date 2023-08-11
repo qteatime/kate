@@ -1,4 +1,5 @@
 import * as UI from "../../ui";
+import { SceneAuditLog } from "./audit";
 import { SceneInputSettings } from "./input";
 import { ScenePermissions } from "./permissions";
 import { ScenePlayHabitsSettings } from "./play-habits";
@@ -72,6 +73,15 @@ export class SceneSettings extends UI.SimpleScene {
         description: "Troubleshoot and reset parts of the console",
         on_click: () => {
           this.os.push_scene(new SceneRecovery(this.os));
+        },
+      }),
+
+      UI.link_card(this.os, {
+        icon: "eye",
+        title: "Audit log",
+        description: "Audit all actions taken on the console",
+        on_click: () => {
+          this.os.push_scene(new SceneAuditLog(this.os));
         },
       }),
     ];

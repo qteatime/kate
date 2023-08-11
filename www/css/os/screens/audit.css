@@ -1,0 +1,55 @@
+.kate-ui-logview-meta-heading {
+  text-align: right;
+  font-size: 0.9em;
+  color: var(--color-text-muted);
+  height: 1.5em;
+  line-height: 1.5em;
+}
+
+.kate-ui-logview-data {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+}
+
+.kate-ui-logview-entry {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--color-border-d1);
+  border-radius: 5px 5px 0 0;
+}
+
+.kate-ui-logview-entry-heading {
+  display: flex;
+  gap: 1em;
+  font-size: 0.8em;
+  color: var(--color-text-muted);
+  background: var(--color-white-d1);
+  padding: 0.25em 0.5em;
+}
+
+.kate-ui-logview-entry-message {
+  padding: 0.5em;
+}
+
+.kate-ui-logview-extra:not(:empty) {
+  border-top: 1px solid var(--color-border);
+  padding: 0.5em;
+  font-family: var(--font-family-mono);
+  font-size: 0.7em;
+  overflow: hidden;
+  line-height: 1.3em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.kate-ui-logview-process {
+  flex-grow: 1;
+  font-weight: bold;
+}
+
+.kate-ui-logview-resources {
+  display: flex;
+  gap: 0.5em;
+  align-items: flex-end;
+}

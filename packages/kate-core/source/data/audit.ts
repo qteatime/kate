@@ -66,4 +66,12 @@ export class AuditStore {
   async log(message: Exclude<AuditMessage, { id: number }>) {
     this.logs.add(message);
   }
+
+  async count_all() {
+    return await this.logs.count();
+  }
+
+  async read_recent(limit: number) {
+    return (await this.logs.get_all()).reverse().slice(0, limit);
+  }
 }
