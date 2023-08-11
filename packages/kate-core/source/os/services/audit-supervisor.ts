@@ -13,6 +13,7 @@ type NewMessage = {
 
 export class KateAuditSupervisor {
   readonly RECENT_LOG_LIMIT = 1000;
+  readonly PRESSURE_MARK = 10000;
 
   constructor(readonly os: KateOS) {}
 
@@ -27,7 +28,10 @@ export class KateAuditSupervisor {
         this.os.db,
         "readwrite",
         async (store) => {
-          return await store.garbage_collect_logs(config.log_retention_days);
+          return await store.garbage_collect_logs(
+            config.log_retention_days,
+            this.PRESSURE_MARK
+          );
         }
       );
       if (removed > 0) {

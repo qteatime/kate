@@ -86,7 +86,7 @@ export class AuditStore {
     });
   }
 
-  async garbage_collect_logs(retention: number) {
+  async garbage_collect_logs(retention: number, pressure_mark: number) {
     if (!Number.isFinite(retention)) {
       return 0;
     }
@@ -94,6 +94,10 @@ export class AuditStore {
     const now = new Date();
     const min_diff = retention * 24 * 60 * 60 * 1000;
     const candidates0 = await this.logs.get_all();
+    if (candidates0.length < pressure_mark) {
+      return 0;
+    }
+
     const candidates = candidates0.filter(
       (x) => now.getTime() - x.time.getTime() > min_diff
     );

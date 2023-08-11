@@ -81,7 +81,8 @@ consider here risks from users' and Kate's perspectives.
   log entries forever.
 
   Kate mitigates this with a log retention configuration and periodically
-  performing garbage collection on older logs.
+  performing garbage collection on older logs if necessary (i.e.: if we have
+  very little log entries there's no point in removing older ones).
 
 
 **Storage of unwanted or sensitive data:**
