@@ -13,6 +13,7 @@ export type AuditResource =
   | "kate:capture"
   | "kate:cartridge"
   | "kate:ui"
+  | "kate:audit"
   | "error";
 
 export type AuditMessage = {
@@ -83,5 +84,22 @@ export class AuditStore {
       message: "*deleted*",
       extra: null,
     });
+  }
+
+  async garbage_collect_logs(retention: number) {
+    if (!Number.isFinite(retention)) {
+      return 0;
+    }
+
+    const now = new Date();
+    const min_diff = retention * 24 * 60 * 60 * 1000;
+    const candidates0 = await this.logs.get_all();
+    const candidates = candidates0.filter(
+      (x) => now.getTime() - x.time.getTime() > min_diff
+    );
+    for (const entry of candidates) {
+      await this.logs.delete(entry.id);
+    }
+    return candidates.length;
   }
 }

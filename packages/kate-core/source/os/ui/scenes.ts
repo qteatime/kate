@@ -103,7 +103,7 @@ export abstract class SimpleScene extends Scene {
           console.error(`(Error rendering screen)`, error);
           this.os.audit_supervisor.log("kate:ui", {
             resources: ["kate:ui", "error"],
-            risk: "low",
+            risk: "high",
             type: "kate.ui.rendering.error",
             message: `Error rendering screen`,
             extra: { error: serialise_error(error) },
@@ -139,7 +139,7 @@ export abstract class SimpleScene extends Scene {
         console.error("Error rendering screen:", e);
         this.os.audit_supervisor.log("kate:ui", {
           resources: ["kate:ui", "error"],
-          risk: "low",
+          risk: "high",
           type: "kate.ui.rendering.error",
           message: `Error rendering screen`,
           extra: { error: serialise_error(e) },

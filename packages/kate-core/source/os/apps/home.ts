@@ -107,7 +107,7 @@ export class SceneHome extends SimpleScene {
       console.error("[Kate] Failed to load cartridges", error);
       this.os.audit_supervisor.log("kate:home", {
         resources: ["kate:cartridge", "error"],
-        risk: "low",
+        risk: "high",
         type: "kate.home.load-failed",
         message: `Failed to load games: internal error`,
         extra: { error: serialise_error(error) },

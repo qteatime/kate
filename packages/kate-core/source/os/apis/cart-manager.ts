@@ -143,7 +143,7 @@ export class CartManager {
       console.error(`Failed to install ${file.name}:`, error);
       await this.os.audit_supervisor.log("kate:cart-manager", {
         resources: ["kate:storage", "error"],
-        risk: "low",
+        risk: "high",
         type: "kate.storage.installation-failed",
         message: `Failed to install ${file.name}`,
         extra: { error: serialise_error(error) },

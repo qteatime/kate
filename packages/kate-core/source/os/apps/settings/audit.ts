@@ -305,6 +305,8 @@ function render_resource(x: AuditResource) {
       return UI.fa_icon("rotate");
     case "kate:ui":
       return UI.fa_icon("window-maximize");
+    case "kate:audit":
+      return UI.fa_icon("eye");
     case "navigate":
       return UI.fa_icon("globe");
     default:

@@ -67,7 +67,7 @@ export class KateProcesses {
     if (this._running != null && this._running.cart.id === id) {
       await this.os.audit_supervisor.log(requester, {
         resources: ["kate:cartridge", "error"],
-        risk: "medium",
+        risk: "high",
         type: "kate.process.terminated",
         message: `Terminated process ${id} for ${reason}`,
         extra: { cartridge: id, reason: reason },
@@ -118,7 +118,7 @@ export class KateProcesses {
       console.error(`Failed to run cartridge ${id}:`, error);
       await this.os.audit_supervisor.log("kate:process", {
         resources: ["kate:cartridge", "error"],
-        risk: "low",
+        risk: "high",
         type: "kate.process.execution-failed",
         message: `Failed to run ${id}`,
         extra: { error: serialise_error(error) },

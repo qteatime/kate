@@ -69,7 +69,7 @@ export class KateCapture {
     if (data.length > this.MAX_SCREENSHOT_SIZE) {
       await this.os.audit_supervisor.log(game_id, {
         resources: ["kate:capture", "error"],
-        risk: "none",
+        risk: "high",
         type: "kate.capture.screenshot-failed.size-exceeded",
         message: `Failed to save screenshot: size limit of ${from_bytes(
           this.MAX_SCREENSHOT_SIZE
@@ -100,7 +100,7 @@ export class KateCapture {
     if (data.length > this.MAX_VIDEO_SIZE) {
       await this.os.audit_supervisor.log(game_id, {
         resources: ["kate:capture", "error"],
-        risk: "low",
+        risk: "high",
         type: "kate.capture.recording-failed.size-exceeded",
         message: `Failed to save recording: size limit of ${from_bytes(
           this.MAX_VIDEO_SIZE

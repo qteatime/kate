@@ -214,6 +214,8 @@ export class KateOS {
       }
     );
 
+    await os.audit_supervisor.start();
+
     boot_screen.set_message("");
 
     await min_boot_time;
