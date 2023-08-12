@@ -98,7 +98,7 @@ const meta = T.spec({
       ) as (_: any) => Genre[],
       tags: T.optional(
         [],
-        T.seq2(T.list_of(T.short_str(255)), T.min_max_items(1, 10))
+        T.seq2(T.list_of(T.short_str(255)), T.min_max_items(0, 10))
       ) as (_: any) => string[],
       rating: T.optional("unknown", content_rating),
       warnings: T.nullable(T.short_str(1_000)),
