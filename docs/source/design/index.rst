@@ -26,3 +26,4 @@ API design
 
   0101-object-storage
   01XX-external-url
+  01XX-device-file-access
