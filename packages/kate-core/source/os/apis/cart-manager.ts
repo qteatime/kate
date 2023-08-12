@@ -164,7 +164,10 @@ export class CartManager {
       const old_title = old_meta.metadata.presentation.title;
       const old_version = old_meta.version;
       if (old_meta.status === "active") {
-        if (old_version === version) {
+        if (
+          old_version === version &&
+          !this.os.settings.get("developer").allow_version_overwrite
+        ) {
           await this.os.notifications.push_transient(
             "kate:cart-manager",
             `Cartridge not installed`,

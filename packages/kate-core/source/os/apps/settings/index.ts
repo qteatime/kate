@@ -1,5 +1,6 @@
 import * as UI from "../../ui";
 import { SceneAudit, SceneAuditLog } from "./audit";
+import { SceneDeveloperSettings } from "./developer";
 import { SceneInputSettings } from "./input";
 import { ScenePermissions } from "./permissions";
 import { ScenePlayHabitsSettings } from "./play-habits";
@@ -83,6 +84,17 @@ export class SceneSettings extends UI.SimpleScene {
           "See what your console and cartridges have been doing behind the scenes",
         on_click: () => {
           this.os.push_scene(new SceneAudit(this.os));
+        },
+      }),
+
+      UI.link_card(this.os, {
+        icon: "code",
+        title: "For developers",
+        description: `
+          Settings intended only for those making their own cartridges for Kate.
+        `,
+        on_click: () => {
+          this.os.push_scene(new SceneDeveloperSettings(this.os));
         },
       }),
     ];

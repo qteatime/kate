@@ -37,12 +37,17 @@ export type Audit = {
   log_retention_days: number;
 };
 
+export type Developer = {
+  allow_version_overwrite: boolean;
+};
+
 export type SettingsData = {
   play_habits: PlayHabits;
   input: Input;
   ui: UI;
   security: Security;
   audit: Audit;
+  developer: Developer;
 };
 
 export type AnySetting = SettingsData[keyof SettingsData];
@@ -178,6 +183,9 @@ const defaults: SettingsData = {
   },
   audit: {
     log_retention_days: 365,
+  },
+  developer: {
+    allow_version_overwrite: false,
   },
 };
 
