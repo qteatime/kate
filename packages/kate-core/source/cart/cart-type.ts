@@ -131,7 +131,9 @@ export type ContextualCapabilityGrant = {
   reason: string;
 };
 
-export type ContextualCapability = { type: "open-urls" };
+export type ContextualCapability =
+  | { type: "open-urls" }
+  | { type: "request-device-files" };
 
 export type Security = {
   contextual_capabilities: ContextualCapabilityGrant[];

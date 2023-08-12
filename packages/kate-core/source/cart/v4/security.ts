@@ -1,3 +1,4 @@
+import { unreachable } from "../../utils";
 import {
   ContextualCapability,
   ContextualCapabilityGrant,
@@ -29,5 +30,12 @@ function parse_contextual_capability(
         type: "open-urls",
       };
     }
+    case Cart_v4.Contextual_capability.$Tags.Request_device_files: {
+      return {
+        type: "request-device-files",
+      };
+    }
+    default:
+      throw unreachable(capability, "capability");
   }
 }

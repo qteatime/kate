@@ -210,6 +210,10 @@ const capability = T.tagged_choice<Capability, Capability["type"]>("type", {
     type: T.constant("open-urls" as const),
     reason: T.short_str(255),
   }),
+  "request-device-files": T.spec({
+    type: T.constant("request-device-files" as const),
+    reason: T.short_str(255),
+  }),
 });
 
 const security = T.spec({
@@ -318,9 +322,11 @@ type KeyMapping = { [key: string]: string } | "defaults" | "kate";
 
 type Capability = ContextualCapability & { reason: string };
 
-type ContextualCapability = {
-  type: "open-urls";
-};
+type ContextualCapability =
+  | {
+      type: "open-urls";
+    }
+  | { type: "request-device-files" };
 
 type Bridge =
   | { type: "network-proxy" }
@@ -690,8 +696,15 @@ function make_capability(json: Capability) {
       });
     }
 
-    // default:
-    //   throw unreachable(json, "capability");
+    case "request-device-files": {
+      return Cart.Capability.Contextual({
+        capability: Cart.Contextual_capability.Request_device_files({}),
+        reason: json.reason,
+      });
+    }
+
+    default:
+      throw unreachable(json, "capability");
   }
 }
 

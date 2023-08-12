@@ -861,6 +861,10 @@
             {
               "name": "Open-URLs",
               "fields": []
+            },
+            {
+              "name": "Request-device-files",
+              "fields": []
             }
           ]
         }

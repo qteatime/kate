@@ -1,12 +1,29 @@
 import { CartMeta, ContextualCapability } from "../cart";
-import type { AnyCapabilityGrant, CapabilityType } from "../data/capability";
-import { AnyCapability, Capability, OpenURLs } from "./definitions";
+import type {
+  AnyCapabilityGrant,
+  CapabilityGrant,
+  CapabilityType,
+} from "../data/capability";
+import { unreachable } from "../utils";
+import {
+  AnyCapability,
+  Capability,
+  OpenURLs,
+  RequestDeviceFiles,
+} from "./definitions";
 
 export function parse(grant: AnyCapabilityGrant) {
   switch (grant.name) {
     case "open-urls": {
-      return OpenURLs.parse(grant);
+      return OpenURLs.parse(grant as CapabilityGrant<"open-urls">);
     }
+    case "request-device-files": {
+      return RequestDeviceFiles.parse(
+        grant as CapabilityGrant<"request-device-files">
+      );
+    }
+    default:
+      throw unreachable(grant.name, "grant");
   }
 }
 
@@ -18,6 +35,11 @@ export function from_metadata(
     case "open-urls": {
       return OpenURLs.from_metadata(cart_id, capability);
     }
+    case "request-device-files": {
+      return RequestDeviceFiles.from_metadata(cart_id, capability);
+    }
+    default:
+      throw unreachable(capability, "capability");
   }
 }
 

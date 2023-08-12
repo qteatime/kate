@@ -197,4 +197,7 @@ union Capability {
 union Contextual-capability {
   // medium risk: data exfiltration, privacy concerns
   type Open-URLs {}
+
+  // high risk: security, privacy, escalation concerns
+  type Request-device-files {}
 }
