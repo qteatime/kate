@@ -17,6 +17,22 @@ declare global {
     multiple: boolean;
     excludeAcceptAllOption: boolean;
   }): Promise<FileSystemFileHandle[]>;
+
+  function showDirectoryPicker(options?: {
+    id?: string;
+    mode?: "read" | "readwrite";
+    startIn?:
+      | "desktop"
+      | "documents"
+      | "downloads"
+      | "music"
+      | "pictures"
+      | "videos";
+  }): Promise<FileSystemDirectoryHandle>;
+
+  interface FileSystemDirectoryHandle {
+    entries(): AsyncIterable<[string, FileSystemHandle]>;
+  }
 }
 
 export class KateContextMenu {

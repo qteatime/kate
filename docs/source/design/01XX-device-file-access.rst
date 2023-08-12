@@ -75,9 +75,7 @@ based on a file system tree. This language is described as follows:
 
 .. code-block:: haskell
 
-  type Node n ::
-    | File { name, parent, data }
-    | Directory { name, parent, children :: [n1, ..., nN] }
+  type File f { path :: Pathname, data }
 
   type Pathname p ::
     | Root
@@ -94,21 +92,17 @@ based on a file system tree. This language is described as follows:
   
   DeviceFiles fs ::
     | fs.request-file(FileFilter) -> {ok, [f1, ..., fN]} | error
-    | fs.request-directory() -> {ok, d} | error
-
-  Node n ::
-    | n.relative-path() -> Pathname
+    | fs.request-directory() -> {ok, [f1, ..., fN]} | error
 
   File f ::
+    | n.relative-path() -> Pathname
     | f.read() -> Bytes
-    
-  Directory d ::
-    | d.children() -> [n1, ..., nN]
 
 Thus a user of this API starts by getting access to a `DeviceFiles` instance.
 From there they may request access to a collection of files, or to a 
-directory. These result in Node handles which then allow the user to read
-files or look at the contents of the subtrees of the selected directory.
+directory. These result in File handles which then allow the user to read
+files in the underlying device file system — the files are a snapshot at
+the time they're requested.
 
 Symbolic and hard links are followed during this navigation. However, users
 only have access to the path of the file relative to the top-most directory
@@ -148,39 +142,38 @@ grants to specific file or directory nodes.
     data — only user data must be selectable.
   * If the user selects a directory:
 
-    * Return a Directory handle for the selected directory.
+    * Return a list of File handles for all files contained within the selected
+      directory which are not system data;
 
   * Otherwise:
 
     * Return a generic access failure.
 
 
-Node metadata
+File metadata
 """""""""""""
 
-Given any node handle we can get some metadata about it. Metadata from a node
+Given any File handle we can get some metadata about it. Metadata from a file
 will **never** allow one to get a more privileged node than the one the
 operation was called on.
 
 
-``n.relative-path()``
+``f.relative-path()``
 '''''''''''''''''''''
 
 .. code-block:: haskell
 
-  File{name = N, parent = P}.relative-path() = Join { N, P.relative-path() };
-  Directory{ name = N, parent = P }.relative-path() = Join { N, P.relative-path() };
-  None.relative-path() = Root;
+  File{path = P}.relative-path() = P;
 
-That is, a relative path is just a sequence of segments starting from the node
-we're in, and following the parent chain until there's no more parent. This
-means that pathnames are canonically in reverse form. E.g.: a path like
-``some/directory/file.txt`` would be represented as
+A relative path is just a sequence of segments starting from the node
+we're in, and following the parent chain until the root directory that granted
+access to this file. This means that pathnames are canonically in reverse form.
+E.g.: a path like ``some/directory/file.txt`` would be represented as
 ``Join {"file.txt", Join {"directory", Join {"some", Root}}}``.
 
 
-File interaction
-""""""""""""""""
+File operations
+"""""""""""""""
 
 Given a File handle, the user can only retrieve its contents.
 
@@ -194,23 +187,6 @@ Given a File handle, the user can only retrieve its contents.
 That is, if we read from a file handle then we synchronously get access to all
 of the binary data stored at that node, as long as we still have the file_access
 capability.
-
-
-Directory interaction
-"""""""""""""""""""""
-
-Given a Directory handle, the user can only access nodes that are directly
-contained in it.
-
-``d.children()``
-''''''''''''''''
-
-.. code-block:: haskell
-
-  Directory{children = C}.children() when has(file_access) = C
-
-That is, given a directory node, the user will get access to the list of
-nodes directly below it as long as it still has the file_access capability.
 
 
 How is this feature dangerous?

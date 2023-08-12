@@ -2,6 +2,7 @@ import { KateBrowser } from "./browser";
 import { KateCapture } from "./capture";
 import { KateCartFS } from "./cart-fs";
 import { KateIPC } from "./channel";
+import { DeviceFileHandle, KateDeviceFileAccess } from "./device-file";
 import { InputKey, ExtendedInputKey, KateInput } from "./input";
 import { KateObjectStore } from "./object-store";
 import {
@@ -34,6 +35,8 @@ export const capture = new KateCapture(channel, input);
 capture.setup();
 
 export const browser = new KateBrowser(channel);
+
+export const device_files = new KateDeviceFileAccess(channel);
 
 window.addEventListener("focus", () => {
   channel.send_and_ignore_result("kate:special.focus", {});
@@ -70,6 +73,7 @@ export type KateAPI = {
   timer: typeof timer;
   capture: typeof capture;
   browser: typeof browser;
+  device_files: typeof device_files;
 };
 
 declare global {
@@ -85,6 +89,7 @@ declare global {
       KateObjectStore,
       PointerLocation,
       PointerClick,
+      DeviceFileHandle,
     };
   }
 }

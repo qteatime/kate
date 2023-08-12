@@ -309,6 +309,8 @@ function render_resource(x: AuditResource) {
       return UI.fa_icon("eye");
     case "navigate":
       return UI.fa_icon("globe");
+    case "device-fs":
+      return UI.fa_icon("laptop-file");
     default:
       throw unreachable(x, "audit resource");
   }

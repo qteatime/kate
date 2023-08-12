@@ -5,6 +5,7 @@ import { kate } from "./db";
 
 export type AuditResource =
   | "navigate"
+  | "device-fs"
   | "kate:version"
   | "kate:settings"
   | "kate:permissions"

@@ -56,16 +56,22 @@ export class KateAuditSupervisor {
   }
 
   async log(process_id: string, message: NewMessage) {
+    const entry = {
+      process_id: process_id,
+      resources: new Set(message.resources ?? []),
+      risk: message.risk,
+      time: new Date(),
+      type: message.type,
+      message: message.message ?? "",
+      extra: message.extra ?? null,
+    };
+    if (entry.resources.has("error")) {
+      console.error(`[Kate Audit]`, process_id, message.message ?? "", entry);
+    } else {
+      console.log(`[Kate Audit]`, process_id, message.message ?? "", entry);
+    }
     await AuditStore.transaction(this.os.db, "readwrite", async (store) => {
-      store.log({
-        process_id: process_id,
-        resources: new Set(message.resources ?? []),
-        risk: message.risk,
-        time: new Date(),
-        type: message.type,
-        message: message.message ?? "",
-        extra: message.extra ?? null,
-      });
+      store.log(entry);
     });
   }
 
