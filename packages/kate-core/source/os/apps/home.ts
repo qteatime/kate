@@ -25,7 +25,7 @@ export class SceneHome extends SimpleScene {
         h("div", { class: "kate-os-carts-image" }, [
           x.thumbnail_dataurl
             ? h("img", { src: x.thumbnail_dataurl }, [])
-            : UI.no_thumbnail(),
+            : UI.no_thumbnail(x.metadata.presentation.title),
           h(
             "div",
             {

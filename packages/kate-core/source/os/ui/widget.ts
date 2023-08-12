@@ -1005,6 +1005,6 @@ export function stack_bar(x: {
   ]);
 }
 
-export function no_thumbnail() {
-  return h("div", { class: "kate-no-thumbnail" }, []);
+export function no_thumbnail(text: string = "") {
+  return h("div", { class: "kate-no-thumbnail" }, [text]);
 }
