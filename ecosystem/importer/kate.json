@@ -38,7 +38,12 @@
     }
   },
   "security": {
-    "capabilities": []
+    "capabilities": [
+      {
+        "type": "request-device-files",
+        "reason": "Import games from your device's storage"
+      }
+    ]
   },
   "files": [
     "www/**/*.html",
