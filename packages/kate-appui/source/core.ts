@@ -86,6 +86,8 @@ export type InteractionHandler = {
   key: KateTypes.ExtendedInputKey[];
   label: string;
   allow_repeat?: boolean;
+  on_click?: boolean;
+  on_menu?: boolean;
   handler: (key: KateTypes.ExtendedInputKey, repeat: boolean) => Promise<void>;
 };
 

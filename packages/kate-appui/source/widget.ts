@@ -2,6 +2,23 @@ import { Observable } from "./utils";
 import type { InteractionHandler, UI } from "./core";
 
 export type Widgetable = null | string | Node | Widget;
+export type Size =
+  | "2xs"
+  | "xs"
+  | "1x"
+  | "lg"
+  | "xl"
+  | "2x"
+  | "3x"
+  | "4x"
+  | "5x"
+  | "6x"
+  | "7x"
+  | "8x";
+export type IconStyle = "solid";
+export type IconAnimation = "spin" | "bounce" | "beat";
+export type BoxJustify = "";
+export type BoxAlign = "";
 
 export function set_attribute(
   element: HTMLElement,
@@ -124,6 +141,15 @@ export class Widget {
     return this;
   }
 
+  style(rules: { [key: string]: string | null | undefined }) {
+    for (const [key, value] of Object.entries(rules)) {
+      if (value != null) {
+        this.canvas.style[key as any] = value;
+      }
+    }
+    return this;
+  }
+
   interactive(
     interactions: InteractionHandler[],
     x?: { custom_focus?: boolean }
@@ -132,6 +158,20 @@ export class Widget {
     this.canvas.classList.add("kate-ui-focus-target");
     if (x?.custom_focus === true) {
       this.canvas.setAttribute("data-custom-focus", "true");
+    }
+    const click_handler = interactions.find((x) => x.on_click);
+    if (click_handler != null) {
+      this.canvas.addEventListener("click", (ev) => {
+        ev.preventDefault();
+        click_handler.handler(click_handler.key[0], false);
+      });
+    }
+    const menu_handler = interactions.find((x) => x.on_menu);
+    if (menu_handler != null) {
+      this.canvas.addEventListener("contextmenu", (ev) => {
+        ev.preventDefault();
+        menu_handler.handler(menu_handler.key[0], false);
+      });
     }
     return this;
   }
@@ -192,8 +232,38 @@ export class WidgetDSL {
         key: ["o"],
         label: "Ok",
         allow_repeat: false,
+        on_click: true,
         handler: async () => {
           on_click?.();
+        },
+      },
+    ]);
+  }
+
+  icon_button(
+    icon: string,
+    options: {
+      on_click?: () => void;
+      label?: string;
+      layout?: "left" | "top";
+      style?: IconStyle;
+      size?: Size;
+      animation?: IconAnimation;
+    }
+  ) {
+    return this.h("button", { class: "kate-ui-icon-button" }, [
+      this.class("kate-ui-icon-button-icon", [
+        this.fa_icon(icon, options.size, options.style, options.animation),
+      ]),
+      this.class("kate-ui-icon-button-label", [options.label ?? null]),
+    ]).interactive([
+      {
+        key: ["o"],
+        label: "Ok",
+        allow_repeat: false,
+        on_click: true,
+        handler: async () => {
+          options.on_click?.();
         },
       },
     ]);
@@ -305,16 +375,34 @@ export class WidgetDSL {
   //   ]);
   // }
 
-  vbox(gap: number, children: Widgetable[]) {
+  vbox(
+    options: { gap?: number; justify?: BoxJustify; align?: BoxAlign },
+    children: Widgetable[]
+  ) {
     return this.class("kate-ui-vbox", children).attr({
-      style: `gap: ${gap}rem`,
+      style: style({
+        gap: rem(options.gap),
+        "justify-content": options.justify,
+        "align-items": options.align,
+      }),
     });
   }
 
-  hbox(gap: number, children: Widgetable[]) {
+  hbox(
+    options: { gap?: number; justify?: BoxJustify; align?: BoxAlign },
+    children: Widgetable[]
+  ) {
     return this.class("kate-ui-hbox", children).attr({
-      style: `gap: ${gap}rem`,
+      style: style({
+        gap: rem(options.gap),
+        "justify-content": options.justify,
+        "align-items": options.align,
+      }),
     });
+  }
+
+  centered(children: Widgetable[]) {
+    return this.class("kate-ui-centered", children);
   }
 
   title(
@@ -333,21 +421,9 @@ export class WidgetDSL {
 
   fa_icon(
     name: string,
-    size:
-      | "2xs"
-      | "xs"
-      | "1x"
-      | "lg"
-      | "xl"
-      | "2x"
-      | "3x"
-      | "4x"
-      | "5x"
-      | "6x"
-      | "7x"
-      | "8x" = "1x",
-    style: "solid" = "solid",
-    animation?: "spin" | "bounce" | "beat" | null
+    size: Size = "1x",
+    style: IconStyle = "solid",
+    animation?: IconAnimation
   ) {
     const anim = animation == null ? "" : `fa-${animation}`;
     return this.h(
@@ -356,4 +432,15 @@ export class WidgetDSL {
       []
     );
   }
+}
+
+function style(items: { [key: string]: string | null | undefined }): string {
+  return Object.entries(items)
+    .filter(([_, x]) => x != null)
+    .map(([k, v]) => `${k}: ${v}`)
+    .join("; ");
+}
+
+function rem(x: number | null | undefined) {
+  return x == null ? `${x}rem` : null;
 }

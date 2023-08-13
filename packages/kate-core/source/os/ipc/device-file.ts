@@ -32,7 +32,7 @@ export class KateDeviceFileIPC {
       this._handles.get(env.frame) ?? new Map<HandleId, DeviceFileHandle>();
     handles.set(id, handle);
     this._handles.set(env.frame, handles);
-    return id;
+    return { id, path: handle.path };
   }
 
   async resolve(os: KateOS, env: RuntimeEnv, id: HandleId) {
@@ -108,16 +108,6 @@ export default [
       const file = await handle.getFile();
       const data = await file.arrayBuffer();
       return new Uint8Array(data);
-    }
-  ),
-
-  handler(
-    "kate:device-fs.relative-path",
-    TC.spec({ id: handle_id }),
-    async (os, env, ipc, { id }) => {
-      await check_access(os, env);
-      const handle = await device_ipc.resolve(os, env, id);
-      return handle.path;
     }
   ),
 ];

@@ -1,4 +1,5 @@
 import { UIScene, Widgetable } from "../deps/appui";
+import * as Importers from "../importers";
 
 export class SceneMain extends UIScene {
   render(): Widgetable {
@@ -8,7 +9,21 @@ export class SceneMain extends UIScene {
       title: ui.title_bar({
         left: ui.title(["Kate Importer"]),
       }),
-      body: ui.class("imp-choice", []),
+      body: ui.centered([
+        ui.hbox({ gap: 2 }, [
+          ui.icon_button("folder-open", {
+            label: "Import from folder",
+            size: "4x",
+            on_click: () => this.import_from_folder(),
+          }),
+        ]),
+      ]),
     });
+  }
+
+  async import_from_folder() {
+    const files = await KateAPI.device_files.request_directory();
+    const candidates = await Importers.candidates(files);
+    console.log(candidates);
   }
 }

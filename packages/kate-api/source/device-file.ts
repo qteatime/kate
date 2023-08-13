@@ -1,7 +1,7 @@
 import type { KateIPC } from "./channel";
 import { Pathname } from "./util";
 
-type HandleId = string & { __handle_id: true };
+type HandleRef = { id: string; path: string };
 
 export class KateDeviceFileAccess {
   #channel: KateIPC;
@@ -18,9 +18,9 @@ export class KateDeviceFileAccess {
     const handles = (await this.#channel.call(
       "kate:device-fs.request-file",
       options
-    )) as HandleId[];
+    )) as HandleRef[];
     return handles.map((x) => {
-      return new DeviceFileHandle(this.#channel, x);
+      return new DeviceFileHandle(this.#channel, x.id, x.path);
     });
   }
 
@@ -28,22 +28,20 @@ export class KateDeviceFileAccess {
     const handles = (await this.#channel.call(
       "kate:device-fs.request-directory",
       {}
-    )) as HandleId[];
-    return handles.map((x) => new DeviceFileHandle(this.#channel, x));
+    )) as HandleRef[];
+    return handles.map(
+      (x) => new DeviceFileHandle(this.#channel, x.id, x.path)
+    );
   }
 }
 
 export class DeviceFileHandle {
   #channel: KateIPC;
+  readonly relative_path: Pathname;
 
-  constructor(channel: KateIPC, private _id: string) {
+  constructor(channel: KateIPC, private _id: string, path: string) {
     this.#channel = channel;
-  }
-
-  async relative_path(): Promise<Pathname> {
-    return Pathname.from_string(
-      await this.#channel.call("kate:device-fs.relative-path", { id: this._id })
-    );
+    this.relative_path = Pathname.from_string(path);
   }
 
   async read(): Promise<Uint8Array> {
