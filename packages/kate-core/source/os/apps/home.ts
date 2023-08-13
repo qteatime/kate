@@ -268,6 +268,8 @@ function pretty_release_type(x: ReleaseType) {
       return "PoC";
     case "regular":
       return "Full";
+    case "unofficial":
+      return "Unofficial";
     default:
       throw unreachable(x, "release type");
   }

@@ -12,7 +12,9 @@
   },
   "references": [
     { "path": "../../packages/kate-api" },
-    { "path": "../../packages/kate-appui" }
+    { "path": "../../packages/kate-appui" },
+    { "path": "../../packages/util" },
+    { "path": "../../packages/schema" }
   ],
   "include": ["source", "../../packages/kate-api/build/index.d.ts"]
 }

@@ -489,7 +489,7 @@ w.task(
 // -- Ecosystem
 w.task(
   "ecosystem:importer",
-  ["tools:build", "appui:build", "glomp:build"],
+  ["util:build", "tools:build", "appui:build", "glomp:build"],
   () => {
     tsc("ecosystem/importer");
     remove("ecosystem/importer/www", { recursive: true, force: true });

@@ -56,7 +56,8 @@ export type ReleaseType =
   | "early-access"
   | "beta"
   | "demo"
-  | "regular";
+  | "regular"
+  | "unofficial";
 
 export type ContentRating =
   | "general"

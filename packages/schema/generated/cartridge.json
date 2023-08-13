@@ -536,6 +536,10 @@
             {
               "name": "Regular",
               "fields": []
+            },
+            {
+              "name": "Unofficial",
+              "fields": []
             }
           ]
         }

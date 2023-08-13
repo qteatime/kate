@@ -802,7 +802,7 @@ export namespace Genre {
 
 
 
-export type Release_type = Release_type.Prototype | Release_type.Early_access | Release_type.Beta | Release_type.Demo | Release_type.Regular;
+export type Release_type = Release_type.Prototype | Release_type.Early_access | Release_type.Beta | Release_type.Demo | Release_type.Regular | Release_type.Unofficial;
 
 export namespace Release_type {
  export const tag = 9;
@@ -812,7 +812,8 @@ export namespace Release_type {
     Early_access = 1,
     Beta = 2,
     Demo = 3,
-    Regular = 4
+    Regular = 4,
+    Unofficial = 5
  }
 
  
@@ -921,6 +922,28 @@ export namespace Release_type {
    readonly '@version': 0;
    readonly '@variant': $Tags.Regular;
    readonly '@variant-name': 'Regular';
+   
+ }
+
+
+  
+ export function Unofficial(x: {}): Release_type {
+   return {
+     '@name': 'Release-type',
+     '@tag': 9,
+     '@version': 0,
+     '@variant': $Tags.Unofficial,
+     '@variant-name': 'Unofficial',
+     ...x
+   }
+ }
+
+ export interface Unofficial {
+   readonly '@name': 'Release-type';
+   readonly '@tag': 9;
+   readonly '@version': 0;
+   readonly '@variant': $Tags.Unofficial;
+   readonly '@variant-name': 'Unofficial';
    
  }
 
