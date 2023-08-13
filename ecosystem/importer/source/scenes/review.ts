@@ -20,33 +20,37 @@ export class SceneReview extends UIScene {
       body: ui.dynamic(
         current.map<Widgetable>((x) => {
           return ui.fragment([
-            ui.class("kate-ui-review-container", [
-              ui.class("kate-ui-review-thumbnail", [
+            ui.class("imp-review-container", [
+              ui.class("imp-review-thumbnail", [
                 ui.class("kate-os-carts-box", [
                   ui.class("kate-os-carts-image", [
                     ui.class("kate-no-thumbnail", [x.title]),
+                    ui.h(
+                      "div",
+                      {
+                        class: "kate-os-carts-release-type",
+                        "data-release-type": "unofficial",
+                      },
+                      ["Unofficial"]
+                    ),
+                    ui.h(
+                      "div",
+                      {
+                        class: "kate-os-carts-rating",
+                        "data-rating": "unknown",
+                      },
+                      ["—"]
+                    ),
                   ]),
-                  ui.h(
-                    "div",
-                    {
-                      class: "kate-os-carts-release-type",
-                      "data-release-type": "unofficial",
-                    },
-                    ["Unofficial"]
-                  ),
-                  ui.h(
-                    "div",
-                    { class: "kate-os-carts-rating", "data-rating": "unknown" },
-                    ["—"]
-                  ),
                 ]),
               ]),
 
-              ui.vbox({ gap: 1 }, [
-                ui.meta_text([x.engine]),
+              ui.class("imp-review-details", [
+                ui.class("imp-review-form", [
+                  ui.meta_text([x.engine]),
 
-                ui.field("Name", [ui.text_input(x.title, {})]),
-
+                  ui.field("Name", [ui.text_input(x.title, {})]),
+                ]),
                 ui.action_buttons([
                   ui.text_button("Import cartridge", () => {
                     this.import(x);

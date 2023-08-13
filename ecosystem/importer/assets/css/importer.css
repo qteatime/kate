@@ -2,3 +2,123 @@
   transform-origin: 0 0;
   transform: scale(var(--kate-screen-scale));
 }
+
+.imp-review-container {
+  padding: 1rem;
+  overflow: auto;
+  display: flex;
+  gap: 2rem;
+}
+
+.imp-review-details {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.imp-review-form {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.kate-os-carts-box {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 182px;
+}
+
+.kate-os-carts-image {
+  width: 182px;
+  height: 317px;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  outline: 0px solid transparent;
+  transition: all 0.1s ease-out;
+  border: 1px solid var(--color-border);
+  position: relative;
+}
+
+.focus .kate-os-carts-box .kate-os-carts-image {
+  outline: 2px solid var(--color-primary);
+  border: 1px solid transparent;
+  border-radius: 4px;
+  transform: scale(1.04);
+  animation: kate-focus-in 0.5s ease-out;
+}
+
+.kate-os-carts-image img {
+  width: 100%;
+  height: auto;
+}
+
+.kate-os-carts-release-type {
+  position: absolute;
+  top: -15px;
+  right: -40px;
+  transform: rotate(45deg);
+  transform-origin: 0 0;
+  background: #4976a9;
+  color: var(--color-white);
+  font-size: 9px;
+  width: 75px;
+  height: 18px;
+  line-height: 18px;
+  text-align: center;
+}
+
+.kate-os-carts-release-type[data-release-type="regular"] {
+  display: none;
+}
+
+.kate-os-carts-rating {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  background: var(--color-black);
+  color: var(--color-white);
+  font-weight: bold;
+  font-size: 14px;
+  width: 32px;
+  height: 32px;
+  text-align: center;
+  line-height: 32px;
+}
+
+.kate-os-carts-rating[data-rating="general"] {
+  background: var(--green);
+  display: none;
+}
+
+.kate-os-carts-rating[data-rating="teen-and-up"] {
+  background: var(--blue);
+}
+
+.kate-os-carts-rating[data-rating="mature"] {
+  background: var(--orange);
+}
+
+.kate-os-carts-rating[data-rating="explicit"] {
+  background: var(--red);
+}
+
+.kate-no-thumbnail {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 4/7;
+  background: #5f5f5f;
+  color: var(--color-white);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  font-size: 28px;
+  padding: 16px;
+  font-family: var(--font-family-title);
+  overflow: hidden;
+}

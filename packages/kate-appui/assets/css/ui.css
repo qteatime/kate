@@ -198,3 +198,21 @@
   height: 100%;
   overflow: hidden;
 }
+
+.kate-ui-field-label {
+  font-weight: bold;
+  line-height: 1.6em;
+  display: block;
+  height: 1.6em;
+}
+
+.kate-ui-field {
+  width: 100%;
+}
+
+.kate-ui-action-buttons {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  width: 100%;
+}
