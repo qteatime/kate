@@ -1,7 +1,8 @@
 import { Cart } from "../deps/schema";
 import { GlobPattern, Pathname, make_id, unreachable } from "../deps/utils";
+import type { Importer } from "./core";
 
-export class BitsyImporter {
+export class BitsyImporter implements Importer {
   static async accepts(files: KateTypes.DeviceFileHandle[]) {
     const is_html = GlobPattern.from_pattern("*.html");
     const matches = files.filter((x) => is_html.test(x.relative_path));
@@ -17,6 +18,10 @@ export class BitsyImporter {
     readonly version: string | null,
     readonly entry: KateTypes.DeviceFileHandle
   ) {}
+
+  get engine() {
+    return `Bitsy v${this.version ?? "(unknown)"}`;
+  }
 
   async make_cartridge() {
     const id = make_id();

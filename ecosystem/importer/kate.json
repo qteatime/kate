@@ -42,6 +42,10 @@
       {
         "type": "request-device-files",
         "reason": "Import games from your device's storage"
+      },
+      {
+        "type": "install-cartridges",
+        "reason": "Import games from your device's storage"
       }
     ]
   },

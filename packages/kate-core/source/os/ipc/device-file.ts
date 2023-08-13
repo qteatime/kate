@@ -1,7 +1,7 @@
 import type { RuntimeEnv } from "../../kernel";
 import type { KateOS } from "../os";
 import { TC, make_id } from "../../utils";
-import { handler } from "./handlers";
+import { EMessageFailed, handler } from "./handlers";
 import { DeviceFileHandle } from "../apis";
 
 async function check_access(os: KateOS, env: RuntimeEnv) {
@@ -15,7 +15,7 @@ async function check_access(os: KateOS, env: RuntimeEnv) {
     console.error(
       `Blocked ${env.cart.id} from requesting device files: capability not granted`
     );
-    throw new Error(`No access`);
+    throw new EMessageFailed("kate.device-file.no-access", `No access`);
   }
 }
 
@@ -49,7 +49,7 @@ export class KateDeviceFileIPC {
         message: `Failed to resolve id: cartridge might be misbehaving.`,
         extra: { id },
       });
-      throw new Error(`No access`);
+      throw new EMessageFailed("kate.device-file.no-access", `No access`);
     }
   }
 }

@@ -1798,14 +1798,15 @@ export namespace Capability {
 
 
 
-export type Contextual_capability = Contextual_capability.Open_URLs | Contextual_capability.Request_device_files;
+export type Contextual_capability = Contextual_capability.Open_URLs | Contextual_capability.Request_device_files | Contextual_capability.Install_cartridges;
 
 export namespace Contextual_capability {
  export const tag = 18;
 
  export const enum $Tags {
    Open_URLs = 0,
-    Request_device_files = 1
+    Request_device_files = 1,
+    Install_cartridges = 2
  }
 
  
@@ -1848,6 +1849,28 @@ export namespace Contextual_capability {
    readonly '@version': 0;
    readonly '@variant': $Tags.Request_device_files;
    readonly '@variant-name': 'Request-device-files';
+   
+ }
+
+
+  
+ export function Install_cartridges(x: {}): Contextual_capability {
+   return {
+     '@name': 'Contextual-capability',
+     '@tag': 18,
+     '@version': 0,
+     '@variant': $Tags.Install_cartridges,
+     '@variant-name': 'Install-cartridges',
+     ...x
+   }
+ }
+
+ export interface Install_cartridges {
+   readonly '@name': 'Contextual-capability';
+   readonly '@tag': 18;
+   readonly '@version': 0;
+   readonly '@variant': $Tags.Install_cartridges;
+   readonly '@variant-name': 'Install-cartridges';
    
  }
 

@@ -43,7 +43,12 @@ export class KateIPC {
     window.addEventListener("message", this.handle_message);
   }
 
-  #do_send(id: string, type: string, payload: Payload) {
+  #do_send(
+    id: string,
+    type: string,
+    payload: Payload,
+    transfer: Transferable[] = []
+  ) {
     this.#server.postMessage(
       {
         type: type,
@@ -51,19 +56,24 @@ export class KateIPC {
         id: id,
         payload: payload,
       },
-      "*"
+      "*",
+      transfer
     );
   }
 
-  async call<A>(type: string, payload: Payload) {
+  async call<A>(type: string, payload: Payload, transfer: Transferable[] = []) {
     const deferred = defer<A>();
     const id = this.#make_id();
     this.#pending.set(id, deferred);
-    this.#do_send(id, type, payload);
+    this.#do_send(id, type, payload, transfer);
     return deferred.promise;
   }
 
-  async send_and_ignore_result(type: string, payload: Payload) {
+  async send_and_ignore_result(
+    type: string,
+    payload: Payload,
+    transfer: Transferable[] = []
+  ) {
     this.#do_send(this.#make_id(), type, payload);
   }
 

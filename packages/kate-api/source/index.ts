@@ -1,6 +1,7 @@
 import { KateBrowser } from "./browser";
 import { KateCapture } from "./capture";
 import { KateCartFS } from "./cart-fs";
+import { KateCartManager } from "./cart-manager";
 import { KateIPC } from "./channel";
 import { DeviceFileHandle, KateDeviceFileAccess } from "./device-file";
 import { InputKey, ExtendedInputKey, KateInput } from "./input";
@@ -38,6 +39,8 @@ export const browser = new KateBrowser(channel);
 
 export const device_files = new KateDeviceFileAccess(channel);
 
+export const cart_manager = new KateCartManager(channel);
+
 window.addEventListener("focus", () => {
   channel.send_and_ignore_result("kate:special.focus", {});
 });
@@ -74,6 +77,7 @@ export type KateAPI = {
   capture: typeof capture;
   browser: typeof browser;
   device_files: typeof device_files;
+  cart_manager: typeof cart_manager;
 };
 
 declare global {

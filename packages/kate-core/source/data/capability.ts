@@ -8,9 +8,13 @@ export type GrantType = { type: "switch"; value: boolean };
 export type GrantConfiguration = {
   "open-urls": {};
   "request-device-files": {};
+  "install-cartridges": {};
 };
 
-export type CapabilityType = "open-urls" | "request-device-files";
+export type CapabilityType =
+  | "open-urls"
+  | "request-device-files"
+  | "install-cartridges";
 
 export type SerialisedCapability = Pick<
   AnyCapabilityGrant,

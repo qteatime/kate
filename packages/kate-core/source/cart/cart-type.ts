@@ -134,7 +134,8 @@ export type ContextualCapabilityGrant = {
 
 export type ContextualCapability =
   | { type: "open-urls" }
-  | { type: "request-device-files" };
+  | { type: "request-device-files" }
+  | { type: "install-cartridges" };
 
 export type Security = {
   contextual_capabilities: ContextualCapabilityGrant[];

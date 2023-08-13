@@ -1,5 +1,6 @@
 import { UIScene, Widgetable } from "../deps/appui";
 import * as Importers from "../importers";
+import { SceneReview } from "./review";
 
 export class SceneMain extends UIScene {
   render(): Widgetable {
@@ -24,6 +25,6 @@ export class SceneMain extends UIScene {
   async import_from_folder() {
     const files = await KateAPI.device_files.request_directory();
     const candidates = await Importers.candidates(files);
-    console.log(candidates);
+    this.ui.push_scene(new SceneReview(this.ui, candidates));
   }
 }

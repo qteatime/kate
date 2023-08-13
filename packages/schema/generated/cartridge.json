@@ -869,6 +869,10 @@
             {
               "name": "Request-device-files",
               "fields": []
+            },
+            {
+              "name": "Install-cartridges",
+              "fields": []
             }
           ]
         }

@@ -99,21 +99,29 @@ export class KateCapture {
 
   async #save_video(blob: Blob, token: string) {
     const buffer = await blob.arrayBuffer();
-    await this.#channel.call("kate:capture.save-recording", {
-      data: new Uint8Array(buffer),
-      type: "video/webm",
-      token: token,
-    });
+    await this.#channel.call(
+      "kate:capture.save-recording",
+      {
+        data: new Uint8Array(buffer),
+        type: "video/webm",
+        token: token,
+      },
+      [buffer]
+    );
   }
 
   async #save_screenshot(token: string) {
     const blob = await this.#take_screenshot();
     const buffer = await blob.arrayBuffer();
-    await this.#channel.call("kate:capture.save-image", {
-      data: new Uint8Array(buffer),
-      type: "image/png",
-      token: token,
-    });
+    await this.#channel.call(
+      "kate:capture.save-image",
+      {
+        data: new Uint8Array(buffer),
+        type: "image/png",
+        token: token,
+      },
+      [buffer]
+    );
   }
 
   async #take_screenshot(): Promise<Blob> {

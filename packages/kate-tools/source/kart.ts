@@ -214,6 +214,10 @@ const capability = T.tagged_choice<Capability, Capability["type"]>("type", {
     type: T.constant("request-device-files" as const),
     reason: T.short_str(255),
   }),
+  "install-cartridges": T.spec({
+    type: T.constant("install-cartridges" as const),
+    reason: T.short_str(255),
+  }),
 });
 
 const security = T.spec({
@@ -326,7 +330,8 @@ type ContextualCapability =
   | {
       type: "open-urls";
     }
-  | { type: "request-device-files" };
+  | { type: "request-device-files" }
+  | { type: "install-cartridges" };
 
 type Bridge =
   | { type: "network-proxy" }
@@ -699,6 +704,13 @@ function make_capability(json: Capability) {
     case "request-device-files": {
       return Cart.Capability.Contextual({
         capability: Cart.Contextual_capability.Request_device_files({}),
+        reason: json.reason,
+      });
+    }
+
+    case "install-cartridges": {
+      return Cart.Capability.Contextual({
+        capability: Cart.Contextual_capability.Install_cartridges({}),
         reason: json.reason,
       });
     }

@@ -349,31 +349,38 @@ export class WidgetDSL {
     });
   }
 
-  // text_input(
-  //   initial_value: string,
-  //   x: { query: string; on_change?: (value: string) => void }
-  // ) {
-  //   const value = new Observable<string>(initial_value);
-  //   return this.class("kate-ui-text-input", [
-  //     this.dynamic(value as Observable<Widgetable>),
-  //     this.fa_icon("pen"),
-  //   ]).interactive([
-  //     {
-  //       key: ["o"],
-  //       label: "Edit",
-  //       handler: async () => {
-  //         const new_value = await KateAPI.dialog.input(x.query, {
-  //           initial_value: value.value,
-  //           type: "text",
-  //         });
-  //         if (new_value != null) {
-  //           value.value = new_value;
-  //           x.on_change?.(new_value);
-  //         }
-  //       },
-  //     },
-  //   ]);
-  // }
+  field(label: string, children: Widgetable[]) {
+    return this.class("kate-ui-field", [
+      this.h("label", { class: "kate-ui-field-label" }, [label]),
+      this.class("kate-ui-field-content", children),
+    ]);
+  }
+
+  text_input(
+    initial_value: string,
+    x: { query?: string; on_change?: (value: string) => void }
+  ) {
+    const value = new Observable<string>(initial_value);
+    return this.class("kate-ui-text-input", [
+      this.dynamic(value as Observable<Widgetable>),
+      this.fa_icon("pen"),
+    ]).interactive([
+      {
+        key: ["o"],
+        label: "Edit",
+        handler: async () => {
+          // const new_value = await KateAPI.dialog.input(x.query, {
+          //   initial_value: value.value,
+          //   type: "text",
+          // });
+          // if (new_value != null) {
+          //   value.value = new_value;
+          //   x.on_change?.(new_value);
+          // }
+        },
+      },
+    ]);
+  }
 
   vbox(
     options: { gap?: number; justify?: BoxJustify; align?: BoxAlign },
@@ -431,6 +438,10 @@ export class WidgetDSL {
       { class: `fa-${style} fa-${size} fa-${name} ${anim}` },
       []
     );
+  }
+
+  action_buttons(buttons: Widgetable[]) {
+    return this.class("kate-ui-action-buttons", buttons);
   }
 }
 

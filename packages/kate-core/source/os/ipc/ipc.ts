@@ -9,6 +9,7 @@ import ObjectStorageMessages from "./object-storage";
 import SpecialMessages from "./special";
 import BrowserMessages from "./browser";
 import DeviceFileMessages from "./device-file";
+import CartManagerMessages from "./cart_manager";
 
 type Message = {
   type: string;
@@ -30,6 +31,7 @@ export class KateIPCServer {
     this.add_handlers(SpecialMessages);
     this.add_handlers(BrowserMessages);
     this.add_handlers(DeviceFileMessages);
+    this.add_handlers(CartManagerMessages);
   }
 
   private add_handlers(handlers: Handler<any, any>[]) {

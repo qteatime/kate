@@ -35,6 +35,11 @@ function parse_contextual_capability(
         type: "request-device-files",
       };
     }
+    case Cart_v4.Contextual_capability.$Tags.Install_cartridges: {
+      return {
+        type: "install-cartridges",
+      };
+    }
     default:
       throw unreachable(capability, "capability");
   }

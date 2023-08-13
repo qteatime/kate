@@ -1,10 +1,15 @@
+import { Cart } from "../deps/schema";
 import { BitsyImporter } from "./bitsy";
 
-interface Parser {
+export interface Parser {
   accepts(files: KateTypes.DeviceFileHandle[]): Promise<Importer[]>;
 }
 
-interface Importer {}
+export interface Importer {
+  title: string;
+  engine: string;
+  make_cartridge(): Promise<Cart.Cartridge>;
+}
 
 const parsers = [BitsyImporter];
 

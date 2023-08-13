@@ -121,3 +121,44 @@ export class RequestDeviceFiles extends SwitchCapability<"request-device-files">
     return this.grant_configuration ? "high" : "none";
   }
 }
+
+export class InstallCartridges extends SwitchCapability<"install-cartridges"> {
+  readonly type = "install-cartridges";
+  readonly title = "Install cartridges";
+  readonly description = `
+    Allow the cartridge to request other cartridges to be installed.
+  `;
+
+  get grant_configuration() {
+    return this._grant_configuration;
+  }
+
+  constructor(readonly cart_id: string, private _grant_configuration: boolean) {
+    super();
+  }
+
+  static parse(grant: CapabilityGrant<InstallCartridges["type"]>) {
+    if (
+      grant.name !== "install-cartridges" ||
+      grant.granted.type !== "switch"
+    ) {
+      throw new Error(`Unexpected capability: ${grant.name}`);
+    }
+    return new InstallCartridges(grant.cart_id, grant.granted.value);
+  }
+
+  static from_metadata(cart_id: string, capability: ContextualCapability) {
+    if (capability.type !== "install-cartridges") {
+      throw new Error(`Unexpected capability: ${capability.type}`);
+    }
+    return new InstallCartridges(cart_id, true);
+  }
+
+  update(grant: boolean): void {
+    this._grant_configuration = grant;
+  }
+
+  risk_category(): RiskCategory {
+    return this.grant_configuration ? "critical" : "none";
+  }
+}

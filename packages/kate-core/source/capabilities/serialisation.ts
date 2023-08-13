@@ -8,6 +8,7 @@ import { unreachable } from "../utils";
 import {
   AnyCapability,
   Capability,
+  InstallCartridges,
   OpenURLs,
   RequestDeviceFiles,
 } from "./definitions";
@@ -20,6 +21,11 @@ export function parse(grant: AnyCapabilityGrant) {
     case "request-device-files": {
       return RequestDeviceFiles.parse(
         grant as CapabilityGrant<"request-device-files">
+      );
+    }
+    case "install-cartridges": {
+      return InstallCartridges.parse(
+        grant as CapabilityGrant<"install-cartridges">
       );
     }
     default:
@@ -37,6 +43,9 @@ export function from_metadata(
     }
     case "request-device-files": {
       return RequestDeviceFiles.from_metadata(cart_id, capability);
+    }
+    case "install-cartridges": {
+      return InstallCartridges.from_metadata(cart_id, capability);
     }
     default:
       throw unreachable(capability, "capability");

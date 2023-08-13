@@ -201,4 +201,7 @@ union Contextual-capability {
 
   // high risk: security, privacy, escalation concerns
   type Request-device-files {}
+
+  // critical risk: security, privacy, escalation concerns
+  type Install-cartridges {}
 }
