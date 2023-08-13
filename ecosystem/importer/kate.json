@@ -53,6 +53,8 @@
     "www/**/*.html",
     "www/**/*.css",
     "www/**/*.js",
+    "www/**/*.txt",
+    "www/**/*.ttf",
     "thumbnail.png",
     "LICENCE.txt"
   ],
