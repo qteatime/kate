@@ -42,8 +42,8 @@
     }
   ],
   "channels": {
-    "preview": "0.23.5-rc1",
-    "nightly": "0.23.6-a1",
+    "preview": "0.23.6-a2",
+    "nightly": "0.23.6-a2",
     "latest": "latest"
   }
 }
