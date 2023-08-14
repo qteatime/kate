@@ -15,7 +15,11 @@ export class SceneReview extends UIScene {
 
     return ui.app_screen({
       title: ui.title_bar({
-        left: ui.title(["Review cartridges"]),
+        left: ui.title([
+          "Kate Importer",
+          ui.fa_icon("caret-right").style({ margin: "0 0.5em" }),
+          "Review",
+        ]),
         right: ui.fragment([
           ui.dynamic(
             current_index.map<Widgetable>(
@@ -38,6 +42,12 @@ export class SceneReview extends UIScene {
                 if (current_index.value + 1 < this.candidates.length) {
                   current_index.value = current_index.value + 1;
                 }
+              },
+            },
+            x: {
+              label: "Return to home",
+              action: () => {
+                this.ui.pop_scene(this);
               },
             },
           }),
