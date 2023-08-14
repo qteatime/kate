@@ -16,6 +16,32 @@ export class SceneReview extends UIScene {
     return ui.app_screen({
       title: ui.title_bar({
         left: ui.title(["Review cartridges"]),
+        right: ui.fragment([
+          ui.dynamic(
+            current_index.map<Widgetable>(
+              (x) => `${x + 1} of ${this.candidates.length}`
+            )
+          ),
+
+          ui.keymap(this, {
+            ltrigger: {
+              label: "Previous",
+              action: () => {
+                if (current_index.value > 0) {
+                  current_index.value = current_index.value - 1;
+                }
+              },
+            },
+            rtrigger: {
+              label: "Next",
+              action: () => {
+                if (current_index.value + 1 < this.candidates.length) {
+                  current_index.value = current_index.value + 1;
+                }
+              },
+            },
+          }),
+        ]),
       }),
       body: ui.dynamic(
         current.map<Widgetable>((x) => {
@@ -52,8 +78,11 @@ export class SceneReview extends UIScene {
                   ui.field("Name", [ui.text_input(x.title, {})]),
                 ]),
                 ui.action_buttons([
-                  ui.text_button("Import cartridge", () => {
-                    this.import(x);
+                  ui.text_button("Return to home screen", () => {
+                    this.ui.pop_scene(this);
+                  }),
+                  ui.text_button("Save cartridge", () => {
+                    this.import(current_index, x);
                   }),
                 ]),
               ]),
@@ -64,7 +93,14 @@ export class SceneReview extends UIScene {
     });
   }
 
-  async import(candidate: Importer) {
+  async next(index: Observable<number>) {
+    if (index.value + 1 < this.candidates.length) {
+      index.value = index.value + 1;
+    } else {
+    }
+  }
+
+  async import(index: Observable<number>, candidate: Importer) {
     const cartridge = await candidate.make_cartridge();
     const bytes = Cart.encode(cartridge);
     await KateAPI.cart_manager.install(bytes);

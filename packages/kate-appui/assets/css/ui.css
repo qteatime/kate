@@ -207,6 +207,7 @@
   flex-direction: row;
   justify-content: flex-end;
   width: 100%;
+  gap: 1rem;
 }
 
 .kate-ui-icon-button {

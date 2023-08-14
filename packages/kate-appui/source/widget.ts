@@ -1,5 +1,5 @@
 import { Observable } from "./utils";
-import type { InteractionHandler, UI } from "./core";
+import type { InteractionHandler, UI, UIScene } from "./core";
 
 export type Widgetable = null | string | Node | Widget;
 export type Size =
@@ -287,6 +287,30 @@ export class WidgetDSL {
     } else {
       return null;
     }
+  }
+
+  keymap(
+    scene: UIScene,
+    mapping: Partial<
+      Record<KateTypes.InputKey, { label: string; action: () => void }>
+    >
+  ) {
+    const handlers: InteractionHandler[] = Object.entries(mapping).map(
+      ([key, handler]) => ({
+        key: [key as KateTypes.InputKey],
+        label: handler.label,
+        allow_repeat: false,
+        handler: async () => handler.action(),
+      })
+    );
+    return dynamic({
+      on_attached: (canvas) => {
+        this.ui.focus.register_scene_handlers(scene, handlers);
+      },
+      on_detached: (canvas) => {
+        this.ui.focus.deregister_scene_handlers(scene, handlers);
+      },
+    });
   }
 
   multistep(

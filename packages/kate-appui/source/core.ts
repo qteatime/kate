@@ -93,6 +93,7 @@ export type InteractionHandler = {
 
 export class UIFocus {
   private _interactive = new WeakMap<HTMLElement, InteractionHandler[]>();
+  private _scene_handlers = new WeakMap<UIScene, InteractionHandler[]>();
 
   readonly on_focus_changed = new EventStream<HTMLElement | null>();
 
@@ -130,6 +131,23 @@ export class UIFocus {
     interactions: InteractionHandler[]
   ) {
     this._interactive.set(element, interactions);
+  }
+
+  register_scene_handlers(scene: UIScene, interactions: InteractionHandler[]) {
+    const handlers0 = this._scene_handlers.get(scene) ?? [];
+    const handlers = handlers0.concat(
+      interactions.filter((x) => !handlers0.includes(x))
+    );
+    this._scene_handlers.set(scene, handlers);
+  }
+
+  deregister_scene_handlers(
+    scene: UIScene,
+    interactions: InteractionHandler[]
+  ) {
+    const handlers0 = this._scene_handlers.get(scene) ?? [];
+    const handlers = handlers0.filter((x) => !interactions.includes(x));
+    this._scene_handlers.set(scene, handlers);
   }
 
   focus(element: HTMLElement | null) {
@@ -171,6 +189,9 @@ export class UIFocus {
       if (this.handle_current_interaction(current, key, repeat)) {
         return;
       }
+    }
+    if (this.handle_scene_interaction(key, repeat)) {
+      return;
     }
 
     if (key === "up" || key === "right" || key === "down" || key === "left") {
@@ -289,6 +310,25 @@ export class UIFocus {
       return false;
     } else {
       interaction.handler(key, repeat);
+      return true;
+    }
+  }
+
+  handle_scene_interaction(key: KateTypes.ExtendedInputKey, repeat: boolean) {
+    if (this.ui.current == null) {
+      return;
+    }
+    const scene_keys = this._scene_handlers.get(this.ui.current);
+    if (scene_keys == null) {
+      return false;
+    }
+    const scene_key = scene_keys?.find(
+      (x) => x.key.includes(key) && (x.allow_repeat || !repeat)
+    );
+    if (scene_key == null) {
+      return false;
+    } else {
+      scene_key?.handler(key, repeat);
       return true;
     }
   }
