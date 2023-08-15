@@ -23,12 +23,46 @@ export class Pathname {
     return new Pathname(true, this.segments);
   }
 
+  make_relative() {
+    return new Pathname(false, this.segments);
+  }
+
   join(x: Pathname) {
     if (x.is_absolute) {
       return x;
     } else {
       return new Pathname(this.is_absolute, [...this.segments, ...x.segments]);
     }
+  }
+
+  to(x: string) {
+    return this.join(Pathname.from_string(x));
+  }
+
+  drop_prefix(prefix: string[]) {
+    const segments = this.segments.slice();
+    for (const segment of prefix) {
+      if (segments.length > 0 && segments[0] === segment) {
+        segments.shift();
+      } else {
+        break;
+      }
+    }
+    return new Pathname(false, [...segments]);
+  }
+
+  starts_with(path: Pathname) {
+    if (path.segments.length > this.segments.length) {
+      return false;
+    }
+    let i = 0;
+    for (const segment of path.segments) {
+      if (this.segments[i] !== segment) {
+        return false;
+      }
+      i += 1;
+    }
+    return true;
   }
 
   normalise() {

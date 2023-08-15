@@ -1,0 +1,11 @@
+[
+  "index.html",
+  "index.html.symbols",
+  "renpy-pre.js",
+  "renpy.data",
+  "renpy.js",
+  "renpy.wasm",
+  "renpy.wasm.map",
+  "service-worker.js",
+  "web-presplash.jpg"
+]

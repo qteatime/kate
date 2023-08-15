@@ -54,7 +54,10 @@
     "www/**/*.css",
     "www/**/*.js",
     "www/**/*.txt",
+    "www/**/*.md",
     "www/**/*.ttf",
+    "www/runtimes/**/*",
+    "www/runtimes/**/.kate.files.json",
     "thumbnail.png",
     "LICENCE.txt"
   ],

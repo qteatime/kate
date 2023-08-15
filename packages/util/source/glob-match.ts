@@ -37,3 +37,25 @@ export class GlobPattern {
     }
   }
 }
+
+export class GlobPatternList {
+  private constructor(private _patterns: GlobPattern[]) {}
+
+  static from_patterns(patterns: string[]) {
+    return new GlobPatternList(
+      patterns.map((x) => GlobPattern.from_pattern(x))
+    );
+  }
+
+  test(path: Pathname | string) {
+    return this._patterns.some((x) => x.test(path));
+  }
+
+  join(that: GlobPatternList) {
+    return new GlobPatternList([...this._patterns, ...that._patterns]);
+  }
+
+  add(that: GlobPattern) {
+    return new GlobPatternList([...this._patterns, that]);
+  }
+}

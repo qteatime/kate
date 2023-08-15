@@ -1,0 +1,2 @@
+Ren'Py is licensed under MIT, with portions based on LGPL code.
+Full licence can be found at https://www.renpy.org/doc/html/license.html
