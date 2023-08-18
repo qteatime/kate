@@ -87,7 +87,7 @@ export class RenpyImporter implements Importer {
     ]);
 
     const cartridge = Cart.Cartridge({
-      id: make_game_id(this.title),
+      id: make_game_id(this.id, this.title),
       version: Cart.Version({ major: 1, minor: 0 }),
       "release-date": Cart.Date({
         year: now.getFullYear(),

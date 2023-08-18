@@ -124,9 +124,8 @@ export function make_meta(title: string) {
   ];
 }
 
-export function make_game_id(title: string) {
-  const id = make_id();
-  return `imported.kate.local/${slug(title)}-${id}`;
+export function make_game_id(uuid: string, title: string) {
+  return `imported.kate.local/${slug(title)}-${uuid}`;
 }
 
 function slug(title: string) {
