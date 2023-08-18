@@ -16,7 +16,7 @@ export type Size =
   | "7x"
   | "8x";
 export type IconStyle = "solid";
-export type IconAnimation = "spin" | "bounce" | "beat";
+export type IconAnimation = "spin" | "spin-pulse" | "bounce" | "beat"; 
 export type BoxJustify = "";
 export type BoxAlign = "";
 

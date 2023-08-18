@@ -2,6 +2,7 @@ import { UIScene, Widgetable } from "../deps/appui";
 import { JSZip, _JSZip } from "../deps/jszip";
 import { Pathname } from "../deps/utils";
 import * as Importers from "../importers";
+import { SceneProgress } from "./progress";
 import { SceneReview } from "./review";
 
 export class SceneMain extends UIScene {
@@ -32,7 +33,11 @@ export class SceneMain extends UIScene {
 
   async import_from_folder() {
     const files = await KateAPI.device_files.request_directory();
+    const progress = SceneProgress.show(this.ui)
+      .set_message("Analysing game files...")
+      .set_unknown_progress();
     const candidates = await Importers.candidates(files);
+    progress.close();
     if (candidates.length > 0) {
       this.ui.push_scene(new SceneReview(this.ui, candidates));
     }
@@ -47,8 +52,13 @@ export class SceneMain extends UIScene {
     if (file == null) {
       return;
     }
+    const progress = SceneProgress.show(this.ui)
+      .set_message("Unpacking zip file...")
+      .set_unknown_progress();
     const files = await unpack_zip(file);
+    progress.set_message("Analysing game files...");
     const candidates = await Importers.candidates(files);
+    progress.close();
     if (candidates.length > 0) {
       this.ui.push_scene(new SceneReview(this.ui, candidates));
     }

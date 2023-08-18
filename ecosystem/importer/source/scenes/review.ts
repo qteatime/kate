@@ -2,6 +2,7 @@ import { UI, UIScene, Widgetable } from "../deps/appui";
 import { Cart } from "../deps/schema";
 import { Observable } from "../deps/utils";
 import { Importer } from "../importers";
+import { SceneProgress } from "./progress";
 
 export class SceneReview extends UIScene {
   constructor(ui: UI, readonly candidates: Importer[]) {
@@ -88,11 +89,8 @@ export class SceneReview extends UIScene {
                   ui.field("Name", [ui.text_input(x.title, {})]),
                 ]),
                 ui.action_buttons([
-                  ui.text_button("Return to home screen", () => {
-                    this.ui.pop_scene(this);
-                  }),
                   ui.text_button("Save cartridge", () => {
-                    this.import(current_index, x);
+                    this.import(x);
                   }),
                 ]),
               ]),
@@ -110,9 +108,14 @@ export class SceneReview extends UIScene {
     }
   }
 
-  async import(index: Observable<number>, candidate: Importer) {
+  async import(candidate: Importer) {
+    const progress = SceneProgress.show(this.ui)
+      .set_message("Preparing cartridge...")
+      .set_unknown_progress();
     const cartridge = await candidate.make_cartridge();
+    progress.set_message("Packing cartridge...");
     const bytes = Cart.encode(cartridge);
+    progress.close();
     await KateAPI.cart_manager.install(bytes);
   }
 }
