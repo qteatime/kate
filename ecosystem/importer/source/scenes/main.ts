@@ -52,15 +52,21 @@ export class SceneMain extends UIScene {
     if (file == null) {
       return;
     }
+
     const progress = SceneProgress.show(this.ui)
       .set_message("Unpacking zip file...")
       .set_unknown_progress();
-    const files = await unpack_zip(file);
-    progress.set_message("Analysing game files...");
-    const candidates = await Importers.candidates(files);
-    progress.close();
-    if (candidates.length > 0) {
-      this.ui.push_scene(new SceneReview(this.ui, candidates));
+    try {
+      const files = await unpack_zip(file);
+      progress.set_message("Analysing game files...");
+      const candidates = await Importers.candidates(files);
+      progress.close();
+      if (candidates.length > 0) {
+        this.ui.push_scene(new SceneReview(this.ui, candidates));
+      }
+    } catch (e) {
+      progress.close();
+      console.error(`Failed to prepare candidates:`, e);
     }
   }
 }

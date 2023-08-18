@@ -3,7 +3,13 @@ import { Cart } from "../deps/schema";
 import { GlobPattern, GlobPatternList, Pathname, make_id } from "../deps/utils";
 import { rpa } from "../formats";
 import type { Importer } from "./core";
-import { make_file, make_mapping, make_meta, mime_type } from "./make-cart";
+import {
+  make_file,
+  make_game_id,
+  make_mapping,
+  make_meta,
+  mime_type,
+} from "./make-cart";
 
 export class RenpyImporter implements Importer {
   static async accepts(files0: KateTypes.DeviceFileHandle[]) {
@@ -49,7 +55,6 @@ export class RenpyImporter implements Importer {
   }
 
   async make_cartridge(): Promise<Cart.Cartridge> {
-    const id = this.id;
     const now = new Date();
     const decoder = new TextDecoder();
     const runtime_dir = Pathname.from_string("/www/runtimes/renpy").to(
@@ -82,7 +87,7 @@ export class RenpyImporter implements Importer {
     ]);
 
     const cartridge = Cart.Cartridge({
-      id: `imported.kate.local/${id}`,
+      id: make_game_id(this.title),
       version: Cart.Version({ major: 1, minor: 0 }),
       "release-date": Cart.Date({
         year: now.getFullYear(),

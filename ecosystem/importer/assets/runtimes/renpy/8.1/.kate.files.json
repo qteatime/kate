@@ -7,5 +7,5 @@
   "renpy.wasm",
   "renpy.wasm.map",
   "service-worker.js",
-  "web-presplash.jpg"
+  "web-presplash.png"
 ]

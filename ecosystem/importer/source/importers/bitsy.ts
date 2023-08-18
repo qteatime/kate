@@ -1,7 +1,13 @@
 import { Cart } from "../deps/schema";
 import { GlobPattern, Pathname, make_id, unreachable } from "../deps/utils";
 import type { Importer } from "./core";
-import { make_file, make_mapping, make_meta, mime_type } from "./make-cart";
+import {
+  make_file,
+  make_game_id,
+  make_mapping,
+  make_meta,
+  mime_type,
+} from "./make-cart";
 
 export class BitsyImporter implements Importer {
   static async accepts(files: KateTypes.DeviceFileHandle[]) {
@@ -26,7 +32,6 @@ export class BitsyImporter implements Importer {
   }
 
   async make_cartridge() {
-    const id = this.id;
     const now = new Date();
 
     const files = await Promise.all(
@@ -36,7 +41,7 @@ export class BitsyImporter implements Importer {
     );
 
     const cartridge = Cart.Cartridge({
-      id: `imported.kate.local/${id}`,
+      id: make_game_id(this.title),
       version: Cart.Version({ major: 1, minor: 0 }),
       "release-date": Cart.Date({
         year: now.getFullYear(),

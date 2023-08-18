@@ -5,6 +5,7 @@ export class SceneProgress extends UIScene {
   readonly title = new Observable<Widgetable>("");
   readonly message = new Observable<Widgetable>("");
   readonly progress = new Observable<Widgetable>(null);
+  private _closed: boolean = false;
 
   static show(ui: UI) {
     const result = new SceneProgress(ui);
@@ -46,6 +47,11 @@ export class SceneProgress extends UIScene {
   }
 
   close() {
+    if (this._closed) {
+      return;
+    }
+
+    this._closed = true;
     this.ui.pop_scene(this);
   }
 }

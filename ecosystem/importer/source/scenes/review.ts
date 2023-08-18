@@ -112,10 +112,15 @@ export class SceneReview extends UIScene {
     const progress = SceneProgress.show(this.ui)
       .set_message("Preparing cartridge...")
       .set_unknown_progress();
-    const cartridge = await candidate.make_cartridge();
-    progress.set_message("Packing cartridge...");
-    const bytes = Cart.encode(cartridge);
-    progress.close();
-    await KateAPI.cart_manager.install(bytes);
+    try {
+      const cartridge = await candidate.make_cartridge();
+      progress.set_message("Packing cartridge...");
+      const bytes = Cart.encode(cartridge);
+      progress.close();
+      await KateAPI.cart_manager.install(bytes);
+    } catch (e) {
+      progress.close();
+      console.error(`Failed to import:`, e);
+    }
   }
 }

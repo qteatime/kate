@@ -1,5 +1,5 @@
 import { Cart } from "../deps/schema";
-import { Pathname, unreachable } from "../deps/utils";
+import { Pathname, make_id, unreachable } from "../deps/utils";
 
 export function make_mapping(mapping: Record<KateTypes.InputKey, string>) {
   return new Map(
@@ -122,6 +122,21 @@ export function make_meta(title: string) {
       "average-completion-seconds": null,
     }),
   ];
+}
+
+export function make_game_id(title: string) {
+  const id = make_id();
+  return `imported.kate.local/${slug(title)}-${id}`;
+}
+
+function slug(title: string) {
+  return title
+    .trim()
+    .toLowerCase()
+    .replace(/[ _]/g, "-")
+    .replace(/\-+/g, "-")
+    .replace(/[^a-z0-9\-]/g, "")
+    .slice(0, 32);
 }
 
 export async function make_file(path: Pathname, data: Uint8Array) {
