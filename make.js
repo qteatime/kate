@@ -518,7 +518,7 @@ w.task("chore:clean-tsc-cache", [], () => {
   });
   for (const file of files) {
     if (!file.includes("node_modules")) {
-      FS.rm(file);
+      FS.rmSync(file);
     }
   }
 });
