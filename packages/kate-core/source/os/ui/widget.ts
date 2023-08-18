@@ -1,3 +1,5 @@
+import { capabilities } from "../..";
+import * as Cart from "../../cart";
 import { InputKey } from "../../kernel/virtual";
 import { EventStream, Observable } from "../../utils";
 import { InteractionHandler } from "../apis";
@@ -1007,4 +1009,23 @@ export function stack_bar(x: {
 
 export function no_thumbnail(text: string = "") {
   return h("div", { class: "kate-no-thumbnail" }, [text]);
+}
+
+export function cartridge_chip(cart: Cart.CartMeta) {
+  const risk = capabilities.risk_from_cartridge(cart);
+
+  return h("div", { class: "kate-ui-cartridge-chip", "data-risk": risk }, [
+    h("div", { class: "kate-ui-cartridge-chip-thumbnail" }, [no_thumbnail()]),
+    h("div", { class: "kate-ui-cartridge-chip-info" }, [
+      h("div", { class: "kate-ui-cartridge-chip-title" }, [
+        cart.metadata.presentation.title,
+      ]),
+      h("div", { class: "kate-ui-cartridge-chip-id" }, [cart.id]),
+      h("div", { class: "kate-ui-cartridge-chip-meta" }, [
+        "Version: ",
+        cart.version,
+      ]),
+      h("div", { class: "kate-ui-cartridge-chip-risk" }, ["Risk: ", risk]),
+    ]),
+  ]);
 }

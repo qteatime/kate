@@ -36,13 +36,8 @@ export default [
         message: UI.stack([
           UI.paragraph([
             UI.strong([UI.mono_text([env.cart.id])]),
-            " wants to install ",
-            UI.strong([UI.mono_text([cart.id])]),
-            " (",
-            UI.mono_text([cart.metadata.presentation.title]),
-            ")",
-            " at version ",
-            UI.strong([UI.mono_text([cart.version])]),
+            " wants to install a cartridge:",
+            UI.cartridge_chip(cart),
           ]),
         ]),
       });
