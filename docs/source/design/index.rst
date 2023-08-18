@@ -15,6 +15,7 @@ Kernel design
   :maxdepth: 1
 
   00XX-capabilities
+  00XX-live-audit
 
 
 API design
