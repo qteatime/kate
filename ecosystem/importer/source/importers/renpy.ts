@@ -359,8 +359,6 @@ async function get_remote_files(files: KateTypes.DeviceFileHandle[]) {
       )
   );
 
-  debugger;
-
   return {
     remote_rules: remotes.map((x) => x.rule).join("\n") + "\n",
     remotes: remotes.map((x) => x.file),
