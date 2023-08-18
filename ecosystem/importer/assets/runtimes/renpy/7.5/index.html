@@ -127,6 +127,9 @@
     </style>
   </head>
   <body>
+    <div id="presplash" style="position: absolute; width: 100%; height: 100%">
+      <img src="/web-presplash.png" style="display: block; margin: auto; width: 100%; height: 100%; object-fit: contain">
+    </div>
 
     <div id="statusbar_container">
       <div id="statusbar">
@@ -220,7 +223,7 @@
           });
         }
         reader.readAsArrayBuffer(input.files[0])
-	input.type = ''; input.type = 'file'; // reset field
+  input.type = ''; input.type = 'file'; // reset field
       }
 
       function onSavegamesExport() {
@@ -250,33 +253,7 @@
             return;
         }
 
-        // presplash
-        presplash = undefined;
-        if (FS.readdir('/').indexOf('web-presplash.png') >= 0) {
-          presplash = FS.readFile('/web-presplash.png');
-        } else if (FS.readdir('/').indexOf('web-presplash.jpg') >= 0) {
-          presplash = FS.readFile('/web-presplash.jpg');
-        } else if (FS.readdir('/').indexOf('web-presplash.webp') >= 0) {
-          presplash = FS.readFile('/web-presplash.webp');
-        } else if (FS.readdir('/').indexOf('web-presplash-default.jpg') >= 0) {
-          presplash = FS.readFile('/web-presplash-default.jpg');
-        }
-
-        div = document.createElement('div');
-        div.id = 'presplash';  // used by presplashEnd()
-        div.style = 'position: absolute; width: 100%; height: 100%';
-        c = document.getElementById('canvas');
-        c.parentElement.prepend(div);
-
-        if (presplash) {
-          obj_url = window.URL.createObjectURL(new Blob([presplash]));
-          img = document.createElement('img');
-          img.src = obj_url;
-          img.style = 'display: block; margin: auto; width: 100%; height: 100%; object-fit: contain';
-          div.appendChild(img)
-        } else {
-          Module.print("Loading game, please wait...\n");
-        }
+        presplash = "/web-presplash.png";
 
         // give control back to webui before running main
         window.setTimeout(function() {
