@@ -209,6 +209,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../api/timer.html"><code class="docutils literal notranslate"><span class="pre">timer</span></code> — Scheduling updates</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../api/capture.html"><code class="docutils literal notranslate"><span class="pre">capture</span></code> — Screenshots and video recording</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../api/store.html"><code class="docutils literal notranslate"><span class="pre">store</span></code> — Saving state</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/browser.html"><code class="docutils literal notranslate"><span class="pre">browser</span></code> — Navigating to URLs</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../web/index.html">Web game support</a><input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" role="switch" type="checkbox"/><label for="toctree-checkbox-9"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -242,7 +243,10 @@
 <p class="caption" role="heading"><span class="caption-text">Design and implementation</span></p>
 <ul>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../../design/index.html">Kate’s Design Documents</a><input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" role="switch" type="checkbox"/><label for="toctree-checkbox-13"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../design/00XX-capabilities.html">#00XX — Capabilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../design/00XX-live-audit.html"># 00XX - Live auditing</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../design/0101-object-storage.html">#0101 — Object Store API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../design/01XX-external-url.html">#01XX — External URL navigation</a></li>
 </ul>
 </li>
 </ul>
@@ -334,6 +338,9 @@ about the origin of a cartridge, improving users’ trust.</p>
 <p>You can use something like <code class="docutils literal notranslate"><span class="pre">your-username.itch.io</span></code> if you don’t own a
 top-level domain. This is a less strong guarantee for origin verification,
 but for Kate’s use cases it’s often good enough.</p>
+<p>The cartridge identifier is complemented by the <code class="docutils literal notranslate"><span class="pre">version</span></code>, in the form
+<code class="docutils literal notranslate"><span class="pre">&lt;major&gt;.&lt;minor&gt;</span></code> (e.g.: “1.4”). Only one version of a cartridge can
+be installed at any given time.</p>
 <div class="admonition important">
 <p class="admonition-title">Important</p>
 <p>Namespaces and names can only contain lower-case latin letters, hyphens, and
@@ -358,21 +365,25 @@ collections. It will also be used by other tools (such as the store feed
 ones) to extract information necessary to present a cartridge.</p>
 <p>The meta-data is itself divided into further sections:</p>
 <ul class="simple">
-<li><p><strong>Title</strong>: This provides information about the cartridge presentation, such
-as the title of the game, the thumbnail to use, etc;</p></li>
-<li><p><strong>Release</strong>: This provides information about when the game was released, what
-kind of stability players should expect, and any usage terms;</p></li>
-<li><p><strong>Rating</strong>: This provides information about the content of the cartridge,
-such as age appropriateness and content warnings;</p></li>
-<li><p><strong>Play</strong>: This provides information about how the game is played, such as
-accessibility and translation provisions;</p></li>
+<li><p><strong>Presentation</strong>: This provides information about how Kate should present
+your cartridge to users across the console and in the store. It includes
+the game’s title, author, thumbnails, etc.</p></li>
+<li><p><strong>Classification</strong>: This provides information about the content of the
+cartridge, such as genre, age appropriateness, and content warnings.</p></li>
+<li><p><strong>Legal</strong>: This provides information about what the user is allowed to
+do with the cartridge, and what rights they hold. It includes information
+on the cartridge’s licence and privacy policy;</p></li>
+<li><p><strong>Accessibility</strong>: This provides information about how the game can be
+played. It contains things such as what input methods are supported,
+which languages are offered, whether the cartridge has additional
+accessibility provisions, etc;</p></li>
 </ul>
 </section>
 <section id="versioning">
 <span id="cartridge-versioning"></span><h2>Versioning<a class="headerlink" href="#versioning" title="Permalink to this heading">#</a></h2>
-<p>Each cartridge has a release version, using a <code class="docutils literal notranslate"><span class="pre">&lt;major&gt;.&lt;minor&gt;</span></code> format
-(e.g.: <code class="docutils literal notranslate"><span class="pre">5.2</span></code>). Kate only allows one version of each cartridge to be
-installed at any given time.</p>
+<p>Like said previously, each cartridge has a release version, using a
+<code class="docutils literal notranslate"><span class="pre">&lt;major&gt;.&lt;minor&gt;</span></code> format (e.g.: <code class="docutils literal notranslate"><span class="pre">5.2</span></code>). Kate only allows one version
+of each cartridge to be installed at any given time.</p>
 <p>When a player tries to install a cartridge that has the same version
 as the one already installed, Kate will just skip the installation altogether,
 so you’re expected to change the version every time the contents of the
@@ -387,16 +398,18 @@ safe.</p>
 <p>A cartridge metadata includes the terms of using the cartridge. This comes in
 the form of a legal notices text, which is then made available to players in
 the console through the context menu.</p>
-<p>Cartridges may also include additional provisions for using the cartridge.
-Open source games can declare which open source licence applies. And games
-with relaxed usage can declare if players are allowed to modify the cartridge
-(e.g.: by making mods), and whether they’re allowed to make commercial use
-of their modification.</p>
-<p>The defaults are those of a restrictive proprietary
-policy, with some provisions for personal modifications. The reason personal
-modifications are allowed by default is that players with particular
-accessibility needs may need to make modifications to be able to play at
-all.</p>
+<p>Any cartridge that uses the internet or includes links to internet addresses
+in any form <strong>must</strong> also include a privacy policy, which indicates to the
+user if any data is collected and how this data is used.</p>
+<p>Cartridges are also encouraged to specify their policy on derivative works
+(e.g.: game mods). The default value allows users to modify the cartridge
+strictly for personal use, however this can be changed to disallow any
+modification or to allow non-commercial or commercial sharing of derivative
+works.</p>
+<p>The reason personal modifications are allowed by default is that players
+with particular accessibility needs may need to make modifications to be
+able to play at all. While you can change the default, supporting personal
+accessibility needs is encouraged.</p>
 </section>
 <section id="rating">
 <span id="cartridge-rating"></span><h2>Rating<a class="headerlink" href="#rating" title="Permalink to this heading">#</a></h2>

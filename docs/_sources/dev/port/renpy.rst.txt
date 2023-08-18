@@ -19,11 +19,13 @@ looks like this:
 
   {
     "id": "my-namespace/my-game",
+    "version": {"major": 1, "minor": 0},
     "root": "my-game-1.0-web",
     "metadata": {
-      "game": {
+      "presentation": {
         "author": "Me",
-        "title": "My Game"
+        "title": "My Game",
+        "tagline": "A Ren'Py visual novel"
       }
     },
     "platform": {

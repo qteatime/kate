@@ -209,6 +209,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../manual/api/timer.html"><code class="docutils literal notranslate"><span class="pre">timer</span></code> — Scheduling updates</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../manual/api/capture.html"><code class="docutils literal notranslate"><span class="pre">capture</span></code> — Screenshots and video recording</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../manual/api/store.html"><code class="docutils literal notranslate"><span class="pre">store</span></code> — Saving state</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../manual/api/browser.html"><code class="docutils literal notranslate"><span class="pre">browser</span></code> — Navigating to URLs</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../manual/web/index.html">Web game support</a><input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" role="switch" type="checkbox"/><label for="toctree-checkbox-9"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -242,7 +243,10 @@
 <p class="caption" role="heading"><span class="caption-text">Design and implementation</span></p>
 <ul>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../design/index.html">Kate’s Design Documents</a><input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" role="switch" type="checkbox"/><label for="toctree-checkbox-13"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../design/00XX-capabilities.html">#00XX — Capabilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../design/00XX-live-audit.html"># 00XX - Live auditing</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../design/0101-object-storage.html">#0101 — Object Store API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../design/01XX-external-url.html">#01XX — External URL navigation</a></li>
 </ul>
 </li>
 </ul>
@@ -317,11 +321,13 @@ uses for the game assets. The minimal configuration for a Ren’Py game
 looks like this:</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;my-namespace/my-game&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;major&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;minor&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">},</span>
 <span class="w">  </span><span class="nt">&quot;root&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;my-game-1.0-web&quot;</span><span class="p">,</span>
 <span class="w">  </span><span class="nt">&quot;metadata&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;game&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;presentation&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">      </span><span class="nt">&quot;author&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Me&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;My Game&quot;</span>
+<span class="w">      </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;My Game&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;tagline&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;A Ren&#39;Py visual novel&quot;</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="w">  </span><span class="p">},</span>
 <span class="w">  </span><span class="nt">&quot;platform&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>

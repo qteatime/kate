@@ -14,10 +14,12 @@ The minimal configuration for a Bitsy game looks like this:
 
   {
     "id": "my-namespace/my-game",
+    "version": {"major": 1, "minor": 0},
     "metadata": {
-      "game": {
+      "presentation": {
         "author": "Me",
-        "title": "My Game"
+        "title": "My Game",
+        "tagline": "A bitsy game"
       }
     },
     "platform": {

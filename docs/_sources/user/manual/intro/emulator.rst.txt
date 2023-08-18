@@ -122,7 +122,7 @@ to control most games. In the emulator you can:
    You can configure the how the keyboard keys map to
    Kate buttons from ``Settings -> Controllers & Sensors -> Control Kate
    with a keyboard``. The default is arrow keys for the |btn_dpad_text|; ``X`` and ``Z``
-   for |btn_cancel| and |btn_ok|; ``A`` and ``S`` for |btn_l| and |btn_r|; ``Left Control``
+   for |btn_cancel| and |btn_ok|; ``A`` and ``S`` for |btn_l| and |btn_r|; ``C``
    for |btn_capture_text|, and ``Left Shift`` for |btn_menu_text|.
 
    .. image:: img/keyboard.png

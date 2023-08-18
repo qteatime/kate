@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="#0101 — Object Store API" href="0101-object-storage.html" /><link rel="prev" title="Ren’Py" href="../dev/port/renpy.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="#00XX — Capabilities" href="00XX-capabilities.html" /><link rel="prev" title="Ren’Py" href="../dev/port/renpy.html" />
 
     <!-- Generated with Sphinx 6.2.1 and Furo 2023.03.27 -->
         <title>Kate’s Design Documents - Kate 0.23.6 documentation</title>
@@ -209,6 +209,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../dev/manual/api/timer.html"><code class="docutils literal notranslate"><span class="pre">timer</span></code> — Scheduling updates</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../dev/manual/api/capture.html"><code class="docutils literal notranslate"><span class="pre">capture</span></code> — Screenshots and video recording</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../dev/manual/api/store.html"><code class="docutils literal notranslate"><span class="pre">store</span></code> — Saving state</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../dev/manual/api/browser.html"><code class="docutils literal notranslate"><span class="pre">browser</span></code> — Navigating to URLs</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../dev/manual/web/index.html">Web game support</a><input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" role="switch" type="checkbox"/><label for="toctree-checkbox-9"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -242,7 +243,10 @@
 <p class="caption" role="heading"><span class="caption-text">Design and implementation</span></p>
 <ul class="current">
 <li class="toctree-l1 current has-children current-page"><a class="current reference internal" href="#">Kate’s Design Documents</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" role="switch" type="checkbox"/><label for="toctree-checkbox-13"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="00XX-capabilities.html">#00XX — Capabilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="00XX-live-audit.html"># 00XX - Live auditing</a></li>
 <li class="toctree-l2"><a class="reference internal" href="0101-object-storage.html">#0101 — Object Store API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="01XX-external-url.html">#01XX — External URL navigation</a></li>
 </ul>
 </li>
 </ul>
@@ -309,11 +313,21 @@
 Kate. This is intended for a more technical audience, security auditors,
 and developers making Kate games who wish to have a deeper understanding
 of the platform they’re developing for.</p>
+<section id="kernel-design">
+<h2>Kernel design<a class="headerlink" href="#kernel-design" title="Permalink to this heading">#</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="00XX-capabilities.html">#00XX — Capabilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="00XX-live-audit.html"># 00XX - Live auditing</a></li>
+</ul>
+</div>
+</section>
 <section id="api-design">
 <h2>API design<a class="headerlink" href="#api-design" title="Permalink to this heading">#</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="0101-object-storage.html">#0101 — Object Store API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="01XX-external-url.html">#01XX — External URL navigation</a></li>
 </ul>
 </div>
 </section>
@@ -324,12 +338,12 @@ of the platform they’re developing for.</p>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="0101-object-storage.html">
+          <a class="next-page" href="00XX-capabilities.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">#0101 — Object Store API</div>
+                <div class="title">#00XX — Capabilities</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
@@ -375,6 +389,7 @@ of the platform they’re developing for.</p>
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Kate’s Design Documents</a><ul>
+<li><a class="reference internal" href="#kernel-design">Kernel design</a></li>
 <li><a class="reference internal" href="#api-design">API design</a></li>
 </ul>
 </li>

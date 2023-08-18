@@ -11,7 +11,6 @@
   padding: 5px 0;
   scroll-behavior: smooth;
   scroll-padding: 30px;
-  padding-right: 800px;
   background: url("../../../img/kate-chan-muted.png") no-repeat fixed;
   background-size: 40%;
   background-position-x: 560px;
@@ -25,7 +24,10 @@
   flex-direction: row;
   flex-wrap: nowrap;
   gap: 10px;
-  padding-right: 800px;
+}
+
+.kate-os-carts > .kate-ui-interactive:last-child {
+  padding-right: 20px;
 }
 
 .kate-os-carts-box {
@@ -45,6 +47,7 @@
   outline: 0px solid transparent;
   transition: all 0.1s ease-out;
   border: 1px solid var(--color-border);
+  position: relative;
 }
 
 .focus .kate-os-carts-box .kate-os-carts-image {
@@ -121,4 +124,54 @@
 .kate-os-quickstart-description > * {
   display: inline-block;
   vertical-align: middle;
+}
+
+.kate-os-carts-release-type {
+  position: absolute;
+  top: -15px;
+  right: -40px;
+  transform: rotate(45deg);
+  transform-origin: 0 0;
+  background: var(--blue);
+  color: var(--color-white);
+  font-size: 9px;
+  width: 75px;
+  height: 18px;
+  line-height: 18px;
+  text-align: center;
+}
+
+.kate-os-carts-release-type[data-release-type="regular"] {
+  display: none;
+}
+
+.kate-os-carts-rating {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  background: var(--color-black);
+  color: var(--color-white);
+  font-weight: bold;
+  font-size: 14px;
+  width: 32px;
+  height: 32px;
+  text-align: center;
+  line-height: 32px;
+}
+
+.kate-os-carts-rating[data-rating="general"] {
+  background: var(--green);
+  display: none;
+}
+
+.kate-os-carts-rating[data-rating="teen-and-up"] {
+  background: var(--blue);
+}
+
+.kate-os-carts-rating[data-rating="mature"] {
+  background: var(--orange);
+}
+
+.kate-os-carts-rating[data-rating="explicit"] {
+  background: var(--red);
 }

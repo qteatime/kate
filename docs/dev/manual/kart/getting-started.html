@@ -209,6 +209,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../api/timer.html"><code class="docutils literal notranslate"><span class="pre">timer</span></code> — Scheduling updates</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../api/capture.html"><code class="docutils literal notranslate"><span class="pre">capture</span></code> — Screenshots and video recording</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../api/store.html"><code class="docutils literal notranslate"><span class="pre">store</span></code> — Saving state</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/browser.html"><code class="docutils literal notranslate"><span class="pre">browser</span></code> — Navigating to URLs</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../web/index.html">Web game support</a><input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" role="switch" type="checkbox"/><label for="toctree-checkbox-9"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -242,7 +243,10 @@
 <p class="caption" role="heading"><span class="caption-text">Design and implementation</span></p>
 <ul>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../../design/index.html">Kate’s Design Documents</a><input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" role="switch" type="checkbox"/><label for="toctree-checkbox-13"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../design/00XX-capabilities.html">#00XX — Capabilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../design/00XX-live-audit.html"># 00XX - Live auditing</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../design/0101-object-storage.html">#0101 — Object Store API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../design/01XX-external-url.html">#01XX — External URL navigation</a></li>
 </ul>
 </li>
 </ul>
@@ -316,10 +320,12 @@ example game included with Kate. A minimal configuration file for it looks like
 the following:</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;qteati.me/katchu&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;major&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;minor&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">},</span>
 <span class="w">  </span><span class="nt">&quot;metadata&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;game&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;presentation&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 <span class="w">      </span><span class="nt">&quot;author&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Q.&quot;</span><span class="p">,</span>
 <span class="w">      </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Kat&#39;chu&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;tagline&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Collect consoles and rack up scores&quot;</span><span class="p">,</span>
 <span class="w">      </span><span class="nt">&quot;thumbnail_path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;thumbnail.png&quot;</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="w">  </span><span class="p">},</span>
@@ -340,7 +346,8 @@ the following:</p>
 <p>Here the <code class="docutils literal notranslate"><span class="pre">id</span></code> field is a unique identifier for your cartridge. This is
 composed from a domain name you have (e.g.: <code class="docutils literal notranslate"><span class="pre">my-name.itch.io</span></code>) and a
 unique name for your game. It follows a specific format described in the
-<a class="reference internal" href="../model/cartridges.html#cartridge-identification"><span class="std std-ref">Identification</span></a> section.</p>
+<a class="reference internal" href="../model/cartridges.html#cartridge-identification"><span class="std std-ref">Identification</span></a> section. A version must also be provided,
+and it needs to be updated every time the contents of the cartridge change.</p>
 <p>Then it includes some <code class="docutils literal notranslate"><span class="pre">metadata</span></code>. Kate has a lot of metadata fields that
 are used to display the cartridge to the player and allow them to organise
 and search their library (and the upcoming stores). You should provide at

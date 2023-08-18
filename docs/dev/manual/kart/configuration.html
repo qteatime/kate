@@ -209,6 +209,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../api/timer.html"><code class="docutils literal notranslate"><span class="pre">timer</span></code> — Scheduling updates</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../api/capture.html"><code class="docutils literal notranslate"><span class="pre">capture</span></code> — Screenshots and video recording</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../api/store.html"><code class="docutils literal notranslate"><span class="pre">store</span></code> — Saving state</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/browser.html"><code class="docutils literal notranslate"><span class="pre">browser</span></code> — Navigating to URLs</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../web/index.html">Web game support</a><input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" role="switch" type="checkbox"/><label for="toctree-checkbox-9"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -242,7 +243,10 @@
 <p class="caption" role="heading"><span class="caption-text">Design and implementation</span></p>
 <ul>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../../design/index.html">Kate’s Design Documents</a><input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" role="switch" type="checkbox"/><label for="toctree-checkbox-13"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../design/00XX-capabilities.html">#00XX — Capabilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../design/00XX-live-audit.html"># 00XX - Live auditing</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../design/0101-object-storage.html">#0101 — Object Store API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../design/01XX-external-url.html">#01XX — External URL navigation</a></li>
 </ul>
 </li>
 </ul>
@@ -311,9 +315,14 @@ to describe how to create the cartridge and what to include in it.</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">id</span></code> — a string with the cartridge identifier. Follows rules specified
 in <a class="reference internal" href="../model/cartridges.html#cartridge-identification"><span class="std std-ref">Identification</span></a>;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">version</span></code> — a unique identification for the specific cartridge release;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">release</span></code> — the date of release for the cartridge. May be used to warn
+users about link rotting and other time-sensitive issues;</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">metadata</span></code> — information used to display and filter the cartridge in the
 Kate library;</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">files</span></code> — describes which files to include in the cartridge file;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">security</span></code> — describes additional capabilities for the cartridge which
+require user consent or that might cause harm when misused/abused;</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">platform</span></code> — describes how to run the cartridge;</p></li>
 </ul>
 <section id="file-location">
@@ -368,118 +377,12 @@ then access when you run it.</p>
 </aside>
 </aside>
 </section>
-<section id="metadata">
-<h2>Metadata<a class="headerlink" href="#metadata" title="Permalink to this heading">#</a></h2>
-<p>The metadata section is further divided into several subsections:</p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">game</span></code> — provides information about the game itself, including how to
-display and categorise it in the library;</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">release</span></code> — provides information about the distribution of the cartridge.
-This includes the version, terms of use, and any legal notices from
-third-party assets that the cartridge includes;</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">rating</span></code> — provides information about the appropriateness of the contents
-of the cartridge. This includes age-appropriateness ratings and content
-warnings;</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">play_style</span></code> — provides information about how the game is played. This
-includes what controls it supports, what language it offers, whether it
-supports multi-play, accessibility provisions, etc;</p></li>
-</ul>
-<section id="game">
-<h3>Game<a class="headerlink" href="#game" title="Permalink to this heading">#</a></h3>
+<section id="identification">
+<h2>Identification<a class="headerlink" href="#identification" title="Permalink to this heading">#</a></h2>
+<p>Besides the <code class="docutils literal notranslate"><span class="pre">id</span></code> field, the top-level part of the cartridge also
+contains:</p>
 <dl>
-<dt>author <em>(recommended)</em></dt><dd><div class="line-block">
-<div class="line"><code class="docutils literal notranslate"><span class="pre">string</span></code></div>
-<div class="line">A descriptive name identifying who made the game. Will show up on stores
-and in the detailed cartridge information screen. Up to 255 characters <a class="footnote-reference brackets" href="#f2" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.</div>
-</div>
-</dd>
-<dt>title</dt><dd><div class="line-block">
-<div class="line"><code class="docutils literal notranslate"><span class="pre">string</span></code></div>
-<div class="line">A descriptive name identifying the game itself. Will show up under the
-cartridge’s thumbnail in the library, and everywhere else the cartridge
-is displayed. Up to 255 characters <a class="footnote-reference brackets" href="#f2" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.</div>
-</div>
-</dd>
-<dt>description <em>(optional)</em></dt><dd><div class="line-block">
-<div class="line"><code class="docutils literal notranslate"><span class="pre">string</span></code></div>
-<div class="line">A free-text description of the game. Might include a summary, features
-players might expect, and similar text to what is generally found in
-game stores. Up to 10,000 (ten thousand) characters <a class="footnote-reference brackets" href="#f2" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.</div>
-</div>
-</dd>
-<dt>genre <em>(recommended)</em></dt><dd><div class="line-block">
-<div class="line"><code class="docutils literal notranslate"><span class="pre">array</span> <span class="pre">of</span> <span class="pre">string</span></code></div>
-<div class="line">A list of genres that the game might be classified as, with a maximum of
-10 items. This is used for organising the cartridge library and allow
-players to search for things they want to play.</div>
-</div>
-<p>The list of genres is pre-defined and can be one of the following:</p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">action</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">fighting</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">interactive-fiction</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">platformer</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">puzzle</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">racing</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">rhythm</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">rpg</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">simulation</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">shooter</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">sports</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">strategy</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">tool</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">other</span></code></p></li>
-</ul>
-<p>The default is <code class="docutils literal notranslate"><span class="pre">other</span></code>, if no list of genres is provided.</p>
-</dd>
-<dt>tag <em>(optional)</em></dt><dd><div class="line-block">
-<div class="line"><code class="docutils literal notranslate"><span class="pre">array</span> <span class="pre">of</span> <span class="pre">string</span></code></div>
-<div class="line">A list of additional tags that help players search for cartridges and
-organise their library.</div>
-</div>
-<p>Each tag can have up to 255 characters <a class="footnote-reference brackets" href="#f2" id="id5" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>, and must consist entirely
-of lower-case latin letters and hyphens. E.g.: <code class="docutils literal notranslate"><span class="pre">visual-novel</span></code> is a
-valid tag, but <code class="docutils literal notranslate"><span class="pre">visual</span> <span class="pre">novel</span></code> is not, because of the white space.
-Neither is <code class="docutils literal notranslate"><span class="pre">café-simulator</span></code>, because of the accent on <code class="docutils literal notranslate"><span class="pre">e</span></code>.</p>
-</dd>
-<dt>thumbnail_path <em>(recommended)</em></dt><dd><div class="line-block">
-<div class="line"><code class="docutils literal notranslate"><span class="pre">string</span></code></div>
-<div class="line">A path to a PNG image to use as the cartridge cover when displaying
-the cartridge across Kate. The path is relative to the root defined in
-the configuration file.</div>
-</div>
-<p>The image should have a 4:7 aspect ratio, and the recommended resolution
-is 400x700 pixels.</p>
-</dd>
-</dl>
-</section>
-<section id="release">
-<h3>Release<a class="headerlink" href="#release" title="Permalink to this heading">#</a></h3>
-<dl>
-<dt>kind <em>(recommended)</em></dt><dd><div class="line-block">
-<div class="line"><code class="docutils literal notranslate"><span class="pre">string</span></code></div>
-<div class="line">Tells players what kind of stability and polish they should expect from
-the cartridge. The default is <code class="docutils literal notranslate"><span class="pre">full</span></code>, which means a proper, stable and
-polished release.</div>
-</div>
-<p>Can be one of:</p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">prototype</span></code> — the game is more of a proof-of-concept than an actual game.
-Players shouldn’t expect polish, stability, or completeness of the contents.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">early-access</span></code> — the game is being released to gather early feedback.
-Players should expect a less polished, less stable, and incomplete
-experience.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">beta</span></code> — the game is complete, but looking for more feedback and testing.
-Players should expect a more polished and complete experience, but they
-should expect there to be bugs.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">demo</span></code> — the game is a portion of a bigger vision, but this portion is
-complete in this release. Players should still expect a polished and stable
-experience.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">full</span></code> — this is for proper stable releases. Players should expect full
-releases to be polished, complete, and stable.</p></li>
-</ul>
-</dd>
-<dt>date <em>(optional)</em></dt><dd><div class="line-block">
+<dt>release <em>(optional)</em></dt><dd><div class="line-block">
 <div class="line"><code class="docutils literal notranslate"><span class="pre">{year:</span> <span class="pre">integer,</span> <span class="pre">month:</span> <span class="pre">integer,</span> <span class="pre">day:</span> <span class="pre">integer}</span></code></div>
 <div class="line">The date in which the cartridge was released. Defaults to the current
 date. This helps players sort store entries and their library by
@@ -496,43 +399,137 @@ with the same id and version already installed
 </div>
 <p>E.g.: <code class="docutils literal notranslate"><span class="pre">{major:</span> <span class="pre">1,</span> <span class="pre">minor:</span> <span class="pre">13}</span></code></p>
 </dd>
-<dt>legal_notices_path <em>(recommended)</em></dt><dd><div class="line-block">
+</dl>
+</section>
+<section id="metadata">
+<h2>Metadata<a class="headerlink" href="#metadata" title="Permalink to this heading">#</a></h2>
+<p>The metadata section is further divided into several subsections:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">presentation</span></code> — provides information about how to display the game
+throughout Kate (e.g.: in the library or in the store);</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">classification</span></code> — provides information for categorising and filtering
+the game in the store and library, this includes things like the genre
+of the game, but also things like age rating;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">legal</span></code> — provides information about the usage terms of the cartridge
+and the users’ rights. This includes things like licence information,
+third party IP notices, but also things like privacy policy;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">accessibility</span></code> — provides information about how the game is played. This
+of course includes things like what accessibility provisions the game offers,
+such as high-contrast or voiced text, but also things like what input methods
+are supported, which languages the game offers, how long it takes to complete
+the game, etc.</p></li>
+</ul>
+<section id="presentation">
+<h3>Presentation<a class="headerlink" href="#presentation" title="Permalink to this heading">#</a></h3>
+<dl>
+<dt>author</dt><dd><div class="line-block">
 <div class="line"><code class="docutils literal notranslate"><span class="pre">string</span></code></div>
-<div class="line">A path to a text file describing the terms of use of the cartridge and
-any additional credits or licences for data that the cartridge uses.
-This is the place where you should e.g.: put licences from assets and
-code that you use in your game, but which was not made by you.</div>
+<div class="line">A descriptive name identifying who made the game. Will show up on stores
+and in the detailed cartridge information screen. Up to 255 characters <a class="footnote-reference brackets" href="#f2" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.</div>
 </div>
-<p>Kate will allow players to read through this file from the cartridge’s
-context menu. See <a class="reference internal" href="../model/cartridges.html#cartridge-usage-terms"><span class="std std-ref">Usage terms</span></a> for details.</p>
 </dd>
-<dt>licence_name <em>(recommended)</em></dt><dd><div class="line-block">
+<dt>title</dt><dd><div class="line-block">
 <div class="line"><code class="docutils literal notranslate"><span class="pre">string</span></code></div>
-<div class="line">If the cartridge is released in an open source licence, this should
-contain the <a class="reference external" href="https://spdx.org/licenses/">SPDX licence id</a> for the
-licence you use. Otherwise it’s <code class="docutils literal notranslate"><span class="pre">proprietary</span></code>, which is the default.</div>
+<div class="line">A descriptive name identifying the game itself. Will show up under the
+cartridge’s thumbnail in the library, and everywhere else the cartridge
+is displayed. Up to 255 characters <a class="footnote-reference brackets" href="#f2" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.</div>
 </div>
 </dd>
-<dt>allow_derivative <em>(optional)</em></dt><dd><div class="line-block">
-<div class="line"><code class="docutils literal notranslate"><span class="pre">boolean</span></code></div>
-<div class="line">This tells players if they can modify the cartridge and share these
-modifications, e.g.: by making mods. The default is <code class="docutils literal notranslate"><span class="pre">false</span></code>, so
-players are not allowed to make mods.</div>
+<dt>tagline</dt><dd><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">string</span></code></div>
+<div class="line">A very short description of the game. This will show up on the store and
+in the game information screen. Up to 255 characters <a class="footnote-reference brackets" href="#f2" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.</div>
 </div>
 </dd>
-<dt>allow_commercial <em>(optional)</em></dt><dd><div class="line-block">
-<div class="line"><code class="docutils literal notranslate"><span class="pre">boolean</span></code></div>
-<div class="line">This tells players if they can profit <strong>from modifications</strong> of the
-cartridge, e.g.: by making mods and selling them. The default is
-<code class="docutils literal notranslate"><span class="pre">false</span></code>, so players are not allowed to profit from cartridge
-modifications.</div>
+<dt>description <em>(optional)</em></dt><dd><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">string</span></code></div>
+<div class="line">A free-text description of the game. Might include a summary, features
+players might expect, and similar text to what is generally found in
+game stores. Up to 10,000 (ten thousand) characters <a class="footnote-reference brackets" href="#f2" id="id5" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.</div>
 </div>
+</dd>
+<dt>release_type <em>(recommended)</em></dt><dd><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">string</span></code></div>
+<div class="line">Tells players what kind of stability and polish they should expect from
+the cartridge. The default is <code class="docutils literal notranslate"><span class="pre">regular</span></code>, which means a proper, stable and
+polished release.</div>
+</div>
+<p>Can be one of:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">prototype</span></code> — the game is more of a proof-of-concept than an actual game.
+Players shouldn’t expect polish, stability, or completeness of the contents.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">early-access</span></code> — the game is being released to gather early feedback.
+Players should expect a less polished, less stable, and incomplete
+experience.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">beta</span></code> — the game is complete, but looking for more feedback and testing.
+Players should expect a more polished and complete experience, but they
+should expect there to be bugs.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">demo</span></code> — the game is a portion of a bigger vision, but this portion is
+complete in this release. Players should still expect a polished and stable
+experience.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">regular</span></code> — this is for proper stable releases. Players should expect regular
+releases to be polished, complete, and stable.</p></li>
+</ul>
+</dd>
+<dt>thumbnail_path <em>(recommended)</em></dt><dd><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">string</span></code></div>
+<div class="line">A path to a PNG image to use as the cartridge cover when displaying
+the cartridge across Kate (e.g.: in the start screen and in the library).
+The path is relative to the root defined in the configuration file.</div>
+</div>
+<p>The image should have a 4:7 aspect ratio, and the recommended resolution
+is 400x700 pixels.</p>
+</dd>
+<dt>banner_path <em>(recommended)</em></dt><dd><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">string</span></code></div>
+<div class="line">A path to a PNG image to use as a banner in the top of the game information
+screen, and also in the game’s store page.</div>
+</div>
+<p>The image should have 1280x200 pixels.</p>
 </dd>
 </dl>
 </section>
-<section id="rating">
-<h3>Rating<a class="headerlink" href="#rating" title="Permalink to this heading">#</a></h3>
+<section id="classification">
+<h3>Classification<a class="headerlink" href="#classification" title="Permalink to this heading">#</a></h3>
 <dl>
+<dt>genre <em>(recommended)</em></dt><dd><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">array</span> <span class="pre">of</span> <span class="pre">string</span></code></div>
+<div class="line">A list of genres that the game might be classified as, with a maximum of
+10 items. This is used for organising the cartridge library and allow
+players to search for things they want to play.</div>
+</div>
+<p>The list of genres is pre-defined and can be one of the following:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">action</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">fighting</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">adventure</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">interactive-fiction</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">platformer</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">puzzle</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">racing</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rhythm</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rpg</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">simulation</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">shooter</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sports</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">strategy</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tool</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">visual-novel</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">other</span></code></p></li>
+</ul>
+<p>The default is <code class="docutils literal notranslate"><span class="pre">other</span></code>, if no list of genres is provided.</p>
+</dd>
+<dt>tag <em>(optional)</em></dt><dd><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">array</span> <span class="pre">of</span> <span class="pre">string</span></code></div>
+<div class="line">A list of additional tags that help players search for cartridges and
+organise their library. You can specify up to 10 tags, so you shouldn’t
+use them to repeat things already conveyed by your set of genres.</div>
+</div>
+<p>Each tag can have up to 255 characters <a class="footnote-reference brackets" href="#f2" id="id6" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>, and must consist entirely
+of lower-case latin letters and hyphens. E.g.: <code class="docutils literal notranslate"><span class="pre">visual-novel</span></code> is a
+valid tag, but <code class="docutils literal notranslate"><span class="pre">visual</span> <span class="pre">novel</span></code> is not, because of the white space.
+Neither is <code class="docutils literal notranslate"><span class="pre">café-simulator</span></code>, because of the accent on <code class="docutils literal notranslate"><span class="pre">e</span></code>.</p>
+</dd>
 <dt>rating <em>(recommended)</em></dt><dd><div class="line-block">
 <div class="line"><code class="docutils literal notranslate"><span class="pre">string</span></code></div>
 <div class="line">The age-appropriateness rating of the cartridge, based on the author’s
@@ -552,7 +549,7 @@ adult-only content regardless of what the actual cartridge is.</div>
 </dd>
 <dt>warnings <em>(recommended)</em></dt><dd><div class="line-block">
 <div class="line"><code class="docutils literal notranslate"><span class="pre">string</span></code></div>
-<div class="line">This is a free text (up to 1,000 characters <a class="footnote-reference brackets" href="#f2" id="id6" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>) where you can provide
+<div class="line">This is a free text (up to 1,000 characters <a class="footnote-reference brackets" href="#f2" id="id7" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>) where you can provide
 any warnings to the player about the content so they can make a more
 informed choice about playing it and avoid dangerous situations. The text
 will be shown as-is to players on the store and on the cartridge details
@@ -564,8 +561,71 @@ to other medical emergencies such as epileptic seizures.</p>
 </dd>
 </dl>
 </section>
-<section id="play-style">
-<h3>Play style<a class="headerlink" href="#play-style" title="Permalink to this heading">#</a></h3>
+<section id="legal">
+<h3>Legal<a class="headerlink" href="#legal" title="Permalink to this heading">#</a></h3>
+<dl>
+<dt>licence_path <em>(recommended)</em></dt><dd><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">string</span></code></div>
+<div class="line">A path to a text file describing the terms of use of the cartridge and
+any additional credits or licences for data that the cartridge uses.
+This is the place where you should e.g.: put licences from assets and
+code that you use in your game, but which was not made by you.</div>
+</div>
+<p>Kate will allow players to read through this file from the cartridge’s
+context menu. See <a class="reference internal" href="../model/cartridges.html#cartridge-usage-terms"><span class="std std-ref">Usage terms</span></a> for details.</p>
+</dd>
+<dt>privacy_policy_path <em>(recommended)</em></dt><dd><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">string</span></code></div>
+<div class="line">A path to a text file describing what privacy guarantees the cartridge
+provides. This <strong>must</strong> be provided if the cartridge requires access
+to the internet or provides links to pages on the internet.</div>
+</div>
+<p>Privacy policy files should be written in a clear, direct, and informative
+style. They’re primarily meant to provide users with enough information to make
+an informed consent about using the cartridge or not based on their own
+personal risks, not to be a legal document to protect the author of the
+cartridge of any claimed damages — keep that in the legal notices file.</p>
+<p>Kate will allow players to read through this file from the cartridge’s
+context menu, and also from the store. See <a class="reference internal" href="../model/cartridges.html#cartridge-usage-terms"><span class="std std-ref">Usage terms</span></a>
+for details.</p>
+</dd>
+<dt>derivative_policy <em>(recommended)</em></dt><dd><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">string</span></code></div>
+<div class="line">Whether the author allows derivative works (e.g.: mods) to be made of
+the cartridge; and if so what limitations are in place for derivative
+works.</div>
+</div>
+<p>The default is <code class="docutils literal notranslate"><span class="pre">personal-use</span></code>, which allows players to modify the
+cartridge <em>strictly</em> for their own personal use, but not share any
+modifications. These provisions exist so players with special accessibility
+needs can use a cartridge even if the cartridge was not made with them
+in mind.</p>
+<p>Can be one of:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">not-allowed</span></code> — No derivative works or modifications are allowed, not
+even for personal use. This is the common case for more restrictive
+proprietary licences for games.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">personal-use</span></code> — The users are allowd to modify the cartridge for their
+own use, but they are not allowed to share any modification they make.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">non-commercial-use</span></code> — The users are allowed to modify the cartridge,
+and are allowed to share modified cartridges as long as there’s no
+commercial usage of the modified cartridge.</p>
+<p>This is not limited to selling the cartridge directly. For example, using
+a modified cartridge in a café or business, even if patrons are not paying
+to play the cartridge directly, is still considered commercial use.</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">commercial-use</span></code> — The users are allowed to modify the cartridge, there
+are no restrictions in the distribution of derivative works regarding
+commercial use.</p></li>
+</ul>
+<p>Note that regardless of how permissive a cartridge is regarding this policy,
+derivative works are still <em>required</em> to make it clear that they are
+unofficial works, not endorsed by the original author.</p>
+</dd>
+</dl>
+</section>
+<section id="accessibility">
+<h3>Accessibility<a class="headerlink" href="#accessibility" title="Permalink to this heading">#</a></h3>
 <dl>
 <dt>input_methods <em>(recommended)</em></dt><dd><div class="line-block">
 <div class="line"><code class="docutils literal notranslate"><span class="pre">array</span> <span class="pre">of</span> <span class="pre">string</span></code></div>
@@ -596,7 +656,7 @@ and the additional booleans specify what is supported in that language.
 voices are translated, and <code class="docutils literal notranslate"><span class="pre">text</span></code> means that the game offers subtitles
 and other text in the language.</p>
 </dd>
-<dt>accessibility <em>(recommended)</em></dt><dd><div class="line-block">
+<dt>provisions <em>(recommended)</em></dt><dd><div class="line-block">
 <div class="line"><code class="docutils literal notranslate"><span class="pre">array</span> <span class="pre">of</span> <span class="pre">string</span></code></div>
 <div class="line">A list of accessibility provisions that the game offers to allow more
 players to play the game. We always encourage developers to look into
@@ -618,30 +678,31 @@ but find themselves unable to cross the game’s difficult barrier.</p></li>
 different interests in what they want out of the game.</p></li>
 </ul>
 </dd>
-<dt>average_duration <em>(recommended)</em></dt><dd><div class="line-block">
-<div class="line"><code class="docutils literal notranslate"><span class="pre">string</span></code></div>
+<dt>average_completion <em>(recommended)</em></dt><dd><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">{unit:</span> <span class="pre">&quot;seconds&quot;</span> <span class="pre">|</span> <span class="pre">&quot;minutes&quot;</span> <span class="pre">|</span> <span class="pre">&quot;hours&quot;,</span> <span class="pre">value:</span> <span class="pre">integer}</span></code></div>
 <div class="line">An estimation of the amount of time that it takes to complete one run of
 the game, but not necessarily doing all of the things the game offers.
 This helps players looking for something to play to consider what
 their options are for the free time they have at the moment.</div>
 </div>
-<p>Can be one of:</p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">seconds</span></code>;</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">few-minutes</span></code>;</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">half-hour</span></code>;</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">few-hours</span></code>;</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">several-hours</span></code>;</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">unknown</span></code>;</p></li>
-</ul>
-<p>The default is <code class="docutils literal notranslate"><span class="pre">unknown</span></code>.</p>
+<p>For example, <code class="docutils literal notranslate"><span class="pre">{&quot;unit&quot;:</span> <span class="pre">&quot;seconds&quot;,</span> <span class="pre">&quot;value&quot;:</span> <span class="pre">30}</span></code> and
+<code class="docutils literal notranslate"><span class="pre">{&quot;unit&quot;:</span> <span class="pre">&quot;hours&quot;,</span> <span class="pre">&quot;value&quot;:</span> <span class="pre">20}</span></code> are valid expressions of
+“roughly a few seconds” and “roughly 20 hours”.</p>
+</dd>
+<dt>average_session <em>(recommended)</em></dt><dd><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">{unit:</span> <span class="pre">&quot;seconds&quot;</span> <span class="pre">|</span> <span class="pre">&quot;minutes&quot;</span> <span class="pre">|</span> <span class="pre">&quot;hours&quot;,</span> <span class="pre">value:</span> <span class="pre">integer}</span></code></div>
+<div class="line">An estimation of the amount of time that it takes to complete one
+portion of the game. What a “session” means varies greatly from
+game to game—it could be a level, a chapter, a match, etc.</div>
+</div>
+<p>The format is the same as <code class="docutils literal notranslate"><span class="pre">average_completion</span></code>.</p>
 </dd>
 </dl>
 <p class="rubric">Footnotes</p>
 <aside class="footnote-list brackets">
 <aside class="footnote brackets" id="f2" role="note">
 <span class="label"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></span>
-<span class="backrefs">(<a role="doc-backlink" href="#id2">1</a>,<a role="doc-backlink" href="#id3">2</a>,<a role="doc-backlink" href="#id4">3</a>,<a role="doc-backlink" href="#id5">4</a>,<a role="doc-backlink" href="#id6">5</a>)</span>
+<span class="backrefs">(<a role="doc-backlink" href="#id2">1</a>,<a role="doc-backlink" href="#id3">2</a>,<a role="doc-backlink" href="#id4">3</a>,<a role="doc-backlink" href="#id5">4</a>,<a role="doc-backlink" href="#id6">5</a>,<a role="doc-backlink" href="#id7">6</a>)</span>
 <p>Kart counts the UTF-16 codepoints. So one character might
 count as multiple ones (e.g.: Japanese characters and emojis often count
 as two or more characters).</p>
@@ -750,11 +811,12 @@ for details.</div>
             <ul>
 <li><a class="reference internal" href="#">Configuration files</a><ul>
 <li><a class="reference internal" href="#file-location">File location</a></li>
+<li><a class="reference internal" href="#identification">Identification</a></li>
 <li><a class="reference internal" href="#metadata">Metadata</a><ul>
-<li><a class="reference internal" href="#game">Game</a></li>
-<li><a class="reference internal" href="#release">Release</a></li>
-<li><a class="reference internal" href="#rating">Rating</a></li>
-<li><a class="reference internal" href="#play-style">Play style</a></li>
+<li><a class="reference internal" href="#presentation">Presentation</a></li>
+<li><a class="reference internal" href="#classification">Classification</a></li>
+<li><a class="reference internal" href="#legal">Legal</a></li>
+<li><a class="reference internal" href="#accessibility">Accessibility</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#files">Files</a></li>

@@ -20,3 +20,4 @@ by Kate.
    timer
    capture
    store
+   browser

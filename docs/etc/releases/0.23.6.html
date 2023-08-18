@@ -139,7 +139,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -209,6 +209,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../dev/manual/api/timer.html"><code class="docutils literal notranslate"><span class="pre">timer</span></code> — Scheduling updates</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../dev/manual/api/capture.html"><code class="docutils literal notranslate"><span class="pre">capture</span></code> — Screenshots and video recording</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../dev/manual/api/store.html"><code class="docutils literal notranslate"><span class="pre">store</span></code> — Saving state</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../dev/manual/api/browser.html"><code class="docutils literal notranslate"><span class="pre">browser</span></code> — Navigating to URLs</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../dev/manual/web/index.html">Web game support</a><input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" role="switch" type="checkbox"/><label for="toctree-checkbox-9"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -242,7 +243,10 @@
 <p class="caption" role="heading"><span class="caption-text">Design and implementation</span></p>
 <ul>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../design/index.html">Kate’s Design Documents</a><input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" role="switch" type="checkbox"/><label for="toctree-checkbox-13"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../design/00XX-capabilities.html">#00XX — Capabilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../design/00XX-live-audit.html"># 00XX - Live auditing</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../design/0101-object-storage.html">#0101 — Object Store API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../design/01XX-external-url.html">#01XX — External URL navigation</a></li>
 </ul>
 </li>
 </ul>
@@ -297,7 +301,7 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
@@ -305,7 +309,128 @@
         <article role="main">
           <section id="kate-v0-23-6-june-2023">
 <h1>Kate v0.23.6  (June 2023)<a class="headerlink" href="#kate-v0-23-6-june-2023" title="Permalink to this heading">#</a></h1>
-<p>The v0.23.8 is August’s experimental release of Kate.</p>
+<p>The v0.23.6 is June’s experimental release of Kate with a focus on
+making it usable for common open source engines for small indie games.</p>
+<section id="more-flexible-resolution">
+<h2>More flexible resolution<a class="headerlink" href="#more-flexible-resolution" title="Permalink to this heading">#</a></h2>
+<p>Kate uses a 800x480 resolution in hand-held mode, but that doesn’t
+mean games <em>have</em> to use this resolution. Bitsy games use a square
+aspect ratio, and many Ren’Py games use 16:9, or even 4:3, but they
+all scale accordingly to fit within the 800x480 window.</p>
+<p>So this release improves the support for different resolutions,
+making sure things like captures and the media gallery store
+and display media in the correct aspect ratio.</p>
+</section>
+<section id="case-modes">
+<h2>Case modes<a class="headerlink" href="#case-modes" title="Permalink to this heading">#</a></h2>
+<p>By default Kate runs in handheld mode, with virtual buttons meant
+for touch-based devices and a 800x480 resolution. This release
+adds a new TV mode and a Full-screen mode, which support a
+resolution of 1200x720. The new modes are meant for running Kate
+in a laptop or with an external display or TV, and taking advantage
+of the additional screen space, similar to how other handhelds can
+increase their resolution when docked.</p>
+</section>
+<section id="pointer-input-support">
+<h2>Pointer input support<a class="headerlink" href="#pointer-input-support" title="Permalink to this heading">#</a></h2>
+<p>This release has added an API for basic pointer support, so games
+that use a mouse or a single touch point should be supported in Kate.
+There’s still work in the roadmap to support multi-touch games and
+games that use a stylus (e.g.: where stylus pressure and tilt angle
+can affect the behaviour of the game).</p>
+</section>
+<section id="functional-ren-py-support">
+<h2>Functional Ren’Py support<a class="headerlink" href="#functional-ren-py-support" title="Permalink to this heading">#</a></h2>
+<p>With this release Kate is functionally compatible with most games
+exported in Ren’Py 7.5 and Ren’Py 8.1. There are a couple of things
+that we don’t yet handle, like Ren’Py’s new text input support in
+8.1, but that will be landing soon as well.</p>
+</section>
+<section id="storage-visualisation">
+<h2>Storage visualisation<a class="headerlink" href="#storage-visualisation" title="Permalink to this heading">#</a></h2>
+<p>There’s a new settings screen for visualising and managing
+different parts of the storage. This includes:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Archiving cartridges (deleting the cartridge files, but keeping
+save data and screenshots/video captures);</p></li>
+<li><p>Deleting all save data; and</p></li>
+<li><p>Deleting all cartridge-related data (except for screenshots/captures).</p></li>
+</ul>
+</div></blockquote>
+<p>This should make Kate a bit more usable around managing what’s
+stored locally and allowing people to remove data they no longer
+need to keep around.</p>
+</section>
+<section id="dropping-support-for-safari">
+<h2>Dropping support for Safari<a class="headerlink" href="#dropping-support-for-safari" title="Permalink to this heading">#</a></h2>
+<p>Since Safari is far behind in implementing some of the APIs that Kate needs
+to work, and implements some of them with inconsistent behaviour compared to
+other browsers, this release drops support for Safari for the time being.</p>
+<p>This will be revisited once a stable release is out. But there’s only so much
+Kate can paper over without Apple implementing the missing features in Safari.</p>
+</section>
+<section id="new-documentation">
+<h2>New documentation<a class="headerlink" href="#new-documentation" title="Permalink to this heading">#</a></h2>
+<p>This release features properly organised documentation instead of an
+assorted collection of text files in a directory. The previous documentation
+was heavily edited and expanded upon, but the documentation is nowhere near
+complete still—nor is Kate.</p>
+<p>We’re aiming for proper documentation by the time the stable release drops,
+which includes all the missing formal documentation on the core security and
+privacy properties for Kate.</p>
+</section>
+<section id="fixed-bugs">
+<h2>Fixed bugs<a class="headerlink" href="#fixed-bugs" title="Permalink to this heading">#</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><p>The local storage proxy now accounts for engines that may expect
+it to behave like a regular JavaScript object;</p></li>
+<li><p>The network proxy now properly handles cases where more arbitrary
+URLs are given to be loaded, as long as we can still resolve it
+to a valid cartridge file path.</p></li>
+<li><p>Paths are now normalised before Kate attempts to read them from
+the cartridge. This should result in less surprises for games
+ported through Bridges.</p></li>
+<li><p>Resources are now properly cached when installing Kate as a
+web app, meaning you should be able to run the web version of
+Kate offline if you install it on an iPhone, Android, or
+Windows 10+.</p></li>
+<li><p>Errors resulting from storage quota being exceeded are now
+handled more gracefully. There’s some reserved system space
+to avoid being locked into unrecoverable storage states.</p></li>
+<li><p>The network bridge now handles blob: urls, so Ren’Py 7.5
+pre-splashes work correctly.</p></li>
+<li><p>Fixed an issue with the indexedDB bridge that caused Ren’Py 8
+games to not load when reconciling save data.</p></li>
+<li><p>Fixed the display of play time and last played date so it doesn’t
+just say “played a month ago” when you’ve played it yesterday.</p></li>
+<li><p>Cartridge titles are now more readable against the start screen
+background. Cartridges are also properly centred.</p></li>
+<li><p>Video and audio are now handled in the initial preparation of the
+cartridge HTML, so games using some of the Bitsy hacks work properly
+with audio.</p></li>
+<li><p>There’s proper feedback about cartridge installation now when using
+the <code class="docutils literal notranslate"><span class="pre">Install</span> <span class="pre">cartridge...</span></code> button.</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="minor-improvements">
+<h2>Minor improvements<a class="headerlink" href="#minor-improvements" title="Permalink to this heading">#</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><p>Screenshots and video captures are now sorted from most recent to
+least recent (they were not sorted previously).</p></li>
+<li><p>Removed size limitations for legal notices and web-archive HTMLs, which
+some Bitsy games go way over as they have too much data embedded in the
+page.</p></li>
+<li><p>Play time is now recorded at minute-granularity. This doesn’t change
+much, but there was no need to record it in milliseconds, so this moves
+things more in line with Kate’s general approach to privacy—not recording
+what we don’t absolutely need.</p></li>
+</ul>
+</div></blockquote>
+</section>
 </section>
 
         </article>
@@ -351,8 +476,35 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Kate v0.23.6  (June 2023)</a><ul>
+<li><a class="reference internal" href="#more-flexible-resolution">More flexible resolution</a></li>
+<li><a class="reference internal" href="#case-modes">Case modes</a></li>
+<li><a class="reference internal" href="#pointer-input-support">Pointer input support</a></li>
+<li><a class="reference internal" href="#functional-ren-py-support">Functional Ren’Py support</a></li>
+<li><a class="reference internal" href="#storage-visualisation">Storage visualisation</a></li>
+<li><a class="reference internal" href="#dropping-support-for-safari">Dropping support for Safari</a></li>
+<li><a class="reference internal" href="#new-documentation">New documentation</a></li>
+<li><a class="reference internal" href="#fixed-bugs">Fixed bugs</a></li>
+<li><a class="reference internal" href="#minor-improvements">Minor improvements</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>

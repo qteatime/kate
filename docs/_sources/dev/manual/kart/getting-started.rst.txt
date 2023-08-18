@@ -18,10 +18,12 @@ the following:
 
   {
     "id": "qteati.me/katchu",
+    "version": {"major": 1, "minor": 0},
     "metadata": {
-      "game": {
+      "presentation": {
         "author": "Q.",
         "title": "Kat'chu",
+        "tagline": "Collect consoles and rack up scores",
         "thumbnail_path": "thumbnail.png"
       }
     },
@@ -41,7 +43,8 @@ the following:
 Here the ``id`` field is a unique identifier for your cartridge. This is
 composed from a domain name you have (e.g.: ``my-name.itch.io``) and a
 unique name for your game. It follows a specific format described in the
-:ref:`Cartridge Identification` section.
+:ref:`Cartridge Identification` section. A version must also be provided,
+and it needs to be updated every time the contents of the cartridge change.
 
 Then it includes some ``metadata``. Kate has a lot of metadata fields that
 are used to display the cartridge to the player and allow them to organise

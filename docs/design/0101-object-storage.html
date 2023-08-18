@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Release notes" href="../etc/releases/index.html" /><link rel="prev" title="Kate’s Design Documents" href="index.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="#01XX — External URL navigation" href="01XX-external-url.html" /><link rel="prev" title="# 00XX - Live auditing" href="00XX-live-audit.html" />
 
     <!-- Generated with Sphinx 6.2.1 and Furo 2023.03.27 -->
         <title>#0101 — Object Store API - Kate 0.23.6 documentation</title>
@@ -209,6 +209,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../dev/manual/api/timer.html"><code class="docutils literal notranslate"><span class="pre">timer</span></code> — Scheduling updates</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../dev/manual/api/capture.html"><code class="docutils literal notranslate"><span class="pre">capture</span></code> — Screenshots and video recording</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../dev/manual/api/store.html"><code class="docutils literal notranslate"><span class="pre">store</span></code> — Saving state</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../dev/manual/api/browser.html"><code class="docutils literal notranslate"><span class="pre">browser</span></code> — Navigating to URLs</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../dev/manual/web/index.html">Web game support</a><input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" role="switch" type="checkbox"/><label for="toctree-checkbox-9"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -242,7 +243,10 @@
 <p class="caption" role="heading"><span class="caption-text">Design and implementation</span></p>
 <ul class="current">
 <li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">Kate’s Design Documents</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" role="switch" type="checkbox"/><label for="toctree-checkbox-13"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="00XX-capabilities.html">#00XX — Capabilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="00XX-live-audit.html"># 00XX - Live auditing</a></li>
 <li class="toctree-l2 current current-page"><a class="current reference internal" href="#">#0101 — Object Store API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="01XX-external-url.html">#01XX — External URL navigation</a></li>
 </ul>
 </li>
 </ul>
@@ -307,14 +311,55 @@
 <h1>#0101 — Object Store API<a class="headerlink" href="#object-store-api" title="Permalink to this heading">#</a></h1>
 <dl class="field-list simple">
 <dt class="field-odd">Author<span class="colon">:</span></dt>
-<dd class="field-odd"><ol class="upperalpha simple" start="17">
-<li></li>
-</ol>
+<dd class="field-odd"><p>Q.</p>
 </dd>
-<dt class="field-even">Last updated<span class="colon">:</span></dt>
-<dd class="field-even"><p>18th April 2023</p>
+<dt class="field-even">Started<span class="colon">:</span></dt>
+<dd class="field-even"><p>2023-04-18</p>
+</dd>
+<dt class="field-odd">Last updated<span class="colon">:</span></dt>
+<dd class="field-odd"><p>2023-06-11</p>
+</dd>
+<dt class="field-even">Status<span class="colon">:</span></dt>
+<dd class="field-even"><p>M1 Shipped</p>
 </dd>
 </dl>
+<section id="timeline">
+<h2>Timeline<a class="headerlink" href="#timeline" title="Permalink to this heading">#</a></h2>
+<p><strong>M1: Storage API</strong></p>
+<div class="table-wrapper docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>First draft</p></th>
+<th class="head"><p>Proof of Concept</p></th>
+<th class="head"><p>Stable implementation</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>2023-04-20</p></td>
+<td><p>2023-04-20</p></td>
+<td><p>2023-04-22</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>M2: Migration API</strong></p>
+<div class="table-wrapper docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>First draft</p></th>
+<th class="head"><p>Proof of Concept</p></th>
+<th class="head"><p>Stable implementation</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>—</p></td>
+<td><p>—</p></td>
+<td><p>—</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
 <section id="summary">
 <h2>Summary<a class="headerlink" href="#summary" title="Permalink to this heading">#</a></h2>
 <p>Kate Cartridges work as a read-only file system; the applications contained
@@ -887,23 +932,23 @@ only the state of the storage before the migration started.</p>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="../etc/releases/index.html">
+          <a class="next-page" href="01XX-external-url.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Release notes</div>
+                <div class="title">#01XX — External URL navigation</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="index.html">
+          <a class="prev-page" href="00XX-live-audit.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Kate’s Design Documents</div>
+                <div class="title"># 00XX - Live auditing</div>
                 
               </div>
             </a>
@@ -938,6 +983,7 @@ only the state of the storage before the migration started.</p>
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">#0101 — Object Store API</a><ul>
+<li><a class="reference internal" href="#timeline">Timeline</a></li>
 <li><a class="reference internal" href="#summary">Summary</a></li>
 <li><a class="reference internal" href="#the-object-store">The object store</a><ul>
 <li><a class="reference internal" href="#why-a-versioned-storage">Why a versioned storage?</a></li>
