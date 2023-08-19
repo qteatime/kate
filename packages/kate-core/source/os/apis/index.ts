@@ -9,3 +9,4 @@ export * from "./processes";
 export * from "./status-bar";
 export * from "./settings";
 export * from "./storage-manager";
+export * from "./device-file";

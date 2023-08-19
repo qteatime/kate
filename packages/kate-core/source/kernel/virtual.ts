@@ -270,6 +270,12 @@ export class VirtualConsole {
     listen_button(this.ltrigger_button, "ltrigger");
     listen_button(this.rtrigger_button, "rtrigger");
 
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) {
+        this.reset_all_keys();
+      }
+    });
+
     this.start_ticking();
     this.on_tick.listen(this.key_update_loop);
   }
@@ -309,6 +315,12 @@ export class VirtualConsole {
       this.update_single_key(key, true);
     }
   };
+
+  reset_all_keys() {
+    for (const key of this.keys) {
+      this.update_virtual_key(key, false);
+    }
+  }
 
   private update_single_key(key: InputKey, special: boolean) {
     const x = this.input_state[key];

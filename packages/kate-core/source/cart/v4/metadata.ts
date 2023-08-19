@@ -142,6 +142,8 @@ function release_kind(x: Cart_v4.Release_type): ReleaseType {
       return "regular";
     case Cart_v4.Release_type.$Tags.Prototype:
       return "prototype";
+    case Cart_v4.Release_type.$Tags.Unofficial:
+      return "unofficial";
     default:
       throw unreachable(x);
   }

@@ -56,7 +56,8 @@ export type ReleaseType =
   | "early-access"
   | "beta"
   | "demo"
-  | "regular";
+  | "regular"
+  | "unofficial";
 
 export type ContentRating =
   | "general"
@@ -131,7 +132,12 @@ export type ContextualCapabilityGrant = {
   reason: string;
 };
 
-export type ContextualCapability = { type: "open-urls" };
+export type ContextualCapability =
+  | { type: "open-urls" }
+  | { type: "request-device-files" }
+  | { type: "install-cartridges" }
+  | { type: "download-files" }
+  | { type: "show-dialogs" };
 
 export type Security = {
   contextual_capabilities: ContextualCapabilityGrant[];

@@ -1,15 +1,21 @@
 import { Database, Transaction } from "../db-schema";
 import { kate } from "./db";
 import * as Capability from "../capabilities";
-import { Cart, CartMeta } from "../cart";
+import { Cart, CartMeta, ContextualCapability } from "../cart";
 
 export type GrantType = { type: "switch"; value: boolean };
 
-export type GrantConfiguration = {
-  "open-urls": {};
-};
+type ValidateGrantConfig<T extends Record<CapabilityType, {}>> = T;
 
-export type CapabilityType = "open-urls";
+export type GrantConfiguration = ValidateGrantConfig<{
+  "open-urls": {};
+  "request-device-files": {};
+  "install-cartridges": {};
+  "download-files": {};
+  "show-dialogs": {};
+}>;
+
+export type CapabilityType = ContextualCapability["type"];
 
 export type SerialisedCapability = Pick<
   AnyCapabilityGrant,

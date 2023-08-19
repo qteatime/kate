@@ -326,6 +326,14 @@ export function instance_of<A>(
   };
 }
 
+export function bytearray(x: any): Uint8Array {
+  if (x instanceof Uint8Array) {
+    return x;
+  } else {
+    throw new EInstance("Uint8Array", x);
+  }
+}
+
 export function spec<T extends { [key: string]: (_: any) => any }>(
   spec: T
 ): (_: any) => { [K in keyof T]: ReturnType<T[K]> } {

@@ -1,3 +1,4 @@
+import { unreachable } from "../../utils";
 import {
   ContextualCapability,
   ContextualCapabilityGrant,
@@ -29,5 +30,27 @@ function parse_contextual_capability(
         type: "open-urls",
       };
     }
+    case Cart_v4.Contextual_capability.$Tags.Request_device_files: {
+      return {
+        type: "request-device-files",
+      };
+    }
+    case Cart_v4.Contextual_capability.$Tags.Install_cartridges: {
+      return {
+        type: "install-cartridges",
+      };
+    }
+    case Cart_v4.Contextual_capability.$Tags.Download_files: {
+      return {
+        type: "download-files",
+      };
+    }
+    case Cart_v4.Contextual_capability.$Tags.Show_dialogs: {
+      return {
+        type: "show-dialogs",
+      };
+    }
+    default:
+      throw unreachable(capability, "capability");
   }
 }

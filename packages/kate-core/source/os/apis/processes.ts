@@ -42,6 +42,7 @@ export class KateProcesses {
         return file;
       },
       on_playtime_update: () => {},
+      is_foreground: (cart) => this.is_foreground(cart.id),
     });
     return await this.display_process(cart, runtime);
   }
@@ -61,6 +62,18 @@ export class KateProcesses {
 
   is_running(cart_id: string) {
     return this.running?.cart.id === cart_id;
+  }
+
+  is_foreground(cart_id: string) {
+    if (this.running == null || this.running.cart.id != cart_id) {
+      return false;
+    } else if (this.os.current_scene == null) {
+      return false;
+    } else if (this.os.current_scene instanceof SceneGame) {
+      return this.os.current_scene.process().cart.id === cart_id;
+    } else {
+      return false;
+    }
   }
 
   async terminate(id: string, requester: string, reason: string) {
@@ -110,6 +123,7 @@ export class KateProcesses {
         on_playtime_update: async (time) => {
           await this.os.play_habits.increase_play_time(id, time);
         },
+        is_foreground: (cart) => this.is_foreground(cart.id),
       });
       await this.os.play_habits.update_last_played(id, new Date());
       return this.display_process(cart, runtime);

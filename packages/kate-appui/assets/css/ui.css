@@ -1,0 +1,221 @@
+.kate-ui-scene {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  background: var(--color-bg);
+}
+
+.kate-ui-title-bar {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 0 1rem;
+  height: 64px;
+  overflow: hidden;
+}
+
+.kate-ui-title-bar .kate-ui-title {
+  line-height: 64px;
+  height: 64px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.kate-ui-app-screen {
+  display: flex;
+  flex-direction: column;
+  justify-content: stretch;
+  align-items: stretch;
+  height: 100%;
+}
+
+.kate-ui-app-screen-body {
+  flex-grow: 1;
+}
+
+.kate-ui-title {
+  font-size: 2rem;
+  font-family: var(--font-title);
+  line-height: 1.2em;
+}
+
+.kate-ui-subtitle {
+  font-size: 1.4rem;
+  font-family: var(--font-sans);
+  line-height: 1.2em;
+  font-weight: 500;
+}
+
+.kate-ui-focus-target[disabled] {
+  opacity: 0.5;
+}
+
+.kate-ui-focus-target.focus:not([data-custom-focus]) {
+  outline: 2px solid var(--color-primary);
+  border-radius: 4px;
+  animation: kate-focus-in 0.5s ease-out;
+}
+
+.kate-ui-focus-target.focus:not([data-custom-focus])[data-dangerous] {
+  outline-color: var(--color-dangerous);
+}
+
+.kate-ui-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 2rem 8rem;
+}
+
+.kate-ui-hero-title {
+  font-size: 2rem;
+  font-family: var(--font-title);
+  line-height: 1.4em;
+  margin: 0.5em 0 0.3em 0;
+  text-align: center;
+}
+
+.kate-ui-hero-subtitle {
+  font-size: 1.2rem;
+  color: var(--color-text-muted);
+  line-height: 1.5em;
+  margin: 0 0 2rem 0;
+  text-align: center;
+}
+
+.kate-ui-vbox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.kate-ui-text-input {
+  width: 100%;
+  padding: 1rem;
+  position: relative;
+  background: #fff;
+  border: 1px solid var(--color-border-d1);
+  border-bottom: 2px solid var(--color-primary);
+  border-radius: 4px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.kate-ui-hero-content {
+  width: 100%;
+}
+
+.kate-ui-space {
+  display: inline-block;
+  vertical-align: baseline;
+}
+
+.kate-ui-meta-text {
+  color: var(--color-text-muted);
+}
+
+.kate-ui-steps {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 2rem 0;
+  gap: 1rem;
+}
+
+.kate-ui-step-actions {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 0rem 8rem;
+  gap: 1rem;
+}
+
+.kate-ui-text-button {
+  padding: 1rem 2rem;
+  border: 1px solid var(--color-border-d1);
+  border-radius: 4px;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+.kate-ui-step-view {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: center;
+  padding: 0 1rem;
+}
+
+.kate-ui-step-actions > * {
+  flex-basis: 33%;
+}
+
+.kate-ui-step-next {
+  display: flex;
+  justify-content: right;
+}
+
+.kate-ui-step-icon {
+  width: 8px;
+  height: 8px;
+  background: var(--color-black-l2);
+  border-radius: 100%;
+}
+
+.kate-ui-step-icon.active {
+  background: var(--color-primary);
+}
+
+.kate-ui-hbox {
+  display: flex;
+  flex-direction: row;
+}
+
+.kate-ui-vbox {
+  display: flex;
+  flex-direction: column;
+}
+
+.kate-ui-centered {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.kate-ui-field-label {
+  font-weight: bold;
+  line-height: 1.6em;
+  display: block;
+  height: 1.6em;
+}
+
+.kate-ui-field {
+  width: 100%;
+}
+
+.kate-ui-action-buttons {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  width: 100%;
+  gap: 1rem;
+}
+
+.kate-ui-icon-button {
+  padding: 0.5rem;
+}
+
+.kate-ui-icon-button-label {
+  padding: 0.5rem 3rem;
+  font-weight: bold;
+  text-transform: uppercase;
+}

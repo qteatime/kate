@@ -27,6 +27,7 @@ import { KateAppResources } from "./apis/app-resources";
 import { KateBrowser } from "./apis/browse";
 import { KateCapabilitySupervisor } from "./services/capability-supervisor";
 import { KateAuditSupervisor } from "./services/audit-supervisor";
+import { KateDeviceFile } from "./apis/device-file";
 
 export type CartChangeReason =
   | "installed"
@@ -53,6 +54,7 @@ export class KateOS {
   readonly play_habits: KatePlayHabits;
   readonly app_resources: KateAppResources;
   readonly browser: KateBrowser;
+  readonly device_file: KateDeviceFile;
   readonly capability_supervisor: KateCapabilitySupervisor;
   readonly audit_supervisor: KateAuditSupervisor;
   readonly events = {
@@ -93,6 +95,7 @@ export class KateOS {
     this.storage_manager.setup();
     this.app_resources = new KateAppResources(this);
     this.browser = new KateBrowser(this);
+    this.device_file = new KateDeviceFile(this);
     this.capability_supervisor = new KateCapabilitySupervisor(this);
     this.audit_supervisor = new KateAuditSupervisor(this);
   }

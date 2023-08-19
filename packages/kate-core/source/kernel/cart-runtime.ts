@@ -10,6 +10,7 @@ export type RuntimeEnvConfig = {
   read_file: (path: string) => Promise<Cart.BasicFile>;
   local_storage: unknown;
   on_playtime_update: (time: number) => void;
+  is_foreground: (cart: Cart.CartMeta) => boolean;
 };
 
 export type RuntimeEnv = RuntimeEnvConfig & {
@@ -162,32 +163,36 @@ export class CR_Web_archive extends CartRuntime {
       "default-src data: blob: 'unsafe-inline' 'unsafe-eval' 'unsafe-inline' 'wasm-unsafe-eval'; navigate-to 'none'";
 
     this.console.on_input_changed.listen((ev) => {
-      channel.send({
-        type: "kate:input-state-changed",
-        key: ev.key,
-        is_down: ev.is_down,
-      });
+      if (env.is_foreground(env.cart)) {
+        channel.send({
+          type: "kate:input-state-changed",
+          key: ev.key,
+          is_down: ev.is_down,
+        });
+      }
     });
 
     let recording = false;
     this.console.on_key_pressed.listen((key) => {
-      channel.send({
-        type: "kate:input-key-pressed",
-        key: key,
-      });
-      if (key.key === "capture") {
-        const token = make_id();
-        env.capture_tokens.add(token);
-        channel.send({ type: "kate:take-screenshot", token });
-      }
-      if (key.key === "long_capture") {
-        recording = !recording;
-        if (recording) {
+      if (env.is_foreground(env.cart)) {
+        channel.send({
+          type: "kate:input-key-pressed",
+          key: key,
+        });
+        if (key.key === "capture") {
           const token = make_id();
           env.capture_tokens.add(token);
-          channel.send({ type: "kate:start-recording", token });
-        } else {
-          channel.send({ type: "kate:stop-recording" });
+          channel.send({ type: "kate:take-screenshot", token });
+        }
+        if (key.key === "long_capture") {
+          recording = !recording;
+          if (recording) {
+            const token = make_id();
+            env.capture_tokens.add(token);
+            channel.send({ type: "kate:start-recording", token });
+          } else {
+            channel.send({ type: "kate:stop-recording" });
+          }
         }
       }
     });

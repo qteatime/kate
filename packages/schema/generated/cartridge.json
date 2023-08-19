@@ -536,6 +536,10 @@
             {
               "name": "Regular",
               "fields": []
+            },
+            {
+              "name": "Unofficial",
+              "fields": []
             }
           ]
         }
@@ -860,6 +864,22 @@
           "variants": [
             {
               "name": "Open-URLs",
+              "fields": []
+            },
+            {
+              "name": "Request-device-files",
+              "fields": []
+            },
+            {
+              "name": "Install-cartridges",
+              "fields": []
+            },
+            {
+              "name": "Download-files",
+              "fields": []
+            },
+            {
+              "name": "Show-dialogs",
               "fields": []
             }
           ]

@@ -1,0 +1,33 @@
+:root {
+  --font-title: "Poppins", sans-serif;
+  --font-sans: "Roboto", sans-serif;
+  --font-mono: "Roboto Mono", monospace;
+
+  --color-white: #fafafa;
+  --color-white-d1: #ececea;
+  --color-white-d2: #dcdcda;
+  --color-black: #2f2f2f;
+  --color-black-l1: #5f5f5f;
+  --color-black-l2: #9f9f9f;
+
+  /* palette is Pollen8 by Conker : https://lospec.com/palette-list/pollen8 */
+  --color-primary-d2: #73464c;
+  --color-primary-d1: #ab5675;
+  --color-primary: #ee6a7c;
+  --color-primary-l1: #ffa7a5;
+  --color-primary-l2: #ffe7d6;
+
+  --color-text: var(--color-black);
+  --color-text-inverted: var(--color-white);
+  --color-text-muted: var(--color-black-l1);
+  --color-text-very-muted: var(--color-black-l2);
+
+  --color-border: var(--color-white-d1);
+  --color-border-d1: var(--color-white-d2);
+
+  --color-bg: var(--color-white);
+
+  font-size: 16px;
+  color: var(--color-text);
+  font-family: var(--font-sans);
+}

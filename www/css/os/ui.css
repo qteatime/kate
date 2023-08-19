@@ -365,3 +365,63 @@
   width: auto;
   height: 64px;
 }
+
+.kate-ui-cartridge-chip {
+  display: flex;
+  border: 1px solid var(--color-border-d1);
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 0.5em 0;
+  gap: 1em;
+  min-height: 120px;
+  flex-wrap: nowrap;
+}
+
+.kate-ui-cartridge-chip-thumbnail {
+  flex-shrink: 0;
+  flex-grow: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: var(--color-border-d1);
+}
+
+.kate-ui-cartridge-chip-title {
+  font-weight: bold;
+  font-size: 0.8em;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.kate-ui-cartridge-chip-info {
+  padding: 0.5em 0.5em 0.5em 0;
+  flex-grow: 1;
+  overflow: hidden;
+}
+
+.kate-ui-cartridge-chip-id {
+  font-family: var(--font-family-mono);
+  margin-bottom: 0.5em;
+  word-break: break-all;
+}
+
+.kate-ui-cartridge-chip-meta {
+  font-size: 0.8em;
+}
+
+.kate-ui-cartridge-chip-risk {
+  font-size: 0.8em;
+}
+
+.kate-ui-cartridge-chip-thumbnail .kate-no-thumbnail,
+.kate-ui-cartridge-chip-thumbnail img {
+  width: 65px;
+  height: auto;
+}
+
+.kate-ui-browse-save-chip {
+  border: 1px solid var(--color-border-d1);
+  border-radius: 4px;
+  padding: 1rem;
+}

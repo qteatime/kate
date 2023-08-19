@@ -7,6 +7,14 @@ export function load_image(url: string) {
   });
 }
 
+export function load_image_from_bytes(mime: string, bytes: Uint8Array) {
+  const blob = new Blob([bytes.buffer], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const img = new Image();
+  img.src = url;
+  return img;
+}
+
 export async function make_empty_thumbnail(width: number, height: number) {
   const canvas = document.createElement("canvas");
   canvas.width = width;

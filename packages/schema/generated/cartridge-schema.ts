@@ -802,7 +802,7 @@ export namespace Genre {
 
 
 
-export type Release_type = Release_type.Prototype | Release_type.Early_access | Release_type.Beta | Release_type.Demo | Release_type.Regular;
+export type Release_type = Release_type.Prototype | Release_type.Early_access | Release_type.Beta | Release_type.Demo | Release_type.Regular | Release_type.Unofficial;
 
 export namespace Release_type {
  export const tag = 9;
@@ -812,7 +812,8 @@ export namespace Release_type {
     Early_access = 1,
     Beta = 2,
     Demo = 3,
-    Regular = 4
+    Regular = 4,
+    Unofficial = 5
  }
 
  
@@ -921,6 +922,28 @@ export namespace Release_type {
    readonly '@version': 0;
    readonly '@variant': $Tags.Regular;
    readonly '@variant-name': 'Regular';
+   
+ }
+
+
+  
+ export function Unofficial(x: {}): Release_type {
+   return {
+     '@name': 'Release-type',
+     '@tag': 9,
+     '@version': 0,
+     '@variant': $Tags.Unofficial,
+     '@variant-name': 'Unofficial',
+     ...x
+   }
+ }
+
+ export interface Unofficial {
+   readonly '@name': 'Release-type';
+   readonly '@tag': 9;
+   readonly '@version': 0;
+   readonly '@variant': $Tags.Unofficial;
+   readonly '@variant-name': 'Unofficial';
    
  }
 
@@ -1775,13 +1798,17 @@ export namespace Capability {
 
 
 
-export type Contextual_capability = Contextual_capability.Open_URLs;
+export type Contextual_capability = Contextual_capability.Open_URLs | Contextual_capability.Request_device_files | Contextual_capability.Install_cartridges | Contextual_capability.Download_files | Contextual_capability.Show_dialogs;
 
 export namespace Contextual_capability {
  export const tag = 18;
 
  export const enum $Tags {
-   Open_URLs = 0
+   Open_URLs = 0,
+    Request_device_files = 1,
+    Install_cartridges = 2,
+    Download_files = 3,
+    Show_dialogs = 4
  }
 
  
@@ -1802,6 +1829,94 @@ export namespace Contextual_capability {
    readonly '@version': 0;
    readonly '@variant': $Tags.Open_URLs;
    readonly '@variant-name': 'Open-URLs';
+   
+ }
+
+
+  
+ export function Request_device_files(x: {}): Contextual_capability {
+   return {
+     '@name': 'Contextual-capability',
+     '@tag': 18,
+     '@version': 0,
+     '@variant': $Tags.Request_device_files,
+     '@variant-name': 'Request-device-files',
+     ...x
+   }
+ }
+
+ export interface Request_device_files {
+   readonly '@name': 'Contextual-capability';
+   readonly '@tag': 18;
+   readonly '@version': 0;
+   readonly '@variant': $Tags.Request_device_files;
+   readonly '@variant-name': 'Request-device-files';
+   
+ }
+
+
+  
+ export function Install_cartridges(x: {}): Contextual_capability {
+   return {
+     '@name': 'Contextual-capability',
+     '@tag': 18,
+     '@version': 0,
+     '@variant': $Tags.Install_cartridges,
+     '@variant-name': 'Install-cartridges',
+     ...x
+   }
+ }
+
+ export interface Install_cartridges {
+   readonly '@name': 'Contextual-capability';
+   readonly '@tag': 18;
+   readonly '@version': 0;
+   readonly '@variant': $Tags.Install_cartridges;
+   readonly '@variant-name': 'Install-cartridges';
+   
+ }
+
+
+  
+ export function Download_files(x: {}): Contextual_capability {
+   return {
+     '@name': 'Contextual-capability',
+     '@tag': 18,
+     '@version': 0,
+     '@variant': $Tags.Download_files,
+     '@variant-name': 'Download-files',
+     ...x
+   }
+ }
+
+ export interface Download_files {
+   readonly '@name': 'Contextual-capability';
+   readonly '@tag': 18;
+   readonly '@version': 0;
+   readonly '@variant': $Tags.Download_files;
+   readonly '@variant-name': 'Download-files';
+   
+ }
+
+
+  
+ export function Show_dialogs(x: {}): Contextual_capability {
+   return {
+     '@name': 'Contextual-capability',
+     '@tag': 18,
+     '@version': 0,
+     '@variant': $Tags.Show_dialogs,
+     '@variant-name': 'Show-dialogs',
+     ...x
+   }
+ }
+
+ export interface Show_dialogs {
+   readonly '@name': 'Contextual-capability';
+   readonly '@tag': 18;
+   readonly '@version': 0;
+   readonly '@variant': $Tags.Show_dialogs;
+   readonly '@variant-name': 'Show-dialogs';
    
  }
 

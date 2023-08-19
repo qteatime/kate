@@ -1,0 +1,77 @@
+{
+  "id": "qteati.me/kate-importer",
+  "version": {
+    "major": 1,
+    "minor": 0
+  },
+  "release": {
+    "year": 2023,
+    "month": 8,
+    "day": 11
+  },
+  "metadata": {
+    "presentation": {
+      "author": "Q.",
+      "title": "Kate Importer",
+      "tagline": "Import games for other platforms into Kate",
+      "release_type": "prototype"
+    },
+    "classification": {
+      "genre": ["tool"],
+      "tags": [],
+      "rating": "general"
+    },
+    "legal": {
+      "licence_path": "LICENCE.txt",
+      "derivative_policy": "commercial-use"
+    },
+    "accessibility": {
+      "input_methods": ["buttons"],
+      "languages": [
+        {
+          "iso_code": "en",
+          "interface": true,
+          "audio": false,
+          "text": true
+        }
+      ]
+    }
+  },
+  "security": {
+    "capabilities": [
+      {
+        "type": "request-device-files",
+        "reason": "Import games from your device's storage"
+      },
+      {
+        "type": "install-cartridges",
+        "reason": "Import games from your device's storage"
+      },
+      {
+        "type": "download-files",
+        "reason": "Save generated cartridges to your device's file system"
+      },
+      {
+        "type": "show-dialogs",
+        "reason": "For text input and error feedback"
+      }
+    ]
+  },
+  "files": [
+    "www/**/*.html",
+    "www/**/*.css",
+    "www/**/*.js",
+    "www/**/*.txt",
+    "www/**/*.md",
+    "www/**/*.ttf",
+    "www/runtimes/**/*",
+    "www/runtimes/**/.kate.files.json",
+    "thumbnail.png",
+    "LICENCE.txt"
+  ],
+  "platform": {
+    "type": "web-archive",
+    "html": "www/index.html",
+    "bridges": []
+  }
+}

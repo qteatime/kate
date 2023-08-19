@@ -109,6 +109,7 @@ union Release-type {
   type Beta {}
   type Demo {}
   type Regular {}
+  type Unofficial {}
 }
 
 union Derivative-policy {
@@ -197,4 +198,16 @@ union Capability {
 union Contextual-capability {
   // medium risk: data exfiltration, privacy concerns
   type Open-URLs {}
+
+  // high risk: security, privacy, escalation concerns
+  type Request-device-files {}
+
+  // critical risk: security, privacy, escalation concerns
+  type Install-cartridges {}
+
+  // critical risk: security, escalation concerns
+  type Download-files {}
+
+  // low risk: annoyance, denial-of-service
+  type Show-dialogs {}
 }

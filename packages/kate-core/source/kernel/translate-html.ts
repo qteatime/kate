@@ -261,12 +261,54 @@ async function inline_css(
   context: RuntimeEnv
 ) {
   const source0 = await get_text_file(root.as_string(), context);
-  const source1 = await transform_css_urls(root.dirname(), source0, context);
-  // TODO: inline imports
+  const source1 = await transform_css(root.dirname(), source0, context);
   const style = dom.createElement("style");
   style.textContent = source1;
   link.parentNode!.insertBefore(style, link);
   link.remove();
+}
+
+async function transform_css(
+  base: Pathname,
+  source: string,
+  context: RuntimeEnv
+) {
+  const source1 = await transform_css_imports(base, source, context);
+  const source2 = await transform_css_urls(base, source1, context);
+  return source2;
+}
+
+async function transform_css_imports(
+  base: Pathname,
+  source: string,
+  context: RuntimeEnv
+) {
+  const imports = Array.from(
+    new Set(
+      [...source.matchAll(/@import\s+url\(("[^"]+")\);/g)]
+        .map((x) => x[1])
+        .filter((x) => !is_non_local(JSON.parse(x)))
+    )
+  );
+  const import_map = new Map(
+    await Promise.all(
+      imports.map(async (url_string) => {
+        const url_path = Pathname.from_string(JSON.parse(url_string));
+        const path = base.join(url_path);
+        const style0 = await get_text_file(path.as_string(), context);
+        const style = await transform_css(path.dirname(), style0, context);
+        return [url_string, style] as const;
+      })
+    )
+  );
+
+  return source.replace(
+    /@import\s+url\(("[^"]+")\);/g,
+    (match, url_string: string) => {
+      const source = import_map.get(url_string)!;
+      return source == null ? match : source;
+    }
+  );
 }
 
 async function transform_css_urls(
@@ -275,7 +317,11 @@ async function transform_css_urls(
   context: RuntimeEnv
 ) {
   const imports = Array.from(
-    new Set([...source.matchAll(/\burl\(("[^"]+")\)/g)].map((x) => x[1]))
+    new Set(
+      [...source.matchAll(/\burl\(("[^"]+")\)/g)]
+        .map((x) => x[1])
+        .filter((x) => !is_non_local(JSON.parse(x)))
+    )
   );
   const import_map = new Map(
     await Promise.all(
@@ -288,9 +334,9 @@ async function transform_css_urls(
     )
   );
 
-  return source.replace(/\burl\(("[^"]+")\)/g, (_, url_string: string) => {
+  return source.replace(/\burl\(("[^"]+")\)/g, (match, url_string: string) => {
     const data_url = import_map.get(url_string)!;
-    return `url(${JSON.stringify(data_url)})`;
+    return data_url == null ? match : `url(${JSON.stringify(data_url)})`;
   });
 }
 
