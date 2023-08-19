@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="#00XX — Capabilities" href="00XX-capabilities.html" /><link rel="prev" title="Ren’Py" href="../dev/port/renpy.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Release notes" href="../etc/releases/index.html" /><link rel="prev" title="#01XX — External URL navigation" href="01XX-external-url.html" />
 
     <!-- Generated with Sphinx 6.2.1 and Furo 2023.03.27 -->
-        <title>Kate’s Design Documents - Kate 0.23.6 documentation</title>
+        <title>#01XX — Device file access - Kate 0.23.6 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=fad236701ea90a88636c2a8c73b44ae642ed2a53" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
@@ -242,12 +242,12 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Design and implementation</span></p>
 <ul class="current">
-<li class="toctree-l1 current has-children current-page"><a class="current reference internal" href="#">Kate’s Design Documents</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" role="switch" type="checkbox"/><label for="toctree-checkbox-13"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">Kate’s Design Documents</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" role="switch" type="checkbox"/><label for="toctree-checkbox-13"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="00XX-capabilities.html">#00XX — Capabilities</a></li>
 <li class="toctree-l2"><a class="reference internal" href="00XX-live-audit.html"># 00XX - Live auditing</a></li>
 <li class="toctree-l2"><a class="reference internal" href="0101-object-storage.html">#0101 — Object Store API</a></li>
 <li class="toctree-l2"><a class="reference internal" href="01XX-external-url.html">#01XX — External URL navigation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="01XX-device-file-access.html">#01XX — Device file access</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">#01XX — Device file access</a></li>
 </ul>
 </li>
 </ul>
@@ -286,7 +286,7 @@
         </a>
         <div class="content-icon-container">
           <div class="edit-this-page">
-  <a class="muted-link" href="https://github.com/qteatime/kate/edit/main/docs/source/design/index.rst" title="Edit this page">
+  <a class="muted-link" href="https://github.com/qteatime/kate/edit/main/docs/source/design/01XX-device-file-access.rst" title="Edit this page">
     <svg aria-hidden="true" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
       <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
       <path d="M4 20h4l10.5 -10.5a1.5 1.5 0 0 0 -4 -4l-10.5 10.5v4" />
@@ -308,30 +308,246 @@
           </label>
         </div>
         <article role="main">
-          <section id="kate-s-design-documents">
-<h1>Kate’s Design Documents<a class="headerlink" href="#kate-s-design-documents" title="Permalink to this heading">#</a></h1>
-<p>This book includes all design documents for the features that make up
-Kate. This is intended for a more technical audience, security auditors,
-and developers making Kate games who wish to have a deeper understanding
-of the platform they’re developing for.</p>
-<section id="kernel-design">
-<h2>Kernel design<a class="headerlink" href="#kernel-design" title="Permalink to this heading">#</a></h2>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="00XX-capabilities.html">#00XX — Capabilities</a></li>
-<li class="toctree-l1"><a class="reference internal" href="00XX-live-audit.html"># 00XX - Live auditing</a></li>
-</ul>
+          <section id="xx-device-file-access">
+<h1>#01XX — Device file access<a class="headerlink" href="#xx-device-file-access" title="Permalink to this heading">#</a></h1>
+<dl class="field-list simple">
+<dt class="field-odd">Author<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Q.</p>
+</dd>
+<dt class="field-even">Started<span class="colon">:</span></dt>
+<dd class="field-even"><p>2023-08-12</p>
+</dd>
+<dt class="field-odd">Last updated<span class="colon">:</span></dt>
+<dd class="field-odd"><p>2023-08-12</p>
+</dd>
+<dt class="field-even">Status<span class="colon">:</span></dt>
+<dd class="field-even"><p>PoC in progress</p>
+</dd>
+</dl>
+<section id="timeline">
+<h2>Timeline<a class="headerlink" href="#timeline" title="Permalink to this heading">#</a></h2>
+<div class="table-wrapper docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>First draft</p></th>
+<th class="head"><p>Proof of Concept</p></th>
+<th class="head"><p>Stable implementation</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>2023-08-12</p></td>
+<td><p>—</p></td>
+<td><p>—</p></td>
+</tr>
+</tbody>
+</table>
 </div>
 </section>
-<section id="api-design">
-<h2>API design<a class="headerlink" href="#api-design" title="Permalink to this heading">#</a></h2>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="0101-object-storage.html">#0101 — Object Store API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="01XX-external-url.html">#01XX — External URL navigation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="01XX-device-file-access.html">#01XX — Device file access</a></li>
-</ul>
+<section id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Permalink to this heading">#</a></h2>
+<p>While games don’t need access to files outside of what’s included in the
+cartridge, Kate is also a platform for running regular applications and
+game development tools (such as Kate Importer or Kate Studio) need
+to read files from the device’s file system.</p>
+<p>We want to make sure that any operations accessing user data has the
+proper security and privacy controls and feedback in place, and they
+also allow users to revoke access immediately at any time. To that end
+all such accesses must go through a Kate-controlled API. In the case
+of device files, this document introduces the Device File Access API.</p>
+<p>The Device File Access API provides a baseline of operations on files
+and directories. It’s guided by the same principles of active and informed
+consent that permeate other Kate features: processes are only granted
+restricted access to files users agree to let them read.</p>
+</section>
+<section id="technical-implementation">
+<h2>Technical implementation<a class="headerlink" href="#technical-implementation" title="Permalink to this heading">#</a></h2>
+<p>The Device File Access API is similar to the web’s File Access API and
+Crochet’s file system package, in that we rely on contextual grants for
+file capabilities and provide individual file objects that can be used
+to further access objects under them.</p>
+<p>Cartridges and Kate processes can ask for the API object, which is a
+passive grant if they have the Device File Access capability granted.
+They can then use any of the entry-point methods in this API to request
+access to a specific node in the file system tree. Nodes can be directories
+or files — the API does not provide any concept of links or devices.</p>
+<p>Nodes are represented as either a file or a directory object. These are
+membranes exposed to outside processes, and all actual operations happen
+within the Device File Access API. This means that capabilities are still
+checked upon each read, write, or similar operation; users must have both
+the object capability to the node <strong>and</strong> the general capability to use
+the Device File Access API for all operations to succeed.</p>
+<p>Handles are not persistent: they’re gone as soon as the process is closed.
+Every time the process is re-opened, it needs to request the capabilities
+to the nodes again.</p>
+<p>For this implementation, all file operations are atomic and synchronous.
+This increases the memory requirements of Kate, but streaming and random
+access APIs require more thought.</p>
+</section>
+<section id="formal-semantics">
+<h2>Formal semantics<a class="headerlink" href="#formal-semantics" title="Permalink to this heading">#</a></h2>
+<p>The entire Device File Access API is governed by a simple core language
+based on a file system tree. This language is described as follows:</p>
+<div class="highlight-haskell notranslate"><div class="highlight"><pre><span></span><span class="kr">type</span><span class="w"> </span><span class="kt">File</span><span class="w"> </span><span class="n">f</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">path</span><span class="w"> </span><span class="ow">::</span><span class="w"> </span><span class="kt">Pathname</span><span class="p">,</span><span class="w"> </span><span class="kr">data</span><span class="w"> </span><span class="p">}</span>
+
+<span class="kr">type</span><span class="w"> </span><span class="kt">Pathname</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="ow">::</span>
+<span class="w">  </span><span class="o">|</span><span class="w"> </span><span class="kt">Root</span>
+<span class="w">  </span><span class="o">|</span><span class="w"> </span><span class="kt">Join</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">segment</span><span class="w"> </span><span class="ow">::</span><span class="w"> </span><span class="n">string</span><span class="p">,</span><span class="w"> </span><span class="n">parent</span><span class="w"> </span><span class="ow">::</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="p">}</span>
+
+<span class="kr">type</span><span class="w"> </span><span class="kt">FileFilter</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">multiple</span><span class="kt">:</span><span class="w"> </span><span class="n">boolean</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="n">false</span><span class="p">;</span>
+<span class="w">  </span><span class="n">strict</span><span class="kt">:</span><span class="w"> </span><span class="n">boolean</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="n">true</span><span class="p">;</span>
+<span class="w">  </span><span class="n">types</span><span class="kt">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">description</span><span class="kt">:</span><span class="w"> </span><span class="n">string</span><span class="p">;</span>
+<span class="w">    </span><span class="n">accept</span><span class="kt">:</span><span class="w"> </span><span class="p">{[</span><span class="n">mime</span><span class="kt">:</span><span class="w"> </span><span class="n">string</span><span class="p">]</span><span class="kt">:</span><span class="w"> </span><span class="n">string</span><span class="kt">[]</span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span><span class="kt">[]</span>
+<span class="p">}</span>
+
+<span class="kt">DeviceFiles</span><span class="w"> </span><span class="n">fs</span><span class="w"> </span><span class="ow">::</span>
+<span class="w">  </span><span class="o">|</span><span class="w"> </span><span class="n">fs</span><span class="o">.</span><span class="n">request</span><span class="o">-</span><span class="n">file</span><span class="p">(</span><span class="kt">FileFilter</span><span class="p">)</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="p">{</span><span class="n">ok</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="n">f1</span><span class="p">,</span><span class="w"> </span><span class="o">...</span><span class="p">,</span><span class="w"> </span><span class="n">fN</span><span class="p">]}</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="ne">error</span>
+<span class="w">  </span><span class="o">|</span><span class="w"> </span><span class="n">fs</span><span class="o">.</span><span class="n">request</span><span class="o">-</span><span class="n">directory</span><span class="nb">()</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="p">{</span><span class="n">ok</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="n">f1</span><span class="p">,</span><span class="w"> </span><span class="o">...</span><span class="p">,</span><span class="w"> </span><span class="n">fN</span><span class="p">]}</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="ne">error</span>
+
+<span class="kt">File</span><span class="w"> </span><span class="n">f</span><span class="w"> </span><span class="ow">::</span>
+<span class="w">  </span><span class="o">|</span><span class="w"> </span><span class="n">n</span><span class="o">.</span><span class="n">relative</span><span class="o">-</span><span class="n">path</span><span class="nb">()</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="kt">Pathname</span>
+<span class="w">  </span><span class="o">|</span><span class="w"> </span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="nb">()</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="kt">Bytes</span>
+</pre></div>
 </div>
+<p>Thus a user of this API starts by getting access to a <cite>DeviceFiles</cite> instance.
+From there they may request access to a collection of files, or to a
+directory. These result in File handles which then allow the user to read
+files in the underlying device file system — the files are a snapshot at
+the time they’re requested.</p>
+<p>Symbolic and hard links are followed during this navigation. However, users
+only have access to the path of the file relative to the top-most directory
+they have been given access to.</p>
+<section id="requesting-capabilities">
+<h3>Requesting capabilities<a class="headerlink" href="#requesting-capabilities" title="Permalink to this heading">#</a></h3>
+<p>Users start with no access to any file. They must first request contextual
+grants to specific file or directory nodes.</p>
+<section id="fs-request-file-filter">
+<h4><code class="docutils literal notranslate"><span class="pre">fs.request-file(filter)</span></code><a class="headerlink" href="#fs-request-file-filter" title="Permalink to this heading">#</a></h4>
+<blockquote>
+<div><ul class="simple">
+<li><p>Show a file picker where:</p>
+<ul>
+<li><p>Users can select multiple entries if <code class="docutils literal notranslate"><span class="pre">filter.multiple</span></code> is true;</p></li>
+<li><p>Users can select files matching the provided mime-type filters; and</p></li>
+<li><p>Users may select any non-mime-type matching file if <code class="docutils literal notranslate"><span class="pre">filter.strict</span></code> is false;</p></li>
+<li><p>The selectable files does not include system data — only user data must be selectable.</p></li>
+</ul>
+</li>
+<li><p>If the user selects a file:</p>
+<ul>
+<li><p>Return a list of File handles for the selected files.</p></li>
+</ul>
+</li>
+<li><p>Otherwise:</p>
+<ul>
+<li><p>Return a generic access failure.</p></li>
+</ul>
+</li>
+</ul>
+</div></blockquote>
+</section>
+<section id="fs-request-directory">
+<h4><code class="docutils literal notranslate"><span class="pre">fs.request-directory()</span></code><a class="headerlink" href="#fs-request-directory" title="Permalink to this heading">#</a></h4>
+<blockquote>
+<div><ul class="simple">
+<li><p>Show a directory picker where selectable directories do not include system
+data — only user data must be selectable.</p></li>
+<li><p>If the user selects a directory:</p>
+<ul>
+<li><p>Return a list of File handles for all files contained within the selected
+directory which are not system data;</p></li>
+</ul>
+</li>
+<li><p>Otherwise:</p>
+<ul>
+<li><p>Return a generic access failure.</p></li>
+</ul>
+</li>
+</ul>
+</div></blockquote>
+</section>
+</section>
+<section id="file-metadata">
+<h3>File metadata<a class="headerlink" href="#file-metadata" title="Permalink to this heading">#</a></h3>
+<p>Given any File handle we can get some metadata about it. Metadata from a file
+will <strong>never</strong> allow one to get a more privileged node than the one the
+operation was called on.</p>
+<section id="f-relative-path">
+<h4><code class="docutils literal notranslate"><span class="pre">f.relative-path()</span></code><a class="headerlink" href="#f-relative-path" title="Permalink to this heading">#</a></h4>
+<div class="highlight-haskell notranslate"><div class="highlight"><pre><span></span><span class="kt">File</span><span class="p">{</span><span class="n">path</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="kt">P</span><span class="p">}</span><span class="o">.</span><span class="n">relative</span><span class="o">-</span><span class="n">path</span><span class="nb">()</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="kt">P</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>A relative path is just a sequence of segments starting from the node
+we’re in, and following the parent chain until the root directory that granted
+access to this file. This means that pathnames are canonically in reverse form.
+E.g.: a path like <code class="docutils literal notranslate"><span class="pre">some/directory/file.txt</span></code> would be represented as
+<code class="docutils literal notranslate"><span class="pre">Join</span> <span class="pre">{&quot;file.txt&quot;,</span> <span class="pre">Join</span> <span class="pre">{&quot;directory&quot;,</span> <span class="pre">Join</span> <span class="pre">{&quot;some&quot;,</span> <span class="pre">Root}}}</span></code>.</p>
+</section>
+</section>
+<section id="file-operations">
+<h3>File operations<a class="headerlink" href="#file-operations" title="Permalink to this heading">#</a></h3>
+<p>Given a File handle, the user can only retrieve its contents.</p>
+<section id="f-read">
+<h4><code class="docutils literal notranslate"><span class="pre">f.read()</span></code><a class="headerlink" href="#f-read" title="Permalink to this heading">#</a></h4>
+<div class="highlight-haskell notranslate"><div class="highlight"><pre><span></span><span class="kt">File</span><span class="p">{</span><span class="kr">data</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="kt">D</span><span class="p">}</span><span class="o">.</span><span class="n">read</span><span class="nb">()</span><span class="w"> </span><span class="n">when</span><span class="w"> </span><span class="n">has</span><span class="p">(</span><span class="n">file_access</span><span class="p">)</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="kt">D</span>
+</pre></div>
+</div>
+<p>That is, if we read from a file handle then we synchronously get access to all
+of the binary data stored at that node, as long as we still have the file_access
+capability.</p>
+</section>
+</section>
+</section>
+<section id="how-is-this-feature-dangerous">
+<h2>How is this feature dangerous?<a class="headerlink" href="#how-is-this-feature-dangerous" title="Permalink to this heading">#</a></h2>
+<p>Device File Access API is a high risk API which provides cartridges with
+read-only access to files or directories selected by the user. In that sense
+it poses considerable privacy and security risks in the hands of a malicious
+cartridge. We consider risks from the Kernel, Device, Cartridge, and Users’
+perspective here.</p>
+<dl>
+<dt><strong>Leaking sensitive data:</strong></dt><dd><p>The API provides access to user data and cannot make any guarantees about
+contents. Further, as it relies on browser file pickers in the web, it
+cannot show the user a preview of the contents before they’re shared. This
+means that a malicious cartridge can trick users into giving them access
+to sensitive data, if the user cannot understand what they’re sharing.</p>
+<p>This is particularly a problem with directory requests, where all files
+inside of a directory are shared. For people who primarily grew up with
+mobile operating systems, the concept of directory trees might even be
+entirely foreign, further making it hard for them to make any reasonable
+risk assessment.</p>
+<p>For web Kate we rely on the browser’s mitigations. For native Kate we
+mitigate with a separate confirmation step in the directory access case.</p>
+</dd>
+<dt><strong>Tree privilege escalation:</strong></dt><dd><p>Because the API provides access to directories, symbolic links within
+it could be used to escalate access to a directory outside of the
+subtree that the user granted access to.</p>
+<p>We rely on the browser’s mitigation for symbolic links and do not include
+grants to links in native Kate.</p>
+</dd>
+<dt><strong>Access to hidden files:</strong></dt><dd><p>Because OS file pickers may not show hidden files by default, it’s possible
+that a user grants access to a directory that contains files they never
+meant to grant access to.</p>
+<p>We rely on the same mitigation as that for sensitive data to cover hidden
+files.</p>
+</dd>
+<dt><strong>Direct access to devices:</strong></dt><dd><p>Because some OSs (e.g.: Linux) expose devices as files, it’s possible that
+a user grants access to a file or directory that is backed by a device,
+and hence grant the cartridge direct read access to that device’s data.</p>
+<p>We mitigate this by only allowing users to select user-data files and
+directories. Browsers have a similar mitigation for device files.</p>
+</dd>
+</dl>
+</section>
+<section id="additional-references">
+<h2>Additional references<a class="headerlink" href="#additional-references" title="Permalink to this heading">#</a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://wicg.github.io/file-system-access/">File System Access API (WICG draft spec)</a></p></li>
+<li><p><a class="reference external" href="https://w3c.github.io/FileAPI/">File API (WICG spec)</a></p></li>
+<li><p><a class="reference external" href="https://developer.chrome.com/articles/file-system-access/">Chrome’s File System API blogpost</a></p></li>
+</ul>
 </section>
 </section>
 
@@ -340,23 +556,23 @@ of the platform they’re developing for.</p>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="00XX-capabilities.html">
+          <a class="next-page" href="../etc/releases/index.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">#00XX — Capabilities</div>
+                <div class="title">Release notes</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="../dev/port/renpy.html">
+          <a class="prev-page" href="01XX-external-url.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Ren’Py</div>
+                <div class="title">#01XX — External URL navigation</div>
                 
               </div>
             </a>
@@ -390,9 +606,28 @@ of the platform they’re developing for.</p>
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">Kate’s Design Documents</a><ul>
-<li><a class="reference internal" href="#kernel-design">Kernel design</a></li>
-<li><a class="reference internal" href="#api-design">API design</a></li>
+<li><a class="reference internal" href="#">#01XX — Device file access</a><ul>
+<li><a class="reference internal" href="#timeline">Timeline</a></li>
+<li><a class="reference internal" href="#summary">Summary</a></li>
+<li><a class="reference internal" href="#technical-implementation">Technical implementation</a></li>
+<li><a class="reference internal" href="#formal-semantics">Formal semantics</a><ul>
+<li><a class="reference internal" href="#requesting-capabilities">Requesting capabilities</a><ul>
+<li><a class="reference internal" href="#fs-request-file-filter"><code class="docutils literal notranslate"><span class="pre">fs.request-file(filter)</span></code></a></li>
+<li><a class="reference internal" href="#fs-request-directory"><code class="docutils literal notranslate"><span class="pre">fs.request-directory()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#file-metadata">File metadata</a><ul>
+<li><a class="reference internal" href="#f-relative-path"><code class="docutils literal notranslate"><span class="pre">f.relative-path()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#file-operations">File operations</a><ul>
+<li><a class="reference internal" href="#f-read"><code class="docutils literal notranslate"><span class="pre">f.read()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-is-this-feature-dangerous">How is this feature dangerous?</a></li>
+<li><a class="reference internal" href="#additional-references">Additional references</a></li>
 </ul>
 </li>
 </ul>
