@@ -1798,7 +1798,7 @@ export namespace Capability {
 
 
 
-export type Contextual_capability = Contextual_capability.Open_URLs | Contextual_capability.Request_device_files | Contextual_capability.Install_cartridges | Contextual_capability.Download_files;
+export type Contextual_capability = Contextual_capability.Open_URLs | Contextual_capability.Request_device_files | Contextual_capability.Install_cartridges | Contextual_capability.Download_files | Contextual_capability.Show_dialogs;
 
 export namespace Contextual_capability {
  export const tag = 18;
@@ -1807,7 +1807,8 @@ export namespace Contextual_capability {
    Open_URLs = 0,
     Request_device_files = 1,
     Install_cartridges = 2,
-    Download_files = 3
+    Download_files = 3,
+    Show_dialogs = 4
  }
 
  
@@ -1894,6 +1895,28 @@ export namespace Contextual_capability {
    readonly '@version': 0;
    readonly '@variant': $Tags.Download_files;
    readonly '@variant-name': 'Download-files';
+   
+ }
+
+
+  
+ export function Show_dialogs(x: {}): Contextual_capability {
+   return {
+     '@name': 'Contextual-capability',
+     '@tag': 18,
+     '@version': 0,
+     '@variant': $Tags.Show_dialogs,
+     '@variant-name': 'Show-dialogs',
+     ...x
+   }
+ }
+
+ export interface Show_dialogs {
+   readonly '@name': 'Contextual-capability';
+   readonly '@tag': 18;
+   readonly '@version': 0;
+   readonly '@variant': $Tags.Show_dialogs;
+   readonly '@variant-name': 'Show-dialogs';
    
  }
 

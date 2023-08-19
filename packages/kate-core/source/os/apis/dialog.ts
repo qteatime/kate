@@ -70,6 +70,95 @@ export class KateDialog {
     }
   }
 
+  async text_input(
+    id: string,
+    message: string,
+    options: {
+      max_length?: number;
+      initial_value?: string;
+      type: "text" | "password";
+      placeholder?: string;
+    }
+  ) {
+    const input = UI.h(
+      "input",
+      {
+        type: options.type,
+        value: options.initial_value ?? "",
+        placeholder: options.placeholder ?? "",
+        class: "kate-ui-text-input-input",
+      },
+      []
+    ) as HTMLInputElement;
+    input.addEventListener("keydown", (ev) => {
+      if (ev.code === "ArrowUp" || ev.code === "ArrowDown") {
+        ev.preventDefault();
+        return;
+      }
+      ev.stopPropagation();
+
+      if (ev.code === "Escape") {
+        input.blur();
+        ev.preventDefault();
+        return;
+      }
+    });
+
+    const deferred = this.custom<string | null>(
+      id,
+      "kate-ui-text-input-container",
+      [
+        UI.h("div", { class: "kate-ui-text-input-message" }, [message]),
+        UI.h("div", { class: "kate-ui-text-input-control" }, [
+          UI.interactive(
+            this.os,
+            input,
+            [
+              {
+                key: ["o"],
+                label: "Edit",
+                on_click: true,
+                handler: () => {
+                  input.focus();
+                },
+              },
+            ],
+            {
+              replace: true,
+              default_focus_indicator: false,
+            }
+          ),
+        ]),
+        UI.h("div", { class: "kate-hud-dialog-actions" }, [
+          UI.h(
+            "div",
+            { class: "kate-hud-dialog-action", "data-kind": "cancel" },
+            [
+              UI.button("Cancel", {
+                on_clicked: () => {
+                  deferred.resolve(null);
+                },
+              }),
+            ]
+          ),
+          UI.h(
+            "div",
+            { class: "kate-hud-dialog-action", "data-kind": "primary" },
+            [
+              UI.button("Ok", {
+                on_clicked: () => {
+                  deferred.resolve(input.value);
+                },
+              }),
+            ]
+          ),
+        ]),
+      ],
+      null
+    );
+    return await deferred.promise;
+  }
+
   custom<A>(
     id: string,
     className: string,
@@ -77,17 +166,17 @@ export class KateDialog {
     cancel_value: A
   ): Deferred<A> {
     const hud = new HUD_Dialog(this);
-    try {
-      this.os.push_scene(hud);
-      return hud.custom(
-        id,
-        `kate-hud-dialog-custom ${className}`,
-        contents,
-        cancel_value
-      );
-    } finally {
+    this.os.push_scene(hud);
+    const deferred = hud.custom(
+      id,
+      `kate-hud-dialog-custom ${className}`,
+      contents,
+      cancel_value
+    );
+    deferred.promise.finally(() => {
       this.os.pop_scene(hud);
-    }
+    });
+    return deferred;
   }
 
   async pop_menu<A>(

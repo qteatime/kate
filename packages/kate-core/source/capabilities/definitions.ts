@@ -65,7 +65,10 @@ export class OpenURLs extends SwitchCapability<"open-urls"> {
     return new OpenURLs(grant.cart_id, grant.granted.value);
   }
 
-  static from_metadata(cart_id: string, capability: ContextualCapability) {
+  static from_metadata(
+    cart_id: string,
+    capability: ContextualCapability & { type: OpenURLs["type"] }
+  ) {
     if (capability.type !== "open-urls") {
       throw new Error(`Unexpected capability: ${capability.type}`);
     }
@@ -106,7 +109,10 @@ export class RequestDeviceFiles extends SwitchCapability<"request-device-files">
     return new RequestDeviceFiles(grant.cart_id, grant.granted.value);
   }
 
-  static from_metadata(cart_id: string, capability: ContextualCapability) {
+  static from_metadata(
+    cart_id: string,
+    capability: ContextualCapability & { type: RequestDeviceFiles["type"] }
+  ) {
     if (capability.type !== "request-device-files") {
       throw new Error(`Unexpected capability: ${capability.type}`);
     }
@@ -147,7 +153,10 @@ export class InstallCartridges extends SwitchCapability<"install-cartridges"> {
     return new InstallCartridges(grant.cart_id, grant.granted.value);
   }
 
-  static from_metadata(cart_id: string, capability: ContextualCapability) {
+  static from_metadata(
+    cart_id: string,
+    capability: ContextualCapability & { type: InstallCartridges["type"] }
+  ) {
     if (capability.type !== "install-cartridges") {
       throw new Error(`Unexpected capability: ${capability.type}`);
     }
@@ -185,7 +194,10 @@ export class DownloadFiles extends SwitchCapability<"download-files"> {
     return new DownloadFiles(grant.cart_id, grant.granted.value);
   }
 
-  static from_metadata(cart_id: string, capability: ContextualCapability) {
+  static from_metadata(
+    cart_id: string,
+    capability: ContextualCapability & { type: DownloadFiles["type"] }
+  ) {
     if (capability.type !== "download-files") {
       throw new Error(`Unexpected capability: ${capability.type}`);
     }
@@ -198,5 +210,46 @@ export class DownloadFiles extends SwitchCapability<"download-files"> {
 
   risk_category(): RiskCategory {
     return this.grant_configuration ? "critical" : "none";
+  }
+}
+
+export class ShowDialogs extends SwitchCapability<"show-dialogs"> {
+  readonly type = "show-dialogs";
+  readonly title = "Show modal dialogs";
+  readonly description = `
+    Allow the cartridge to show modal dialogs.
+  `;
+
+  get grant_configuration() {
+    return this._grant_configuration;
+  }
+
+  constructor(readonly cart_id: string, private _grant_configuration: boolean) {
+    super();
+  }
+
+  static parse(grant: CapabilityGrant<ShowDialogs["type"]>) {
+    if (grant.name !== "show-dialogs" || grant.granted.type !== "switch") {
+      throw new Error(`Unexpected capability: ${grant.name}`);
+    }
+    return new ShowDialogs(grant.cart_id, grant.granted.value);
+  }
+
+  static from_metadata(
+    cart_id: string,
+    capability: ContextualCapability & { type: ShowDialogs["type"] }
+  ) {
+    if (capability.type !== "show-dialogs") {
+      throw new Error(`Unexpected capability: ${capability.type}`);
+    }
+    return new ShowDialogs(cart_id, true);
+  }
+
+  update(grant: boolean): void {
+    this._grant_configuration = grant;
+  }
+
+  risk_category(): RiskCategory {
+    return this.grant_configuration ? "low" : "none";
   }
 }

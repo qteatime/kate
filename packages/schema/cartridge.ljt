@@ -207,4 +207,7 @@ union Contextual-capability {
 
   // critical risk: security, escalation concerns
   type Download-files {}
+
+  // low risk: annoyance, denial-of-service
+  type Show-dialogs {}
 }

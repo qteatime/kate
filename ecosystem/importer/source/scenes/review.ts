@@ -87,7 +87,14 @@ export class SceneReview extends UIScene {
                 ui.class("imp-review-form", [
                   ui.meta_text([x.engine]),
 
-                  ui.field("Name", [ui.text_input(x.title, {})]),
+                  ui.field("Name", [
+                    ui.text_input(x.title, {
+                      query: "Enter a title for the cartridge:",
+                      on_change: (title) => {
+                        x.title = title;
+                      },
+                    }),
+                  ]),
                 ]),
                 ui.action_buttons([
                   ui.text_button("Download cartridge", () => {

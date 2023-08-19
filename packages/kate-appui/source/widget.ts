@@ -16,7 +16,7 @@ export type Size =
   | "7x"
   | "8x";
 export type IconStyle = "solid";
-export type IconAnimation = "spin" | "spin-pulse" | "bounce" | "beat"; 
+export type IconAnimation = "spin" | "spin-pulse" | "bounce" | "beat";
 export type BoxJustify = "";
 export type BoxAlign = "";
 
@@ -393,14 +393,15 @@ export class WidgetDSL {
         key: ["o"],
         label: "Edit",
         handler: async () => {
-          // const new_value = await KateAPI.dialog.input(x.query, {
-          //   initial_value: value.value,
-          //   type: "text",
-          // });
-          // if (new_value != null) {
-          //   value.value = new_value;
-          //   x.on_change?.(new_value);
-          // }
+          const new_value = await KateAPI.dialogs.text_input(x.query ?? "", {
+            type: "text",
+            initial_value: initial_value,
+            max_length: 255,
+          });
+          if (new_value != null) {
+            value.value = new_value;
+            x.on_change?.(new_value);
+          }
         },
       },
     ]);

@@ -45,6 +45,11 @@ function parse_contextual_capability(
         type: "download-files",
       };
     }
+    case Cart_v4.Contextual_capability.$Tags.Show_dialogs: {
+      return {
+        type: "show-dialogs",
+      };
+    }
     default:
       throw unreachable(capability, "capability");
   }

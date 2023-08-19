@@ -50,6 +50,10 @@
       {
         "type": "download-files",
         "reason": "Save generated cartridges to your device's file system"
+      },
+      {
+        "type": "show-dialogs",
+        "reason": "For text input and error feedback"
       }
     ]
   },

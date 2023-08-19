@@ -877,6 +877,10 @@
             {
               "name": "Download-files",
               "fields": []
+            },
+            {
+              "name": "Show-dialogs",
+              "fields": []
             }
           ]
         }

@@ -87,3 +87,33 @@
   position: relative;
   z-index: 1;
 }
+
+.kate-hud-dialog-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.kate-ui-text-input-message {
+  padding: 1rem;
+}
+
+.kate-ui-text-input-control {
+  padding: 0 1rem;
+  margin-bottom: 1rem;
+}
+
+.kate-ui-text-input-input {
+  width: 100%;
+  display: block;
+  border: 1px solid var(--color-border);
+  border-bottom: 2px solid var(--color-border-d1);
+  font-size: 1rem;
+  padding: 0.3rem;
+  border-radius: 4px;
+  outline: none;
+}
+
+.kate-ui-text-input-input:focus {
+  border-bottom-color: var(--color-primary);
+  caret-color: var(--color-primary);
+}
