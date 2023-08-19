@@ -10,7 +10,15 @@ export class KateDeviceFile {
   constructor(readonly os: KateOS) {}
 
   private single_file() {
-    const single_file = h("input", { type: "file", id: "kate-os-device-file-single", style: "display: none" }, []);
+    const single_file = h(
+      "input",
+      {
+        type: "file",
+        id: "kate-os-device-file-single",
+        style: "display: none",
+      },
+      []
+    );
     document.body.appendChild(single_file);
     return single_file as HTMLInputElement;
   }
@@ -23,6 +31,8 @@ export class KateDeviceFile {
       types: { description: string; accept: { [mime: string]: string[] } }[];
     }
   ): Promise<DeviceFileHandle[]> {
+    this.os.kernel.console.reset_all_keys();
+
     let handles: DeviceFileHandle[];
     if ("showOpenFilePicker" in window) {
       handles = await this.open_file_picker(options);
@@ -41,15 +51,15 @@ export class KateDeviceFile {
     return handles;
   }
 
-  private async open_file_input(
-    options: {
-      multiple?: boolean;
-      strict?: boolean;
-      types: { description: string; accept: { [mime: string]: string[] } }[];
-    }
-  ): Promise<DeviceFileHandle[]> {
+  private async open_file_input(options: {
+    multiple?: boolean;
+    strict?: boolean;
+    types: { description: string; accept: { [mime: string]: string[] } }[];
+  }): Promise<DeviceFileHandle[]> {
     const input = this.single_file();
-    input.accept = options.types.flatMap(x => Object.entries(x.accept).map(([k, v]) => [k, ...v])).join(",");
+    input.accept = options.types
+      .flatMap((x) => Object.entries(x.accept).map(([k, v]) => [k, ...v]))
+      .join(",");
     input.multiple = options.multiple ?? false;
     const result = new Promise<DeviceFileHandle[]>((resolve, reject) => {
       input.onchange = (ev) => {
@@ -64,28 +74,29 @@ export class KateDeviceFile {
           files.push({ path: file.name, handle: file });
         }
         resolve(files);
-      }
+      };
 
       input.click();
-    })
+    });
     result.finally(() => {
       input.remove();
     });
     return result;
   }
 
-  private async open_file_picker(
-    options: {
-      multiple?: boolean;
-      strict?: boolean;
-      types: { description: string; accept: { [mime: string]: string[] } }[];
-    }): Promise<DeviceFileHandle[]> {
+  private async open_file_picker(options: {
+    multiple?: boolean;
+    strict?: boolean;
+    types: { description: string; accept: { [mime: string]: string[] } }[];
+  }): Promise<DeviceFileHandle[]> {
     const handles = await window.showOpenFilePicker({
       multiple: options.multiple ?? false,
       excludeAcceptAllOption: options.strict ?? false,
       types: options.types,
     });
-    return Promise.all(handles.map(async x => ({ path: x.name, handle: await x.getFile() })));
+    return Promise.all(
+      handles.map(async (x) => ({ path: x.name, handle: await x.getFile() }))
+    );
   }
 
   async open_directory(requestee: string): Promise<DeviceFileHandle[]> {
@@ -111,7 +122,7 @@ async function directory_to_files(
       if (handle.kind === "file") {
         files.push({
           path: path + "/" + key,
-          handle: await (handle as FileSystemFileHandle).getFile()
+          handle: await (handle as FileSystemFileHandle).getFile(),
         });
       }
       if (handle.kind === "directory") {
