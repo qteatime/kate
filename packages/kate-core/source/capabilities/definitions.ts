@@ -83,7 +83,7 @@ export class OpenURLs extends SwitchCapability<"open-urls"> {
 
 export class RequestDeviceFiles extends SwitchCapability<"request-device-files"> {
   readonly type = "request-device-files";
-  readonly title = "Request access to device files";
+  readonly title = "Ask to access your files";
   readonly description = `
     Allow the cartridge to request access to files and directories on your device.
   `;
@@ -124,9 +124,9 @@ export class RequestDeviceFiles extends SwitchCapability<"request-device-files">
 
 export class InstallCartridges extends SwitchCapability<"install-cartridges"> {
   readonly type = "install-cartridges";
-  readonly title = "Install cartridges";
+  readonly title = "Ask to install cartridges";
   readonly description = `
-    Allow the cartridge to request other cartridges to be installed.
+    Allow the cartridge to request installation of other cartridges.
   `;
 
   get grant_configuration() {
@@ -165,9 +165,9 @@ export class InstallCartridges extends SwitchCapability<"install-cartridges"> {
 
 export class DownloadFiles extends SwitchCapability<"download-files"> {
   readonly type = "download-files";
-  readonly title = "Save files to device";
+  readonly title = "Ask to download files";
   readonly description = `
-    Allow the cartridge to save files to your device's file system.
+    Allow the cartridge to ask to save files to your device's file system.
   `;
 
   get grant_configuration() {
