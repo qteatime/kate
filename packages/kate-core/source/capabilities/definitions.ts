@@ -162,3 +162,41 @@ export class InstallCartridges extends SwitchCapability<"install-cartridges"> {
     return this.grant_configuration ? "critical" : "none";
   }
 }
+
+export class DownloadFiles extends SwitchCapability<"download-files"> {
+  readonly type = "download-files";
+  readonly title = "Save files to device";
+  readonly description = `
+    Allow the cartridge to save files to your device's file system.
+  `;
+
+  get grant_configuration() {
+    return this._grant_configuration;
+  }
+
+  constructor(readonly cart_id: string, private _grant_configuration: boolean) {
+    super();
+  }
+
+  static parse(grant: CapabilityGrant<DownloadFiles["type"]>) {
+    if (grant.name !== "download-files" || grant.granted.type !== "switch") {
+      throw new Error(`Unexpected capability: ${grant.name}`);
+    }
+    return new DownloadFiles(grant.cart_id, grant.granted.value);
+  }
+
+  static from_metadata(cart_id: string, capability: ContextualCapability) {
+    if (capability.type !== "download-files") {
+      throw new Error(`Unexpected capability: ${capability.type}`);
+    }
+    return new DownloadFiles(cart_id, true);
+  }
+
+  update(grant: boolean): void {
+    this._grant_configuration = grant;
+  }
+
+  risk_category(): RiskCategory {
+    return this.grant_configuration ? "critical" : "none";
+  }
+}

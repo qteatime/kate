@@ -1,19 +1,13 @@
+import { from_bytes } from "../../utils";
 import type { KateOS } from "../os";
 import * as UI from "../ui";
 
 export class KateBrowser {
-  private pending_request: boolean = false;
   readonly SUPPORTED_PROTOCOLS = ["http:", "https:"];
 
   constructor(readonly os: KateOS) {}
 
   async open(requestee: string, url: URL) {
-    if (this.pending_request) {
-      console.error(
-        `Blocked ${requestee} from opening URL ${url}: a request is already pending`
-      );
-      return;
-    }
     if (!this.SUPPORTED_PROTOCOLS.includes(url.protocol)) {
       console.error(
         `Blocked ${requestee} from opening URL with unsupported protocol ${url}`
@@ -27,7 +21,6 @@ export class KateBrowser {
       return;
     }
 
-    this.pending_request = true;
     const ok = await this.os.dialog.confirm("kate:browser", {
       title: "Navigate outside of Kate?",
       message: UI.stack([
@@ -43,7 +36,6 @@ export class KateBrowser {
       cancel: "Cancel",
       ok: "Continue to website",
     });
-    this.pending_request = false;
 
     if (!ok) {
       return;
@@ -58,6 +50,43 @@ export class KateBrowser {
     });
 
     window.open(url, "_blank", "noopener,noreferrer");
+  }
+
+  async download(requestee: string, filename: string, data: Uint8Array) {
+    const ok = await this.os.dialog.confirm("kate:browser", {
+      title: "Save file to your device?",
+      message: UI.stack([
+        UI.paragraph([
+          UI.strong([UI.mono_text([requestee])]),
+          " wants to save a file to your device:",
+        ]),
+        UI.h("div", { class: "kate-ui-browse-save-chip" }, [
+          UI.stack([
+            UI.line_field("Suggested name:", filename),
+            UI.line_field("File size:", from_bytes(data.length)),
+          ]),
+        ]),
+      ]),
+      cancel: "Cancel",
+      ok: "Save to device",
+    });
+
+    if (!ok) {
+      return;
+    }
+
+    await this.os.audit_supervisor.log(requestee, {
+      resources: ["device-fs"],
+      risk: "high",
+      type: "kate.browse.download",
+      message: `Saved a file to the user's device.`,
+      extra: { filename, size: data.length },
+    });
+
+    const blob = new Blob([data.buffer]);
+    const url = URL.createObjectURL(blob);
+    const link = UI.h("a", { download: filename, href: url }, []);
+    link.click();
   }
 }
 

@@ -1022,10 +1022,15 @@ export function cartridge_chip(cart: Cart.CartMeta) {
       ]),
       h("div", { class: "kate-ui-cartridge-chip-id" }, [cart.id]),
       h("div", { class: "kate-ui-cartridge-chip-meta" }, [
-        "Version: ",
-        cart.version,
+        line_field("Version:", cart.version),
       ]),
-      h("div", { class: "kate-ui-cartridge-chip-risk" }, ["Risk: ", risk]),
+      h("div", { class: "kate-ui-cartridge-chip-risk" }, [
+        line_field("Risk:", risk),
+      ]),
     ]),
   ]);
+}
+
+export function line_field(title: Widgetable, value: Widgetable) {
+  return hbox(1, [strong([title]), value]);
 }

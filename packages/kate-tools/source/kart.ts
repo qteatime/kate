@@ -218,6 +218,10 @@ const capability = T.tagged_choice<Capability, Capability["type"]>("type", {
     type: T.constant("install-cartridges" as const),
     reason: T.short_str(255),
   }),
+  "download-files": T.spec({
+    type: T.constant("download-files" as const),
+    reason: T.short_str(255),
+  }),
 });
 
 const security = T.spec({
@@ -327,11 +331,10 @@ type KeyMapping = { [key: string]: string } | "defaults" | "kate";
 type Capability = ContextualCapability & { reason: string };
 
 type ContextualCapability =
-  | {
-      type: "open-urls";
-    }
+  | { type: "open-urls" }
   | { type: "request-device-files" }
-  | { type: "install-cartridges" };
+  | { type: "install-cartridges" }
+  | { type: "download-files" };
 
 type Bridge =
   | { type: "network-proxy" }
@@ -711,6 +714,13 @@ function make_capability(json: Capability) {
     case "install-cartridges": {
       return Cart.Capability.Contextual({
         capability: Cart.Contextual_capability.Install_cartridges({}),
+        reason: json.reason,
+      });
+    }
+
+    case "download-files": {
+      return Cart.Capability.Contextual({
+        capability: Cart.Contextual_capability.Download_files({}),
         reason: json.reason,
       });
     }

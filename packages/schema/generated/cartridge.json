@@ -873,6 +873,10 @@
             {
               "name": "Install-cartridges",
               "fields": []
+            },
+            {
+              "name": "Download-files",
+              "fields": []
             }
           ]
         }

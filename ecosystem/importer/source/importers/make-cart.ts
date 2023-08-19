@@ -128,14 +128,14 @@ export function make_game_id(uuid: string, title: string) {
   return `imported.kate.local/${slug(title)}-${uuid}`;
 }
 
-function slug(title: string) {
+export function slug(title: string, max_length: number = 32) {
   return title
     .trim()
     .toLowerCase()
     .replace(/[ _]/g, "-")
     .replace(/\-+/g, "-")
     .replace(/[^a-z0-9\-]/g, "")
-    .slice(0, 32);
+    .slice(0, max_length);
 }
 
 export async function make_file(path: Pathname, data: Uint8Array) {

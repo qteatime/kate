@@ -10,4 +10,8 @@ export class KateBrowser {
   open(url: URL): void {
     this.#channel.call("kate:browser.open", { url: url.toString() });
   }
+
+  download(filename: string, data: Uint8Array) {
+    this.#channel.call("kate:browser.download", { filename, data });
+  }
 }

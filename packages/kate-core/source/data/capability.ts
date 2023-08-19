@@ -9,12 +9,14 @@ export type GrantConfiguration = {
   "open-urls": {};
   "request-device-files": {};
   "install-cartridges": {};
+  "download-files": {};
 };
 
 export type CapabilityType =
   | "open-urls"
   | "request-device-files"
-  | "install-cartridges";
+  | "install-cartridges"
+  | "download-files";
 
 export type SerialisedCapability = Pick<
   AnyCapabilityGrant,

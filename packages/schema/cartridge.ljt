@@ -204,4 +204,7 @@ union Contextual-capability {
 
   // critical risk: security, privacy, escalation concerns
   type Install-cartridges {}
+
+  // critical risk: security, escalation concerns
+  type Download-files {}
 }

@@ -40,6 +40,11 @@ function parse_contextual_capability(
         type: "install-cartridges",
       };
     }
+    case Cart_v4.Contextual_capability.$Tags.Download_files: {
+      return {
+        type: "download-files",
+      };
+    }
     default:
       throw unreachable(capability, "capability");
   }

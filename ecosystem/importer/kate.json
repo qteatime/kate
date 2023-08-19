@@ -46,6 +46,10 @@
       {
         "type": "install-cartridges",
         "reason": "Import games from your device's storage"
+      },
+      {
+        "type": "download-files",
+        "reason": "Save generated cartridges to your device's file system"
       }
     ]
   },

@@ -29,4 +29,34 @@ export default [
       return null;
     }
   ),
+
+  handler(
+    "kate:browser.download",
+    TC.spec({ filename: TC.short_str(255), data: TC.bytearray }),
+    async (os, env, ipc, { filename, data }) => {
+      if (
+        !(await os.capability_supervisor.is_allowed(
+          env.cart.id,
+          "download-files",
+          {}
+        ))
+      ) {
+        console.error(
+          `Blocked ${env.cart.id} from downloading ${filename}: capability not granted`
+        );
+        return null;
+      }
+
+      try {
+        await os.browser.download(env.cart.id, filename, data);
+      } catch (error) {
+        console.error(
+          `Failed to download ${filename} at the request of ${env.cart.id}:`,
+          error
+        );
+      }
+
+      return null;
+    }
+  ),
 ];
