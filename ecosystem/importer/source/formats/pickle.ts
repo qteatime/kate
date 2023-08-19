@@ -5,24 +5,24 @@ import { unreachable } from "../deps/utils";
 //       the closest to that I guess? Unfortunately it isn't very clear on
 //       the specifics of integer encoding so I also had to look at the
 //       _pickle.c implementation of that.
-enum Opcode {
+const enum Opcode {
   // Integers
-  INT = "I".charCodeAt(0), // decimalNL !!TODO :: [] -> [x]
-  BININT = "J".charCodeAt(0), // int32LE :: [] -> [x]
-  BININT1 = "K".charCodeAt(0), // uint8 :: [] -> [x]
-  BININT2 = "M".charCodeAt(0), // uint16LE :: [] -> [x]
-  LONG = "L".charCodeAt(0), // decimalNL long !!TODO :: [] -> [x]
+  INT = 0x49, // "I", decimalNL !!TODO :: [] -> [x]
+  BININT = 0x4a, // "J", int32LE :: [] -> [x]
+  BININT1 = 0x4b, // "K", uint8 :: [] -> [x]
+  BININT2 = 0x4d, // "M", uint16LE :: [] -> [x]
+  LONG = 0x4c, // "L", decimalNL long !!TODO :: [] -> [x]
   LONG1 = 0x8a, // size:uint8 * uint8... :: [] -> [x]
   LONG4 = 0x8b, // size:int32LE * uint8... :: [] -> [x]
 
   // Strings
-  STRING = "S".charCodeAt(0), // stringNL !!TODO :: [] -> [x]
-  BINSTRING = "T".charCodeAt(0), // length: int32LE * uint8... :: [] -> [x]
-  SHORT_BINSTRING = "U".charCodeAt(0), // length: uint8 * uint8... :: [] -> [x]
+  STRING = 0x53, // "S", stringNL !!TODO :: [] -> [x]
+  BINSTRING = 0x54, // "T", length: int32LE * uint8... :: [] -> [x]
+  SHORT_BINSTRING = 0x55, // "U", length: uint8 * uint8... :: [] -> [x]
 
   // Raw bytes
-  BINBYTES = "B".charCodeAt(0), // length: uint32LE * uint8... :: [] -> [x]
-  SHORT_BINBYTES = "C".charCodeAt(0), // length: uint8 * uint8... :: [] -> [x]
+  BINBYTES = 0x42, // "B", length: uint32LE * uint8... :: [] -> [x]
+  SHORT_BINBYTES = 0x43, // "C", length: uint8 * uint8... :: [] -> [x]
   BINBYTES8 = 0x8e, // length: uint64 * uint8... !!TODO :: [] -> [x]
   BYTEARRAY8 = 0x96, // length: uint64 * uint8... !!TODO :: [] -> [x]
 
@@ -31,57 +31,57 @@ enum Opcode {
   READONLY_BUFFER = 0x98, // TODO
 
   // Basic scalars
-  NONE = "N".charCodeAt(0), // :: [] -> [x]
+  NONE = 0x4e, // "N", :: [] -> [x]
   NEWTRUE = 0x88, // :: [] -> [x]
   NEWFALSE = 0x89, // :: [] -> [x]
 
   // Unicode strings
-  UNICODE = "V".charCodeAt(0), // unicodeStringNL !!TODO :: [] -> [x]
+  UNICODE = 0x56, // "V", unicodeStringNL !!TODO :: [] -> [x]
   SHORT_BINUNICODE = 0x8c, // length: int8LE * uint8... :: [] -> [x]
-  BINUNICODE = "X".charCodeAt(0), // length: uint32LE * uint8... :: [] -> [x]
+  BINUNICODE = 0x58, // "X", length: uint32LE * uint8... :: [] -> [x]
   BINUNICODE8 = 0x8d, // length: uint64LE * uint8 !!TODO :: [] -> [x]
 
   // Floating points
-  FLOAT = "F".charCodeAt(0), // floatNL !!TODO :: [] -> [x]
-  BINFLOAT = "G".charCodeAt(0), // float64 :: [] -> [x]
+  FLOAT = 0x46, // "F", floatNL !!TODO :: [] -> [x]
+  BINFLOAT = 0x47, // "G", float64 :: [] -> [x]
 
   // Lists
-  EMPTY_LIST = "]".charCodeAt(0), // :: [] -> [list]
-  APPEND = "a".charCodeAt(0), // :: [list, x] -> [list ++ x]
-  APPENDS = "e".charCodeAt(0), // :: [list, mark, x...] -> [list ++ ...x]
-  LIST = "l".charCodeAt(0), // :: [mark, x...] -> [list ++ ...x]
+  EMPTY_LIST = 0x5d, // "]", :: [] -> [list]
+  APPEND = 0x61, // "a", :: [list, x] -> [list ++ x]
+  APPENDS = 0x65, // "e", :: [list, mark, x...] -> [list ++ ...x]
+  LIST = 0x6c, // "l", :: [mark, x...] -> [list ++ ...x]
 
   // Tuples
-  EMPTY_TUPLE = ")".charCodeAt(0), // :: [] -> [()]
-  TUPLE = "t".charCodeAt(0), // :: [mark, x...] -> [(...x)]
+  EMPTY_TUPLE = 0x29, // ")", :: [] -> [()]
+  TUPLE = 0x74, // "t", :: [mark, x...] -> [(...x)]
   TUPLE1 = 0x85, // :: [x] -> [(x)]
   TUPLE2 = 0x86, // :: [x, y] -> [(x, y)]
   TUPLE3 = 0x87, // :: [x, y, z] -> [(x, y, z)]
 
   // Dicts
-  EMPTY_DICT = "}".charCodeAt(0), // :: [] -> [{}]
-  DICT = "d".charCodeAt(0), // :: [mark, k v...] -> [{k: v, ...}]
+  EMPTY_DICT = 0x7d, // "}", :: [] -> [{}]
+  DICT = 0x64, // "d", :: [mark, k v...] -> [{k: v, ...}]
 
   // Sets
-  SETITEM = "s".charCodeAt(0), // :: [{}, k, v] -> [{k: v}]
-  SETITEMS = "u".charCodeAt(0), // :: [{}, mark, k v...] -> [{k: v, ...}]
+  SETITEM = 0x73, // "s", :: [{}, k, v] -> [{k: v}]
+  SETITEMS = 0x75, // "u", :: [{}, mark, k v...] -> [{k: v, ...}]
   EMPTY_SET = 0x8f, // :: [] -> [#{}]
   ADDITEMS = 0x90, // :: [#{}, mark, x...] -> [#{...x}]
   FROZENSET = 0x91, // :: [mark, x...] -> [#{...x}]
 
   // Stack manipulation
-  POP = "0".charCodeAt(0), // :: [x] -> []
-  DUP = "2".charCodeAt(0), // :: [x] -> [x, x]
-  MARK = "(".charCodeAt(0), // :: [] -> [mark]
-  POP_MARK = "1".charCodeAt(0), // :: [mark, x...] -> []
+  POP = 0x30, // "0", :: [x] -> []
+  DUP = 0x32, // "2", :: [x] -> [x, x]
+  MARK = 0x28, // "(", :: [] -> [mark]
+  POP_MARK = 0x31, // "1", :: [mark, x...] -> []
 
   // Memo manipulation
-  GET = "g".charCodeAt(0), // decimalNL !!TODO :: <n: x> [] -> [x]
-  BINGET = "h".charCodeAt(0), // uint8 :: <n: x> [] -> [x]
-  LONG_BINGET = "j".charCodeAt(0), // uint32 :: <n: x> [] -> [x]
-  PUT = "p".charCodeAt(0), // decimalNL !!TODO :: [x] -> <n: x> [x]
-  BINPUT = "q".charCodeAt(0), // uint8 :: [x] -> <n: x> [x]
-  LONG_BINPUT = "r".charCodeAt(0), // uint32 :: [x] -> <n: x> [x]
+  GET = 0x67, // "g", decimalNL !!TODO :: <n: x> [] -> [x]
+  BINGET = 0x68, // "h", uint8 :: <n: x> [] -> [x]
+  LONG_BINGET = 0x6a, // "j", uint32 :: <n: x> [] -> [x]
+  PUT = 0x70, // "p", decimalNL !!TODO :: [x] -> <n: x> [x]
+  BINPUT = 0x71, // "q", uint8 :: [x] -> <n: x> [x]
+  LONG_BINPUT = 0x72, // "r", uint32 :: [x] -> <n: x> [x]
   MEMOIZE = 0x94, // :: [x] -> <n: x> [x] --- where n is the next memo position
 
   // Access extensions :: hopefully not needed here
@@ -90,23 +90,23 @@ enum Opcode {
   EXT4 = 0x84, // uint32 !! TODO :: [] -> [x]
 
   // Python-specific object serialisation :: uh... yeah
-  GLOBAL = "c".charCodeAt(0), // module StrNL, class StrNL !!TODO :: [] -> [class]
+  GLOBAL = 0x63, // "c", module StrNL, class StrNL !!TODO :: [] -> [class]
   STACK_GLOBAL = 0x93, // !! TODO :: [moduleSTR, classSTR] -> [class]
-  REDUCE = "R".charCodeAt(0), // I, too, despair of having to implement this
-  BUILD = "b".charCodeAt(0),
-  INST = "i".charCodeAt(0),
-  OBJ = "o".charCodeAt(0),
+  REDUCE = 0x52, // "R", I, too, despair of having to implement this
+  BUILD = 0x62, // "b",
+  INST = 0x69, // "i",
+  OBJ = 0x6f, // "o",
   NEWOBJ = 0x81,
   NEWOBJ_EX = 0x92,
 
   // Machine control
   PROTO = 0x80, // uint8 :: [] -> []
-  STOP = ".".charCodeAt(0),
+  STOP = 0x2e, // "."
   FRAME = 0x95, // uint64 (length of the buffer) :: [] -> []
 
   // Persistent ids
-  PERSID = "P".charCodeAt(0), // stringNL !!TODO :: [] -> [x]
-  BINPERSID = "Q".charCodeAt(0), // !!TODO :: [id] -> [x]
+  PERSID = 0x50, // "P", stringNL !!TODO :: [] -> [x]
+  BINPERSID = 0x51, // "Q", !!TODO :: [id] -> [x]
 }
 
 const enum Result {
@@ -655,7 +655,7 @@ function step(frame: Frame, program: Program) {
     case Opcode.EXT1:
     case Opcode.EXT2:
     case Opcode.EXT4: {
-      throw new Error(`Unsupported: extensions ${Opcode[opcode]}`);
+      throw new Error(`Unsupported: extensions ${opcode}`);
     }
 
     case Opcode.GLOBAL:
@@ -666,9 +666,7 @@ function step(frame: Frame, program: Program) {
     case Opcode.OBJ:
     case Opcode.NEWOBJ:
     case Opcode.NEWOBJ_EX: {
-      throw new Error(
-        `Unsupported: python-specific serialisation ${Opcode[opcode]}`
-      );
+      throw new Error(`Unsupported: python-specific serialisation ${opcode}`);
     }
 
     case Opcode.PROTO: {
@@ -700,7 +698,7 @@ function step(frame: Frame, program: Program) {
     default:
       throw unreachable(
         opcode,
-        `Unsupported opcode ${opcode} (${Opcode[opcode]}) at ${program.offset}`
+        `Unsupported opcode ${opcode} (at ${program.offset}`
       );
   }
 }
