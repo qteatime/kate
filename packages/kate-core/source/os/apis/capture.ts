@@ -26,8 +26,8 @@ export class KateCapture {
   readonly THUMBNAIL_WIDTH = 160;
   readonly THUMBNAIL_HEIGHT = 96;
 
-  readonly MAX_SCREENSHOT_SIZE = mb(2);
-  readonly MAX_VIDEO_SIZE = mb(32);
+  readonly MAX_SCREENSHOT_SIZE = mb(10);
+  readonly MAX_VIDEO_SIZE = mb(128);
 
   constructor(readonly os: KateOS) {}
 
