@@ -128,3 +128,18 @@
   font-family: var(--font-family-title);
   overflow: hidden;
 }
+
+.imp-floating-edit-button {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  background: var(--color-white);
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 100%;
+  overflow: hidden;
+  box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.6);
+}

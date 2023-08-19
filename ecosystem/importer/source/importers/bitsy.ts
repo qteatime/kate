@@ -6,6 +6,7 @@ import {
   make_game_id,
   make_mapping,
   make_meta,
+  maybe_add_thumbnail,
   mime_type,
 } from "./make-cart";
 
@@ -18,6 +19,8 @@ export class BitsyImporter implements Importer {
       (x) => new BitsyImporter(files, make_id(), x.title, x.version, x.file)
     );
   }
+
+  public thumbnail: Uint8Array | null = null;
 
   constructor(
     readonly files: KateTypes.DeviceFileHandle[],
@@ -71,8 +74,8 @@ export class BitsyImporter implements Importer {
           Cart.Bridge.Capture_canvas({ selector: "#game" }),
         ],
       }),
-      metadata: make_meta(this.title),
-      files: files,
+      metadata: make_meta(this.title, this.thumbnail),
+      files: await maybe_add_thumbnail(files, this.thumbnail),
     });
     return cartridge;
   }

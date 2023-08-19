@@ -92,7 +92,22 @@ export function mime_type(path: Pathname) {
   return mime_table[path.extname() ?? ""] ?? "application/octet-stream";
 }
 
-export function make_meta(title: string) {
+export async function maybe_add_thumbnail(
+  files: Cart.File[],
+  thumbnail: Uint8Array | null
+): Promise<Cart.File[]> {
+  if (thumbnail == null) {
+    return files;
+  } else {
+    const file = await make_file(
+      Pathname.from_string("kate-thumbnail.png"),
+      thumbnail
+    );
+    return [...files, file];
+  }
+}
+
+export function make_meta(title: string, thumbnail: Uint8Array | null) {
   return [
     Cart.Metadata.Presentation({
       title: title,
@@ -100,7 +115,7 @@ export function make_meta(title: string) {
       tagline: "",
       description: "",
       "release-type": Cart.Release_type.Unofficial({}),
-      "thumbnail-path": null,
+      "thumbnail-path": thumbnail != null ? "/kate-thumbnail.png" : null,
       "banner-path": null,
     }),
     Cart.Metadata.Classification({

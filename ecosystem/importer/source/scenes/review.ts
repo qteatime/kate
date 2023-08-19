@@ -1,6 +1,10 @@
 import { UI, UIScene, Widgetable } from "../deps/appui";
 import { Cart } from "../deps/schema";
-import { Observable } from "../deps/utils";
+import {
+  Observable,
+  load_image_from_bytes,
+  make_thumbnail_from_bytes,
+} from "../deps/utils";
 import { Importer } from "../importers";
 import { slug } from "../importers/make-cart";
 import { SceneProgress } from "./progress";
@@ -60,27 +64,43 @@ export class SceneReview extends UIScene {
           return ui.fragment([
             ui.class("imp-review-container", [
               ui.class("imp-review-thumbnail", [
-                ui.class("kate-os-carts-box", [
-                  ui.class("kate-os-carts-image", [
-                    ui.class("kate-no-thumbnail", [x.title]),
-                    ui.h(
-                      "div",
-                      {
-                        class: "kate-os-carts-release-type",
-                        "data-release-type": "unofficial",
+                ui
+                  .class("kate-os-carts-box", [
+                    ui.class("kate-os-carts-image", [
+                      x.thumbnail == null
+                        ? ui.class("kate-no-thumbnail", [x.title])
+                        : load_image_from_bytes("image/png", x.thumbnail),
+                      ui.h(
+                        "div",
+                        {
+                          class: "kate-os-carts-release-type",
+                          "data-release-type": "unofficial",
+                        },
+                        ["Unofficial"]
+                      ),
+                      ui.h(
+                        "div",
+                        {
+                          class: "kate-os-carts-rating",
+                          "data-rating": "unknown",
+                        },
+                        ["—"]
+                      ),
+                      ui.class("imp-floating-edit-button", [
+                        ui.fa_icon("pencil"),
+                      ]),
+                    ]),
+                  ])
+                  .interactive([
+                    {
+                      key: ["o"],
+                      on_click: true,
+                      label: "Change thumbnail",
+                      handler: async () => {
+                        await this.select_thumbnail(current_index, x);
                       },
-                      ["Unofficial"]
-                    ),
-                    ui.h(
-                      "div",
-                      {
-                        class: "kate-os-carts-rating",
-                        "data-rating": "unknown",
-                      },
-                      ["—"]
-                    ),
+                    },
                   ]),
-                ]),
               ]),
 
               ui.class("imp-review-details", [
@@ -91,7 +111,7 @@ export class SceneReview extends UIScene {
                     ui.text_input(x.title, {
                       query: "Enter a title for the cartridge:",
                       on_change: (title) => {
-                        x.title = title;
+                        x.title = title ?? "(Untitled)";
                       },
                     }),
                   ]),
@@ -110,6 +130,31 @@ export class SceneReview extends UIScene {
         })
       ),
     });
+  }
+
+  async select_thumbnail(current: Observable<number>, candidate: Importer) {
+    const files = await KateAPI.device_files.request_file({
+      strict: true,
+      types: [
+        { type: "image/*", extensions: [".jpg", ".jpeg", ".png", ".webp"] },
+      ],
+    });
+    if (files.length !== 1) {
+      return;
+    }
+    const [file] = files;
+    const image = await file.read();
+    const thumbnail_url = await make_thumbnail_from_bytes(
+      400,
+      700,
+      "image/png",
+      image
+    );
+    const bytes = new Uint8Array(
+      await (await fetch(thumbnail_url)).arrayBuffer()
+    );
+    candidate.thumbnail = bytes;
+    current.value = current.value;
   }
 
   async next(index: Observable<number>) {

@@ -8,6 +8,7 @@ import {
   make_game_id,
   make_mapping,
   make_meta,
+  maybe_add_thumbnail,
   mime_type,
 } from "./make-cart";
 
@@ -34,6 +35,8 @@ export class RenpyImporter implements Importer {
       return [];
     }
   }
+
+  public thumbnail: Uint8Array | null = null;
 
   constructor(
     readonly files: KateTypes.DeviceFileHandle[],
@@ -130,8 +133,8 @@ export class RenpyImporter implements Importer {
           }),
         ],
       }),
-      metadata: make_meta(this.title),
-      files: files,
+      metadata: make_meta(this.title, this.thumbnail),
+      files: await maybe_add_thumbnail(files, this.thumbnail),
     });
     return cartridge;
   }

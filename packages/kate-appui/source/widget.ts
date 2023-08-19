@@ -150,6 +150,11 @@ export class Widget {
     return this;
   }
 
+  replace(content: Widgetable) {
+    replace(this.canvas, content);
+    return this;
+  }
+
   interactive(
     interactions: InteractionHandler[],
     x?: { custom_focus?: boolean }
@@ -287,6 +292,24 @@ export class WidgetDSL {
     } else {
       return null;
     }
+  }
+
+  lazy(
+    entry: Promise<Widgetable> | (() => Promise<Widgetable>),
+    error_widget: Widgetable = "Failed to load"
+  ) {
+    const x = typeof entry === "function" ? entry() : entry;
+    const widget = this.class("kate-ui-lazy", []);
+    x.then(
+      (value) => {
+        widget.replace(value);
+      },
+      (error) => {
+        console.error(`Failed to load widget:`, error);
+        widget.replace(error_widget);
+      }
+    );
+    return widget;
   }
 
   keymap(

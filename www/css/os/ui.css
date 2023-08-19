@@ -414,7 +414,8 @@
   font-size: 0.8em;
 }
 
-.kate-ui-cartridge-chip-thumbnail .kate-no-thumbnail {
+.kate-ui-cartridge-chip-thumbnail .kate-no-thumbnail,
+.kate-ui-cartridge-chip-thumbnail img {
   width: 65px;
   height: auto;
 }

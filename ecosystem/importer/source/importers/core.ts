@@ -9,6 +9,7 @@ export interface Parser {
 export interface Importer {
   title: string;
   engine: string;
+  thumbnail: Uint8Array | null;
   make_cartridge(): Promise<Cart.Cartridge>;
 }
 
