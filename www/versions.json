@@ -41,6 +41,14 @@
       "release_notes": "/kate/RELEASE-0.23.8-a1.txt"
     },
     {
+      "version": "0.23.8-a2",
+      "main": "/kate/kate-0.23.8-a2.js",
+      "breaking_change": true,
+      "migration_needed": false,
+      "channels": ["nightly"],
+      "release_notes": "/kate/RELEASE-0.23.8-a2.txt"
+    },
+    {
       "version": "latest",
       "main": "/kate/kate-latest.js",
       "breaking_change": true,
@@ -51,7 +59,7 @@
   ],
   "channels": {
     "preview": "0.23.6-a2",
-    "nightly": "0.23.8-a1",
+    "nightly": "0.23.8-a2",
     "latest": "latest"
   }
 }
