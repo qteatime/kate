@@ -104,8 +104,7 @@ export default [
     TC.spec({ id: handle_id }),
     async (os, env, ipc, { id }) => {
       await check_access(os, env);
-      const handle = (await device_ipc.resolve(os, env, id)).handle;
-      const file = await handle.getFile();
+      const file = (await device_ipc.resolve(os, env, id)).handle;
       const data = await file.arrayBuffer();
       return new Uint8Array(data);
     }
