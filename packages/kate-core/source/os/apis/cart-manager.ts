@@ -239,6 +239,8 @@ export class CartManager {
         cartridge: cart.id,
         version: cart.version,
         title: cart.metadata.presentation.title,
+        grants: grants.map((x) => x.serialise()),
+        potential_risk: Capability.risk_from_grants(grants),
       },
     });
     await this.os.notifications.push_transient(
