@@ -32,4 +32,25 @@ export default [
       return result;
     }
   ),
+
+  handler(
+    "kate:dialog.message",
+    TC.spec({ message: TC.str }),
+    async (os, env, ipc, { message }) => {
+      if (
+        !(await os.capability_supervisor.is_allowed(
+          env.cart.id,
+          "show-dialogs",
+          { type: "message" }
+        ))
+      ) {
+        console.error(
+          `Blocked ${env.cart.id} from showing message dialog: capability not granted`
+        );
+        return null;
+      }
+      await os.dialog.message(env.cart.id, { title: "", message });
+      return null;
+    }
+  ),
 ];

@@ -67,6 +67,9 @@ export class SceneMain extends UIScene {
     } catch (e) {
       progress.close();
       console.error(`Failed to prepare candidates:`, e);
+      await KateAPI.dialogs.message(
+        `Failed to import the zip file: file might be corrupted.`
+      );
     }
   }
 }

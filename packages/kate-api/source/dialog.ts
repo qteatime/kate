@@ -24,4 +24,8 @@ export class KateDialogs {
       placeholder: options.placeholder,
     });
   }
+
+  async message(message: string): Promise<void> {
+    await this.#channel.call("kate:dialog.message", { message });
+  }
 }

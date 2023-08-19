@@ -178,6 +178,9 @@ export class SceneReview extends UIScene {
     } catch (e) {
       progress.close();
       console.error(`Failed to download:`, e);
+      await KateAPI.dialogs.message(
+        "Failed to prepare cartridge for download: unknown internal error."
+      );
     }
   }
 
@@ -194,6 +197,9 @@ export class SceneReview extends UIScene {
     } catch (e) {
       progress.close();
       console.error(`Failed to import:`, e);
+      await KateAPI.dialogs.message(
+        "Failed to prepare cartridge for installation: unknown internal error"
+      );
     }
   }
 }
