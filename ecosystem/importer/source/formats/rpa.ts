@@ -126,11 +126,8 @@ async function deflate(data: Uint8Array): Promise<Uint8Array> {
   const decompressor = new DecompressionStream("deflate");
   const writer = decompressor.writable.getWriter();
   const reader = decompressor.readable.getReader();
-  writer.write(data).then((x) => {
-    writer.close().then((y) => {
-      console.log("close: ", x);
-    });
-    console.log("write: ", x);
+  writer.write(data).then(() => {
+    writer.close();
   });
   const decompressed = await reader.read();
   return decompressed.value!;
