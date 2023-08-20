@@ -1,5 +1,5 @@
 import type { ExtendedInputKey, InputKey } from "../../kernel";
-import { Sets, serialise_error } from "../../utils";
+import { EventStream, Sets, serialise_error } from "../../utils";
 import { FocusInteraction } from "../apis";
 import type { KateOS } from "../os";
 import {
@@ -65,6 +65,7 @@ export abstract class SimpleScene extends Scene {
     },
   ];
   private _previous_traps: FocusInteraction | null = null;
+  public on_close = new EventStream<void>();
 
   constructor(os: KateOS) {
     super(os, true);
@@ -168,6 +169,7 @@ export abstract class SimpleScene extends Scene {
     this.os.focus_handler.on_traps_changed.remove(
       this.update_status_with_traps
     );
+    this.on_close.emit();
   }
 
   update_status_with_traps = (traps: FocusInteraction | null) => {

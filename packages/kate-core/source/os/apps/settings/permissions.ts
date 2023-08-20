@@ -89,7 +89,9 @@ export class ScenePermissions extends UI.SimpleScene {
       value: x.risk,
       description: `Potential risk: ${x.potential_risk} | Current risk: ${x.risk}`,
       on_click: () => {
-        this.os.push_scene(new SceneCartridgePermissions(this.os, x.cart));
+        const scene = new SceneCartridgePermissions(this.os, x.cart);
+        scene.on_close.listen(() => this.refresh());
+        this.os.push_scene(scene);
       },
     });
   }
