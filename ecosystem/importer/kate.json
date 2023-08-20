@@ -1,8 +1,8 @@
 {
   "id": "qteati.me/kate-importer",
   "version": {
-    "major": 1,
-    "minor": 0
+    "major": 0,
+    "minor": 2
   },
   "release": {
     "year": 2023,
@@ -14,7 +14,8 @@
       "author": "Q.",
       "title": "Kate Importer",
       "tagline": "Import games for other platforms into Kate",
-      "release_type": "prototype"
+      "release_type": "prototype",
+      "thumbnail_path": "thumbnail.png"
     },
     "classification": {
       "genre": ["tool"],
