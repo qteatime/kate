@@ -50,6 +50,10 @@ export function h(
   return element;
 }
 
+export function klass(name: string, children: Widgetable[]) {
+  return h("div", { class: name }, children);
+}
+
 export function svg(
   tag: string,
   attrs: { [key: string]: string },

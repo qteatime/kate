@@ -92,67 +92,73 @@ export class SceneAuditLog extends UI.SimpleScene {
   icon = "eye";
   title = ["Audit log"];
   page = new Observable(0);
+  data = new Observable<{ total: number; logs: AuditMessage[] }>({
+    total: 0,
+    logs: [],
+  });
   PAGE_SIZE = 100;
+
+  current = this.page.zip_with(this.data, (page, data) => {
+    const start = page * this.PAGE_SIZE;
+    const logs = data.logs.slice(start, start + this.PAGE_SIZE);
+    const has_next = data.logs.length > start + this.PAGE_SIZE;
+    const has_prev = start > 0;
+    return { start, logs, has_next, has_prev };
+  });
+
+  subtitle = UI.dynamic(
+    this.current.zip_with(
+      this.data,
+      (x, data) =>
+        `
+      Displaying ${x.start + 1} to ${x.start + x.logs.length} (of ${data.total})
+    ` as UI.Widgetable
+    )
+  );
+
+  actions: UI.Action[] = [
+    {
+      key: ["ltrigger"],
+      label: "Previous page",
+      handler: () => {
+        if (this.current.value.has_prev) {
+          this.page.value -= 1;
+        }
+      },
+    },
+    {
+      key: ["rtrigger"],
+      label: "Next page",
+      handler: () => {
+        if (this.current.value.has_next) {
+          this.page.value += 1;
+        }
+      },
+    },
+    {
+      key: ["x"],
+      label: "Return",
+      handler: () => {
+        this.on_return();
+      },
+    },
+  ];
 
   async body() {
     const data = await this.os.audit_supervisor.read_recent();
+    this.data.value = data;
 
-    return [this.log_view(data)];
-  }
-
-  log_view(data: { total: number; logs: AuditMessage[] }) {
-    const page = this.page;
-    const page_size = this.PAGE_SIZE;
-
-    const current = page.map((page) => {
-      const start = page * page_size;
-      const logs = data.logs.slice(start, start + page_size);
-      const has_next = data.logs.length > start + page_size;
-      const has_prev = start > 0;
-      return { start, logs, has_next, has_prev };
-    });
-
-    const message = current.map<UI.Widgetable>(
-      (x) =>
-        `Displaying ${x.start + 1} to ${x.start + x.logs.length} (of ${
-          data.total
-        })`
-    );
-
-    const table = current.map<UI.Widgetable>((x) => {
-      return UI.h("div", { class: "kate-ui-logview-data" }, [
-        ...x.logs.map((a) => this.render_entry(a)),
-      ]);
-    });
-
-    return UI.h("div", { class: "kate-ui-logview" }, [
-      UI.h("div", { class: "kate-ui-logview-meta-heading" }, [
-        UI.dynamic(message),
-      ]),
-      UI.dynamic(table),
-      UI.h("div", { class: "kate-ui-logview-pagination" }, [
-        UI.dynamic(
-          current.map<UI.Widgetable>((x) => {
-            return UI.fragment([
-              UI.when(x.has_prev, [
-                UI.text_button(this.os, "Previous page", {
-                  on_click: () => {
-                    page.value = page.value - 1;
-                  },
-                }),
-              ]),
-              UI.when(x.has_next, [
-                UI.text_button(this.os, "Next page", {
-                  on_click: () => {
-                    page.value = page.value + 1;
-                  },
-                }),
-              ]),
-            ]);
-          })
-        ),
-      ]),
-    ]);
+    return [
+      UI.dynamic(
+        this.current.map<UI.Widgetable>((current) => {
+          return UI.klass("kate-ui-logview", [
+            UI.klass("kate-ui-logview-data", [
+              ...current.logs.map((x) => this.render_entry(x)),
+            ]),
+          ]);
+        })
+      ),
+    ];
   }
 
   render_entry(x: AuditMessage) {
