@@ -115,7 +115,7 @@ export class RenpyImporter implements Importer {
               menu: "ShiftLeft",
               capture: "KeyC",
               ltrigger: "PageUp",
-              rtrigger: "PageDown",
+              rtrigger: "ControlLeft",
             }),
           }),
           Cart.Bridge.Pointer_input_proxy({
