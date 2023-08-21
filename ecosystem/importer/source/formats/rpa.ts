@@ -1,5 +1,5 @@
 import { unpickle } from "./pickle";
-import { Pathname } from "../deps/utils";
+import { Pathname, binary } from "../deps/utils";
 
 type AnyIndexEntry = [number, number] | [number, number, Uint8Array];
 type IndexEntry = [number, number, Uint8Array];
@@ -129,20 +129,14 @@ async function deflate(data: Uint8Array): Promise<Uint8Array> {
   writer.write(data).then(() => {
     writer.close();
   });
-  const decompressed = await reader.read();
-  return decompressed.value!;
+  const chunks: Uint8Array[] = [];
+  let chunk = await reader.read();
+  while (!chunk.done) {
+    chunks.push(chunk.value);
+    chunk = await reader.read();
+  }
+  return binary.concat_all(chunks);
 }
-
-// import * as zlib from "zlib";
-// async function deflate(data: Uint8Array): Promise<Uint8Array> {
-//   const buffer = zlib.unzipSync(data);
-//   return new Uint8Array(
-//     buffer.buffer.slice(
-//       buffer.byteOffset,
-//       buffer.byteOffset + buffer.byteLength
-//     )
-//   );
-// }
 
 function has_header(header: Uint8Array, bytes: Uint8Array) {
   return byte_equals(header, bytes.slice(0, header.length));

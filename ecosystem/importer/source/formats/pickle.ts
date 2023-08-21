@@ -200,7 +200,7 @@ class Program {
 
   private assert_not_eof(offset: number) {
     if (this.is_eof(offset)) {
-      throw new Error(`Offset out of bounds.`);
+      throw new Error(`Offset out of bounds @ ${offset}.`);
     }
   }
 
