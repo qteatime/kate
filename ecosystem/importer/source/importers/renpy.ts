@@ -142,6 +142,9 @@ export class RenpyImporter implements Importer {
 
 async function get_renpy_title(files: KateTypes.DeviceFileHandle[]) {
   const decoder = new TextDecoder();
+
+  // If we can get the name from the source code that's best, as it'll likely
+  // be the most accurate we can get.
   const is_rpy_file = GlobPatternList.from_patterns(["game/options.rpy"]);
   const rpy_files = files.filter((x) => is_rpy_file.test(x.relative_path));
   for (const file of rpy_files) {
@@ -152,6 +155,15 @@ async function get_renpy_title(files: KateTypes.DeviceFileHandle[]) {
       return match[1];
     }
   }
+
+  // Otherwise we fall back to inferring it from an executable file.
+  const is_executable = GlobPatternList.from_patterns(["*.exe", "*.sh"]);
+  const executable = files.find((x) => is_executable.test(x.relative_path));
+  if (executable != null) {
+    return executable.relative_path.basename() || "(Untitled)";
+  }
+
+  // If all fails, leave it up to the user to amend a title.
   return "(Untitled)";
 }
 
