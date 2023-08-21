@@ -33,13 +33,23 @@ export class SceneMain extends UIScene {
 
   async import_from_folder() {
     const files = await KateAPI.device_files.request_directory();
+
     const progress = SceneProgress.show(this.ui)
       .set_message("Analysing game files...")
       .set_unknown_progress();
-    const candidates = await Importers.candidates(files);
-    progress.close();
-    if (candidates.length > 0) {
-      this.ui.push_scene(new SceneReview(this.ui, candidates));
+
+    try {
+      const candidates = await Importers.candidates(files);
+      progress.close();
+      if (candidates.length > 0) {
+        this.ui.push_scene(new SceneReview(this.ui, candidates));
+      }
+    } catch (e) {
+      progress.close();
+      console.error(`Failed to prepare candidates:`, e);
+      await KateAPI.dialogs.message(
+        `Failed to import: an unknown internal error occurred while importing.`
+      );
     }
   }
 
