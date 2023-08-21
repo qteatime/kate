@@ -112,6 +112,7 @@ export class SceneReview extends UIScene {
                       query: "Enter a title for the cartridge:",
                       on_change: (title) => {
                         x.title = title ?? "(Untitled)";
+                        current_index.value = current_index.value;
                       },
                     }),
                   ]),
