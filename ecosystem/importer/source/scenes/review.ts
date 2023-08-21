@@ -193,8 +193,9 @@ export class SceneReview extends UIScene {
       const cartridge = await candidate.make_cartridge();
       progress.set_message("Packing cartridge...");
       const bytes = Cart.encode(cartridge);
-      progress.close();
+      progress.set_message("Preparing to install...");
       await KateAPI.cart_manager.install(bytes);
+      progress.close();
     } catch (e) {
       progress.close();
       console.error(`Failed to import:`, e);
