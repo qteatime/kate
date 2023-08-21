@@ -11,7 +11,12 @@ export default [
       placeholder: TC.optional("", TC.str),
       max_length: TC.optional(undefined, TC.int),
     }),
-    async (os, env, ipc, { type, message, placeholder, max_length }) => {
+    async (
+      os,
+      env,
+      ipc,
+      { type, message, initial_value, placeholder, max_length }
+    ) => {
       if (
         !(await os.capability_supervisor.is_allowed(
           env.cart.id,
@@ -27,6 +32,7 @@ export default [
       const result = await os.dialog.text_input(env.cart.id, message, {
         max_length: max_length ?? undefined,
         type: type,
+        initial_value,
         placeholder,
       });
       return result;
