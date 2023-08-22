@@ -249,7 +249,7 @@ const config = T.spec({
   root: T.nullable(T.str),
   metadata: meta,
   files: T.optional([], T.list_of(T.str)),
-  security: security,
+  security: T.optional({ capabilities: [] }, security),
   platform: platform_web,
 });
 
