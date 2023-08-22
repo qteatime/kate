@@ -15,6 +15,9 @@ Cartridges are made out of four main sections:
 * The **Meta-data**, which provides Kate with information to present the
   cartridge and allow it to be searched for;
 
+* The **Security**, which specifies which additional capabilities the
+  cartridge needs to function;
+
 * The **File system**, which provides Kate with all data that makes up the
   cartridge; and
 
@@ -86,6 +89,24 @@ The meta-data is itself divided into further sections:
   played. It contains things such as what input methods are supported,
   which languages are offered, whether the cartridge has additional
   accessibility provisions, etc;
+
+
+Security
+--------
+
+Cartridges run in a sandboxed environment with no powers by default. You can't
+read files outside of your cartridge, save files to the player's device,
+make network calls, or even take keyboard input.
+
+In order to be able to do any of these things, your cartridge needs to ask
+for them — and the player needs to consent in giving your cartridge those
+powers over their device. The security section of the cartridge is where you
+specify which of these powers your cartridge needs to be able to work.
+
+You might already be familiar with capabilities if you've used phone
+applications before; Kate's capabilities are slightly different, but
+very much related. The :doc:`Capabilities <capabilities>` section explains
+this in more details.
 
 
 .. _cartridge versioning:
