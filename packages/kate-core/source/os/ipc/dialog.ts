@@ -1,8 +1,8 @@
 import { TC } from "../../utils";
-import { EMessageFailed, handler } from "./handlers";
+import { EMessageFailed, auth_handler, handler } from "./handlers";
 
 export default [
-  handler(
+  auth_handler(
     "kate:dialog.text-input",
     TC.spec({
       type: TC.one_of(["text", "password"] as const),
@@ -11,52 +11,42 @@ export default [
       placeholder: TC.optional("", TC.str),
       max_length: TC.optional(undefined, TC.int),
     }),
+    { fail_silently: true, capabilities: [{ type: "show-dialogs" }] },
     async (
       os,
       env,
       ipc,
       { type, message, initial_value, placeholder, max_length }
     ) => {
-      if (
-        !(await os.capability_supervisor.is_allowed(
-          env.cart.id,
-          "show-dialogs",
-          { type: "text-input" }
-        ))
-      ) {
-        console.error(
-          `Blocked ${env.cart.id} from showing text-input dialog: capability not granted`
-        );
-        return null;
-      }
-      const result = await os.dialog.text_input(env.cart.id, message, {
-        max_length: max_length ?? undefined,
-        type: type,
-        initial_value,
-        placeholder,
-      });
-      return result;
+      return await os.fairness_supervisor.with_resource(
+        env.cart.id,
+        "modal-dialog",
+        async () => {
+          const result = await os.dialog.text_input(env.cart.id, message, {
+            max_length: max_length ?? undefined,
+            type: type,
+            initial_value,
+            placeholder,
+          });
+          return result;
+        }
+      );
     }
   ),
 
-  handler(
+  auth_handler(
     "kate:dialog.message",
     TC.spec({ message: TC.str }),
+    { fail_silently: true, capabilities: [{ type: "show-dialogs" }] },
     async (os, env, ipc, { message }) => {
-      if (
-        !(await os.capability_supervisor.is_allowed(
-          env.cart.id,
-          "show-dialogs",
-          { type: "message" }
-        ))
-      ) {
-        console.error(
-          `Blocked ${env.cart.id} from showing message dialog: capability not granted`
-        );
-        return null;
-      }
-      await os.dialog.message(env.cart.id, { title: "", message });
-      return null;
+      return await os.fairness_supervisor.with_resource(
+        env.cart.id,
+        "modal-dialog",
+        async () => {
+          await os.dialog.message(env.cart.id, { title: "", message });
+          return null;
+        }
+      );
     }
   ),
 ];

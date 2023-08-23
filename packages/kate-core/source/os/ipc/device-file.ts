@@ -1,23 +1,8 @@
 import type { RuntimeEnv } from "../../kernel";
 import type { KateOS } from "../os";
 import { TC, make_id } from "../../utils";
-import { EMessageFailed, handler } from "./handlers";
+import { EMessageFailed, auth_handler, handler } from "./handlers";
 import { DeviceFileHandle } from "../apis";
-
-async function check_access(os: KateOS, env: RuntimeEnv) {
-  if (
-    !(await os.capability_supervisor.is_allowed(
-      env.cart.id,
-      "request-device-files",
-      {}
-    ))
-  ) {
-    console.error(
-      `Blocked ${env.cart.id} from requesting device files: capability not granted`
-    );
-    throw new EMessageFailed("kate.device-file.no-access", `No access`);
-  }
-}
 
 type HandleId = string & { __handle_id: true };
 export class KateDeviceFileIPC {
@@ -59,7 +44,7 @@ const handle_id = TC.str as (_: any) => HandleId;
 const device_ipc = new KateDeviceFileIPC();
 
 export default [
-  handler(
+  auth_handler(
     "kate:device-fs.request-file",
     TC.spec({
       multiple: TC.optional(false, TC.bool),
@@ -71,39 +56,51 @@ export default [
         })
       ),
     }),
+    { capabilities: [{ type: "request-device-files" }] },
     async (os, env, ipc, { multiple, strict, types }) => {
-      await check_access(os, env);
-      const handles = await os.device_file.open_file(env.cart.id, {
-        multiple,
-        strict,
-        types: [
-          {
-            description: "",
-            accept: Object.fromEntries(
-              types.map((x) => [x.type, x.extensions])
-            ),
-          },
-        ],
-      });
-      return handles.map((x) => device_ipc.expose(env, x));
+      return await os.fairness_supervisor.with_resource(
+        env.cart.id,
+        "modal-dialog",
+        async () => {
+          const handles = await os.device_file.open_file(env.cart.id, {
+            multiple,
+            strict,
+            types: [
+              {
+                description: "",
+                accept: Object.fromEntries(
+                  types.map((x) => [x.type, x.extensions])
+                ),
+              },
+            ],
+          });
+          return handles.map((x) => device_ipc.expose(env, x));
+        }
+      );
     }
   ),
 
-  handler(
+  auth_handler(
     "kate:device-fs.request-directory",
     TC.spec({}),
+    { capabilities: [{ type: "request-device-files" }] },
     async (os, env, ipc, _) => {
-      await check_access(os, env);
-      const handles = await os.device_file.open_directory(env.cart.id);
-      return handles.map((x) => device_ipc.expose(env, x));
+      return await os.fairness_supervisor.with_resource(
+        env.cart.id,
+        "modal-dialog",
+        async () => {
+          const handles = await os.device_file.open_directory(env.cart.id);
+          return handles.map((x) => device_ipc.expose(env, x));
+        }
+      );
     }
   ),
 
-  handler(
+  auth_handler(
     "kate:device-fs.read-file",
     TC.spec({ id: handle_id }),
+    { capabilities: [{ type: "request-device-files" }] },
     async (os, env, ipc, { id }) => {
-      await check_access(os, env);
       const file = (await device_ipc.resolve(os, env, id)).handle;
       const data = await file.arrayBuffer();
       return new Uint8Array(data);
