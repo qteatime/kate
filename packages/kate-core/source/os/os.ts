@@ -28,6 +28,7 @@ import { KateBrowser } from "./apis/browse";
 import { KateCapabilitySupervisor } from "./services/capability-supervisor";
 import { KateAuditSupervisor } from "./services/audit-supervisor";
 import { KateDeviceFile } from "./apis/device-file";
+import { KateFairnessSupervisor } from "./services/fairness-supervisor";
 
 export type CartChangeReason =
   | "installed"
@@ -55,8 +56,11 @@ export class KateOS {
   readonly app_resources: KateAppResources;
   readonly browser: KateBrowser;
   readonly device_file: KateDeviceFile;
+  // Services
   readonly capability_supervisor: KateCapabilitySupervisor;
   readonly audit_supervisor: KateAuditSupervisor;
+  readonly fairness_supervisor: KateFairnessSupervisor;
+
   readonly events = {
     on_cart_inserted: new EventStream<Cart.CartMeta>(),
     on_cart_removed: new EventStream<{ id: string; title: string }>(),
@@ -98,6 +102,7 @@ export class KateOS {
     this.device_file = new KateDeviceFile(this);
     this.capability_supervisor = new KateCapabilitySupervisor(this);
     this.audit_supervisor = new KateAuditSupervisor(this);
+    this.fairness_supervisor = new KateFairnessSupervisor(this);
   }
 
   get display() {

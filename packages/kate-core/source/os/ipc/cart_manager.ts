@@ -1,51 +1,45 @@
 import { TC } from "../../utils";
-import { EMessageFailed, handler } from "./handlers";
+import { EMessageFailed, auth_handler, handler } from "./handlers";
 import * as Cart from "../../cart";
 import * as UI from "../ui";
 
 export default [
-  handler(
+  auth_handler(
     "kate:cart-manager.install",
     TC.spec({ cartridge: TC.bytearray }),
+    { capabilities: [{ type: "install-cartridges" }] },
     async (os, env, ipc, { cartridge }) => {
-      const cart = Cart.parse(cartridge);
-      const errors = await Cart.verify_integrity(cart);
-      if (errors.length !== 0) {
-        console.error(`Corrupted cartridge ${cart.id}`, errors);
-        throw new EMessageFailed(
-          "kate.cart-manager.corrupted",
-          `Corrupted cartridge`
-        );
-      }
+      return await os.fairness_supervisor.with_resource(
+        env.cart.id,
+        "modal-dialog",
+        async () => {
+          const cart = Cart.parse(cartridge);
+          const errors = await Cart.verify_integrity(cart);
+          if (errors.length !== 0) {
+            console.error(`Corrupted cartridge ${cart.id}`, errors);
+            throw new EMessageFailed(
+              "kate.cart-manager.corrupted",
+              `Corrupted cartridge`
+            );
+          }
 
-      if (
-        !(await os.capability_supervisor.is_allowed(
-          env.cart.id,
-          "install-cartridges",
-          { id: cart.id }
-        ))
-      ) {
-        console.error(
-          `Blocked ${env.cart.id} from installing a cartridge: capability not granted`
-        );
-        throw new EMessageFailed("kate.cart-manager.no-access", "No access");
-      }
-
-      const should_install = await os.dialog.confirm("kate:cart-manager", {
-        title: "Install cartridge?",
-        message: UI.stack([
-          UI.paragraph([
-            UI.strong([UI.mono_text([env.cart.id])]),
-            " wants to install a cartridge:",
-            UI.cartridge_chip(cart),
-          ]),
-        ]),
-      });
-      if (!should_install) {
-        return null;
-      }
-      await os.cart_manager.install(cart);
-      return null;
+          const should_install = await os.dialog.confirm("kate:cart-manager", {
+            title: "Install cartridge?",
+            message: UI.stack([
+              UI.paragraph([
+                UI.strong([UI.mono_text([env.cart.id])]),
+                " wants to install a cartridge:",
+                UI.cartridge_chip(cart),
+              ]),
+            ]),
+          });
+          if (!should_install) {
+            return null;
+          }
+          await os.cart_manager.install(cart);
+          return null;
+        }
+      );
     }
   ),
 ];

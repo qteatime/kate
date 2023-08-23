@@ -1,6 +1,6 @@
 import type { RuntimeEnv } from "../../kernel";
 import type { KateOS } from "../os";
-import type { Handler } from "./handlers";
+import { EMessageFailed, type Handler } from "./handlers";
 import { TC } from "../../utils";
 import CaptureMessages from "./capture";
 import CartFSMessages from "./cart_fs";
@@ -192,6 +192,28 @@ export class KateIPCServer {
     }
 
     const payload = TC.parse(handler.parser, message.payload);
+    for (const capability of handler.auth.capabilities) {
+      if (
+        !(await this.os.capability_supervisor.is_allowed(
+          env.cart.id,
+          capability.type,
+          capability.configuration ?? {}
+        ))
+      ) {
+        console.error(
+          `[kate:ipc] Denied ${env.cart.id} access to ${message.type}: missing ${capability.type}`,
+          message
+        );
+        if (handler.auth.fail_silently) {
+          return null;
+        } else {
+          throw new EMessageFailed(
+            "kate.ipc.access-denied",
+            `Operation not allowed`
+          );
+        }
+      }
+    }
     return await handler.handler(this.os, env, this, payload, message);
   }
 }
