@@ -118,9 +118,6 @@ export class SceneReview extends UIScene {
                   ]),
                 ]),
                 ui.action_buttons([
-                  ui.text_button("Download cartridge", () => {
-                    this.download(x);
-                  }),
                   ui.text_button("Install", () => {
                     this.import(x);
                   }),
@@ -162,26 +159,6 @@ export class SceneReview extends UIScene {
     if (index.value + 1 < this.candidates.length) {
       index.value = index.value + 1;
     } else {
-    }
-  }
-
-  async download(candidate: Importer) {
-    const progress = SceneProgress.show(this.ui)
-      .set_message("Preparing cartridge...")
-      .set_unknown_progress();
-    try {
-      const cartridge = await candidate.make_cartridge();
-      progress.set_message("Packing cartridge...");
-      const bytes = Cart.encode(cartridge);
-      progress.close();
-      const filename = slug(candidate.title, 255) + ".kart";
-      KateAPI.browser.download(filename, bytes);
-    } catch (e) {
-      progress.close();
-      console.error(`Failed to download:`, e);
-      await KateAPI.dialogs.message(
-        "Failed to prepare cartridge for download: unknown internal error."
-      );
     }
   }
 
