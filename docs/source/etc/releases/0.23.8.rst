@@ -1,13 +1,18 @@
-=======================================================================
 Kate v0.23.8  (August 2023)
-=======================================================================
+===========================
+
 
 The v0.23.8 is August's experimental release of Kate. This is a
 breaking release.
 
-!!BREAKING CHANGE!!
 New cartridge format
 --------------------
+
+.. important::
+  
+  **BREAKING CHANGE**: cartridge format will not work on older
+  Kate versions, and older cartridge formats will not work on newer Kate
+  versions.
 
 0.23.8 uses a new block-based cartridge format and will not be able
 to read previous cartridge versions. This means that this version
@@ -18,7 +23,7 @@ for supporting signed cartridges and better memory usage — the current
 implementation still reads the entire cartridge in memory, but future
 implementations will stream the contents instead.
 
-PRs: #14
+PRs: `#14 <https://github.com/qteatime/kate/pull/14>`_
 
 
 Cache refreshing support
@@ -30,7 +35,7 @@ out of sync with updates and use; this version adds a new "Refresh cache"
 operation to the `Diagonstics & Recovery` section to help with such
 issues.
 
-PRs: #13
+PRs: `#13 <https://github.com/qteatime/kate/pull/13>`_
 
 
 Support for navigation requests
@@ -45,7 +50,7 @@ This version introduces a new capability to support this feature and
 the necessary rails to allow this to work with the user's active
 consent (and some minimal auditing support).
 
-PRs: #15
+PRs: `#15 <https://github.com/qteatime/kate/pull/15>`_
 
 
 Proper capability support
@@ -57,7 +62,7 @@ new permissions screen allows users to revoke capabilities even while
 cartridges are running (and it takes effect immediately), to mitigate
 the damage if a cartridge abuses its powers.
 
-PRs: #16
+PRs: `#16 <https://github.com/qteatime/kate/pull/16>`_
 
 
 Audit logs!
@@ -68,7 +73,7 @@ policy. This gives users a more persistent view of what their console
 has been up to in the background. There's no automated audit based on
 this yet, but that may be coming in future versions as well.
 
-PRs: #18
+PRs: `#18 <https://github.com/qteatime/kate/pull/18>`_
 
 
 The importer and new powerful capabilities!
@@ -93,7 +98,7 @@ Together these form the basis of the new Kate Importer cartridge,
 which supports importing some games made for other platforms and
 automatically converting them to work on Kate.
 
-PRs: #19
+PRs: `#19 <https://github.com/qteatime/kate/pull/19>`_
 
 
 Minor changes
@@ -106,7 +111,7 @@ Minor changes
 
   * Cartridge boxes in the library now show the stability of the cartridge
     (e.g.: if it's a demo, a beta release, or a regular one), as well as the
-    age rating. (PRs: #17)
+    age rating. (PRs: `#17 <https://github.com/qteatime/kate/pull/17>`_)
 
   * Older, unused and undocumented API experiments have been removed from the
     source code. This doesn't impact any cartridge, but it reduces the Kerne's
@@ -125,7 +130,8 @@ Minor changes
     The new limits should be safe and reasonable for most games.
 
   * Introduced a "Fairness Supervisor", which helps prevent cartridges from
-    abusing resources in the device in a way that makes it unusable. (PRs: #20)
+    abusing resources in the device in a way that makes it unusable.
+    (PRs: `#20 <https://github.com/qteatime/kate/pull/20>`_)
 
 
 Fixed bugs
