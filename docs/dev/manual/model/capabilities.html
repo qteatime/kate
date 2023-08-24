@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
-<link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Capabilities" href="capabilities.html" /><link rel="prev" title="Cartridges" href="cartridges.html" />
+<link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Kate API" href="../api/index.html" /><link rel="prev" title="Sandboxing and APIs" href="sandboxing.html" />
 
     <!-- Generated with Sphinx 6.2.1 and Furo 2023.03.27 -->
-        <title>Sandboxing and APIs - Kate 0.23.8 documentation</title>
+        <title>Capabilities - Kate 0.23.8 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?digest=fad236701ea90a88636c2a8c73b44ae642ed2a53" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
@@ -200,8 +200,8 @@
 <li class="toctree-l2 current has-children"><a class="reference internal" href="index.html">Programming model</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="overview.html">Overview</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cartridges.html">Cartridges</a></li>
-<li class="toctree-l3 current current-page"><a class="current reference internal" href="#">Sandboxing and APIs</a></li>
-<li class="toctree-l3"><a class="reference internal" href="capabilities.html">Capabilities</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sandboxing.html">Sandboxing and APIs</a></li>
+<li class="toctree-l3 current current-page"><a class="current reference internal" href="#">Capabilities</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../api/index.html">Kate API</a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" role="switch" type="checkbox"/><label for="toctree-checkbox-8"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -290,7 +290,7 @@
         </a>
         <div class="content-icon-container">
           <div class="edit-this-page">
-  <a class="muted-link" href="https://github.com/qteatime/kate/edit/main/docs/source/dev/manual/model/sandboxing.rst" title="Edit this page">
+  <a class="muted-link" href="https://github.com/qteatime/kate/edit/main/docs/source/dev/manual/model/capabilities.rst" title="Edit this page">
     <svg aria-hidden="true" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
       <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
       <path d="M4 20h4l10.5 -10.5a1.5 1.5 0 0 0 -4 -4l-10.5 10.5v4" />
@@ -312,77 +312,172 @@
           </label>
         </div>
         <article role="main">
-          <section id="sandboxing-and-apis">
-<h1>Sandboxing and APIs<a class="headerlink" href="#sandboxing-and-apis" title="Permalink to this heading">#</a></h1>
-<p>All cartridges run in a <a class="reference internal" href="../../../glossary.html#term-Sandboxed-IFrame"><span class="xref std std-term">sandboxed iframe</span></a>. This iframe runs with
-no exposed web APIs (other than the ability of playing sounds and videos),
-and with a very restrictive <a class="reference internal" href="../../../glossary.html#term-Content-Security-Policy"><span class="xref std std-term">content security policy</span></a>. It also
-runs with no <a class="reference internal" href="../../../glossary.html#term-Origin"><span class="xref std std-term">origin</span></a>—this means no access to any web APIs that
-touch storage or require a defined origin.</p>
-<p>The biggest implication of the sandboxing is no direct access to any
-web API, and not being allowed to load any asset by using a URL. For
-example, this means that the following way of loading an image will
-never work in Kate:</p>
-<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="kd">const</span><span class="w"> </span><span class="nx">img</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Image</span><span class="p">();</span>
-<span class="nx">img</span><span class="p">.</span><span class="nx">src</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;/sprite.png&quot;</span><span class="p">;</span>
-</pre></div>
+          <section id="capabilities">
+<h1>Capabilities<a class="headerlink" href="#capabilities" title="Permalink to this heading">#</a></h1>
+<p>Kate uses a model called “Capability Security” to ensure that users are
+always in control of how much risk they’re taking when running cartridges.
+This is particularly important for tools and applications, as the default
+things a cartridge can do are often enough for most games.</p>
+<p>“Capability Security” is really just a fancy name to a model where permissions
+are assigned to each individual application you have on your device, rather
+than those applications inheriting all permissions of the user running them.
+You might already be familiar with this model if you’ve used applications for
+smartphones before — both iPhones and Android phones use capabilities for
+their application security.</p>
+<section id="types-of-capabilities">
+<h2>Types of capabilities<a class="headerlink" href="#types-of-capabilities" title="Permalink to this heading">#</a></h2>
+<p>Capabilities in Kate are divided in two categories:</p>
+<ul>
+<li><p><strong>Contextual</strong> capabilities are the ones your cartridge asks for when the
+user is performing an action. For example, if the user can click on a button
+in your application and get asked “X would like to access one of your files”
+with the possibility of selecting a file to grant your cartridge access to,
+that’s a contextual capability — the actual grant of the access happens
+in a specific context, so the user is aware of the cause/effect, and must
+agree to the permission request every time they click that button.</p></li>
+<li><p><strong>Passive</strong> capabilities are the ones your cartridge asks for when the user
+is installing your cartridge. For example, a multiplayer game needs to send
+and receive data to other computers all the time, it would not be feasible
+to show a confirmation dialog every time data is sent over the internet.
+So, instead, the cartridge gets to ask for it once during installation and
+have access to it with no dialogs afterwards.</p>
+<p>To be transparent, Kate will always show an icon related to the resource
+your cartridge is using while you have access to a passive capability. The
+icon is shown from the moment your cartridge requests the API object for
+that capability until the moment your cartridge asks for that object access
+to be revoked.</p>
+</li>
+</ul>
+<p>Further, capabilities can be <strong>required</strong>, if the cartridge cannot function
+without them, or <strong>optional</strong>, if the cartridge could offer additional features
+by getting such access, but if it doesn’t it can still offer the player a
+simpler set of features.</p>
+</section>
+<section id="granting-and-revoking">
+<h2>Granting and revoking<a class="headerlink" href="#granting-and-revoking" title="Permalink to this heading">#</a></h2>
+<p>Capabilities are always first granted at the point where your cartridge is
+installed. From that point on, players can revoke or grant a capability by
+going to the <code class="docutils literal notranslate"><span class="pre">Settings</span> <span class="pre">-&gt;</span> <span class="pre">Permissions</span></code> screen.</p>
+<p>Contextual capabilities are also “granted” at the point where the cartridge
+is installed. This might sound odd, but you should think of it as the
+cartridge being granted the power of asking for the capability at any
+point in time.</p>
+<p>For example, if your cartridge requires “Device File Access” (a contextual
+capability), then it will only get access to actual files after the user
+is shown a confirmation dialog and chooses a file to grant your cartridge
+access to. Every time you ask for a file the user will see this same
+confirmation dialog and will have to select the file again.
+But if the user revokes your capability of “Device File Access”
+at any point in time, your request for a file will be immediately rejected,
+with no confirmation or dialog being shown to the user.</p>
+</section>
+<section id="contextual-capabilities">
+<h2>Contextual capabilities<a class="headerlink" href="#contextual-capabilities" title="Permalink to this heading">#</a></h2>
+<p>Having these capabilities allows the cartridge to ask for other accesses
+in the context of a user action.</p>
+<section id="open-urls">
+<span id="open-urls-capability"></span><h3>Open URLs<a class="headerlink" href="#open-urls" title="Permalink to this heading">#</a></h3>
+<dl class="field-list simple">
+<dt class="field-odd">Risk<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Medium</p>
+</dd>
+<dt class="field-even">Main concerns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Data exfiltration, privacy</p>
+</dd>
+<dt class="field-odd">Gates access to<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="../api/browser.html#KateAPI.browser.open" title="KateAPI.browser.open"><code class="xref py py-meth docutils literal notranslate"><span class="pre">KateAPI.browser.open()</span></code></a></p>
+</dd>
+<dt class="field-even">Kart type<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">open-urls</span></code></p>
+</dd>
+</dl>
+<p>Kate blocks any sort of internet access and URL navigation in a cartridge
+for security and privacy reasons. However, some times it’s useful for a
+cartridge to ask for a URL to be opened in the user’s browser.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>If your cartridge requests this capability, it <strong>MUST</strong> also provide a
+privacy policy that covers what data the target URLs collect from the
+user when they land.</p>
 </div>
-<p>Instead, data needs to be read from the cartridge’s file system using
-the Kate cartridge file API:</p>
-<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="kd">const</span><span class="w"> </span><span class="nx">img</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Image</span><span class="p">();</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">KateAPI</span><span class="p">.</span><span class="nx">cart_fs</span><span class="p">.</span><span class="nx">read_file</span><span class="p">(</span><span class="s2">&quot;/sprite.png&quot;</span><span class="p">);</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">blob</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Blob</span><span class="p">([</span><span class="nx">file</span><span class="p">.</span><span class="nx">bytes</span><span class="p">],</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">type</span><span class="o">:</span><span class="w"> </span><span class="nx">file</span><span class="p">.</span><span class="nx">mime</span><span class="w"> </span><span class="p">});</span>
-<span class="nx">img</span><span class="p">.</span><span class="nx">src</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">URL</span><span class="p">.</span><span class="nx">createObjectURL</span><span class="p">(</span><span class="nx">blob</span><span class="p">);</span>
-</pre></div>
-</div>
-<p>The same is true for any other web api besides Canvas and Web Audio: rather
-than being used directly, you need to use the equivalent Kate API instead.</p>
-<section id="reading-files">
-<h2>Reading files<a class="headerlink" href="#reading-files" title="Permalink to this heading">#</a></h2>
-<p>A cartridge can read files that were bundled with it. The cartridge file
-system is a read-only API that gives you access to the binary data of
-the file as well as its <a class="reference internal" href="../../../glossary.html#term-MIME-type"><span class="xref std std-term">MIME type</span></a>.</p>
-<p>Reading files is always asynchronous because only the Kate Kernel process
-has access to them; the cartridge must send a message to the Kernel process
-requesting the file data. There’s currently no way of streaming file
-contents, so reading a large binary file means that all of its contents
-need to be read into memory and then copied to the cartridge process,
-so it’s a good thing to read files upfront and keep them around, rather
-than re-reading them multiple times.</p>
-<p>Such functionality is provided by the minimal <a class="reference internal" href="../api/cart-fs.html#module-KateAPI.cart_fs" title="KateAPI.cart_fs: Read files bundled with the cartridge."><code class="xref py py-mod docutils literal notranslate"><span class="pre">KateAPI.cart_fs</span></code></a> API.</p>
 </section>
-<section id="input">
-<h2>Input<a class="headerlink" href="#input" title="Permalink to this heading">#</a></h2>
-<p>Because Kate blocks direct interaction with the cartridge’s screen
-(by placing a protective screen above it), the cartridge never receives
-the user’s focus. And likewise never receives direct input, be it from
-keyboard, gamepad, or pointer devices. No <a class="reference internal" href="../../../glossary.html#term-DOM-trusted-events"><span class="xref std std-term">DOM trusted events</span></a> ever
-flow into the cartridge either.</p>
-<p>Instead, cartridges must use the <a class="reference internal" href="../api/input.html#module-KateAPI.input" title="KateAPI.input: React to buttons pressed in the Kate gamepad."><code class="xref py py-mod docutils literal notranslate"><span class="pre">Input</span> <span class="pre">API</span></code></a> and
-<a class="reference internal" href="../api/input.html#module-KateAPI.pointer_input" title="KateAPI.pointer_input: React to pointer (such as mouse) events."><code class="xref py py-mod docutils literal notranslate"><span class="pre">Pointer</span> <span class="pre">Input</span> <span class="pre">API</span></code></a> to react to player
-interaction.</p>
+<section id="download-files">
+<span id="download-files-capability"></span><h3>Download files<a class="headerlink" href="#download-files" title="Permalink to this heading">#</a></h3>
+<dl class="field-list simple">
+<dt class="field-odd">Risk<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Critical</p>
+</dd>
+<dt class="field-even">Main concerns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Escalation, unsandboxed code execution</p>
+</dd>
+<dt class="field-odd">Gates access to<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="../api/browser.html#KateAPI.browser.download" title="KateAPI.browser.download"><code class="xref py py-meth docutils literal notranslate"><span class="pre">KateAPI.browser.download()</span></code></a></p>
+</dd>
+<dt class="field-even">Kart type<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">download-files</span></code></p>
+</dd>
+</dl>
+<p>Allows a cartridge to ask the user to get a file saved to their device’s
+regular file system. The file is treated in the same way any other
+browser download would be.</p>
 </section>
-<section id="save-data">
-<h2>Save data<a class="headerlink" href="#save-data" title="Permalink to this heading">#</a></h2>
-<p>The cartridge loads in a “null origin”, which means that it will not
-have access to any storage API from the browser. This is because browsers
-require a secure connection and a defined origin to be able to
-properly partition things like Local Storage and IndexedDB.</p>
-<p>Instead, cartridges can make use of the <a class="reference internal" href="../api/store.html#module-KateAPI.store" title="KateAPI.store: Allows saving and reading cartridge state."><code class="xref py py-mod docutils literal notranslate"><span class="pre">Object</span> <span class="pre">Store</span> <span class="pre">API</span></code></a>
-to save and read small amounts of data as necessary to track players’ progress
-in the game.</p>
+<section id="show-dialogs">
+<h3>Show dialogs<a class="headerlink" href="#show-dialogs" title="Permalink to this heading">#</a></h3>
+<dl class="field-list simple">
+<dt class="field-odd">Risk<span class="colon">:</span></dt>
+<dd class="field-odd"><p>low</p>
+</dd>
+<dt class="field-even">Main concerns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Denial of service, bad user experience</p>
+</dd>
+<dt class="field-odd">Gates access to<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-mod docutils literal notranslate"><span class="pre">KateAPI.dialogs</span></code></p>
+</dd>
+<dt class="field-even">Kart type<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">show-dialogs</span></code></p>
+</dd>
+</dl>
+<p>Allows a cartridge to show Kate OS-like modal dialogs to the user, such
+as message alerts or requests for text input.</p>
 </section>
-<section id="screenshots-and-video-capture">
-<h2>Screenshots and video capture<a class="headerlink" href="#screenshots-and-video-capture" title="Permalink to this heading">#</a></h2>
-<p>Some engines provide native support for taking screenshots or video
-captures of the game play. For example, <a class="reference external" href="https://www.renpy.org/">Ren’Py</a> allows one to take
-a screenshot in its web export and have it automatically downloaded
-in the device. This is also true for other engines like <a class="reference external" href="https://www.lexaloffle.com/pico-8.php">Pico-8</a>.</p>
-<p>Because Kate blocks any download or navigation initiated by the
-cartridge to protect players’ safety, these features will not work in
-Kate. Instead, cartridges will need to rely on Kate’s native screenshotting
-and video capture support, which can be done by registering what parts of
-the game should be captured using the <a class="reference internal" href="../api/capture.html#module-KateAPI.capture" title="KateAPI.capture: Opt-in or out of screenshots and video recording of your cartridge's screen."><code class="xref py py-mod docutils literal notranslate"><span class="pre">Capture</span> <span class="pre">API</span></code></a>.</p>
+<section id="request-device-files">
+<h3>Request device files<a class="headerlink" href="#request-device-files" title="Permalink to this heading">#</a></h3>
+<dl class="field-list simple">
+<dt class="field-odd">Risk<span class="colon">:</span></dt>
+<dd class="field-odd"><p>High</p>
+</dd>
+<dt class="field-even">Main concerns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Privacy, general security, privilege escalation</p>
+</dd>
+<dt class="field-odd">Gates access to<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-mod docutils literal notranslate"><span class="pre">KateAPI.device_file</span></code></p>
+</dd>
+<dt class="field-even">Kart type<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">request-device-files</span></code></p>
+</dd>
+</dl>
+<p>Allows a cartridge to ask the user for read-only access to a single file
+or a single directory.</p>
+</section>
+<section id="install-cartridges">
+<h3>Install cartridges<a class="headerlink" href="#install-cartridges" title="Permalink to this heading">#</a></h3>
+<dl class="field-list simple">
+<dt class="field-odd">Risk<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Critical</p>
+</dd>
+<dt class="field-even">Main concerns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Escalation, code execution, general security</p>
+</dd>
+<dt class="field-odd">Gates access to<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-mod docutils literal notranslate"><span class="pre">KateAPI.cart_manager</span></code></p>
+</dd>
+<dt class="field-even">Kart type<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">install-cartridges</span></code></p>
+</dd>
+</dl>
+<p>Allows a cartridge to ask the user to install a cartridge by providing
+the cartridge’s binary data.</p>
+</section>
 </section>
 </section>
 
@@ -391,23 +486,23 @@ the game should be captured using the <a class="reference internal" href="../api
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="capabilities.html">
+          <a class="next-page" href="../api/index.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Capabilities</div>
+                <div class="title">Kate API</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="cartridges.html">
+          <a class="prev-page" href="sandboxing.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Cartridges</div>
+                <div class="title">Sandboxing and APIs</div>
                 
               </div>
             </a>
@@ -441,11 +536,17 @@ the game should be captured using the <a class="reference internal" href="../api
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">Sandboxing and APIs</a><ul>
-<li><a class="reference internal" href="#reading-files">Reading files</a></li>
-<li><a class="reference internal" href="#input">Input</a></li>
-<li><a class="reference internal" href="#save-data">Save data</a></li>
-<li><a class="reference internal" href="#screenshots-and-video-capture">Screenshots and video capture</a></li>
+<li><a class="reference internal" href="#">Capabilities</a><ul>
+<li><a class="reference internal" href="#types-of-capabilities">Types of capabilities</a></li>
+<li><a class="reference internal" href="#granting-and-revoking">Granting and revoking</a></li>
+<li><a class="reference internal" href="#contextual-capabilities">Contextual capabilities</a><ul>
+<li><a class="reference internal" href="#open-urls">Open URLs</a></li>
+<li><a class="reference internal" href="#download-files">Download files</a></li>
+<li><a class="reference internal" href="#show-dialogs">Show dialogs</a></li>
+<li><a class="reference internal" href="#request-device-files">Request device files</a></li>
+<li><a class="reference internal" href="#install-cartridges">Install cartridges</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

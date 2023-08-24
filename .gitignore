@@ -12,3 +12,4 @@ dist/
 .cache/
 /asset-source/
 /ignore/
+.vscode

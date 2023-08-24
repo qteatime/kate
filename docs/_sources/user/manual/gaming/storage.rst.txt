@@ -33,11 +33,12 @@ This includes:
 * The emulator code and assets;
 * All of the settings that you can change in the ``Settings`` screen;
 * Performance-related caches;
-* Meta-data required to manage all other data Kate stores.
+* Meta-data required to manage all other data Kate stores;
+* Execution and audit logs.
 
 Kate itself does not offer a detailed breakdown for this data, and rather
 groups all of it under ``System`` in the storage summary. There's no way
-of removing or manually changing part of this data without corrupting the Kate
+of removing or manually changing most of this data without corrupting the Kate
 emulator and having to reset to factory defaults (hence losing all your data).
 
 .. warning::

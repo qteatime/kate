@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
-<link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" /><link rel="next" title="Terms of use" href="../licence.html" /><link rel="prev" title="Kate v0.23.5 (May 2023)" href="0.23.5.html" />
+<link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" /><link rel="next" title="Kate v0.23.6 (June 2023)" href="0.23.6.html" /><link rel="prev" title="Release notes" href="index.html" />
 
     <!-- Generated with Sphinx 6.2.1 and Furo 2023.03.27 -->
-        <title>Kate v0.23.4 (April 2023) - Kate 0.23.8 documentation</title>
+        <title>Kate v0.23.8 (August 2023) - Kate 0.23.8 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?digest=fad236701ea90a88636c2a8c73b44ae642ed2a53" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
@@ -257,10 +257,10 @@
 <p class="caption" role="heading"><span class="caption-text">Changes, Terms, and Credits</span></p>
 <ul class="current">
 <li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">Release notes</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-14" name="toctree-checkbox-14" role="switch" type="checkbox"/><label for="toctree-checkbox-14"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="0.23.8.html">Kate v0.23.8  (August 2023)</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Kate v0.23.8  (August 2023)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="0.23.6.html">Kate v0.23.6  (June 2023)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="0.23.5.html">Kate v0.23.5  (May 2023)</a></li>
-<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Kate v0.23.4  (April 2023)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="0.23.4.html">Kate v0.23.4  (April 2023)</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../licence.html">Terms of use</a></li>
@@ -290,7 +290,7 @@
         </a>
         <div class="content-icon-container">
           <div class="edit-this-page">
-  <a class="muted-link" href="https://github.com/qteatime/kate/edit/main/docs/source/etc/releases/0.23.4.rst" title="Edit this page">
+  <a class="muted-link" href="https://github.com/qteatime/kate/edit/main/docs/source/etc/releases/0.23.8.rst" title="Edit this page">
     <svg aria-hidden="true" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
       <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
       <path d="M4 20h4l10.5 -10.5a1.5 1.5 0 0 0 -4 -4l-10.5 10.5v4" />
@@ -312,138 +312,135 @@
           </label>
         </div>
         <article role="main">
-          <section id="kate-v0-23-4-april-2023">
-<h1>Kate v0.23.4  (April 2023)<a class="headerlink" href="#kate-v0-23-4-april-2023" title="Permalink to this heading">#</a></h1>
-<p>The v0.23.4 is April’s experimental release of Kate, including a
-handful of bugfixes, some new features, and a database redesign
-(a breaking change).</p>
-<section id="ui-redesign-code-simplifications">
-<h2>UI redesign &amp; code simplifications<a class="headerlink" href="#ui-redesign-code-simplifications" title="Permalink to this heading">#</a></h2>
-<p>This version has a minor UI redesign including more playful
-sans-serif fonts and a more pervasive use of button hints in the
-status bar. There’s now some audio feedback for keyboard/gamepad
-actions and a more consistent handling of “X” as a “go back” button.</p>
-<p>Custom themes are going to land sometime later this year, there’s
-still some work needed on how they’re going to be distributed, and
-how to divide up capabilities in themming (e.g.: allowing people to
-install CSS files directly is too dangerous, since Kate relies
-heavily on having specific visual cues for security).</p>
-<p>There’s been quite a lot of work in simplifying parts of the code,
-such as focus handling and game/OS scene handling. Though the code
-is still very much experimental, this should make management a
-little bit easier.</p>
+          <section id="kate-v0-23-8-august-2023">
+<h1>Kate v0.23.8  (August 2023)<a class="headerlink" href="#kate-v0-23-8-august-2023" title="Permalink to this heading">#</a></h1>
+<p>The v0.23.8 is August’s experimental release of Kate. This is a
+breaking release.</p>
+<section id="new-cartridge-format">
+<h2>New cartridge format<a class="headerlink" href="#new-cartridge-format" title="Permalink to this heading">#</a></h2>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p><strong>BREAKING CHANGE</strong>: cartridge format will not work on older
+Kate versions, and older cartridge formats will not work on newer Kate
+versions.</p>
+</div>
+<p>0.23.8 uses a new block-based cartridge format and will not be able
+to read previous cartridge versions. This means that this version
+will not be able to upgrade past cartridges or load past cartridges.</p>
+<p>The new cartridge version is simpler and lays the necessary groundwork
+for supporting signed cartridges and better memory usage — the current
+implementation still reads the entire cartridge in memory, but future
+implementations will stream the contents instead.</p>
+<p>PRs: <a class="reference external" href="https://github.com/qteatime/kate/pull/14">#14</a></p>
 </section>
-<section id="screen-capture-media-gallery">
-<h2>Screen capture &amp; Media gallery<a class="headerlink" href="#screen-capture-media-gallery" title="Permalink to this heading">#</a></h2>
-<p>There’s support for taking screenshots and capturing videos of
-gameplay from an installed cartridge. The cartridge must indicate
-its intention of being captured by registering an HTML Canvas element
-with the Kate Capture API.</p>
-<p>Screenshots have audio feedback, screen recording has a visual
-feedback in the form of a little recording icon in the active
-resources area. Recording can be started by holding the Capture
-button for a second, and stopped by holding the Capture button
-for a second again.</p>
+<section id="cache-refreshing-support">
+<h2>Cache refreshing support<a class="headerlink" href="#cache-refreshing-support" title="Permalink to this heading">#</a></h2>
+<p>In order to work offline in the browser, Kate caches all of the files
+needed to run the application locally. Sometimes this cache might get
+out of sync with updates and use; this version adds a new “Refresh cache”
+operation to the <cite>Diagonstics &amp; Recovery</cite> section to help with such
+issues.</p>
+<p>PRs: <a class="reference external" href="https://github.com/qteatime/kate/pull/13">#13</a></p>
 </section>
-<section id="in-game-legal-notices">
-<h2>In-game legal notices<a class="headerlink" href="#in-game-legal-notices" title="Permalink to this heading">#</a></h2>
-<p>Games, and indie games in particular, generally include content (such
-as code or assets) that have been developed by a third party, and made
-available under some sort of licence. Developers need to provide
-sufficiently visible notices of these licences, which is a bit trickier
-when you ship a binary cartridge around.</p>
-<p>This version of Kate adds support to including a text file that
-collects all these licences into a single place, and can be displayed
-to the user in a regular KateOS screen, which is similar to how other
-hand-held consoles handle the issue, and should fulfill the legal
-requirements of shipping licences in a readable format with your
-binary distribution.</p>
+<section id="support-for-navigation-requests">
+<h2>Support for navigation requests<a class="headerlink" href="#support-for-navigation-requests" title="Permalink to this heading">#</a></h2>
+<p>Kate blocks all network access in cartridges for security and privacy,
+but there are cases where it is reasonable to allow a cartridge to
+open an URL in the user’s browser (e.g.: if it’s linking to the
+developers’ pages in a credits screen).</p>
+<p>This version introduces a new capability to support this feature and
+the necessary rails to allow this to work with the user’s active
+consent (and some minimal auditing support).</p>
+<p>PRs: <a class="reference external" href="https://github.com/qteatime/kate/pull/15">#15</a></p>
 </section>
-<section id="storage-and-memory-usage-improvements">
-<h2>Storage and memory usage improvements<a class="headerlink" href="#storage-and-memory-usage-improvements" title="Permalink to this heading">#</a></h2>
-<p>Cartridges are now unpacked in the IndexedDB storage, which means that
-cartridge binary changes do not affect already installed cartridges.</p>
-<p>Besides that, this has the benefit of improving memory usage for
-installed cartridges, as the game does not need to keep all of the
-files in memory while running. For games with a larger size, this
-should allow a little smoother playing, as long as individual files
-have reasonable sizes as well.</p>
-<p>While reading files has an added latency because of this, files are
-still loaded from local storage, so it should be fast enough for most
-use cases.</p>
+<section id="proper-capability-support">
+<h2>Proper capability support<a class="headerlink" href="#proper-capability-support" title="Permalink to this heading">#</a></h2>
+<p>Since this version introduces the first capabilities in the console, it
+also introduces a way for users to manage capabilities at any time. The
+new permissions screen allows users to revoke capabilities even while
+cartridges are running (and it takes effect immediately), to mitigate
+the damage if a cartridge abuses its powers.</p>
+<p>PRs: <a class="reference external" href="https://github.com/qteatime/kate/pull/16">#16</a></p>
 </section>
-<section id="new-objectstorage-api">
-<h2>New ObjectStorage API<a class="headerlink" href="#new-objectstorage-api" title="Permalink to this heading">#</a></h2>
-<p>This version adds a new ObjectStorage API, which is a key/value store
-with enforced quota. This should allow cartridges to serialise save
-data while protecting users from malicious cartridges trying to
-overload the device’s storage.</p>
-<p>Each cartridge gets 32MB of storage in the object store. There will
-be a capability to request more storage in future versions, but for
-now this should be enough for most save data use cases.</p>
-<p>Note that the ObjectStorage API does not protect against degrading
-the device storage by abusing writes. That’s something that may be
-looked into for future versions.</p>
+<section id="audit-logs">
+<h2>Audit logs!<a class="headerlink" href="#audit-logs" title="Permalink to this heading">#</a></h2>
+<p>This version introduces proper audit logs with a retention and cleanup
+policy. This gives users a more persistent view of what their console
+has been up to in the background. There’s no automated audit based on
+this yet, but that may be coming in future versions as well.</p>
+<p>PRs: <a class="reference external" href="https://github.com/qteatime/kate/pull/18">#18</a></p>
 </section>
-<section id="a-new-js-packaging-tool">
-<h2>A new JS packaging tool<a class="headerlink" href="#a-new-js-packaging-tool" title="Permalink to this heading">#</a></h2>
-<p>This version does away with Browserify as a way of packaging Kate code
-and introduces a new tool, Glomp, which handles packaging JavaScript
-(and other web files) in a simplified manner.</p>
-<p>This was a requirement for improving Kate security, as Browserify is
-too large to manually audit, and it injects packages arbitrarily in the
-output.</p>
-<p>Glomp is not yet verified, and it does not handle mal-formed JavaScript;
-those are the next steps before a stable release of Kate.</p>
+<section id="the-importer-and-new-powerful-capabilities">
+<h2>The importer and new powerful capabilities!<a class="headerlink" href="#the-importer-and-new-powerful-capabilities" title="Permalink to this heading">#</a></h2>
+<p>In order to support game dev tools to run sandboxed in Kate, this
+version introduces a few powerful capabilities to get restricted
+expose restricted access to the device’s resources to cartridges.</p>
+<p>The new APIs are:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>“Device File Access”: gives a cartridge the ability of accessing
+selected files and folders in your device — you have to select
+the files first;</p></li>
+<li><p>“Save to device”: gives a cartridge the ability of saving data
+to the device’s file system, modelled after browsers’ “download”
+concept;</p></li>
+<li><p>“Install cartridge”: gives a cartridge the ability of installing
+other cartridges — you’ll be asked for confirmation.</p></li>
+</ul>
+</div></blockquote>
+<p>Together these form the basis of the new Kate Importer cartridge,
+which supports importing some games made for other platforms and
+automatically converting them to work on Kate.</p>
+<p>PRs: <a class="reference external" href="https://github.com/qteatime/kate/pull/19">#19</a></p>
 </section>
-<section id="loading-images-in-html-entry-point">
-<h2>Loading images in HTML entry-point<a class="headerlink" href="#loading-images-in-html-entry-point" title="Permalink to this heading">#</a></h2>
-<p>Images included in the HTML entry-point are now loaded while sandboxing
-the HTML page, so they should work in the same way as images
-dynamically loaded. Paths still need to point to a valid cartridge file
-path (e.g.: <code class="docutils literal notranslate"><span class="pre">/images/loading.png</span></code>)</p>
+<section id="minor-changes">
+<h2>Minor changes<a class="headerlink" href="#minor-changes" title="Permalink to this heading">#</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><p>The default keyboard key for Kate’s <cite>Capture</cite> button is now <cite>C</cite> instead
+of <cite>Left Control</cite>. The change is due to how browsers’ shortcuts depend
+on Control modifiers, making captures be triggered when the user did not
+intend them to be.</p></li>
+<li><p>Cartridge boxes in the library now show the stability of the cartridge
+(e.g.: if it’s a demo, a beta release, or a regular one), as well as the
+age rating. (PRs: <a class="reference external" href="https://github.com/qteatime/kate/pull/17">#17</a>)</p></li>
+<li><p>Older, unused and undocumented API experiments have been removed from the
+source code. This doesn’t impact any cartridge, but it reduces the Kerne’s
+attack surface and moves us further towards a proper secure Kate release.</p></li>
+<li><p>There’s a new developer-oriented settings screen with the only option
+being relaxing Kate’s installation preconditions so you can reinstall
+the same version of the cartridge — good for iterating while dev’ing.</p></li>
+<li><p>Cartridges that do not have a thumbnail image now have their title shown
+in the cartridge box instead, which makes it easier to figure out what
+all the black boxes are if devs haven’t included a cover image.</p></li>
+<li><p>Bumped limits for captures: now that games for other platforms can be
+imported, the initial capture limits are too small for their resolution.
+The new limits should be safe and reasonable for most games.</p></li>
+<li><p>Introduced a “Fairness Supervisor”, which helps prevent cartridges from
+abusing resources in the device in a way that makes it unusable.
+(PRs: <a class="reference external" href="https://github.com/qteatime/kate/pull/20">#20</a>)</p></li>
+</ul>
+</div></blockquote>
 </section>
-<section id="active-resources-area">
-<h2>Active Resources Area<a class="headerlink" href="#active-resources-area" title="Permalink to this heading">#</a></h2>
-<p>It’s hard to know what applications are doing sometimes. Previously
-Kate distinguished between trusted/untrusted prompts (like confirmation
-dialogs and menus) by showing a red border around the screen. But that
-doesn’t work for things like “this game is using my microphone”.</p>
-<p>This version of Kate introduces the “Active Resources Area”, a small
-display of icons to the right of the “= KATE =” engraving in the
-emulator that shows which special resources the current application
-or game is using.</p>
-<p>Currently this is used to display the use of screen recording
-(a small red bullet is displayed), or the lack of persistent storage
-(a hard drive with a clock is displayed).</p>
-<p>Lack of persistent storage here means that data stored in Kate is
-stored in a “best effort” manner, where the browser might delete it
-if the device is running out of space. This should only be an issue
-when using Kate online, without having it installed as a WebApp.</p>
-</section>
-<section id="playing-habits">
-<h2>Playing habits<a class="headerlink" href="#playing-habits" title="Permalink to this heading">#</a></h2>
-<p>This version of Kate now collects small playing habit data by default,
-meaning that we store locally when a cartridge was last played, and
-how much time in total was spent in each cartridge. There’s a new
-settings screen where this feature can be turned off, and collected
-data both visualised and deleted.</p>
-<p>The last_played data is used to sort entries in the Home screen. The
-total play times are not currently used for anything, just available
-locally.</p>
-</section>
-<section id="pinned-versions-on-the-web">
-<h2>Pinned versions on the web<a class="headerlink" href="#pinned-versions-on-the-web" title="Permalink to this heading">#</a></h2>
-<p>The web version of the Kate emulator no longer updates automatically.
-We record what version you’re running, and offer the option to update
-at your leisure from the About Kate screen.</p>
-<p>This is needed because, since all data is stored locally, some upgrades
-require updating the local data due to format changes, and these
-updates can run for a few minutes if you have a lot of data. Having
-the player initiate these updates means less surprises when they’re
-just trying to play something.</p>
-<p>This also gives players a chance of reviewing what has changed between
-the current version and the new one.</p>
+<section id="fixed-bugs">
+<h2>Fixed bugs<a class="headerlink" href="#fixed-bugs" title="Permalink to this heading">#</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><p>Fixed an issue where the last cartridge would not scroll fully into
+view upon selection if there were many cartridges before it in the
+library.</p></li>
+<li><p>Changed how IndexedDB indexes are used in Kate so that we don’t trigger
+the semantic issues Safari has with it. This makes Kate partially supported
+in iOS again — but do note that Safari still lacks implementation for many
+of the APIs Kate relies on, such as webp recording for screen recording.</p></li>
+<li><p>Fixed an issue where the cartridge would still get input when it
+was not the application on the foreground. No more confusing behaviour
+when opening the settings screen while playing a game.</p></li>
+<li><p>Virtual input is reset when the console loses focus. This makes it harder
+to have confusing things happening when you switch out to another tab
+or minimise Kate.</p></li>
+</ul>
+</div></blockquote>
 </section>
 </section>
 
@@ -452,23 +449,23 @@ the current version and the new one.</p>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="../licence.html">
+          <a class="next-page" href="0.23.6.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Terms of use</div>
+                <div class="title">Kate v0.23.6  (June 2023)</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="0.23.5.html">
+          <a class="prev-page" href="index.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Kate v0.23.5  (May 2023)</div>
+                <div class="title">Release notes</div>
                 
               </div>
             </a>
@@ -502,17 +499,15 @@ the current version and the new one.</p>
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">Kate v0.23.4  (April 2023)</a><ul>
-<li><a class="reference internal" href="#ui-redesign-code-simplifications">UI redesign &amp; code simplifications</a></li>
-<li><a class="reference internal" href="#screen-capture-media-gallery">Screen capture &amp; Media gallery</a></li>
-<li><a class="reference internal" href="#in-game-legal-notices">In-game legal notices</a></li>
-<li><a class="reference internal" href="#storage-and-memory-usage-improvements">Storage and memory usage improvements</a></li>
-<li><a class="reference internal" href="#new-objectstorage-api">New ObjectStorage API</a></li>
-<li><a class="reference internal" href="#a-new-js-packaging-tool">A new JS packaging tool</a></li>
-<li><a class="reference internal" href="#loading-images-in-html-entry-point">Loading images in HTML entry-point</a></li>
-<li><a class="reference internal" href="#active-resources-area">Active Resources Area</a></li>
-<li><a class="reference internal" href="#playing-habits">Playing habits</a></li>
-<li><a class="reference internal" href="#pinned-versions-on-the-web">Pinned versions on the web</a></li>
+<li><a class="reference internal" href="#">Kate v0.23.8  (August 2023)</a><ul>
+<li><a class="reference internal" href="#new-cartridge-format">New cartridge format</a></li>
+<li><a class="reference internal" href="#cache-refreshing-support">Cache refreshing support</a></li>
+<li><a class="reference internal" href="#support-for-navigation-requests">Support for navigation requests</a></li>
+<li><a class="reference internal" href="#proper-capability-support">Proper capability support</a></li>
+<li><a class="reference internal" href="#audit-logs">Audit logs!</a></li>
+<li><a class="reference internal" href="#the-importer-and-new-powerful-capabilities">The importer and new powerful capabilities!</a></li>
+<li><a class="reference internal" href="#minor-changes">Minor changes</a></li>
+<li><a class="reference internal" href="#fixed-bugs">Fixed bugs</a></li>
 </ul>
 </li>
 </ul>

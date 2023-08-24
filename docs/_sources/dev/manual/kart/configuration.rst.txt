@@ -412,6 +412,28 @@ average_session *(recommended)*
   as two or more characters).
 
 
+Security
+--------
+
+capabilities *(required)*
+  | list of capability
+  | The list of capabilities that your cartridge needs to work, and the
+    reason why you need them. The reason is not shown to the user in any
+    kind of risk assessment, but it's used for store reviews.
+
+  A basic capability has the following shape:
+
+  .. code-block:: json
+
+    {
+      "type": "open-urls",
+      "reason": "Open links to developers' pages in credits"
+    }
+
+  You can see all available capabilities in the :doc:`Capabilities <../model/capabilities>`
+  section.
+
+
 Files
 -----
 

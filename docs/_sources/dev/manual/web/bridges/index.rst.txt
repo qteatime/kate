@@ -20,6 +20,7 @@ Web APIs
   pointer-input-proxy
   local-storage-proxy
   indexeddb-proxy
+  external-url-handler
 
 Kate support
 ------------

@@ -124,9 +124,6 @@ Minor changes
     imported, the initial capture limits are too small for their resolution.
     The new limits should be safe and reasonable for most games.
 
-  * Introduced a "Fairness Supervisor", which helps prevent cartridges from
-    abusing resources in the device in a way that makes it unusable. (PRs: #20)
-
 
 Fixed bugs
 ----------

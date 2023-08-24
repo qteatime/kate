@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
-<link rel="index" title="Index" href="../../../../genindex.html" /><link rel="search" title="Search" href="../../../../search.html" /><link rel="next" title="Capture canvas" href="capture-canvas.html" /><link rel="prev" title="External URL handler" href="external-url-handler.html" />
+<link rel="index" title="Index" href="../../../../genindex.html" /><link rel="search" title="Search" href="../../../../search.html" /><link rel="next" title="Preserve WebGL Render" href="preserve-webgl-render.html" /><link rel="prev" title="IndexedDB proxy" href="indexeddb-proxy.html" />
 
     <!-- Generated with Sphinx 6.2.1 and Furo 2023.03.27 -->
-        <title>Preserve WebGL Render - Kate 0.23.8 documentation</title>
+        <title>External URL handler - Kate 0.23.8 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo.css?digest=fad236701ea90a88636c2a8c73b44ae642ed2a53" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
@@ -222,8 +222,8 @@
 <li class="toctree-l4"><a class="reference internal" href="pointer-input-proxy.html">Pointer input proxy</a></li>
 <li class="toctree-l4"><a class="reference internal" href="local-storage-proxy.html">Local storage proxy</a></li>
 <li class="toctree-l4"><a class="reference internal" href="indexeddb-proxy.html">IndexedDB proxy</a></li>
-<li class="toctree-l4"><a class="reference internal" href="external-url-handler.html">External URL handler</a></li>
-<li class="toctree-l4 current current-page"><a class="current reference internal" href="#">Preserve WebGL Render</a></li>
+<li class="toctree-l4 current current-page"><a class="current reference internal" href="#">External URL handler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="preserve-webgl-render.html">Preserve WebGL Render</a></li>
 <li class="toctree-l4"><a class="reference internal" href="capture-canvas.html">Capture canvas</a></li>
 <li class="toctree-l4"><a class="reference internal" href="renpy-tweaks.html">Ren’Py tweaks</a></li>
 </ul>
@@ -290,7 +290,7 @@
         </a>
         <div class="content-icon-container">
           <div class="edit-this-page">
-  <a class="muted-link" href="https://github.com/qteatime/kate/edit/main/docs/source/dev/manual/web/bridges/preserve-webgl-render.rst" title="Edit this page">
+  <a class="muted-link" href="https://github.com/qteatime/kate/edit/main/docs/source/dev/manual/web/bridges/external-url-handler.rst" title="Edit this page">
     <svg aria-hidden="true" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
       <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
       <path d="M4 20h4l10.5 -10.5a1.5 1.5 0 0 0 -4 -4l-10.5 10.5v4" />
@@ -312,52 +312,28 @@
           </label>
         </div>
         <article role="main">
-          <section id="preserve-webgl-render">
-<h1>Preserve WebGL Render<a class="headerlink" href="#preserve-webgl-render" title="Permalink to this heading">#</a></h1>
-<p>Forces a all canvases in the cartridge’s process to disable its
-off-screen rendering optimisation to provide support for Kate’s
-screenshot feature. There’s no configuration for this bridge, it’ll
-affect all canvases.</p>
+          <section id="external-url-handler">
+<h1>External URL handler<a class="headerlink" href="#external-url-handler" title="Permalink to this heading">#</a></h1>
+<p>Patches <code class="docutils literal notranslate"><span class="pre">window.open</span></code> and other navigation APIs to allow them to be
+opened in a regular browser’s window or tab.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Usage of this bridge requires you to request the
+<a class="reference internal" href="../../model/capabilities.html#open-urls-capability"><span class="std std-ref">Open URLs</span></a> capability.</p>
+</div>
 <section id="using-in-kart">
 <h2>Using in Kart<a class="headerlink" href="#using-in-kart" title="Permalink to this heading">#</a></h2>
-<p>To add this bridge to your cartridge, you specify the following in your
+<p>To add this bridge to your cartridge you specify the following in your
 <code class="docutils literal notranslate"><span class="pre">kate.json</span></code> configuration:</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
 <span class="w">  </span><span class="nt">&quot;bridges&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">    </span><span class="p">{</span>
-<span class="w">      </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;preserve-webgl-render&quot;</span>
+<span class="w">      </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;external-url-handler&quot;</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="w">  </span><span class="p">]</span>
 <span class="p">}</span>
 </pre></div>
 </div>
-</section>
-<section id="why-and-how">
-<h2>Why and how<a class="headerlink" href="#why-and-how" title="Permalink to this heading">#</a></h2>
-<p>Kate’s screenshot and video capture runs on its own process, and as such
-it’s not synchronised with your game’s drawing loop. The
-<a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API">WebGL API</a>
-offers a rendering optimisation where the contents drawn to the screen
-are not always available to this separate process Kate runs, and in that
-case the player might capture a screenshot that ends up blank because
-your game is in the process of updating the screen at that exact moment.</p>
-<p>In some cases this optimisation is turned on by whatever engine you’re
-using (e.g.: Ren’Py uses it), and it might be quite difficult to disable it.
-That’s because you choose to have or not the optimisation only when creating
-the WebGL context for the canvas, and you can’t change it afterwards.</p>
-<p>The bridge patches the function that creates canvas rendering contexts to
-prevent the optimisation from being enabled in the first place, but passing
-through every other option. This keeps the same behaviour, but allows
-screenshots to be taken consistently.</p>
-</section>
-<section id="performance-drawbacks">
-<h2>Performance drawbacks<a class="headerlink" href="#performance-drawbacks" title="Permalink to this heading">#</a></h2>
-<p>Not having to preserve the WebGL render is a rendering optimisation. This
-means that this bridge will have a negative effect on your game’s rendering
-performance. That said, for most cases, and for the kind of games Kate is
-designed for, the difference tends to not be noticeable. You should do some
-thorough testing on lower end devices to make sure your game still runs
-fine after disabling the optimisation, though.</p>
 </section>
 </section>
 
@@ -366,23 +342,23 @@ fine after disabling the optimisation, though.</p>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="capture-canvas.html">
+          <a class="next-page" href="preserve-webgl-render.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Capture canvas</div>
+                <div class="title">Preserve WebGL Render</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="external-url-handler.html">
+          <a class="prev-page" href="indexeddb-proxy.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">External URL handler</div>
+                <div class="title">IndexedDB proxy</div>
                 
               </div>
             </a>
@@ -416,10 +392,8 @@ fine after disabling the optimisation, though.</p>
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">Preserve WebGL Render</a><ul>
+<li><a class="reference internal" href="#">External URL handler</a><ul>
 <li><a class="reference internal" href="#using-in-kart">Using in Kart</a></li>
-<li><a class="reference internal" href="#why-and-how">Why and how</a></li>
-<li><a class="reference internal" href="#performance-drawbacks">Performance drawbacks</a></li>
 </ul>
 </li>
 </ul>

@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
-<link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Resource indicators" href="indicators.html" /><link rel="prev" title="Privacy policy" href="privacy.html" />
+<link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Making games for Kate!" href="../../../dev/manual/index.html" /><link rel="prev" title="Resource indicators" href="indicators.html" />
 
     <!-- Generated with Sphinx 6.2.1 and Furo 2023.03.27 -->
-        <title>Trust and consent - Kate 0.23.8 documentation</title>
+        <title>Audit logs - Kate 0.23.8 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?digest=fad236701ea90a88636c2a8c73b44ae642ed2a53" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
@@ -180,9 +180,9 @@
 <li class="toctree-l3"><a class="reference internal" href="philosophy.html">Safety philosophy</a></li>
 <li class="toctree-l3"><a class="reference internal" href="sandboxing.html">Sandboxing</a></li>
 <li class="toctree-l3"><a class="reference internal" href="privacy.html">Privacy policy</a></li>
-<li class="toctree-l3 current current-page"><a class="current reference internal" href="#">Trust and consent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="trust.html">Trust and consent</a></li>
 <li class="toctree-l3"><a class="reference internal" href="indicators.html">Resource indicators</a></li>
-<li class="toctree-l3"><a class="reference internal" href="audit.html">Audit logs</a></li>
+<li class="toctree-l3 current current-page"><a class="current reference internal" href="#">Audit logs</a></li>
 </ul>
 </li>
 </ul>
@@ -290,7 +290,7 @@
         </a>
         <div class="content-icon-container">
           <div class="edit-this-page">
-  <a class="muted-link" href="https://github.com/qteatime/kate/edit/main/docs/source/user/manual/security/trust.rst" title="Edit this page">
+  <a class="muted-link" href="https://github.com/qteatime/kate/edit/main/docs/source/user/manual/security/audit.rst" title="Edit this page">
     <svg aria-hidden="true" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
       <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
       <path d="M4 20h4l10.5 -10.5a1.5 1.5 0 0 0 -4 -4l-10.5 10.5v4" />
@@ -312,51 +312,38 @@
           </label>
         </div>
         <article role="main">
-          <section id="trust-and-consent">
-<h1>Trust and consent<a class="headerlink" href="#trust-and-consent" title="Permalink to this heading">#</a></h1>
-<p>Sometimes you will take actions in Kate that require consent. This is
-generally the case with dangerous or irreversible actions, such as
-deleting data from the database. But it might also arise from things
-like granting access to files or more storage space for a cartridge.</p>
-<p>When the emulator prompts you for consent in these cases, there will
-be a distinctive indicator (called the “Trust Frame”) to show that the
-request is truly coming from the Kate emulator, and not from a malicious
-cartridge mimicing the same UI.</p>
-<section id="hand-held-and-tv-modes">
-<h2>Hand-held and TV modes<a class="headerlink" href="#hand-held-and-tv-modes" title="Permalink to this heading">#</a></h2>
-<p>In hand-held and TV mode, this distinct indicator takes the form of
-a red-ish border surrounding the screen. In this case the dialog
-is coming from the Kate emulator because there are no black borders
-between the console’s case and the screen:</p>
-<img alt="../../../_images/trust-frame.png" src="../../../_images/trust-frame.png" />
-<p>Because the border around the screen is outside of the screen the
-cartridge has access to show things on, there’s no way for a cartridge
-to mimic this indicator.</p>
+          <section id="audit-logs">
+<h1>Audit logs<a class="headerlink" href="#audit-logs" title="Permalink to this heading">#</a></h1>
+<p>In any software system there’s a lot happening in the background at all
+times. While Kate aims to be as transparent as possible when it comes
+to high-risk events, it usually needs to show you a very summarised
+view of those events — there’s a limited screen space and overwhelming
+players with security notices helps no one.</p>
+<p>For all times where you need details on what has happened, Kate keeps
+audit logs. These are more detailed versions of the events happening
+while your console and games are running. They can be accessed by
+going to <code class="docutils literal notranslate"><span class="pre">Settings</span> <span class="pre">-&gt;</span> <span class="pre">Audit</span> <span class="pre">logs</span></code>.</p>
+<section id="storage-usage-and-retention">
+<h2>Storage usage and retention<a class="headerlink" href="#storage-usage-and-retention" title="Permalink to this heading">#</a></h2>
+<p>By default logs are kept for up to one year. You can change this retention
+period to more or less time in the same settings screen. The reason Kate
+doesn’t keep audit logs forever is that they take storage space, too.
+While a few log entries are not much of a concern, several months worth
+of log entries on a very active console can get more demanding.</p>
+<p>The usefulness of logs decreases as time goes on, since most issues that
+would make you look at them will have more immediate effects. For example,
+you might notice that a cartridge was using a dangerous resource that you
+didn’t expect and look at the logs to check the details on what it was
+doing — and you’re usually going to do that right after, rather than 6
+months down the road.</p>
 </section>
-<section id="fullscreen-mode">
-<h2>Fullscreen mode<a class="headerlink" href="#fullscreen-mode" title="Permalink to this heading">#</a></h2>
-<p>When running Kate in fullscreen mode, the trust frame takes a different
-shape. It’s indicated by a 3 pixels tall contiguous line at the very
-top of the screen, along with the <a class="reference internal" href="indicators.html"><span class="doc">resource indicator band</span></a>
-at the top-right. Like the trust frame in hand-held and TV modes, the
-one in fullscreen mode will also change colour when a dialog
-presented on the screen to get your consent comes from Kate itself.</p>
-<img alt="../../../_images/fullscreen-trust.png" src="../../../_images/fullscreen-trust.png" />
-<p>Because the trust indicators in fullscreen mode are always on top of the
-screen, there’s likewise no way for a cartridge to mimic it, so you will
-always know what dialogs are trustworthy and which ones are presented
-by the cartridge when you look at the trust frame.</p>
-</section>
-<section id="note-on-non-visual-cues">
-<h2>Note on non-visual cues<a class="headerlink" href="#note-on-non-visual-cues" title="Permalink to this heading">#</a></h2>
-<p>Currently Kate uses only visual cues for the trust frame, and the cues
-are colour-based. This is a problem for colour-blind players, and it
-may be a problem for players who have another vision disability or
-cannot look at the screen for one reason or another.</p>
-<p>A future version of Kate will expand these channels to non-visual and
-non-colour-based ones as well, but that requires more research on
-forms of communicating this information through non-visual channels
-in ways that can’t be mimic’d.</p>
+<section id="removing-sensitive-data">
+<h2>Removing sensitive data<a class="headerlink" href="#removing-sensitive-data" title="Permalink to this heading">#</a></h2>
+<p>Kate tries it best to not add sensitive data to the logs. However, some
+of the data it logs comes from cartridges, and Kate cannot determine if
+they’re sensitive or not.</p>
+<p>If you notice unwanted data in your log entries you can remove them
+individually from the log view screen.</p>
 </section>
 </section>
 
@@ -365,23 +352,23 @@ in ways that can’t be mimic’d.</p>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="indicators.html">
+          <a class="next-page" href="../../../dev/manual/index.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Resource indicators</div>
+                <div class="title">Making games for Kate!</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="privacy.html">
+          <a class="prev-page" href="indicators.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Privacy policy</div>
+                <div class="title">Resource indicators</div>
                 
               </div>
             </a>
@@ -415,10 +402,9 @@ in ways that can’t be mimic’d.</p>
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">Trust and consent</a><ul>
-<li><a class="reference internal" href="#hand-held-and-tv-modes">Hand-held and TV modes</a></li>
-<li><a class="reference internal" href="#fullscreen-mode">Fullscreen mode</a></li>
-<li><a class="reference internal" href="#note-on-non-visual-cues">Note on non-visual cues</a></li>
+<li><a class="reference internal" href="#">Audit logs</a><ul>
+<li><a class="reference internal" href="#storage-usage-and-retention">Storage usage and retention</a></li>
+<li><a class="reference internal" href="#removing-sensitive-data">Removing sensitive data</a></li>
 </ul>
 </li>
 </ul>

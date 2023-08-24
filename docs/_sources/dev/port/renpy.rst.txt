@@ -183,3 +183,41 @@ storage, which doesn't leave much room for user-created save slots. If a
 cartridge goes over its storage quota there's currently no way of extending
 it, and the emulator will refuse to store additional data until the cartridge
 deletes some of it to make more room; so keep those save slots reasonably small.
+
+
+Support for opening URLs
+------------------------
+
+In order to support opening URLs you'll need to request the
+:ref:`Open URLs <open urls capability>` capability for your cartridge. And
+you'll also need to include a privacy policy file that specifies what data
+is collected when the user clicks on those links. The
+:doc:`External URL handler <../manual/web/bridges/external-url-handler>`
+bridge will allow the URLs to be opened in the user's browser in a new window
+or tab.
+
+All these requirements can be fulfilled by adding the following to your JSON
+configuration:
+
+.. code-block:: json
+
+  {
+    "metadata": {
+      "legal": {
+        "privacy_policy_path": "/PRIVACY.txt"
+      }
+    },
+    "security": {
+      "capabilities": [
+        {
+          "type": "open-urls",
+          "reason": "Open links to developers' profiles in credits"
+        }
+      ]
+    },
+    "platform": {
+      "bridges": [
+        { "type": "external-url-handler" }
+      ]
+    }
+  }

@@ -11,3 +11,4 @@ you can better understand issues with running your game on Kate.
    overview
    cartridges
    sandboxing
+   capabilities

@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Sandboxing and APIs" href="sandboxing.html" /><link rel="prev" title="Overview" href="overview.html" />
 
     <!-- Generated with Sphinx 6.2.1 and Furo 2023.03.27 -->
-        <title>Cartridges - Kate 0.23.6 documentation</title>
+        <title>Cartridges - Kate 0.23.8 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?digest=fad236701ea90a88636c2a8c73b44ae642ed2a53" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
@@ -128,7 +128,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../../index.html"><div class="brand">Kate 0.23.6 documentation</div></a>
+      <a href="../../../index.html"><div class="brand">Kate 0.23.8 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -151,7 +151,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../index.html">
   
   
-  <span class="sidebar-brand-text">Kate 0.23.6 documentation</span>
+  <span class="sidebar-brand-text">Kate 0.23.8 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -182,6 +182,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../user/manual/security/privacy.html">Privacy policy</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../user/manual/security/trust.html">Trust and consent</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../user/manual/security/indicators.html">Resource indicators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../user/manual/security/audit.html">Audit logs</a></li>
 </ul>
 </li>
 </ul>
@@ -200,6 +201,7 @@
 <li class="toctree-l3"><a class="reference internal" href="overview.html">Overview</a></li>
 <li class="toctree-l3 current current-page"><a class="current reference internal" href="#">Cartridges</a></li>
 <li class="toctree-l3"><a class="reference internal" href="sandboxing.html">Sandboxing and APIs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="capabilities.html">Capabilities</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../api/index.html">Kate API</a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" role="switch" type="checkbox"/><label for="toctree-checkbox-8"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -220,6 +222,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../web/bridges/pointer-input-proxy.html">Pointer input proxy</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../web/bridges/local-storage-proxy.html">Local storage proxy</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../web/bridges/indexeddb-proxy.html">IndexedDB proxy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../web/bridges/external-url-handler.html">External URL handler</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../web/bridges/preserve-webgl-render.html">Preserve WebGL Render</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../web/bridges/capture-canvas.html">Capture canvas</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../web/bridges/renpy-tweaks.html">Ren’Py tweaks</a></li>
@@ -254,6 +257,7 @@
 <p class="caption" role="heading"><span class="caption-text">Changes, Terms, and Credits</span></p>
 <ul>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../../etc/releases/index.html">Release notes</a><input class="toctree-checkbox" id="toctree-checkbox-14" name="toctree-checkbox-14" role="switch" type="checkbox"/><label for="toctree-checkbox-14"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../etc/releases/0.23.8.html">Kate v0.23.8  (August 2023)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../etc/releases/0.23.6.html">Kate v0.23.6  (June 2023)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../etc/releases/0.23.5.html">Kate v0.23.5  (May 2023)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../etc/releases/0.23.4.html">Kate v0.23.4  (April 2023)</a></li>
@@ -321,6 +325,8 @@ a more efficient format for execution.</p>
 identify the cartridge and who published it;</p></li>
 <li><p>The <strong>Meta-data</strong>, which provides Kate with information to present the
 cartridge and allow it to be searched for;</p></li>
+<li><p>The <strong>Security</strong>, which specifies which additional capabilities the
+cartridge needs to function;</p></li>
 <li><p>The <strong>File system</strong>, which provides Kate with all data that makes up the
 cartridge; and</p></li>
 <li><p>The <strong>Runtime</strong>, which provides Kate with information about how to run the
@@ -379,6 +385,20 @@ played. It contains things such as what input methods are supported,
 which languages are offered, whether the cartridge has additional
 accessibility provisions, etc;</p></li>
 </ul>
+</section>
+<section id="security">
+<h2>Security<a class="headerlink" href="#security" title="Permalink to this heading">#</a></h2>
+<p>Cartridges run in a sandboxed environment with no powers by default. You can’t
+read files outside of your cartridge, save files to the player’s device,
+make network calls, or even take keyboard input.</p>
+<p>In order to be able to do any of these things, your cartridge needs to ask
+for them — and the player needs to consent in giving your cartridge those
+powers over their device. The security section of the cartridge is where you
+specify which of these powers your cartridge needs to be able to work.</p>
+<p>You might already be familiar with capabilities if you’ve used phone
+applications before; Kate’s capabilities are slightly different, but
+very much related. The <a class="reference internal" href="capabilities.html"><span class="doc">Capabilities</span></a> section explains
+this in more details.</p>
 </section>
 <section id="versioning">
 <span id="cartridge-versioning"></span><h2>Versioning<a class="headerlink" href="#versioning" title="Permalink to this heading">#</a></h2>
@@ -516,6 +536,7 @@ to emulate web APIs that the cartridge uses, using the Kate APIs.</p></li>
 <li><a class="reference internal" href="#">Cartridges</a><ul>
 <li><a class="reference internal" href="#cartridge-identification">Identification</a></li>
 <li><a class="reference internal" href="#meta-data">Meta-data</a></li>
+<li><a class="reference internal" href="#security">Security</a></li>
 <li><a class="reference internal" href="#versioning">Versioning</a></li>
 <li><a class="reference internal" href="#usage-terms">Usage terms</a></li>
 <li><a class="reference internal" href="#rating">Rating</a></li>
