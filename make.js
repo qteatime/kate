@@ -438,7 +438,7 @@ w.task("www:release", ["www:bundle"], async () => {
 
 w.task("www:generate-cache-manifest", [], () => {
   const files0 = glob("**/*", { cwd: "www", nodir: true });
-  const exclude = new Set(["worker.js"]);
+  const exclude = new Set(["worker.js", "versions.json"]);
   const files = files0.filter((x) => !exclude.has(x)).map((x) => `/${x}`);
   FS.writeFileSync("www/cache-manifest.json", JSON.stringify(files, null, 2));
 });

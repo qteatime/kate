@@ -78,6 +78,15 @@ self.addEventListener("install", (ev0: any) => {
   ev.waitUntil(update_cache());
 });
 
+self.addEventListener("fetch", (ev0: any) => {
+  ev0.respondWith(
+    (async () => {
+      const response = await caches.match(ev0.request);
+      return response || fetch(ev0.request);
+    })()
+  );
+});
+
 self.addEventListener("activate", (ev0: any) => {
   const ev = ev0 as ExtendableEvent;
   ev.waitUntil(remove_old_caches());
