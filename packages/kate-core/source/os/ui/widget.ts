@@ -1051,3 +1051,7 @@ export function cartridge_chip(cart: Cart.CartMeta | Cart.Cart) {
 export function line_field(title: Widgetable, value: Widgetable) {
   return hbox(1, [strong([title]), value]);
 }
+
+export function text_ellipsis(text: Widgetable[]) {
+  return klass("kate-ui-text-ellipsis", text);
+}

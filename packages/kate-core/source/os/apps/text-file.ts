@@ -21,7 +21,7 @@ export class SceneTextFile extends Scene {
           UI.fa_icon("circle-info", "lg"),
           new UI.Section_title([this.title]),
         ]),
-        right: this.app_title,
+        right: UI.text_ellipsis([this.app_title]),
       }),
       h("div", { class: "kate-os-text-scroll" }, [
         h("div", { class: "kate-os-padding" }, [this.text]),
