@@ -87,16 +87,18 @@ export class SceneSettings extends UI.SimpleScene {
         },
       }),
 
-      UI.link_card(this.os, {
-        icon: "code",
-        title: "For developers",
-        description: `
-          Settings intended only for those making their own cartridges for Kate.
-        `,
-        on_click: () => {
-          this.os.push_scene(new SceneDeveloperSettings(this.os));
-        },
-      }),
+      UI.when(this.os.kernel.console.options.mode !== "single", [
+        UI.link_card(this.os, {
+          icon: "code",
+          title: "For developers",
+          description: `
+            Settings intended only for those making their own cartridges for Kate.
+          `,
+          on_click: () => {
+            this.os.push_scene(new SceneDeveloperSettings(this.os));
+          },
+        }),
+      ]),
     ];
   }
 }
