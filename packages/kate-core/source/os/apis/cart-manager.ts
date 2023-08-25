@@ -157,6 +157,12 @@ export class CartManager {
   }
 
   async install(cart: Cart.Cart) {
+    if (this.os.kernel.console.options.mode === "single") {
+      throw new Error(
+        `Cartridge installation is not available in single mode.`
+      );
+    }
+
     const old_meta = await this.try_read_metadata(cart.id);
     if (old_meta != null) {
       const version = cart.version;

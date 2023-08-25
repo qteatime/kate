@@ -13,6 +13,13 @@ export default [
         env.cart.id,
         "modal-dialog",
         async () => {
+          if (os.kernel.console.options.mode === "single") {
+            throw new EMessageFailed(
+              "kate.os.not-available",
+              "Feature not available in single mode"
+            );
+          }
+
           const cart = Cart.parse(cartridge);
           const errors = await Cart.verify_integrity(cart);
           if (errors.length !== 0) {

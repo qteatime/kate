@@ -9,7 +9,7 @@ import ObjectStorageMessages from "./object-storage";
 import SpecialMessages from "./special";
 import BrowserMessages from "./browser";
 import DeviceFileMessages from "./device-file";
-import CartManagerMessages from "./cart_manager";
+import CartManagerMessages from "./cart-manager";
 import DialogMessages from "./dialog";
 
 type Message = {
