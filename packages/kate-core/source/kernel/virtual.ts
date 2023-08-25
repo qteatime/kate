@@ -217,24 +217,6 @@ export class VirtualConsole {
     );
     this.update_scale(null);
 
-    this.body
-      .querySelector(".kate-engraving")
-      ?.addEventListener("click", () => {
-        this.set_case(
-          this._case.type === "handheld"
-            ? {
-                type: "tv",
-                resolution: 720,
-                scale_to_fit: this._case.scale_to_fit,
-              }
-            : {
-                type: "handheld",
-                resolution: 480,
-                scale_to_fit: this._case.scale_to_fit,
-              }
-        );
-      });
-
     const listen_button = (button: HTMLElement, key: InputKey) => {
       button.addEventListener("mousedown", (ev) => {
         ev.preventDefault();
