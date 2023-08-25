@@ -9,7 +9,7 @@ export class KateDialog {
   constructor(readonly os: KateOS) {}
 
   async message(id: string, x: { title: string; message: UI.Widgetable }) {
-    const hud = new HUD_Dialog(this);
+    const hud = new HUD_Dialog(this, "message");
     try {
       this.os.push_scene(hud);
       return await hud.show(
@@ -34,7 +34,7 @@ export class KateDialog {
       dangerous?: boolean;
     }
   ) {
-    const hud = new HUD_Dialog(this);
+    const hud = new HUD_Dialog(this, "confirm");
     try {
       this.os.push_scene(hud);
       return await hud.show(
@@ -61,7 +61,7 @@ export class KateDialog {
     message: UI.Widgetable,
     process: (_: Progress) => Promise<void>
   ) {
-    const hud = new HUD_Dialog(this);
+    const hud = new HUD_Dialog(this, "progress");
     try {
       this.os.push_scene(hud);
       return await hud.progress(id, message, process);
@@ -154,7 +154,8 @@ export class KateDialog {
           ),
         ]),
       ],
-      null
+      null,
+      "text-input"
     );
     return await deferred.promise;
   }
@@ -163,9 +164,10 @@ export class KateDialog {
     id: string,
     className: string,
     contents: UI.Widgetable[],
-    cancel_value: A
+    cancel_value: A,
+    description: string = "custom"
   ): Deferred<A> {
-    const hud = new HUD_Dialog(this);
+    const hud = new HUD_Dialog(this, description);
     this.os.push_scene(hud);
     const deferred = hud.custom(
       id,
@@ -185,7 +187,7 @@ export class KateDialog {
     buttons: { label: string; value: A }[],
     cancel_value: A
   ) {
-    const hud = new HUD_Dialog(this);
+    const hud = new HUD_Dialog(this, "pop-menu");
     try {
       this.os.push_scene(hud);
       return await hud.pop_menu(id, heading, buttons, cancel_value);
@@ -221,17 +223,13 @@ export class Progress {
 export class HUD_Dialog extends Scene {
   readonly FADE_OUT_TIME_MS = 250;
 
-  constructor(readonly manager: KateDialog) {
+  constructor(readonly manager: KateDialog, readonly description = "dialog") {
     super(manager.os, false);
-    (this as any).canvas = UI.h("div", { class: "kate-hud-dialog" }, []);
-  }
-
-  setup() {
-    this.manager.os.show_hud(this);
-  }
-
-  teardown() {
-    this.manager.os.hide_hud(this);
+    (this as any).canvas = UI.h(
+      "div",
+      { class: "kate-hud-dialog", "data-title": description },
+      []
+    );
   }
 
   render() {
@@ -260,9 +258,7 @@ export class HUD_Dialog extends Scene {
       const result = process(progress);
       this.canvas.textContent = "";
       this.canvas.appendChild(element);
-      this.os.focus_handler.push_root(this.canvas);
       await result;
-      this.os.focus_handler.pop_root(this.canvas);
       setTimeout(async () => {
         element.classList.add("leaving");
         await wait(this.FADE_OUT_TIME_MS);
@@ -349,11 +345,9 @@ export class HUD_Dialog extends Scene {
         }
         return false;
       };
-      this.os.focus_handler.push_root(this.canvas);
       this.os.focus_handler.listen(this.canvas, key_handler);
       result.promise.finally(() => {
         this.os.kernel.exit_trusted_mode();
-        this.os.focus_handler.pop_root(this.canvas);
         this.os.focus_handler.remove(this.canvas, key_handler);
         setTimeout(async () => {
           dialog.classList.add("leaving");
