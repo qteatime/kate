@@ -234,10 +234,7 @@ export class HUD_ContextMenu extends Scene {
       return;
     }
 
-    const licence_file = await this.os.cart_manager.read_file_by_path(
-      process.cart.id,
-      path
-    );
+    const licence_file = await process.runtime.read_file(path);
     const decoder = new TextDecoder();
     const licence = decoder.decode(licence_file.data);
     const legal = new SceneTextFile(

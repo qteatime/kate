@@ -48,6 +48,7 @@ export abstract class CR_Process {
   abstract exit(): Promise<void>;
   abstract pause(): Promise<void>;
   abstract unpause(): Promise<void>;
+  abstract read_file(path: string): Promise<Cart.BasicFile>;
   abstract node: Node;
 }
 
@@ -96,6 +97,10 @@ export class CRW_Process extends CR_Process {
 
   get node() {
     return this.env.frame;
+  }
+
+  async read_file(path: string): Promise<Cart.BasicFile> {
+    return this.env.read_file(path);
   }
 
   async setup() {
