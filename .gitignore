@@ -13,3 +13,6 @@ dist/
 /asset-source/
 /ignore/
 .vscode
+build/
+ecosystem/importer/www/
+ecosystem/**/*.kart
