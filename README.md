@@ -64,11 +64,11 @@ Kate does not accept source contributions currently, since it has not reached a 
 - ~~Pointer input support;~~
 - ~~Higher resolution with external displays;~~
 - ~~Visualising and managing device storage;~~ _(0.23.6)_
+- ~~Arbitrary text input;~~
+- ~~Auditing action logs in the console;~~ _(0.23.8)_
 - **Exporting and synchronising data across devices;** _(<- we're here now)_
 - Decentralised stores (a community-driven form of curation);
-- Arbitrary text input;
 - Game collections and library filtering;
-- Auditing action logs in the console;
 - Native app support (Android, ChromeOS, SteamOS, Linux, Windows);
 - Accessibility options (TTS, contrast, sizes, etc);
 - Stabilise cartridge format;
