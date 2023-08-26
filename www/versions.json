@@ -61,7 +61,7 @@
       "main": "/kate/kate-0.23.8-a4.js",
       "breaking_change": false,
       "migration_needed": false,
-      "channels": ["nightly"],
+      "channels": ["preview", "nightly"],
       "release_notes": "/kate/RELEASE-0.23.8-a4.txt"
     },
     {
@@ -74,7 +74,7 @@
     }
   ],
   "channels": {
-    "preview": "0.23.6-a2",
+    "preview": "0.23.8-a4",
     "nightly": "0.23.8-a4",
     "latest": "latest"
   }
