@@ -95,6 +95,7 @@
   "/kate/kate-0.23.8-a1.js",
   "/kate/kate-0.23.8-a2.js",
   "/kate/kate-0.23.8-a3.js",
+  "/kate/kate-0.23.8-a4.js",
   "/kate/kate-latest.js",
   "/kate/RELEASE-0.23.4-a1.txt",
   "/kate/RELEASE-0.23.5-rc1.txt",
@@ -103,12 +104,12 @@
   "/kate/RELEASE-0.23.8-a1.txt",
   "/kate/RELEASE-0.23.8-a2.txt",
   "/kate/RELEASE-0.23.8-a3.txt",
+  "/kate/RELEASE-0.23.8-a4.txt",
   "/kate/RELEASE-latest.txt",
   "/loader.js",
   "/manifest.json",
   "/sfx/cursor.wav",
   "/sfx/invalid.wav",
   "/sfx/select.wav",
-  "/sfx/shutter.wav",
-  "/versions.json"
+  "/sfx/shutter.wav"
 ]

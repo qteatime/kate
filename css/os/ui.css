@@ -6,21 +6,24 @@
   align-items: baseline;
   font-size: 18px;
   height: 64px;
+  gap: 1rem;
+  overflow: hidden;
 }
 
 .kate-ui-title-bar-child {
   flex-grow: 1;
-  width: 100%;
   display: flex;
   flex-direction: row;
   align-items: center;
   gap: 10px;
   white-space: nowrap;
+  overflow: hidden;
 }
 
 .kate-ui-title-bar-child:first-child {
   justify-content: left;
   margin-left: 16px;
+  flex-shrink: 0;
 }
 
 .kate-ui-title-bar-child:last-child:not(:first-child) {
@@ -424,4 +427,10 @@
   border: 1px solid var(--color-border-d1);
   border-radius: 4px;
   padding: 1rem;
+}
+
+.kate-ui-text-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }

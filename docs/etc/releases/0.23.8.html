@@ -419,6 +419,10 @@ The new limits should be safe and reasonable for most games.</p></li>
 <li><p>Introduced a “Fairness Supervisor”, which helps prevent cartridges from
 abusing resources in the device in a way that makes it unusable.
 (PRs: <a class="reference external" href="https://github.com/qteatime/kate/pull/20">#20</a>)</p></li>
+<li><p>Removed the possibility of installing cartridges in single-cartridge mode.
+Also removed the “For Developers” settings from this mode — since this
+is used to publish a single cartridge in a platform like Itch.io, neither
+of these features are useful or desirable there.</p></li>
 </ul>
 </div></blockquote>
 </section>
@@ -439,6 +443,12 @@ when opening the settings screen while playing a game.</p></li>
 <li><p>Virtual input is reset when the console loses focus. This makes it harder
 to have confusing things happening when you switch out to another tab
 or minimise Kate.</p></li>
+<li><p>Fixed an issue where an error happening while showing a dialog would cause
+gamepad controls to be stuck in an inexisting dialog screen.</p></li>
+<li><p>Fixed an issue where cartridges with very long titles would overflow the
+screen and cause it to move around as focus changed horizontally.</p></li>
+<li><p>Fixed an issue where licence/privacy notices could not be loaded in
+single-cartridge mode.</p></li>
 </ul>
 </div></blockquote>
 </section>

@@ -133,6 +133,11 @@ Minor changes
     abusing resources in the device in a way that makes it unusable.
     (PRs: `#20 <https://github.com/qteatime/kate/pull/20>`_)
 
+  * Removed the possibility of installing cartridges in single-cartridge mode.
+    Also removed the "For Developers" settings from this mode — since this
+    is used to publish a single cartridge in a platform like Itch.io, neither
+    of these features are useful or desirable there.
+
 
 Fixed bugs
 ----------
@@ -153,3 +158,12 @@ Fixed bugs
   * Virtual input is reset when the console loses focus. This makes it harder
     to have confusing things happening when you switch out to another tab
     or minimise Kate.
+
+  * Fixed an issue where an error happening while showing a dialog would cause
+    gamepad controls to be stuck in an inexisting dialog screen.
+
+  * Fixed an issue where cartridges with very long titles would overflow the
+    screen and cause it to move around as focus changed horizontally.
+
+  * Fixed an issue where licence/privacy notices could not be loaded in
+    single-cartridge mode.
