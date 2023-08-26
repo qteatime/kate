@@ -65,6 +65,7 @@ async function load_all_media(dom: Document, context: RuntimeEnv) {
 
 function add_preamble(dom: Document, context: RuntimeEnv) {
   const script = dom.createElement("script");
+  const user_agent = "Kate";
   const id = `preamble_${make_id()}`;
   script.id = id;
   script.textContent = `
@@ -75,6 +76,12 @@ function add_preamble(dom: Document, context: RuntimeEnv) {
     let script = document.getElementById(${JSON.stringify(id)});
     script.remove();
     script = null;
+
+    Object.defineProperty(navigator, "userAgent", {
+      value: ${JSON.stringify(user_agent)},
+      enumerable: true,
+      configurable: true
+    });
   }();
   `;
   dom.head.insertBefore(script, dom.head.firstChild);
