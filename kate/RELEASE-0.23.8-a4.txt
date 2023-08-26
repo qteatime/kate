@@ -162,3 +162,8 @@ Fixed bugs
 
   * Fixed an issue where licence/privacy notices could not be loaded in
     single-cartridge mode.
+
+  * Stopped leaking the user agent of the browser to the cartridge process,
+    which in turn avoids engines relying on that (e.g.: Ren'py) from making
+    unnecessary adaptations for mobile phones, often rendering the game
+    unplayable.
