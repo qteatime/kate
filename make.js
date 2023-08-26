@@ -5,6 +5,7 @@ const OS = require("os");
 const Path = require("path");
 const FS = require("fs");
 const glob = require("glob").sync;
+const crypto = require("crypto");
 const { copy, copy_tree, assert_root, zip } = require("./support/utils");
 const gen_build = require("./support/generate-builds");
 
@@ -629,6 +630,38 @@ w.task(
   ["release:linux:x64", "release:linux:armv7l", "release:linux:arm64"],
   () => {}
 );
+
+w.task("release:cartridges", ["example:all", "ecosystem:all"], () => {
+  // Copy all cartridges
+  FS.mkdirSync("dist/cartridges/examples", { recursive: true });
+  copy(
+    "examples/boon-scrolling/boon-scrolling.kart",
+    "dist/cartridges/examples/boon-scrolling.kart"
+  );
+  copy(
+    "examples/hello-world/hello.kart",
+    "dist/cartridges/examples/hello.kart"
+  );
+  copy("examples/katchu/katchu.kart", "dist/cartridges/examples/katchu.kart");
+  FS.mkdirSync("dist/cartridges/ecosystem", { recursive: true });
+  copy(
+    "ecosystem/importer/kate-importer.kart",
+    "dist/cartridges/ecosystem/kate-importer.kart"
+  );
+
+  // Generate integrity hashes
+  const files = glob("dist/cartridges/**/*.kart");
+  const hashes = files.map((file) => {
+    const buffer = FS.readFileSync(file);
+    const hash = crypto
+      .createHash("sha256")
+      .update(buffer)
+      .digest()
+      .toString("hex");
+    return `${hash} ${file.replace(/^dist\/cartridges\//, "")}`;
+  });
+  FS.writeFileSync("dist/cartridges/SHASUM256.txt", hashes.join("\n") + "\n");
+});
 
 // -- Multi-project convenience
 w.task("dependencies", ["tools:dependencies"], () => {});
