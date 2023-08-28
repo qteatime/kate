@@ -1,6 +1,6 @@
 {
   "name": "@qteatime/kate-core",
-  "version": "0.23.8-a4",
+  "version": "0.23.9-a1",
   "description": "The Kate emulator --- a fantasy console for 2d story games.",
   "main": "build/index.js",
   "repository": {
