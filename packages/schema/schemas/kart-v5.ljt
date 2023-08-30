@@ -1,0 +1,259 @@
+% ljt/0
+schema "KART" version 5
+
+// == Informational: not encoded with LJT
+type Cartridge {
+  field header: Header;
+  field metadata: Metadata;
+  field files: File[];
+}
+
+// == Information for parsing the cartridge
+type Header {
+  field minimum-kate-version: Kate-version;
+  field metadata-location: Binary-location;
+  field content-location: Binary-location;
+}
+
+// == Information for handling the cartridge's contents
+type Metadata {
+  field identification: Meta-identification;
+  field presentation: Meta-presentation;
+  field classification: Meta-classification;
+  field legal: Meta-legal;
+  field accessibility: Meta-accessibility;
+  field security: Security;
+  field runtime: Runtime;
+  field signature: Signature-block?;
+  field signed-by: Text[];
+}
+
+type Meta-identification {
+  field id: Text;
+  field version: Version;
+  field release-date: Date;
+}
+
+type Meta-presentation {
+  field title: Text;
+  field author: Text;
+  field tagline: Text;
+  field description: Text;
+  field release-type: Release-type;
+  field thumbnail-path: Text?;
+  field banner-path: Text?;
+}
+
+type Meta-classification {
+  field genre: Genre[];
+  field tags: Text[];
+  field rating: Content-rating;
+  field warnings: Text?;
+}
+
+type Meta-legal {
+  field derivative-policy: Derivative-policy;
+  field licence-path: Text?;
+  field privacy-policy-path: Text?;
+}
+
+type Meta-accessibility {
+  field input-methods: Input-method[];
+  field languages: Language[];
+  field provisions: Accessibility-provision[];
+  field average-completion-seconds: Uint32?;
+  field average-session-seconds: Uint32?;
+}
+
+// == Information for assessing cartridge risks
+type Security {
+  field capabilities: Capability[];
+}
+
+// == Information for running the cartridge
+union Runtime {
+  type Web-archive {
+    field html-path: Text;
+    field bridges: Bridge[];
+  }
+}
+
+// == Additional content stored in a cartridge
+type File {
+  field path: Text;
+  field mime: Text;
+  field integrity: Raw-bytes;
+  field data: Raw-bytes;
+  field signature: Signature-block?;
+}
+
+// == Signature blocks
+type Signature-block {
+  field purpose: Text;
+  field signatures: Signature[];
+}
+
+type Signature {
+  field signed-by: Text;
+  field signature: Raw-bytes;
+}
+
+// -- Supporting types ------------------------------------------------
+type Version {
+  field major: Uint32;
+  field minor: Uint32;
+}
+
+type Kate-version {
+  field major: Uint32;
+  field minor: Uint32;
+  field patch: Uint32;
+}
+
+type Binary-location {
+  field offset: Uint32;
+  field size: Uint32;
+}
+
+type Date {
+  field year: Uint32;
+  field month: Uint8;
+  field day: Uint8;
+}
+
+union Genre {
+  type Not-specified {}
+  type Action {}
+  type Platformer {}
+  type Shooter {}
+  type Racing {}
+  type Fighting {}
+  type Rhythm {}
+  type Adventure {}
+  type Interactive-fiction {}
+  type Visual-novel {}
+  type Puzzle {}
+  type RPG {}
+  type Simulation {}
+  type Strategy {}
+  type Sports {}
+  type Tool {}
+  type Other {}
+}
+
+union Content-rating {
+  type General {}
+  type Teen-and-up {}
+  type Mature {}
+  type Explicit {}
+  type Unknown {}
+}
+
+union Release-type {
+  type Prototype {}
+  type Early-access {}
+  type Beta {}
+  type Demo {}
+  type Regular {}
+  type Unofficial {}
+}
+
+union Derivative-policy {
+  type Not-allowed {}
+  type Personal-use {}
+  type Non-commercial-use {}
+  type Commercial-use {}
+}
+
+union Input-method {
+  type Buttons {}
+  type Pointer {}
+}
+
+type Language {
+  field iso-code: Text;
+  field interface: Boolean;
+  field audio: Boolean;
+  field text: Boolean;
+}
+
+union Accessibility-provision {
+  type High-contrast {}
+  type Subtitles {}
+  type Image-captions {}
+  type Voiced-text {}
+  type Configurable-difficulty {}
+  type Skippable-content {}
+}
+
+union Bridge {
+  type Network-proxy {}
+
+  type Local-storage-proxy {}
+
+  type Input-proxy {
+    field mapping: Virtual-key -> Keyboard-key;
+  }
+
+  type Preserve-WebGL-render {}
+
+  type Capture-canvas {
+    field selector: Text;
+  }
+
+  type Pointer-input-proxy {
+    field selector: Text;
+    field hide-cursor: Boolean;
+  }
+
+  type IndexedDB-proxy {
+    field versioned: Boolean;
+  }
+
+  type Renpy-web-tweaks {
+    field version: Version;
+  }
+
+  type External-URL-handler {}
+}
+
+union Virtual-key {
+  type Up {}
+  type Right {}
+  type Down {}
+  type Left {}
+  type Menu {}
+  type Capture {}
+  type X {}
+  type O {}
+  type L-trigger {}
+  type R-trigger {}
+}
+
+type Keyboard-key {
+  field code: Text;
+}
+
+union Capability {
+  type Contextual {
+    field capability: Contextual-capability;
+    field reason: Text;
+  }
+}
+
+union Contextual-capability {
+  // medium risk: data exfiltration, privacy concerns
+  type Open-URLs {}
+
+  // high risk: security, privacy, escalation concerns
+  type Request-device-files {}
+
+  // critical risk: security, privacy, escalation concerns
+  type Install-cartridges {}
+
+  // critical risk: security, escalation concerns
+  type Download-files {}
+
+  // low risk: annoyance, denial-of-service
+  type Show-dialogs {}
+}

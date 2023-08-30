@@ -256,16 +256,20 @@ w.task("ljt:build", ["ljt:compile"], () => {});
 
 // -- Schema
 w.task("schema:generate", [], () => {
-  ljtc(
-    "json",
-    "packages/schema/cartridge.ljt",
-    "packages/schema/generated/cartridge.json"
-  );
-  ljtc(
-    "ts-types",
-    "packages/schema/cartridge.ljt",
-    "packages/schema/generated/cartridge-schema.ts"
-  );
+  FS.mkdirSync("packages/schema/generated", { recursive: true });
+  for (const file of glob("*.ljt", { cwd: "packages/schema/schemas" })) {
+    const name = Path.basename(file, ".ljt");
+    ljtc(
+      "json",
+      `packages/schema/schemas/${file}`,
+      `packages/schema/generated/${name}.json`
+    );
+    ljtc(
+      "ts-types",
+      `packages/schema/schemas/${file}`,
+      `packages/schema/generated/${name}.ts`
+    );
+  }
 });
 
 w.task("schema:compile", ["ljt:build"], () => {

@@ -12,5 +12,5 @@
     "declaration": true
   },
   "include": ["generated", "lib"],
-  "references": [{ "path": "../ljt-vm" }]
+  "references": [{ "path": "../ljt-vm" }, { "path": "../util" }]
 }
