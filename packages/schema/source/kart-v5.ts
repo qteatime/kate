@@ -80,7 +80,7 @@ export function encode(options: EncodeOptions) {
     LJT.encode_magicless(x, schema, Cart.File.tag)
   );
   const file_size = new Uint8Array(4);
-  new DataView(file_size.buffer).setUint32(0, file_list.length);
+  new DataView(file_size.buffer).setUint32(0, file_list.length, true);
   const file_bytes = concat_all([file_size, ...file_list]);
 
   const header = Cart.Header({
@@ -95,10 +95,8 @@ export function encode(options: EncodeOptions) {
     }),
   });
   const header_size = LJT.encode(header, schema, Cart.Header.tag).length;
-  (header["metadata-location"] as any).offset =
-    header_size + LJT.magic_size(schema);
-  (header["content-location"] as any).offset =
-    header_size + LJT.magic_size(schema) + meta_bytes.length;
+  (header["metadata-location"] as any).offset = header_size;
+  (header["content-location"] as any).offset = header_size + meta_bytes.length;
 
   const header_bytes = LJT.encode(header, schema, Cart.Header.tag);
   return concat_all([header_bytes, meta_bytes, file_bytes]);
@@ -108,7 +106,7 @@ function slice_intersect(
   a: { offset: number; size: number },
   b: { offset: number; size: number }
 ) {
-  if (a.offset + a.size < b.offset) return false;
-  if (a.offset > b.offset + b.size) return false;
+  if (a.offset + a.size <= b.offset) return false;
+  if (a.offset >= b.offset + b.size) return false;
   return true;
 }
