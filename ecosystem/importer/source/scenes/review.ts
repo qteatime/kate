@@ -1,5 +1,5 @@
 import { UI, UIScene, Widgetable } from "../deps/appui";
-import { Cart } from "../deps/schema";
+import { kart_v5 as Cart } from "../deps/schema";
 import {
   Observable,
   load_image_from_bytes,
@@ -169,7 +169,11 @@ export class SceneReview extends UIScene {
     try {
       const cartridge = await candidate.make_cartridge();
       progress.set_message("Packing cartridge...");
-      const bytes = Cart.encode(cartridge);
+      const bytes = Cart.encode({
+        kate_version: Cart.Kate_version({ major: 0, minor: 29, patch: 1 }),
+        metadata: cartridge.metadata,
+        files: cartridge.files,
+      });
       progress.set_message("Preparing to install...");
       await KateAPI.cart_manager.install(bytes);
       progress.close();

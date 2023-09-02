@@ -1,4 +1,4 @@
-import { Cart } from "../deps/schema";
+import { kart_v5 as Cart } from "../deps/schema";
 import { Pathname, make_id, unreachable } from "../deps/utils";
 
 export function make_mapping(mapping: Record<KateTypes.InputKey, string>) {
@@ -108,8 +108,8 @@ export async function maybe_add_thumbnail(
 }
 
 export function make_meta(title: string, thumbnail: Uint8Array | null) {
-  return [
-    Cart.Metadata.Presentation({
+  return {
+    presentation: Cart.Meta_presentation({
       title: title,
       author: "Unknown",
       tagline: "",
@@ -118,25 +118,25 @@ export function make_meta(title: string, thumbnail: Uint8Array | null) {
       "thumbnail-path": thumbnail != null ? "/kate-thumbnail.png" : null,
       "banner-path": null,
     }),
-    Cart.Metadata.Classification({
+    classification: Cart.Meta_classification({
       genre: [],
       tags: [],
       rating: Cart.Content_rating.Unknown({}),
       warnings: null,
     }),
-    Cart.Metadata.Legal({
+    legal: Cart.Meta_legal({
       "derivative-policy": Cart.Derivative_policy.Not_allowed({}),
       "licence-path": null,
       "privacy-policy-path": null,
     }),
-    Cart.Metadata.Accessibility({
+    accessibility: Cart.Meta_accessibility({
       "input-methods": [],
       languages: [],
       provisions: [],
       "average-session-seconds": null,
       "average-completion-seconds": null,
     }),
-  ];
+  };
 }
 
 export function make_game_id(uuid: string, title: string) {
@@ -160,5 +160,6 @@ export async function make_file(path: Pathname, data: Uint8Array) {
     mime: mime_type(path),
     integrity: new Uint8Array(integrity),
     data: data,
+    signature: null,
   });
 }

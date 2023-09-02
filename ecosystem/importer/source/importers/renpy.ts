@@ -1,8 +1,8 @@
 import { JSZip } from "../deps/jszip";
-import { Cart } from "../deps/schema";
+import { kart_v5 as Cart } from "../deps/schema";
 import { GlobPattern, GlobPatternList, Pathname, make_id } from "../deps/utils";
 import { rpa } from "../formats";
-import type { Importer } from "./core";
+import type { CartConfig, Importer } from "./core";
 import {
   make_file,
   make_game_id,
@@ -57,7 +57,7 @@ export class RenpyImporter implements Importer {
     return Number(this.versions.engine.split(".")[1]);
   }
 
-  async make_cartridge(): Promise<Cart.Cartridge> {
+  async make_cartridge(): Promise<CartConfig> {
     const now = new Date();
     const decoder = new TextDecoder();
     const runtime_dir = Pathname.from_string("/www/runtimes/renpy").to(
@@ -89,53 +89,59 @@ export class RenpyImporter implements Importer {
       }),
     ]);
 
-    const cartridge = Cart.Cartridge({
-      id: make_game_id(this.id, this.title),
-      version: Cart.Version({ major: 1, minor: 0 }),
-      "release-date": Cart.Date({
-        year: now.getFullYear(),
-        month: now.getMonth() + 1,
-        day: now.getDate(),
-      }),
-      security: Cart.Security({
-        capabilities: [],
-      }),
-      runtime: Cart.Runtime.Web_archive({
-        "html-path": "/index.html",
-        bridges: [
-          Cart.Bridge.Network_proxy({}),
-          Cart.Bridge.Input_proxy({
-            mapping: make_mapping({
-              up: "ArrowUp",
-              right: "ArrowRight",
-              left: "ArrowLeft",
-              down: "ArrowDown",
-              x: "Escape",
-              o: "Enter",
-              menu: "ShiftLeft",
-              capture: "KeyC",
-              ltrigger: "PageUp",
-              rtrigger: "ControlLeft",
+    const cartridge: CartConfig = {
+      metadata: Cart.Metadata({
+        ...make_meta(this.title, this.thumbnail),
+        identification: Cart.Meta_identification({
+          id: make_game_id(this.id, this.title),
+          version: Cart.Version({ major: 1, minor: 0 }),
+          "release-date": Cart.Date({
+            year: now.getFullYear(),
+            month: now.getMonth() + 1,
+            day: now.getDate(),
+          }),
+        }),
+        security: Cart.Security({
+          capabilities: [],
+        }),
+        runtime: Cart.Runtime.Web_archive({
+          "html-path": "/index.html",
+          bridges: [
+            Cart.Bridge.Network_proxy({}),
+            Cart.Bridge.Input_proxy({
+              mapping: make_mapping({
+                up: "ArrowUp",
+                right: "ArrowRight",
+                left: "ArrowLeft",
+                down: "ArrowDown",
+                x: "Escape",
+                o: "Enter",
+                menu: "ShiftLeft",
+                capture: "KeyC",
+                ltrigger: "PageUp",
+                rtrigger: "ControlLeft",
+              }),
             }),
-          }),
-          Cart.Bridge.Pointer_input_proxy({
-            selector: "#canvas",
-            "hide-cursor": false,
-          }),
-          Cart.Bridge.Preserve_WebGL_render({}),
-          Cart.Bridge.Capture_canvas({ selector: "#canvas" }),
-          Cart.Bridge.IndexedDB_proxy({ versioned: false }),
-          Cart.Bridge.Renpy_web_tweaks({
-            version: Cart.Version({
-              major: this.engine_major,
-              minor: this.engine_minor,
+            Cart.Bridge.Pointer_input_proxy({
+              selector: "#canvas",
+              "hide-cursor": false,
             }),
-          }),
-        ],
+            Cart.Bridge.Preserve_WebGL_render({}),
+            Cart.Bridge.Capture_canvas({ selector: "#canvas" }),
+            Cart.Bridge.IndexedDB_proxy({ versioned: false }),
+            Cart.Bridge.Renpy_web_tweaks({
+              version: Cart.Version({
+                major: this.engine_major,
+                minor: this.engine_minor,
+              }),
+            }),
+          ],
+        }),
+        signature: null,
+        "signed-by": [],
       }),
-      metadata: make_meta(this.title, this.thumbnail),
       files: await maybe_add_thumbnail(files, this.thumbnail),
-    });
+    };
     return cartridge;
   }
 }

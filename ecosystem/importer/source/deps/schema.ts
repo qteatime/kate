@@ -1,1 +1,1 @@
-export * from "../../../../packages/schema/lib";
+export * from "../../../../packages/schema/build";
