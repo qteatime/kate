@@ -1,5 +1,5 @@
 import * as LJT from "../../ljt-vm/build";
-const source = require("../generated/kart-v5.json");
+const source = require("./generated/kart-v5.json");
 import * as Cart from "./generated/kart-v5";
 export * from "./generated/kart-v5";
 import { concat_all } from "./util";

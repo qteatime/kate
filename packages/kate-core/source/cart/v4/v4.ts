@@ -1,10 +1,11 @@
-import * as Cart_v4 from "../../../../schema/lib/cartridge-schema";
-import { Cart } from "../cart-type";
+import * as Cart_v4 from "../../../../schema/build/kart-v4";
+import { Cart, CartMeta } from "../cart-type";
 import { regex, str } from "../parser-utils";
 import * as Metadata from "./metadata";
 import * as Runtime from "./runtime";
 import * as Files from "./files";
 import * as Security from "./security";
+import { mb } from "../../utils";
 export { Cart_v4 };
 
 const MAGIC = Number(
@@ -34,8 +35,12 @@ export function parse_v4(x: Uint8Array): Cart | null {
   if (magic_header !== MAGIC) {
     return null;
   }
+  const version = view.getUint32(4, true);
+  if (version !== 4) {
+    return null;
+  }
 
-  const cart = Cart_v4.decode(x, Cart_v4.Cartridge.tag);
+  const cart = Cart_v4.decode(x);
   const meta = Metadata.parse_metadata(cart);
   const runtime = Runtime.parse_runtime(cart);
   const security = Security.parse_security(cart);
@@ -50,4 +55,11 @@ export function parse_v4(x: Uint8Array): Cart | null {
     runtime: runtime,
     files: files,
   };
+}
+
+export function parse_v4_metadata(x: Uint8Array): CartMeta | null {
+  if (x.length > mb(64)) {
+    console.warn(`v4 cartridge too big for parsing metadata`);
+  }
+  return parse_v4(x);
 }

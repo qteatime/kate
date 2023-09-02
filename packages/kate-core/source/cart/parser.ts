@@ -1,7 +1,8 @@
 import { Cart, File } from "./cart-type";
 import { parse_v4 } from "./v4/v4";
+import { parse_v5 } from "./v5/v5";
 
-const parsers = [parse_v4];
+const parsers = [parse_v5, parse_v4];
 
 export function try_parse(data: Uint8Array) {
   for (const parser of parsers) {

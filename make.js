@@ -273,6 +273,12 @@ w.task("schema:generate", [], () => {
 });
 
 w.task("schema:compile", ["ljt:build"], () => {
+  for (const file of glob("**/*.json", { cwd: "packages/schema/source" })) {
+    copy(
+      Path.join("packages/schema/source", file),
+      Path.join("packages/schema/build", file)
+    );
+  }
   tsc("packages/schema");
 });
 
