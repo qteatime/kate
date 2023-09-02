@@ -1,7 +1,7 @@
 import * as Path from "path";
 import * as FS from "fs";
 import * as Crypto from "crypto";
-import { Cart } from "./deps/schema";
+import { kart_v5 as Cart } from "./deps/schema";
 import { enumerate, from_bytes, unreachable } from "./deps/util";
 import * as Glob from "glob";
 import { Spec as T } from "./deps/util";
@@ -460,7 +460,7 @@ function metadata(x: Kart["metadata"], root: string, base_dir: string) {
     assert_file_exists(x.legal.privacy_policy_path, root, base_dir);
   }
 
-  const presentation = Cart.Metadata.Presentation({
+  const presentation = Cart.Meta_presentation({
     title: x.presentation.title,
     author: x.presentation.author,
     tagline: x.presentation.tagline,
@@ -474,14 +474,14 @@ function metadata(x: Kart["metadata"], root: string, base_dir: string) {
       : null,
   });
 
-  const classification = Cart.Metadata.Classification({
+  const classification = Cart.Meta_classification({
     genre: x.classification?.genre.map(make_genre) ?? [],
     tags: x.classification?.tags ?? [],
     rating: make_rating(x.classification?.rating ?? "unknown"),
     warnings: x.classification?.warnings ?? null,
   });
 
-  const legal = Cart.Metadata.Legal({
+  const legal = Cart.Meta_legal({
     "derivative-policy": make_derivative_policy(
       x.legal?.derivative_policy ?? "personal-use"
     ),
@@ -493,7 +493,7 @@ function metadata(x: Kart["metadata"], root: string, base_dir: string) {
       : null,
   });
 
-  const accessibility = Cart.Metadata.Accessibility({
+  const accessibility = Cart.Meta_accessibility({
     "input-methods":
       x.accessibility?.input_methods.map(make_input_method) ?? [],
     languages: x.accessibility?.languages.map(make_language) ?? [],
@@ -507,7 +507,7 @@ function metadata(x: Kart["metadata"], root: string, base_dir: string) {
       : null,
   });
 
-  return [presentation, classification, legal, accessibility];
+  return { presentation, classification, legal, accessibility } as const;
 }
 
 function make_genre(x: Genre): Cart.Genre {
@@ -686,6 +686,7 @@ async function files(patterns: Kart["files"], root: string, base_dir: string) {
           mime: mime,
           integrity: new Uint8Array(integrity),
           data: load_file(path, root, base_dir),
+          signature: null,
         })
       );
     }
@@ -742,8 +743,12 @@ function make_capability(json: Capability) {
   }
 }
 
-function save(cartridge: Cart.Cartridge, output: string) {
-  const bytes = Cart.encode(cartridge);
+function save(metadata: Cart.Metadata, files: Cart.File[], output: string) {
+  const bytes = Cart.encode({
+    kate_version: Cart.Kate_version({ major: 0, minor: 23, patch: 9 }),
+    metadata: metadata,
+    files: files,
+  });
   console.log(`> Total size: ${from_bytes(bytes.byteLength)}`);
   FS.writeFileSync(output, bytes);
 }
@@ -1053,18 +1058,22 @@ export async function make_cartridge(path: string, output: string) {
   switch (x.type) {
     case "web-archive": {
       save(
-        Cart.Cartridge({
-          id: json.id,
-          version: make_version(json.version),
-          "release-date": make_date(json.release),
-          metadata: meta,
+        Cart.Metadata({
+          ...meta,
+          identification: Cart.Meta_identification({
+            id: json.id,
+            version: make_version(json.version),
+            "release-date": make_date(json.release),
+          }),
           runtime: Cart.Runtime.Web_archive({
             "html-path": make_absolute(x.html),
             bridges: x.bridges.flatMap(make_bridge),
           }),
           security: make_security(json.security),
-          files: archive,
+          signature: null,
+          "signed-by": [],
         }),
+        archive,
         output
       );
       break;

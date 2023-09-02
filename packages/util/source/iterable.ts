@@ -17,3 +17,24 @@ export function foldl<A, B>(
   }
   return result;
 }
+
+export function* iterator<A>(x: Iterable<A>) {
+  yield* x;
+}
+
+export function* zip<A, B>(a0: Iterable<A>, b0: Iterable<B>) {
+  const a = iterator(a0);
+  const b = iterator(b0);
+  while (true) {
+    const va = a.next();
+    const vb = b.next();
+    if (va.done && vb.done) {
+      break;
+    }
+    if (!va.done && !vb.done) {
+      yield [va.value, vb.value] as const;
+      continue;
+    }
+    throw new Error(`Mismatched iterable lengths`);
+  }
+}

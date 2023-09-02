@@ -1,6 +1,6 @@
-import { Cart } from "../deps/schema";
+import { kart_v5 as Cart } from "../deps/schema";
 import { GlobPattern, Pathname, make_id, unreachable } from "../deps/utils";
-import type { Importer } from "./core";
+import type { CartConfig, Importer } from "./core";
 import {
   make_file,
   make_game_id,
@@ -34,7 +34,7 @@ export class BitsyImporter implements Importer {
     return `Bitsy v${this.version ?? "(unknown)"}`;
   }
 
-  async make_cartridge() {
+  async make_cartridge(): Promise<CartConfig> {
     const now = new Date();
 
     const files = await Promise.all(
@@ -43,40 +43,46 @@ export class BitsyImporter implements Importer {
       })
     );
 
-    const cartridge = Cart.Cartridge({
-      id: make_game_id(this.id, this.title),
-      version: Cart.Version({ major: 1, minor: 0 }),
-      "release-date": Cart.Date({
-        year: now.getFullYear(),
-        month: now.getMonth() + 1,
-        day: now.getDate(),
-      }),
-      security: Cart.Security({
-        capabilities: [],
-      }),
-      runtime: Cart.Runtime.Web_archive({
-        "html-path": this.entry.relative_path.as_string(),
-        bridges: [
-          Cart.Bridge.Input_proxy({
-            mapping: make_mapping({
-              up: "ArrowUp",
-              right: "ArrowRight",
-              left: "ArrowLeft",
-              down: "ArrowDown",
-              x: "KeyX",
-              o: "KeyZ",
-              menu: "ShiftLeft",
-              capture: "KeyC",
-              ltrigger: "KeyA",
-              rtrigger: "KeyS",
-            }),
+    const cartridge: CartConfig = {
+      metadata: Cart.Metadata({
+        ...make_meta(this.title, this.thumbnail),
+        identification: Cart.Meta_identification({
+          id: make_game_id(this.id, this.title),
+          version: Cart.Version({ major: 1, minor: 0 }),
+          "release-date": Cart.Date({
+            year: now.getFullYear(),
+            month: now.getMonth() + 1,
+            day: now.getDate(),
           }),
-          Cart.Bridge.Capture_canvas({ selector: "#game" }),
-        ],
+        }),
+        security: Cart.Security({
+          capabilities: [],
+        }),
+        runtime: Cart.Runtime.Web_archive({
+          "html-path": this.entry.relative_path.as_string(),
+          bridges: [
+            Cart.Bridge.Input_proxy({
+              mapping: make_mapping({
+                up: "ArrowUp",
+                right: "ArrowRight",
+                left: "ArrowLeft",
+                down: "ArrowDown",
+                x: "KeyX",
+                o: "KeyZ",
+                menu: "ShiftLeft",
+                capture: "KeyC",
+                ltrigger: "KeyA",
+                rtrigger: "KeyS",
+              }),
+            }),
+            Cart.Bridge.Capture_canvas({ selector: "#game" }),
+          ],
+        }),
+        signature: null,
+        "signed-by": [],
       }),
-      metadata: make_meta(this.title, this.thumbnail),
       files: await maybe_add_thumbnail(files, this.thumbnail),
-    });
+    };
     return cartridge;
   }
 }

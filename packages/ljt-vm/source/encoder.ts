@@ -208,10 +208,24 @@ export class Encoder {
   }
 }
 
+export function magic_size(schema: Schema) {
+  return schema.magic.length + 4; // magic + version
+}
+
 export function encode(value: unknown, schema: Schema, root: number) {
   const encoder = new Encoder();
   encoder.raw_bytes(schema.magic);
   encoder.uint32(schema.version);
+  return do_encode(
+    value,
+    { op: "record", id: root },
+    encoder,
+    schema
+  ).to_bytes();
+}
+
+export function encode_magicless(value: unknown, schema: Schema, root: number) {
+  const encoder = new Encoder();
   return do_encode(
     value,
     { op: "record", id: root },
