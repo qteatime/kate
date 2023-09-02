@@ -1,8 +1,8 @@
 import * as LJT from "../../ljt-vm/build";
 const source = require("../generated/kart-v5.json");
-import * as Cart from "../generated/kart-v5";
-export * from "../generated/kart-v5";
-import { byte_equals, bytes_to_hex, concat_all } from "./util";
+import * as Cart from "./generated/kart-v5";
+export * from "./generated/kart-v5";
+import { concat_all } from "./util";
 
 const schema = LJT.parse(source);
 
@@ -10,15 +10,21 @@ const schema = LJT.parse(source);
 export function decode_header(bytes: Uint8Array): Cart.Header {
   const decoder = LJT.SchemaDecoder.from_bytes(bytes, schema);
   decoder.assert_magic();
-  return decoder.record(Cart.Header.tag) as Cart.Header;
+  const header = decoder.record(Cart.Header.tag) as Cart.Header;
+  const meta_loc = header["metadata-location"];
+  const file_loc = header["content-location"];
+  if (slice_intersect(meta_loc, file_loc)) {
+    throw new Error(`Invalid cartridge file: overlapping sections`);
+  }
+  return header;
 }
 
-export function decode_metadata(bytes: Uint8Array): Cart.Metadata {
+function decode_metadata_record(bytes: Uint8Array): Cart.Metadata {
   const decoder = LJT.SchemaDecoder.from_bytes(bytes, schema);
   return decoder.record(Cart.Metadata.tag) as Cart.Metadata;
 }
 
-export function decode_files(bytes: Uint8Array): Cart.File[] {
+function decode_files_record(bytes: Uint8Array): Cart.File[] {
   const decoder = LJT.SchemaDecoder.from_bytes(bytes, schema);
   const result: Cart.File[] = [];
   const size = decoder.decoder.uint32();
@@ -28,21 +34,32 @@ export function decode_files(bytes: Uint8Array): Cart.File[] {
   return result;
 }
 
-export function decode(bytes: Uint8Array): Cart.Cartridge {
-  const header = decode_header(bytes);
+export function decode_metadata(
+  bytes: Uint8Array,
+  header: Cart.Header
+): Cart.Metadata {
   const meta_loc = header["metadata-location"];
-  const file_loc = header["content-location"];
-  if (slice_intersect(meta_loc, file_loc)) {
-    throw new Error(`Invalid cartridge file: overlapping sections`);
-  }
   const metadata_bytes = bytes.slice(
     meta_loc.offset,
     meta_loc.offset + meta_loc.size
   );
-  const metadata = decode_metadata(metadata_bytes);
-  const files = decode_files(
+  return decode_metadata_record(metadata_bytes);
+}
+
+export function decode_files(
+  bytes: Uint8Array,
+  header: Cart.Header
+): Cart.File[] {
+  const file_loc = header["content-location"];
+  return decode_files_record(
     bytes.slice(file_loc.offset, file_loc.offset + file_loc.size)
   );
+}
+
+export function decode(bytes: Uint8Array): Cart.Cartridge {
+  const header = decode_header(bytes);
+  const metadata = decode_metadata(bytes, header);
+  const files = decode_files(bytes, header);
   return Cart.Cartridge({ header, metadata, files });
 }
 

@@ -1,7 +1,7 @@
 import * as LJT from "../../ljt-vm/build";
-const source = require("../generated/kart-v4.json");
-import * as Cart from "../generated/kart-v4";
-export * from "../generated/kart-v4";
+const source = require("./generated/kart-v4.json");
+import * as Cart from "./generated/kart-v4";
+export * from "./generated/kart-v4";
 
 const schema = LJT.parse(source);
 
