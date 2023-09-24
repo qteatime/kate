@@ -1,3 +1,8 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
 import { JSZip } from "../deps/jszip";
 import { kart_v5 as Cart } from "../deps/schema";
 import { GlobPattern, GlobPatternList, Pathname, make_id } from "../deps/utils";

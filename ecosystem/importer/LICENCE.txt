@@ -1,11 +1,18 @@
 Copyright (c) 2023 Q.
 
-The Kate Importer is released under the terms of the MIT licence.
-You may find a copy of the source code at
-https://github.com/qteatime/kate
+The Kate Importer is released under the terms of the Mozilla Public Licence,
+v. 2.0. A copy of the MPL is included in this file, but you can also obtain
+one at https://mozilla.org/MPL/2.0/.
 
-Full text for all relevant licenses are included here after
-attributions, in the goal of making them offline-friendly.
+You may get a copy of the source code at https://github.com/qteatime/kate.
+Information on how to build the Kate Importer from the source code is also
+included there. Official releases will always be distributed at
+https://github.com/qteatime/kate, and you're encouraged to audit any
+modifications if you've got your copy of the Kate Importer cartridge elsewhere.
+
+There are other components that make up the Kate Importer project and which
+are available under different terms. Full text for all relevant licences is
+included here, after attributions, in the goal of making them offline-friendly.
 
 This software contains portions of code, fonts, images, and sounds by
 third-parties, specified below.

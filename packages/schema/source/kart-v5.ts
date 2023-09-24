@@ -1,3 +1,9 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
 import * as LJT from "../../ljt-vm/build";
 const source = require("./generated/kart-v5.json");
 import * as Cart from "./generated/kart-v5";

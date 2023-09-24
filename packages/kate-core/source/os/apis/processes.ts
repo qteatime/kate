@@ -1,3 +1,9 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
 import * as Cart from "../../cart";
 import type { CR_Process, CartRuntime } from "../../kernel/cart-runtime";
 import type { KateOS } from "../os";

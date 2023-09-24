@@ -1,3 +1,9 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
 const checksum = {
   c5744744f5c1e1b349e453d8e237dec1765858c1e8b159684f507851aed79437:
     "chromedriver-v24.1.2-darwin-arm64.zip",

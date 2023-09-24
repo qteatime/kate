@@ -35,9 +35,23 @@ The current recommended way of trying out Kate is to use the Web version: https:
 
 For alternative installation options and how to build Kate from source, please refer to the [Kate installation instructions](https://kate.qteati.me/docs/user/manual/intro/install.html).
 
+## Ecosystem
+
+Kate provides tools for making or porting games to the console. Together these
+tools constitute the "Kate Ecosystem", and are generally available under the
+`ecosystem/` folder in this repository. You can build all of them into
+cartridges by running `node make ecosystem:all`.
+
+- [**Kate Importer**](ecosystem/importer/): A tool that allows installing and
+  running games made for other platforms in Kate, using emulation.
+
+- [**Kate Command-line Tools**](packages/kate-tools/): A set of command-line
+  tools for making and publishing Kate cartridges.
+
 ## Examples
 
-See the `examples/` folder in this repository for some example games. You can build all of them into cartridges by running `node make example:all`.
+See the `examples/` folder in this repository for some example games. You can build all of them into cartridges by running `node make example:all`. Example
+cartridges have their own licences (usually more permissive than Kate's).
 
 - [**Hello, from Kate**](examples/hello-world/): A hello-world type demo that shows what keys you're pressing (uses the input API).
 
@@ -120,5 +134,37 @@ We aim to support all reasonable web-exports of common game engines. The list be
 
 ## Licence
 
-Copyright (c) 2023 Q.  
-Licensed under the permissive MIT licence.
+Unless otherwise specified, Kate, its constituing packages, tools, and
+ecosystem cartridges are all released under the
+[Mozilla Public License v2.0][mpl]. The following header should be present in
+the relevant files:
+
+```
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+```
+
+Where dependencies are used, they remain under their specific licences.
+If a package includes more specific licence, it'll have its own `LICENCE.txt`
+file. Otherwise `LICENCE.MPL.txt` at the root of this repository applies.
+See those files for all details and legally-binding texts, this section is
+merely informational.
+
+Kate is [free software][free] under a [copyleft][] licence. You'll
+always be able to obtain the source code for it, and you'll always be able to
+audit what you're running. If you modify Kate _and distribute
+your modified version to others_, you'll need to make available the
+source code for those modifications and the build instructions as well.
+The recipients of your modified copy should continue to have the same rights.
+
+Note that the MPL does not grant you trademark, logo, and similar rights. It
+also does not require you to release source code for things you make with
+MPL-licenced code---only changes to specifically MPL-licenced code. See
+[Mozilla's FAQ on MPL][faq].
+
+[mpl]: https://www.mozilla.org/en-US/MPL/
+[free]: https://en.wikipedia.org/wiki/Free_software
+[cc4]: https://creativecommons.org/licenses/by/4.0/
+[copyleft]: https://en.wikipedia.org/wiki/Copyleft
+[faq]: https://www.mozilla.org/en-US/MPL/2.0/FAQ/

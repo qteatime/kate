@@ -1,3 +1,8 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
 import { UIScene, Widgetable } from "../deps/appui";
 import { JSZip, _JSZip } from "../deps/jszip";
 import { Pathname } from "../deps/utils";

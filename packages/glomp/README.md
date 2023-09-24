@@ -57,4 +57,5 @@ Glomp currently transforms JavaScript using regular expressions. This is reasona
 
 ## Licence
 
-Glomp is (c) Q. and released under the MIT license.
+Glomp is (c) Q. and released under the Mozilla Public License v2.0.
+See `LICENCE` for details.

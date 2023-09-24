@@ -1,3 +1,9 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
 import { Cart, File } from "./cart-type";
 import { parse_v4 } from "./v4/v4";
 import { parse_v5 } from "./v5/v5";
