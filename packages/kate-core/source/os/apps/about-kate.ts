@@ -79,14 +79,12 @@ export class SceneAboutKate extends SimpleScene {
       h("div", { class: "kate-os-about-box" }, [
         h("div", { class: "kate-os-about-content" }, [
           h("h2", {}, ["Kate", UI.hspace(10), this.os.kernel.console.version]),
-          h("div", { class: "kt-meta" }, [
-            "Copyright (c) 2023 Q. (MIT licensed)",
-          ]),
+          h("div", { class: "kt-meta" }, ["Copyright (c) 2023 Q."]),
           UI.vspace(32),
           UI.vbox(0.5, [
-            UI.text_button(this.os, "Third-party notices", {
+            UI.text_button(this.os, "Licensing information", {
               status_label: "Open",
-              on_click: this.handle_third_party,
+              on_click: this.handle_licence,
             }),
             UI.text_button(this.os, "Release notes", {
               status_label: "Open",
@@ -224,7 +222,7 @@ export class SceneAboutKate extends SimpleScene {
     );
   }
 
-  handle_third_party = () => {
+  handle_licence = () => {
     this.os.push_scene(
       new SceneTextFile(this.os, "Legal Notices", "Kate", Legal.notice)
     );
