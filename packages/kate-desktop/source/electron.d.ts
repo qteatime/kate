@@ -1,38 +1,23 @@
-// Type definitions for Electron 24.1.2
+// Type definitions for Electron 26.2.2
 // Project: http://electronjs.org/
 // Definitions by: The Electron Team <https://github.com/electron/electron>
-// Definitions: https://github.com/electron/electron-typescript-definitions
-
-// Copyright (c) Electron contributors
-// Copyright (c) 2013-2020 GitHub Inc.
-//
-// Permission is hereby granted, free of charge, to any person obtaining
-// a copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to
-// permit persons to whom the Software is furnished to do so, subject to
-// the following conditions:
-//
-// The above copyright notice and this permission notice shall be
-// included in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-// LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-// OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-// WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+// Definitions: https://github.com/electron/typescript-definitions
 
 /// <reference types="node" />
 
-type GlobalEvent = Event & { returnValue: any };
+type DOMEvent = Event;
+type GlobalResponse = Response;
+type GlobalRequest = Request;
 
 declare namespace Electron {
   const NodeEventEmitter: typeof import("events").EventEmitter;
 
-  class Accelerator extends String {}
+  type Accelerator = string;
+  type Event<Params extends object = {}> = {
+    preventDefault: () => void;
+    readonly defaultPrevented: boolean;
+  } & Params;
+
   interface App extends NodeJS.EventEmitter {
     // Docs: https://electronjs.org/docs/api/app
 
@@ -466,9 +451,10 @@ declare namespace Electron {
       ) => void
     ): this;
     /**
-     * Emitted when mac application become active. Difference from `activate` event is
-     * that `did-become-active` is emitted every time the app becomes active, not only
-     * when Dock icon is clicked or application is re-launched.
+     * Emitted when the application becomes active. This differs from the `activate`
+     * event in that `did-become-active` is emitted every time the app becomes active,
+     * not only when Dock icon is clicked or application is re-launched. It is also
+     * emitted when a user switches to the app via the macOS App Switcher.
      *
      * @platform darwin
      */
@@ -480,6 +466,23 @@ declare namespace Electron {
     ): this;
     removeListener(
       event: "did-become-active",
+      listener: (event: Event) => void
+    ): this;
+    /**
+     * Emitted when the app is no longer active and doesn’t have focus. This can be
+     * triggered, for example, by clicking on another application or by using the macOS
+     * App Switcher to switch to another application.
+     *
+     * @platform darwin
+     */
+    on(event: "did-resign-active", listener: (event: Event) => void): this;
+    once(event: "did-resign-active", listener: (event: Event) => void): this;
+    addListener(
+      event: "did-resign-active",
+      listener: (event: Event) => void
+    ): this;
+    removeListener(
+      event: "did-resign-active",
       listener: (event: Event) => void
     ): this;
     /**
@@ -669,6 +672,9 @@ declare namespace Electron {
       event: "ready",
       listener: (
         event: Event,
+        /**
+         * @platform darwin
+         */
         launchInfo: Record<string, any> | NotificationResponse
       ) => void
     ): this;
@@ -676,6 +682,9 @@ declare namespace Electron {
       event: "ready",
       listener: (
         event: Event,
+        /**
+         * @platform darwin
+         */
         launchInfo: Record<string, any> | NotificationResponse
       ) => void
     ): this;
@@ -683,6 +692,9 @@ declare namespace Electron {
       event: "ready",
       listener: (
         event: Event,
+        /**
+         * @platform darwin
+         */
         launchInfo: Record<string, any> | NotificationResponse
       ) => void
     ): this;
@@ -690,6 +702,9 @@ declare namespace Electron {
       event: "ready",
       listener: (
         event: Event,
+        /**
+         * @platform darwin
+         */
         launchInfo: Record<string, any> | NotificationResponse
       ) => void
     ): this;
@@ -1150,7 +1165,7 @@ declare namespace Electron {
     /**
      * Enables full sandbox mode on the app. This means that all renderers will be
      * launched sandboxed, regardless of the value of the `sandbox` flag in
-     * WebPreferences.
+     * `WebPreferences`.
      *
      * This method can only be called before app is ready.
      */
@@ -2128,6 +2143,9 @@ declare namespace Electron {
      * @experimental
      */
     getBounds(): Rectangle;
+    /**
+     * @experimental
+     */
     setAutoResize(options: AutoResizeOptions): void;
     /**
      * Examples of valid `color` values:
@@ -2814,6 +2832,11 @@ declare namespace Electron {
     getBackgroundColor(): string;
     /**
      * The `bounds` of the window as `Object`.
+     *
+     * **Note:** On macOS, the y-coordinate value returned will be at minimum the Tray
+     * height. For example, calling `win.setBounds({ x: 25, y: 20, width: 800, height:
+     * 600 })` with a tray height of 38 means that `win.getBounds()` will return `{ x:
+     * 25, y: 38, width: 800, height: 600 }`.
      */
     getBounds(): Rectangle;
     /**
@@ -2910,11 +2933,22 @@ declare namespace Electron {
      */
     getTitle(): string;
     /**
-     * The custom position for the traffic light buttons in frameless window.
+     * The custom position for the traffic light buttons in frameless window, `{ x: 0,
+     * y: 0 }` will be returned when there is no custom position.
      *
+     * > **Note** This function is deprecated. Use getWindowButtonPosition instead.
+     *
+     * @deprecated
      * @platform darwin
      */
     getTrafficLightPosition(): Point;
+    /**
+     * The custom position for the traffic light buttons in frameless window, `null`
+     * will be returned when there is no custom position.
+     *
+     * @platform darwin
+     */
+    getWindowButtonPosition(): Point | null;
     /**
      * Whether the window has a shadow.
      */
@@ -3076,7 +3110,7 @@ declare namespace Electron {
      */
     isTabletMode(): boolean;
     /**
-     * Whether the window is visible to the user.
+     * Whether the window is visible to the user in the foreground of the app.
      */
     isVisible(): boolean;
     /**
@@ -3162,6 +3196,9 @@ declare namespace Electron {
      * Same as `webContents.reload`.
      */
     reload(): void;
+    /**
+     * @experimental
+     */
     removeBrowserView(browserView: BrowserView): void;
     /**
      * Remove the window's menu bar.
@@ -3281,10 +3318,31 @@ declare namespace Electron {
      */
     setBackgroundColor(backgroundColor: string): void;
     /**
+     * This method sets the browser window's system-drawn background material,
+     * including behind the non-client area.
+     *
+     * See the Windows documentation for more details.
+     *
+     * **Note:** This method is only supported on Windows 11 22H2 and up.
+     *
+     * @platform win32
+     */
+    setBackgroundMaterial(
+      material: "auto" | "none" | "mica" | "acrylic" | "tabbed"
+    ): void;
+    /**
      * Resizes and moves the window to the supplied bounds. Any properties that are not
      * supplied will default to their current values.
+     *
+     * **Note:** On macOS, the y-coordinate value cannot be smaller than the Tray
+     * height. The tray height has changed over time and depends on the operating
+     * system, but is between 20-40px. Passing a value lower than the tray height will
+     * result in a window that is flush to the tray.
      */
     setBounds(bounds: Partial<Rectangle>, animate?: boolean): void;
+    /**
+     * @experimental
+     */
     setBrowserView(browserView: BrowserView | null): void;
     /**
      * Sets whether the window can be manually closed by user. On Linux does nothing.
@@ -3333,6 +3391,10 @@ declare namespace Electron {
     setFocusable(focusable: boolean): void;
     /**
      * Sets whether the window should be in fullscreen mode.
+     *
+     * **Note:** On macOS, fullscreen transitions take place asynchronously. If further
+     * actions depend on the fullscreen state, use the 'enter-full-screen' or
+     * 'leave-full-screen' events.
      */
     setFullScreen(flag: boolean): void;
     /**
@@ -3583,8 +3645,12 @@ declare namespace Electron {
      */
     setTouchBar(touchBar: TouchBar | null): void;
     /**
-     * Set a custom position for the traffic light buttons in frameless window.
+     * Set a custom position for the traffic light buttons in frameless window. Passing
+     * `{ x: 0, y: 0 }` will reset the position to default.
      *
+     * > **Note** This function is deprecated. Use setWindowButtonPosition instead.
+     *
+     * @deprecated
      * @platform darwin
      */
     setTrafficLightPosition(position: Point): void;
@@ -3633,6 +3699,13 @@ declare namespace Electron {
       visible: boolean,
       options?: VisibleOnAllWorkspacesOptions
     ): void;
+    /**
+     * Set a custom position for the traffic light buttons in frameless window. Passing
+     * `null` will reset the position to default.
+     *
+     * @platform darwin
+     */
+    setWindowButtonPosition(position: Point | null): void;
     /**
      * Sets whether the window traffic light buttons should be visible.
      *
@@ -3821,6 +3894,334 @@ declare namespace Electron {
      *
      */
     readonly webContents: WebContents;
+  }
+
+  interface BrowserWindowConstructorOptions {
+    // Docs: https://electronjs.org/docs/api/structures/browser-window-options
+
+    /**
+     * Whether clicking an inactive window will also click through to the web contents.
+     * Default is `false` on macOS. This option is not configurable on other platforms.
+     *
+     * @platform darwin
+     */
+    acceptFirstMouse?: boolean;
+    /**
+     * Whether the window should always stay on top of other windows. Default is
+     * `false`.
+     */
+    alwaysOnTop?: boolean;
+    /**
+     * Auto hide the menu bar unless the `Alt` key is pressed. Default is `false`.
+     */
+    autoHideMenuBar?: boolean;
+    /**
+     * The window's background color in Hex, RGB, RGBA, HSL, HSLA or named CSS color
+     * format. Alpha in #AARRGGBB format is supported if `transparent` is set to
+     * `true`. Default is `#FFF` (white). See win.setBackgroundColor for more
+     * information.
+     */
+    backgroundColor?: string;
+    /**
+     * Set the window's system-drawn background material, including behind the
+     * non-client area. Can be `auto`, `none`, `mica`, `acrylic` or `tabbed`. See
+     * win.setBackgroundMaterial for more information.
+     *
+     * @platform win32
+     */
+    backgroundMaterial?: "auto" | "none" | "mica" | "acrylic" | "tabbed";
+    /**
+     * Show window in the center of the screen. Default is `false`.
+     */
+    center?: boolean;
+    /**
+     * Whether window is closable. This is not implemented on Linux. Default is `true`.
+     *
+     * @platform darwin,win32
+     */
+    closable?: boolean;
+    /**
+     * Forces using dark theme for the window, only works on some GTK+3 desktop
+     * environments. Default is `false`.
+     */
+    darkTheme?: boolean;
+    /**
+     * Whether to hide cursor when typing. Default is `false`.
+     */
+    disableAutoHideCursor?: boolean;
+    /**
+     * Enable the window to be resized larger than screen. Only relevant for macOS, as
+     * other OSes allow larger-than-screen windows by default. Default is `false`.
+     *
+     * @platform darwin
+     */
+    enableLargerThanScreen?: boolean;
+    /**
+     * Whether the window can be focused. Default is `true`. On Windows setting
+     * `focusable: false` also implies setting `skipTaskbar: true`. On Linux setting
+     * `focusable: false` makes the window stop interacting with wm, so the window will
+     * always stay on top in all workspaces.
+     */
+    focusable?: boolean;
+    /**
+     * Specify `false` to create a frameless window. Default is `true`.
+     */
+    frame?: boolean;
+    /**
+     * Whether the window should show in fullscreen. When explicitly set to `false` the
+     * fullscreen button will be hidden or disabled on macOS. Default is `false`.
+     */
+    fullscreen?: boolean;
+    /**
+     * Whether the window can be put into fullscreen mode. On macOS, also whether the
+     * maximize/zoom button should toggle full screen mode or maximize window. Default
+     * is `true`.
+     */
+    fullscreenable?: boolean;
+    /**
+     * Shows the title in the title bar in full screen mode on macOS for `hiddenInset`
+     * titleBarStyle. Default is `false`.
+     *
+     * @deprecated
+     * @platform darwin
+     */
+    fullscreenWindowTitle?: boolean;
+    /**
+     * Whether window should have a shadow. Default is `true`.
+     */
+    hasShadow?: boolean;
+    /**
+     * Window's height in pixels. Default is `600`.
+     */
+    height?: number;
+    /**
+     * Whether window should be hidden when the user toggles into mission control.
+     *
+     * @platform darwin
+     */
+    hiddenInMissionControl?: boolean;
+    /**
+     * The window icon. On Windows it is recommended to use `ICO` icons to get best
+     * visual effects, you can also leave it undefined so the executable's icon will be
+     * used.
+     */
+    icon?: NativeImage | string;
+    /**
+     * Whether the window is in kiosk mode. Default is `false`.
+     */
+    kiosk?: boolean;
+    /**
+     * Window's maximum height. Default is no limit.
+     */
+    maxHeight?: number;
+    /**
+     * Whether window is maximizable. This is not implemented on Linux. Default is
+     * `true`.
+     *
+     * @platform darwin,win32
+     */
+    maximizable?: boolean;
+    /**
+     * Window's maximum width. Default is no limit.
+     */
+    maxWidth?: number;
+    /**
+     * Window's minimum height. Default is `0`.
+     */
+    minHeight?: number;
+    /**
+     * Whether window is minimizable. This is not implemented on Linux. Default is
+     * `true`.
+     *
+     * @platform darwin,win32
+     */
+    minimizable?: boolean;
+    /**
+     * Window's minimum width. Default is `0`.
+     */
+    minWidth?: number;
+    /**
+     * Whether this is a modal window. This only works when the window is a child
+     * window. Default is `false`.
+     */
+    modal?: boolean;
+    /**
+     * Whether window is movable. This is not implemented on Linux. Default is `true`.
+     *
+     * @platform darwin,win32
+     */
+    movable?: boolean;
+    /**
+     * Set the initial opacity of the window, between 0.0 (fully transparent) and 1.0
+     * (fully opaque). This is only implemented on Windows and macOS.
+     *
+     * @platform darwin,win32
+     */
+    opacity?: number;
+    /**
+     * Whether the renderer should be active when `show` is `false` and it has just
+     * been created.  In order for `document.visibilityState` to work correctly on
+     * first load with `show: false` you should set this to `false`.  Setting this to
+     * `false` will cause the `ready-to-show` event to not fire.  Default is `true`.
+     */
+    paintWhenInitiallyHidden?: boolean;
+    /**
+     * Specify parent window. Default is `null`.
+     */
+    parent?: BrowserWindow;
+    /**
+     * Whether window is resizable. Default is `true`.
+     */
+    resizable?: boolean;
+    /**
+     * Whether frameless window should have rounded corners on macOS. Default is
+     * `true`. Setting this property to `false` will prevent the window from being
+     * fullscreenable.
+     *
+     * @platform darwin
+     */
+    roundedCorners?: boolean;
+    /**
+     * Whether window should be shown when created. Default is `true`.
+     */
+    show?: boolean;
+    /**
+     * Use pre-Lion fullscreen on macOS. Default is `false`.
+     *
+     * @platform darwin
+     */
+    simpleFullscreen?: boolean;
+    /**
+     * Whether to show the window in taskbar. Default is `false`.
+     *
+     * @platform darwin,win32
+     */
+    skipTaskbar?: boolean;
+    /**
+     * Tab group name, allows opening the window as a native tab. Windows with the same
+     * tabbing identifier will be grouped together. This also adds a native new tab
+     * button to your window's tab bar and allows your `app` and window to receive the
+     * `new-window-for-tab` event.
+     *
+     * @platform darwin
+     */
+    tabbingIdentifier?: string;
+    /**
+     * Use `WS_THICKFRAME` style for frameless windows on Windows, which adds standard
+     * window frame. Setting it to `false` will remove window shadow and window
+     * animations. Default is `true`.
+     */
+    thickFrame?: boolean;
+    /**
+     * Default window title. Default is `"Electron"`. If the HTML tag `<title>` is
+     * defined in the HTML file loaded by `loadURL()`, this property will be ignored.
+     */
+    title?: string;
+    /**
+     *  When using a frameless window in conjunction with
+     * `win.setWindowButtonVisibility(true)` on macOS or using a `titleBarStyle` so
+     * that the standard window controls ("traffic lights" on macOS) are visible, this
+     * property enables the Window Controls Overlay JavaScript APIs and CSS Environment
+     * Variables. Specifying `true` will result in an overlay with default system
+     * colors. Default is `false`.
+     */
+    titleBarOverlay?: TitleBarOverlay | boolean;
+    /**
+     * The style of window title bar. Default is `default`. Possible values are:
+     *
+     * @platform darwin,win32
+     */
+    titleBarStyle?:
+      | "default"
+      | "hidden"
+      | "hiddenInset"
+      | "customButtonsOnHover";
+    /**
+     * Set a custom position for the traffic light buttons in frameless windows.
+     *
+     * @platform darwin
+     */
+    trafficLightPosition?: Point;
+    /**
+     * Makes the window transparent. Default is `false`. On Windows, does not work
+     * unless the window is frameless.
+     */
+    transparent?: boolean;
+    /**
+     * The type of window, default is normal window. See more about this below.
+     */
+    type?: string;
+    /**
+     * The `width` and `height` would be used as web page's size, which means the
+     * actual window's size will include window frame's size and be slightly larger.
+     * Default is `false`.
+     */
+    useContentSize?: boolean;
+    /**
+     * Add a type of vibrancy effect to the window, only on macOS. Can be
+     * `appearance-based`, `light`, `dark`, `titlebar`, `selection`, `menu`, `popover`,
+     * `sidebar`, `medium-light`, `ultra-dark`, `header`, `sheet`, `window`, `hud`,
+     * `fullscreen-ui`, `tooltip`, `content`, `under-window`, or `under-page`. Please
+     * note that `appearance-based`, `light`, `dark`, `medium-light`, and `ultra-dark`
+     * are deprecated and have been removed in macOS Catalina (10.15).
+     *
+     * @platform darwin
+     */
+    vibrancy?:
+      | "appearance-based"
+      | "light"
+      | "dark"
+      | "titlebar"
+      | "selection"
+      | "menu"
+      | "popover"
+      | "sidebar"
+      | "medium-light"
+      | "ultra-dark"
+      | "header"
+      | "sheet"
+      | "window"
+      | "hud"
+      | "fullscreen-ui"
+      | "tooltip"
+      | "content"
+      | "under-window"
+      | "under-page";
+    /**
+     * Specify how the material appearance should reflect window activity state on
+     * macOS. Must be used with the `vibrancy` property. Possible values are:
+     *
+     * @platform darwin
+     */
+    visualEffectState?: "followWindow" | "active" | "inactive";
+    /**
+     * Settings of web page's features.
+     */
+    webPreferences?: WebPreferences;
+    /**
+     * Window's width in pixels. Default is `800`.
+     */
+    width?: number;
+    /**
+     * (**required** if y is used) Window's left offset from screen. Default is to
+     * center the window.
+     */
+    x?: number;
+    /**
+     * (**required** if x is used) Window's top offset from screen. Default is to
+     * center the window.
+     */
+    y?: number;
+    /**
+     * Controls the behavior on macOS when option-clicking the green stoplight button
+     * on the toolbar or by clicking the Window > Zoom menu item. If `true`, the window
+     * will grow to the preferred width of the web page when zoomed, `false` will cause
+     * it to zoom to the width of the screen. This will also affect the behavior when
+     * calling `maximize()` directly. Default is `false`.
+     *
+     * @platform darwin
+     */
+    zoomToPageWidth?: boolean;
   }
 
   interface Certificate {
@@ -4102,7 +4503,7 @@ declare namespace Electron {
       chunk?: string | Buffer,
       encoding?: string,
       callback?: () => void
-    ): void;
+    ): this;
     /**
      * Continues any pending redirection. Can only be called during a `'redirect'`
      * event.
@@ -4565,7 +4966,12 @@ declare namespace Electron {
     /**
      * A promise which resolves when the cookie store has been flushed
      *
-     * Writes any unwritten cookies data to disk.
+     * Writes any unwritten cookies data to disk
+     *
+     * Cookies written by any method will not be written to disk immediately, but will
+     * be written every 30 seconds or 512 operations
+     *
+     * Calling this method can cause the cookie to be written to disk immediately.
      */
     flushStore(): Promise<void>;
     /**
@@ -5564,12 +5970,6 @@ declare namespace Electron {
     savePath: string;
   }
 
-  interface Event extends GlobalEvent {
-    // Docs: https://electronjs.org/docs/api/structures/event
-
-    preventDefault: () => void;
-  }
-
   interface Extension {
     // Docs: https://electronjs.org/docs/api/structures/extension
 
@@ -6066,7 +6466,7 @@ declare namespace Electron {
       listener: (
         event: IpcMainInvokeEvent,
         ...args: any[]
-      ) => Promise<void> | any
+      ) => Promise<any> | any
     ): void;
     /**
      * Handles a single `invoke`able IPC message, then removes the listener. See
@@ -6077,7 +6477,7 @@ declare namespace Electron {
       listener: (
         event: IpcMainInvokeEvent,
         ...args: any[]
-      ) => Promise<void> | any
+      ) => Promise<any> | any
     ): void;
     /**
      * Listens to `channel`, when a new message arrives `listener` would be called with
@@ -6131,7 +6531,7 @@ declare namespace Electron {
      * "reply" to the sent message in order to guarantee the reply will go to the
      * correct process and frame.
      */
-    reply: Function;
+    reply: (channel: string, ...args: any[]) => void;
     /**
      * Set this to the value to be returned in a synchronous message
      */
@@ -6322,6 +6722,12 @@ declare namespace Electron {
      * `event.senderId` to `0`.
      */
     senderId: number;
+    /**
+     * Whether the message sent via ipcRenderer.sendTo was sent by the main frame. This
+     * is relevant when `nodeIntegrationInSubFrames` is enabled in the originating
+     * `webContents`.
+     */
+    senderIsMainFrame?: boolean;
   }
 
   interface JumpListCategory {
@@ -6460,7 +6866,7 @@ declare namespace Electron {
     size: number;
   }
 
-  class Menu {
+  class Menu extends NodeEventEmitter {
     // Docs: https://electronjs.org/docs/api/menu
 
     /**
@@ -7113,6 +7519,37 @@ declare namespace Electron {
     // Docs: https://electronjs.org/docs/api/net
 
     /**
+     * see Response.
+     *
+     * Sends a request, similarly to how `fetch()` works in the renderer, using
+     * Chrome's network stack. This differs from Node's `fetch()`, which uses Node.js's
+     * HTTP stack.
+     *
+     * Example:
+     *
+     * This method will issue requests from the default session. To send a `fetch`
+     * request from another session, use ses.fetch().
+     *
+     * See the MDN documentation for `fetch()` for more details.
+     *
+     * Limitations:
+     *
+     * * `net.fetch()` does not support the `data:` or `blob:` schemes.
+     * * The value of the `integrity` option is ignored.
+     * * The `.type` and `.url` values of the returned `Response` object are incorrect.
+     *
+     * By default, requests made with `net.fetch` can be made to custom protocols as
+     * well as `file:`, and will trigger webRequest handlers if present. When the
+     * non-standard `bypassCustomProtocolHandlers` option is set in RequestInit, custom
+     * protocol handlers will not be called for this request. This allows forwarding an
+     * intercepted request to the built-in handler. webRequest handlers will still be
+     * triggered when bypassing custom protocols.
+     */
+    fetch(
+      input: string | GlobalRequest,
+      init?: RequestInit & { bypassCustomProtocolHandlers?: boolean }
+    ): Promise<GlobalResponse>;
+    /**
      * Whether there is currently internet connection.
      *
      * A return value of `false` is a pretty strong indicator that the user won't be
@@ -7128,6 +7565,16 @@ declare namespace Electron {
      * specified protocol scheme in the `options` object.
      */
     request(options: ClientRequestConstructorOptions | string): ClientRequest;
+    /**
+     * Resolves with the resolved IP addresses for the `host`.
+     *
+     * This method will resolve hosts from the default session. To resolve a host from
+     * another session, use ses.resolveHost().
+     */
+    resolveHost(
+      host: string,
+      options?: ResolveHostOptions
+    ): Promise<Electron.ResolvedHost>;
     /**
      * A `boolean` property. Whether there is currently internet connection.
      *
@@ -7167,6 +7614,9 @@ declare namespace Electron {
   class Notification extends NodeEventEmitter {
     // Docs: https://electronjs.org/docs/api/notification
 
+    /**
+     * @platform darwin
+     */
     on(
       event: "action",
       listener: (
@@ -7577,12 +8027,43 @@ declare namespace Electron {
     addListener(event: "shutdown", listener: Function): this;
     removeListener(event: "shutdown", listener: Function): this;
     /**
+     * Notification of a change in the operating system's advertised speed limit for
+     * CPUs, in percent. Values below 100 indicate that the system is impairing
+     * processing power due to thermal management.
+     *
+     * @platform darwin,win32
+     */
+    on(event: "speed-limit-change", listener: Function): this;
+    once(event: "speed-limit-change", listener: Function): this;
+    addListener(event: "speed-limit-change", listener: Function): this;
+    removeListener(event: "speed-limit-change", listener: Function): this;
+    /**
      * Emitted when the system is suspending.
      */
     on(event: "suspend", listener: Function): this;
     once(event: "suspend", listener: Function): this;
     addListener(event: "suspend", listener: Function): this;
     removeListener(event: "suspend", listener: Function): this;
+    /**
+     * Emitted when the thermal state of the system changes. Notification of a change
+     * in the thermal status of the system, such as entering a critical temperature
+     * range. Depending on the severity, the system might take steps to reduce said
+     * temperature, for example, throttling the CPU or switching on the fans if
+     * available.
+     *
+     * Apps may react to the new state by reducing expensive computing tasks (e.g.
+     * video encoding), or notifying the user. The same state might be received
+     * repeatedly.
+     *
+     * See
+     * https://developer.apple.com/library/archive/documentation/Performance/Conceptual/power_efficiency_guidelines_osx/RespondToThermalStateChanges.html
+     *
+     * @platform darwin
+     */
+    on(event: "thermal-state-change", listener: Function): this;
+    once(event: "thermal-state-change", listener: Function): this;
+    addListener(event: "thermal-state-change", listener: Function): this;
+    removeListener(event: "thermal-state-change", listener: Function): this;
     /**
      * Emitted as soon as the systems screen is unlocked.
      *
@@ -7613,7 +8094,19 @@ declare namespace Electron {
     addListener(event: "user-did-resign-active", listener: Function): this;
     removeListener(event: "user-did-resign-active", listener: Function): this;
     /**
-     * The system's current state. Can be `active`, `idle`, `locked` or `unknown`.
+     * The system's current thermal state. Can be `unknown`, `nominal`, `fair`,
+     * `serious`, or `critical`.
+     *
+     * @platform darwin
+     */
+    getCurrentThermalState():
+      | "unknown"
+      | "nominal"
+      | "fair"
+      | "serious"
+      | "critical";
+    /**
+     * The system's current idle state. Can be `active`, `idle`, `locked` or `unknown`.
      *
      * Calculate the system idle state. `idleThreshold` is the amount of time (in
      * seconds) before considered idle.  `locked` is available on supported systems
@@ -7668,8 +8161,10 @@ declare namespace Electron {
     start(type: "prevent-app-suspension" | "prevent-display-sleep"): number;
     /**
      * Stops the specified power save blocker.
+     *
+     * Whether the specified `powerSaveBlocker` has been stopped.
      */
-    stop(id: number): void;
+    stop(id: number): boolean;
   }
 
   interface PrinterInfo {
@@ -7901,10 +8396,28 @@ declare namespace Electron {
     // Docs: https://electronjs.org/docs/api/protocol
 
     /**
+     * Register a protocol handler for `scheme`. Requests made to URLs with this scheme
+     * will delegate to this handler to determine what response should be sent.
+     *
+     * Either a `Response` or a `Promise<Response>` can be returned.
+     *
+     * Example:
+     *
+     * See the MDN docs for `Request` and `Response` for more details.
+     */
+    handle(
+      scheme: string,
+      handler: (
+        request: GlobalRequest
+      ) => GlobalResponse | Promise<GlobalResponse>
+    ): void;
+    /**
      * Whether the protocol was successfully intercepted
      *
      * Intercepts `scheme` protocol and uses `handler` as the protocol's new handler
      * which sends a `Buffer` as a response.
+     *
+     * @deprecated
      */
     interceptBufferProtocol(
       scheme: string,
@@ -7918,6 +8431,8 @@ declare namespace Electron {
      *
      * Intercepts `scheme` protocol and uses `handler` as the protocol's new handler
      * which sends a file as a response.
+     *
+     * @deprecated
      */
     interceptFileProtocol(
       scheme: string,
@@ -7931,6 +8446,8 @@ declare namespace Electron {
      *
      * Intercepts `scheme` protocol and uses `handler` as the protocol's new handler
      * which sends a new HTTP request as a response.
+     *
+     * @deprecated
      */
     interceptHttpProtocol(
       scheme: string,
@@ -7944,6 +8461,8 @@ declare namespace Electron {
      *
      * Same as `protocol.registerStreamProtocol`, except that it replaces an existing
      * protocol handler.
+     *
+     * @deprecated
      */
     interceptStreamProtocol(
       scheme: string,
@@ -7957,6 +8476,8 @@ declare namespace Electron {
      *
      * Intercepts `scheme` protocol and uses `handler` as the protocol's new handler
      * which sends a `string` as a response.
+     *
+     * @deprecated
      */
     interceptStringProtocol(
       scheme: string,
@@ -7966,11 +8487,19 @@ declare namespace Electron {
       ) => void
     ): boolean;
     /**
+     * Whether `scheme` is already handled.
+     */
+    isProtocolHandled(scheme: string): boolean;
+    /**
      * Whether `scheme` is already intercepted.
+     *
+     * @deprecated
      */
     isProtocolIntercepted(scheme: string): boolean;
     /**
      * Whether `scheme` is already registered.
+     *
+     * @deprecated
      */
     isProtocolRegistered(scheme: string): boolean;
     /**
@@ -7983,6 +8512,8 @@ declare namespace Electron {
      * property.
      *
      * Example:
+     *
+     * @deprecated
      */
     registerBufferProtocol(
       scheme: string,
@@ -8004,6 +8535,8 @@ declare namespace Electron {
      *
      * By default the `scheme` is treated like `http:`, which is parsed differently
      * from protocols that follow the "generic URI syntax" like `file:`.
+     *
+     * @deprecated
      */
     registerFileProtocol(
       scheme: string,
@@ -8019,6 +8552,8 @@ declare namespace Electron {
      *
      * The usage is the same with `registerFileProtocol`, except that the `callback`
      * should be called with an object that has the `url` property.
+     *
+     * @deprecated
      */
     registerHttpProtocol(
       scheme: string,
@@ -8078,6 +8613,8 @@ declare namespace Electron {
      *
      * It is possible to pass any object that implements the readable stream API (emits
      * `data`/`end`/`error` events). For example, here's how a file could be returned:
+     *
+     * @deprecated
      */
     registerStreamProtocol(
       scheme: string,
@@ -8094,6 +8631,8 @@ declare namespace Electron {
      * The usage is the same with `registerFileProtocol`, except that the `callback`
      * should be called with either a `string` or an object that has the `data`
      * property.
+     *
+     * @deprecated
      */
     registerStringProtocol(
       scheme: string,
@@ -8103,15 +8642,23 @@ declare namespace Electron {
       ) => void
     ): boolean;
     /**
+     * Removes a protocol handler registered with `protocol.handle`.
+     */
+    unhandle(scheme: string): void;
+    /**
      * Whether the protocol was successfully unintercepted
      *
      * Remove the interceptor installed for `scheme` and restore its original handler.
+     *
+     * @deprecated
      */
     uninterceptProtocol(scheme: string): boolean;
     /**
      * Whether the protocol was successfully unregistered
      *
      * Unregisters the custom protocol of `scheme`.
+     *
+     * @deprecated
      */
     unregisterProtocol(scheme: string): boolean;
   }
@@ -8209,31 +8756,7 @@ declare namespace Electron {
 
     /**
      * Emitted when the app receives a remote notification while running. See:
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     * com/documentation/appkit/nsapplicationdelegate/1428430-application?language=objc
+     * https://developer.apple.com/documentation/appkit/nsapplicationdelegate/1428430-application?language=objc
      *
      * @platform darwin
      */
@@ -8258,88 +8781,14 @@ declare namespace Electron {
      * Sound, and Alert notifications. If registration is successful, the promise will
      * be resolved with the APNS device token. Otherwise, the promise will be rejected
      * with an error message. See:
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     * tion/appkit/nsapplication/1428476-registerforremotenotificationtyp?language=objc
+     * https://developer.apple.com/documentation/appkit/nsapplication/1428476-registerforremotenotificationtyp?language=objc
      *
      * @platform darwin
      */
     registerForAPNSNotifications(): Promise<string>;
     /**
      * Unregisters the app from notifications received from APNS. See:
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     *
-     * tion/appkit/nsapplication/1428747-unregisterforremotenotifications?language=objc
+     * https://developer.apple.com/documentation/appkit/nsapplication/1428747-unregisterforremotenotifications?language=objc
      *
      * @platform darwin
      */
@@ -8390,6 +8839,27 @@ declare namespace Electron {
     url: string;
   }
 
+  interface RenderProcessGoneDetails {
+    // Docs: https://electronjs.org/docs/api/structures/render-process-gone-details
+
+    /**
+     * The exit code of the process, unless `reason` is `launch-failed`, in which case
+     * `exitCode` will be a platform-specific launch failure error code.
+     */
+    exitCode: number;
+    /**
+     * The reason the render process is gone.  Possible values:
+     */
+    reason:
+      | "clean-exit"
+      | "abnormal-exit"
+      | "killed"
+      | "crashed"
+      | "oom"
+      | "launch-failed"
+      | "integrity-failure";
+  }
+
   interface ResolvedEndpoint {
     // Docs: https://electronjs.org/docs/api/structures/resolved-endpoint
 
@@ -8426,6 +8896,33 @@ declare namespace Electron {
      */
     encryptString(plainText: string): Buffer;
     /**
+     * User friendly name of the password manager selected on Linux.
+     *
+     * This function will return one of the following values:
+     *
+     * * `basic_text` - When the desktop environment is not recognised or if the
+     * following command line flag is provided `--password-store="basic"`.
+     * * `gnome_libsecret` - When the desktop environment is `X-Cinnamon`, `Deepin`,
+     * `GNOME`, `Pantheon`, `XFCE`, `UKUI`, `unity` or if the following command line
+     * flag is provided `--password-store="gnome-libsecret"`.
+     * * `kwallet` - When the desktop session is `kde4` or if the following command
+     * line flag is provided `--password-store="kwallet"`.
+     * * `kwallet5` - When the desktop session is `kde5` or if the following command
+     * line flag is provided `--password-store="kwallet5"`.
+     * * `kwallet6` - When the desktop session is `kde6`.
+     * * `unknown` - When the function is called before app has emitted the `ready`
+     * event.
+     *
+     * @platform linux
+     */
+    getSelectedStorageBackend():
+      | "basic_text"
+      | "gnome_libsecret"
+      | "kwallet"
+      | "kwallet5"
+      | "kwallet6"
+      | "unknown";
+    /**
      * Whether encryption is available.
      *
      * On Linux, returns true if the app has emitted the `ready` event and the secret
@@ -8433,6 +8930,13 @@ declare namespace Electron {
      * returns true once the app has emitted the `ready` event.
      */
     isEncryptionAvailable(): boolean;
+    /**
+     * This function on Linux will force the module to use an in memory password for
+     * creating symmetric key that is used for encrypt/decrypt functions when a valid
+     * OS password manager cannot be determined for the current active desktop
+     * environment. This function is a no-op on Windows and MacOS.
+     */
+    setUsePlainTextEncryption(usePlainText: boolean): void;
   }
 
   interface Screen extends NodeJS.EventEmitter {
@@ -8602,12 +9106,14 @@ declare namespace Electron {
 
     /**
      * A stable identifier on Windows that can be used for device permissions.
+     *
+     * @platform win32
      */
     deviceInstanceId?: string;
     /**
      * A string suitable for display to the user for describing this device.
      */
-    displayName: string;
+    displayName?: string;
     /**
      * Unique identifier for the port.
      */
@@ -8617,21 +9123,23 @@ declare namespace Electron {
      */
     portName: string;
     /**
-     * Optional USB product ID.
+     * The USB product ID.
      */
-    productId: string;
+    productId?: string;
     /**
      * The USB device serial number.
      */
-    serialNumber: string;
+    serialNumber?: string;
     /**
      * Represents a single serial port on macOS can be enumerated by multiple drivers.
+     *
+     * @platform darwin
      */
     usbDriverName?: string;
     /**
-     * Optional USB vendor ID.
+     * The USB vendor ID.
      */
-    vendorId: string;
+    vendorId?: string;
   }
 
   interface ServiceWorkerInfo {
@@ -8779,6 +9287,18 @@ declare namespace Electron {
       partition: string,
       options?: FromPartitionOptions
     ): Session;
+    /**
+     * A session instance from the absolute path as specified by the `path` string.
+     * When there is an existing `Session` with the same absolute path, it will be
+     * returned; otherwise a new `Session` instance will be created with `options`. The
+     * call will throw an error if the path is not an absolute path. Additionally, an
+     * error will be thrown if an empty string is provided.
+     *
+     * To create a `Session` with `options`, you have to ensure the `Session` with the
+     * `path` has never been used before. There is no way to change the `options` of an
+     * existing `Session` object.
+     */
+    static fromPath(path: string, options?: FromPathOptions): Session;
     /**
      * A `Session` object, the default session object of the app.
      */
@@ -9384,19 +9904,35 @@ declare namespace Electron {
      */
     on(
       event: "usb-device-added",
-      listener: (event: Event, details: UsbDeviceAddedDetails) => void
+      listener: (
+        event: Event,
+        device: USBDevice,
+        webContents: WebContents
+      ) => void
     ): this;
     once(
       event: "usb-device-added",
-      listener: (event: Event, details: UsbDeviceAddedDetails) => void
+      listener: (
+        event: Event,
+        device: USBDevice,
+        webContents: WebContents
+      ) => void
     ): this;
     addListener(
       event: "usb-device-added",
-      listener: (event: Event, details: UsbDeviceAddedDetails) => void
+      listener: (
+        event: Event,
+        device: USBDevice,
+        webContents: WebContents
+      ) => void
     ): this;
     removeListener(
       event: "usb-device-added",
-      listener: (event: Event, details: UsbDeviceAddedDetails) => void
+      listener: (
+        event: Event,
+        device: USBDevice,
+        webContents: WebContents
+      ) => void
     ): this;
     /**
      * Emitted after `navigator.usb.requestDevice` has been called and
@@ -9407,19 +9943,35 @@ declare namespace Electron {
      */
     on(
       event: "usb-device-removed",
-      listener: (event: Event, details: UsbDeviceRemovedDetails) => void
+      listener: (
+        event: Event,
+        device: USBDevice,
+        webContents: WebContents
+      ) => void
     ): this;
     once(
       event: "usb-device-removed",
-      listener: (event: Event, details: UsbDeviceRemovedDetails) => void
+      listener: (
+        event: Event,
+        device: USBDevice,
+        webContents: WebContents
+      ) => void
     ): this;
     addListener(
       event: "usb-device-removed",
-      listener: (event: Event, details: UsbDeviceRemovedDetails) => void
+      listener: (
+        event: Event,
+        device: USBDevice,
+        webContents: WebContents
+      ) => void
     ): this;
     removeListener(
       event: "usb-device-removed",
-      listener: (event: Event, details: UsbDeviceRemovedDetails) => void
+      listener: (
+        event: Event,
+        device: USBDevice,
+        webContents: WebContents
+      ) => void
     ): this;
     /**
      * Emitted after `USBDevice.forget()` has been called.  This event can be used to
@@ -9543,11 +10095,42 @@ declare namespace Electron {
      * **Note:** This does not perform any security checks that relate to a page's
      * origin, unlike `webContents.downloadURL`.
      */
-    downloadURL(url: string): void;
+    downloadURL(url: string, options?: DownloadURLOptions): void;
     /**
      * Emulates network with the given configuration for the `session`.
      */
     enableNetworkEmulation(options: EnableNetworkEmulationOptions): void;
+    /**
+     * see Response.
+     *
+     * Sends a request, similarly to how `fetch()` works in the renderer, using
+     * Chrome's network stack. This differs from Node's `fetch()`, which uses Node.js's
+     * HTTP stack.
+     *
+     * Example:
+     *
+     * See also `net.fetch()`, a convenience method which issues requests from the
+     * default session.
+     *
+     * See the MDN documentation for `fetch()` for more details.
+     *
+     * Limitations:
+     *
+     * * `net.fetch()` does not support the `data:` or `blob:` schemes.
+     * * The value of the `integrity` option is ignored.
+     * * The `.type` and `.url` values of the returned `Response` object are incorrect.
+     *
+     * By default, requests made with `net.fetch` can be made to custom protocols as
+     * well as `file:`, and will trigger webRequest handlers if present. When the
+     * non-standard `bypassCustomProtocolHandlers` option is set in RequestInit, custom
+     * protocol handlers will not be called for this request. This allows forwarding an
+     * intercepted request to the built-in handler. webRequest handlers will still be
+     * triggered when bypassing custom protocols.
+     */
+    fetch(
+      input: string | GlobalRequest,
+      init?: RequestInit
+    ): Promise<GlobalResponse>;
     /**
      * Writes any unwritten DOMStorage data to disk.
      */
@@ -9574,12 +10157,12 @@ declare namespace Electron {
      */
     getCacheSize(): Promise<number>;
     /**
-     * | `null` - The loaded extension with the given ID.
+     * The loaded extension with the given ID.
      *
      * **Note:** This API cannot be called before the `ready` event of the `app` module
      * is emitted.
      */
-    getExtension(extensionId: string): Extension;
+    getExtension(extensionId: string): Extension | null;
     /**
      * an array of paths to preload scripts that have been registered.
      */
@@ -9778,7 +10361,22 @@ declare namespace Electron {
       handler:
         | ((
             webContents: WebContents | null,
-            permission: string,
+            permission:
+              | "clipboard-read"
+              | "clipboard-sanitized-write"
+              | "geolocation"
+              | "fullscreen"
+              | "hid"
+              | "idle-detection"
+              | "media"
+              | "mediaKeySystem"
+              | "midi"
+              | "midiSysex"
+              | "notifications"
+              | "openExternal"
+              | "pointerLock"
+              | "serial"
+              | "usb",
             requestingOrigin: string,
             details: PermissionCheckHandlerHandlerDetails
           ) => boolean)
@@ -9799,15 +10397,16 @@ declare namespace Electron {
             permission:
               | "clipboard-read"
               | "clipboard-sanitized-write"
-              | "media"
               | "display-capture"
-              | "mediaKeySystem"
+              | "fullscreen"
               | "geolocation"
-              | "notifications"
+              | "idle-detection"
+              | "media"
+              | "mediaKeySystem"
               | "midi"
               | "midiSysex"
+              | "notifications"
               | "pointerLock"
-              | "fullscreen"
               | "openExternal"
               | "window-management"
               | "unknown",
@@ -9923,6 +10522,30 @@ declare namespace Electron {
      * reused for new connections.
      */
     setSSLConfig(config: SSLConfigConfig): void;
+    /**
+     * Sets the handler which can be used to override which USB classes are protected.
+     * The return value for the handler is a string array of USB classes which should
+     * be considered protected (eg not available in the renderer).  Valid values for
+     * the array are:
+     *
+     * * `audio`
+     * * `audio-video`
+     * * `hid`
+     * * `mass-storage`
+     * * `smart-card`
+     * * `video`
+     * * `wireless`
+     *
+     * Returning an empty string array from the handler will allow all USB classes;
+     * returning the passed in array will maintain the default list of protected USB
+     * classes (this is also the default behavior if a handler is not defined). To
+     * clear the handler, call `setUSBProtectedClassesHandler(null)`.
+     */
+    setUSBProtectedClassesHandler(
+      handler:
+        | ((details: USBProtectedClassesHandlerHandlerDetails) => string[])
+        | null
+    ): void;
     /**
      * Overrides the `userAgent` and `acceptLanguages` for this session.
      *
@@ -10135,6 +10758,9 @@ declare namespace Electron {
   interface SystemPreferences extends NodeJS.EventEmitter {
     // Docs: https://electronjs.org/docs/api/system-preferences
 
+    /**
+     * @platform win32
+     */
     on(
       event: "accent-color-changed",
       listener: (
@@ -10175,6 +10801,9 @@ declare namespace Electron {
         newColor: string
       ) => void
     ): this;
+    /**
+     * @platform win32
+     */
     on(event: "color-changed", listener: (event: Event) => void): this;
     once(event: "color-changed", listener: (event: Event) => void): this;
     addListener(event: "color-changed", listener: (event: Event) => void): this;
@@ -10490,36 +11119,6 @@ declare namespace Electron {
      */
     isAeroGlassEnabled(): boolean;
     /**
-     * Whether the system is in Dark Mode.
-     *
-     * **Deprecated:** Should use the new `nativeTheme.shouldUseDarkColors` API.
-     *
-     * @deprecated
-     * @platform darwin,win32
-     */
-    isDarkMode(): boolean;
-    /**
-     * `true` if a high contrast theme is active, `false` otherwise.
-     *
-     * **Deprecated:** Should use the new `nativeTheme.shouldUseHighContrastColors`
-     * API.
-     *
-     * @deprecated
-     * @platform darwin,win32
-     */
-    isHighContrastColorScheme(): boolean;
-    /**
-     * `true` if an inverted color scheme (a high contrast color scheme with light text
-     * and dark backgrounds) is active, `false` otherwise.
-     *
-     * **Deprecated:** Should use the new `nativeTheme.shouldUseInvertedColorScheme`
-     * API.
-     *
-     * @deprecated
-     * @platform win32
-     */
-    isInvertedColorScheme(): boolean;
-    /**
      * Whether the Swipe between pages setting is on.
      *
      * @platform darwin
@@ -10715,6 +11314,7 @@ declare namespace Electron {
      *
      * This property is only available on macOS 10.14 Mojave or newer.
      *
+     * @deprecated
      * @platform darwin
      */
     appLevelAppearance: "dark" | "light" | "unknown";
@@ -10770,7 +11370,7 @@ declare namespace Electron {
   interface ThumbarButton {
     // Docs: https://electronjs.org/docs/api/structures/thumbar-button
 
-    click: Function;
+    click: () => void;
     /**
      * Control specific states and behaviors of the button. By default, it is
      * `['enabled']`.
@@ -11882,15 +12482,16 @@ declare namespace Electron {
     /**
      * Number of bytes to read from `offset`. Defaults to `0`.
      */
-    length: number;
+    length?: number;
     /**
-     * Last Modification time in number of seconds since the UNIX epoch.
+     * Last Modification time in number of seconds since the UNIX epoch. Defaults to
+     * `0`.
      */
-    modificationTime: number;
+    modificationTime?: number;
     /**
      * Defaults to `0`.
      */
-    offset: number;
+    offset?: number;
     /**
      * `file`.
      */
@@ -12094,33 +12695,51 @@ declare namespace Electron {
     // Docs: https://electronjs.org/docs/api/web-contents
 
     /**
-     * | undefined - A WebContents instance with the given TargetID, or `undefined` if
-     * there is no WebContents associated with the given TargetID.
+     * A WebContents instance with the given TargetID, or `undefined` if there is no
+     * WebContents associated with the given TargetID.
      *
      * When communicating with the Chrome DevTools Protocol, it can be useful to lookup
      * a WebContents instance based on its assigned TargetID.
      */
-    static fromDevToolsTargetId(targetId: string): WebContents;
+    static fromDevToolsTargetId(targetId: string): WebContents | undefined;
     /**
-     * | undefined - A WebContents instance with the given WebFrameMain, or `undefined`
-     * if there is no WebContents associated with the given WebFrameMain.
+     * A WebContents instance with the given WebFrameMain, or `undefined` if there is
+     * no WebContents associated with the given WebFrameMain.
      */
-    static fromFrame(frame: WebFrameMain): WebContents;
+    static fromFrame(frame: WebFrameMain): WebContents | undefined;
     /**
-     * | undefined - A WebContents instance with the given ID, or `undefined` if there
-     * is no WebContents associated with the given ID.
+     * A WebContents instance with the given ID, or `undefined` if there is no
+     * WebContents associated with the given ID.
      */
-    static fromId(id: number): WebContents;
+    static fromId(id: number): WebContents | undefined;
     /**
      * An array of all `WebContents` instances. This will contain web contents for all
      * windows, webviews, opened devtools, and devtools extension background pages.
      */
     static getAllWebContents(): WebContents[];
     /**
-     * | null - The web contents that is focused in this application, otherwise returns
-     * `null`.
+     * The web contents that is focused in this application, otherwise returns `null`.
      */
-    static getFocusedWebContents(): WebContents;
+    static getFocusedWebContents(): WebContents | null;
+    /**
+     * Emitted when media becomes audible or inaudible.
+     */
+    on(
+      event: "audio-state-changed",
+      listener: (event: Event<WebContentsAudioStateChangedEventParams>) => void
+    ): this;
+    once(
+      event: "audio-state-changed",
+      listener: (event: Event<WebContentsAudioStateChangedEventParams>) => void
+    ): this;
+    addListener(
+      event: "audio-state-changed",
+      listener: (event: Event<WebContentsAudioStateChangedEventParams>) => void
+    ): this;
+    removeListener(
+      event: "audio-state-changed",
+      listener: (event: Event<WebContentsAudioStateChangedEventParams>) => void
+    ): this;
     /**
      * Emitted before dispatching the `keydown` and `keyup` events in the page. Calling
      * `event.preventDefault` will prevent the page `keydown`/`keyup` events and the
@@ -12411,14 +13030,17 @@ declare namespace Electron {
       listener: (event: Event, killed: boolean) => void
     ): this;
     /**
-     * Emitted when the cursor's type changes. The `type` parameter can be `default`,
-     * `crosshair`, `pointer`, `text`, `wait`, `help`, `e-resize`, `n-resize`,
+     * Emitted when the cursor's type changes. The `type` parameter can be `pointer`,
+     * `crosshair`, `hand`, `text`, `wait`, `help`, `e-resize`, `n-resize`,
      * `ne-resize`, `nw-resize`, `s-resize`, `se-resize`, `sw-resize`, `w-resize`,
      * `ns-resize`, `ew-resize`, `nesw-resize`, `nwse-resize`, `col-resize`,
-     * `row-resize`, `m-panning`, `e-panning`, `n-panning`, `ne-panning`, `nw-panning`,
-     * `s-panning`, `se-panning`, `sw-panning`, `w-panning`, `move`, `vertical-text`,
-     * `cell`, `context-menu`, `alias`, `progress`, `nodrop`, `copy`, `none`,
-     * `not-allowed`, `zoom-in`, `zoom-out`, `grab`, `grabbing` or `custom`.
+     * `row-resize`, `m-panning`, `m-panning-vertical`, `m-panning-horizontal`,
+     * `e-panning`, `n-panning`, `ne-panning`, `nw-panning`, `s-panning`, `se-panning`,
+     * `sw-panning`, `w-panning`, `move`, `vertical-text`, `cell`, `context-menu`,
+     * `alias`, `progress`, `nodrop`, `copy`, `none`, `not-allowed`, `zoom-in`,
+     * `zoom-out`, `grab`, `grabbing`, `custom`, `null`, `drag-drop-none`,
+     * `drag-drop-move`, `drag-drop-copy`, `drag-drop-link`, `ns-no-resize`,
+     * `ew-no-resize`, `nesw-no-resize`, `nwse-no-resize`, or `default`.
      *
      * If the `type` parameter is `custom`, the `image` parameter will hold the custom
      * cursor image in a `NativeImage`, and `scale`, `size` and `hotspot` will hold
@@ -12532,6 +13154,7 @@ declare namespace Electron {
     on(
       event: "devtools-open-url",
       listener: (
+        event: Event,
         /**
          * URL of the link that was clicked or selected.
          */
@@ -12541,6 +13164,7 @@ declare namespace Electron {
     once(
       event: "devtools-open-url",
       listener: (
+        event: Event,
         /**
          * URL of the link that was clicked or selected.
          */
@@ -12550,6 +13174,7 @@ declare namespace Electron {
     addListener(
       event: "devtools-open-url",
       listener: (
+        event: Event,
         /**
          * URL of the link that was clicked or selected.
          */
@@ -12559,6 +13184,7 @@ declare namespace Electron {
     removeListener(
       event: "devtools-open-url",
       listener: (
+        event: Event,
         /**
          * URL of the link that was clicked or selected.
          */
@@ -13044,44 +13670,104 @@ declare namespace Electron {
     on(
       event: "did-redirect-navigation",
       listener: (
-        event: Event,
+        details: Event<WebContentsDidRedirectNavigationEventParams>,
+        /**
+         * @deprecated
+         */
         url: string,
+        /**
+         * @deprecated
+         */
         isInPlace: boolean,
+        /**
+         * @deprecated
+         */
         isMainFrame: boolean,
+        /**
+         * @deprecated
+         */
         frameProcessId: number,
+        /**
+         * @deprecated
+         */
         frameRoutingId: number
       ) => void
     ): this;
     once(
       event: "did-redirect-navigation",
       listener: (
-        event: Event,
+        details: Event<WebContentsDidRedirectNavigationEventParams>,
+        /**
+         * @deprecated
+         */
         url: string,
+        /**
+         * @deprecated
+         */
         isInPlace: boolean,
+        /**
+         * @deprecated
+         */
         isMainFrame: boolean,
+        /**
+         * @deprecated
+         */
         frameProcessId: number,
+        /**
+         * @deprecated
+         */
         frameRoutingId: number
       ) => void
     ): this;
     addListener(
       event: "did-redirect-navigation",
       listener: (
-        event: Event,
+        details: Event<WebContentsDidRedirectNavigationEventParams>,
+        /**
+         * @deprecated
+         */
         url: string,
+        /**
+         * @deprecated
+         */
         isInPlace: boolean,
+        /**
+         * @deprecated
+         */
         isMainFrame: boolean,
+        /**
+         * @deprecated
+         */
         frameProcessId: number,
+        /**
+         * @deprecated
+         */
         frameRoutingId: number
       ) => void
     ): this;
     removeListener(
       event: "did-redirect-navigation",
       listener: (
-        event: Event,
+        details: Event<WebContentsDidRedirectNavigationEventParams>,
+        /**
+         * @deprecated
+         */
         url: string,
+        /**
+         * @deprecated
+         */
         isInPlace: boolean,
+        /**
+         * @deprecated
+         */
         isMainFrame: boolean,
+        /**
+         * @deprecated
+         */
         frameProcessId: number,
+        /**
+         * @deprecated
+         */
         frameRoutingId: number
       ) => void
     ): this;
@@ -13093,50 +13779,109 @@ declare namespace Electron {
     addListener(event: "did-start-loading", listener: Function): this;
     removeListener(event: "did-start-loading", listener: Function): this;
     /**
-     * Emitted when any frame (including main) starts navigating. `isInPlace` will be
-     * `true` for in-page navigations.
+     * Emitted when any frame (including main) starts navigating.
      */
     on(
       event: "did-start-navigation",
       listener: (
-        event: Event,
+        details: Event<WebContentsDidStartNavigationEventParams>,
+        /**
+         * @deprecated
+         */
         url: string,
+        /**
+         * @deprecated
+         */
         isInPlace: boolean,
+        /**
+         * @deprecated
+         */
         isMainFrame: boolean,
+        /**
+         * @deprecated
+         */
         frameProcessId: number,
+        /**
+         * @deprecated
+         */
         frameRoutingId: number
       ) => void
     ): this;
     once(
       event: "did-start-navigation",
       listener: (
-        event: Event,
+        details: Event<WebContentsDidStartNavigationEventParams>,
+        /**
+         * @deprecated
+         */
         url: string,
+        /**
+         * @deprecated
+         */
         isInPlace: boolean,
+        /**
+         * @deprecated
+         */
         isMainFrame: boolean,
+        /**
+         * @deprecated
+         */
         frameProcessId: number,
+        /**
+         * @deprecated
+         */
         frameRoutingId: number
       ) => void
     ): this;
     addListener(
       event: "did-start-navigation",
       listener: (
-        event: Event,
+        details: Event<WebContentsDidStartNavigationEventParams>,
+        /**
+         * @deprecated
+         */
         url: string,
+        /**
+         * @deprecated
+         */
         isInPlace: boolean,
+        /**
+         * @deprecated
+         */
         isMainFrame: boolean,
+        /**
+         * @deprecated
+         */
         frameProcessId: number,
+        /**
+         * @deprecated
+         */
         frameRoutingId: number
       ) => void
     ): this;
     removeListener(
       event: "did-start-navigation",
       listener: (
-        event: Event,
+        details: Event<WebContentsDidStartNavigationEventParams>,
+        /**
+         * @deprecated
+         */
         url: string,
+        /**
+         * @deprecated
+         */
         isInPlace: boolean,
+        /**
+         * @deprecated
+         */
         isMainFrame: boolean,
+        /**
+         * @deprecated
+         */
         frameProcessId: number,
+        /**
+         * @deprecated
+         */
         frameRoutingId: number
       ) => void
     ): this;
@@ -13245,19 +13990,19 @@ declare namespace Electron {
      */
     on(
       event: "ipc-message",
-      listener: (event: Event, channel: string, ...args: any[]) => void
+      listener: (event: IpcMainEvent, channel: string, ...args: any[]) => void
     ): this;
     once(
       event: "ipc-message",
-      listener: (event: Event, channel: string, ...args: any[]) => void
+      listener: (event: IpcMainEvent, channel: string, ...args: any[]) => void
     ): this;
     addListener(
       event: "ipc-message",
-      listener: (event: Event, channel: string, ...args: any[]) => void
+      listener: (event: IpcMainEvent, channel: string, ...args: any[]) => void
     ): this;
     removeListener(
       event: "ipc-message",
-      listener: (event: Event, channel: string, ...args: any[]) => void
+      listener: (event: IpcMainEvent, channel: string, ...args: any[]) => void
     ): this;
     /**
      * Emitted when the renderer process sends a synchronous message via
@@ -13268,19 +14013,19 @@ declare namespace Electron {
      */
     on(
       event: "ipc-message-sync",
-      listener: (event: Event, channel: string, ...args: any[]) => void
+      listener: (event: IpcMainEvent, channel: string, ...args: any[]) => void
     ): this;
     once(
       event: "ipc-message-sync",
-      listener: (event: Event, channel: string, ...args: any[]) => void
+      listener: (event: IpcMainEvent, channel: string, ...args: any[]) => void
     ): this;
     addListener(
       event: "ipc-message-sync",
-      listener: (event: Event, channel: string, ...args: any[]) => void
+      listener: (event: IpcMainEvent, channel: string, ...args: any[]) => void
     ): this;
     removeListener(
       event: "ipc-message-sync",
-      listener: (event: Event, channel: string, ...args: any[]) => void
+      listener: (event: IpcMainEvent, channel: string, ...args: any[]) => void
     ): this;
     /**
      * Emitted when the window leaves a full-screen state triggered by HTML API.
@@ -13758,8 +14503,51 @@ declare namespace Electron {
       ) => void
     ): this;
     /**
-     * Emitted when a user or the page wants to start navigation. It can happen when
-     * the `window.location` object is changed or a user clicks a link in the page.
+     * Emitted when a user or the page wants to start navigation in any frame. It can
+     * happen when the `window.location` object is changed or a user clicks a link in
+     * the page.
+     *
+     * Unlike `will-navigate`, `will-frame-navigate` is fired when the main frame or
+     * any of its subframes attempts to navigate. When the navigation event comes from
+     * the main frame, `isMainFrame` will be `true`.
+     *
+     * This event will not emit when the navigation is started programmatically with
+     * APIs like `webContents.loadURL` and `webContents.back`.
+     *
+     * It is also not emitted for in-page navigations, such as clicking anchor links or
+     * updating the `window.location.hash`. Use `did-navigate-in-page` event for this
+     * purpose.
+     *
+     * Calling `event.preventDefault()` will prevent the navigation.
+     */
+    on(
+      event: "will-frame-navigate",
+      listener: (
+        details: Event<WebContentsWillFrameNavigateEventParams>
+      ) => void
+    ): this;
+    once(
+      event: "will-frame-navigate",
+      listener: (
+        details: Event<WebContentsWillFrameNavigateEventParams>
+      ) => void
+    ): this;
+    addListener(
+      event: "will-frame-navigate",
+      listener: (
+        details: Event<WebContentsWillFrameNavigateEventParams>
+      ) => void
+    ): this;
+    removeListener(
+      event: "will-frame-navigate",
+      listener: (
+        details: Event<WebContentsWillFrameNavigateEventParams>
+      ) => void
+    ): this;
+    /**
+     * Emitted when a user or the page wants to start navigation on the main frame. It
+     * can happen when the `window.location` object is changed or a user clicks a link
+     * in the page.
      *
      * This event will not emit when the navigation is started programmatically with
      * APIs like `webContents.loadURL` and `webContents.back`.
@@ -13772,19 +14560,107 @@ declare namespace Electron {
      */
     on(
       event: "will-navigate",
-      listener: (event: Event, url: string) => void
+      listener: (
+        details: Event<WebContentsWillNavigateEventParams>,
+        /**
+         * @deprecated
+         */
+        url: string,
+        /**
+         * @deprecated
+         */
+        isInPlace: boolean,
+        /**
+         * @deprecated
+         */
+        isMainFrame: boolean,
+        /**
+         * @deprecated
+         */
+        frameProcessId: number,
+        /**
+         * @deprecated
+         */
+        frameRoutingId: number
+      ) => void
     ): this;
     once(
       event: "will-navigate",
-      listener: (event: Event, url: string) => void
+      listener: (
+        details: Event<WebContentsWillNavigateEventParams>,
+        /**
+         * @deprecated
+         */
+        url: string,
+        /**
+         * @deprecated
+         */
+        isInPlace: boolean,
+        /**
+         * @deprecated
+         */
+        isMainFrame: boolean,
+        /**
+         * @deprecated
+         */
+        frameProcessId: number,
+        /**
+         * @deprecated
+         */
+        frameRoutingId: number
+      ) => void
     ): this;
     addListener(
       event: "will-navigate",
-      listener: (event: Event, url: string) => void
+      listener: (
+        details: Event<WebContentsWillNavigateEventParams>,
+        /**
+         * @deprecated
+         */
+        url: string,
+        /**
+         * @deprecated
+         */
+        isInPlace: boolean,
+        /**
+         * @deprecated
+         */
+        isMainFrame: boolean,
+        /**
+         * @deprecated
+         */
+        frameProcessId: number,
+        /**
+         * @deprecated
+         */
+        frameRoutingId: number
+      ) => void
     ): this;
     removeListener(
       event: "will-navigate",
-      listener: (event: Event, url: string) => void
+      listener: (
+        details: Event<WebContentsWillNavigateEventParams>,
+        /**
+         * @deprecated
+         */
+        url: string,
+        /**
+         * @deprecated
+         */
+        isInPlace: boolean,
+        /**
+         * @deprecated
+         */
+        isMainFrame: boolean,
+        /**
+         * @deprecated
+         */
+        frameProcessId: number,
+        /**
+         * @deprecated
+         */
+        frameRoutingId: number
+      ) => void
     ): this;
     /**
      * Emitted when a `beforeunload` event handler is attempting to cancel a page
@@ -13820,44 +14696,104 @@ declare namespace Electron {
     on(
       event: "will-redirect",
       listener: (
-        event: Event,
+        details: Event<WebContentsWillRedirectEventParams>,
+        /**
+         * @deprecated
+         */
         url: string,
+        /**
+         * @deprecated
+         */
         isInPlace: boolean,
+        /**
+         * @deprecated
+         */
         isMainFrame: boolean,
+        /**
+         * @deprecated
+         */
         frameProcessId: number,
+        /**
+         * @deprecated
+         */
         frameRoutingId: number
       ) => void
     ): this;
     once(
       event: "will-redirect",
       listener: (
-        event: Event,
+        details: Event<WebContentsWillRedirectEventParams>,
+        /**
+         * @deprecated
+         */
         url: string,
+        /**
+         * @deprecated
+         */
         isInPlace: boolean,
+        /**
+         * @deprecated
+         */
         isMainFrame: boolean,
+        /**
+         * @deprecated
+         */
         frameProcessId: number,
+        /**
+         * @deprecated
+         */
         frameRoutingId: number
       ) => void
     ): this;
     addListener(
       event: "will-redirect",
       listener: (
-        event: Event,
+        details: Event<WebContentsWillRedirectEventParams>,
+        /**
+         * @deprecated
+         */
         url: string,
+        /**
+         * @deprecated
+         */
         isInPlace: boolean,
+        /**
+         * @deprecated
+         */
         isMainFrame: boolean,
+        /**
+         * @deprecated
+         */
         frameProcessId: number,
+        /**
+         * @deprecated
+         */
         frameRoutingId: number
       ) => void
     ): this;
     removeListener(
       event: "will-redirect",
       listener: (
-        event: Event,
+        details: Event<WebContentsWillRedirectEventParams>,
+        /**
+         * @deprecated
+         */
         url: string,
+        /**
+         * @deprecated
+         */
         isInPlace: boolean,
+        /**
+         * @deprecated
+         */
         isMainFrame: boolean,
+        /**
+         * @deprecated
+         */
         frameProcessId: number,
+        /**
+         * @deprecated
+         */
         frameRoutingId: number
       ) => void
     ): this;
@@ -13911,6 +14847,27 @@ declare namespace Electron {
      */
     addWorkSpace(path: string): void;
     /**
+     * Adjusts the current text selection starting and ending points in the focused
+     * frame by the given amounts. A negative amount moves the selection towards the
+     * beginning of the document, and a positive amount moves the selection towards the
+     * end of the document.
+     *
+     * Example:
+     *
+     * For a call of `win.webContents.adjustSelection({ start: 1, end: 5 })`
+     *
+     * Before:
+     *
+     * <img width="487" alt="Image Before Text Selection Adjustment"
+     * src="../images/web-contents-text-selection-before.png"/>
+     *
+     * After:
+     *
+     * <img width="487" alt="Image After Text Selection Adjustment"
+     * src="../images/web-contents-text-selection-after.png"/>
+     */
+    adjustSelection(options: AdjustSelectionOptions): void;
+    /**
      * Begin subscribing for presentation events and captured frames, the `callback`
      * will be called with `callback(image, dirtyRect)` when there is a presentation
      * event.
@@ -13961,6 +14918,10 @@ declare namespace Electron {
      */
     capturePage(rect?: Rectangle, opts?: Opts): Promise<Electron.NativeImage>;
     /**
+     * Centers the current text selection in web page.
+     */
+    centerSelection(): void;
+    /**
      * Clears the navigation history.
      */
     clearHistory(): void;
@@ -14000,7 +14961,7 @@ declare namespace Electron {
      * Initiates a download of the resource at `url` without navigating. The
      * `will-download` event of `session` will be triggered.
      */
-    downloadURL(url: string): void;
+    downloadURL(url: string, options?: DownloadURLOptions): void;
     /**
      * Enable device emulation with the given parameters.
      */
@@ -14366,6 +15327,14 @@ declare namespace Electron {
       saveType: "HTMLOnly" | "HTMLComplete" | "MHTML"
     ): Promise<void>;
     /**
+     * Scrolls to the bottom of the current `webContents`.
+     */
+    scrollToBottom(): void;
+    /**
+     * Scrolls to the top of the current `webContents`.
+     */
+    scrollToTop(): void;
+    /**
      * Executes the editing command `selectAll` in web page.
      */
     selectAll(): void;
@@ -14497,7 +15466,9 @@ declare namespace Electron {
      * details and how to use this in conjunction with `did-create-window`.
      */
     setWindowOpenHandler(
-      handler: (details: HandlerDetails) =>
+      handler: (
+        details: HandlerDetails
+      ) =>
         | { action: "deny" }
         | {
             action: "allow";
@@ -14681,7 +15652,7 @@ declare namespace Electron {
     zoomLevel: number;
   }
 
-  interface WebFrame extends NodeJS.EventEmitter {
+  interface WebFrame {
     // Docs: https://electronjs.org/docs/api/web-frame
 
     /**
@@ -15048,6 +16019,247 @@ declare namespace Electron {
     readonly visibilityState: string;
   }
 
+  interface WebPreferences {
+    // Docs: https://electronjs.org/docs/api/structures/web-preferences
+
+    /**
+     * An alternative title string provided only to accessibility tools such as screen
+     * readers. This string is not directly visible to users.
+     */
+    accessibleTitle?: string;
+    /**
+     * A list of strings that will be appended to `process.argv` in the renderer
+     * process of this app.  Useful for passing small bits of data down to renderer
+     * process preload scripts.
+     */
+    additionalArguments?: string[];
+    /**
+     * Allow an https page to run JavaScript, CSS or plugins from http URLs. Default is
+     * `false`.
+     */
+    allowRunningInsecureContent?: boolean;
+    /**
+     * Autoplay policy to apply to content in the window, can be
+     * `no-user-gesture-required`, `user-gesture-required`,
+     * `document-user-activation-required`. Defaults to `no-user-gesture-required`.
+     */
+    autoplayPolicy?:
+      | "no-user-gesture-required"
+      | "user-gesture-required"
+      | "document-user-activation-required";
+    /**
+     * Whether to throttle animations and timers when the page becomes background. This
+     * also affects the Page Visibility API. Defaults to `true`.
+     */
+    backgroundThrottling?: boolean;
+    /**
+     * Whether to run Electron APIs and the specified `preload` script in a separate
+     * JavaScript context. Defaults to `true`. The context that the `preload` script
+     * runs in will only have access to its own dedicated `document` and `window`
+     * globals, as well as its own set of JavaScript builtins (`Array`, `Object`,
+     * `JSON`, etc.), which are all invisible to the loaded content. The Electron API
+     * will only be available in the `preload` script and not the loaded page. This
+     * option should be used when loading potentially untrusted remote content to
+     * ensure the loaded content cannot tamper with the `preload` script and any
+     * Electron APIs being used.  This option uses the same technique used by Chrome
+     * Content Scripts.  You can access this context in the dev tools by selecting the
+     * 'Electron Isolated Context' entry in the combo box at the top of the Console
+     * tab.
+     */
+    contextIsolation?: boolean;
+    /**
+     * Defaults to `ISO-8859-1`.
+     */
+    defaultEncoding?: string;
+    /**
+     * Sets the default font for the font-family.
+     */
+    defaultFontFamily?: DefaultFontFamily;
+    /**
+     * Defaults to `16`.
+     */
+    defaultFontSize?: number;
+    /**
+     * Defaults to `13`.
+     */
+    defaultMonospaceFontSize?: number;
+    /**
+     * Whether to enable DevTools. If it is set to `false`, can not use
+     * `BrowserWindow.webContents.openDevTools()` to open DevTools. Default is `true`.
+     */
+    devTools?: boolean;
+    /**
+     * A list of feature strings separated by `,`, like `CSSVariables,KeyboardEventKey`
+     * to disable. The full list of supported feature strings can be found in the
+     * RuntimeEnabledFeatures.json5 file.
+     */
+    disableBlinkFeatures?: string;
+    /**
+     * Whether to disable dialogs completely. Overrides `safeDialogs`. Default is
+     * `false`.
+     */
+    disableDialogs?: boolean;
+    /**
+     * Whether to prevent the window from resizing when entering HTML Fullscreen.
+     * Default is `false`.
+     */
+    disableHtmlFullscreenWindowResize?: boolean;
+    /**
+     * A list of feature strings separated by `,`, like `CSSVariables,KeyboardEventKey`
+     * to enable. The full list of supported feature strings can be found in the
+     * RuntimeEnabledFeatures.json5 file.
+     */
+    enableBlinkFeatures?: string;
+    /**
+     * Whether to enable preferred size mode. The preferred size is the minimum size
+     * needed to contain the layout of the document—without requiring scrolling.
+     * Enabling this will cause the `preferred-size-changed` event to be emitted on the
+     * `WebContents` when the preferred size changes. Default is `false`.
+     */
+    enablePreferredSizeMode?: boolean;
+    /**
+     * Whether to enable the WebSQL api. Default is `true`.
+     */
+    enableWebSQL?: boolean;
+    /**
+     * Enables Chromium's experimental features. Default is `false`.
+     */
+    experimentalFeatures?: boolean;
+    /**
+     * Specifies how to run image animations (E.g. GIFs).  Can be `animate`,
+     * `animateOnce` or `noAnimation`.  Default is `animate`.
+     */
+    imageAnimationPolicy?: "animate" | "animateOnce" | "noAnimation";
+    /**
+     * Enables image support. Default is `true`.
+     */
+    images?: boolean;
+    /**
+     * Enables JavaScript support. Default is `true`.
+     */
+    javascript?: boolean;
+    /**
+     * Defaults to `0`.
+     */
+    minimumFontSize?: number;
+    /**
+     * Whether dragging and dropping a file or link onto the page causes a navigation.
+     * Default is `false`.
+     */
+    navigateOnDragDrop?: boolean;
+    /**
+     * Whether node integration is enabled. Default is `false`.
+     */
+    nodeIntegration?: boolean;
+    /**
+     * Experimental option for enabling Node.js support in sub-frames such as iframes
+     * and child windows. All your preloads will load for every iframe, you can use
+     * `process.isMainFrame` to determine if you are in the main frame or not.
+     */
+    nodeIntegrationInSubFrames?: boolean;
+    /**
+     * Whether node integration is enabled in web workers. Default is `false`. More
+     * about this can be found in Multithreading.
+     */
+    nodeIntegrationInWorker?: boolean;
+    /**
+     * Whether to enable offscreen rendering for the browser window. Defaults to
+     * `false`. See the offscreen rendering tutorial for more details.
+     */
+    offscreen?: boolean;
+    /**
+     * Sets the session used by the page according to the session's partition string.
+     * If `partition` starts with `persist:`, the page will use a persistent session
+     * available to all pages in the app with the same `partition`. If there is no
+     * `persist:` prefix, the page will use an in-memory session. By assigning the same
+     * `partition`, multiple pages can share the same session. Default is the default
+     * session.
+     */
+    partition?: string;
+    /**
+     * Whether plugins should be enabled. Default is `false`.
+     */
+    plugins?: boolean;
+    /**
+     * Specifies a script that will be loaded before other scripts run in the page.
+     * This script will always have access to node APIs no matter whether node
+     * integration is turned on or off. The value should be the absolute file path to
+     * the script. When node integration is turned off, the preload script can
+     * reintroduce Node global symbols back to the global scope. See example here.
+     */
+    preload?: string;
+    /**
+     * Whether to enable browser style consecutive dialog protection. Default is
+     * `false`.
+     */
+    safeDialogs?: boolean;
+    /**
+     * The message to display when consecutive dialog protection is triggered. If not
+     * defined the default message would be used, note that currently the default
+     * message is in English and not localized.
+     */
+    safeDialogsMessage?: string;
+    /**
+     * If set, this will sandbox the renderer associated with the window, making it
+     * compatible with the Chromium OS-level sandbox and disabling the Node.js engine.
+     * This is not the same as the `nodeIntegration` option and the APIs available to
+     * the preload script are more limited. Read more about the option here.
+     */
+    sandbox?: boolean;
+    /**
+     * Enables scroll bounce (rubber banding) effect on macOS. Default is `false`.
+     *
+     * @platform darwin
+     */
+    scrollBounce?: boolean;
+    /**
+     * Sets the session used by the page. Instead of passing the Session object
+     * directly, you can also choose to use the `partition` option instead, which
+     * accepts a partition string. When both `session` and `partition` are provided,
+     * `session` will be preferred. Default is the default session.
+     */
+    session?: Session;
+    /**
+     * Whether to enable the builtin spellchecker. Default is `true`.
+     */
+    spellcheck?: boolean;
+    /**
+     * Make TextArea elements resizable. Default is `true`.
+     */
+    textAreasAreResizable?: boolean;
+    /**
+     * Enforces the v8 code caching policy used by blink. Accepted values are
+     */
+    v8CacheOptions?:
+      | "none"
+      | "code"
+      | "bypassHeatCheck"
+      | "bypassHeatCheckAndEagerCompile";
+    /**
+     * Enables WebGL support. Default is `true`.
+     */
+    webgl?: boolean;
+    /**
+     * When `false`, it will disable the same-origin policy (usually using testing
+     * websites by people), and set `allowRunningInsecureContent` to `true` if this
+     * options has not been set by user. Default is `true`.
+     */
+    webSecurity?: boolean;
+    /**
+     * Whether to enable the `<webview>` tag. Defaults to `false`. **Note:** The
+     * `preload` script configured for the `<webview>` will have node integration
+     * enabled when it is executed so you should ensure remote/untrusted content is not
+     * able to create a `<webview>` tag with a possibly malicious `preload` script. You
+     * can use the `will-attach-webview` event on webContents to strip away the
+     * `preload` script and to validate or alter the `<webview>`'s initial settings.
+     */
+    webviewTag?: boolean;
+    /**
+     * The default zoom factor of the page, `3.0` represents `300%`. Default is `1.0`.
+     */
+    zoomFactor?: number;
+  }
+
   class WebRequest {
     // Docs: https://electronjs.org/docs/api/web-request
 
@@ -15287,12 +16499,12 @@ declare namespace Electron {
      */
     addEventListener(
       event: "did-finish-load",
-      listener: (event: Event) => void,
+      listener: (event: DOMEvent) => void,
       useCapture?: boolean
     ): this;
     removeEventListener(
       event: "did-finish-load",
-      listener: (event: Event) => void
+      listener: (event: DOMEvent) => void
     ): this;
     /**
      * This event is like `did-finish-load`, but fired when the load failed or was
@@ -15324,48 +16536,48 @@ declare namespace Electron {
      */
     addEventListener(
       event: "did-start-loading",
-      listener: (event: Event) => void,
+      listener: (event: DOMEvent) => void,
       useCapture?: boolean
     ): this;
     removeEventListener(
       event: "did-start-loading",
-      listener: (event: Event) => void
+      listener: (event: DOMEvent) => void
     ): this;
     /**
      * Corresponds to the points in time when the spinner of the tab stops spinning.
      */
     addEventListener(
       event: "did-stop-loading",
-      listener: (event: Event) => void,
+      listener: (event: DOMEvent) => void,
       useCapture?: boolean
     ): this;
     removeEventListener(
       event: "did-stop-loading",
-      listener: (event: Event) => void
+      listener: (event: DOMEvent) => void
     ): this;
     /**
      * Fired when attached to the embedder web contents.
      */
     addEventListener(
       event: "did-attach",
-      listener: (event: Event) => void,
+      listener: (event: DOMEvent) => void,
       useCapture?: boolean
     ): this;
     removeEventListener(
       event: "did-attach",
-      listener: (event: Event) => void
+      listener: (event: DOMEvent) => void
     ): this;
     /**
      * Fired when document in the given frame is loaded.
      */
     addEventListener(
       event: "dom-ready",
-      listener: (event: Event) => void,
+      listener: (event: DOMEvent) => void,
       useCapture?: boolean
     ): this;
     removeEventListener(
       event: "dom-ready",
-      listener: (event: Event) => void
+      listener: (event: DOMEvent) => void
     ): this;
     /**
      * Fired when page title is set during navigation. `explicitSet` is false when
@@ -15397,24 +16609,24 @@ declare namespace Electron {
      */
     addEventListener(
       event: "enter-html-full-screen",
-      listener: (event: Event) => void,
+      listener: (event: DOMEvent) => void,
       useCapture?: boolean
     ): this;
     removeEventListener(
       event: "enter-html-full-screen",
-      listener: (event: Event) => void
+      listener: (event: DOMEvent) => void
     ): this;
     /**
      * Fired when page leaves fullscreen triggered by HTML API.
      */
     addEventListener(
       event: "leave-html-full-screen",
-      listener: (event: Event) => void,
+      listener: (event: DOMEvent) => void,
       useCapture?: boolean
     ): this;
     removeEventListener(
       event: "leave-html-full-screen",
-      listener: (event: Event) => void
+      listener: (event: DOMEvent) => void
     ): this;
     /**
      * Fired when the guest window logs a console message.
@@ -15464,6 +16676,29 @@ declare namespace Electron {
     removeEventListener(
       event: "will-navigate",
       listener: (event: WillNavigateEvent) => void
+    ): this;
+    /**
+     * Emitted when a user or the page wants to start navigation anywhere in the
+     * `<webview>` or any frames embedded within. It can happen when the
+     * `window.location` object is changed or a user clicks a link in the page.
+     *
+     * This event will not emit when the navigation is started programmatically with
+     * APIs like `<webview>.loadURL` and `<webview>.back`.
+     *
+     * It is also not emitted during in-page navigation, such as clicking anchor links
+     * or updating the `window.location.hash`. Use `did-navigate-in-page` event for
+     * this purpose.
+     *
+     * Calling `event.preventDefault()` does **NOT** have any effect.
+     */
+    addEventListener(
+      event: "will-frame-navigate",
+      listener: (event: WillFrameNavigateEvent) => void,
+      useCapture?: boolean
+    ): this;
+    removeEventListener(
+      event: "will-frame-navigate",
+      listener: (event: WillFrameNavigateEvent) => void
     ): this;
     /**
      * Emitted when any frame (including main) starts navigating. `isInPlace` will be
@@ -15547,10 +16782,13 @@ declare namespace Electron {
      */
     addEventListener(
       event: "close",
-      listener: (event: Event) => void,
+      listener: (event: DOMEvent) => void,
       useCapture?: boolean
     ): this;
-    removeEventListener(event: "close", listener: (event: Event) => void): this;
+    removeEventListener(
+      event: "close",
+      listener: (event: DOMEvent) => void
+    ): this;
     /**
      * Fired when the guest page has sent an asynchronous message to embedder page.
      *
@@ -15567,16 +16805,35 @@ declare namespace Electron {
       listener: (event: IpcMessageEvent) => void
     ): this;
     /**
-     * Fired when the renderer process is crashed.
+     * Fired when the renderer process crashes or is killed.
+     *
+     * **Deprecated:** This event is superceded by the `render-process-gone` event
+     * which contains more information about why the render process disappeared. It
+     * isn't always because it crashed.
+     *
+     * @deprecated
      */
     addEventListener(
       event: "crashed",
-      listener: (event: Event) => void,
+      listener: (event: DOMEvent) => void,
       useCapture?: boolean
     ): this;
     removeEventListener(
       event: "crashed",
-      listener: (event: Event) => void
+      listener: (event: DOMEvent) => void
+    ): this;
+    /**
+     * Fired when the renderer process unexpectedly disappears. This is normally
+     * because it was crashed or killed.
+     */
+    addEventListener(
+      event: "render-process-gone",
+      listener: (event: RenderProcessGoneEvent) => void,
+      useCapture?: boolean
+    ): this;
+    removeEventListener(
+      event: "render-process-gone",
+      listener: (event: RenderProcessGoneEvent) => void
     ): this;
     /**
      * Fired when a plugin process is crashed.
@@ -15595,36 +16852,36 @@ declare namespace Electron {
      */
     addEventListener(
       event: "destroyed",
-      listener: (event: Event) => void,
+      listener: (event: DOMEvent) => void,
       useCapture?: boolean
     ): this;
     removeEventListener(
       event: "destroyed",
-      listener: (event: Event) => void
+      listener: (event: DOMEvent) => void
     ): this;
     /**
      * Emitted when media starts playing.
      */
     addEventListener(
       event: "media-started-playing",
-      listener: (event: Event) => void,
+      listener: (event: DOMEvent) => void,
       useCapture?: boolean
     ): this;
     removeEventListener(
       event: "media-started-playing",
-      listener: (event: Event) => void
+      listener: (event: DOMEvent) => void
     ): this;
     /**
      * Emitted when media is paused or done playing.
      */
     addEventListener(
       event: "media-paused",
-      listener: (event: Event) => void,
+      listener: (event: DOMEvent) => void,
       useCapture?: boolean
     ): this;
     removeEventListener(
       event: "media-paused",
-      listener: (event: Event) => void
+      listener: (event: DOMEvent) => void
     ): this;
     /**
      * Emitted when a page's theme color changes. This is usually due to encountering a
@@ -15669,36 +16926,36 @@ declare namespace Electron {
      */
     addEventListener(
       event: "devtools-opened",
-      listener: (event: Event) => void,
+      listener: (event: DOMEvent) => void,
       useCapture?: boolean
     ): this;
     removeEventListener(
       event: "devtools-opened",
-      listener: (event: Event) => void
+      listener: (event: DOMEvent) => void
     ): this;
     /**
      * Emitted when DevTools is closed.
      */
     addEventListener(
       event: "devtools-closed",
-      listener: (event: Event) => void,
+      listener: (event: DOMEvent) => void,
       useCapture?: boolean
     ): this;
     removeEventListener(
       event: "devtools-closed",
-      listener: (event: Event) => void
+      listener: (event: DOMEvent) => void
     ): this;
     /**
      * Emitted when DevTools is focused / opened.
      */
     addEventListener(
       event: "devtools-focused",
-      listener: (event: Event) => void,
+      listener: (event: DOMEvent) => void,
       useCapture?: boolean
     ): this;
     removeEventListener(
       event: "devtools-focused",
-      listener: (event: Event) => void
+      listener: (event: DOMEvent) => void
     ): this;
     /**
      * Emitted when there is a new context menu that needs to be handled.
@@ -15733,6 +16990,15 @@ declare namespace Electron {
       useCapture?: boolean
     ): void;
     /**
+     * Adjusts the current text selection starting and ending points in the focused
+     * frame by the given amounts. A negative amount moves the selection towards the
+     * beginning of the document, and a positive amount moves the selection towards the
+     * end of the document.
+     *
+     * See `webContents.adjustSelection` for examples.
+     */
+    adjustSelection(options: AdjustSelectionOptions): void;
+    /**
      * Whether the guest page can go back.
      */
     canGoBack(): boolean;
@@ -15751,6 +17017,10 @@ declare namespace Electron {
      * whole visible page.
      */
     capturePage(rect?: Rectangle): Promise<Electron.NativeImage>;
+    /**
+     * Centers the current text selection in page.
+     */
+    centerSelection(): void;
     /**
      * Clears the navigation history.
      */
@@ -15774,7 +17044,7 @@ declare namespace Electron {
     /**
      * Initiates a download of the resource at `url` without navigating.
      */
-    downloadURL(url: string): void;
+    downloadURL(url: string, options?: DownloadURLOptions): void;
     /**
      * A promise that resolves with the result of the executed code or is rejected if
      * the result of the code is a rejected promise.
@@ -15947,6 +17217,14 @@ declare namespace Electron {
      */
     replaceMisspelling(text: string): void;
     /**
+     * Scrolls to the bottom of the current `<webview>`.
+     */
+    scrollToBottom(): void;
+    /**
+     * Scrolls to the top of the current `<webview>`.
+     */
+    scrollToTop(): void;
+    /**
      * Executes editing command `selectAll` in page.
      */
     selectAll(): void;
@@ -16048,6 +17326,8 @@ declare namespace Electron {
     /**
      * A `boolean`. When this attribute is present the guest page will have web
      * security disabled. Web security is enabled by default.
+     *
+     * This value can only be modified before the first navigation.
      */
     disablewebsecurity: boolean;
     /**
@@ -16202,6 +17482,17 @@ declare namespace Electron {
     dataURL?: string;
   }
 
+  interface AdjustSelectionOptions {
+    /**
+     * Amount to shift the start index of the current selection.
+     */
+    start?: number;
+    /**
+     * Amount to shift the end index of the current selection.
+     */
+    end?: number;
+  }
+
   interface AnimationSettings {
     /**
      * Returns true if rich animations should be rendered. Looks at session type (e.g.
@@ -16336,327 +17627,9 @@ declare namespace Electron {
 
   interface BrowserViewConstructorOptions {
     /**
-     * See BrowserWindow.
-     */
-    webPreferences?: WebPreferences;
-  }
-
-  interface BrowserWindowConstructorOptions {
-    /**
-     * Window's width in pixels. Default is `800`.
-     */
-    width?: number;
-    /**
-     * Window's height in pixels. Default is `600`.
-     */
-    height?: number;
-    /**
-     * (**required** if y is used) Window's left offset from screen. Default is to
-     * center the window.
-     */
-    x?: number;
-    /**
-     * (**required** if x is used) Window's top offset from screen. Default is to
-     * center the window.
-     */
-    y?: number;
-    /**
-     * The `width` and `height` would be used as web page's size, which means the
-     * actual window's size will include window frame's size and be slightly larger.
-     * Default is `false`.
-     */
-    useContentSize?: boolean;
-    /**
-     * Show window in the center of the screen. Default is `false`.
-     */
-    center?: boolean;
-    /**
-     * Window's minimum width. Default is `0`.
-     */
-    minWidth?: number;
-    /**
-     * Window's minimum height. Default is `0`.
-     */
-    minHeight?: number;
-    /**
-     * Window's maximum width. Default is no limit.
-     */
-    maxWidth?: number;
-    /**
-     * Window's maximum height. Default is no limit.
-     */
-    maxHeight?: number;
-    /**
-     * Whether window is resizable. Default is `true`.
-     */
-    resizable?: boolean;
-    /**
-     * Whether window is movable. This is not implemented on Linux. Default is `true`.
-     *
-     * @platform darwin,win32
-     */
-    movable?: boolean;
-    /**
-     * Whether window is minimizable. This is not implemented on Linux. Default is
-     * `true`.
-     *
-     * @platform darwin,win32
-     */
-    minimizable?: boolean;
-    /**
-     * Whether window is maximizable. This is not implemented on Linux. Default is
-     * `true`.
-     *
-     * @platform darwin,win32
-     */
-    maximizable?: boolean;
-    /**
-     * Whether window is closable. This is not implemented on Linux. Default is `true`.
-     *
-     * @platform darwin,win32
-     */
-    closable?: boolean;
-    /**
-     * Whether the window can be focused. Default is `true`. On Windows setting
-     * `focusable: false` also implies setting `skipTaskbar: true`. On Linux setting
-     * `focusable: false` makes the window stop interacting with wm, so the window will
-     * always stay on top in all workspaces.
-     */
-    focusable?: boolean;
-    /**
-     * Whether the window should always stay on top of other windows. Default is
-     * `false`.
-     */
-    alwaysOnTop?: boolean;
-    /**
-     * Whether the window should show in fullscreen. When explicitly set to `false` the
-     * fullscreen button will be hidden or disabled on macOS. Default is `false`.
-     */
-    fullscreen?: boolean;
-    /**
-     * Whether the window can be put into fullscreen mode. On macOS, also whether the
-     * maximize/zoom button should toggle full screen mode or maximize window. Default
-     * is `true`.
-     */
-    fullscreenable?: boolean;
-    /**
-     * Use pre-Lion fullscreen on macOS. Default is `false`.
-     *
-     * @platform darwin
-     */
-    simpleFullscreen?: boolean;
-    /**
-     * Whether to show the window in taskbar. Default is `false`.
-     *
-     * @platform darwin,win32
-     */
-    skipTaskbar?: boolean;
-    /**
-     * Whether window should be hidden when the user toggles into mission control.
-     *
-     * @platform darwin
-     */
-    hiddenInMissionControl?: boolean;
-    /**
-     * Whether the window is in kiosk mode. Default is `false`.
-     */
-    kiosk?: boolean;
-    /**
-     * Default window title. Default is `"Electron"`. If the HTML tag `<title>` is
-     * defined in the HTML file loaded by `loadURL()`, this property will be ignored.
-     */
-    title?: string;
-    /**
-     * The window icon. On Windows it is recommended to use `ICO` icons to get best
-     * visual effects, you can also leave it undefined so the executable's icon will be
-     * used.
-     */
-    icon?: NativeImage | string;
-    /**
-     * Whether window should be shown when created. Default is `true`.
-     */
-    show?: boolean;
-    /**
-     * Whether the renderer should be active when `show` is `false` and it has just
-     * been created.  In order for `document.visibilityState` to work correctly on
-     * first load with `show: false` you should set this to `false`.  Setting this to
-     * `false` will cause the `ready-to-show` event to not fire.  Default is `true`.
-     */
-    paintWhenInitiallyHidden?: boolean;
-    /**
-     * Specify `false` to create a frameless window. Default is `true`.
-     */
-    frame?: boolean;
-    /**
-     * Specify parent window. Default is `null`.
-     */
-    parent?: BrowserWindow;
-    /**
-     * Whether this is a modal window. This only works when the window is a child
-     * window. Default is `false`.
-     */
-    modal?: boolean;
-    /**
-     * Whether clicking an inactive window will also click through to the web contents.
-     * Default is `false` on macOS. This option is not configurable on other platforms.
-     *
-     * @platform darwin
-     */
-    acceptFirstMouse?: boolean;
-    /**
-     * Whether to hide cursor when typing. Default is `false`.
-     */
-    disableAutoHideCursor?: boolean;
-    /**
-     * Auto hide the menu bar unless the `Alt` key is pressed. Default is `false`.
-     */
-    autoHideMenuBar?: boolean;
-    /**
-     * Enable the window to be resized larger than screen. Only relevant for macOS, as
-     * other OSes allow larger-than-screen windows by default. Default is `false`.
-     *
-     * @platform darwin
-     */
-    enableLargerThanScreen?: boolean;
-    /**
-     * The window's background color in Hex, RGB, RGBA, HSL, HSLA or named CSS color
-     * format. Alpha in #AARRGGBB format is supported if `transparent` is set to
-     * `true`. Default is `#FFF` (white). See win.setBackgroundColor for more
-     * information.
-     */
-    backgroundColor?: string;
-    /**
-     * Whether window should have a shadow. Default is `true`.
-     */
-    hasShadow?: boolean;
-    /**
-     * Set the initial opacity of the window, between 0.0 (fully transparent) and 1.0
-     * (fully opaque). This is only implemented on Windows and macOS.
-     *
-     * @platform darwin,win32
-     */
-    opacity?: number;
-    /**
-     * Forces using dark theme for the window, only works on some GTK+3 desktop
-     * environments. Default is `false`.
-     */
-    darkTheme?: boolean;
-    /**
-     * Makes the window transparent. Default is `false`. On Windows, does not work
-     * unless the window is frameless.
-     */
-    transparent?: boolean;
-    /**
-     * The type of window, default is normal window. See more about this below.
-     */
-    type?: string;
-    /**
-     * Specify how the material appearance should reflect window activity state on
-     * macOS. Must be used with the `vibrancy` property. Possible values are:
-     *
-     * @platform darwin
-     */
-    visualEffectState?: "followWindow" | "active" | "inactive";
-    /**
-     * The style of window title bar. Default is `default`. Possible values are:
-     *
-     * @platform darwin,win32
-     */
-    titleBarStyle?:
-      | "default"
-      | "hidden"
-      | "hiddenInset"
-      | "customButtonsOnHover";
-    /**
-     * Set a custom position for the traffic light buttons in frameless windows.
-     *
-     * @platform darwin
-     */
-    trafficLightPosition?: Point;
-    /**
-     * Whether frameless window should have rounded corners on macOS. Default is
-     * `true`. Setting this property to `false` will prevent the window from being
-     * fullscreenable.
-     *
-     * @platform darwin
-     */
-    roundedCorners?: boolean;
-    /**
-     * Shows the title in the title bar in full screen mode on macOS for `hiddenInset`
-     * titleBarStyle. Default is `false`.
-     *
-     * @deprecated
-     * @platform darwin
-     */
-    fullscreenWindowTitle?: boolean;
-    /**
-     * Use `WS_THICKFRAME` style for frameless windows on Windows, which adds standard
-     * window frame. Setting it to `false` will remove window shadow and window
-     * animations. Default is `true`.
-     */
-    thickFrame?: boolean;
-    /**
-     * Add a type of vibrancy effect to the window, only on macOS. Can be
-     * `appearance-based`, `light`, `dark`, `titlebar`, `selection`, `menu`, `popover`,
-     * `sidebar`, `medium-light`, `ultra-dark`, `header`, `sheet`, `window`, `hud`,
-     * `fullscreen-ui`, `tooltip`, `content`, `under-window`, or `under-page`. Please
-     * note that `appearance-based`, `light`, `dark`, `medium-light`, and `ultra-dark`
-     * are deprecated and have been removed in macOS Catalina (10.15).
-     *
-     * @platform darwin
-     */
-    vibrancy?:
-      | "appearance-based"
-      | "light"
-      | "dark"
-      | "titlebar"
-      | "selection"
-      | "menu"
-      | "popover"
-      | "sidebar"
-      | "medium-light"
-      | "ultra-dark"
-      | "header"
-      | "sheet"
-      | "window"
-      | "hud"
-      | "fullscreen-ui"
-      | "tooltip"
-      | "content"
-      | "under-window"
-      | "under-page";
-    /**
-     * Controls the behavior on macOS when option-clicking the green stoplight button
-     * on the toolbar or by clicking the Window > Zoom menu item. If `true`, the window
-     * will grow to the preferred width of the web page when zoomed, `false` will cause
-     * it to zoom to the width of the screen. This will also affect the behavior when
-     * calling `maximize()` directly. Default is `false`.
-     *
-     * @platform darwin
-     */
-    zoomToPageWidth?: boolean;
-    /**
-     * Tab group name, allows opening the window as a native tab. Windows with the same
-     * tabbing identifier will be grouped together. This also adds a native new tab
-     * button to your window's tab bar and allows your `app` and window to receive the
-     * `new-window-for-tab` event.
-     *
-     * @platform darwin
-     */
-    tabbingIdentifier?: string;
-    /**
      * Settings of web page's features.
      */
     webPreferences?: WebPreferences;
-    /**
-     *  When using a frameless window in conjunction with
-     * `win.setWindowButtonVisibility(true)` on macOS or using a `titleBarStyle` so
-     * that the standard window controls ("traffic lights" on macOS) are visible, this
-     * property enables the Window Controls Overlay JavaScript APIs and CSS Environment
-     * Variables. Specifying `true` will result in an overlay with default system
-     * colors. Default is `false`.
-     */
-    titleBarOverlay?: TitleBarOverlay | boolean;
   }
 
   interface CallbackResponse {
@@ -16694,16 +17667,25 @@ declare namespace Electron {
      */
     origin?: string;
     /**
-     * The types of storages to clear, can contain: `cookies`, `filesystem`, `indexdb`,
+     * The types of storages to clear, can be `cookies`, `filesystem`, `indexdb`,
      * `localstorage`, `shadercache`, `websql`, `serviceworkers`, `cachestorage`. If
      * not specified, clear all storage types.
      */
-    storages?: string[];
+    storages?: Array<
+      | "cookies"
+      | "filesystem"
+      | "indexdb"
+      | "localstorage"
+      | "shadercache"
+      | "websql"
+      | "serviceworkers"
+      | "cachestorage"
+    >;
     /**
-     * The types of quotas to clear, can contain: `temporary`, `syncable`. If not
-     * specified, clear all quotas.
+     * The types of quotas to clear, can be `temporary`, `syncable`. If not specified,
+     * clear all quotas.
      */
-    quotas?: string[];
+    quotas?: Array<"temporary" | "syncable">;
   }
 
   interface ClientRequestConstructorOptions {
@@ -16727,15 +17709,16 @@ declare namespace Electron {
      */
     partition?: string;
     /**
-     * Can be `include` or `omit`. Whether to send credentials with this request. If
-     * set to `include`, credentials from the session associated with the request will
-     * be used. If set to `omit`, credentials will not be sent with the request (and
-     * the `'login'` event will not be triggered in the event of a 401). This matches
-     * the behavior of the fetch option of the same name. If this option is not
-     * specified, authentication data from the session will be sent, and cookies will
-     * not be sent (unless `useSessionCookies` is set).
+     * Can be `include`, `omit` or `same-origin`. Whether to send credentials with this
+     * request. If set to `include`, credentials from the session associated with the
+     * request will be used. If set to `omit`, credentials will not be sent with the
+     * request (and the `'login'` event will not be triggered in the event of a 401).
+     * If set to `same-origin`, `origin` must also be specified. This matches the
+     * behavior of the fetch option of the same name. If this option is not specified,
+     * authentication data from the session will be sent, and cookies will not be sent
+     * (unless `useSessionCookies` is set).
      */
-    credentials?: "include" | "omit";
+    credentials?: "include" | "omit" | "same-origin";
     /**
      * Whether to send cookies with this request from the provided session. If
      * `credentials` is specified, this option has no effect. Default is `false`.
@@ -16745,7 +17728,7 @@ declare namespace Electron {
      * Can be `http:` or `https:`. The protocol scheme in the form 'scheme:'. Defaults
      * to 'http:'.
      */
-    protocol?: string;
+    protocol?: "http:" | "https:";
     /**
      * The server host provided as a concatenation of the hostname and the port number
      * 'hostname:port'.
@@ -16774,6 +17757,24 @@ declare namespace Electron {
      * The origin URL of the request.
      */
     origin?: string;
+    /**
+     * can be `""`, `no-referrer`, `no-referrer-when-downgrade`, `origin`,
+     * `origin-when-cross-origin`, `unsafe-url`, `same-origin`, `strict-origin`, or
+     * `strict-origin-when-cross-origin`. Defaults to
+     * `strict-origin-when-cross-origin`.
+     */
+    referrerPolicy?: string;
+    /**
+     * can be `default`, `no-store`, `reload`, `no-cache`, `force-cache` or
+     * `only-if-cached`.
+     */
+    cache?:
+      | "default"
+      | "no-store"
+      | "reload"
+      | "no-cache"
+      | "force-cache"
+      | "only-if-cached";
   }
 
   interface CloseOpts {
@@ -16839,7 +17840,7 @@ declare namespace Electron {
     enableAdditionalDnsQueryTypes?: boolean;
   }
 
-  interface ConsoleMessageEvent extends Event {
+  interface ConsoleMessageEvent extends DOMEvent {
     /**
      * The log level, from 0 to 3. In order it matches `verbose`, `info`, `warning` and
      * `error`.
@@ -16856,7 +17857,7 @@ declare namespace Electron {
     sourceId: string;
   }
 
-  interface ContextMenuEvent extends Event {
+  interface ContextMenuEvent extends DOMEvent {
     params: Params;
   }
 
@@ -16959,9 +17960,9 @@ declare namespace Electron {
     frameCharset: string;
     /**
      * If the context menu was invoked on an input field, the type of that field.
-     * Possible values are `none`, `plainText`, `password`, `other`.
+     * Possible values include `none`, `plainText`, `password`, `other`.
      */
-    inputFieldType: string;
+    inputFieldType: "none" | "plainText" | "password" | "other";
     /**
      * If the context is editable, whether or not spellchecking is enabled.
      */
@@ -17203,6 +18204,33 @@ declare namespace Electron {
     bookmark?: string;
   }
 
+  interface DefaultFontFamily {
+    /**
+     * Defaults to `Times New Roman`.
+     */
+    standard?: string;
+    /**
+     * Defaults to `Times New Roman`.
+     */
+    serif?: string;
+    /**
+     * Defaults to `Arial`.
+     */
+    sansSerif?: string;
+    /**
+     * Defaults to `Courier New`.
+     */
+    monospace?: string;
+    /**
+     * Defaults to `Script`.
+     */
+    cursive?: string;
+    /**
+     * Defaults to `Impact`.
+     */
+    fantasy?: string;
+  }
+
   interface Details {
     /**
      * Process type. One of the following values:
@@ -17255,17 +18283,17 @@ declare namespace Electron {
     /**
      * the device that permission is being requested for.
      */
-    device: HIDDevice | SerialPort;
+    device: HIDDevice | SerialPort | USBDevice;
   }
 
-  interface DevtoolsOpenUrlEvent extends Event {
+  interface DevtoolsOpenUrlEvent extends DOMEvent {
     /**
      * URL of the link that was clicked or selected.
      */
     url: string;
   }
 
-  interface DidChangeThemeColorEvent extends Event {
+  interface DidChangeThemeColorEvent extends DOMEvent {
     themeColor: string;
   }
 
@@ -17308,18 +18336,18 @@ declare namespace Electron {
       | "other";
   }
 
-  interface DidFailLoadEvent extends Event {
+  interface DidFailLoadEvent extends DOMEvent {
     errorCode: number;
     errorDescription: string;
     validatedURL: string;
     isMainFrame: boolean;
   }
 
-  interface DidFrameFinishLoadEvent extends Event {
+  interface DidFrameFinishLoadEvent extends DOMEvent {
     isMainFrame: boolean;
   }
 
-  interface DidFrameNavigateEvent extends Event {
+  interface DidFrameNavigateEvent extends DOMEvent {
     url: string;
     /**
      * -1 for non HTTP navigations
@@ -17334,16 +18362,16 @@ declare namespace Electron {
     frameRoutingId: number;
   }
 
-  interface DidNavigateEvent extends Event {
+  interface DidNavigateEvent extends DOMEvent {
     url: string;
   }
 
-  interface DidNavigateInPageEvent extends Event {
+  interface DidNavigateInPageEvent extends DOMEvent {
     isMainFrame: boolean;
     url: string;
   }
 
-  interface DidRedirectNavigationEvent extends Event {
+  interface DidRedirectNavigationEvent extends DOMEvent {
     url: string;
     isInPlace: boolean;
     isMainFrame: boolean;
@@ -17351,7 +18379,7 @@ declare namespace Electron {
     frameRoutingId: number;
   }
 
-  interface DidStartNavigationEvent extends Event {
+  interface DidStartNavigationEvent extends DOMEvent {
     url: string;
     isInPlace: boolean;
     isMainFrame: boolean;
@@ -17407,6 +18435,13 @@ declare namespace Electron {
      * Whether a user gesture was active when this request was triggered.
      */
     userGesture: boolean;
+  }
+
+  interface DownloadURLOptions {
+    /**
+     * HTTP request headers.
+     */
+    headers?: Record<string, string>;
   }
 
   interface EnableNetworkEmulationOptions {
@@ -17514,7 +18549,7 @@ declare namespace Electron {
     allowLoadingUnsignedLibraries?: boolean;
   }
 
-  interface FoundInPageEvent extends Event {
+  interface FoundInPageEvent extends DOMEvent {
     result: FoundInPageResult;
   }
 
@@ -17523,6 +18558,13 @@ declare namespace Electron {
   }
 
   interface FromPartitionOptions {
+    /**
+     * Whether to enable cache.
+     */
+    cache: boolean;
+  }
+
+  interface FromPathOptions {
     /**
      * Whether to enable cache.
      */
@@ -17702,7 +18744,7 @@ declare namespace Electron {
     cssOrigin?: string;
   }
 
-  interface IpcMessageEvent extends Event {
+  interface IpcMessageEvent extends DOMEvent {
     /**
      * pair of `[processId, frameId]`.
      */
@@ -17742,7 +18784,7 @@ declare namespace Electron {
     removedItems: JumpListItem[];
   }
 
-  interface LoadCommitEvent extends Event {
+  interface LoadCommitEvent extends DOMEvent {
     url: string;
     isMainFrame: boolean;
   }
@@ -18016,12 +19058,11 @@ declare namespace Electron {
      */
     message: string;
     /**
-     * Can be `"none"`, `"info"`, `"error"`, `"question"` or `"warning"`. On Windows,
-     * `"question"` displays the same icon as `"info"`, unless you set an icon using
-     * the `"icon"` option. On macOS, both `"warning"` and `"error"` display the same
-     * warning icon.
+     * Can be `none`, `info`, `error`, `question` or `warning`. On Windows, `question`
+     * displays the same icon as `info`, unless you set an icon using the `icon`
+     * option. On macOS, both `warning` and `error` display the same warning icon.
      */
-    type?: string;
+    type?: "none" | "info" | "error" | "question" | "warning";
     /**
      * Array of texts for buttons. On Windows, an empty array will result in one button
      * labeled "OK".
@@ -18105,12 +19146,11 @@ declare namespace Electron {
      */
     message: string;
     /**
-     * Can be `"none"`, `"info"`, `"error"`, `"question"` or `"warning"`. On Windows,
-     * `"question"` displays the same icon as `"info"`, unless you set an icon using
-     * the `"icon"` option. On macOS, both `"warning"` and `"error"` display the same
-     * warning icon.
+     * Can be `none`, `info`, `error`, `question` or `warning`. On Windows, `question`
+     * displays the same icon as `info`, unless you set an icon using the `icon`
+     * option. On macOS, both `warning` and `error` display the same warning icon.
      */
-    type?: string;
+    type?: "none" | "info" | "error" | "question" | "warning";
     /**
      * Array of texts for buttons. On Windows, an empty array will result in one button
      * labeled "OK".
@@ -18706,14 +19746,14 @@ declare namespace Electron {
     stayAwake?: boolean;
   }
 
-  interface PageFaviconUpdatedEvent extends Event {
+  interface PageFaviconUpdatedEvent extends DOMEvent {
     /**
      * Array of URLs.
      */
     favicons: string[];
   }
 
-  interface PageTitleUpdatedEvent extends Event {
+  interface PageTitleUpdatedEvent extends DOMEvent {
     title: string;
     explicitSet: boolean;
   }
@@ -18815,7 +19855,7 @@ declare namespace Electron {
     isMainFrame: boolean;
   }
 
-  interface PluginCrashedEvent extends Event {
+  interface PluginCrashedEvent extends DOMEvent {
     name: string;
     version: string;
   }
@@ -18842,6 +19882,27 @@ declare namespace Electron {
      * @platform darwin
      */
     positioningItem?: number;
+    /**
+     * This should map to the `menuSourceType` provided by the `context-menu` event. It
+     * is not recommended to set this value manually, only provide values you receive
+     * from other APIs or leave it `undefined`. Can be `none`, `mouse`, `keyboard`,
+     * `touch`, `touchMenu`, `longPress`, `longTap`, `touchHandle`, `stylus`,
+     * `adjustSelection`, or `adjustSelectionReset`.
+     *
+     * @platform win32,linux
+     */
+    sourceType?:
+      | "none"
+      | "mouse"
+      | "keyboard"
+      | "touch"
+      | "touchMenu"
+      | "longPress"
+      | "longTap"
+      | "touchHandle"
+      | "stylus"
+      | "adjustSelection"
+      | "adjustSelectionReset";
     /**
      * Called when menu is closed.
      */
@@ -18881,7 +19942,21 @@ declare namespace Electron {
      * `A5`, `A6`, `Legal`, `Letter`, `Tabloid`, `Ledger`, or an Object containing
      * `height` and `width` in inches. Defaults to `Letter`.
      */
-    pageSize?: string | Size;
+    pageSize?:
+      | (
+          | "A0"
+          | "A1"
+          | "A2"
+          | "A3"
+          | "A4"
+          | "A5"
+          | "A6"
+          | "Legal"
+          | "Letter"
+          | "Tabloid"
+          | "Ledger"
+        )
+      | Size;
     margins?: Margins;
     /**
      * Paper ranges to print, e.g., '1-5, 8, 11-13'. Defaults to the empty string,
@@ -18985,23 +20060,8 @@ declare namespace Electron {
     execPath?: string;
   }
 
-  interface RenderProcessGoneDetails {
-    /**
-     * The reason the render process is gone.  Possible values:
-     */
-    reason:
-      | "clean-exit"
-      | "abnormal-exit"
-      | "killed"
-      | "crashed"
-      | "oom"
-      | "launch-failed"
-      | "integrity-failure";
-    /**
-     * The exit code of the process, unless `reason` is `launch-failed`, in which case
-     * `exitCode` will be a platform-specific launch failure error code.
-     */
-    exitCode: number;
+  interface RenderProcessGoneEvent extends DOMEvent {
+    details: RenderProcessGoneDetails;
   }
 
   interface Request {
@@ -19035,13 +20095,14 @@ declare namespace Electron {
      */
     height?: number;
     /**
-     * The desired quality of the resize image. Possible values are `good`, `better`,
-     * or `best`. The default is `best`. These values express a desired quality/speed
-     * tradeoff. They are translated into an algorithm-specific method that depends on
-     * the capabilities (CPU, GPU) of the underlying platform. It is possible for all
-     * three methods to be mapped to the same algorithm on a given platform.
+     * The desired quality of the resize image. Possible values include `good`,
+     * `better`, or `best`. The default is `best`. These values express a desired
+     * quality/speed tradeoff. They are translated into an algorithm-specific method
+     * that depends on the capabilities (CPU, GPU) of the underlying platform. It is
+     * possible for all three methods to be mapped to the same algorithm on a given
+     * platform.
      */
-    quality?: string;
+    quality?: "good" | "better" | "best";
   }
 
   interface ResolveHostOptions {
@@ -19296,9 +20357,9 @@ declare namespace Electron {
   interface SourcesOptions {
     /**
      * An array of strings that lists the types of desktop sources to be captured,
-     * available types are `screen` and `window`.
+     * available types can be `screen` and `window`.
      */
-    types: string[];
+    types: Array<"screen" | "window">;
     /**
      * The size that the media source thumbnail should be scaled to. Default is `150` x
      * `150`. Set width or height to 0 when you do not need the thumbnails. This will
@@ -19319,12 +20380,12 @@ declare namespace Electron {
      * Can be `tls1`, `tls1.1`, `tls1.2` or `tls1.3`. The minimum SSL version to allow
      * when connecting to remote servers. Defaults to `tls1`.
      */
-    minVersion?: string;
+    minVersion?: "tls1" | "tls1.1" | "tls1.2" | "tls1.3";
     /**
      * Can be `tls1.2` or `tls1.3`. The maximum SSL version to allow when connecting to
      * remote servers. Defaults to `tls1.3`.
      */
-    maxVersion?: string;
+    maxVersion?: "tls1.2" | "tls1.3";
     /**
      * List of cipher suites which should be explicitly prevented from being used in
      * addition to those disabled by the net built-in policy. Supported literal forms:
@@ -19390,6 +20451,30 @@ declare namespace Electron {
      * @platform win32,linux
      */
     swapFree: number;
+  }
+
+  interface TitleBarOverlay {
+    /**
+     * The CSS color of the Window Controls Overlay when enabled. Default is the system
+     * color.
+     *
+     * @platform win32
+     */
+    color?: string;
+    /**
+     * The CSS color of the symbols on the Window Controls Overlay when enabled.
+     * Default is the system color.
+     *
+     * @platform win32
+     */
+    symbolColor?: string;
+    /**
+     * The height of the title bar and Window Controls Overlay in pixels. Default is
+     * system height.
+     *
+     * @platform darwin,win32
+     */
+    height?: number;
   }
 
   interface TitleBarOverlayOptions {
@@ -19661,7 +20746,7 @@ declare namespace Electron {
     percentage: number;
   }
 
-  interface UpdateTargetUrlEvent extends Event {
+  interface UpdateTargetUrlEvent extends DOMEvent {
     url: string;
   }
 
@@ -19686,22 +20771,27 @@ declare namespace Electron {
     total: number;
   }
 
-  interface UsbDeviceAddedDetails {
-    device: USBDevice;
-    frame: WebFrameMain;
-  }
-
-  interface UsbDeviceRemovedDetails {
-    device: USBDevice;
-    frame: WebFrameMain;
-  }
-
   interface UsbDeviceRevokedDetails {
-    device: USBDevice[];
+    device: USBDevice;
     /**
      * The origin that the device has been revoked from.
      */
     origin?: string;
+  }
+
+  interface USBProtectedClassesHandlerHandlerDetails {
+    /**
+     * The current list of protected USB classes. Possible class values include:
+     */
+    protectedClasses: Array<
+      | "audio"
+      | "audio-video"
+      | "hid"
+      | "mass-storage"
+      | "smart-card"
+      | "video"
+      | "wireless"
+    >;
   }
 
   interface VisibleOnAllWorkspacesOptions {
@@ -19721,6 +20811,69 @@ declare namespace Electron {
      * @platform darwin
      */
     skipTransformProcessType?: boolean;
+  }
+
+  interface WebContentsAudioStateChangedEventParams {
+    /**
+     * True if one or more frames or child `webContents` are emitting audio.
+     */
+    audible: boolean;
+  }
+
+  interface WebContentsDidRedirectNavigationEventParams {
+    /**
+     * The URL the frame is navigating to.
+     */
+    url: string;
+    /**
+     * Whether the navigation happened without changing document. Examples of same
+     * document navigations are reference fragment navigations, pushState/replaceState,
+     * and same page history navigation.
+     */
+    isSameDocument: boolean;
+    /**
+     * True if the navigation is taking place in a main frame.
+     */
+    isMainFrame: boolean;
+    /**
+     * The frame to be navigated.
+     */
+    frame: WebFrameMain;
+    /**
+     * The frame which initiated the navigation, which can be a parent frame (e.g. via
+     * `window.open` with a frame's name), or null if the navigation was not initiated
+     * by a frame. This can also be null if the initiating frame was deleted before the
+     * event was emitted.
+     */
+    initiator?: WebFrameMain;
+  }
+
+  interface WebContentsDidStartNavigationEventParams {
+    /**
+     * The URL the frame is navigating to.
+     */
+    url: string;
+    /**
+     * Whether the navigation happened without changing document. Examples of same
+     * document navigations are reference fragment navigations, pushState/replaceState,
+     * and same page history navigation.
+     */
+    isSameDocument: boolean;
+    /**
+     * True if the navigation is taking place in a main frame.
+     */
+    isMainFrame: boolean;
+    /**
+     * The frame to be navigated.
+     */
+    frame: WebFrameMain;
+    /**
+     * The frame which initiated the navigation, which can be a parent frame (e.g. via
+     * `window.open` with a frame's name), or null if the navigation was not initiated
+     * by a frame. This can also be null if the initiating frame was deleted before the
+     * event was emitted.
+     */
+    initiator?: WebFrameMain;
   }
 
   interface WebContentsPrintOptions {
@@ -19786,7 +20939,104 @@ declare namespace Electron {
      * `A5`, `A6`, `Legal`, `Letter`, `Tabloid` or an Object containing `height` and
      * `width`.
      */
-    pageSize?: string | Size;
+    pageSize?:
+      | (
+          | "A0"
+          | "A1"
+          | "A2"
+          | "A3"
+          | "A4"
+          | "A5"
+          | "A6"
+          | "Legal"
+          | "Letter"
+          | "Tabloid"
+        )
+      | Size;
+  }
+
+  interface WebContentsWillFrameNavigateEventParams {
+    /**
+     * The URL the frame is navigating to.
+     */
+    url: string;
+    /**
+     * This event does not fire for same document navigations using window.history api
+     * and reference fragment navigations. This property is always set to `false` for
+     * this event.
+     */
+    isSameDocument: boolean;
+    /**
+     * True if the navigation is taking place in a main frame.
+     */
+    isMainFrame: boolean;
+    /**
+     * The frame to be navigated.
+     */
+    frame: WebFrameMain;
+    /**
+     * The frame which initiated the navigation, which can be a parent frame (e.g. via
+     * `window.open` with a frame's name), or null if the navigation was not initiated
+     * by a frame. This can also be null if the initiating frame was deleted before the
+     * event was emitted.
+     */
+    initiator?: WebFrameMain;
+  }
+
+  interface WebContentsWillNavigateEventParams {
+    /**
+     * The URL the frame is navigating to.
+     */
+    url: string;
+    /**
+     * This event does not fire for same document navigations using window.history api
+     * and reference fragment navigations. This property is always set to `false` for
+     * this event.
+     */
+    isSameDocument: boolean;
+    /**
+     * True if the navigation is taking place in a main frame.
+     */
+    isMainFrame: boolean;
+    /**
+     * The frame to be navigated.
+     */
+    frame: WebFrameMain;
+    /**
+     * The frame which initiated the navigation, which can be a parent frame (e.g. via
+     * `window.open` with a frame's name), or null if the navigation was not initiated
+     * by a frame. This can also be null if the initiating frame was deleted before the
+     * event was emitted.
+     */
+    initiator?: WebFrameMain;
+  }
+
+  interface WebContentsWillRedirectEventParams {
+    /**
+     * The URL the frame is navigating to.
+     */
+    url: string;
+    /**
+     * Whether the navigation happened without changing document. Examples of same
+     * document navigations are reference fragment navigations, pushState/replaceState,
+     * and same page history navigation.
+     */
+    isSameDocument: boolean;
+    /**
+     * True if the navigation is taking place in a main frame.
+     */
+    isMainFrame: boolean;
+    /**
+     * The frame to be navigated.
+     */
+    frame: WebFrameMain;
+    /**
+     * The frame which initiated the navigation, which can be a parent frame (e.g. via
+     * `window.open` with a frame's name), or null if the navigation was not initiated
+     * by a frame. This can also be null if the initiating frame was deleted before the
+     * event was emitted.
+     */
+    initiator?: WebFrameMain;
   }
 
   interface WebviewTagPrintOptions {
@@ -19851,10 +21101,17 @@ declare namespace Electron {
      * Specify page size of the printed document. Can be `A3`, `A4`, `A5`, `Legal`,
      * `Letter`, `Tabloid` or an Object containing `height` in microns.
      */
-    pageSize?: string | Size;
+    pageSize?: ("A3" | "A4" | "A5" | "Legal" | "Letter" | "Tabloid") | Size;
   }
 
-  interface WillNavigateEvent extends Event {
+  interface WillFrameNavigateEvent extends DOMEvent {
+    url: string;
+    isMainFrame: boolean;
+    frameProcessId: number;
+    frameRoutingId: number;
+  }
+
+  interface WillNavigateEvent extends DOMEvent {
     url: string;
   }
 
@@ -20147,9 +21404,9 @@ declare namespace Electron {
     frameCharset: string;
     /**
      * If the context menu was invoked on an input field, the type of that field.
-     * Possible values are `none`, `plainText`, `password`, `other`.
+     * Possible values include `none`, `plainText`, `password`, `other`.
      */
-    inputFieldType: string;
+    inputFieldType: "none" | "plainText" | "password" | "other";
     /**
      * If the context is editable, whether or not spellchecking is enabled.
      */
@@ -20182,30 +21439,6 @@ declare namespace Electron {
     editFlags: EditFlags;
   }
 
-  interface TitleBarOverlay {
-    /**
-     * The CSS color of the Window Controls Overlay when enabled. Default is the system
-     * color.
-     *
-     * @platform win32
-     */
-    color?: string;
-    /**
-     * The CSS color of the symbols on the Window Controls Overlay when enabled.
-     * Default is the system color.
-     *
-     * @platform win32
-     */
-    symbolColor?: string;
-    /**
-     * The height of the title bar and Window Controls Overlay in pixels. Default is
-     * system height.
-     *
-     * @platform darwin,win32
-     */
-    height?: number;
-  }
-
   interface Video {
     /**
      * The id of the stream being granted. This will usually come from a
@@ -20217,272 +21450,6 @@ declare namespace Electron {
      * DesktopCapturerSource object.
      */
     name: string;
-  }
-
-  interface WebPreferences {
-    /**
-     * Whether to enable DevTools. If it is set to `false`, can not use
-     * `BrowserWindow.webContents.openDevTools()` to open DevTools. Default is `true`.
-     */
-    devTools?: boolean;
-    /**
-     * Whether node integration is enabled. Default is `false`.
-     */
-    nodeIntegration?: boolean;
-    /**
-     * Whether node integration is enabled in web workers. Default is `false`. More
-     * about this can be found in Multithreading.
-     */
-    nodeIntegrationInWorker?: boolean;
-    /**
-     * Experimental option for enabling Node.js support in sub-frames such as iframes
-     * and child windows. All your preloads will load for every iframe, you can use
-     * `process.isMainFrame` to determine if you are in the main frame or not.
-     */
-    nodeIntegrationInSubFrames?: boolean;
-    /**
-     * Specifies a script that will be loaded before other scripts run in the page.
-     * This script will always have access to node APIs no matter whether node
-     * integration is turned on or off. The value should be the absolute file path to
-     * the script. When node integration is turned off, the preload script can
-     * reintroduce Node global symbols back to the global scope. See example here.
-     */
-    preload?: string;
-    /**
-     * If set, this will sandbox the renderer associated with the window, making it
-     * compatible with the Chromium OS-level sandbox and disabling the Node.js engine.
-     * This is not the same as the `nodeIntegration` option and the APIs available to
-     * the preload script are more limited. Read more about the option here.
-     */
-    sandbox?: boolean;
-    /**
-     * Sets the session used by the page. Instead of passing the Session object
-     * directly, you can also choose to use the `partition` option instead, which
-     * accepts a partition string. When both `session` and `partition` are provided,
-     * `session` will be preferred. Default is the default session.
-     */
-    session?: Session;
-    /**
-     * Sets the session used by the page according to the session's partition string.
-     * If `partition` starts with `persist:`, the page will use a persistent session
-     * available to all pages in the app with the same `partition`. If there is no
-     * `persist:` prefix, the page will use an in-memory session. By assigning the same
-     * `partition`, multiple pages can share the same session. Default is the default
-     * session.
-     */
-    partition?: string;
-    /**
-     * The default zoom factor of the page, `3.0` represents `300%`. Default is `1.0`.
-     */
-    zoomFactor?: number;
-    /**
-     * Enables JavaScript support. Default is `true`.
-     */
-    javascript?: boolean;
-    /**
-     * When `false`, it will disable the same-origin policy (usually using testing
-     * websites by people), and set `allowRunningInsecureContent` to `true` if this
-     * options has not been set by user. Default is `true`.
-     */
-    webSecurity?: boolean;
-    /**
-     * Allow an https page to run JavaScript, CSS or plugins from http URLs. Default is
-     * `false`.
-     */
-    allowRunningInsecureContent?: boolean;
-    /**
-     * Enables image support. Default is `true`.
-     */
-    images?: boolean;
-    /**
-     * Specifies how to run image animations (E.g. GIFs).  Can be `animate`,
-     * `animateOnce` or `noAnimation`.  Default is `animate`.
-     */
-    imageAnimationPolicy?: "animate" | "animateOnce" | "noAnimation";
-    /**
-     * Make TextArea elements resizable. Default is `true`.
-     */
-    textAreasAreResizable?: boolean;
-    /**
-     * Enables WebGL support. Default is `true`.
-     */
-    webgl?: boolean;
-    /**
-     * Whether plugins should be enabled. Default is `false`.
-     */
-    plugins?: boolean;
-    /**
-     * Enables Chromium's experimental features. Default is `false`.
-     */
-    experimentalFeatures?: boolean;
-    /**
-     * Enables scroll bounce (rubber banding) effect on macOS. Default is `false`.
-     *
-     * @platform darwin
-     */
-    scrollBounce?: boolean;
-    /**
-     * A list of feature strings separated by `,`, like `CSSVariables,KeyboardEventKey`
-     * to enable. The full list of supported feature strings can be found in the
-     * RuntimeEnabledFeatures.json5 file.
-     */
-    enableBlinkFeatures?: string;
-    /**
-     * A list of feature strings separated by `,`, like `CSSVariables,KeyboardEventKey`
-     * to disable. The full list of supported feature strings can be found in the
-     * RuntimeEnabledFeatures.json5 file.
-     */
-    disableBlinkFeatures?: string;
-    /**
-     * Sets the default font for the font-family.
-     */
-    defaultFontFamily?: DefaultFontFamily;
-    /**
-     * Defaults to `16`.
-     */
-    defaultFontSize?: number;
-    /**
-     * Defaults to `13`.
-     */
-    defaultMonospaceFontSize?: number;
-    /**
-     * Defaults to `0`.
-     */
-    minimumFontSize?: number;
-    /**
-     * Defaults to `ISO-8859-1`.
-     */
-    defaultEncoding?: string;
-    /**
-     * Whether to throttle animations and timers when the page becomes background. This
-     * also affects the Page Visibility API. Defaults to `true`.
-     */
-    backgroundThrottling?: boolean;
-    /**
-     * Whether to enable offscreen rendering for the browser window. Defaults to
-     * `false`. See the offscreen rendering tutorial for more details.
-     */
-    offscreen?: boolean;
-    /**
-     * Whether to run Electron APIs and the specified `preload` script in a separate
-     * JavaScript context. Defaults to `true`. The context that the `preload` script
-     * runs in will only have access to its own dedicated `document` and `window`
-     * globals, as well as its own set of JavaScript builtins (`Array`, `Object`,
-     * `JSON`, etc.), which are all invisible to the loaded content. The Electron API
-     * will only be available in the `preload` script and not the loaded page. This
-     * option should be used when loading potentially untrusted remote content to
-     * ensure the loaded content cannot tamper with the `preload` script and any
-     * Electron APIs being used.  This option uses the same technique used by Chrome
-     * Content Scripts.  You can access this context in the dev tools by selecting the
-     * 'Electron Isolated Context' entry in the combo box at the top of the Console
-     * tab.
-     */
-    contextIsolation?: boolean;
-    /**
-     * Whether to enable the `<webview>` tag. Defaults to `false`. **Note:** The
-     * `preload` script configured for the `<webview>` will have node integration
-     * enabled when it is executed so you should ensure remote/untrusted content is not
-     * able to create a `<webview>` tag with a possibly malicious `preload` script. You
-     * can use the `will-attach-webview` event on webContents to strip away the
-     * `preload` script and to validate or alter the `<webview>`'s initial settings.
-     */
-    webviewTag?: boolean;
-    /**
-     * A list of strings that will be appended to `process.argv` in the renderer
-     * process of this app.  Useful for passing small bits of data down to renderer
-     * process preload scripts.
-     */
-    additionalArguments?: string[];
-    /**
-     * Whether to enable browser style consecutive dialog protection. Default is
-     * `false`.
-     */
-    safeDialogs?: boolean;
-    /**
-     * The message to display when consecutive dialog protection is triggered. If not
-     * defined the default message would be used, note that currently the default
-     * message is in English and not localized.
-     */
-    safeDialogsMessage?: string;
-    /**
-     * Whether to disable dialogs completely. Overrides `safeDialogs`. Default is
-     * `false`.
-     */
-    disableDialogs?: boolean;
-    /**
-     * Whether dragging and dropping a file or link onto the page causes a navigation.
-     * Default is `false`.
-     */
-    navigateOnDragDrop?: boolean;
-    /**
-     * Autoplay policy to apply to content in the window, can be
-     * `no-user-gesture-required`, `user-gesture-required`,
-     * `document-user-activation-required`. Defaults to `no-user-gesture-required`.
-     */
-    autoplayPolicy?:
-      | "no-user-gesture-required"
-      | "user-gesture-required"
-      | "document-user-activation-required";
-    /**
-     * Whether to prevent the window from resizing when entering HTML Fullscreen.
-     * Default is `false`.
-     */
-    disableHtmlFullscreenWindowResize?: boolean;
-    /**
-     * An alternative title string provided only to accessibility tools such as screen
-     * readers. This string is not directly visible to users.
-     */
-    accessibleTitle?: string;
-    /**
-     * Whether to enable the builtin spellchecker. Default is `true`.
-     */
-    spellcheck?: boolean;
-    /**
-     * Whether to enable the WebSQL api. Default is `true`.
-     */
-    enableWebSQL?: boolean;
-    /**
-     * Enforces the v8 code caching policy used by blink. Accepted values are
-     */
-    v8CacheOptions?:
-      | "none"
-      | "code"
-      | "bypassHeatCheck"
-      | "bypassHeatCheckAndEagerCompile";
-    /**
-     * Whether to enable preferred size mode. The preferred size is the minimum size
-     * needed to contain the layout of the document—without requiring scrolling.
-     * Enabling this will cause the `preferred-size-changed` event to be emitted on the
-     * `WebContents` when the preferred size changes. Default is `false`.
-     */
-    enablePreferredSizeMode?: boolean;
-  }
-
-  interface DefaultFontFamily {
-    /**
-     * Defaults to `Times New Roman`.
-     */
-    standard?: string;
-    /**
-     * Defaults to `Times New Roman`.
-     */
-    serif?: string;
-    /**
-     * Defaults to `Arial`.
-     */
-    sansSerif?: string;
-    /**
-     * Defaults to `Courier New`.
-     */
-    monospace?: string;
-    /**
-     * Defaults to `Script`.
-     */
-    cursive?: string;
-    /**
-     * Defaults to `Impact`.
-     */
-    fantasy?: string;
   }
 
   interface RemoteMainInterface {
@@ -20524,6 +21491,7 @@ declare namespace Electron {
   }
 
   namespace Common {
+    type Event<Params extends object = {}> = Electron.Event<Params>;
     const clipboard: Clipboard;
     type Clipboard = Electron.Clipboard;
     const crashReporter: CrashReporter;
@@ -20534,6 +21502,7 @@ declare namespace Electron {
     type Shell = Electron.Shell;
     type AboutPanelOptionsOptions = Electron.AboutPanelOptionsOptions;
     type AddRepresentationOptions = Electron.AddRepresentationOptions;
+    type AdjustSelectionOptions = Electron.AdjustSelectionOptions;
     type AnimationSettings = Electron.AnimationSettings;
     type AppDetailsOptions = Electron.AppDetailsOptions;
     type ApplicationInfoForProtocolReturnValue =
@@ -20547,8 +21516,6 @@ declare namespace Electron {
     type BluetoothPairingHandlerHandlerDetails =
       Electron.BluetoothPairingHandlerHandlerDetails;
     type BrowserViewConstructorOptions = Electron.BrowserViewConstructorOptions;
-    type BrowserWindowConstructorOptions =
-      Electron.BrowserWindowConstructorOptions;
     type CallbackResponse = Electron.CallbackResponse;
     type CertificateTrustDialogOptions = Electron.CertificateTrustDialogOptions;
     type ClearCodeCachesOptions = Electron.ClearCodeCachesOptions;
@@ -20570,6 +21537,7 @@ declare namespace Electron {
     type CreateInterruptedDownloadOptions =
       Electron.CreateInterruptedDownloadOptions;
     type Data = Electron.Data;
+    type DefaultFontFamily = Electron.DefaultFontFamily;
     type Details = Electron.Details;
     type DevicePermissionHandlerHandlerDetails =
       Electron.DevicePermissionHandlerHandlerDetails;
@@ -20586,6 +21554,7 @@ declare namespace Electron {
     type DisplayBalloonOptions = Electron.DisplayBalloonOptions;
     type DisplayMediaRequestHandlerHandlerRequest =
       Electron.DisplayMediaRequestHandlerHandlerRequest;
+    type DownloadURLOptions = Electron.DownloadURLOptions;
     type EnableNetworkEmulationOptions = Electron.EnableNetworkEmulationOptions;
     type FeedURLOptions = Electron.FeedURLOptions;
     type FileIconOptions = Electron.FileIconOptions;
@@ -20595,6 +21564,7 @@ declare namespace Electron {
     type FoundInPageEvent = Electron.FoundInPageEvent;
     type FrameCreatedDetails = Electron.FrameCreatedDetails;
     type FromPartitionOptions = Electron.FromPartitionOptions;
+    type FromPathOptions = Electron.FromPathOptions;
     type HandlerDetails = Electron.HandlerDetails;
     type HeadersReceivedResponse = Electron.HeadersReceivedResponse;
     type HeapStatistics = Electron.HeapStatistics;
@@ -20665,7 +21635,7 @@ declare namespace Electron {
     type ReadBookmark = Electron.ReadBookmark;
     type RegistrationCompletedDetails = Electron.RegistrationCompletedDetails;
     type RelaunchOptions = Electron.RelaunchOptions;
-    type RenderProcessGoneDetails = Electron.RenderProcessGoneDetails;
+    type RenderProcessGoneEvent = Electron.RenderProcessGoneEvent;
     type Request = Electron.Request;
     type ResizeOptions = Electron.ResizeOptions;
     type ResolveHostOptions = Electron.ResolveHostOptions;
@@ -20684,6 +21654,7 @@ declare namespace Electron {
     type StartLoggingOptions = Electron.StartLoggingOptions;
     type Streams = Electron.Streams;
     type SystemMemoryInfo = Electron.SystemMemoryInfo;
+    type TitleBarOverlay = Electron.TitleBarOverlay;
     type TitleBarOverlayOptions = Electron.TitleBarOverlayOptions;
     type TitleOptions = Electron.TitleOptions;
     type ToBitmapOptions = Electron.ToBitmapOptions;
@@ -20711,12 +21682,25 @@ declare namespace Electron {
     type TraceBufferUsageReturnValue = Electron.TraceBufferUsageReturnValue;
     type UpdateTargetUrlEvent = Electron.UpdateTargetUrlEvent;
     type UploadProgress = Electron.UploadProgress;
-    type UsbDeviceAddedDetails = Electron.UsbDeviceAddedDetails;
-    type UsbDeviceRemovedDetails = Electron.UsbDeviceRemovedDetails;
     type UsbDeviceRevokedDetails = Electron.UsbDeviceRevokedDetails;
+    type USBProtectedClassesHandlerHandlerDetails =
+      Electron.USBProtectedClassesHandlerHandlerDetails;
     type VisibleOnAllWorkspacesOptions = Electron.VisibleOnAllWorkspacesOptions;
+    type WebContentsAudioStateChangedEventParams =
+      Electron.WebContentsAudioStateChangedEventParams;
+    type WebContentsDidRedirectNavigationEventParams =
+      Electron.WebContentsDidRedirectNavigationEventParams;
+    type WebContentsDidStartNavigationEventParams =
+      Electron.WebContentsDidStartNavigationEventParams;
     type WebContentsPrintOptions = Electron.WebContentsPrintOptions;
+    type WebContentsWillFrameNavigateEventParams =
+      Electron.WebContentsWillFrameNavigateEventParams;
+    type WebContentsWillNavigateEventParams =
+      Electron.WebContentsWillNavigateEventParams;
+    type WebContentsWillRedirectEventParams =
+      Electron.WebContentsWillRedirectEventParams;
     type WebviewTagPrintOptions = Electron.WebviewTagPrintOptions;
+    type WillFrameNavigateEvent = Electron.WillFrameNavigateEvent;
     type WillNavigateEvent = Electron.WillNavigateEvent;
     type WillResizeDetails = Electron.WillResizeDetails;
     type EditFlags = Electron.EditFlags;
@@ -20727,11 +21711,10 @@ declare namespace Electron {
     type MediaFlags = Electron.MediaFlags;
     type PageRanges = Electron.PageRanges;
     type Params = Electron.Params;
-    type TitleBarOverlay = Electron.TitleBarOverlay;
     type Video = Electron.Video;
-    type WebPreferences = Electron.WebPreferences;
-    type DefaultFontFamily = Electron.DefaultFontFamily;
     type BluetoothDevice = Electron.BluetoothDevice;
+    type BrowserWindowConstructorOptions =
+      Electron.BrowserWindowConstructorOptions;
     type Certificate = Electron.Certificate;
     type CertificatePrincipal = Electron.CertificatePrincipal;
     type Cookie = Electron.Cookie;
@@ -20740,7 +21723,6 @@ declare namespace Electron {
     type CustomScheme = Electron.CustomScheme;
     type DesktopCapturerSource = Electron.DesktopCapturerSource;
     type Display = Electron.Display;
-    type Event = Electron.Event;
     type Extension = Electron.Extension;
     type ExtensionInfo = Electron.ExtensionInfo;
     type FileFilter = Electron.FileFilter;
@@ -20777,6 +21759,7 @@ declare namespace Electron {
     type ProtocolResponseUploadData = Electron.ProtocolResponseUploadData;
     type Rectangle = Electron.Rectangle;
     type Referrer = Electron.Referrer;
+    type RenderProcessGoneDetails = Electron.RenderProcessGoneDetails;
     type ResolvedEndpoint = Electron.ResolvedEndpoint;
     type ResolvedHost = Electron.ResolvedHost;
     type ScrubberItem = Electron.ScrubberItem;
@@ -20797,11 +21780,13 @@ declare namespace Electron {
     type UploadRawData = Electron.UploadRawData;
     type USBDevice = Electron.USBDevice;
     type UserDefaultTypes = Electron.UserDefaultTypes;
+    type WebPreferences = Electron.WebPreferences;
     type WebRequestFilter = Electron.WebRequestFilter;
     type WebSource = Electron.WebSource;
   }
 
   namespace Main {
+    type Event<Params extends object = {}> = Electron.Event<Params>;
     const app: App;
     type App = Electron.App;
     const autoUpdater: AutoUpdater;
@@ -20877,6 +21862,7 @@ declare namespace Electron {
     type WebRequest = Electron.WebRequest;
     type AboutPanelOptionsOptions = Electron.AboutPanelOptionsOptions;
     type AddRepresentationOptions = Electron.AddRepresentationOptions;
+    type AdjustSelectionOptions = Electron.AdjustSelectionOptions;
     type AnimationSettings = Electron.AnimationSettings;
     type AppDetailsOptions = Electron.AppDetailsOptions;
     type ApplicationInfoForProtocolReturnValue =
@@ -20890,8 +21876,6 @@ declare namespace Electron {
     type BluetoothPairingHandlerHandlerDetails =
       Electron.BluetoothPairingHandlerHandlerDetails;
     type BrowserViewConstructorOptions = Electron.BrowserViewConstructorOptions;
-    type BrowserWindowConstructorOptions =
-      Electron.BrowserWindowConstructorOptions;
     type CallbackResponse = Electron.CallbackResponse;
     type CertificateTrustDialogOptions = Electron.CertificateTrustDialogOptions;
     type ClearCodeCachesOptions = Electron.ClearCodeCachesOptions;
@@ -20913,6 +21897,7 @@ declare namespace Electron {
     type CreateInterruptedDownloadOptions =
       Electron.CreateInterruptedDownloadOptions;
     type Data = Electron.Data;
+    type DefaultFontFamily = Electron.DefaultFontFamily;
     type Details = Electron.Details;
     type DevicePermissionHandlerHandlerDetails =
       Electron.DevicePermissionHandlerHandlerDetails;
@@ -20929,6 +21914,7 @@ declare namespace Electron {
     type DisplayBalloonOptions = Electron.DisplayBalloonOptions;
     type DisplayMediaRequestHandlerHandlerRequest =
       Electron.DisplayMediaRequestHandlerHandlerRequest;
+    type DownloadURLOptions = Electron.DownloadURLOptions;
     type EnableNetworkEmulationOptions = Electron.EnableNetworkEmulationOptions;
     type FeedURLOptions = Electron.FeedURLOptions;
     type FileIconOptions = Electron.FileIconOptions;
@@ -20938,6 +21924,7 @@ declare namespace Electron {
     type FoundInPageEvent = Electron.FoundInPageEvent;
     type FrameCreatedDetails = Electron.FrameCreatedDetails;
     type FromPartitionOptions = Electron.FromPartitionOptions;
+    type FromPathOptions = Electron.FromPathOptions;
     type HandlerDetails = Electron.HandlerDetails;
     type HeadersReceivedResponse = Electron.HeadersReceivedResponse;
     type HeapStatistics = Electron.HeapStatistics;
@@ -21008,7 +21995,7 @@ declare namespace Electron {
     type ReadBookmark = Electron.ReadBookmark;
     type RegistrationCompletedDetails = Electron.RegistrationCompletedDetails;
     type RelaunchOptions = Electron.RelaunchOptions;
-    type RenderProcessGoneDetails = Electron.RenderProcessGoneDetails;
+    type RenderProcessGoneEvent = Electron.RenderProcessGoneEvent;
     type Request = Electron.Request;
     type ResizeOptions = Electron.ResizeOptions;
     type ResolveHostOptions = Electron.ResolveHostOptions;
@@ -21027,6 +22014,7 @@ declare namespace Electron {
     type StartLoggingOptions = Electron.StartLoggingOptions;
     type Streams = Electron.Streams;
     type SystemMemoryInfo = Electron.SystemMemoryInfo;
+    type TitleBarOverlay = Electron.TitleBarOverlay;
     type TitleBarOverlayOptions = Electron.TitleBarOverlayOptions;
     type TitleOptions = Electron.TitleOptions;
     type ToBitmapOptions = Electron.ToBitmapOptions;
@@ -21054,12 +22042,25 @@ declare namespace Electron {
     type TraceBufferUsageReturnValue = Electron.TraceBufferUsageReturnValue;
     type UpdateTargetUrlEvent = Electron.UpdateTargetUrlEvent;
     type UploadProgress = Electron.UploadProgress;
-    type UsbDeviceAddedDetails = Electron.UsbDeviceAddedDetails;
-    type UsbDeviceRemovedDetails = Electron.UsbDeviceRemovedDetails;
     type UsbDeviceRevokedDetails = Electron.UsbDeviceRevokedDetails;
+    type USBProtectedClassesHandlerHandlerDetails =
+      Electron.USBProtectedClassesHandlerHandlerDetails;
     type VisibleOnAllWorkspacesOptions = Electron.VisibleOnAllWorkspacesOptions;
+    type WebContentsAudioStateChangedEventParams =
+      Electron.WebContentsAudioStateChangedEventParams;
+    type WebContentsDidRedirectNavigationEventParams =
+      Electron.WebContentsDidRedirectNavigationEventParams;
+    type WebContentsDidStartNavigationEventParams =
+      Electron.WebContentsDidStartNavigationEventParams;
     type WebContentsPrintOptions = Electron.WebContentsPrintOptions;
+    type WebContentsWillFrameNavigateEventParams =
+      Electron.WebContentsWillFrameNavigateEventParams;
+    type WebContentsWillNavigateEventParams =
+      Electron.WebContentsWillNavigateEventParams;
+    type WebContentsWillRedirectEventParams =
+      Electron.WebContentsWillRedirectEventParams;
     type WebviewTagPrintOptions = Electron.WebviewTagPrintOptions;
+    type WillFrameNavigateEvent = Electron.WillFrameNavigateEvent;
     type WillNavigateEvent = Electron.WillNavigateEvent;
     type WillResizeDetails = Electron.WillResizeDetails;
     type EditFlags = Electron.EditFlags;
@@ -21070,11 +22071,10 @@ declare namespace Electron {
     type MediaFlags = Electron.MediaFlags;
     type PageRanges = Electron.PageRanges;
     type Params = Electron.Params;
-    type TitleBarOverlay = Electron.TitleBarOverlay;
     type Video = Electron.Video;
-    type WebPreferences = Electron.WebPreferences;
-    type DefaultFontFamily = Electron.DefaultFontFamily;
     type BluetoothDevice = Electron.BluetoothDevice;
+    type BrowserWindowConstructorOptions =
+      Electron.BrowserWindowConstructorOptions;
     type Certificate = Electron.Certificate;
     type CertificatePrincipal = Electron.CertificatePrincipal;
     type Cookie = Electron.Cookie;
@@ -21083,7 +22083,6 @@ declare namespace Electron {
     type CustomScheme = Electron.CustomScheme;
     type DesktopCapturerSource = Electron.DesktopCapturerSource;
     type Display = Electron.Display;
-    type Event = Electron.Event;
     type Extension = Electron.Extension;
     type ExtensionInfo = Electron.ExtensionInfo;
     type FileFilter = Electron.FileFilter;
@@ -21120,6 +22119,7 @@ declare namespace Electron {
     type ProtocolResponseUploadData = Electron.ProtocolResponseUploadData;
     type Rectangle = Electron.Rectangle;
     type Referrer = Electron.Referrer;
+    type RenderProcessGoneDetails = Electron.RenderProcessGoneDetails;
     type ResolvedEndpoint = Electron.ResolvedEndpoint;
     type ResolvedHost = Electron.ResolvedHost;
     type ScrubberItem = Electron.ScrubberItem;
@@ -21140,19 +22140,23 @@ declare namespace Electron {
     type UploadRawData = Electron.UploadRawData;
     type USBDevice = Electron.USBDevice;
     type UserDefaultTypes = Electron.UserDefaultTypes;
+    type WebPreferences = Electron.WebPreferences;
     type WebRequestFilter = Electron.WebRequestFilter;
     type WebSource = Electron.WebSource;
   }
 
   namespace Renderer {
+    type Event<Params extends object = {}> = Electron.Event<Params>;
     const contextBridge: ContextBridge;
     type ContextBridge = Electron.ContextBridge;
     const ipcRenderer: IpcRenderer;
     type IpcRenderer = Electron.IpcRenderer;
     const webFrame: WebFrame;
     type WebFrame = Electron.WebFrame;
+    type WebviewTag = Electron.WebviewTag;
     type AboutPanelOptionsOptions = Electron.AboutPanelOptionsOptions;
     type AddRepresentationOptions = Electron.AddRepresentationOptions;
+    type AdjustSelectionOptions = Electron.AdjustSelectionOptions;
     type AnimationSettings = Electron.AnimationSettings;
     type AppDetailsOptions = Electron.AppDetailsOptions;
     type ApplicationInfoForProtocolReturnValue =
@@ -21166,8 +22170,6 @@ declare namespace Electron {
     type BluetoothPairingHandlerHandlerDetails =
       Electron.BluetoothPairingHandlerHandlerDetails;
     type BrowserViewConstructorOptions = Electron.BrowserViewConstructorOptions;
-    type BrowserWindowConstructorOptions =
-      Electron.BrowserWindowConstructorOptions;
     type CallbackResponse = Electron.CallbackResponse;
     type CertificateTrustDialogOptions = Electron.CertificateTrustDialogOptions;
     type ClearCodeCachesOptions = Electron.ClearCodeCachesOptions;
@@ -21189,6 +22191,7 @@ declare namespace Electron {
     type CreateInterruptedDownloadOptions =
       Electron.CreateInterruptedDownloadOptions;
     type Data = Electron.Data;
+    type DefaultFontFamily = Electron.DefaultFontFamily;
     type Details = Electron.Details;
     type DevicePermissionHandlerHandlerDetails =
       Electron.DevicePermissionHandlerHandlerDetails;
@@ -21205,6 +22208,7 @@ declare namespace Electron {
     type DisplayBalloonOptions = Electron.DisplayBalloonOptions;
     type DisplayMediaRequestHandlerHandlerRequest =
       Electron.DisplayMediaRequestHandlerHandlerRequest;
+    type DownloadURLOptions = Electron.DownloadURLOptions;
     type EnableNetworkEmulationOptions = Electron.EnableNetworkEmulationOptions;
     type FeedURLOptions = Electron.FeedURLOptions;
     type FileIconOptions = Electron.FileIconOptions;
@@ -21214,6 +22218,7 @@ declare namespace Electron {
     type FoundInPageEvent = Electron.FoundInPageEvent;
     type FrameCreatedDetails = Electron.FrameCreatedDetails;
     type FromPartitionOptions = Electron.FromPartitionOptions;
+    type FromPathOptions = Electron.FromPathOptions;
     type HandlerDetails = Electron.HandlerDetails;
     type HeadersReceivedResponse = Electron.HeadersReceivedResponse;
     type HeapStatistics = Electron.HeapStatistics;
@@ -21284,7 +22289,7 @@ declare namespace Electron {
     type ReadBookmark = Electron.ReadBookmark;
     type RegistrationCompletedDetails = Electron.RegistrationCompletedDetails;
     type RelaunchOptions = Electron.RelaunchOptions;
-    type RenderProcessGoneDetails = Electron.RenderProcessGoneDetails;
+    type RenderProcessGoneEvent = Electron.RenderProcessGoneEvent;
     type Request = Electron.Request;
     type ResizeOptions = Electron.ResizeOptions;
     type ResolveHostOptions = Electron.ResolveHostOptions;
@@ -21303,6 +22308,7 @@ declare namespace Electron {
     type StartLoggingOptions = Electron.StartLoggingOptions;
     type Streams = Electron.Streams;
     type SystemMemoryInfo = Electron.SystemMemoryInfo;
+    type TitleBarOverlay = Electron.TitleBarOverlay;
     type TitleBarOverlayOptions = Electron.TitleBarOverlayOptions;
     type TitleOptions = Electron.TitleOptions;
     type ToBitmapOptions = Electron.ToBitmapOptions;
@@ -21330,12 +22336,25 @@ declare namespace Electron {
     type TraceBufferUsageReturnValue = Electron.TraceBufferUsageReturnValue;
     type UpdateTargetUrlEvent = Electron.UpdateTargetUrlEvent;
     type UploadProgress = Electron.UploadProgress;
-    type UsbDeviceAddedDetails = Electron.UsbDeviceAddedDetails;
-    type UsbDeviceRemovedDetails = Electron.UsbDeviceRemovedDetails;
     type UsbDeviceRevokedDetails = Electron.UsbDeviceRevokedDetails;
+    type USBProtectedClassesHandlerHandlerDetails =
+      Electron.USBProtectedClassesHandlerHandlerDetails;
     type VisibleOnAllWorkspacesOptions = Electron.VisibleOnAllWorkspacesOptions;
+    type WebContentsAudioStateChangedEventParams =
+      Electron.WebContentsAudioStateChangedEventParams;
+    type WebContentsDidRedirectNavigationEventParams =
+      Electron.WebContentsDidRedirectNavigationEventParams;
+    type WebContentsDidStartNavigationEventParams =
+      Electron.WebContentsDidStartNavigationEventParams;
     type WebContentsPrintOptions = Electron.WebContentsPrintOptions;
+    type WebContentsWillFrameNavigateEventParams =
+      Electron.WebContentsWillFrameNavigateEventParams;
+    type WebContentsWillNavigateEventParams =
+      Electron.WebContentsWillNavigateEventParams;
+    type WebContentsWillRedirectEventParams =
+      Electron.WebContentsWillRedirectEventParams;
     type WebviewTagPrintOptions = Electron.WebviewTagPrintOptions;
+    type WillFrameNavigateEvent = Electron.WillFrameNavigateEvent;
     type WillNavigateEvent = Electron.WillNavigateEvent;
     type WillResizeDetails = Electron.WillResizeDetails;
     type EditFlags = Electron.EditFlags;
@@ -21346,11 +22365,10 @@ declare namespace Electron {
     type MediaFlags = Electron.MediaFlags;
     type PageRanges = Electron.PageRanges;
     type Params = Electron.Params;
-    type TitleBarOverlay = Electron.TitleBarOverlay;
     type Video = Electron.Video;
-    type WebPreferences = Electron.WebPreferences;
-    type DefaultFontFamily = Electron.DefaultFontFamily;
     type BluetoothDevice = Electron.BluetoothDevice;
+    type BrowserWindowConstructorOptions =
+      Electron.BrowserWindowConstructorOptions;
     type Certificate = Electron.Certificate;
     type CertificatePrincipal = Electron.CertificatePrincipal;
     type Cookie = Electron.Cookie;
@@ -21359,7 +22377,6 @@ declare namespace Electron {
     type CustomScheme = Electron.CustomScheme;
     type DesktopCapturerSource = Electron.DesktopCapturerSource;
     type Display = Electron.Display;
-    type Event = Electron.Event;
     type Extension = Electron.Extension;
     type ExtensionInfo = Electron.ExtensionInfo;
     type FileFilter = Electron.FileFilter;
@@ -21396,6 +22413,7 @@ declare namespace Electron {
     type ProtocolResponseUploadData = Electron.ProtocolResponseUploadData;
     type Rectangle = Electron.Rectangle;
     type Referrer = Electron.Referrer;
+    type RenderProcessGoneDetails = Electron.RenderProcessGoneDetails;
     type ResolvedEndpoint = Electron.ResolvedEndpoint;
     type ResolvedHost = Electron.ResolvedHost;
     type ScrubberItem = Electron.ScrubberItem;
@@ -21416,11 +22434,13 @@ declare namespace Electron {
     type UploadRawData = Electron.UploadRawData;
     type USBDevice = Electron.USBDevice;
     type UserDefaultTypes = Electron.UserDefaultTypes;
+    type WebPreferences = Electron.WebPreferences;
     type WebRequestFilter = Electron.WebRequestFilter;
     type WebSource = Electron.WebSource;
   }
 
   namespace CrossProcessExports {
+    type Event<Params extends object = {}> = Electron.Event<Params>;
     const app: App;
     type App = Electron.App;
     const autoUpdater: AutoUpdater;
@@ -21508,8 +22528,10 @@ declare namespace Electron {
     const webFrameMain: typeof WebFrameMain;
     type WebFrameMain = Electron.WebFrameMain;
     type WebRequest = Electron.WebRequest;
+    type WebviewTag = Electron.WebviewTag;
     type AboutPanelOptionsOptions = Electron.AboutPanelOptionsOptions;
     type AddRepresentationOptions = Electron.AddRepresentationOptions;
+    type AdjustSelectionOptions = Electron.AdjustSelectionOptions;
     type AnimationSettings = Electron.AnimationSettings;
     type AppDetailsOptions = Electron.AppDetailsOptions;
     type ApplicationInfoForProtocolReturnValue =
@@ -21523,8 +22545,6 @@ declare namespace Electron {
     type BluetoothPairingHandlerHandlerDetails =
       Electron.BluetoothPairingHandlerHandlerDetails;
     type BrowserViewConstructorOptions = Electron.BrowserViewConstructorOptions;
-    type BrowserWindowConstructorOptions =
-      Electron.BrowserWindowConstructorOptions;
     type CallbackResponse = Electron.CallbackResponse;
     type CertificateTrustDialogOptions = Electron.CertificateTrustDialogOptions;
     type ClearCodeCachesOptions = Electron.ClearCodeCachesOptions;
@@ -21546,6 +22566,7 @@ declare namespace Electron {
     type CreateInterruptedDownloadOptions =
       Electron.CreateInterruptedDownloadOptions;
     type Data = Electron.Data;
+    type DefaultFontFamily = Electron.DefaultFontFamily;
     type Details = Electron.Details;
     type DevicePermissionHandlerHandlerDetails =
       Electron.DevicePermissionHandlerHandlerDetails;
@@ -21562,6 +22583,7 @@ declare namespace Electron {
     type DisplayBalloonOptions = Electron.DisplayBalloonOptions;
     type DisplayMediaRequestHandlerHandlerRequest =
       Electron.DisplayMediaRequestHandlerHandlerRequest;
+    type DownloadURLOptions = Electron.DownloadURLOptions;
     type EnableNetworkEmulationOptions = Electron.EnableNetworkEmulationOptions;
     type FeedURLOptions = Electron.FeedURLOptions;
     type FileIconOptions = Electron.FileIconOptions;
@@ -21571,6 +22593,7 @@ declare namespace Electron {
     type FoundInPageEvent = Electron.FoundInPageEvent;
     type FrameCreatedDetails = Electron.FrameCreatedDetails;
     type FromPartitionOptions = Electron.FromPartitionOptions;
+    type FromPathOptions = Electron.FromPathOptions;
     type HandlerDetails = Electron.HandlerDetails;
     type HeadersReceivedResponse = Electron.HeadersReceivedResponse;
     type HeapStatistics = Electron.HeapStatistics;
@@ -21641,7 +22664,7 @@ declare namespace Electron {
     type ReadBookmark = Electron.ReadBookmark;
     type RegistrationCompletedDetails = Electron.RegistrationCompletedDetails;
     type RelaunchOptions = Electron.RelaunchOptions;
-    type RenderProcessGoneDetails = Electron.RenderProcessGoneDetails;
+    type RenderProcessGoneEvent = Electron.RenderProcessGoneEvent;
     type Request = Electron.Request;
     type ResizeOptions = Electron.ResizeOptions;
     type ResolveHostOptions = Electron.ResolveHostOptions;
@@ -21660,6 +22683,7 @@ declare namespace Electron {
     type StartLoggingOptions = Electron.StartLoggingOptions;
     type Streams = Electron.Streams;
     type SystemMemoryInfo = Electron.SystemMemoryInfo;
+    type TitleBarOverlay = Electron.TitleBarOverlay;
     type TitleBarOverlayOptions = Electron.TitleBarOverlayOptions;
     type TitleOptions = Electron.TitleOptions;
     type ToBitmapOptions = Electron.ToBitmapOptions;
@@ -21687,12 +22711,25 @@ declare namespace Electron {
     type TraceBufferUsageReturnValue = Electron.TraceBufferUsageReturnValue;
     type UpdateTargetUrlEvent = Electron.UpdateTargetUrlEvent;
     type UploadProgress = Electron.UploadProgress;
-    type UsbDeviceAddedDetails = Electron.UsbDeviceAddedDetails;
-    type UsbDeviceRemovedDetails = Electron.UsbDeviceRemovedDetails;
     type UsbDeviceRevokedDetails = Electron.UsbDeviceRevokedDetails;
+    type USBProtectedClassesHandlerHandlerDetails =
+      Electron.USBProtectedClassesHandlerHandlerDetails;
     type VisibleOnAllWorkspacesOptions = Electron.VisibleOnAllWorkspacesOptions;
+    type WebContentsAudioStateChangedEventParams =
+      Electron.WebContentsAudioStateChangedEventParams;
+    type WebContentsDidRedirectNavigationEventParams =
+      Electron.WebContentsDidRedirectNavigationEventParams;
+    type WebContentsDidStartNavigationEventParams =
+      Electron.WebContentsDidStartNavigationEventParams;
     type WebContentsPrintOptions = Electron.WebContentsPrintOptions;
+    type WebContentsWillFrameNavigateEventParams =
+      Electron.WebContentsWillFrameNavigateEventParams;
+    type WebContentsWillNavigateEventParams =
+      Electron.WebContentsWillNavigateEventParams;
+    type WebContentsWillRedirectEventParams =
+      Electron.WebContentsWillRedirectEventParams;
     type WebviewTagPrintOptions = Electron.WebviewTagPrintOptions;
+    type WillFrameNavigateEvent = Electron.WillFrameNavigateEvent;
     type WillNavigateEvent = Electron.WillNavigateEvent;
     type WillResizeDetails = Electron.WillResizeDetails;
     type EditFlags = Electron.EditFlags;
@@ -21703,11 +22740,10 @@ declare namespace Electron {
     type MediaFlags = Electron.MediaFlags;
     type PageRanges = Electron.PageRanges;
     type Params = Electron.Params;
-    type TitleBarOverlay = Electron.TitleBarOverlay;
     type Video = Electron.Video;
-    type WebPreferences = Electron.WebPreferences;
-    type DefaultFontFamily = Electron.DefaultFontFamily;
     type BluetoothDevice = Electron.BluetoothDevice;
+    type BrowserWindowConstructorOptions =
+      Electron.BrowserWindowConstructorOptions;
     type Certificate = Electron.Certificate;
     type CertificatePrincipal = Electron.CertificatePrincipal;
     type Cookie = Electron.Cookie;
@@ -21716,7 +22752,6 @@ declare namespace Electron {
     type CustomScheme = Electron.CustomScheme;
     type DesktopCapturerSource = Electron.DesktopCapturerSource;
     type Display = Electron.Display;
-    type Event = Electron.Event;
     type Extension = Electron.Extension;
     type ExtensionInfo = Electron.ExtensionInfo;
     type FileFilter = Electron.FileFilter;
@@ -21753,6 +22788,7 @@ declare namespace Electron {
     type ProtocolResponseUploadData = Electron.ProtocolResponseUploadData;
     type Rectangle = Electron.Rectangle;
     type Referrer = Electron.Referrer;
+    type RenderProcessGoneDetails = Electron.RenderProcessGoneDetails;
     type ResolvedEndpoint = Electron.ResolvedEndpoint;
     type ResolvedHost = Electron.ResolvedHost;
     type ScrubberItem = Electron.ScrubberItem;
@@ -21773,6 +22809,7 @@ declare namespace Electron {
     type UploadRawData = Electron.UploadRawData;
     type USBDevice = Electron.USBDevice;
     type UserDefaultTypes = Electron.UserDefaultTypes;
+    type WebPreferences = Electron.WebPreferences;
     type WebRequestFilter = Electron.WebRequestFilter;
     type WebSource = Electron.WebSource;
   }
@@ -21851,6 +22888,11 @@ declare module "original-fs" {
   export = fs;
 }
 
+declare module "node:original-fs" {
+  import * as fs from "fs";
+  export = fs;
+}
+
 interface Document {
   createElement(tagName: "webview"): Electron.WebviewTag;
 }
@@ -21905,6 +22947,9 @@ declare namespace NodeJS {
      * in Kilobytes.
      */
     getHeapStatistics(): Electron.HeapStatistics;
+    /**
+     * @platform win32,linux
+     */
     getIOCounters(): Electron.IOCounters;
     /**
      * Resolves with a ProcessMemoryInfo
@@ -21980,8 +23025,11 @@ declare namespace NodeJS {
      */
     readonly contextIsolated: boolean;
     /**
-     * A `boolean`. When app is started by being passed as parameter to the default
-     * app, this property is `true` in the main process, otherwise it is `undefined`.
+     * A `boolean`. When the app is started by being passed as parameter to the default
+     * Electron executable, this property is `true` in the main process, otherwise it
+     * is `undefined`. For example when running the app with `electron .`, it is
+     * `true`, even if the app is packaged (`isPackaged`) is `true`. This can be useful
+     * to determine how many arguments will need to be sliced off from `process.argv`.
      *
      */
     readonly defaultApp: boolean;

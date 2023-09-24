@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/qteatime/kate/issues"
   },
-  "homepage": "https://github.com/qteatime/kate#readme"
+  "homepage": "https://github.com/qteatime/kate#readme",
+  "dependencies": {
+    "electron": "^26.2.2"
+  }
 }

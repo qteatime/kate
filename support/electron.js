@@ -13,7 +13,7 @@ const Streams = require("stream/promises");
 const Crypto = require("crypto");
 const electron_checksum = require("./electron-checksum");
 
-const version = "v24.1.2";
+const version = "v26.2.2";
 
 function fetch(url) {
   return new Promise((resolve, reject) => {
