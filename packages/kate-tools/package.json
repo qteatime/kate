@@ -12,7 +12,7 @@
     "url": "git+https://github.com/qteatime/kate.git"
   },
   "author": "Q.",
-  "license": "MIT",
+  "license": "MPL-2.0",
   "bugs": {
     "url": "https://github.com/qteatime/kate/issues"
   },
