@@ -39,7 +39,7 @@ async function gen_unsigned_zip(platform, arch) {
     Path.join(dest, "LICENSE.electron.txt")
   );
   copy("README.md", Path.join(dest, "README.md"));
-  copy("LICENCE", Path.join(dest, "LICENCE.kate.txt"));
+  copy("LICENCE.txt", Path.join(dest, "LICENCE.kate.txt"));
 
   switch (platform) {
     case "win32":
