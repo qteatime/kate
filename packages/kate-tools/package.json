@@ -1,6 +1,6 @@
 {
   "name": "@qteatime/kate-tools",
-  "version": "0.23.9-a1",
+  "version": "0.23.10-a1",
   "description": "Command line tools for interacting with Kate cartridges.",
   "main": "build/index.js",
   "bin": {
