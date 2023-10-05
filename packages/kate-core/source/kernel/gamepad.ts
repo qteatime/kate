@@ -83,7 +83,7 @@ export class GamepadInput {
   }
 
   use_gamepad(gamepad: Gamepad | null) {
-    if (gamepad != null && gamepad.mapping === "standard") {
+    if (gamepad != null) {
       this.gamepad = new GamepadAdaptor(gamepad, this.mapping, this.console);
       this.schedule_update();
     } else {
