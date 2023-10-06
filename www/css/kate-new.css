@@ -35,7 +35,7 @@ body {
 .kc-body {
   background: var(--red);
   width: 1040px;
-  height: 480px;
+  height: 490px;
   position: absolute;
   border-radius: 80px;
   user-select: none;
@@ -51,15 +51,15 @@ body {
   border-radius: 20px;
   overflow: hidden;
   transform-origin: top left;
+  transition: translate 50ms ease-out;
 }
 
-.kc-shoulder::after {
-  content: "";
+.kc-hide-shoulder {
   display: block;
   width: 240px;
   height: 240px;
   background: var(--red);
-  border-radius: 100%;
+  border-radius: 80px;
   position: absolute;
   translate: 0px 0px;
   transform-origin: top left;
@@ -69,22 +69,26 @@ body {
   translate: 0px 0px;
 }
 
-.kc-shoulder-left::after {
-  translate: 0px 0px;
+.kc-shoulder-left.active {
+  translate: 10px 10px;
 }
 
 .kc-shoulder-right {
   translate: 920px 0px;
 }
 
-.kc-shoulder-right::after {
-  translate: -120px 0px;
+.kc-shoulder-right.active {
+  translate: 910px 10px;
+}
+
+.kc-hide-shoulder-right {
+  translate: 800px 0px;
 }
 
 .kc-screen {
   position: absolute;
   transform-origin: top left;
-  translate: 120px 0px;
+  translate: 120px 5px;
   width: var(--screen-width);
   height: var(--screen-height);
   background: #2f2f2f;
