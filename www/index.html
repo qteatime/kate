@@ -54,7 +54,11 @@
         const ww = window.innerWidth;
         const wh = window.innerHeight;
         const scale = Math.min(ww / kw, wh / kh);
-        document.querySelector(".kate-case").style.setProperty("--case-scale", String(scale));
+        const rw = kw * scale;
+        const rh = kh * scale;
+        const kase = document.querySelector(".kate-case");
+        kase.style.setProperty("--case-scale", String(scale));
+        kase.style.translate = `${Math.round((ww - rw) / 2)}px ${Math.round((wh - rh) / 2)}px`;
       }, 1000);
     </script>
   </body>
