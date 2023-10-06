@@ -1,0 +1,167 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
+:root {
+  touch-action: none;
+}
+
+body {
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+.kate-case {
+  --case-scale: 0.818;
+  --screen-scale: 1;
+  --base-screen-width: 800px;
+  --base-screen-height: 480px;
+  --screen-width: 800px;
+  --screen-height: 480px;
+
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 100vw;
+  height: 100vh;
+  --red: #faaaaa;
+  --blue: #69c;
+  --grey: #e8ebecff;
+}
+
+.kc-body {
+  background: var(--red);
+  width: 1040px;
+  height: 480px;
+  position: absolute;
+  border-radius: 80px;
+  user-select: none;
+  scale: var(--case-scale);
+  transform-origin: top left;
+}
+
+.kc-shoulder {
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  background: var(--blue);
+  border-radius: 20px;
+  overflow: hidden;
+  transform-origin: top left;
+}
+
+.kc-shoulder::after {
+  content: "";
+  display: block;
+  width: 240px;
+  height: 240px;
+  background: var(--red);
+  border-radius: 100%;
+  position: absolute;
+  translate: 0px 0px;
+  transform-origin: top left;
+}
+
+.kc-shoulder-left {
+  translate: 0px 0px;
+}
+
+.kc-shoulder-left::after {
+  translate: 0px 0px;
+}
+
+.kc-shoulder-right {
+  translate: 920px 0px;
+}
+
+.kc-shoulder-right::after {
+  translate: -120px 0px;
+}
+
+.kc-screen {
+  position: absolute;
+  transform-origin: top left;
+  translate: 120px 0px;
+  width: var(--screen-width);
+  height: var(--screen-height);
+  background: #2f2f2f;
+}
+
+.kc-dpad {
+  position: absolute;
+  transform-origin: top left;
+  translate: 10px 150px;
+  width: 100px;
+  height: 100px;
+  background: #e8ebecff;
+  border: 1px solid #afb2b2ff;
+  border-radius: 100%;
+}
+
+.kc-thumb {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  top: 20px;
+  left: 20px;
+  background: var(--blue);
+  border-radius: 100%;
+  box-shadow: inset 1px 1px 1px #fff, 1px 1px 2px 1px rgba(0, 0, 0, 0.2);
+}
+
+.kc-faces {
+  position: absolute;
+  transform-origin: top left;
+  translate: 920px 150px;
+  width: 120px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.kc-special {
+  position: absolute;
+  transform-origin: top left;
+  translate: 0px 340px;
+  width: 120px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+.kc-button {
+  width: 75px;
+  height: 75px;
+  background: var(--blue);
+  border-radius: 100%;
+  display: flex;
+  justify-content: center;
+  font-size: 45px;
+  line-height: 70px;
+  box-shadow: 1px 1px 1px #fff, inset 1px 1px 1px rgba(0, 0, 0, 0.2);
+  font-family: "Roboto Mono";
+  color: transparent;
+  text-shadow: 0 0 0 #fafafa;
+}
+
+.kc-small-button {
+  width: 45px;
+  height: 45px;
+  background: var(--grey);
+  border-radius: 100%;
+  display: flex;
+  justify-content: center;
+  font-size: 20px;
+  line-height: 45px;
+  box-shadow: 1px 1px 1px #fff, inset 1px 1px 1px rgba(0, 0, 0, 0.2);
+  font-family: "Roboto Mono";
+  color: transparent;
+  text-shadow: 0 0 0 #2f2f2f;
+}
