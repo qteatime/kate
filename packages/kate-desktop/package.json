@@ -17,6 +17,6 @@
   },
   "homepage": "https://github.com/qteatime/kate#readme",
   "dependencies": {
-    "electron": "^26.2.2"
+    "electron": "^26.3.0"
   }
 }

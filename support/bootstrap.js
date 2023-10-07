@@ -8,6 +8,7 @@
 // Sets up the environment for running Kate
 const { exec, assert_root } = require("./utils");
 const electron = require("./electron");
+const FS = require("fs");
 
 const args = require("util").parseArgs({
   options: {
@@ -33,14 +34,16 @@ async function main() {
   }
 
   // Downloads Electron, if needed
-  await electron.download(
-    electron.make_name(),
-    args.values["download-electron"]
-  );
+  await electron.download(electron.make_name(), args.values["download-electron"]);
 
   // Unzips Electron
   if (args.values["unzip-electron"]) {
     console.log("> Unzipping Electron");
+
+    if (FS.existsSync("electron")) {
+      console.log("> First cleaning up electron/ directory...");
+      FS.rmdirSync("electron", { recursive: true, force: true });
+    }
     electron.unzip(electron.make_name(), "electron");
   }
 

@@ -13,7 +13,7 @@ const Streams = require("stream/promises");
 const Crypto = require("crypto");
 const electron_checksum = require("./electron-checksum");
 
-const version = "v26.2.2";
+const version = "v26.3.0";
 
 function fetch(url) {
   return new Promise((resolve, reject) => {
@@ -55,10 +55,7 @@ function electron_arch() {
   }
 }
 
-function make_electron_name(
-  platform = electron_platform(),
-  arch = electron_arch()
-) {
+function make_electron_name(platform = electron_platform(), arch = electron_arch()) {
   return `electron-${version}-${platform}-${arch}.zip`;
 }
 
@@ -80,9 +77,7 @@ async function download_electron(filename, force = false) {
     .toString("hex");
   const expected = electron_checksum.get(filename);
   if (hash !== expected) {
-    throw new Error(
-      `Integrity check failed for ${filename}: expected ${expected}`
-    );
+    throw new Error(`Integrity check failed for ${filename}: expected ${expected}`);
   }
 }
 
