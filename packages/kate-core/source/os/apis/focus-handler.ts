@@ -28,7 +28,7 @@ export class KateFocusHandler {
   private _previous_traps: FocusInteraction | null = null;
   private _handlers: {
     root: HTMLElement;
-    handler: (ev: { key: InputKey; is_repeat: boolean }) => boolean;
+    handler: (ev: { key: InputKey; is_repeat: boolean; is_long_press: boolean }) => boolean;
   }[] = [];
   readonly on_focus_changed = new EventStream<HTMLElement | null>();
   readonly on_traps_changed = new EventStream<FocusInteraction | null>();
@@ -40,11 +40,17 @@ export class KateFocusHandler {
     this.os.kernel.console.on_key_pressed.listen(this.handle_input);
   }
 
-  listen(root: HTMLElement, handler: (ev: { key: InputKey; is_repeat: boolean }) => boolean) {
+  listen(
+    root: HTMLElement,
+    handler: (ev: { key: InputKey; is_repeat: boolean; is_long_press: boolean }) => boolean
+  ) {
     this._handlers.push({ root, handler });
   }
 
-  remove(root: HTMLElement, handler: (ev: { key: InputKey; is_repeat: boolean }) => boolean) {
+  remove(
+    root: HTMLElement,
+    handler: (ev: { key: InputKey; is_repeat: boolean; is_long_press: boolean }) => boolean
+  ) {
     this._handlers = this._handlers.filter((x) => x.root !== root && x.handler !== handler);
   }
 
@@ -90,14 +96,22 @@ export class KateFocusHandler {
     }
   }
 
-  handle_input = ({ key, is_repeat }: { key: InputKey; is_repeat: boolean }) => {
+  handle_input = ({
+    key,
+    is_repeat,
+    is_long_press,
+  }: {
+    key: InputKey;
+    is_repeat: boolean;
+    is_long_press: boolean;
+  }) => {
     if (this._current_root == null) {
       return;
     }
 
     for (const { root, handler } of this._handlers) {
       if (this._current_root === root) {
-        if (handler({ key, is_repeat })) {
+        if (handler({ key, is_repeat, is_long_press })) {
           return;
         }
       }
