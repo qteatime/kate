@@ -200,7 +200,6 @@ export class VirtualConsole {
     });
 
     this.start_ticking();
-    this.on_tick.listen(this.key_update_loop);
   }
 
   set_case(kase: ConsoleCase) {
@@ -227,72 +226,13 @@ export class VirtualConsole {
     }
   }
 
-  private key_update_loop = (time: number) => {
-    // for (const key of this.keys) {
-    //   this.update_single_key(key, false);
-    // }
-    // for (const key of this.special_keys) {
-    //   this.update_single_key(key, true);
-    // }
-  };
-
   reset_all_keys() {
     this.button_state.reset();
     this.virtual_case.reset();
-    // for (const key of this.keys) {
-    //   this.update_virtual_key(key, false);
-    // }
-  }
-
-  private update_single_key(key: InputKey, special: boolean) {
-    // const x = this.input_state[key];
-    // if (x.pressed) {
-    //   x.count = (x.count + 1) >>> 0 || 2;
-    //   if (special && x.count >= this.SPECIAL_FRAMES) {
-    //     x.count = 0;
-    //     x.pressed = false;
-    //     this.on_key_pressed.emit({
-    //       key: `long_${key as SpecialInputKey}`,
-    //       is_repeat: false,
-    //     });
-    //     this.render_button_state(key, false);
-    //   } else if (!special && x.count === 1) {
-    //     this.on_input_changed.emit({ key, is_down: true });
-    //     this.on_key_pressed.emit({ key, is_repeat: false });
-    //   } else if (!special && x.count % this.REPEAT_FRAMES === 0) {
-    //     this.on_key_pressed.emit({ key, is_repeat: true });
-    //   }
-    // } else {
-    //   if (special) {
-    //     if (x.count === -1) {
-    //       this.on_input_changed.emit({ key, is_down: false });
-    //       x.count = 0;
-    //     } else if (x.count > 0 && x.count < this.SPECIAL_FRAMES) {
-    //       this.on_input_changed.emit({ key, is_down: true });
-    //       this.on_key_pressed.emit({ key, is_repeat: false });
-    //       x.count = -1;
-    //     }
-    //   } else if (x.count > 0) {
-    //     x.count = 0;
-    //     this.on_input_changed.emit({ key, is_down: false });
-    //   }
-    // }
   }
 
   update_virtual_key(key: InputKey, state: boolean) {
     this.button_state.update(key, state);
-    this.virtual_case.update(key, state);
-    // const x = this.input_state[key];
-    // if (x.pressed !== state) {
-    //   x.pressed = state;
-    //   if (state) {
-    //     x.count = 0;
-    //   }
-    //   this.render_button_state(key, state);
-    // }
-  }
-
-  private render_button_state(key: InputKey, state: boolean) {
     this.virtual_case.update(key, state);
   }
 
@@ -387,7 +327,7 @@ abstract class Case {
     root.setAttribute("data-case-type", this.case_type);
     root.setAttribute("data-resolution", String(this.screen_height));
     root.style.setProperty("--case-scale", String(scale));
-    root.style.setProperty("--case-downscale", String(Math.min(1, scale)));
+    root.style.setProperty("--case-downscale", String(Math.max(1, scale)));
     root.style.setProperty("--screen-scale", String(screen_scale));
     root.style.setProperty("--screen-width", `${this.screen_width}px`);
     root.style.setProperty("--screen-height", `${this.screen_height}px`);

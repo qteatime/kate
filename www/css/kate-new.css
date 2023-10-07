@@ -16,6 +16,7 @@ body {
 
 .kate-case {
   --case-scale: 1;
+  --case-downscale: 1;
   --screen-scale: 1;
   --base-screen-width: 800px;
   --base-screen-height: 480px;
@@ -27,6 +28,9 @@ body {
   left: 0px;
   width: 100vw;
   height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   --red: #faaaaa;
   --blue: #69c;
   --grey: #e8ebecff;
@@ -36,11 +40,12 @@ body {
   background: var(--red);
   width: 1040px;
   height: 490px;
-  position: absolute;
   border-radius: 80px;
   user-select: none;
-  scale: var(--case-scale);
-  transform-origin: top left;
+  scale: var(--case-downscale);
+  flex-shrink: 0;
+  flex-grow: 0;
+  box-shadow: 0px 5px 0px #c99;
 }
 
 .kc-shoulder {
@@ -101,6 +106,7 @@ body {
   width: var(--screen-width);
   height: var(--screen-height);
   background: #2f2f2f;
+  outline: 2px solid #5f5f5f;
 }
 
 .kc-dpad {
@@ -216,6 +222,20 @@ body {
   text-align: right;
   color: #fafafa;
   text-shadow: -1px -1px 0px rgba(0, 0, 0, 0.1);
+}
+
+/* electron */
+.kc-body {
+  -webkit-user-select: none;
+  -webkit-app-region: drag;
+}
+
+.kc-shoulder,
+.kc-dpad,
+.kc-screen,
+.kc-button,
+.kc-small-button {
+  -webkit-app-region: no-drag;
 }
 
 /* running games (FIXME: move elsewhere) */
