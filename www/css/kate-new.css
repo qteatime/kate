@@ -105,21 +105,35 @@ body {
 
 .kc-dpad {
   position: absolute;
+  touch-action: none;
   transform-origin: top left;
-  translate: 10px 150px;
+  translate: 0px 120px;
+  width: 150px;
+  height: 200px;
+}
+
+.kc-dpad::before {
+  content: "";
+  display: block;
+  position: absolute;
+  pointer-events: none;
+  touch-action: none;
   width: 100px;
   height: 100px;
+  border-radius: 100%;
   background: #e8ebecff;
   border: 1px solid #afb2b2ff;
-  border-radius: 100%;
+  translate: 10px 50px;
 }
 
 .kc-thumb {
+  pointer-events: none;
+  touch-action: none;
   position: absolute;
   width: 60px;
   height: 60px;
-  top: 20px;
-  left: 20px;
+  top: 70px;
+  left: 30px;
   background: var(--blue);
   border-radius: 100%;
   box-shadow: inset 1px 1px 1px #fff, 1px 1px 2px 1px rgba(0, 0, 0, 0.2);

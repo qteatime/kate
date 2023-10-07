@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { EventStream, unreachable } from "../utils";
+import { EventStream, clamp, unreachable } from "../utils";
 import type { InputKey } from "./virtual";
 
 type Direction = "up" | "right" | "down" | "left";
@@ -53,7 +53,10 @@ export class KateMobileCase extends KateCase {
 
   private thumb_direction: Dpad = Dpad.IDLE;
   private thumb_range: number;
+  private moving_thumb: boolean = false;
+  private dpad: HTMLElement;
   private dpad_thumb: HTMLElement;
+
   private btn_ok: HTMLElement;
   private btn_cancel: HTMLElement;
   private btn_sparkle: HTMLElement;
@@ -68,6 +71,7 @@ export class KateMobileCase extends KateCase {
   constructor(private root: HTMLElement) {
     super();
 
+    this.dpad = root.querySelector(".kc-dpad")!;
     this.dpad_thumb = root.querySelector(".kc-thumb")!;
     this.thumb_range = Number(this.dpad_thumb.getAttribute("data-range"));
     if (Number.isNaN(this.thumb_range) || Math.trunc(this.thumb_range) !== this.thumb_range) {
@@ -95,6 +99,7 @@ export class KateMobileCase extends KateCase {
     this.listen_virtual_button(this.btn_berry, "berry");
     this.listen_virtual_button(this.btn_l, "ltrigger");
     this.listen_virtual_button(this.btn_r, "rtrigger");
+    this.listen_thumb();
   }
 
   override teardown(): void {
@@ -104,34 +109,86 @@ export class KateMobileCase extends KateCase {
     this.subscriptions = [];
   }
 
+  private listen_thumb() {
+    const area = this.dpad;
+    const thumb = this.dpad_thumb;
+    let moving: unknown = null;
+    const thumb_center_x = thumb.offsetWidth / 2 + thumb.offsetLeft;
+    const thumb_center_y = thumb.offsetHeight / 2 + thumb.offsetTop;
+    const range = this.thumb_range;
+
+    const on_down = (ev: PointerEvent) => {
+      ev.preventDefault();
+      moving = ev.pointerId;
+      this.moving_thumb = true;
+    };
+
+    const on_up = (ev: PointerEvent) => {
+      ev.preventDefault();
+
+      if (ev.pointerId === moving) {
+        moving = false;
+        this.on_virtual_change.emit({ key: "up", is_down: false });
+        this.on_virtual_change.emit({ key: "right", is_down: false });
+        this.on_virtual_change.emit({ key: "down", is_down: false });
+        this.on_virtual_change.emit({ key: "left", is_down: false });
+        thumb.style.translate = `0px 0px`;
+        this.moving_thumb = false;
+      }
+    };
+
+    const on_move = (ev: PointerEvent) => {
+      ev.preventDefault();
+      if (ev.pointerId === moving) {
+        const x = ev.offsetX - thumb_center_x;
+        const y = ev.offsetY - thumb_center_y;
+        const clamp_x = Math.floor(clamp(x, -range, range));
+        const clamp_y = Math.floor(clamp(y, -range, range));
+        thumb.style.translate = `${clamp_x}px ${clamp_y}px`;
+        const move_y = clamp_y / 20;
+        const move_x = clamp_x / 20;
+        this.on_virtual_change.emit({ key: "up", is_down: move_y <= -0.5 });
+        this.on_virtual_change.emit({ key: "right", is_down: move_x >= 0.5 });
+        this.on_virtual_change.emit({ key: "down", is_down: move_y >= 0.5 });
+        this.on_virtual_change.emit({ key: "left", is_down: move_x <= -0.5 });
+        const out = document.querySelector("#out")!;
+        out.textContent = `${x} : ${y} || ${ev.clientX} : ${ev.clientY} || ${ev.offsetX} : ${ev.offsetY}`;
+      }
+    };
+
+    area.addEventListener("pointerdown", on_down);
+    this.root.addEventListener("pointerup", on_up);
+    area.addEventListener("pointermove", on_move);
+
+    this.subscriptions.push(
+      { button: area, event: "pointerdown", listener: on_down },
+      { button: this.root, event: "pointerup", listener: on_up },
+      { button: area, event: "pointermove", listener: on_move }
+    );
+  }
+
   private listen_virtual_button(button: HTMLElement, key: InputKey) {
-    const on_down = (ev: MouseEvent) => {
+    const on_down = (ev: MouseEvent | TouchEvent) => {
       ev.preventDefault();
+      ev.stopPropagation();
       this.on_virtual_change.emit({ key, is_down: true });
     };
-    const on_up = (ev: MouseEvent) => {
+    const on_up = (ev: MouseEvent | TouchEvent) => {
       ev.preventDefault();
-      this.on_virtual_change.emit({ key, is_down: false });
-    };
-    const on_touch_start = (ev: TouchEvent) => {
-      ev.preventDefault();
-      this.on_virtual_change.emit({ key, is_down: true });
-    };
-    const on_touch_end = (ev: TouchEvent) => {
-      ev.preventDefault();
+      ev.stopPropagation();
       this.on_virtual_change.emit({ key, is_down: false });
     };
 
     button.addEventListener("mousedown", on_down);
     button.addEventListener("mouseup", on_up);
-    button.addEventListener("touchstart", on_touch_start);
-    button.addEventListener("touchend", on_touch_end);
+    button.addEventListener("touchstart", on_down);
+    button.addEventListener("touchend", on_up);
 
     this.subscriptions.push(
       { button, event: "mousedown", listener: on_down },
       { button, event: "mouseup", listener: on_up },
-      { button, event: "touchstart", listener: on_touch_start },
-      { button, event: "touchend", listener: on_touch_end }
+      { button, event: "touchstart", listener: on_down },
+      { button, event: "touchend", listener: on_up }
     );
   }
 
@@ -193,7 +250,9 @@ export class KateMobileCase extends KateCase {
 
   update_thumb(direction: Direction, is_down: boolean) {
     this.move_thumb(direction, is_down);
-    this.dpad_thumb.style.translate = this.thumb_translate;
+    if (!this.moving_thumb) {
+      this.dpad_thumb.style.translate = this.thumb_translate;
+    }
   }
 
   private move_thumb(direction: Direction, is_down: boolean) {

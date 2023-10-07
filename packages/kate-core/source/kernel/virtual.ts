@@ -404,11 +404,6 @@ abstract class Case {
 
 class HandheldCase extends Case {
   readonly case_type = "handheld";
-  readonly screen_bevel = 10;
-  readonly case_padding = 25;
-  readonly side_padding = 250;
-  readonly depth_padding = 10;
-  readonly shoulder_padding = 20;
 
   get screen_scale() {
     return Case.BASE_HEIGHT / this.resolution;
@@ -416,9 +411,8 @@ class HandheldCase extends Case {
 
   get padding() {
     return {
-      horizontal: this.screen_bevel * 2 + this.side_padding * 2,
-      vertical:
-        this.screen_bevel * 2 + this.case_padding * 2 + this.depth_padding + this.shoulder_padding,
+      horizontal: 240,
+      vertical: 10,
     };
   }
 }
