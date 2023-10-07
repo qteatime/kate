@@ -29,10 +29,7 @@ function bridge(x: Cart_v5.Bridge): Bridge {
     case Cart_v5.Bridge.$Tags.Input_proxy: {
       return {
         type: "input-proxy",
-        mapping: map_map(x.mapping, (a, b) => [
-          virtual_key(a),
-          keyboard_key(b),
-        ]),
+        mapping: map_map(x.mapping, (a, b) => [virtual_key(a), keyboard_key(b)]),
       };
     }
     case Cart_v5.Bridge.$Tags.Local_storage_proxy: {
@@ -68,10 +65,7 @@ function bridge(x: Cart_v5.Bridge): Bridge {
   }
 }
 
-function map_map<A, B, C, D>(
-  map: Map<A, B>,
-  f: (a: A, b: B) => [C, D]
-): Map<C, D> {
+function map_map<A, B, C, D>(map: Map<A, B>, f: (a: A, b: B) => [C, D]): Map<C, D> {
   const result = new Map<C, D>();
   for (const [k, v] of map.entries()) {
     const [k1, v1] = f(k, v);
@@ -102,6 +96,10 @@ function virtual_key(key: Cart_v5.Virtual_key): InputKey {
       return "ltrigger";
     case Cart_v5.Virtual_key.$Tags.R_trigger:
       return "rtrigger";
+    case Cart_v5.Virtual_key.$Tags.Berry:
+      return "berry";
+    case Cart_v5.Virtual_key.$Tags.Sparkle:
+      return "sparkle";
     default:
       throw unreachable(key);
   }

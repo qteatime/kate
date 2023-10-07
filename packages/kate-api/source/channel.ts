@@ -5,7 +5,7 @@
  */
 
 import { EventStream, defer, Deferred } from "./util";
-import type { ExtendedInputKey, InputKey } from "./input";
+import type { InputKey } from "./input";
 
 type Payload = { [key: string]: any };
 
@@ -17,8 +17,9 @@ export class KateIPC {
   readonly events = {
     input_state_changed: new EventStream<{ key: InputKey; is_down: boolean }>(),
     key_pressed: new EventStream<{
-      key: ExtendedInputKey;
+      key: InputKey;
       is_repeat: boolean;
+      is_long_press: boolean;
     }>(),
     take_screenshot: new EventStream<{ token: string }>(),
     start_recording: new EventStream<{ token: string }>(),
@@ -49,12 +50,7 @@ export class KateIPC {
     window.addEventListener("message", this.handle_message);
   }
 
-  #do_send(
-    id: string,
-    type: string,
-    payload: Payload,
-    transfer: Transferable[] = []
-  ) {
+  #do_send(id: string, type: string, payload: Payload, transfer: Transferable[] = []) {
     this.#server.postMessage(
       {
         type: type,
@@ -75,11 +71,7 @@ export class KateIPC {
     return deferred.promise;
   }
 
-  async send_and_ignore_result(
-    type: string,
-    payload: Payload,
-    transfer: Transferable[] = []
-  ) {
+  async send_and_ignore_result(type: string, payload: Payload, transfer: Transferable[] = []) {
     this.#do_send(this.#make_id(), type, payload);
   }
 

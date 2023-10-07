@@ -1633,7 +1633,7 @@ export namespace Bridge {
 
 
 
-export type Virtual_key = Virtual_key.Up | Virtual_key.Right | Virtual_key.Down | Virtual_key.Left | Virtual_key.Menu | Virtual_key.Capture | Virtual_key.X | Virtual_key.O | Virtual_key.L_trigger | Virtual_key.R_trigger;
+export type Virtual_key = Virtual_key.Up | Virtual_key.Right | Virtual_key.Down | Virtual_key.Left | Virtual_key.Menu | Virtual_key.Capture | Virtual_key.X | Virtual_key.O | Virtual_key.L_trigger | Virtual_key.R_trigger | Virtual_key.Berry | Virtual_key.Sparkle;
 
 export namespace Virtual_key {
  export const tag = 25;
@@ -1648,7 +1648,9 @@ export namespace Virtual_key {
     X = 6,
     O = 7,
     L_trigger = 8,
-    R_trigger = 9
+    R_trigger = 9,
+    Berry = 10,
+    Sparkle = 11
  }
 
  
@@ -1867,6 +1869,50 @@ export namespace Virtual_key {
    readonly '@version': 0;
    readonly '@variant': $Tags.R_trigger;
    readonly '@variant-name': 'R-trigger';
+   
+ }
+
+
+  
+ export function Berry(x: {}): Virtual_key {
+   return {
+     '@name': 'Virtual-key',
+     '@tag': 25,
+     '@version': 0,
+     '@variant': $Tags.Berry,
+     '@variant-name': 'Berry',
+     ...x
+   }
+ }
+
+ export interface Berry {
+   readonly '@name': 'Virtual-key';
+   readonly '@tag': 25;
+   readonly '@version': 0;
+   readonly '@variant': $Tags.Berry;
+   readonly '@variant-name': 'Berry';
+   
+ }
+
+
+  
+ export function Sparkle(x: {}): Virtual_key {
+   return {
+     '@name': 'Virtual-key',
+     '@tag': 25,
+     '@version': 0,
+     '@variant': $Tags.Sparkle,
+     '@variant-name': 'Sparkle',
+     ...x
+   }
+ }
+
+ export interface Sparkle {
+   readonly '@name': 'Virtual-key';
+   readonly '@tag': 25;
+   readonly '@version': 0;
+   readonly '@variant': $Tags.Sparkle;
+   readonly '@variant-name': 'Sparkle';
    
  }
 

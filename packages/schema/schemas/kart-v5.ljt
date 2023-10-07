@@ -232,6 +232,8 @@ union Virtual-key {
   type O {}
   type L-trigger {}
   type R-trigger {}
+  type Berry {}
+  type Sparkle {}
 }
 
 type Keyboard-key {

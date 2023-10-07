@@ -4,16 +4,12 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import type { ExtendedInputKey, InputKey } from "../../kate-api/build/input";
+import type { InputKey } from "../../kate-api/build/input";
 import type { KateUI } from "./ui";
 import { Observable } from "./observable";
 import { LiveNode } from "./transform";
 
-export function h(
-  tag: string,
-  attrs: { [key: string]: string },
-  children: Node[]
-) {
+export function h(tag: string, attrs: { [key: string]: string }, children: Node[]) {
   const element = document.createElement(tag);
   for (const [key, value] of Object.entries(attrs)) {
     element.setAttribute(key, value);
@@ -89,11 +85,7 @@ export class Text extends Widget {
 }
 
 export class Box extends Widget {
-  constructor(
-    readonly tag: string,
-    readonly class_names: string,
-    readonly children: Widget[]
-  ) {
+  constructor(readonly tag: string, readonly class_names: string, readonly children: Widget[]) {
     super();
   }
 
@@ -177,19 +169,15 @@ export class Icon extends Widget {
       case "down":
       case "right":
       case "left":
-        return h(
-          "div",
-          { class: "kate-icon kate-icon-light", "data-name": this.type },
-          []
-        );
+        return h("div", { class: "kate-icon kate-icon-light", "data-name": this.type }, []);
       case "ltrigger":
       case "rtrigger":
       case "menu":
       case "capture":
-        return h("div", { class: "kate-icon", "data-name": this.type }, []);
       case "x":
-        return h("div", { class: "kate-icon", "data-name": this.type }, []);
       case "o":
+      case "berry":
+      case "sparkle":
         return h("div", { class: "kate-icon", "data-name": this.type }, []);
     }
   }
@@ -296,9 +284,7 @@ export class FocusTarget extends Widget {
 export class Keymap extends Widget {
   private active: boolean = true;
 
-  constructor(
-    readonly mapping: Partial<Record<InputKey, () => Promise<boolean>>>
-  ) {
+  constructor(readonly mapping: Partial<Record<InputKey, () => Promise<boolean>>>) {
     super();
   }
 
@@ -332,9 +318,7 @@ export class Keymap extends Widget {
 export class KeyEventMap extends Widget {
   private active: boolean = true;
 
-  constructor(
-    readonly mapping: Partial<Record<ExtendedInputKey, () => Promise<boolean>>>
-  ) {
+  constructor(readonly mapping: Partial<Record<InputKey, () => Promise<boolean>>>) {
     super();
   }
 
@@ -350,7 +334,7 @@ export class KeyEventMap extends Widget {
     KateAPI.input.on_key_pressed.remove(this.handle_input);
   }
 
-  handle_input = async (key: ExtendedInputKey) => {
+  handle_input = async (key: InputKey) => {
     if (!this.active) {
       return;
     }
