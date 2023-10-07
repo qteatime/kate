@@ -15,7 +15,7 @@ body {
 }
 
 .kate-case {
-  --case-scale: 0.818;
+  --case-scale: 1;
   --screen-scale: 1;
   --base-screen-width: 800px;
   --base-screen-height: 480px;
@@ -69,7 +69,7 @@ body {
   translate: 0px 0px;
 }
 
-.kc-shoulder-left.active {
+.kc-shoulder-left.down {
   translate: 10px 10px;
 }
 
@@ -77,7 +77,7 @@ body {
   translate: 920px 0px;
 }
 
-.kc-shoulder-right.active {
+.kc-shoulder-right.down {
   translate: 910px 10px;
 }
 
@@ -114,6 +114,10 @@ body {
   background: var(--blue);
   border-radius: 100%;
   box-shadow: inset 1px 1px 1px #fff, 1px 1px 2px 1px rgba(0, 0, 0, 0.2);
+}
+
+.kc-dpad.down .kc-thumb {
+  background: #9af;
 }
 
 .kc-faces {
@@ -155,6 +159,10 @@ body {
   text-shadow: 0 0 0 #fafafa;
 }
 
+.kc-button.down {
+  background: #9af;
+}
+
 .kc-small-button {
   width: 45px;
   height: 45px;
@@ -168,4 +176,8 @@ body {
   font-family: "Roboto Mono";
   color: transparent;
   text-shadow: 0 0 0 #2f2f2f;
+}
+
+.kc-small-button.down {
+  background: #fafafa;
 }

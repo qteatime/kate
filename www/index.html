@@ -25,41 +25,29 @@
         <div class="kc-hide-shoulder kc-hide-shoulder-left"></div>
         <div class="kc-hide-shoulder kc-hide-shoulder-right"></div>
 
-        <div class="kc-dpad"><div class="kc-thumb"></div></div>
+        <div class="kc-dpad"><div class="kc-thumb" data-range="20"></div></div>
 
-        <div class="kc-screen"></div>
+        <div class="kc-screen">
+          <div id="kate-os-root"></div>
+          <div id="kate-hud"></div>
+          <div id="kate-resources"></div>
+        </div>
 
         <div class="kc-special">
-          <div class="kc-small-button">🍑</div>
-          <div class="kc-small-button">🔴</div>
+          <div class="kc-small-button kc-strawberry">🍑</div>
+          <div class="kc-small-button kc-capture">🔴</div>
         </div>
 
         <div class="kc-faces">
-          <div class="kc-button">⭕</div>
-          <div class="kc-button">❌</div>
-          <div class="kc-button">✨</div>
-          <div class="kc-small-button" style="margin-top: 5px">🟰</div>
+          <div class="kc-button kc-ok">⭕</div>
+          <div class="kc-button kc-cancel">❌</div>
+          <div class="kc-button kc-sparkles">✨</div>
+          <div class="kc-small-button kc-menu" style="margin-top: 5px">🟰</div>
         </div>
+
+        <div id="kate-version"></div>
       </div>
     </div>
-    <script>
-      document.addEventListener("click", async (ev) => {
-        const kase = document.querySelector(".kate-case");
-        await kase.requestFullscreen({ navigationUI: "hide" });
-      });
-
-      setInterval(() => {
-        const kw = 1040;
-        const kh = 490;
-        const ww = window.innerWidth;
-        const wh = window.innerHeight;
-        const scale = Math.min(ww / kw, wh / kh);
-        const rw = kw * scale;
-        const rh = kh * scale;
-        const kase = document.querySelector(".kate-case");
-        kase.style.setProperty("--case-scale", String(scale));
-        kase.style.translate = `${Math.round((ww - rw) / 2)}px ${Math.round((wh - rh) / 2)}px`;
-      }, 1000);
-    </script>
+    <script src="loader.js"></script>
   </body>
 </html>
