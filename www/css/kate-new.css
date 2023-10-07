@@ -204,7 +204,7 @@ body {
   text-shadow: -1px -1px 0px rgba(0, 0, 0, 0.1);
 }
 
-/* running games (move elsewhere) */
+/* running games (FIXME: move elsewhere) */
 .kate-game-frame {
   width: 100%;
   height: 100%;
