@@ -58,12 +58,9 @@ export class VirtualConsole {
 
   readonly SPECIAL_FRAMES = 15;
   readonly REPEAT_FRAMES = 10;
+  readonly REPEAT_RATE = 3;
   readonly FPS = 30;
   readonly ONE_FRAME = Math.ceil(1000 / 30);
-
-  // private input_state!: Record<InputKey, { pressed: boolean; count: number }>;
-  // private keys: InputKey[] = ["up", "right", "down", "left", "x", "o", "ltrigger", "rtrigger"];
-  // private special_keys: InputKey[] = ["menu", "capture"];
 
   constructor(readonly root: HTMLElement, readonly options: ConsoleOptions) {
     this._case = options.case;
@@ -128,21 +125,25 @@ export class VirtualConsole {
 
   private do_tick(time: number) {
     this.last_time = time;
-    this.button_state.tick();
+    document.querySelector("#out")!.textContent = `${[...this.button_state.all_changed]
+      .map((x) => `${x.id}:${x.pressed}:${x.count}`)
+      .join("  |  ")}`;
     for (const key of this.button_state.all_changed) {
       this.virtual_case.update(key.id as any, key.pressed);
       this.on_input_changed.emit({ key: key.id as any, is_down: key.pressed });
       this.handle_key_pressed(key);
     }
     this.on_tick.emit(time);
+    this.button_state.tick();
   }
 
   private handle_key_pressed(key: KeyState) {
     const is_special = key.id === "capture";
-    const is_pressed = key.count > 0;
     const is_just_released = key.count === -1;
+    const is_just_pressed = key.count === 1;
     const is_long_press = key.count % this.SPECIAL_FRAMES === 0;
-    const is_repeat = key.count % this.REPEAT_FRAMES === 0;
+    const is_repeat =
+      key.count >= this.REPEAT_FRAMES && (key.count - this.REPEAT_FRAMES) % this.REPEAT_RATE === 0;
 
     if (is_special && is_long_press) {
       if (is_long_press) {
@@ -151,7 +152,7 @@ export class VirtualConsole {
       } else if (is_just_released) {
         this.on_key_pressed.emit({ key: key.id, is_repeat: false, is_long_press: false });
       }
-    } else if (is_pressed) {
+    } else if (is_just_pressed || is_repeat) {
       this.on_key_pressed.emit({ key: key.id as any, is_repeat: is_repeat, is_long_press: false });
     }
   }
@@ -301,6 +302,8 @@ export class VirtualConsole {
   }
 
   update_virtual_key(key: InputKey, state: boolean) {
+    this.button_state.update(key, state);
+    this.virtual_case.update(key, state);
     // const x = this.input_state[key];
     // if (x.pressed !== state) {
     //   x.pressed = state;

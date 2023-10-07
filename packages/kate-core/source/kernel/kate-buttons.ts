@@ -65,6 +65,10 @@ export class KateButtons {
   }
 
   update(key: KateKey, is_down: boolean) {
+    if (this.state[key].pressed === is_down) {
+      return;
+    }
+
     this.changed.add(key);
     if (is_down) {
       this.state[key].pressed = true;
@@ -76,6 +80,7 @@ export class KateButtons {
   }
 
   tick() {
+    this.changed.clear();
     for (const key of keys) {
       const state = this.state[key];
       if (state.pressed) {
