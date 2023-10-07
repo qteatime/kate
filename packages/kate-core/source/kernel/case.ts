@@ -151,8 +151,6 @@ export class KateMobileCase extends KateCase {
         this.on_virtual_change.emit({ key: "right", is_down: move_x >= 0.5 });
         this.on_virtual_change.emit({ key: "down", is_down: move_y >= 0.5 });
         this.on_virtual_change.emit({ key: "left", is_down: move_x <= -0.5 });
-        const out = document.querySelector("#out")!;
-        out.textContent = `${x} : ${y} || ${ev.clientX} : ${ev.clientY} || ${ev.offsetX} : ${ev.offsetY}`;
       }
     };
 
