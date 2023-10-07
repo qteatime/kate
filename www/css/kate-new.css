@@ -181,3 +181,16 @@ body {
 .kc-small-button.down {
   background: #fafafa;
 }
+
+#kate-version {
+  position: absolute;
+  font-size: 8px;
+  font-family: sans-serif;
+  font-weight: bold;
+  transform-origin: top left;
+  translate: 55px 470px;
+  width: 60px;
+  text-align: right;
+  color: #fafafa;
+  text-shadow: -1px -1px 0px rgba(0, 0, 0, 0.1);
+}
