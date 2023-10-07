@@ -203,3 +203,16 @@ body {
   color: #fafafa;
   text-shadow: -1px -1px 0px rgba(0, 0, 0, 0.1);
 }
+
+/* running games (move elsewhere) */
+.kate-game-frame {
+  width: 100%;
+  height: 100%;
+  border: none;
+  overflow: clip;
+}
+
+.kate-game-frame-defaults {
+  width: var(--screen-width);
+  height: var(--screen-height);
+}
