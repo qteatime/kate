@@ -125,9 +125,6 @@ export class VirtualConsole {
 
   private do_tick(time: number) {
     this.last_time = time;
-    document.querySelector("#out")!.textContent = `${[...this.button_state.all_changed]
-      .map((x) => `${x.id}:${x.pressed}:${x.count}`)
-      .join("  |  ")}`;
     for (const key of this.button_state.all_changed) {
       this.virtual_case.update(key.id as any, key.pressed);
       this.on_input_changed.emit({ key: key.id as any, is_down: key.pressed });
@@ -141,11 +138,11 @@ export class VirtualConsole {
     const is_special = key.id === "capture";
     const is_just_released = key.count === -1;
     const is_just_pressed = key.count === 1;
-    const is_long_press = key.count % this.SPECIAL_FRAMES === 0;
+    const is_long_press = key.count > 0 && key.count % this.SPECIAL_FRAMES === 0;
     const is_repeat =
       key.count >= this.REPEAT_FRAMES && (key.count - this.REPEAT_FRAMES) % this.REPEAT_RATE === 0;
 
-    if (is_special && is_long_press) {
+    if (is_special) {
       if (is_long_press) {
         this.on_key_pressed.emit({ key: key.id, is_repeat: false, is_long_press: true });
         this.button_state.force_reset("capture");

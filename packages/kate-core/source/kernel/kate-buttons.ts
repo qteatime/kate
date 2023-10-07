@@ -89,8 +89,8 @@ export class KateButtons {
     this.changed.clear();
     for (const key of keys) {
       const state = this.state[key];
-      if (state.pressed) {
-        state.count = (state.count + 1) >>> 0 || 2;
+      if (state.count !== 0) {
+        state.count = (state.count + 1) | 0 || (state.pressed ? 2 : 0);
         this.changed.add(key);
       }
     }
@@ -100,9 +100,7 @@ export class KateButtons {
     const result: KeyState[] = [];
 
     for (const key of this.changed) {
-      if (this.state[key].pressed) {
-        result.push(this.state[key]);
-      }
+      result.push(this.state[key]);
     }
 
     return result;
