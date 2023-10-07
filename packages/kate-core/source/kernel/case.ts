@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { unreachable } from "../utils";
+import { EventStream, unreachable } from "../utils";
 import type { InputKey } from "./virtual";
 
 type Direction = "up" | "right" | "down" | "left";
@@ -35,12 +35,22 @@ const keys: InputKey[] = [
   "rtrigger",
 ];
 
+export type VirtualInputChange = {
+  key: InputKey;
+  is_down: boolean;
+};
+
 export abstract class KateCase {
   abstract reset(): void;
   abstract update(button: InputKey, is_down: boolean): void;
+  abstract setup(): void;
+  abstract teardown(): void;
+  abstract on_virtual_change: EventStream<VirtualInputChange>;
 }
 
 export class KateMobileCase extends KateCase {
+  readonly on_virtual_change = new EventStream<VirtualInputChange>();
+
   private thumb_direction: Dpad = Dpad.IDLE;
   private thumb_range: number;
   private dpad_thumb: HTMLElement;
@@ -52,6 +62,8 @@ export class KateMobileCase extends KateCase {
   private btn_berry: HTMLElement;
   private btn_l: HTMLElement;
   private btn_r: HTMLElement;
+
+  private subscriptions: { button: HTMLElement; event: string; listener: unknown }[] = [];
 
   constructor(private root: HTMLElement) {
     super();
@@ -72,6 +84,55 @@ export class KateMobileCase extends KateCase {
 
     this.btn_l = root.querySelector(".kc-shoulder-left")!;
     this.btn_r = root.querySelector(".kc-shoulder-right")!;
+  }
+
+  override setup(): void {
+    this.listen_virtual_button(this.btn_ok, "o");
+    this.listen_virtual_button(this.btn_cancel, "x");
+    this.listen_virtual_button(this.btn_sparkle, "sparkle");
+    this.listen_virtual_button(this.btn_menu, "menu");
+    this.listen_virtual_button(this.btn_capture, "capture");
+    this.listen_virtual_button(this.btn_berry, "berry");
+    this.listen_virtual_button(this.btn_l, "ltrigger");
+    this.listen_virtual_button(this.btn_r, "rtrigger");
+  }
+
+  override teardown(): void {
+    for (const { button, event, listener } of this.subscriptions) {
+      button.removeEventListener(event, listener as any);
+    }
+    this.subscriptions = [];
+  }
+
+  private listen_virtual_button(button: HTMLElement, key: InputKey) {
+    const on_down = (ev: MouseEvent) => {
+      ev.preventDefault();
+      this.on_virtual_change.emit({ key, is_down: true });
+    };
+    const on_up = (ev: MouseEvent) => {
+      ev.preventDefault();
+      this.on_virtual_change.emit({ key, is_down: false });
+    };
+    const on_touch_start = (ev: TouchEvent) => {
+      ev.preventDefault();
+      this.on_virtual_change.emit({ key, is_down: true });
+    };
+    const on_touch_end = (ev: TouchEvent) => {
+      ev.preventDefault();
+      this.on_virtual_change.emit({ key, is_down: false });
+    };
+
+    button.addEventListener("mousedown", on_down);
+    button.addEventListener("mouseup", on_up);
+    button.addEventListener("touchstart", on_touch_start);
+    button.addEventListener("touchend", on_touch_end);
+
+    this.subscriptions.push(
+      { button, event: "mousedown", listener: on_down },
+      { button, event: "mouseup", listener: on_up },
+      { button, event: "touchstart", listener: on_touch_start },
+      { button, event: "touchend", listener: on_touch_end }
+    );
   }
 
   override reset() {

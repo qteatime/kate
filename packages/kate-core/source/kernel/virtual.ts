@@ -188,29 +188,10 @@ export class VirtualConsole {
     (screen as any).addEventListener?.("orientationchange", () => this.update_scale(null));
     this.update_scale(null);
 
-    const listen_button = (button: HTMLElement, key: InputKey) => {
-      button.addEventListener("mousedown", (ev) => {
-        ev.preventDefault();
-        this.update_virtual_key(key, true);
-      });
-      button.addEventListener("mouseup", (ev) => {
-        ev.preventDefault();
-        this.update_virtual_key(key, false);
-      });
-      button.addEventListener(
-        "touchstart",
-        (ev) => {
-          ev.preventDefault();
-          this.on_virtual_button_touched.emit(key);
-          this.update_virtual_key(key, true);
-        },
-        { passive: false }
-      );
-      button.addEventListener("touchend", (ev) => {
-        ev.preventDefault();
-        this.update_virtual_key(key, false);
-      });
-    };
+    this.virtual_case.setup();
+    this.virtual_case.on_virtual_change.listen((change) => {
+      this.update_virtual_key(change.key, change.is_down);
+    });
 
     document.addEventListener("visibilitychange", () => {
       if (document.hidden) {
