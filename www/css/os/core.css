@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-.kate-screen {
+.kc-screen {
   --font-family-title: "Poppins", sans-serif;
   --font-family-sans: "Roboto", sans-serif;
   --font-family-mono: "Roboto Mono", monospace;
@@ -44,9 +44,7 @@
   --color-border: var(--color-white-d1);
   --color-border-d1: var(--color-white-d2);
   --color-background: var(--color-white);
-  --color-dangerous: var(
-    --color-primary-d1
-  ); /* TODO: pick better primary/dangerous */
+  --color-dangerous: var(--color-primary-d1); /* TODO: pick better primary/dangerous */
   --color-backdrop: rgba(0, 0, 0, 0.4);
   --color-shadow: rgba(0, 0, 0, 0.5);
   --color-status-background: var(--color-primary-d1);

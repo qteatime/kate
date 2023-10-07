@@ -13,11 +13,13 @@ export class KeyboardInput {
     down: "ArrowDown",
     left: "ArrowLeft",
     menu: "ShiftLeft",
-    capture: "KeyC",
+    capture: "KeyF",
     x: "KeyX",
     o: "KeyZ",
     ltrigger: "KeyA",
     rtrigger: "KeyS",
+    berry: "KeyQ",
+    sparkle: "KeyC",
   };
 
   private ignore_repeat = ["menu", "capture"];

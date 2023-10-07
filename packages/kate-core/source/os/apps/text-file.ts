@@ -7,7 +7,7 @@
 import type { KateOS } from "../os";
 import { h } from "../ui/widget";
 import * as UI from "../ui/widget";
-import type { ExtendedInputKey } from "../../kernel";
+import type { InputKey } from "../../kernel";
 import { Scene } from "../ui/scenes";
 
 export class SceneTextFile extends Scene {
@@ -23,10 +23,7 @@ export class SceneTextFile extends Scene {
   render() {
     return h("div", { class: "kate-os-simple-screen" }, [
       new UI.Title_bar({
-        left: UI.fragment([
-          UI.fa_icon("circle-info", "lg"),
-          new UI.Section_title([this.title]),
-        ]),
+        left: UI.fragment([UI.fa_icon("circle-info", "lg"), new UI.Section_title([this.title])]),
         right: UI.text_ellipsis([this.app_title]),
       }),
       h("div", { class: "kate-os-text-scroll" }, [
@@ -46,7 +43,7 @@ export class SceneTextFile extends Scene {
     this.os.focus_handler.remove(this.canvas, this.handle_key_pressed);
   }
 
-  handle_key_pressed = (x: { key: ExtendedInputKey; is_repeat: boolean }) => {
+  handle_key_pressed = (x: { key: InputKey; is_repeat: boolean }) => {
     const scroll = this.canvas.querySelector(".kate-os-text-scroll");
     if (scroll == null) {
       return false;

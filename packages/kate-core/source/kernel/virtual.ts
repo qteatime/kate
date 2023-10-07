@@ -6,23 +6,11 @@
 
 import { EventStream, unreachable } from "../utils";
 import { KateCase, KateMobileCase } from "./case";
+import { KateButtons } from "./kate-buttons";
+import type { KateKey, KeyState } from "./kate-buttons";
 const pkg = require("../../package.json");
 
-export type InputKey =
-  | "up"
-  | "right"
-  | "down"
-  | "left"
-  | "menu"
-  | "capture"
-  | "x"
-  | "o"
-  | "ltrigger"
-  | "rtrigger";
-
-export type SpecialInputKey = "menu" | "capture";
-
-export type ExtendedInputKey = InputKey | `long_${SpecialInputKey}`;
+export type InputKey = KateKey;
 
 export type Resource = "screen-recording" | "transient-storage" | "low-storage";
 
@@ -40,6 +28,7 @@ export type ConsoleOptions = {
 
 export class VirtualConsole {
   private virtual_case: KateCase;
+  private button_state: KateButtons;
 
   private is_listening = false;
   private _case: ConsoleCase;
@@ -55,8 +44,9 @@ export class VirtualConsole {
     is_down: boolean;
   }>();
   readonly on_key_pressed = new EventStream<{
-    key: ExtendedInputKey;
+    key: InputKey;
     is_repeat: boolean;
+    is_long_press: boolean;
   }>();
   readonly on_virtual_button_touched = new EventStream<InputKey>();
   readonly on_tick = new EventStream<number>();
@@ -71,13 +61,14 @@ export class VirtualConsole {
   readonly FPS = 30;
   readonly ONE_FRAME = Math.ceil(1000 / 30);
 
-  private input_state!: Record<InputKey, { pressed: boolean; count: number }>;
-  private keys: InputKey[] = ["up", "right", "down", "left", "x", "o", "ltrigger", "rtrigger"];
-  private special_keys: InputKey[] = ["menu", "capture"];
+  // private input_state!: Record<InputKey, { pressed: boolean; count: number }>;
+  // private keys: InputKey[] = ["up", "right", "down", "left", "x", "o", "ltrigger", "rtrigger"];
+  // private special_keys: InputKey[] = ["menu", "capture"];
 
   constructor(readonly root: HTMLElement, readonly options: ConsoleOptions) {
     this._case = options.case;
     this.virtual_case = new KateMobileCase(root);
+    this.button_state = new KateButtons();
 
     this.os_root = root.querySelector("#kate-os-root")!;
     this.hud = root.querySelector("#kate-hud")!;
@@ -93,21 +84,8 @@ export class VirtualConsole {
   }
 
   private reset_states() {
-    this.input_state = {
-      up: { pressed: false, count: 0 },
-      right: { pressed: false, count: 0 },
-      down: { pressed: false, count: 0 },
-      left: { pressed: false, count: 0 },
-      menu: { pressed: false, count: 0 },
-      capture: { pressed: false, count: 0 },
-      x: { pressed: false, count: 0 },
-      o: { pressed: false, count: 0 },
-      ltrigger: { pressed: false, count: 0 },
-      rtrigger: { pressed: false, count: 0 },
-    };
-    for (const key of Object.keys(this.input_state)) {
-      this.virtual_case.update(key as any, false);
-    }
+    this.button_state.reset();
+    this.virtual_case.reset();
   }
 
   private start_ticking() {
@@ -133,7 +111,7 @@ export class VirtualConsole {
   private tick = (time: number) => {
     if (this.last_time == null) {
       this.last_time = time;
-      this.on_tick.emit(time);
+      this.do_tick(time);
       this.timer_id = requestAnimationFrame(this.tick);
       return;
     }
@@ -143,11 +121,40 @@ export class VirtualConsole {
     if (elapsed < this.ONE_FRAME) {
       this.timer_id = requestAnimationFrame(this.tick);
     } else {
-      this.last_time = time;
-      this.on_tick.emit(time);
+      this.do_tick(time);
       this.timer_id = requestAnimationFrame(this.tick);
     }
   };
+
+  private do_tick(time: number) {
+    this.last_time = time;
+    this.button_state.tick();
+    for (const key of this.button_state.all_changed) {
+      this.virtual_case.update(key.id as any, key.pressed);
+      this.on_input_changed.emit({ key: key.id as any, is_down: key.pressed });
+      this.handle_key_pressed(key);
+    }
+    this.on_tick.emit(time);
+  }
+
+  private handle_key_pressed(key: KeyState) {
+    const is_special = key.id === "capture";
+    const is_pressed = key.count > 0;
+    const is_just_released = key.count === -1;
+    const is_long_press = key.count % this.SPECIAL_FRAMES === 0;
+    const is_repeat = key.count % this.REPEAT_FRAMES === 0;
+
+    if (is_special && is_long_press) {
+      if (is_long_press) {
+        this.on_key_pressed.emit({ key: key.id, is_repeat: false, is_long_press: true });
+        this.button_state.force_reset("capture");
+      } else if (is_just_released) {
+        this.on_key_pressed.emit({ key: key.id, is_repeat: false, is_long_press: false });
+      }
+    } else if (is_pressed) {
+      this.on_key_pressed.emit({ key: key.id as any, is_repeat: is_repeat, is_long_press: false });
+    }
+  }
 
   get case() {
     return Case.from_configuration(this._case);
@@ -233,7 +240,7 @@ export class VirtualConsole {
   async request_fullscreen() {
     try {
       await document.body.requestFullscreen({ navigationUI: "hide" });
-      await screen.orientation.lock("landscape").catch((_) => {});
+      await (screen.orientation as any).lock("landscape").catch((_: any) => {}); // FIXME:
       return true;
     } catch (error) {
       console.warn(`[Kate] locking orientation in fullscreen not supported`, error);
@@ -242,64 +249,66 @@ export class VirtualConsole {
   }
 
   private key_update_loop = (time: number) => {
-    for (const key of this.keys) {
-      this.update_single_key(key, false);
-    }
-    for (const key of this.special_keys) {
-      this.update_single_key(key, true);
-    }
+    // for (const key of this.keys) {
+    //   this.update_single_key(key, false);
+    // }
+    // for (const key of this.special_keys) {
+    //   this.update_single_key(key, true);
+    // }
   };
 
   reset_all_keys() {
-    for (const key of this.keys) {
-      this.update_virtual_key(key, false);
-    }
+    this.button_state.reset();
+    this.virtual_case.reset();
+    // for (const key of this.keys) {
+    //   this.update_virtual_key(key, false);
+    // }
   }
 
   private update_single_key(key: InputKey, special: boolean) {
-    const x = this.input_state[key];
-    if (x.pressed) {
-      x.count = (x.count + 1) >>> 0 || 2;
-      if (special && x.count >= this.SPECIAL_FRAMES) {
-        x.count = 0;
-        x.pressed = false;
-        this.on_key_pressed.emit({
-          key: `long_${key as SpecialInputKey}`,
-          is_repeat: false,
-        });
-        this.render_button_state(key, false);
-      } else if (!special && x.count === 1) {
-        this.on_input_changed.emit({ key, is_down: true });
-        this.on_key_pressed.emit({ key, is_repeat: false });
-      } else if (!special && x.count % this.REPEAT_FRAMES === 0) {
-        this.on_key_pressed.emit({ key, is_repeat: true });
-      }
-    } else {
-      if (special) {
-        if (x.count === -1) {
-          this.on_input_changed.emit({ key, is_down: false });
-          x.count = 0;
-        } else if (x.count > 0 && x.count < this.SPECIAL_FRAMES) {
-          this.on_input_changed.emit({ key, is_down: true });
-          this.on_key_pressed.emit({ key, is_repeat: false });
-          x.count = -1;
-        }
-      } else if (x.count > 0) {
-        x.count = 0;
-        this.on_input_changed.emit({ key, is_down: false });
-      }
-    }
+    // const x = this.input_state[key];
+    // if (x.pressed) {
+    //   x.count = (x.count + 1) >>> 0 || 2;
+    //   if (special && x.count >= this.SPECIAL_FRAMES) {
+    //     x.count = 0;
+    //     x.pressed = false;
+    //     this.on_key_pressed.emit({
+    //       key: `long_${key as SpecialInputKey}`,
+    //       is_repeat: false,
+    //     });
+    //     this.render_button_state(key, false);
+    //   } else if (!special && x.count === 1) {
+    //     this.on_input_changed.emit({ key, is_down: true });
+    //     this.on_key_pressed.emit({ key, is_repeat: false });
+    //   } else if (!special && x.count % this.REPEAT_FRAMES === 0) {
+    //     this.on_key_pressed.emit({ key, is_repeat: true });
+    //   }
+    // } else {
+    //   if (special) {
+    //     if (x.count === -1) {
+    //       this.on_input_changed.emit({ key, is_down: false });
+    //       x.count = 0;
+    //     } else if (x.count > 0 && x.count < this.SPECIAL_FRAMES) {
+    //       this.on_input_changed.emit({ key, is_down: true });
+    //       this.on_key_pressed.emit({ key, is_repeat: false });
+    //       x.count = -1;
+    //     }
+    //   } else if (x.count > 0) {
+    //     x.count = 0;
+    //     this.on_input_changed.emit({ key, is_down: false });
+    //   }
+    // }
   }
 
   update_virtual_key(key: InputKey, state: boolean) {
-    const x = this.input_state[key];
-    if (x.pressed !== state) {
-      x.pressed = state;
-      if (state) {
-        x.count = 0;
-      }
-      this.render_button_state(key, state);
-    }
+    // const x = this.input_state[key];
+    // if (x.pressed !== state) {
+    //   x.pressed = state;
+    //   if (state) {
+    //     x.count = 0;
+    //   }
+    //   this.render_button_state(key, state);
+    // }
   }
 
   private render_button_state(key: InputKey, state: boolean) {

@@ -6,17 +6,11 @@
 
 import { h } from "../ui/widget";
 import * as UI from "../ui/widget";
-import type { ConsoleOptions, ExtendedInputKey } from "../../kernel";
+import type { ConsoleOptions } from "../../kernel";
 import * as Legal from "../../legal";
 import { SceneTextFile } from "./text-file";
 import { Scene, SimpleScene } from "../ui/scenes";
-import {
-  UAInfo,
-  basic_ua_details,
-  from_bytes,
-  mhz_to_ghz,
-  user_agent_info,
-} from "../../utils";
+import { UAInfo, basic_ua_details, from_bytes, mhz_to_ghz, user_agent_info } from "../../utils";
 
 const release_notes = require("../../../RELEASE.txt!text") as string;
 
@@ -60,9 +54,7 @@ export class SceneAboutKate extends SimpleScene {
   title = ["About Kate"];
 
   body_container(body: UI.Widgetable[]): HTMLElement {
-    return h("div", { class: "kate-os-scroll kate-os-content kate-about-bg" }, [
-      ...body,
-    ]);
+    return h("div", { class: "kate-os-scroll kate-os-content kate-about-bg" }, [...body]);
   }
 
   body() {
@@ -125,9 +117,7 @@ export class SceneAboutKate extends SimpleScene {
           kate: this.kate_info(),
           host: {
             os: `${info.os.name} ${info.os.version}\n(${
-              info.os.extended_version === info.os.version
-                ? ""
-                : info.os.extended_version
+              info.os.extended_version === info.os.version ? "" : info.os.extended_version
             })`,
             browser: info.engine.map((x) => `${x.name} ${x.version}`),
             device: device,
@@ -138,9 +128,7 @@ export class SceneAboutKate extends SimpleScene {
             cpu_model: info.cpu.model,
             cpu_logical_cores: info.cpu.logical_cores,
             cpu_frequency: mhz_to_ghz(info.cpu.speed),
-            memory: `${from_bytes(info.memory.total)} (${from_bytes(
-              info.memory.free
-            )} free)`,
+            memory: `${from_bytes(info.memory.total)} (${from_bytes(info.memory.free)} free)`,
           },
         };
       }
@@ -200,22 +188,16 @@ export class SceneAboutKate extends SimpleScene {
 
         h("h3", {}, ["Host"]),
         UI.info_line("Browser", [
-          new UI.VBox(0.5, [
-            ...x.host.browser.map((x) => UI.h("div", {}, [x])),
-          ]),
+          new UI.VBox(0.5, [...x.host.browser.map((x) => UI.h("div", {}, [x]))]),
         ]),
         UI.info_line("OS", [x.host.os]),
         UI.info_line("Architecture", [x.host.architecture]),
-        UI.info_line("x64/ARM64 translation?", [
-          bool_text(x.host.arm64_translation),
-        ]),
+        UI.info_line("x64/ARM64 translation?", [bool_text(x.host.arm64_translation)]),
         UI.info_line("Device", [x.host.device]),
 
         h("h3", {}, ["Hardware"]),
         UI.info_line("CPU model", [x.hardware.cpu_model]),
-        UI.info_line("CPU logical cores", [
-          String(x.hardware.cpu_logical_cores),
-        ]),
+        UI.info_line("CPU logical cores", [String(x.hardware.cpu_logical_cores)]),
         UI.info_line("CPU frequency", [x.hardware.cpu_frequency]),
         UI.info_line("Memory", [x.hardware.memory]),
       ])
@@ -223,15 +205,11 @@ export class SceneAboutKate extends SimpleScene {
   }
 
   handle_licence = () => {
-    this.os.push_scene(
-      new SceneTextFile(this.os, "Legal Notices", "Kate", Legal.notice)
-    );
+    this.os.push_scene(new SceneTextFile(this.os, "Legal Notices", "Kate", Legal.notice));
   };
 
   handle_release_notes = () => {
-    this.os.push_scene(
-      new SceneTextFile(this.os, "Release Notes", "Kate", release_notes)
-    );
+    this.os.push_scene(new SceneTextFile(this.os, "Release Notes", "Kate", release_notes));
   };
 
   async check_for_updates(container: HTMLElement) {
@@ -240,35 +218,27 @@ export class SceneAboutKate extends SimpleScene {
       return;
     }
 
-    const versions = (await fetch("/versions.json").then((x) =>
-      x.json()
-    )) as VersionMeta;
+    const versions = (await fetch("/versions.json").then((x) => x.json())) as VersionMeta;
     const channel = localStorage["kate-channel"];
     const current = JSON.parse(localStorage["kate-version"]) as Version;
-    const available = versions.versions.filter((x) =>
-      x.channels.includes(channel)
-    );
+    const available = versions.versions.filter((x) => x.channels.includes(channel));
 
-    const channel_button = UI.when(
-      this.os.kernel.console.options.mode === "web",
-      [
-        UI.link_card(this.os, {
-          arrow: "pencil",
-          title: "Release channel",
-          description: UI.vbox(0.3, [
-            "Frequency and stability of Kate's updates",
-            UI.meta_text(["(the emulator will reload when changing this)"]),
-          ]),
-          value: channel,
-          click_label: "Change",
-          on_click: () => this.handle_change_channel(container, versions),
-        }),
-      ]
-    );
+    const channel_button = UI.when(this.os.kernel.console.options.mode === "web", [
+      UI.link_card(this.os, {
+        arrow: "pencil",
+        title: "Release channel",
+        description: UI.vbox(0.3, [
+          "Frequency and stability of Kate's updates",
+          UI.meta_text(["(the emulator will reload when changing this)"]),
+        ]),
+        value: channel,
+        click_label: "Change",
+        on_click: () => this.handle_change_channel(container, versions),
+      }),
+    ]);
 
     if (available.length > 0) {
-      const current_index =
-        available.findIndex((x) => x.version === current.version) ?? 0;
+      const current_index = available.findIndex((x) => x.version === current.version) ?? 0;
       if (current_index < available.length - 1) {
         const latest = available.at(-1)!;
         container.textContent = "";
@@ -295,9 +265,7 @@ export class SceneAboutKate extends SimpleScene {
     }
 
     container.textContent = "";
-    container.append(
-      h("div", {}, [UI.vbox(0.5, [channel_button, "You're up to date!"])])
-    );
+    container.append(h("div", {}, [UI.vbox(0.5, [channel_button, "You're up to date!"])]));
   }
 
   async handle_change_channel(container: HTMLElement, versions: VersionMeta) {
@@ -317,12 +285,8 @@ export class SceneAboutKate extends SimpleScene {
       }
 
       const channel_pointer = versions.channels[current_channel];
-      const current_version = JSON.parse(
-        localStorage["kate-version"]
-      ) as Version;
-      const available_versions = versions.versions.filter((x) =>
-        x.channels.includes(channel)
-      );
+      const current_version = JSON.parse(localStorage["kate-version"]) as Version;
+      const available_versions = versions.versions.filter((x) => x.channels.includes(channel));
       const version =
         available_versions.find((x) => x.version === current_version.version) ??
         available_versions.find((x) => x.version === channel_pointer) ??
@@ -337,9 +301,7 @@ export class SceneAboutKate extends SimpleScene {
       const old_version_index = versions.versions.findIndex(
         (x) => x.version === current_version.version
       );
-      const new_version_index = versions.versions.findIndex(
-        (x) => x.version === version.version
-      );
+      const new_version_index = versions.versions.findIndex((x) => x.version === version.version);
       if (
         old_version_index === -1 ||
         new_version_index === -1 ||
@@ -377,12 +339,7 @@ export class SceneAboutKate extends SimpleScene {
   async handle_release_notes_for_version(version: Version) {
     const text = await fetch(version.release_notes).then((x) => x.text());
     this.os.push_scene(
-      new SceneTextFile(
-        this.os,
-        `Release notes v${version.version}`,
-        "Kate",
-        text
-      )
+      new SceneTextFile(this.os, `Release notes v${version.version}`, "Kate", text)
     );
   }
 

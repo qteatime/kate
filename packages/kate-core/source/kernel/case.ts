@@ -20,7 +20,22 @@ const enum Dpad {
   DOWN_LEFT = (2 << 2) | (2 << 3),
 }
 
+// FIXME: converge
+const keys: InputKey[] = [
+  "up",
+  "right",
+  "down",
+  "left",
+  "o",
+  "x",
+  "menu",
+  "capture",
+  "ltrigger",
+  "rtrigger",
+];
+
 export abstract class KateCase {
+  abstract reset(): void;
   abstract update(button: InputKey, is_down: boolean): void;
 }
 
@@ -58,6 +73,12 @@ export class KateMobileCase extends KateCase {
     this.btn_r = root.querySelector(".kc-shoulder-right")!;
   }
 
+  override reset() {
+    for (const key of keys) {
+      this.update(key, false);
+    }
+  }
+
   override update(button: InputKey, is_down: boolean) {
     switch (button) {
       case "up":
@@ -89,6 +110,14 @@ export class KateMobileCase extends KateCase {
 
       case "rtrigger":
         this.update_button(this.btn_r, is_down);
+        break;
+
+      case "berry":
+        this.update_button(this.btn_berry, is_down);
+        break;
+
+      case "sparkle":
+        this.update_button(this.btn_sparkle, is_down);
         break;
 
       default:
