@@ -5,7 +5,7 @@
  */
 
 // Provides an input source for regularly attached keyboards. The default
-// mapping is externally-reconfigurable, so the OS can provide a way for
+// mapping is externally-reconfigurable so the OS can provide a way for
 // the user to have their own custom mappings.
 
 import { EventStream } from "../../utils";
@@ -32,7 +32,7 @@ const default_mapping: Record<string, KateButton> = Object.assign(
   Object.fromEntries(Object.entries(default_config).map(([button, kbd]) => [kbd, button]))
 );
 
-export class KeyboardInput implements KateButtonInputSource {
+export class KateKeyboardInputSource implements KateButtonInputSource {
   readonly on_button_changed = new EventStream<ButtonChangeEvent>();
   private ignore_repeat = ["menu", "capture"];
   private physical_map: { [key: string]: KateButton | null } = default_mapping;
@@ -46,9 +46,9 @@ export class KeyboardInput implements KateButtonInputSource {
     this.physical_map = map;
   }
 
-  listen() {
+  setup() {
     if (this.attached) {
-      throw new Error(`listen called twice`);
+      throw new Error(`[kate:keyboard] setup() called twice`);
     }
     this.attached = true;
 

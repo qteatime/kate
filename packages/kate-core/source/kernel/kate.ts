@@ -4,9 +4,9 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { CartRuntime, KateRuntimes } from "./cart-runtime";
-import { GamepadInput } from "./input/gamepad-input";
-import { KeyboardInput } from "./input/keyboard-input";
+import { KateRuntimes } from "./cart-runtime";
+import { KateGamepadInputSource } from "./input/gamepad-input";
+import { KateKeyboardInputSource } from "./input/keyboard-input";
 import { ConsoleOptions, VirtualConsole } from "./virtual";
 
 export class KateKernel {
@@ -14,8 +14,8 @@ export class KateKernel {
 
   private constructor(
     readonly console: VirtualConsole,
-    readonly keyboard: KeyboardInput,
-    readonly gamepad: GamepadInput
+    readonly keyboard: KateKeyboardInputSource,
+    readonly gamepad: KateGamepadInputSource
   ) {
     this.runtimes = new KateRuntimes(console);
   }
@@ -30,12 +30,13 @@ export class KateKernel {
         scale_to_fit: false,
       },
     });
-    const keyboard = new KeyboardInput();
-    const gamepad = new GamepadInput(console);
+    const keyboard = new KateKeyboardInputSource();
+    const gamepad = new KateGamepadInputSource();
     console.listen();
-    keyboard.listen();
+    keyboard.setup();
     gamepad.setup();
     keyboard.on_button_changed.listen((ev) => console.update_virtual_key(ev.button, ev.is_pressed));
+    gamepad.on_button_changed.listen((ev) => console.update_virtual_key(ev.button, ev.is_pressed));
     return new KateKernel(console, keyboard, gamepad);
   }
 

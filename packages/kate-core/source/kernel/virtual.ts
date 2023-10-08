@@ -5,7 +5,7 @@
  */
 
 import { EventStream, unreachable } from "../utils";
-import { KateVirtualInput } from "./input/virtual-input";
+import { KateVirtualInputSource } from "./input/virtual-input";
 import { KateButtons } from "./input/buttons";
 import type { KateButton, ButtonState } from "./input/buttons";
 const pkg = require("../../package.json");
@@ -27,7 +27,7 @@ export type ConsoleOptions = {
 };
 
 export class VirtualConsole {
-  private virtual_case: KateVirtualInput;
+  private virtual_case: KateVirtualInputSource;
   private button_state: KateButtons;
 
   private is_listening = false;
@@ -64,7 +64,7 @@ export class VirtualConsole {
 
   constructor(readonly root: HTMLElement, readonly options: ConsoleOptions) {
     this._case = options.case;
-    this.virtual_case = new KateVirtualInput(root);
+    this.virtual_case = new KateVirtualInputSource(root);
     this.button_state = new KateButtons();
 
     this.os_root = root.querySelector("#kate-os-root")!;

@@ -36,11 +36,7 @@ import { KateAuditSupervisor } from "./services/audit-supervisor";
 import { KateDeviceFile } from "./apis/device-file";
 import { KateFairnessSupervisor } from "./services/fairness-supervisor";
 
-export type CartChangeReason =
-  | "installed"
-  | "removed"
-  | "archived"
-  | "save-data-changed";
+export type CartChangeReason = "installed" | "removed" | "archived" | "save-data-changed";
 
 export class KateOS {
   private _scene_stack: Scene[] = [];
@@ -190,21 +186,16 @@ export class KateOS {
     this.display.classList.toggle("disable-animation", !enabled);
   }
 
-  static async boot(
-    kernel: KateKernel,
-    x: { database?: string; set_case_mode?: boolean } = {}
-  ) {
+  static async boot(kernel: KateKernel, x: { database?: string; set_case_mode?: boolean } = {}) {
     // Setup OS
     const sfx = await KateSfx.make(kernel);
     const { db, old_version } = await KateDb.kate.open(x.database);
     const settings = await KateSettings.load(db);
     const os = new KateOS(kernel, db, sfx, settings);
-    kernel.console.on_virtual_button_touched.listen(
-      os.handle_virtual_button_feedback
-    );
+    kernel.console.on_virtual_button_touched.listen(os.handle_virtual_button_feedback);
     kernel.keyboard.remap(settings.get("input").keyboard_mapping);
     kernel.gamepad.remap(settings.get("input").gamepad_mapping.standard);
-    kernel.gamepad.pair(settings.get("input").paired_gamepad);
+    kernel.gamepad.set_primary(settings.get("input").paired_gamepad);
     sfx.set_enabled(settings.get("ui").sound_feedback);
     os.set_os_animation(settings.get("ui").animation_effects);
     if (x.set_case_mode !== false) {
@@ -218,15 +209,11 @@ export class KateOS {
     await request_persistent_storage(os);
     os.push_scene(boot_screen);
 
-    await KateDb.kate.run_data_migration(
-      old_version,
-      db,
-      (migration, current, total) => {
-        boot_screen.set_message(
-          `Updating database (${current} of ${total}): ${migration.description}`
-        );
-      }
-    );
+    await KateDb.kate.run_data_migration(old_version, db, (migration, current, total) => {
+      boot_screen.set_message(
+        `Updating database (${current} of ${total}): ${migration.description}`
+      );
+    });
 
     await os.audit_supervisor.start();
 
@@ -242,18 +229,12 @@ export class KateOS {
 }
 
 async function request_persistent_storage(os: KateOS) {
-  if (
-    navigator.storage?.persisted == null ||
-    navigator.storage?.persist == null
-  ) {
+  if (navigator.storage?.persisted == null || navigator.storage?.persist == null) {
     os.kernel.console.take_resource("transient-storage");
     return;
   }
 
-  if (
-    os.kernel.console.options.persistent_storage &&
-    !(await navigator.storage.persisted())
-  ) {
+  if (os.kernel.console.options.persistent_storage && !(await navigator.storage.persisted())) {
     const persistent = await navigator.storage.persist();
     if (persistent) {
       return;

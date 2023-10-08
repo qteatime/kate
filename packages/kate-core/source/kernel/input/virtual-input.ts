@@ -27,8 +27,10 @@ const enum Dpad {
   DOWN_LEFT = (2 << 2) | (2 << 3),
 }
 
-export class KateVirtualInput implements KateButtonInputSource {
+export class KateVirtualInputSource implements KateButtonInputSource {
   readonly on_button_changed = new EventStream<ButtonChangeEvent>();
+
+  private _attached = false;
 
   private thumb_direction: Dpad = Dpad.IDLE;
   private thumb_range: number;
@@ -52,7 +54,7 @@ export class KateVirtualInput implements KateButtonInputSource {
     this.dpad_thumb = root.querySelector(".kc-thumb")!;
     this.thumb_range = Number(this.dpad_thumb.getAttribute("data-range"));
     if (Number.isNaN(this.thumb_range) || Math.trunc(this.thumb_range) !== this.thumb_range) {
-      throw new Error(`[internal] Invalid data-range for dpad thumbstick`);
+      throw new Error(`[kate:virtual-input] Invalid data-range for dpad thumbstick`);
     }
 
     this.btn_ok = root.querySelector(".kc-ok")!;
@@ -68,6 +70,11 @@ export class KateVirtualInput implements KateButtonInputSource {
   }
 
   setup(): void {
+    if (this._attached) {
+      throw new Error(`[kate:virtual-input] setup() called twice.`);
+    }
+    this._attached = true;
+
     this.listen_virtual_button(this.btn_ok, "o");
     this.listen_virtual_button(this.btn_cancel, "x");
     this.listen_virtual_button(this.btn_sparkle, "sparkle");
@@ -84,6 +91,7 @@ export class KateVirtualInput implements KateButtonInputSource {
       button.removeEventListener(event, listener as any);
     }
     this.subscriptions = [];
+    this._attached = false;
   }
 
   private listen_thumb() {
