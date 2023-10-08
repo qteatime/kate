@@ -38,13 +38,7 @@ const genre = T.one_of([
   "other",
 ] as const);
 
-const release_type = T.one_of([
-  "prototype",
-  "early-access",
-  "beta",
-  "demo",
-  "regular",
-] as const);
+const release_type = T.one_of(["prototype", "early-access", "beta", "demo", "regular"] as const);
 
 const content_rating = T.one_of([
   "general",
@@ -77,14 +71,8 @@ const accessibility = T.one_of([
   "skippable-content",
 ] as const);
 
-const valid_id = T.regex(
-  "valid id",
-  /^[a-z0-9\-]+(\.[a-z0-9\-]+)*\/[a-z0-9\-]+(\.[a-z0-9\-]+)*$/
-);
-const valid_language = T.regex(
-  "valid ISO language code",
-  /^[a-z]{2}(?:[\-_][a-zA-Z_]{2,})?$/
-);
+const valid_id = T.regex("valid id", /^[a-z0-9\-]+(\.[a-z0-9\-]+)*\/[a-z0-9\-]+(\.[a-z0-9\-]+)*$/);
+const valid_language = T.regex("valid ISO language code", /^[a-z]{2}(?:[\-_][a-zA-Z_]{2,})?$/);
 
 const meta = T.spec({
   presentation: T.spec({
@@ -98,14 +86,12 @@ const meta = T.spec({
   }),
   classification: T.nullable(
     T.spec({
-      genre: T.optional(
-        ["other"],
-        T.seq2(T.list_of(genre), T.min_max_items(1, 10))
-      ) as (_: any) => Genre[],
-      tags: T.optional(
-        [],
-        T.seq2(T.list_of(T.short_str(255)), T.min_max_items(0, 10))
-      ) as (_: any) => string[],
+      genre: T.optional(["other"], T.seq2(T.list_of(genre), T.min_max_items(1, 10))) as (
+        _: any
+      ) => Genre[],
+      tags: T.optional([], T.seq2(T.list_of(T.short_str(255)), T.min_max_items(0, 10))) as (
+        _: any
+      ) => string[],
       rating: T.optional("unknown", content_rating),
       warnings: T.nullable(T.short_str(1_000)),
     })
@@ -191,14 +177,8 @@ const recipe = T.tagged_choice<Recipe, Recipe["type"]>("type", {
   renpy: T.spec({
     type: T.constant("renpy" as const),
     pointer_support: T.optional(true, T.bool),
-    save_data: T.optional(
-      "versioned",
-      T.one_of(["versioned" as const, "unversioned" as const])
-    ),
-    renpy_version: T.regex(
-      "version in the form MM.NN (e.g.: 7.5, 8.1)",
-      /^\d+\.\d+$/
-    ),
+    save_data: T.optional("versioned", T.one_of(["versioned" as const, "unversioned" as const])),
+    renpy_version: T.regex("version in the form MM.NN (e.g.: 7.5, 8.1)", /^\d+\.\d+$/),
     hide_cursor: T.optional(false, T.bool),
     open_urls_reason: T.optional(null, T.short_str(255)),
   }),
@@ -295,12 +275,7 @@ type Version = { major: number; minor: number };
 
 type ReleaseType = "prototype" | "early-access" | "beta" | "demo" | "regular";
 
-type ContentRating =
-  | "general"
-  | "teen-and-up"
-  | "mature"
-  | "explicit"
-  | "unknown";
+type ContentRating = "general" | "teen-and-up" | "mature" | "explicit" | "unknown";
 
 type DerivativePolicy = ReturnType<typeof derivative_policy>;
 
@@ -440,11 +415,7 @@ function assert_file_exists(path0: string, root: string, base_dir: string) {
   }
 }
 
-function maybe_load_text_file(
-  path: string | null,
-  root: string,
-  base_dir: string
-) {
+function maybe_load_text_file(path: string | null, root: string, base_dir: string) {
   if (path == null) {
     return "";
   } else {
@@ -475,9 +446,7 @@ function metadata(x: Kart["metadata"], root: string, base_dir: string) {
     "thumbnail-path": x.presentation.thumbnail_path
       ? make_absolute(x.presentation.thumbnail_path)
       : null,
-    "banner-path": x.presentation.banner_path
-      ? make_absolute(x.presentation.banner_path)
-      : null,
+    "banner-path": x.presentation.banner_path ? make_absolute(x.presentation.banner_path) : null,
   });
 
   const classification = Cart.Meta_classification({
@@ -488,23 +457,17 @@ function metadata(x: Kart["metadata"], root: string, base_dir: string) {
   });
 
   const legal = Cart.Meta_legal({
-    "derivative-policy": make_derivative_policy(
-      x.legal?.derivative_policy ?? "personal-use"
-    ),
-    "licence-path": x.legal?.licence_path
-      ? make_absolute(x.legal.licence_path)
-      : null,
+    "derivative-policy": make_derivative_policy(x.legal?.derivative_policy ?? "personal-use"),
+    "licence-path": x.legal?.licence_path ? make_absolute(x.legal.licence_path) : null,
     "privacy-policy-path": x.legal?.privacy_policy_path
       ? make_absolute(x.legal.privacy_policy_path)
       : null,
   });
 
   const accessibility = Cart.Meta_accessibility({
-    "input-methods":
-      x.accessibility?.input_methods.map(make_input_method) ?? [],
+    "input-methods": x.accessibility?.input_methods.map(make_input_method) ?? [],
     languages: x.accessibility?.languages.map(make_language) ?? [],
-    provisions:
-      x.accessibility?.provisions.map(make_accessibility_provision) ?? [],
+    provisions: x.accessibility?.provisions.map(make_accessibility_provision) ?? [],
     "average-completion-seconds": x.accessibility?.average_completion
       ? make_duration(x.accessibility.average_completion)
       : null,
@@ -675,9 +638,7 @@ function make_absolute(path: string) {
 }
 
 async function files(patterns: Kart["files"], root: string, base_dir: string) {
-  const paths = [
-    ...new Set(patterns.flatMap((x) => Glob.sync(x, { cwd: base_dir }))),
-  ];
+  const paths = [...new Set(patterns.flatMap((x) => Glob.sync(x, { cwd: base_dir })))];
 
   const result: Cart.File[] = [];
   for (const path of paths) {
@@ -772,9 +733,7 @@ function make_bridge(x: Bridge): Cart.Bridge[] {
     case "input-proxy": {
       return [
         Cart.Bridge.Input_proxy({
-          mapping: new Map(
-            Object.entries(get_mapping(x.mapping)).map(make_key_pair)
-          ),
+          mapping: new Map(Object.entries(get_mapping(x.mapping)).map(make_key_pair)),
         }),
       ];
     }
@@ -801,9 +760,7 @@ function make_bridge(x: Bridge): Cart.Bridge[] {
     }
 
     case "renpy-web-tweaks": {
-      return [
-        Cart.Bridge.Renpy_web_tweaks({ version: Cart.Version(x.version) }),
-      ];
+      return [Cart.Bridge.Renpy_web_tweaks({ version: Cart.Version(x.version) })];
     }
 
     case "external-url-handler": {
@@ -826,6 +783,7 @@ function get_mapping(x: KeyMapping) {
           down: "ArrowDown",
           x: "Escape",
           o: "Enter",
+          sparkle: "KeyH",
           menu: "ShiftLeft",
           l: "PageUp",
           r: "PageDown",
@@ -839,6 +797,7 @@ function get_mapping(x: KeyMapping) {
           down: "ArrowDown",
           x: "KeyX",
           o: "KeyZ",
+          sparkle: "KeyC",
           menu: "ShiftLeft",
           l: "KeyA",
           r: "KeyS",
@@ -852,10 +811,7 @@ function get_mapping(x: KeyMapping) {
   }
 }
 
-function make_key_pair([virtual, key_id]: [string, string]): [
-  Cart.Virtual_key,
-  Cart.Keyboard_key
-] {
+function make_key_pair([virtual, key_id]: [string, string]): [Cart.Virtual_key, Cart.Keyboard_key] {
   if (!keymap[key_id]) {
     throw new Error(`Unknown key code ${key_id}`);
   }
@@ -883,6 +839,8 @@ function make_virtual_key(key: string) {
       return Cart.Virtual_key.X({});
     case "o":
       return Cart.Virtual_key.O({});
+    case "sparkle":
+      return Cart.Virtual_key.Sparkle({});
     case "l":
       return Cart.Virtual_key.L_trigger({});
     case "r":
@@ -892,9 +850,7 @@ function make_virtual_key(key: string) {
   }
 }
 
-function apply_recipe(
-  json: ReturnType<typeof config>
-): ReturnType<typeof config> {
+function apply_recipe(json: ReturnType<typeof config>): ReturnType<typeof config> {
   const recipe = json.platform.recipe;
   switch (recipe.type) {
     case "identity": {
