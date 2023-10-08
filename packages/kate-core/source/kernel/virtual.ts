@@ -5,7 +5,6 @@
  */
 
 import { EventStream, unreachable } from "../utils";
-import { KateButton } from "./input";
 import { KateButtonInputAggregator } from "./input/button-input";
 const pkg = require("../../package.json");
 
