@@ -4,9 +4,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-export * from "./kate";
-export * from "./cart-runtime";
-export * from "./input/input-source-gamepad";
-export * from "./input/input-source-keyboard";
-export * from "./virtual";
-export * from "./input";
+export * from "./hardware-buttons";
+export * from "./input-source";
+export * from "./input-source-gamepad";
+export * from "./input-source-keyboard";
+export * from "./input-source-virtual";

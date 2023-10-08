@@ -17,13 +17,10 @@ if (!("KateNative" in window)) {
 const url_args = new URL(location.href).searchParams;
 
 const DEFAULT_CHANNEL =
-  url_args.get("channel") ??
-  (location.hostname === "kate.qteati.me" ? "preview" : "latest");
+  url_args.get("channel") ?? (location.hostname === "kate.qteati.me" ? "preview" : "latest");
 
 if (url_args.get("reset") === "erase-all-data") {
-  if (
-    window.confirm("Erase all data in Kate and restore it to factory defaults?")
-  ) {
+  if (window.confirm("Erase all data in Kate and restore it to factory defaults?")) {
     localStorage["kate-channel"] = "";
     localStorage["kate-version"] = "null";
     indexedDB.deleteDatabase("kate");
@@ -49,14 +46,7 @@ async function load_script(url: string) {
     const script = document.createElement("script");
     script.onload = () => resolve();
     script.onerror = (ev, source, lineno, colno, error) => {
-      console.error(
-        `[Kate] failed to load script at ${url}`,
-        ev,
-        source,
-        lineno,
-        colno,
-        error
-      );
+      console.error(`[Kate] failed to load script at ${url}`, ev, source, lineno, colno, error);
       reject(new Error(`failed to load script at ${url}`));
     };
     script.src = url;
@@ -74,14 +64,10 @@ async function load_kate(version: Version) {
 }
 
 async function main() {
-  let version: Version | null = JSON.parse(
-    localStorage["kate-version"] ?? "null"
-  );
+  let version: Version | null = JSON.parse(localStorage["kate-version"] ?? "null");
   const channel: string = localStorage["kate-channel"] || DEFAULT_CHANNEL;
   if (version == null) {
-    const versions = (await fetch("versions.json").then((x) =>
-      x.json()
-    )) as VersionMeta;
+    const versions = (await fetch("versions.json").then((x) => x.json())) as VersionMeta;
     const latest = versions.channels[channel];
     version = versions.versions.find((x) => x.version === latest) ?? null;
     if (version == null) {
@@ -101,13 +87,10 @@ async function main() {
   });
 
   // Run Kate
-  const kate = Kate.kernel.KateKernel.from_root(
-    document.querySelector(".kate")!,
-    {
-      mode: "web",
-      persistent_storage: true,
-    }
-  );
+  const kate = Kate.kernel.KateKernel.from_root(document.querySelector(".kate-case")!, {
+    mode: "web",
+    persistent_storage: true,
+  });
   const kate_os = await Kate.os.KateOS.boot(kate);
   (window as any).kate = kate;
   (window as any).kate_os = kate_os;

@@ -6,7 +6,7 @@
 
 import { capabilities } from "../..";
 import * as Cart from "../../cart";
-import { InputKey } from "../../kernel/virtual";
+import { KateButton } from "../../kernel";
 import { EventStream, Observable, load_image_from_bytes } from "../../utils";
 import { InteractionHandler } from "../apis";
 import type { KateOS } from "../os";
@@ -41,11 +41,7 @@ function set_attr(element: HTMLElement, key: string, value: string | boolean) {
   }
 }
 
-export function h(
-  tag: string,
-  attrs: { [key: string]: string | boolean },
-  children: Widgetable[]
-) {
+export function h(tag: string, attrs: { [key: string]: string | boolean }, children: Widgetable[]) {
   const element = document.createElement(tag);
   for (const [key, value] of Object.entries(attrs)) {
     set_attr(element, key, value);
@@ -60,11 +56,7 @@ export function klass(name: string, children: Widgetable[]) {
   return h("div", { class: name }, children);
 }
 
-export function svg(
-  tag: string,
-  attrs: { [key: string]: string },
-  children: SVGElement[]
-) {
+export function svg(tag: string, attrs: { [key: string]: string }, children: SVGElement[]) {
   const element = document.createElementNS("http://www.w3.org/2000/svg", tag);
   for (const [key, value] of Object.entries(attrs)) {
     element.setAttribute(key, value);
@@ -126,11 +118,7 @@ export class HBox extends Widget {
   }
 
   render() {
-    return h(
-      "div",
-      { class: "kate-ui-hbox", style: `gap: ${this.gap}rem` },
-      this.children
-    );
+    return h("div", { class: "kate-ui-hbox", style: `gap: ${this.gap}rem` }, this.children);
   }
 }
 
@@ -156,11 +144,7 @@ export class VBox extends Widget {
   }
 
   render() {
-    return h(
-      "div",
-      { class: "kate-ui-vbox", style: `gap: ${this.gap}rem` },
-      this.children
-    );
+    return h("div", { class: "kate-ui-vbox", style: `gap: ${this.gap}rem` }, this.children);
   }
 }
 
@@ -181,24 +165,15 @@ export class Title_bar extends Widget {
 
   render() {
     return h("div", { class: "kate-ui-title-bar" }, [
-      h("div", { class: "kate-ui-title-bar-child" }, [
-        this.children.left ?? null,
-      ]),
-      h("div", { class: "kate-ui-title-bar-child" }, [
-        this.children.middle ?? null,
-      ]),
-      h("div", { class: "kate-ui-title-bar-child" }, [
-        this.children.right ?? null,
-      ]),
+      h("div", { class: "kate-ui-title-bar-child" }, [this.children.left ?? null]),
+      h("div", { class: "kate-ui-title-bar-child" }, [this.children.middle ?? null]),
+      h("div", { class: "kate-ui-title-bar-child" }, [this.children.right ?? null]),
     ]);
   }
 }
 
 export class Space extends Widget {
-  constructor(
-    readonly x: { width?: number; height?: number },
-    readonly display: string
-  ) {
+  constructor(readonly x: { width?: number; height?: number }, readonly display: string) {
     super();
   }
 
@@ -207,9 +182,9 @@ export class Space extends Widget {
       "div",
       {
         class: "kate-ui-space",
-        style: `width: ${this.x.width ?? 0}px; height: ${
-          this.x.height ?? 0
-        }px; display: ${this.display}`,
+        style: `width: ${this.x.width ?? 0}px; height: ${this.x.height ?? 0}px; display: ${
+          this.display
+        }`,
       },
       []
     );
@@ -338,15 +313,11 @@ export function image(src: string) {
   return h("img", { src: src }, []);
 }
 
-export function icon_button(icon: InputKey | InputKey[], text: string) {
+export function icon_button(icon: KateButton | KateButton[], text: string) {
   if (typeof icon === "string") {
-    return new Button([new HBox(0.5, [new Icon(icon), text])]).focus_target(
-      false
-    );
+    return new Button([new HBox(0.5, [new Icon(icon), text])]).focus_target(false);
   } else {
-    return new Button([
-      new HBox(0.5, [...icon.map((x) => new Icon(x)), text]),
-    ]).focus_target(false);
+    return new Button([new HBox(0.5, [...icon.map((x) => new Icon(x)), text])]).focus_target(false);
   }
 }
 
@@ -412,7 +383,7 @@ export function chip(x: Widgetable[]) {
 }
 
 export class Icon extends Widget {
-  constructor(readonly type: InputKey) {
+  constructor(readonly type: KateButton) {
     super();
   }
 
@@ -422,11 +393,9 @@ export class Icon extends Widget {
       case "down":
       case "right":
       case "left":
-        return h(
-          "div",
-          { class: "kate-icon kate-icon-light", "data-name": this.type },
-          [h("img", { src: `img/${this.type}.png` }, [])]
-        );
+        return h("div", { class: "kate-icon kate-icon-light", "data-name": this.type }, [
+          h("img", { src: `img/${this.type}.png` }, []),
+        ]);
       case "ltrigger":
       case "rtrigger":
       case "menu":
@@ -440,11 +409,16 @@ export class Icon extends Widget {
         return h("div", { class: "kate-icon", "data-name": this.type }, [
           h("img", { src: `img/ok.png` }, []),
         ]);
+      case "berry":
+      case "sparkle":
+        return h("div", { class: "kate-icon", "data-name": this.type }, [
+          h("img", { src: `img/${this.type}.png` }, []),
+        ]);
     }
   }
 }
 
-export function icon(x: InputKey) {
+export function icon(x: KateButton) {
   return new Icon(x);
 }
 
@@ -482,19 +456,7 @@ export function status_bar(children: Widgetable[]) {
 
 export function fa_icon(
   name: string,
-  size:
-    | "2xs"
-    | "xs"
-    | "1x"
-    | "lg"
-    | "xl"
-    | "2x"
-    | "3x"
-    | "4x"
-    | "5x"
-    | "6x"
-    | "7x"
-    | "8x" = "1x",
+  size: "2xs" | "xs" | "1x" | "lg" | "xl" | "2x" | "3x" | "4x" | "5x" | "6x" | "7x" | "8x" = "1x",
   style: "solid" = "solid",
   animation?: "spin" | "bounce" | "beat" | null
 ) {
@@ -503,18 +465,10 @@ export function fa_icon(
 }
 
 export function focusable_container(children: Widgetable[]) {
-  return h(
-    "div",
-    { class: "kate-ui-focusable-container kate-ui-focus-target" },
-    [...children]
-  );
+  return h("div", { class: "kate-ui-focusable-container kate-ui-focus-target" }, [...children]);
 }
 
-export function info_line(
-  label: Widgetable,
-  data: Widgetable[],
-  x?: { interactive?: boolean }
-) {
+export function info_line(label: Widgetable, data: Widgetable[], x?: { interactive?: boolean }) {
   const info = [
     h("div", { class: "kate-ui-info-line" }, [
       h("div", { class: "kate-ui-info-line-label" }, [label]),
@@ -552,9 +506,7 @@ export function button_panel(
       },
       [
         h("div", { class: "kate-ui-button-panel-title" }, [x.title]),
-        h("div", { class: "kate-ui-button-panel-description" }, [
-          x.description ?? "",
-        ]),
+        h("div", { class: "kate-ui-button-panel-description" }, [x.description ?? ""]),
       ]
     ),
     [
@@ -583,14 +535,9 @@ export function toggle_cell(
   }
 ) {
   const checked = Observable.from(x.value);
-  const mutate =
-    typeof x.value === "boolean"
-      ? (v: boolean) => (checked.value = v)
-      : () => {};
+  const mutate = typeof x.value === "boolean" ? (v: boolean) => (checked.value = v) : () => {};
   const container = h("div", { class: "kate-ui-toggle-container" }, [
-    h("div", { class: "kate-ui-toggle-view" }, [
-      h("div", { class: "kate-ui-toggle-bullet" }, []),
-    ]),
+    h("div", { class: "kate-ui-toggle-view" }, [h("div", { class: "kate-ui-toggle-bullet" }, [])]),
     h("div", { class: "kate-ui-toggle-label-yes" }, [x.on_label ?? "ON "]),
     h("div", { class: "kate-ui-toggle-label-no" }, [x.off_label ?? "OFF"]),
   ]);
@@ -633,17 +580,11 @@ export function toggle(
   } = {}
 ) {
   let checked = value;
-  const container = h(
-    "div",
-    { class: "kate-ui-toggle-container kate-ui-focus-target" },
-    [
-      h("div", { class: "kate-ui-toggle-view" }, [
-        h("div", { class: "kate-ui-toggle-bullet" }, []),
-      ]),
-      h("div", { class: "kate-ui-toggle-label-yes" }, [x.enabled ?? "YES"]),
-      h("div", { class: "kate-ui-toggle-label-no" }, [x.disabled ?? "NO "]),
-    ]
-  );
+  const container = h("div", { class: "kate-ui-toggle-container kate-ui-focus-target" }, [
+    h("div", { class: "kate-ui-toggle-view" }, [h("div", { class: "kate-ui-toggle-bullet" }, [])]),
+    h("div", { class: "kate-ui-toggle-label-yes" }, [x.enabled ?? "YES"]),
+    h("div", { class: "kate-ui-toggle-label-no" }, [x.disabled ?? "NO "]),
+  ]);
 
   container.classList.toggle("active", checked);
 
@@ -677,38 +618,28 @@ export function link_card(
     on_click?: () => void;
   }
 ) {
-  const element = h(
-    "div",
-    { class: "kate-ui-link-card kate-ui-focus-target" },
-    [
-      h("div", { class: "kate-ui-link-card-icon" }, [
-        x.icon == null
-          ? null
-          : typeof x.icon === "string"
-          ? fa_icon(x.icon, "2x")
-          : x.icon,
-      ]),
-      h("div", { class: "kate-ui-link-card-text" }, [
-        h("div", { class: "kate-ui-link-card-title" }, [x.title]),
-        h("div", { class: "kate-ui-link-card-description" }, [
-          x.description ?? null,
-        ]),
-      ]),
-      h("div", { class: "kate-ui-link-card-value" }, [x.value ?? null]),
-      h(
-        "div",
-        {
-          class: "kate-ui-link-card-arrow",
-          "data-value-suffix": x.value != null,
-        },
-        [
-          x.arrow != null
-            ? fa_icon(x.arrow, x.value == null ? "xl" : "1x")
-            : fa_icon("chevron-right", x.value == null ? "xl" : "1x"),
-        ]
-      ),
-    ]
-  );
+  const element = h("div", { class: "kate-ui-link-card kate-ui-focus-target" }, [
+    h("div", { class: "kate-ui-link-card-icon" }, [
+      x.icon == null ? null : typeof x.icon === "string" ? fa_icon(x.icon, "2x") : x.icon,
+    ]),
+    h("div", { class: "kate-ui-link-card-text" }, [
+      h("div", { class: "kate-ui-link-card-title" }, [x.title]),
+      h("div", { class: "kate-ui-link-card-description" }, [x.description ?? null]),
+    ]),
+    h("div", { class: "kate-ui-link-card-value" }, [x.value ?? null]),
+    h(
+      "div",
+      {
+        class: "kate-ui-link-card-arrow",
+        "data-value-suffix": x.value != null,
+      },
+      [
+        x.arrow != null
+          ? fa_icon(x.arrow, x.value == null ? "xl" : "1x")
+          : fa_icon("chevron-right", x.value == null ? "xl" : "1x"),
+      ]
+    ),
+  ]);
   if (x.on_click) {
     element.classList.add("kate-ui-link-card-clickable");
     element.classList.remove("kate-ui-focus-target");
@@ -748,18 +679,14 @@ export function simple_screen(x: {
   body: Widgetable;
   status?: Widgetable[] | null;
 }) {
-  return h(
-    "div",
-    { class: "kate-os-simple-screen", "data-title": stringify(x.title) },
-    [
-      new Title_bar({
-        left: fragment([fa_icon(x.icon, "lg"), new Section_title(x.title)]),
-        right: x.subtitle,
-      }),
-      x.body,
-      x.status ? statusbar([...x.status]) : null,
-    ]
-  );
+  return h("div", { class: "kate-os-simple-screen", "data-title": stringify(x.title) }, [
+    new Title_bar({
+      left: fragment([fa_icon(x.icon, "lg"), new Section_title(x.title)]),
+      right: x.subtitle,
+    }),
+    x.body,
+    x.status ? statusbar([...x.status]) : null,
+  ]);
 }
 
 export function text_panel(x: { title: Widgetable; description: Widgetable }) {
@@ -882,11 +809,7 @@ export function padded_container(
   padding: "s" | "1x" | "lg" | "2x" | "3x" | "4x",
   children: Widgetable[]
 ) {
-  return h(
-    "div",
-    { class: "kate-ui-padded-container", "data-padding": padding },
-    [...children]
-  );
+  return h("div", { class: "kate-ui-padded-container", "data-padding": padding }, [...children]);
 }
 
 export function centered_container(child: Widgetable) {
@@ -915,11 +838,7 @@ export function dynamic(x: Observable<Widgetable>) {
 }
 
 export function hchoices(gap: number, choices: Widgetable[]) {
-  return h(
-    "div",
-    { class: "kate-ui-hchoices", style: `gap: ${gap}rem` },
-    choices
-  );
+  return h("div", { class: "kate-ui-hchoices", style: `gap: ${gap}rem` }, choices);
 }
 
 export function choice_button(
@@ -970,9 +889,7 @@ export function stack_bar(x: {
     "var(--color-5)",
   ];
   const skip_zero = x.skip_zero_value !== false;
-  const components = x.components.filter((x) =>
-    skip_zero ? x.value > 0 : true
-  );
+  const components = x.components.filter((x) => (skip_zero ? x.value > 0 : true));
   return h("div", { class: "kate-ui-stack-bar-container stack-horizontal" }, [
     h("div", { class: "kate-ui-stack-bar" }, [
       ...components.map((a, i) =>
@@ -980,9 +897,7 @@ export function stack_bar(x: {
           "div",
           {
             class: "kate-ui-stack-bar-component",
-            style: `--stack-bar-color: ${
-              colours[i % colours.length]
-            }; --stack-bar-size: ${Math.max(
+            style: `--stack-bar-color: ${colours[i % colours.length]}; --stack-bar-size: ${Math.max(
               x.minimum_component_size ?? 0,
               a.value / x.total
             )};`,
@@ -1027,29 +942,19 @@ export function cartridge_chip(cart: Cart.CartMeta | Cart.Cart) {
   const thumbnail_file =
     thumbnail_url == null
       ? null
-      : (cart as Cart.Cart).files?.find((x) => x.path === thumbnail_url) ??
-        null;
+      : (cart as Cart.Cart).files?.find((x) => x.path === thumbnail_url) ?? null;
 
   return h("div", { class: "kate-ui-cartridge-chip", "data-risk": risk }, [
     h("div", { class: "kate-ui-cartridge-chip-thumbnail" }, [
       thumbnail_file == null
         ? no_thumbnail()
-        : load_image_from_bytes(
-            "application/octet-stream",
-            thumbnail_file.data
-          ),
+        : load_image_from_bytes("application/octet-stream", thumbnail_file.data),
     ]),
     h("div", { class: "kate-ui-cartridge-chip-info" }, [
-      h("div", { class: "kate-ui-cartridge-chip-title" }, [
-        cart.metadata.presentation.title,
-      ]),
+      h("div", { class: "kate-ui-cartridge-chip-title" }, [cart.metadata.presentation.title]),
       h("div", { class: "kate-ui-cartridge-chip-id" }, [cart.id]),
-      h("div", { class: "kate-ui-cartridge-chip-meta" }, [
-        line_field("Version:", cart.version),
-      ]),
-      h("div", { class: "kate-ui-cartridge-chip-risk" }, [
-        line_field("Risk:", risk),
-      ]),
+      h("div", { class: "kate-ui-cartridge-chip-meta" }, [line_field("Version:", cart.version)]),
+      h("div", { class: "kate-ui-cartridge-chip-risk" }, [line_field("Risk:", risk)]),
     ]),
   ]);
 }

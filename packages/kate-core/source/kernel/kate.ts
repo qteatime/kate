@@ -4,20 +4,24 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { CartRuntime, KateRuntimes } from "./cart-runtime";
-import { GamepadInput } from "./gamepad";
-import { KeyboardInput } from "./input";
+import { KateRuntimes } from "./cart-runtime";
+import { KateGamepadInputSource } from "./input/input-source-gamepad";
+import { KateKeyboardInputSource } from "./input/input-source-keyboard";
 import { ConsoleOptions, VirtualConsole } from "./virtual";
 
 export class KateKernel {
   readonly runtimes: KateRuntimes;
 
-  private constructor(
-    readonly console: VirtualConsole,
-    readonly keyboard: KeyboardInput,
-    readonly gamepad: GamepadInput
-  ) {
+  private constructor(readonly console: VirtualConsole) {
     this.runtimes = new KateRuntimes(console);
+  }
+
+  get gamepad_source() {
+    return this.console.button_input.gamepad_source;
+  }
+
+  get keyboard_source() {
+    return this.console.button_input.keyboard_source;
   }
 
   static from_root(root: HTMLElement, options: Partial<ConsoleOptions>) {
@@ -30,19 +34,17 @@ export class KateKernel {
         scale_to_fit: false,
       },
     });
-    const keyboard = new KeyboardInput(console);
-    const gamepad = new GamepadInput(console);
     console.listen();
-    keyboard.listen(document.body);
-    gamepad.setup();
-    return new KateKernel(console, keyboard, gamepad);
+    return new KateKernel(console);
   }
 
   enter_trusted_mode() {
     this.console.body.classList.add("trusted-mode");
+    this.console.take_resource("trusted-mode");
   }
 
   exit_trusted_mode() {
     this.console.body.classList.remove("trusted-mode");
+    this.console.release_resource("trusted-mode");
   }
 }

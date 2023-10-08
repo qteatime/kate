@@ -18,33 +18,30 @@ export type InputKey =
   | "x"
   | "o"
   | "ltrigger"
-  | "rtrigger";
-
-export type ExtendedInputKey = InputKey | "long_menu" | "long_capture";
+  | "rtrigger"
+  | "berry"
+  | "sparkle";
 
 export class KateInput {
   #channel: KateIPC;
-  readonly on_key_pressed = new EventStream<InputKey>();
-  readonly on_extended_key_pressed = new EventStream<{
-    key: ExtendedInputKey;
+  readonly on_key_pressed = new EventStream<{
+    key: InputKey;
     is_repeat: boolean;
+    is_long_press: boolean;
   }>();
   private _paused = false;
-  private _state: Record<InputKey, number> = Object.assign(
-    Object.create(null),
-    {
-      up: 0,
-      right: 0,
-      down: 0,
-      left: 0,
-      menu: 0,
-      capture: 0,
-      x: 0,
-      o: 0,
-      ltrigger: 0,
-      rtrigger: 0,
-    }
-  );
+  private _state: Record<InputKey, number> = Object.assign(Object.create(null), {
+    up: 0,
+    right: 0,
+    down: 0,
+    left: 0,
+    menu: 0,
+    capture: 0,
+    x: 0,
+    o: 0,
+    ltrigger: 0,
+    rtrigger: 0,
+  });
   private _changed: Set<InputKey> = new Set();
   private _keys: InputKey[] = Object.keys(this._state) as any;
 
@@ -62,7 +59,6 @@ export class KateInput {
         if (is_down) {
           if (this._state[key] <= 0) {
             this._changed.add(key);
-            this.on_key_pressed.emit(key);
           }
           this._state[key] = Math.max(1, this._state[key]);
         } else {
@@ -79,9 +75,7 @@ export class KateInput {
         this._state[key] = 0;
       }
     });
-    this.#channel.events.key_pressed.listen((key) =>
-      this.on_extended_key_pressed.emit(key)
-    );
+    this.#channel.events.key_pressed.listen((key) => this.on_key_pressed.emit(key));
     this.timer.on_tick.listen(this.update_key_state);
   }
 

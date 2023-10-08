@@ -33,12 +33,7 @@ export class KateRuntimes {
   from_cartridge(cart: Cart.CartMeta, env: RuntimeEnvConfig): CartRuntime {
     switch (cart.runtime.type) {
       case "web-archive":
-        return new CR_Web_archive(
-          this.console,
-          cart.metadata,
-          cart.runtime,
-          env
-        );
+        return new CR_Web_archive(this.console, cart.metadata, cart.runtime, env);
 
       default:
         throw new Error(`Unsupported cartridge`);
@@ -63,10 +58,7 @@ class UpdateTimeLoop {
   private last_stored: Date | null = null;
   private handler: any = null;
 
-  constructor(
-    readonly start_time: Date,
-    readonly on_update: (time: number) => void
-  ) {}
+  constructor(readonly start_time: Date, readonly on_update: (time: number) => void) {}
 
   start() {
     this.handler = setTimeout(this.tick, this.UPDATE_FREQUENCY);
@@ -80,8 +72,7 @@ class UpdateTimeLoop {
 
   private update() {
     const now = new Date();
-    const elapsed =
-      now.getTime() - (this.last_stored ?? this.start_time).getTime();
+    const elapsed = now.getTime() - (this.last_stored ?? this.start_time).getTime();
     this.last_stored = now;
     this.on_update(elapsed);
   }
@@ -173,7 +164,7 @@ export class CR_Web_archive extends CartRuntime {
     (frame as any).csp =
       "default-src data: blob: 'unsafe-inline' 'unsafe-eval' 'unsafe-inline' 'wasm-unsafe-eval'; navigate-to 'none'";
 
-    this.console.on_input_changed.listen((ev) => {
+    this.console.button_input.on_state_changed.listen((ev) => {
       if (env.is_foreground(env.cart)) {
         channel.send({
           type: "kate:input-state-changed",
@@ -184,33 +175,34 @@ export class CR_Web_archive extends CartRuntime {
     });
 
     let recording = false;
-    this.console.on_key_pressed.listen((key) => {
+    this.console.button_input.on_button_pressed.listen((key) => {
       if (env.is_foreground(env.cart)) {
         channel.send({
           type: "kate:input-key-pressed",
           key: key,
+          is_repeat: key.is_repeat,
+          is_long_press: key.is_long_press,
         });
         if (key.key === "capture") {
-          const token = make_id();
-          env.capture_tokens.add(token);
-          channel.send({ type: "kate:take-screenshot", token });
-        }
-        if (key.key === "long_capture") {
-          recording = !recording;
-          if (recording) {
+          if (key.is_long_press) {
+            recording = !recording;
+            if (recording) {
+              const token = make_id();
+              env.capture_tokens.add(token);
+              channel.send({ type: "kate:start-recording", token });
+            } else {
+              channel.send({ type: "kate:stop-recording" });
+            }
+          } else {
             const token = make_id();
             env.capture_tokens.add(token);
-            channel.send({ type: "kate:start-recording", token });
-          } else {
-            channel.send({ type: "kate:stop-recording" });
+            channel.send({ type: "kate:take-screenshot", token });
           }
         }
       }
     });
 
-    frame.src = URL.createObjectURL(
-      new Blob([await this.proxy_html(env)], { type: "text/html" })
-    );
+    frame.src = URL.createObjectURL(new Blob([await this.proxy_html(env)], { type: "text/html" }));
     frame.scrolling = "no";
     const process = new CRW_Process(this, env);
     process.setup();

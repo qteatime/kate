@@ -4,17 +4,17 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
+import { KateButton } from "../../kernel";
 import { EventStream } from "../../utils";
-import { ExtendedInputKey, InputKey } from "../../kernel/virtual";
 import type { KateOS } from "../os";
 
 export type InteractionHandler = {
-  key: InputKey[];
+  key: KateButton[];
   allow_repeat?: boolean;
   on_click?: boolean;
   on_menu?: boolean;
   label: string;
-  handler: (key: InputKey, is_repeat: boolean) => void;
+  handler: (key: KateButton, is_repeat: boolean) => void;
   enabled?: () => boolean;
 };
 
@@ -28,7 +28,7 @@ export class KateFocusHandler {
   private _previous_traps: FocusInteraction | null = null;
   private _handlers: {
     root: HTMLElement;
-    handler: (ev: { key: ExtendedInputKey; is_repeat: boolean }) => boolean;
+    handler: (ev: { key: KateButton; is_repeat: boolean; is_long_press: boolean }) => boolean;
   }[] = [];
   readonly on_focus_changed = new EventStream<HTMLElement | null>();
   readonly on_traps_changed = new EventStream<FocusInteraction | null>();
@@ -37,30 +37,28 @@ export class KateFocusHandler {
   constructor(readonly os: KateOS) {}
 
   setup() {
-    this.os.kernel.console.on_key_pressed.listen(this.handle_input);
+    this.os.kernel.console.button_input.on_button_pressed.listen(this.handle_input);
   }
 
   listen(
     root: HTMLElement,
-    handler: (ev: { key: ExtendedInputKey; is_repeat: boolean }) => boolean
+    handler: (ev: { key: KateButton; is_repeat: boolean; is_long_press: boolean }) => boolean
   ) {
     this._handlers.push({ root, handler });
   }
 
   remove(
     root: HTMLElement,
-    handler: (ev: { key: ExtendedInputKey; is_repeat: boolean }) => boolean
+    handler: (ev: { key: KateButton; is_repeat: boolean; is_long_press: boolean }) => boolean
   ) {
-    this._handlers = this._handlers.filter(
-      (x) => x.root !== root && x.handler !== handler
-    );
+    this._handlers = this._handlers.filter((x) => x.root !== root && x.handler !== handler);
   }
 
   register_interactive(element: HTMLElement, interactions: FocusInteraction) {
     this.interactives.set(element, interactions);
   }
 
-  private should_handle(key: ExtendedInputKey) {
+  private should_handle(key: KateButton) {
     return ["up", "down", "left", "right", "o"].includes(key);
   }
 
@@ -101,9 +99,11 @@ export class KateFocusHandler {
   handle_input = ({
     key,
     is_repeat,
+    is_long_press,
   }: {
-    key: ExtendedInputKey;
+    key: KateButton;
     is_repeat: boolean;
+    is_long_press: boolean;
   }) => {
     if (this._current_root == null) {
       return;
@@ -111,7 +111,7 @@ export class KateFocusHandler {
 
     for (const { root, handler } of this._handlers) {
       if (this._current_root === root) {
-        if (handler({ key, is_repeat })) {
+        if (handler({ key, is_repeat, is_long_press })) {
           return;
         }
       }
@@ -123,18 +123,18 @@ export class KateFocusHandler {
       if (traps != null) {
         const trap = traps.handlers.find(
           (x) =>
-            x.key.includes(key as InputKey) &&
+            x.key.includes(key as KateButton) &&
             (!is_repeat || x.allow_repeat) &&
             (x.enabled == null || x.enabled())
         );
         if (trap != null) {
-          trap.handler(key as InputKey, is_repeat);
+          trap.handler(key as KateButton, is_repeat);
           return;
         }
       }
     }
 
-    if ((key === "capture" || key === "long_capture") && !is_repeat) {
+    if (key === "capture" && !is_repeat) {
       this.os.notifications.push_transient(
         "kate:focus-manager",
         "Capture unsupported",
@@ -148,9 +148,7 @@ export class KateFocusHandler {
     }
 
     const focusable = (
-      Array.from(
-        this._current_root.querySelectorAll(".kate-ui-focus-target")
-      ) as HTMLElement[]
+      Array.from(this._current_root.querySelectorAll(".kate-ui-focus-target")) as HTMLElement[]
     ).map((x) => {
       const rect = x.getBoundingClientRect();
 
@@ -169,9 +167,7 @@ export class KateFocusHandler {
     const right_limit = Math.max(...focusable.map((x) => x.position.right));
     const bottom_limit = Math.max(...focusable.map((x) => x.position.bottom));
 
-    const current = focusable.find((x) =>
-      x.element.classList.contains("focus")
-    );
+    const current = focusable.find((x) => x.element.classList.contains("focus"));
     const left = current?.position.x ?? -1;
     const top = current?.position.y ?? -1;
     const right = current?.position.right ?? right_limit + 1;
@@ -191,8 +187,7 @@ export class KateFocusHandler {
           .filter((x) => x.position.bottom < bottom)
           .sort((a, b) => b.position.bottom - a.position.bottom);
         const closest = candidates.sort(
-          (a, b) =>
-            Math.abs(a.position.x - left) - Math.abs(b.position.x - left)
+          (a, b) => Math.abs(a.position.x - left) - Math.abs(b.position.x - left)
         );
         this.focus(closest[0]?.element, key);
         break;
@@ -203,8 +198,7 @@ export class KateFocusHandler {
           .filter((x) => x.position.y > top)
           .sort((a, b) => a.position.y - b.position.y);
         const closest = candidates.sort(
-          (a, b) =>
-            Math.abs(a.position.x - left) - Math.abs(b.position.x - left)
+          (a, b) => Math.abs(a.position.x - left) - Math.abs(b.position.x - left)
         );
         this.focus(closest[0]?.element, key);
         break;
@@ -240,18 +234,14 @@ export class KateFocusHandler {
     }
 
     const root = container ?? this._current_root;
-    const candidates0 = Array.from(
-      root.querySelectorAll(".kate-ui-focus-target")
-    ) as HTMLElement[];
-    const candidates1 = candidates0.map(
-      (x) => [x.getBoundingClientRect(), x] as const
-    );
+    const candidates0 = Array.from(root.querySelectorAll(".kate-ui-focus-target")) as HTMLElement[];
+    const candidates1 = candidates0.map((x) => [x.getBoundingClientRect(), x] as const);
     const candidates = candidates1.sort(([ra, _], [rb, __]) => ra.top - rb.top);
     const candidate = candidates[0]?.[1];
     this.focus(candidate);
   }
 
-  focus(element: HTMLElement | null, key: ExtendedInputKey | null = null) {
+  focus(element: HTMLElement | null, key: KateButton | null = null) {
     if (element == null || this._current_root == null) {
       if (key != null) {
         this.os.sfx.play("invalid");

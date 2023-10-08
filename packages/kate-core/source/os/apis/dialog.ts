@@ -4,8 +4,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
+import { KateButton } from "../../kernel";
 import { Deferred, defer } from "../../utils";
-import type { ExtendedInputKey } from "../../kernel";
 import type { KateOS } from "../os";
 import { wait } from "../time";
 import * as UI from "../ui";
@@ -62,11 +62,7 @@ export class KateDialog {
     }
   }
 
-  async progress(
-    id: string,
-    message: UI.Widgetable,
-    process: (_: Progress) => Promise<void>
-  ) {
+  async progress(id: string, message: UI.Widgetable, process: (_: Progress) => Promise<void>) {
     const hud = new HUD_Dialog(this, "progress");
     try {
       this.os.push_scene(hud);
@@ -136,28 +132,20 @@ export class KateDialog {
           ),
         ]),
         UI.h("div", { class: "kate-hud-dialog-actions" }, [
-          UI.h(
-            "div",
-            { class: "kate-hud-dialog-action", "data-kind": "cancel" },
-            [
-              UI.button("Cancel", {
-                on_clicked: () => {
-                  deferred.resolve(null);
-                },
-              }),
-            ]
-          ),
-          UI.h(
-            "div",
-            { class: "kate-hud-dialog-action", "data-kind": "primary" },
-            [
-              UI.button("Ok", {
-                on_clicked: () => {
-                  deferred.resolve(input.value);
-                },
-              }),
-            ]
-          ),
+          UI.h("div", { class: "kate-hud-dialog-action", "data-kind": "cancel" }, [
+            UI.button("Cancel", {
+              on_clicked: () => {
+                deferred.resolve(null);
+              },
+            }),
+          ]),
+          UI.h("div", { class: "kate-hud-dialog-action", "data-kind": "primary" }, [
+            UI.button("Ok", {
+              on_clicked: () => {
+                deferred.resolve(input.value);
+              },
+            }),
+          ]),
         ]),
       ],
       null,
@@ -175,12 +163,7 @@ export class KateDialog {
   ): Deferred<A> {
     const hud = new HUD_Dialog(this, description);
     this.os.push_scene(hud);
-    const deferred = hud.custom(
-      id,
-      `kate-hud-dialog-custom ${className}`,
-      contents,
-      cancel_value
-    );
+    const deferred = hud.custom(id, `kate-hud-dialog-custom ${className}`, contents, cancel_value);
     deferred.promise.finally(() => {
       this.os.pop_scene(hud);
     });
@@ -221,8 +204,7 @@ export class Progress {
 
   set_message(message: string) {
     this._message = message;
-    this.canvas.querySelector(".kate-ui-progress-message")!.textContent =
-      message;
+    this.canvas.querySelector(".kate-ui-progress-message")!.textContent = message;
   }
 }
 
@@ -231,11 +213,7 @@ export class HUD_Dialog extends Scene {
 
   constructor(readonly manager: KateDialog, readonly description = "dialog") {
     super(manager.os, false);
-    (this as any).canvas = UI.h(
-      "div",
-      { class: "kate-hud-dialog", "data-title": description },
-      []
-    );
+    (this as any).canvas = UI.h("div", { class: "kate-hud-dialog", "data-title": description }, []);
   }
 
   render() {
@@ -246,11 +224,7 @@ export class HUD_Dialog extends Scene {
     return id.startsWith("kate:");
   }
 
-  async progress(
-    id: string,
-    message: UI.Widgetable,
-    process: (_: Progress) => Promise<void>
-  ) {
+  async progress(id: string, message: UI.Widgetable, process: (_: Progress) => Promise<void>) {
     const progress = new Progress(message);
     const element = UI.h(
       "div",
@@ -301,11 +275,7 @@ export class HUD_Dialog extends Scene {
                 class: "kate-hud-dialog-action",
                 "data-kind": x.kind ?? "cancel",
               },
-              [
-                new UI.Button([x.label]).on_clicked(() =>
-                  result.resolve(x.value)
-                ),
-              ]
+              [new UI.Button([x.label]).on_clicked(() => result.resolve(x.value))]
             );
           }),
         ]),
@@ -315,12 +285,7 @@ export class HUD_Dialog extends Scene {
     return result.promise;
   }
 
-  custom<A>(
-    id: string,
-    className: string,
-    content: UI.Widgetable[],
-    cancel_value: A
-  ) {
+  custom<A>(id: string, className: string, content: UI.Widgetable[], cancel_value: A) {
     const result = defer<A>();
     const dialog = UI.h(
       "div",
@@ -341,10 +306,7 @@ export class HUD_Dialog extends Scene {
     try {
       this.canvas.textContent = "";
       this.canvas.appendChild(dialog);
-      const key_handler = (x: {
-        key: ExtendedInputKey;
-        is_repeat: boolean;
-      }) => {
+      const key_handler = (x: { key: KateButton; is_repeat: boolean }) => {
         if (x.key === "x" && !x.is_repeat) {
           result.resolve(cancel_value);
           return true;
@@ -386,11 +348,7 @@ export class HUD_Dialog extends Scene {
                 {
                   class: "kate-hud-dialog-pop-menu-action",
                 },
-                [
-                  new UI.Button([x.label]).on_clicked(() =>
-                    result.resolve(x.value)
-                  ),
-                ]
+                [new UI.Button([x.label]).on_clicked(() => result.resolve(x.value))]
               );
             }),
           ]),

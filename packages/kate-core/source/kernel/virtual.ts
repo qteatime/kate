@@ -5,25 +5,10 @@
  */
 
 import { EventStream, unreachable } from "../utils";
+import { KateButtonInputAggregator } from "./input/button-input";
 const pkg = require("../../package.json");
 
-export type InputKey =
-  | "up"
-  | "right"
-  | "down"
-  | "left"
-  | "menu"
-  | "capture"
-  | "x"
-  | "o"
-  | "ltrigger"
-  | "rtrigger";
-
-export type SpecialInputKey = "menu" | "capture";
-
-export type ExtendedInputKey = InputKey | `long_${SpecialInputKey}`;
-
-export type Resource = "screen-recording" | "transient-storage" | "low-storage";
+export type Resource = "screen-recording" | "transient-storage" | "low-storage" | "trusted-mode";
 
 export type ConsoleCase = {
   type: "handheld" | "tv" | "fullscreen";
@@ -38,16 +23,8 @@ export type ConsoleOptions = {
 };
 
 export class VirtualConsole {
-  private up_button: HTMLElement;
-  private right_button: HTMLElement;
-  private down_button: HTMLElement;
-  private left_button: HTMLElement;
-  private menu_button: HTMLElement;
-  private capture_button: HTMLElement;
-  private x_button: HTMLElement;
-  private o_button: HTMLElement;
-  private ltrigger_button: HTMLElement;
-  private rtrigger_button: HTMLElement;
+  readonly button_input = new KateButtonInputAggregator();
+
   private is_listening = false;
   private _case: ConsoleCase;
   readonly body: HTMLElement;
@@ -57,15 +34,6 @@ export class VirtualConsole {
   readonly version_container: HTMLElement | null;
   readonly resources_container: HTMLElement;
   readonly version = pkg?.version == null ? null : `v${pkg.version}`;
-  readonly on_input_changed = new EventStream<{
-    key: InputKey;
-    is_down: boolean;
-  }>();
-  readonly on_key_pressed = new EventStream<{
-    key: ExtendedInputKey;
-    is_repeat: boolean;
-  }>();
-  readonly on_virtual_button_touched = new EventStream<InputKey>();
   readonly on_tick = new EventStream<number>();
   readonly audio_context = new AudioContext();
   readonly resources = new Map<Resource, number>();
@@ -73,73 +41,22 @@ export class VirtualConsole {
   private timer_id: any = null;
   private last_time: number | null = null;
 
-  readonly SPECIAL_FRAMES = 15;
-  readonly REPEAT_FRAMES = 10;
   readonly FPS = 30;
   readonly ONE_FRAME = Math.ceil(1000 / 30);
-
-  private input_state!: Record<InputKey, { pressed: boolean; count: number }>;
-  private keys: InputKey[] = [
-    "up",
-    "right",
-    "down",
-    "left",
-    "x",
-    "o",
-    "ltrigger",
-    "rtrigger",
-  ];
-  private special_keys: InputKey[] = ["menu", "capture"];
 
   constructor(readonly root: HTMLElement, readonly options: ConsoleOptions) {
     this._case = options.case;
 
-    this.up_button = root.querySelector(".kate-dpad-up")!;
-    this.right_button = root.querySelector(".kate-dpad-right")!;
-    this.down_button = root.querySelector(".kate-dpad-down")!;
-    this.left_button = root.querySelector(".kate-dpad-left")!;
-    this.menu_button = root.querySelector(".kate-area-menu")!;
-    this.capture_button = root.querySelector(".kate-area-capture")!;
-    this.x_button = root.querySelector(".kate-button-x")!;
-    this.o_button = root.querySelector(".kate-button-o")!;
-    this.ltrigger_button = root.querySelector(".kate-trigger-left")!;
-    this.rtrigger_button = root.querySelector(".kate-trigger-right")!;
     this.os_root = root.querySelector("#kate-os-root")!;
     this.hud = root.querySelector("#kate-hud")!;
     this.device_display = root.querySelector(".kate-screen")!;
-    this.body = root.querySelector(".kate-body")!;
-    this.version_container = root.querySelector(".kate-version");
-    this.resources_container = root.querySelector(".kate-resources")!;
+    this.body = root.querySelector(".kc-body")!;
+    this.version_container = root.querySelector("#kate-version");
+    this.resources_container = root.querySelector("#kate-resources")!;
     if (this.version_container != null && this.version != null) {
       this.version_container.textContent = this.version;
     }
     this.open_audio_output();
-    this.reset_states();
-  }
-
-  private reset_states() {
-    this.input_state = {
-      up: { pressed: false, count: 0 },
-      right: { pressed: false, count: 0 },
-      down: { pressed: false, count: 0 },
-      left: { pressed: false, count: 0 },
-      menu: { pressed: false, count: 0 },
-      capture: { pressed: false, count: 0 },
-      x: { pressed: false, count: 0 },
-      o: { pressed: false, count: 0 },
-      ltrigger: { pressed: false, count: 0 },
-      rtrigger: { pressed: false, count: 0 },
-    };
-    this.up_button.classList.remove("down");
-    this.right_button.classList.remove("down");
-    this.down_button.classList.remove("down");
-    this.left_button.classList.remove("down");
-    this.menu_button.classList.remove("down");
-    this.capture_button.classList.remove("down");
-    this.x_button.classList.remove("down");
-    this.o_button.classList.remove("down");
-    this.ltrigger_button.classList.remove("down");
-    this.rtrigger_button.classList.remove("down");
   }
 
   private start_ticking() {
@@ -165,7 +82,7 @@ export class VirtualConsole {
   private tick = (time: number) => {
     if (this.last_time == null) {
       this.last_time = time;
-      this.on_tick.emit(time);
+      this.do_tick(time);
       this.timer_id = requestAnimationFrame(this.tick);
       return;
     }
@@ -175,11 +92,17 @@ export class VirtualConsole {
     if (elapsed < this.ONE_FRAME) {
       this.timer_id = requestAnimationFrame(this.tick);
     } else {
-      this.last_time = time;
-      this.on_tick.emit(time);
+      this.do_tick(time);
       this.timer_id = requestAnimationFrame(this.tick);
     }
   };
+
+  private do_tick(time: number) {
+    this.last_time = time;
+    this.button_input.update(time);
+    this.on_tick.emit(time);
+    this.button_input.tick();
+  }
 
   get case() {
     return Case.from_configuration(this._case);
@@ -190,17 +113,11 @@ export class VirtualConsole {
   }
 
   get active() {
-    return (
-      this.options.mode === "native" ||
-      (navigator.userActivation?.isActive ?? true)
-    );
+    return this.options.mode === "native" || (navigator.userActivation?.isActive ?? true);
   }
 
   get sticky_active() {
-    return (
-      this.options.mode === "native" ||
-      (navigator.userActivation?.hasBeenActive ?? true)
-    );
+    return this.options.mode === "native" || (navigator.userActivation?.hasBeenActive ?? true);
   }
 
   vibrate(pattern: number | number[]) {
@@ -211,61 +128,25 @@ export class VirtualConsole {
 
   listen() {
     if (this.is_listening) {
-      throw new Error(`listen called twice`);
+      throw new Error(`[kate:virtual] listen called twice`);
     }
     this.is_listening = true;
 
     window.addEventListener("load", () => this.update_scale(null));
     window.addEventListener("resize", () => this.update_scale(null));
     window.addEventListener("orientationchange", () => this.update_scale(null));
-    (screen as any).addEventListener?.("orientationchange", () =>
-      this.update_scale(null)
-    );
+    (screen as any).addEventListener?.("orientationchange", () => this.update_scale(null));
     this.update_scale(null);
 
-    const listen_button = (button: HTMLElement, key: InputKey) => {
-      button.addEventListener("mousedown", (ev) => {
-        ev.preventDefault();
-        this.update_virtual_key(key, true);
-      });
-      button.addEventListener("mouseup", (ev) => {
-        ev.preventDefault();
-        this.update_virtual_key(key, false);
-      });
-      button.addEventListener(
-        "touchstart",
-        (ev) => {
-          ev.preventDefault();
-          this.on_virtual_button_touched.emit(key);
-          this.update_virtual_key(key, true);
-        },
-        { passive: false }
-      );
-      button.addEventListener("touchend", (ev) => {
-        ev.preventDefault();
-        this.update_virtual_key(key, false);
-      });
-    };
-
-    listen_button(this.up_button, "up");
-    listen_button(this.right_button, "right");
-    listen_button(this.down_button, "down");
-    listen_button(this.left_button, "left");
-    listen_button(this.menu_button, "menu");
-    listen_button(this.capture_button, "capture");
-    listen_button(this.x_button, "x");
-    listen_button(this.o_button, "o");
-    listen_button(this.ltrigger_button, "ltrigger");
-    listen_button(this.rtrigger_button, "rtrigger");
+    this.button_input.setup(this.root);
 
     document.addEventListener("visibilitychange", () => {
       if (document.hidden) {
-        this.reset_all_keys();
+        this.button_input.reset();
       }
     });
 
     this.start_ticking();
-    this.on_tick.listen(this.key_update_loop);
   }
 
   set_case(kase: ConsoleCase) {
@@ -284,96 +165,11 @@ export class VirtualConsole {
   async request_fullscreen() {
     try {
       await document.body.requestFullscreen({ navigationUI: "hide" });
-      await screen.orientation.lock("landscape").catch((_) => {});
+      await (screen.orientation as any).lock("landscape").catch((_: any) => {}); // FIXME:
       return true;
     } catch (error) {
-      console.warn(
-        `[Kate] locking orientation in fullscreen not supported`,
-        error
-      );
+      console.warn(`[Kate] locking orientation in fullscreen not supported`, error);
       return false;
-    }
-  }
-
-  private key_update_loop = (time: number) => {
-    for (const key of this.keys) {
-      this.update_single_key(key, false);
-    }
-    for (const key of this.special_keys) {
-      this.update_single_key(key, true);
-    }
-  };
-
-  reset_all_keys() {
-    for (const key of this.keys) {
-      this.update_virtual_key(key, false);
-    }
-  }
-
-  private update_single_key(key: InputKey, special: boolean) {
-    const x = this.input_state[key];
-    if (x.pressed) {
-      x.count = (x.count + 1) >>> 0 || 2;
-      if (special && x.count >= this.SPECIAL_FRAMES) {
-        x.count = 0;
-        x.pressed = false;
-        this.on_key_pressed.emit({
-          key: `long_${key as SpecialInputKey}`,
-          is_repeat: false,
-        });
-        this.render_button_state(key, false);
-      } else if (!special && x.count === 1) {
-        this.on_input_changed.emit({ key, is_down: true });
-        this.on_key_pressed.emit({ key, is_repeat: false });
-      } else if (!special && x.count % this.REPEAT_FRAMES === 0) {
-        this.on_key_pressed.emit({ key, is_repeat: true });
-      }
-    } else {
-      if (special) {
-        if (x.count === -1) {
-          this.on_input_changed.emit({ key, is_down: false });
-          x.count = 0;
-        } else if (x.count > 0 && x.count < this.SPECIAL_FRAMES) {
-          this.on_input_changed.emit({ key, is_down: true });
-          this.on_key_pressed.emit({ key, is_repeat: false });
-          x.count = -1;
-        }
-      } else if (x.count > 0) {
-        x.count = 0;
-        this.on_input_changed.emit({ key, is_down: false });
-      }
-    }
-  }
-
-  update_virtual_key(key: InputKey, state: boolean) {
-    const x = this.input_state[key];
-    if (x.pressed !== state) {
-      x.pressed = state;
-      if (state) {
-        x.count = 0;
-      }
-      this.render_button_state(key, state);
-    }
-  }
-
-  private render_button_state(key: InputKey, state: boolean) {
-    const button = {
-      up: this.up_button,
-      right: this.right_button,
-      down: this.down_button,
-      left: this.left_button,
-      menu: this.menu_button,
-      capture: this.capture_button,
-      x: this.x_button,
-      o: this.o_button,
-      ltrigger: this.ltrigger_button,
-      rtrigger: this.rtrigger_button,
-    }[key];
-
-    if (state) {
-      button.classList.add("down");
-    } else {
-      button.classList.remove("down");
     }
   }
 
@@ -485,11 +281,6 @@ abstract class Case {
 
 class HandheldCase extends Case {
   readonly case_type = "handheld";
-  readonly screen_bevel = 10;
-  readonly case_padding = 25;
-  readonly side_padding = 250;
-  readonly depth_padding = 10;
-  readonly shoulder_padding = 20;
 
   get screen_scale() {
     return Case.BASE_HEIGHT / this.resolution;
@@ -497,12 +288,8 @@ class HandheldCase extends Case {
 
   get padding() {
     return {
-      horizontal: this.screen_bevel * 2 + this.side_padding * 2,
-      vertical:
-        this.screen_bevel * 2 +
-        this.case_padding * 2 +
-        this.depth_padding +
-        this.shoulder_padding,
+      horizontal: 240,
+      vertical: 10,
     };
   }
 }
@@ -516,8 +303,7 @@ class TvCase extends Case {
   get padding() {
     return {
       horizontal: this.screen_bevel * 2 + this.case_padding * 2,
-      vertical:
-        this.screen_bevel * 2 + this.case_padding * 2 + this.depth_padding,
+      vertical: this.screen_bevel * 2 + this.case_padding * 2 + this.depth_padding,
     };
   }
 }

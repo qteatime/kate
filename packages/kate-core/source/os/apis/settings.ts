@@ -7,7 +7,7 @@
 import { RiskCategory } from "../../capabilities";
 import * as Db from "../../data";
 import type { Database } from "../../db-schema";
-import type { ConsoleCase, GamepadMapping, InputKey } from "../../kernel";
+import type { ConsoleCase, GamepadMapping, KateButton } from "../../kernel";
 import { EventStream } from "../../utils";
 
 export type PlayHabits = {
@@ -17,7 +17,7 @@ export type PlayHabits = {
 
 export type KeyboardToKate = {
   key: string;
-  button: InputKey;
+  button: KateButton;
 };
 
 export type Input = {
@@ -99,7 +99,7 @@ const defaults: SettingsData = {
         button: "menu",
       },
       {
-        key: "KeyC",
+        key: "KeyF",
         button: "capture",
       },
       {
@@ -117,6 +117,14 @@ const defaults: SettingsData = {
       {
         key: "KeyS",
         button: "rtrigger",
+      },
+      {
+        key: "KeyC",
+        button: "sparkle",
+      },
+      {
+        key: "KeyQ",
+        button: "berry",
       },
     ],
     gamepad_mapping: {
@@ -144,7 +152,7 @@ const defaults: SettingsData = {
         {
           type: "button",
           index: 9,
-          pressed: "menu",
+          pressed: "berry",
         },
         {
           type: "button",
@@ -160,6 +168,16 @@ const defaults: SettingsData = {
           type: "button",
           index: 1,
           pressed: "o",
+        },
+        {
+          type: "button",
+          index: 2,
+          pressed: "sparkle",
+        },
+        {
+          type: "button",
+          index: 3,
+          pressed: "menu",
         },
         {
           type: "button",
@@ -202,9 +220,7 @@ export type ChangedSetting<K extends keyof SettingsData> = {
 
 export class KateSettings {
   private _data: SettingsData | null = null;
-  readonly on_settings_changed = new EventStream<
-    ChangedSetting<keyof SettingsData>
-  >();
+  readonly on_settings_changed = new EventStream<ChangedSetting<keyof SettingsData>>();
 
   static defaults = defaults;
 
@@ -228,22 +244,18 @@ export class KateSettings {
   }
 
   async load() {
-    this._data = await this.db.transaction(
-      [Db.settings],
-      "readonly",
-      async (t) => {
-        const settings = t.get_table1(Db.settings);
+    this._data = await this.db.transaction([Db.settings], "readonly", async (t) => {
+      const settings = t.get_table1(Db.settings);
 
-        const result: SettingsData = Object.create(null);
-        for (const [key, default_value] of Object.entries(defaults)) {
-          const stored = await settings.try_get(key);
-          const value = { ...default_value, ...(stored?.data ?? {}) };
-          result[key as keyof SettingsData] = value;
-        }
-
-        return result;
+      const result: SettingsData = Object.create(null);
+      for (const [key, default_value] of Object.entries(defaults)) {
+        const stored = await settings.try_get(key);
+        const value = { ...default_value, ...(stored?.data ?? {}) };
+        result[key as keyof SettingsData] = value;
       }
-    );
+
+      return result;
+    });
   }
 
   async update<K extends keyof SettingsData>(

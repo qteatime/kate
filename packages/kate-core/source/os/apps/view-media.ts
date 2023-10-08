@@ -7,20 +7,16 @@
 import type { KateOS } from "../os";
 import { h } from "../ui/widget";
 import * as UI from "../ui/widget";
-import type { ExtendedInputKey } from "../../kernel";
 import * as Db from "../../data";
 import { unreachable } from "../../utils";
 import { SceneMedia } from "./media";
 import { Scene } from "../ui/scenes";
+import { KateButton } from "../../kernel";
 
 export class SceneViewMedia extends Scene {
   private url: string | null = null;
 
-  constructor(
-    os: KateOS,
-    readonly media_list: SceneMedia,
-    readonly media: Db.Media
-  ) {
+  constructor(os: KateOS, readonly media_list: SceneMedia, readonly media: Db.Media) {
     super(os, true);
   }
 
@@ -92,7 +88,7 @@ export class SceneViewMedia extends Scene {
     }
   }
 
-  handle_key_pressed = (x: { key: ExtendedInputKey; is_repeat: boolean }) => {
+  handle_key_pressed = (x: { key: KateButton; is_repeat: boolean }) => {
     if (x.is_repeat) {
       return false;
     }
@@ -190,11 +186,7 @@ export class SceneViewMedia extends Scene {
         message: `Media deleted`,
         extra: { id: this.media.id },
       });
-      await this.os.notifications.push_transient(
-        "kate:media",
-        `Media deleted`,
-        ""
-      );
+      await this.os.notifications.push_transient("kate:media", `Media deleted`, "");
       this.media_list.mark_deleted(this.media.id!);
       this.close();
     }

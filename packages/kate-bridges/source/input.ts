@@ -55,12 +55,7 @@ void (function () {
     paused = state;
   });
 
-  function listen(
-    this: any,
-    type: string,
-    listener: EventListener,
-    options: any
-  ) {
+  function listen(this: any, type: string, listener: EventListener, options: any) {
     if (type === "keydown") {
       down_listeners.push(listener);
     } else if (type === "keyup") {

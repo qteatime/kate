@@ -7,8 +7,8 @@
 import * as UI from "../../ui";
 import type { KateOS } from "../../os";
 import { KeyboardToKate, SettingsData } from "../../apis/settings";
-import { InputKey } from "../../../kernel";
 import { Deferred, Observable, defer } from "../../../utils";
+import { ButtonChangeEvent, KateButton } from "../../../kernel";
 
 export class KeyboardInputSettings extends UI.SimpleScene {
   icon = "keyboard";
@@ -44,11 +44,9 @@ export class KeyboardInputSettings extends UI.SimpleScene {
   };
 
   body_container(body: UI.Widgetable[]): HTMLElement {
-    return UI.h(
-      "div",
-      { class: "kate-keyboard-mapping kate-os-content kate-os-screen-body" },
-      [...body]
-    );
+    return UI.h("div", { class: "kate-keyboard-mapping kate-os-content kate-os-screen-body" }, [
+      ...body,
+    ]);
   }
 
   body() {
@@ -56,11 +54,9 @@ export class KeyboardInputSettings extends UI.SimpleScene {
       UI.h("div", { class: "kate-keyboard-mapping-main" }, [
         UI.h("div", { class: "kate-wireframe" }, [
           UI.h("div", { class: "kate-wireframe-dpad" }, [
-            UI.h(
-              "div",
-              { class: "kate-wireframe-dpad-button kate-wireframe-dpad-up" },
-              [this.keymap("up")]
-            ),
+            UI.h("div", { class: "kate-wireframe-dpad-button kate-wireframe-dpad-up" }, [
+              this.keymap("up"),
+            ]),
             UI.h(
               "div",
               {
@@ -83,11 +79,9 @@ export class KeyboardInputSettings extends UI.SimpleScene {
               [this.keymap("left")]
             ),
           ]),
-          UI.h(
-            "div",
-            { class: "kate-wireframe-shoulder kate-wireframe-shoulder-left" },
-            [this.keymap("ltrigger")]
-          ),
+          UI.h("div", { class: "kate-wireframe-shoulder kate-wireframe-shoulder-left" }, [
+            this.keymap("ltrigger"),
+          ]),
           UI.h(
             "div",
             {
@@ -95,27 +89,19 @@ export class KeyboardInputSettings extends UI.SimpleScene {
             },
             [this.keymap("rtrigger")]
           ),
-          UI.h(
-            "div",
-            { class: "kate-wireframe-special kate-wireframe-special-left" },
-            [this.keymap("capture")]
-          ),
-          UI.h(
-            "div",
-            { class: "kate-wireframe-special kate-wireframe-special-right" },
-            [this.keymap("menu")]
-          ),
+          UI.h("div", { class: "kate-wireframe-special kate-wireframe-special-left" }, [
+            this.keymap("capture"),
+          ]),
+          UI.h("div", { class: "kate-wireframe-special kate-wireframe-special-right" }, [
+            this.keymap("menu"),
+          ]),
           UI.h("div", { class: "kate-wireframe-buttons" }, [
-            UI.h(
-              "div",
-              { class: "kate-wireframe-button kate-wireframe-button-x" },
-              [this.keymap("x")]
-            ),
-            UI.h(
-              "div",
-              { class: "kate-wireframe-button kate-wireframe-button-o" },
-              [this.keymap("o")]
-            ),
+            UI.h("div", { class: "kate-wireframe-button kate-wireframe-button-x" }, [
+              this.keymap("x"),
+            ]),
+            UI.h("div", { class: "kate-wireframe-button kate-wireframe-button-o" }, [
+              this.keymap("o"),
+            ]),
           ]),
         ]),
       ]),
@@ -144,7 +130,7 @@ export class KeyboardInputSettings extends UI.SimpleScene {
 
   revert_defaults() {
     this._mapping = this.os.settings.defaults.input.keyboard_mapping.slice();
-    const keys: InputKey[] = [
+    const keys: KateButton[] = [
       "up",
       "right",
       "down",
@@ -176,17 +162,13 @@ export class KeyboardInputSettings extends UI.SimpleScene {
       message: "Updated keyboard mapping",
       extra: this._mapping,
     });
-    this.os.kernel.keyboard.remap(this._mapping);
+    this.os.kernel.keyboard_source.remap(this._mapping);
     this.close();
   };
 
-  keymap(key: InputKey) {
+  keymap(key: KateButton) {
     const kbd = this._mapping.find((x) => x.button === key);
-    const container = UI.h(
-      "div",
-      { class: "kate-wireframe-mapping-button", "data-key": key },
-      []
-    );
+    const container = UI.h("div", { class: "kate-wireframe-mapping-button", "data-key": key }, []);
     const update = async (key: string | null) => {
       container.setAttribute("title", key ?? "");
       container.textContent = "";
@@ -215,7 +197,7 @@ export class KeyboardInputSettings extends UI.SimpleScene {
     ]);
   }
 
-  async update_key_mapping(key: InputKey, kbd: string | null) {
+  async update_key_mapping(key: KateButton, kbd: string | null) {
     const container = this.canvas.querySelector(
       `.kate-wireframe-mapping-button[data-key=${JSON.stringify(key)}]`
     );
@@ -226,11 +208,9 @@ export class KeyboardInputSettings extends UI.SimpleScene {
     }
   }
 
-  async associate(key: InputKey, kbd: string) {
+  async associate(key: KateButton, kbd: string) {
     const previous = this._mapping.find((x) => x.key === kbd);
-    const mapping = this._mapping.filter(
-      (x) => x.key !== kbd && x.button !== key
-    );
+    const mapping = this._mapping.filter((x) => x.key !== kbd && x.button !== key);
     if (previous != null && previous.button !== key) {
       const should_associate = await this.os.dialog.confirm("kate:settings", {
         title: "Replace mapping?",
@@ -261,24 +241,18 @@ export class KeyboardInputSettings extends UI.SimpleScene {
     }
   }
 
-  ask_key(key: InputKey) {
+  ask_key(key: KateButton) {
     const result = defer<string | null>();
-    const dialog = UI.h(
-      "div",
-      { class: "kate-screen-dialog kate-screen-kbd-dialog" },
-      [
-        UI.h("div", { class: "kate-screen-dialog-container" }, [
-          UI.hbox(0.5, [
-            UI.h("span", {}, [
-              "Press a key in your keyboard to associate with ",
-            ]),
-            UI.icon(key),
-            UI.h("span", {}, [`(${key})`]),
-            UI.h("input", { class: "wait-for-key" }, []),
-          ]),
+    const dialog = UI.h("div", { class: "kate-screen-dialog kate-screen-kbd-dialog" }, [
+      UI.h("div", { class: "kate-screen-dialog-container" }, [
+        UI.hbox(0.5, [
+          UI.h("span", {}, ["Press a key in your keyboard to associate with "]),
+          UI.icon(key),
+          UI.h("span", {}, [`(${key})`]),
+          UI.h("input", { class: "wait-for-key" }, []),
         ]),
-      ]
-    );
+      ]),
+    ]);
     const input = dialog.querySelector("input") as HTMLInputElement;
     const handle_key = (ev: KeyboardEvent) => {
       ev.preventDefault();
@@ -289,8 +263,8 @@ export class KeyboardInputSettings extends UI.SimpleScene {
       ev.preventDefault();
       result.resolve(null);
     };
-    const x_cancel = (key: InputKey) => {
-      if (key === "x") {
+    const x_cancel = (ev: ButtonChangeEvent) => {
+      if (ev.button === "x") {
         result.resolve(null);
       }
     };
@@ -299,11 +273,11 @@ export class KeyboardInputSettings extends UI.SimpleScene {
       dialog.remove();
       input.removeEventListener("keydown", handle_key);
       dialog.removeEventListener("click", click_cancel);
-      this.os.kernel.console.on_virtual_button_touched.remove(x_cancel);
+      this.os.kernel.console.button_input.virtual_source.on_button_changed.remove(x_cancel);
     };
     input.addEventListener("keydown", handle_key);
     dialog.addEventListener("click", click_cancel);
-    this.os.kernel.console.on_virtual_button_touched.listen(x_cancel);
+    this.os.kernel.console.button_input.virtual_source.on_button_changed.listen(x_cancel);
     this.canvas.append(dialog);
     input.focus();
     this.os.focus_handler.push_root(dialog);
@@ -327,8 +301,9 @@ export async function friendly_kbd(x: string | null) {
   }
 }
 
-export const friendly_name: { [key: string]: string | undefined } =
-  Object.assign(Object.create(null), {
+export const friendly_name: { [key: string]: string | undefined } = Object.assign(
+  Object.create(null),
+  {
     ArrowLeft: UI.fa_icon("arrow-left"),
     ArrowRight: UI.fa_icon("arrow-right"),
     ArrowUp: UI.fa_icon("arrow-up"),
@@ -418,4 +393,5 @@ export const friendly_name: { [key: string]: string | undefined } =
     F11: "F11",
     F12: "F12",
     Escape: "Escape",
-  });
+  }
+);

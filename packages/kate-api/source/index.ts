@@ -11,13 +11,9 @@ import { KateCartManager } from "./cart-manager";
 import { KateIPC } from "./channel";
 import { DeviceFileHandle, KateDeviceFileAccess } from "./device-file";
 import { KateDialogs } from "./dialog";
-import { InputKey, ExtendedInputKey, KateInput } from "./input";
+import { InputKey, KateInput } from "./input";
 import { KateObjectStore } from "./object-store";
-import {
-  KatePointerInput,
-  PointerClick,
-  PointerLocation,
-} from "./pointer-input";
+import { KatePointerInput, PointerClick, PointerLocation } from "./pointer-input";
 import { KateTimer } from "./timer";
 
 declare var KATE_SECRET: string;
@@ -97,7 +93,6 @@ declare global {
       InputKey,
       KateInput,
       KatePointerInput,
-      ExtendedInputKey,
       KateTimer,
       KateBrowser,
       KateObjectStore,

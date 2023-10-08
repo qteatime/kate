@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import type { ExtendedInputKey, InputKey } from "../../kernel";
+import { KateButton } from "../../kernel";
 import { EventStream, Sets, serialise_error } from "../../utils";
 import { FocusInteraction } from "../apis";
 import type { KateOS } from "../os";
@@ -23,11 +23,7 @@ import {
 export abstract class Scene {
   readonly canvas: HTMLElement;
   constructor(protected os: KateOS, upscaled: boolean) {
-    this.canvas = h(
-      "div",
-      { class: `kate-os-screen ${upscaled ? "upscaled" : ""}` },
-      []
-    );
+    this.canvas = h("div", { class: `kate-os-screen ${upscaled ? "upscaled" : ""}` }, []);
   }
 
   async attach(to: HTMLElement) {
@@ -53,9 +49,9 @@ export abstract class Scene {
 }
 
 export type Action = {
-  key: InputKey[];
+  key: KateButton[];
   label: string;
-  handler: (key: InputKey, is_repeat: boolean) => void;
+  handler: (key: KateButton, is_repeat: boolean, is_long_press: boolean) => void;
 };
 
 export abstract class SimpleScene extends Scene {
@@ -124,9 +120,7 @@ export abstract class SimpleScene extends Scene {
   }
 
   body_container(body: Widgetable[]) {
-    return scroll([
-      h("div", { class: "kate-os-content kate-os-screen-body" }, body),
-    ]);
+    return scroll([h("div", { class: "kate-os-content kate-os-screen-body" }, body)]);
   }
 
   replace_body(content: Widgetable[]) {
@@ -158,23 +152,19 @@ export abstract class SimpleScene extends Scene {
 
   render_action(action: Action) {
     return icon_button(action.key, action.label).on_clicked(() =>
-      action.handler(action.key[0], false)
+      action.handler(action.key[0], false, false)
     );
   }
 
   on_attached(): void {
     this.canvas.setAttribute("data-title", stringify(this.title));
     this.os.focus_handler.listen(this.canvas, this.handle_key_pressed);
-    this.os.focus_handler.on_traps_changed.listen(
-      this.update_status_with_traps
-    );
+    this.os.focus_handler.on_traps_changed.listen(this.update_status_with_traps);
   }
 
   on_detached(): void {
     this.os.focus_handler.remove(this.canvas, this.handle_key_pressed);
-    this.os.focus_handler.on_traps_changed.remove(
-      this.update_status_with_traps
-    );
+    this.os.focus_handler.on_traps_changed.remove(this.update_status_with_traps);
     this.on_close.emit();
   }
 
@@ -185,13 +175,9 @@ export abstract class SimpleScene extends Scene {
 
     const handlers = traps?.handlers ?? [];
     if (this._previous_traps != null) {
-      const new_keys = new Set(
-        handlers.map((x) => `${x.key.join(",")}:${x.label}`)
-      );
+      const new_keys = new Set(handlers.map((x) => `${x.key.join(",")}:${x.label}`));
       const old_keys = new Set(
-        this._previous_traps.handlers.map(
-          (x) => `${x.key.join(" ")}:${x.label}`
-        )
+        this._previous_traps.handlers.map((x) => `${x.key.join(" ")}:${x.label}`)
       );
       if (Sets.same_set(new_keys, old_keys)) {
         return;
@@ -216,14 +202,14 @@ export abstract class SimpleScene extends Scene {
     }
   };
 
-  handle_key_pressed = (x: { key: ExtendedInputKey; is_repeat: boolean }) => {
+  handle_key_pressed = (x: { key: KateButton; is_repeat: boolean; is_long_press: boolean }) => {
     if (x.is_repeat) {
       return false;
     }
 
-    const handler = this.actions.find((h) => h.key.includes(x.key as InputKey));
+    const handler = this.actions.find((h) => h.key.includes(x.key as KateButton));
     if (handler != null) {
-      handler.handler(x.key as InputKey, x.is_repeat);
+      handler.handler(x.key as KateButton, x.is_repeat, x.is_long_press);
       return true;
     }
     return false;

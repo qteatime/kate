@@ -6,7 +6,7 @@
 
 import { defer } from "./util";
 import type { KateIPC } from "./channel";
-import type { ExtendedInputKey, KateInput } from "./input";
+import type { KateInput } from "./input";
 
 export class KateCapture {
   readonly CAPTURE_FPS = 24;
@@ -49,9 +49,7 @@ export class KateCapture {
       }
 
       if (this.will_capture()) {
-        this.#capture_monitor.stop((blob, token) =>
-          this.#save_video(blob, token)
-        );
+        this.#capture_monitor.stop((blob, token) => this.#save_video(blob, token));
         this.#capture_monitor = null;
       }
     });
@@ -59,9 +57,7 @@ export class KateCapture {
 
   set_root(element: HTMLCanvasElement | null) {
     if (element != null && !(element instanceof HTMLCanvasElement)) {
-      throw new Error(
-        `Invalid root for captures. Kate captures only support <canvas>`
-      );
+      throw new Error(`Invalid root for captures. Kate captures only support <canvas>`);
     }
 
     this.#capture_root = element;
@@ -83,10 +79,7 @@ export class KateCapture {
     const data = defer<Blob>();
 
     const canvas = this.#capture_root!;
-    const recorder = new MediaRecorder(
-      canvas.captureStream(this.CAPTURE_FPS),
-      this.CAPTURE_FORMAT
-    );
+    const recorder = new MediaRecorder(canvas.captureStream(this.CAPTURE_FPS), this.CAPTURE_FORMAT);
     recorder.ondataavailable = (ev) => {
       if (ev.data.size > 0) {
         data.resolve(ev.data);

@@ -4,7 +4,6 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import type { ExtendedInputKey } from "../../kernel/virtual";
 import type { KateOS } from "../os";
 import { Scene } from "../ui/scenes";
 import { SceneAboutKate } from "../apps/about-kate";
@@ -15,6 +14,7 @@ import { EventStream } from "../../utils";
 import { SceneSettings } from "../apps";
 import { SceneCartridgeStorageSettings } from "../apps/settings/storage";
 import { SceneCartridgePermissions } from "../apps/settings/permissions";
+import { KateButton } from "../../kernel";
 
 declare global {
   function showOpenFilePicker(options: {
@@ -27,13 +27,7 @@ declare global {
   function showDirectoryPicker(options?: {
     id?: string;
     mode?: "read" | "readwrite";
-    startIn?:
-      | "desktop"
-      | "documents"
-      | "downloads"
-      | "music"
-      | "pictures"
-      | "videos";
+    startIn?: "desktop" | "documents" | "downloads" | "music" | "pictures" | "videos";
   }): Promise<FileSystemDirectoryHandle>;
 
   interface FileSystemDirectoryHandle {
@@ -45,20 +39,20 @@ export class KateContextMenu {
   constructor(readonly os: KateOS) {}
 
   setup() {
-    this.os.kernel.console.on_key_pressed.listen(this.handle_key_press);
+    this.os.kernel.console.button_input.on_button_pressed.listen(this.handle_key_press);
   }
 
   teardown() {
-    this.os.kernel.console.on_key_pressed.remove(this.handle_key_press);
+    this.os.kernel.console.button_input.on_button_pressed.remove(this.handle_key_press);
   }
 
-  handle_key_press = (x: { key: ExtendedInputKey; is_repeat: boolean }) => {
+  handle_key_press = (x: { key: KateButton; is_repeat: boolean }) => {
     if (x.is_repeat) {
       return;
     }
 
     switch (x.key) {
-      case "long_menu": {
+      case "berry": {
         this.show_context_menu();
         break;
       }
@@ -88,9 +82,7 @@ export class HUD_ContextMenu extends Scene {
   render() {
     const fullscreen_button = () =>
       UI.when(emulator.options.mode !== "native", [
-        UI.fa_icon_button("expand", "Fullscreen").on_clicked(
-          this.on_toggle_fullscreen
-        ),
+        UI.fa_icon_button("expand", "Fullscreen").on_clicked(this.on_toggle_fullscreen),
       ]);
     const emulator = this.os.kernel.console;
     const cart = this.os.processes.running?.cart;
@@ -102,51 +94,32 @@ export class HUD_ContextMenu extends Scene {
           new UI.If(() => this.os.processes.running != null, {
             then: new UI.Menu_list([
               UI.when(emulator.options.mode !== "single", [
-                UI.fa_icon_button("square-xmark", "Close game").on_clicked(
-                  this.on_close_game
-                ),
+                UI.fa_icon_button("square-xmark", "Close game").on_clicked(this.on_close_game),
               ]),
               fullscreen_button(),
               UI.when(cart?.metadata.legal.licence_path != null, [
-                UI.fa_icon_button("circle-info", "Legal notices").on_clicked(
-                  () =>
-                    this.on_legal_notices(
-                      "Legal notices",
-                      cart?.metadata.legal.licence_path ?? null
-                    )
+                UI.fa_icon_button("circle-info", "Legal notices").on_clicked(() =>
+                  this.on_legal_notices("Legal notices", cart?.metadata.legal.licence_path ?? null)
                 ),
               ]),
               UI.when(cart?.metadata.legal.privacy_policy_path != null, [
-                UI.fa_icon_button("circle-info", "Privacy policy").on_clicked(
-                  () =>
-                    this.on_legal_notices(
-                      "Privacy policy",
-                      cart?.metadata.legal.privacy_policy_path ?? null
-                    )
+                UI.fa_icon_button("circle-info", "Privacy policy").on_clicked(() =>
+                  this.on_legal_notices(
+                    "Privacy policy",
+                    cart?.metadata.legal.privacy_policy_path ?? null
+                  )
                 ),
               ]),
-              UI.fa_icon_button("images", "Media gallery").on_clicked(
-                this.on_media_gallery
-              ),
-              UI.fa_icon_button("hard-drive", "Storage").on_clicked(
-                this.on_manage_data
-              ),
-              UI.fa_icon_button("key", "Permissions").on_clicked(
-                this.on_permissions
-              ),
+              UI.fa_icon_button("images", "Media gallery").on_clicked(this.on_media_gallery),
+              UI.fa_icon_button("hard-drive", "Storage").on_clicked(this.on_manage_data),
+              UI.fa_icon_button("key", "Permissions").on_clicked(this.on_permissions),
               UI.menu_separator(),
-              UI.fa_icon_button("cat", "About Kate").on_clicked(
-                this.on_about_kate
-              ),
-              UI.fa_icon_button("gear", "Settings").on_clicked(
-                this.on_settings
-              ),
+              UI.fa_icon_button("cat", "About Kate").on_clicked(this.on_about_kate),
+              UI.fa_icon_button("gear", "Settings").on_clicked(this.on_settings),
             ]),
             else: new UI.Menu_list([
               UI.when(emulator.options.mode === "native", [
-                UI.fa_icon_button("power-off", "Power off").on_clicked(
-                  this.on_power_off
-                ),
+                UI.fa_icon_button("power-off", "Power off").on_clicked(this.on_power_off),
               ]),
               fullscreen_button(),
               UI.fa_icon_button("download", "Install cartridge").on_clicked(
@@ -175,9 +148,7 @@ export class HUD_ContextMenu extends Scene {
   on_attached(): void {
     this.canvas.setAttribute("data-title", "Context Menu");
     this.os.focus_handler.listen(this.canvas, this.handle_key_pressed);
-    const backdrop = this.canvas.querySelector(
-      ".kate-os-hud-context-menu-backdrop"
-    ) as HTMLElement;
+    const backdrop = this.canvas.querySelector(".kate-os-hud-context-menu-backdrop") as HTMLElement;
     backdrop.addEventListener("click", (ev: Event) => {
       ev.preventDefault();
       this.on_return();
@@ -188,7 +159,7 @@ export class HUD_ContextMenu extends Scene {
     this.os.focus_handler.remove(this.canvas, this.handle_key_pressed);
   }
 
-  handle_key_pressed = (x: { key: ExtendedInputKey; is_repeat: boolean }) => {
+  handle_key_pressed = (x: { key: KateButton; is_repeat: boolean }) => {
     switch (x.key) {
       case "x": {
         if (!x.is_repeat) {
@@ -220,9 +191,7 @@ export class HUD_ContextMenu extends Scene {
     if (process == null) {
       throw new Error(`on_manage_data() called without a running process`);
     }
-    const app = await this.os.storage_manager.try_estimate_live_cartridge(
-      process.cart
-    );
+    const app = await this.os.storage_manager.try_estimate_live_cartridge(process.cart);
     this.os.push_scene(new SceneCartridgeStorageSettings(this.os, app));
   };
 
@@ -279,9 +248,7 @@ export class HUD_ContextMenu extends Scene {
     this.close();
 
     await new Promise<void>((resolve, reject) => {
-      const installer = document.querySelector(
-        "#kate-installer"
-      ) as HTMLInputElement;
+      const installer = document.querySelector("#kate-installer") as HTMLInputElement;
       const teardown = () => {
         installer.onchange = () => {};
         installer.onerror = () => {};

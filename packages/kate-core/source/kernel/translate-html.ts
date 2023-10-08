@@ -7,8 +7,8 @@
 import { bridges } from "../bridges";
 import * as Cart from "../cart";
 import { make_id, unreachable, file_to_dataurl, Pathname } from "../utils";
-import type { InputKey } from "./virtual";
 import { RuntimeEnv } from "./cart-runtime";
+import { KateButton } from "./input";
 
 export async function translate_html(html: string, context: RuntimeEnv) {
   const dom = new DOMParser().parseFromString(html, "text/html");
@@ -26,18 +26,12 @@ async function load_all_media(dom: Document, context: RuntimeEnv) {
       media instanceof HTMLMediaElement
         ? Array.from(media.querySelectorAll("source[src]"))
             .filter(
-              (x) =>
-                !x.getAttribute("type") ||
-                media.canPlayType(x.getAttribute("type")!) !== ""
+              (x) => !x.getAttribute("type") || media.canPlayType(x.getAttribute("type")!) !== ""
             )
             .map((x) => x.getAttribute("src"))
         : [];
     const maybe_path = media.getAttribute("src") ?? maybe_source[0] ?? null;
-    if (
-      maybe_path == null ||
-      maybe_path.trim() === "" ||
-      is_non_local(maybe_path)
-    ) {
+    if (maybe_path == null || maybe_path.trim() === "" || is_non_local(maybe_path)) {
       continue;
     }
     const path = Pathname.from_string(maybe_path).normalise().make_absolute();
@@ -93,9 +87,7 @@ function add_preamble(dom: Document, context: RuntimeEnv) {
   dom.head.insertBefore(script, dom.head.firstChild);
   const all_scripts = Array.from(dom.querySelectorAll("script"));
   if (all_scripts[0] !== script) {
-    throw new Error(
-      `Cannot sandbox HTML: aborting insecure cartridge instantiation`
-    );
+    throw new Error(`Cannot sandbox HTML: aborting insecure cartridge instantiation`);
   }
 
   const kase = context.console.case;
@@ -151,11 +143,7 @@ function apply_bridge(
 
     case "input-proxy": {
       const code = bridges["input.js"];
-      const keys = JSON.stringify(
-        generate_proxied_key_mappings(bridge.mapping),
-        null,
-        2
-      );
+      const keys = JSON.stringify(generate_proxied_key_mappings(bridge.mapping), null, 2);
       const full_source = `const key_mapping = ${keys};\n${code}`;
       append_proxy(full_source);
       break;
@@ -177,9 +165,7 @@ function apply_bridge(
 
     case "capture-canvas": {
       const code = bridges["capture-canvas.js"];
-      const full_source = `const SELECTOR = ${JSON.stringify(
-        bridge.selector
-      )};\n${code}`;
+      const full_source = `const SELECTOR = ${JSON.stringify(bridge.selector)};\n${code}`;
       const script = document.createElement("script");
       script.textContent = wrap(full_source);
       dom.body.appendChild(script);
@@ -231,11 +217,8 @@ function apply_bridge(
   }
 }
 
-function generate_proxied_key_mappings(map: Map<InputKey, Cart.KeyboardKey>) {
-  const pairs = [...map.entries()].map(([k, v]) => [
-    k,
-    [v.key, v.code, Number(v.key_code)],
-  ]);
+function generate_proxied_key_mappings(map: Map<KateButton, Cart.KeyboardKey>) {
+  const pairs = [...map.entries()].map(([k, v]) => [k, [v.key, v.code, Number(v.key_code)]]);
   return Object.fromEntries(pairs);
 }
 
@@ -243,10 +226,7 @@ async function inline_all_scripts(dom: Document, context: RuntimeEnv) {
   for (const script of Array.from(dom.querySelectorAll("script"))) {
     const src = script.getAttribute("src");
     if (src != null && src.trim() !== "") {
-      const real_path = Pathname.from_string(src)
-        .normalise()
-        .make_absolute()
-        .as_string();
+      const real_path = Pathname.from_string(src).normalise().make_absolute().as_string();
       const contents = await get_text_file(real_path, context);
       script.removeAttribute("src");
       script.removeAttribute("type");
@@ -281,21 +261,13 @@ async function inline_css(
   link.remove();
 }
 
-async function transform_css(
-  base: Pathname,
-  source: string,
-  context: RuntimeEnv
-) {
+async function transform_css(base: Pathname, source: string, context: RuntimeEnv) {
   const source1 = await transform_css_imports(base, source, context);
   const source2 = await transform_css_urls(base, source1, context);
   return source2;
 }
 
-async function transform_css_imports(
-  base: Pathname,
-  source: string,
-  context: RuntimeEnv
-) {
+async function transform_css_imports(base: Pathname, source: string, context: RuntimeEnv) {
   const imports = Array.from(
     new Set(
       [...source.matchAll(/@import\s+url\(("[^"]+")\);/g)]
@@ -315,20 +287,13 @@ async function transform_css_imports(
     )
   );
 
-  return source.replace(
-    /@import\s+url\(("[^"]+")\);/g,
-    (match, url_string: string) => {
-      const source = import_map.get(url_string)!;
-      return source == null ? match : source;
-    }
-  );
+  return source.replace(/@import\s+url\(("[^"]+")\);/g, (match, url_string: string) => {
+    const source = import_map.get(url_string)!;
+    return source == null ? match : source;
+  });
 }
 
-async function transform_css_urls(
-  base: Pathname,
-  source: string,
-  context: RuntimeEnv
-) {
+async function transform_css_urls(base: Pathname, source: string, context: RuntimeEnv) {
   const imports = Array.from(
     new Set(
       [...source.matchAll(/\burl\(("[^"]+")\)/g)]

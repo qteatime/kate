@@ -6,20 +6,13 @@
 
 import * as UI from "../../ui";
 import type { KateOS } from "../../os";
-import { ChangedSetting, SettingsData } from "../../apis/settings";
-import {
-  Deferred,
-  Observable,
-  clamp,
-  enumerate,
-  unreachable,
-} from "../../../utils";
+import { Deferred, Observable, clamp, enumerate, unreachable } from "../../../utils";
 import { friendly_gamepad_id } from "../../../friendly/gamepad";
 import {
   GamepadAxisToKate,
   GamepadButtonToKate,
   GamepadMapping,
-  InputKey,
+  KateButton,
 } from "../../../kernel";
 import { InteractionHandler } from "../../apis";
 
@@ -72,49 +65,34 @@ export class TestStandardMappingSettings extends UI.SimpleScene {
 
   on_attached(): void {
     this.os.kernel.console.on_tick.listen(this.update_gamepad_status);
-    this.os.kernel.gamepad.pause();
+    this.os.kernel.gamepad_source.pause();
     this.index_buttons();
     super.on_attached();
   }
 
   on_detached(): void {
     super.on_detached();
-    this.os.kernel.gamepad.unpause();
+    this.os.kernel.gamepad_source.unpause();
     this.os.kernel.console.on_tick.remove(this.update_gamepad_status);
   }
 
   index_buttons = () => {
     this._buttons = new Map();
-    for (const button of Array.from(
-      this.canvas.querySelectorAll("div[data-index]")
-    )) {
-      this._buttons.set(
-        Number(button.getAttribute("data-index")),
-        button as HTMLElement
-      );
+    for (const button of Array.from(this.canvas.querySelectorAll("div[data-index]"))) {
+      this._buttons.set(Number(button.getAttribute("data-index")), button as HTMLElement);
     }
     this._haxes = new Map();
-    for (const axes of Array.from(
-      this.canvas.querySelectorAll("div[data-axis-h]")
-    )) {
-      this._haxes.set(
-        Number(axes.getAttribute("data-axis-h")),
-        axes as HTMLElement
-      );
+    for (const axes of Array.from(this.canvas.querySelectorAll("div[data-axis-h]"))) {
+      this._haxes.set(Number(axes.getAttribute("data-axis-h")), axes as HTMLElement);
     }
     this._vaxes = new Map();
-    for (const axes of Array.from(
-      this.canvas.querySelectorAll("div[data-axis-v]")
-    )) {
-      this._vaxes.set(
-        Number(axes.getAttribute("data-axis-v")),
-        axes as HTMLElement
-      );
+    for (const axes of Array.from(this.canvas.querySelectorAll("div[data-axis-v]"))) {
+      this._vaxes.set(Number(axes.getAttribute("data-axis-v")), axes as HTMLElement);
     }
   };
 
   update_gamepad_status = (time: number) => {
-    const gamepad = this.os.kernel.gamepad.current?.raw;
+    const gamepad = this.os.kernel.gamepad_source.resolve_primary()?.resolve_raw();
     if (gamepad == null) {
       return;
     }
@@ -159,8 +137,7 @@ function axis_to_offset(x: number) {
 }
 
 function standard_frame(
-  handler: (index: number, element: UI.Widgetable) => UI.Widgetable = (_, x) =>
-    x
+  handler: (index: number, element: UI.Widgetable) => UI.Widgetable = (_, x) => x
 ) {
   return UI.h("div", { class: "standard-gamepad-frame" }, [
     UI.h("div", { class: "standard-gamepad-left standard-gamepad-cluster" }, [
@@ -310,62 +287,52 @@ function standard_frame(
         )
       ),
     ]),
-    UI.h(
-      "div",
-      { class: "standard-gamepad-axes standard-gamepad-axes-right" },
-      [
-        handler(
-          11,
-          UI.h(
-            "div",
-            {
-              class: "standard-gamepad-joystick",
-              "data-name": "right thumbstick",
-              "data-axis-h": "2",
-              "data-axis-v": "3",
-              "data-index": "11",
-            },
-            [
-              UI.h("div", { class: "standard-gamepad-joystick-up" }, []),
-              UI.h("div", { class: "standard-gamepad-joystick-down" }, []),
-              UI.h("div", { class: "standard-gamepad-joystick-left" }, []),
-              UI.h("div", { class: "standard-gamepad-joystick-right" }, []),
-              UI.h("div", { class: "standard-gamepad-joystick-press" }, []),
-            ]
-          )
-        ),
-      ]
-    ),
-    UI.h(
-      "div",
-      { class: "standard-gamepad-shoulder standard-gamepad-shoulder-left" },
-      [
-        handler(
-          6,
-          UI.h(
-            "div",
-            {
-              class:
-                "standard-gamepad-shoulder-button standard-gamepad-shoulder-button1",
-              "data-index": "6",
-            },
-            []
-          )
-        ),
-        handler(
-          4,
-          UI.h(
-            "div",
-            {
-              class:
-                "standard-gamepad-shoulder-button standard-gamepad-shoulder-button2",
-              "data-index": "4",
-            },
-            []
-          )
-        ),
-      ]
-    ),
+    UI.h("div", { class: "standard-gamepad-axes standard-gamepad-axes-right" }, [
+      handler(
+        11,
+        UI.h(
+          "div",
+          {
+            class: "standard-gamepad-joystick",
+            "data-name": "right thumbstick",
+            "data-axis-h": "2",
+            "data-axis-v": "3",
+            "data-index": "11",
+          },
+          [
+            UI.h("div", { class: "standard-gamepad-joystick-up" }, []),
+            UI.h("div", { class: "standard-gamepad-joystick-down" }, []),
+            UI.h("div", { class: "standard-gamepad-joystick-left" }, []),
+            UI.h("div", { class: "standard-gamepad-joystick-right" }, []),
+            UI.h("div", { class: "standard-gamepad-joystick-press" }, []),
+          ]
+        )
+      ),
+    ]),
+    UI.h("div", { class: "standard-gamepad-shoulder standard-gamepad-shoulder-left" }, [
+      handler(
+        6,
+        UI.h(
+          "div",
+          {
+            class: "standard-gamepad-shoulder-button standard-gamepad-shoulder-button1",
+            "data-index": "6",
+          },
+          []
+        )
+      ),
+      handler(
+        4,
+        UI.h(
+          "div",
+          {
+            class: "standard-gamepad-shoulder-button standard-gamepad-shoulder-button2",
+            "data-index": "4",
+          },
+          []
+        )
+      ),
+    ]),
     UI.h(
       "div",
       {
@@ -377,8 +344,7 @@ function standard_frame(
           UI.h(
             "div",
             {
-              class:
-                "standard-gamepad-shoulder-button standard-gamepad-shoulder-button1",
+              class: "standard-gamepad-shoulder-button standard-gamepad-shoulder-button1",
               "data-index": "7",
             },
             []
@@ -389,8 +355,7 @@ function standard_frame(
           UI.h(
             "div",
             {
-              class:
-                "standard-gamepad-shoulder-button standard-gamepad-shoulder-button2",
+              class: "standard-gamepad-shoulder-button standard-gamepad-shoulder-button2",
               "data-index": "5",
             },
             []
@@ -491,9 +456,7 @@ export class RemapStandardSettings extends UI.SimpleScene {
       ) as GamepadButtonToKate | null;
       if (entry != null) {
         UI.append(
-          UI.h("div", { class: "gamepad-pressed-mapping" }, [
-            UI.icon(entry.pressed),
-          ]),
+          UI.h("div", { class: "gamepad-pressed-mapping" }, [UI.icon(entry.pressed)]),
           button
         );
       }
@@ -641,8 +604,7 @@ export class RemapStandardSettings extends UI.SimpleScene {
     return UI.h(
       "div",
       {
-        class:
-          "gamepad-settings-remap-container kate-os-content kate-os-screen-body",
+        class: "gamepad-settings-remap-container kate-os-content kate-os-screen-body",
       },
       [...body]
     );
@@ -650,9 +612,7 @@ export class RemapStandardSettings extends UI.SimpleScene {
 
   body() {
     return [
-      UI.h("div", { class: "gamepad-settings-remap-frame" }, [
-        this.annotated_layout(),
-      ]),
+      UI.h("div", { class: "gamepad-settings-remap-frame" }, [this.annotated_layout()]),
       UI.h("div", { class: "gamepad-settings-remap-actions" }, [
         UI.text_button(this.os, "Save", {
           primary: true,
@@ -670,8 +630,7 @@ export class RemapStandardSettings extends UI.SimpleScene {
   }
 
   revert_defaults = async () => {
-    this._mapping =
-      this.os.settings.defaults.input.gamepad_mapping.standard.slice();
+    this._mapping = this.os.settings.defaults.input.gamepad_mapping.standard.slice();
     this.updated.value = true;
     this.refresh_mode();
   };
@@ -706,15 +665,13 @@ export class RemapStandardSettings extends UI.SimpleScene {
       message: "Updated standard gamepad mapping",
       extra: this._mapping,
     });
-    this.os.kernel.gamepad.remap(this._mapping);
+    this.os.kernel.gamepad_source.remap(this._mapping);
     this.close();
   };
 
   on_attached(): void {
     super.on_attached();
-    const frame = this.canvas.querySelector(
-      ".gamepad-settings-remap-frame"
-    ) as HTMLElement;
+    const frame = this.canvas.querySelector(".gamepad-settings-remap-frame") as HTMLElement;
     this.mode.stream.listen(() => {
       this.os.focus_handler.refocus(frame);
     });
@@ -729,10 +686,7 @@ export class RemapStandardSettings extends UI.SimpleScene {
     }
   }
 
-  async ask_remap_axis(
-    button: HTMLElement,
-    direction: "left" | "right" | "up" | "down"
-  ) {
+  async ask_remap_axis(button: HTMLElement, direction: "left" | "right" | "up" | "down") {
     const clone = <A extends { [key: string]: any }>(x: A) => ({ ...x });
 
     const name = button.getAttribute("data-name") ?? "joystick";
@@ -805,17 +759,12 @@ export class RemapStandardSettings extends UI.SimpleScene {
       const current = this._mapping.find(
         (x) => x.type === "button" && x.index === index
       ) as GamepadButtonToKate | null;
-      const key = await this.remap(
-        `When button ${index} is pressed`,
-        current?.pressed ?? null
-      );
+      const key = await this.remap(`When button ${index} is pressed`, current?.pressed ?? null);
       if (key === false) {
         return;
       }
       if (key !== current) {
-        const mapping = this._mapping.filter(
-          (x) => x.type !== "button" || x.index !== index
-        );
+        const mapping = this._mapping.filter((x) => x.type !== "button" || x.index !== index);
         const addition: GamepadMapping[] =
           key == null ? [] : [{ type: "button", index, pressed: key }];
         this._mapping = mapping.concat(addition);
@@ -825,16 +774,14 @@ export class RemapStandardSettings extends UI.SimpleScene {
     }
   }
 
-  async remap(title: string, current: InputKey | null) {
-    let pressed = new Observable<null | InputKey>(current);
-    const choose_pressed = (key: InputKey | null, title: string) => {
+  async remap(title: string, current: KateButton | null) {
+    let pressed = new Observable<null | KateButton>(current);
+    const choose_pressed = (key: KateButton | null, title: string) => {
       const active = pressed.value === key ? "active" : "";
       return UI.interactive(
         this.os,
         UI.h("div", { class: `kate-key-button ${active}` }, [
-          UI.h("div", { class: "kate-key-button-icon" }, [
-            key == null ? null : UI.icon(key),
-          ]),
+          UI.h("div", { class: "kate-key-button-icon" }, [key == null ? null : UI.icon(key)]),
           UI.h("div", { class: "kate-key-button-title" }, [title]),
         ]),
         [
@@ -880,28 +827,20 @@ export class RemapStandardSettings extends UI.SimpleScene {
           ),
         ]),
         UI.h("div", { class: "kate-hud-dialog-actions" }, [
-          UI.h(
-            "div",
-            { class: "kate-hud-dialog-action", "data-kind": "cancel" },
-            [
-              UI.button("Discard", {
-                on_clicked: () => {
-                  result.resolve(false);
-                },
-              }),
-            ]
-          ),
-          UI.h(
-            "div",
-            { class: "kate-hud-dialog-action", "data-kind": "primary" },
-            [
-              UI.button("Remap", {
-                on_clicked: () => {
-                  result.resolve(true);
-                },
-              }),
-            ]
-          ),
+          UI.h("div", { class: "kate-hud-dialog-action", "data-kind": "cancel" }, [
+            UI.button("Discard", {
+              on_clicked: () => {
+                result.resolve(false);
+              },
+            }),
+          ]),
+          UI.h("div", { class: "kate-hud-dialog-action", "data-kind": "primary" }, [
+            UI.button("Remap", {
+              on_clicked: () => {
+                result.resolve(true);
+              },
+            }),
+          ]),
         ]),
       ],
       false
@@ -971,7 +910,7 @@ export class ChooseActiveGamepadSettings extends UI.SimpleScene {
       extra: { id: paired.id },
     });
 
-    this.os.kernel.gamepad.pair(paired.id);
+    this.os.kernel.gamepad_source.set_primary(paired.id);
     this.close();
   };
 
@@ -991,12 +930,12 @@ export class ChooseActiveGamepadSettings extends UI.SimpleScene {
   on_attached(): void {
     super.on_attached();
     this.os.kernel.console.on_tick.listen(this.update_gamepads);
-    this.os.kernel.gamepad.pause();
+    this.os.kernel.gamepad_source.pause();
   }
 
   on_detached(): void {
     this.os.kernel.console.on_tick.remove(this.update_gamepads);
-    this.os.kernel.gamepad.unpause();
+    this.os.kernel.gamepad_source.unpause();
     super.on_detached();
   }
 
@@ -1015,25 +954,17 @@ export class ChooseActiveGamepadSettings extends UI.SimpleScene {
       return gamepad.buttons[4].pressed || gamepad.buttons[5].pressed;
     };
 
-    const all_gamepads = navigator
-      .getGamepads()
-      .filter((x) => x != null) as Gamepad[];
+    const all_gamepads = navigator.getGamepads().filter((x) => x != null) as Gamepad[];
     const gamepad = all_gamepads
       .filter(has_updated)
       .filter(is_pairing)
       .sort((a, b) => b.timestamp - a.timestamp)[0] as Gamepad | null;
 
     if (gamepad != null) {
-      if (
-        gamepad.id !== this._paired.value?.id ||
-        this._paired.value.active == null
-      ) {
+      if (gamepad.id !== this._paired.value?.id || this._paired.value.active == null) {
         this._paired.value = { id: gamepad.id, active: time };
       }
-    } else if (
-      this._paired.value != null &&
-      this._paired.value.active != null
-    ) {
+    } else if (this._paired.value != null && this._paired.value.active != null) {
       const active = this._paired.value.active;
       const elapsed = time - active;
       if (elapsed >= 1_000) {
@@ -1046,32 +977,19 @@ export class ChooseActiveGamepadSettings extends UI.SimpleScene {
       .find((x) => x.id === this._paired.value?.id);
     if (paired_update != null) {
       const is_left = (a: Gamepad) =>
-        a.buttons[14].pressed ||
-        a.buttons[2].pressed ||
-        a.axes[0] < -0.5 ||
-        a.axes[2] < -0.5;
+        a.buttons[14].pressed || a.buttons[2].pressed || a.axes[0] < -0.5 || a.axes[2] < -0.5;
       const is_right = (a: Gamepad) =>
-        a.buttons[15].pressed ||
-        a.buttons[1].pressed ||
-        a.axes[0] > 0.5 ||
-        a.axes[2] > 0.5;
+        a.buttons[15].pressed || a.buttons[1].pressed || a.axes[0] > 0.5 || a.axes[2] > 0.5;
 
-      this._left_held_at = is_left(paired_update)
-        ? this._left_held_at ?? time
-        : null;
-      this._right_held_at = is_right(paired_update)
-        ? this._right_held_at ?? time
-        : null;
+      this._left_held_at = is_left(paired_update) ? this._left_held_at ?? time : null;
+      this._right_held_at = is_right(paired_update) ? this._right_held_at ?? time : null;
     }
 
     if (this._left_held_at != null && time - this._left_held_at > 1_000) {
       this._left_held_at = null;
       this._right_held_at = null;
       this.on_return();
-    } else if (
-      this._right_held_at != null &&
-      time - this._right_held_at > 1_000
-    ) {
+    } else if (this._right_held_at != null && time - this._right_held_at > 1_000) {
       this._right_held_at = null;
       this._right_held_at = null;
       this.on_save();
@@ -1086,14 +1004,9 @@ export class ChooseActiveGamepadSettings extends UI.SimpleScene {
         return UI.h(
           "div",
           {
-            class:
-              "gamepad-choose-controller gamepad-choose-controller-inactive",
+            class: "gamepad-choose-controller gamepad-choose-controller-inactive",
           },
-          [
-            UI.h("div", { class: "gamepad-choose-controller-port" }, [
-              "(No controller paired)",
-            ]),
-          ]
+          [UI.h("div", { class: "gamepad-choose-controller-port" }, ["(No controller paired)"])]
         );
       } else {
         return UI.h(
@@ -1103,15 +1016,8 @@ export class ChooseActiveGamepadSettings extends UI.SimpleScene {
             "data-active": x.active != null,
           },
           [
-            UI.fa_icon(
-              "gamepad",
-              "2x",
-              "solid",
-              x.active != null ? "bounce" : null
-            ),
-            UI.h("div", { class: "gamepad-choose-controller-name" }, [
-              friendly_gamepad_id(x.id),
-            ]),
+            UI.fa_icon("gamepad", "2x", "solid", x.active != null ? "bounce" : null),
+            UI.h("div", { class: "gamepad-choose-controller-name" }, [friendly_gamepad_id(x.id)]),
           ]
         );
       }
@@ -1126,22 +1032,16 @@ export class ChooseActiveGamepadSettings extends UI.SimpleScene {
           UI.icon("rtrigger"),
           "on the gamepad to pair with Kate.",
         ]),
-        UI.h(
-          "div",
-          { class: "gamepad-choose-message", style: "font-size: 1rem" },
-          [
-            "On the paired gamepad, hold",
-            UI.button_icon("dpad-right"),
-            "to save, or",
-            UI.button_icon("dpad-left"),
-            "to return without changes.",
-          ]
-        ),
+        UI.h("div", { class: "gamepad-choose-message", style: "font-size: 1rem" }, [
+          "On the paired gamepad, hold",
+          UI.button_icon("dpad-right"),
+          "to save, or",
+          UI.button_icon("dpad-left"),
+          "to return without changes.",
+        ]),
         UI.vspace(8),
         UI.dynamic(
-          widgets.map<UI.Widgetable>((x) =>
-            UI.h("div", { class: "gamepad-choose-paired" }, [x])
-          )
+          widgets.map<UI.Widgetable>((x) => UI.h("div", { class: "gamepad-choose-paired" }, [x]))
         ),
       ]),
     ];

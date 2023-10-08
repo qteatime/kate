@@ -6,10 +6,10 @@
 import { kart_v5 as Cart } from "../deps/schema";
 import { Pathname, make_id, unreachable } from "../deps/utils";
 
-export function make_mapping(mapping: Record<KateTypes.InputKey, string>) {
+export function make_mapping(mapping: Record<KateTypes.InputKey, string | null>) {
   return new Map(
-    Object.entries(mapping).map(([k, v]) =>
-      make_key_pair([k as KateTypes.InputKey, v])
+    Object.entries(mapping).flatMap(([k, v]) =>
+      v == null ? [] : [make_key_pair([k as KateTypes.InputKey, v])]
     )
   );
 }
@@ -42,12 +42,16 @@ function make_virtual_key(key: KateTypes.InputKey) {
       return Cart.Virtual_key.X({});
     case "o":
       return Cart.Virtual_key.O({});
+    case "sparkle":
+      return Cart.Virtual_key.Sparkle({});
     case "ltrigger":
       return Cart.Virtual_key.L_trigger({});
     case "rtrigger":
       return Cart.Virtual_key.R_trigger({});
     case "capture":
       return Cart.Virtual_key.Capture({});
+    case "berry":
+      return Cart.Virtual_key.Berry({});
     default:
       throw unreachable(key, "unknown virtual key");
   }
@@ -104,10 +108,7 @@ export async function maybe_add_thumbnail(
   if (thumbnail == null) {
     return files;
   } else {
-    const file = await make_file(
-      Pathname.from_string("kate-thumbnail.png"),
-      thumbnail
-    );
+    const file = await make_file(Pathname.from_string("kate-thumbnail.png"), thumbnail);
     return [...files, file];
   }
 }
