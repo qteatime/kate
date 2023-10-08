@@ -27,7 +27,7 @@ export type ConsoleOptions = {
 };
 
 export class VirtualConsole {
-  private virtual_case: KateVirtualInputSource;
+  private virtual_source: KateVirtualInputSource;
   private button_state: KateButtons;
 
   private is_listening = false;
@@ -64,7 +64,7 @@ export class VirtualConsole {
 
   constructor(readonly root: HTMLElement, readonly options: ConsoleOptions) {
     this._case = options.case;
-    this.virtual_case = new KateVirtualInputSource(root);
+    this.virtual_source = new KateVirtualInputSource(root);
     this.button_state = new KateButtons();
 
     this.os_root = root.querySelector("#kate-os-root")!;
@@ -82,7 +82,7 @@ export class VirtualConsole {
 
   private reset_states() {
     this.button_state.reset();
-    this.virtual_case.reset();
+    this.virtual_source.reset();
   }
 
   private start_ticking() {
@@ -126,7 +126,7 @@ export class VirtualConsole {
   private do_tick(time: number) {
     this.last_time = time;
     for (const key of this.button_state.all_changed) {
-      this.virtual_case.update(key.id as any, key.pressed);
+      this.virtual_source.update(key.id as any, key.pressed);
       this.on_input_changed.emit({ key: key.id as any, is_down: key.pressed });
       this.handle_key_pressed(key);
     }
@@ -188,8 +188,8 @@ export class VirtualConsole {
     (screen as any).addEventListener?.("orientationchange", () => this.update_scale(null));
     this.update_scale(null);
 
-    this.virtual_case.setup();
-    this.virtual_case.on_button_changed.listen((change) => {
+    this.virtual_source.setup();
+    this.virtual_source.on_button_changed.listen((change) => {
       this.update_virtual_key(change.button, change.is_pressed);
     });
 
@@ -228,12 +228,12 @@ export class VirtualConsole {
 
   reset_all_keys() {
     this.button_state.reset();
-    this.virtual_case.reset();
+    this.virtual_source.reset();
   }
 
   update_virtual_key(key: InputKey, state: boolean) {
     this.button_state.update(key, state);
-    this.virtual_case.update(key, state);
+    this.virtual_source.update(key, state);
   }
 
   take_resource(resource: Resource) {
