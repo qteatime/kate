@@ -36,6 +36,10 @@ body {
   --grey: #e8ebecff;
 }
 
+.kate-case * {
+  box-sizing: border-box;
+}
+
 .kc-body {
   user-select: none;
   scale: var(--case-downscale);
@@ -65,10 +69,13 @@ body {
 
 #kate-version {
   position: absolute;
-  font-size: 8px;
+  font-size: 10px;
   font-family: sans-serif;
   font-weight: bold;
-  width: 60px;
+  width: 70px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
   text-align: right;
   color: #fafafa;
   text-shadow: -1px -1px 0px rgba(0, 0, 0, 0.1);
@@ -254,7 +261,7 @@ body {
 
 .kate-case[data-case-type="handheld"] #kate-version {
   transform-origin: top left;
-  translate: 55px 470px;
+  translate: 45px 470px;
 }
 
 .kate-case[data-case-type="handheld"] .kc-screen-container {
@@ -431,8 +438,10 @@ body {
 }
 
 .kate-case[data-case-type="tv"] #kate-version {
-  bottom: 15px;
-  right: 15px;
+  bottom: 10px;
+  right: 32px;
+  font-size: 11px;
+  width: max-content;
 }
 
 /* fullscreen mode */
