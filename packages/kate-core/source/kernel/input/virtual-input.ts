@@ -4,8 +4,14 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { EventStream, clamp, unreachable } from "../utils";
-import type { InputKey } from "./virtual";
+// Provides the user with virtual buttons that the user can interact with
+// using touch-based devices. The buttons both send input to the underlying
+// Kate input handling source, and reflect changes in the input source
+// originating from elsewhere.
+
+import { EventStream, clamp, unreachable } from "../../utils";
+import { KateButton, buttons } from "./buttons";
+import { ButtonChangeEvent, KateButtonInputSource } from "./input-source";
 
 type Direction = "up" | "right" | "down" | "left";
 
@@ -21,35 +27,8 @@ const enum Dpad {
   DOWN_LEFT = (2 << 2) | (2 << 3),
 }
 
-// FIXME: converge
-const keys: InputKey[] = [
-  "up",
-  "right",
-  "down",
-  "left",
-  "o",
-  "x",
-  "menu",
-  "capture",
-  "ltrigger",
-  "rtrigger",
-];
-
-export type VirtualInputChange = {
-  key: InputKey;
-  is_down: boolean;
-};
-
-export abstract class KateCase {
-  abstract reset(): void;
-  abstract update(button: InputKey, is_down: boolean): void;
-  abstract setup(): void;
-  abstract teardown(): void;
-  abstract on_virtual_change: EventStream<VirtualInputChange>;
-}
-
-export class KateMobileCase extends KateCase {
-  readonly on_virtual_change = new EventStream<VirtualInputChange>();
+export class KateVirtualInput implements KateButtonInputSource {
+  readonly on_button_changed = new EventStream<ButtonChangeEvent>();
 
   private thumb_direction: Dpad = Dpad.IDLE;
   private thumb_range: number;
@@ -69,8 +48,6 @@ export class KateMobileCase extends KateCase {
   private subscriptions: { button: HTMLElement; event: string; listener: unknown }[] = [];
 
   constructor(private root: HTMLElement) {
-    super();
-
     this.dpad = root.querySelector(".kc-dpad")!;
     this.dpad_thumb = root.querySelector(".kc-thumb")!;
     this.thumb_range = Number(this.dpad_thumb.getAttribute("data-range"));
@@ -90,7 +67,7 @@ export class KateMobileCase extends KateCase {
     this.btn_r = root.querySelector(".kc-shoulder-right")!;
   }
 
-  override setup(): void {
+  setup(): void {
     this.listen_virtual_button(this.btn_ok, "o");
     this.listen_virtual_button(this.btn_cancel, "x");
     this.listen_virtual_button(this.btn_sparkle, "sparkle");
@@ -102,7 +79,7 @@ export class KateMobileCase extends KateCase {
     this.listen_thumb();
   }
 
-  override teardown(): void {
+  teardown(): void {
     for (const { button, event, listener } of this.subscriptions) {
       button.removeEventListener(event, listener as any);
     }
@@ -128,10 +105,10 @@ export class KateMobileCase extends KateCase {
 
       if (ev.pointerId === moving) {
         moving = false;
-        this.on_virtual_change.emit({ key: "up", is_down: false });
-        this.on_virtual_change.emit({ key: "right", is_down: false });
-        this.on_virtual_change.emit({ key: "down", is_down: false });
-        this.on_virtual_change.emit({ key: "left", is_down: false });
+        this.on_button_changed.emit({ button: "up", is_pressed: false });
+        this.on_button_changed.emit({ button: "right", is_pressed: false });
+        this.on_button_changed.emit({ button: "down", is_pressed: false });
+        this.on_button_changed.emit({ button: "left", is_pressed: false });
         thumb.style.translate = `0px 0px`;
         this.moving_thumb = false;
       }
@@ -147,10 +124,10 @@ export class KateMobileCase extends KateCase {
         thumb.style.translate = `${clamp_x}px ${clamp_y}px`;
         const move_y = clamp_y / 20;
         const move_x = clamp_x / 20;
-        this.on_virtual_change.emit({ key: "up", is_down: move_y <= -0.5 });
-        this.on_virtual_change.emit({ key: "right", is_down: move_x >= 0.5 });
-        this.on_virtual_change.emit({ key: "down", is_down: move_y >= 0.5 });
-        this.on_virtual_change.emit({ key: "left", is_down: move_x <= -0.5 });
+        this.on_button_changed.emit({ button: "up", is_pressed: move_y <= -0.5 });
+        this.on_button_changed.emit({ button: "right", is_pressed: move_x >= 0.5 });
+        this.on_button_changed.emit({ button: "down", is_pressed: move_y >= 0.5 });
+        this.on_button_changed.emit({ button: "left", is_pressed: move_x <= -0.5 });
       }
     };
 
@@ -165,16 +142,16 @@ export class KateMobileCase extends KateCase {
     );
   }
 
-  private listen_virtual_button(button: HTMLElement, key: InputKey) {
+  private listen_virtual_button(button: HTMLElement, key: KateButton) {
     const on_down = (ev: MouseEvent | TouchEvent) => {
       ev.preventDefault();
       ev.stopPropagation();
-      this.on_virtual_change.emit({ key, is_down: true });
+      this.on_button_changed.emit({ button: key, is_pressed: true });
     };
     const on_up = (ev: MouseEvent | TouchEvent) => {
       ev.preventDefault();
       ev.stopPropagation();
-      this.on_virtual_change.emit({ key, is_down: false });
+      this.on_button_changed.emit({ button: key, is_pressed: false });
     };
 
     button.addEventListener("mousedown", on_down);
@@ -190,13 +167,13 @@ export class KateMobileCase extends KateCase {
     );
   }
 
-  override reset() {
-    for (const key of keys) {
+  reset() {
+    for (const key of buttons) {
       this.update(key, false);
     }
   }
 
-  override update(button: InputKey, is_down: boolean) {
+  update(button: KateButton, is_down: boolean) {
     switch (button) {
       case "up":
       case "down":

@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import type { InputKey, VirtualConsole } from "./virtual";
+import type { InputKey, VirtualConsole } from "../virtual";
 
 export type GamepadButtonToKate = {
   type: "button";
@@ -146,9 +146,7 @@ class GamepadAdaptor {
   }
 
   private resolve_gamepad() {
-    return (
-      navigator.getGamepads().find((x) => x?.id === this._raw_static.id) ?? null
-    );
+    return navigator.getGamepads().find((x) => x?.id === this._raw_static.id) ?? null;
   }
 
   update_virtual_state(time: number) {

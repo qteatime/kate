@@ -5,8 +5,8 @@
  */
 
 import { CartRuntime, KateRuntimes } from "./cart-runtime";
-import { GamepadInput } from "./gamepad";
-import { KeyboardInput } from "./input";
+import { GamepadInput } from "./input/gamepad-input";
+import { KeyboardInput } from "./input/keyboard-input";
 import { ConsoleOptions, VirtualConsole } from "./virtual";
 
 export class KateKernel {
@@ -30,11 +30,12 @@ export class KateKernel {
         scale_to_fit: false,
       },
     });
-    const keyboard = new KeyboardInput(console);
+    const keyboard = new KeyboardInput();
     const gamepad = new GamepadInput(console);
     console.listen();
-    keyboard.listen(document.body);
+    keyboard.listen();
     gamepad.setup();
+    keyboard.on_button_changed.listen((ev) => console.update_virtual_key(ev.button, ev.is_pressed));
     return new KateKernel(console, keyboard, gamepad);
   }
 

@@ -5,12 +5,12 @@
  */
 
 import { EventStream, unreachable } from "../utils";
-import { KateCase, KateMobileCase } from "./case";
-import { KateButtons } from "./kate-buttons";
-import type { KateKey, KeyState } from "./kate-buttons";
+import { KateVirtualInput } from "./input/virtual-input";
+import { KateButtons } from "./input/buttons";
+import type { KateButton, ButtonState } from "./input/buttons";
 const pkg = require("../../package.json");
 
-export type InputKey = KateKey;
+export type InputKey = KateButton;
 
 export type Resource = "screen-recording" | "transient-storage" | "low-storage" | "trusted-mode";
 
@@ -27,7 +27,7 @@ export type ConsoleOptions = {
 };
 
 export class VirtualConsole {
-  private virtual_case: KateCase;
+  private virtual_case: KateVirtualInput;
   private button_state: KateButtons;
 
   private is_listening = false;
@@ -64,7 +64,7 @@ export class VirtualConsole {
 
   constructor(readonly root: HTMLElement, readonly options: ConsoleOptions) {
     this._case = options.case;
-    this.virtual_case = new KateMobileCase(root);
+    this.virtual_case = new KateVirtualInput(root);
     this.button_state = new KateButtons();
 
     this.os_root = root.querySelector("#kate-os-root")!;
@@ -134,7 +134,7 @@ export class VirtualConsole {
     this.button_state.tick();
   }
 
-  private handle_key_pressed(key: KeyState) {
+  private handle_key_pressed(key: ButtonState) {
     const is_special = key.id === "capture";
     const is_just_released = key.count === -1;
     const is_just_pressed = key.count === 1;
@@ -189,8 +189,8 @@ export class VirtualConsole {
     this.update_scale(null);
 
     this.virtual_case.setup();
-    this.virtual_case.on_virtual_change.listen((change) => {
-      this.update_virtual_key(change.key, change.is_down);
+    this.virtual_case.on_button_changed.listen((change) => {
+      this.update_virtual_key(change.button, change.is_pressed);
     });
 
     document.addEventListener("visibilitychange", () => {

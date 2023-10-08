@@ -4,7 +4,11 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-export type KateKey =
+// Handles all the underlying Kate-specific input, except for the OS-specific
+// parts (e.g.: long-presses, repeats), which will have configurations
+// elsewhere.
+
+export type KateButton =
   | "up"
   | "right"
   | "down"
@@ -18,7 +22,7 @@ export type KateKey =
   | "ltrigger"
   | "rtrigger";
 
-const keys: KateKey[] = [
+export const buttons: KateButton[] = [
   "up",
   "right",
   "down",
@@ -33,14 +37,14 @@ const keys: KateKey[] = [
   "rtrigger",
 ];
 
-export type KeyState = {
-  id: KateKey;
+export type ButtonState = {
+  id: KateButton;
   pressed: boolean;
   count: number;
 };
 
 export class KateButtons {
-  readonly state: Record<KateKey, KeyState> = {
+  readonly state: Record<KateButton, ButtonState> = {
     up: { id: "up", pressed: false, count: 0 | 0 },
     right: { id: "right", pressed: false, count: 0 | 0 },
     down: { id: "down", pressed: false, count: 0 | 0 },
@@ -54,71 +58,71 @@ export class KateButtons {
     ltrigger: { id: "ltrigger", pressed: false, count: 0 | 0 },
     rtrigger: { id: "rtrigger", pressed: false, count: 0 | 0 },
   };
-  private changed = new Set<KateKey>();
+  private changed = new Set<KateButton>();
 
   reset() {
-    for (const key of keys) {
-      this.state[key].pressed = false;
-      this.state[key].count = 0 | 0;
-      this.changed.add(key);
+    for (const button of buttons) {
+      this.state[button].pressed = false;
+      this.state[button].count = 0 | 0;
+      this.changed.add(button);
     }
   }
 
-  force_reset(key: KateKey) {
-    this.state[key].pressed = false;
-    this.state[key].count = 0;
-    this.changed.add(key);
+  force_reset(button: KateButton) {
+    this.state[button].pressed = false;
+    this.state[button].count = 0;
+    this.changed.add(button);
   }
 
-  update(key: KateKey, is_down: boolean) {
-    if (this.state[key].pressed === is_down) {
+  update(button: KateButton, is_pressed: boolean) {
+    if (this.state[button].pressed === is_pressed) {
       return;
     }
 
-    this.changed.add(key);
-    if (is_down) {
-      this.state[key].pressed = true;
-      this.state[key].count = 1 | 0;
+    this.changed.add(button);
+    if (is_pressed) {
+      this.state[button].pressed = true;
+      this.state[button].count = 1 | 0;
     } else {
-      this.state[key].pressed = false;
-      this.state[key].count = -1 | 0;
+      this.state[button].pressed = false;
+      this.state[button].count = -1 | 0;
     }
   }
 
   tick() {
     this.changed.clear();
-    for (const key of keys) {
-      const state = this.state[key];
+    for (const button of buttons) {
+      const state = this.state[button];
       if (state.count !== 0) {
         state.count = (state.count + 1) | 0 || (state.pressed ? 2 : 0);
-        this.changed.add(key);
+        this.changed.add(button);
       }
     }
   }
 
   get all_changed() {
-    const result: KeyState[] = [];
+    const result: ButtonState[] = [];
 
-    for (const key of this.changed) {
-      result.push(this.state[key]);
+    for (const button of this.changed) {
+      result.push(this.state[button]);
     }
 
     return result;
   }
 
-  is_pressed(key: KateKey) {
-    return this.state[key].pressed;
+  is_pressed(button: KateButton) {
+    return this.state[button].pressed;
   }
 
-  is_just_pressed(key: KateKey) {
-    return this.state[key].count === 1;
+  is_just_pressed(button: KateButton) {
+    return this.state[button].count === 1;
   }
 
-  is_just_released(key: KateKey) {
-    return this.state[key].count === -1;
+  is_just_released(button: KateButton) {
+    return this.state[button].count === -1;
   }
 
-  frames_pressed(key: KateKey) {
-    return this.state[key].count;
+  frames_pressed(button: KateButton) {
+    return this.state[button].count;
   }
 }
