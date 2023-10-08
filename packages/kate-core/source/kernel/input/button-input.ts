@@ -49,6 +49,9 @@ export class KateButtonInputAggregator {
     this.virtual_source.setup(root);
     this.gamepad_source.setup();
     this.keyboard_source.setup();
+    this.virtual_source.on_button_changed.listen((ev) =>
+      this.update_button(ev.button, ev.is_pressed)
+    );
     this.gamepad_source.on_button_changed.listen((ev) =>
       this.update_button(ev.button, ev.is_pressed)
     );

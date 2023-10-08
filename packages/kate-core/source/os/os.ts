@@ -176,9 +176,12 @@ export class KateOS {
   }
 
   handle_virtual_button_feedback = (ev: ButtonChangeEvent) => {
-    const settings = this.settings.get("input");
-    if (settings.haptic_feedback_for_virtual_button) {
-      this.kernel.console.vibrate(30);
+    const ignore = ["up", "down", "left", "right"];
+    if (ev.is_pressed && !ignore.includes(ev.button)) {
+      const settings = this.settings.get("input");
+      if (settings.haptic_feedback_for_virtual_button) {
+        this.kernel.console.vibrate(30);
+      }
     }
   };
 
