@@ -130,23 +130,26 @@ export class KateGamepadInputSource implements KateButtonInputSource {
   }
 }
 
+// NOTE: this is done as a bitset just to make the update loop cheaper
+enum ButtonBit {
+  up = 2 << 1,
+  right = 2 << 2,
+  down = 2 << 3,
+  left = 2 << 4,
+  o = 2 << 5,
+  x = 2 << 6,
+  sparkle = 2 << 7,
+  ltrigger = 2 << 8,
+  rtrigger = 2 << 9,
+  berry = 2 << 10,
+  capture = 2 << 11,
+  menu = 2 << 12,
+}
+
 export class KateGamepadAdaptor {
   private _last_update: number | null = null;
   private _paused: boolean = false;
-  private _state: Record<KateButton, boolean> = {
-    up: false,
-    right: false,
-    down: false,
-    left: false,
-    o: false,
-    x: false,
-    sparkle: false,
-    ltrigger: false,
-    rtrigger: false,
-    berry: false,
-    capture: false,
-    menu: false,
-  };
+  private _state: ButtonBit | 0 = 0;
   private _changes: Map<KateButton, boolean> = new Map();
 
   constructor(private _raw_pad: Gamepad, private mapping: GamepadMapping[]) {}
@@ -191,10 +194,8 @@ export class KateGamepadAdaptor {
   }
 
   reset() {
-    this._changes = new Map();
-    for (const button of buttons) {
-      this._state[button] = false;
-    }
+    this._changes.clear();
+    this._state = 0;
   }
 
   update(time: number) {
@@ -202,7 +203,7 @@ export class KateGamepadAdaptor {
       return;
     }
 
-    this._changes = new Map();
+    this._changes.clear();
     const g = this.resolve_raw();
     if (g == null) {
       return;
@@ -212,25 +213,33 @@ export class KateGamepadAdaptor {
     }
 
     this._last_update = time;
+    let new_state = 0;
+
+    const add_change = (button: KateButton | null, is_pressed: boolean) => {
+      if (button != null && is_pressed) {
+        new_state = new_state | ButtonBit[button];
+      }
+    };
+
     for (const mapping of this.mapping) {
       const type = mapping.type;
       switch (type) {
         case "button": {
-          this.add_change(mapping.pressed, g.buttons[mapping.index].pressed);
+          add_change(mapping.pressed, g.buttons[mapping.index].pressed);
           break;
         }
 
         case "axis": {
           const axis = g.axes[mapping.index];
           if (axis < -0.5) {
-            this.add_change(mapping.negative, true);
-            this.add_change(mapping.positive, false);
+            add_change(mapping.negative, true);
+            add_change(mapping.positive, false);
           } else if (axis > 0.5) {
-            this.add_change(mapping.negative, false);
-            this.add_change(mapping.positive, true);
+            add_change(mapping.negative, false);
+            add_change(mapping.positive, true);
           } else {
-            this.add_change(mapping.negative, false);
-            this.add_change(mapping.positive, false);
+            add_change(mapping.negative, false);
+            add_change(mapping.positive, false);
           }
           break;
         }
@@ -239,12 +248,16 @@ export class KateGamepadAdaptor {
           throw unreachable(type);
       }
     }
-  }
 
-  private add_change(button: KateButton | null, is_pressed: boolean) {
-    if (button != null && this._state[button] !== is_pressed) {
-      this._changes.set(button, is_pressed);
-      this._state[button] = is_pressed;
+    const old_state = this._state;
+    for (const button of buttons) {
+      const state_before = old_state & ButtonBit[button];
+      const state_after = new_state & ButtonBit[button];
+      if (state_before !== state_after) {
+        this._changes.set(button, state_after !== 0);
+      }
     }
+
+    this._state = new_state;
   }
 }
