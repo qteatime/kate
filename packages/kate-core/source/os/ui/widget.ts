@@ -6,7 +6,7 @@
 
 import { capabilities } from "../..";
 import * as Cart from "../../cart";
-import { InputKey } from "../../kernel/virtual";
+import { KateButton } from "../../kernel";
 import { EventStream, Observable, load_image_from_bytes } from "../../utils";
 import { InteractionHandler } from "../apis";
 import type { KateOS } from "../os";
@@ -313,7 +313,7 @@ export function image(src: string) {
   return h("img", { src: src }, []);
 }
 
-export function icon_button(icon: InputKey | InputKey[], text: string) {
+export function icon_button(icon: KateButton | KateButton[], text: string) {
   if (typeof icon === "string") {
     return new Button([new HBox(0.5, [new Icon(icon), text])]).focus_target(false);
   } else {
@@ -383,7 +383,7 @@ export function chip(x: Widgetable[]) {
 }
 
 export class Icon extends Widget {
-  constructor(readonly type: InputKey) {
+  constructor(readonly type: KateButton) {
     super();
   }
 
@@ -418,7 +418,7 @@ export class Icon extends Widget {
   }
 }
 
-export function icon(x: InputKey) {
+export function icon(x: KateButton) {
   return new Icon(x);
 }
 

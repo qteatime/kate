@@ -4,7 +4,6 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import type { InputKey } from "../../kernel/virtual";
 import type { KateOS } from "../os";
 import { Scene } from "../ui/scenes";
 import { SceneAboutKate } from "../apps/about-kate";
@@ -15,6 +14,7 @@ import { EventStream } from "../../utils";
 import { SceneSettings } from "../apps";
 import { SceneCartridgeStorageSettings } from "../apps/settings/storage";
 import { SceneCartridgePermissions } from "../apps/settings/permissions";
+import { KateButton } from "../../kernel";
 
 declare global {
   function showOpenFilePicker(options: {
@@ -46,7 +46,7 @@ export class KateContextMenu {
     this.os.kernel.console.button_input.on_button_pressed.remove(this.handle_key_press);
   }
 
-  handle_key_press = (x: { key: InputKey; is_repeat: boolean }) => {
+  handle_key_press = (x: { key: KateButton; is_repeat: boolean }) => {
     if (x.is_repeat) {
       return;
     }
@@ -159,7 +159,7 @@ export class HUD_ContextMenu extends Scene {
     this.os.focus_handler.remove(this.canvas, this.handle_key_pressed);
   }
 
-  handle_key_pressed = (x: { key: InputKey; is_repeat: boolean }) => {
+  handle_key_pressed = (x: { key: KateButton; is_repeat: boolean }) => {
     switch (x.key) {
       case "x": {
         if (!x.is_repeat) {

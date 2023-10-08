@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { InputKey } from "../kernel";
+import { KateButton } from "../kernel";
 
 export type Metadata = {
   presentation: {
@@ -57,20 +57,9 @@ export type Genre =
   | "tool"
   | "other";
 
-export type ReleaseType =
-  | "prototype"
-  | "early-access"
-  | "beta"
-  | "demo"
-  | "regular"
-  | "unofficial";
+export type ReleaseType = "prototype" | "early-access" | "beta" | "demo" | "regular" | "unofficial";
 
-export type ContentRating =
-  | "general"
-  | "teen-and-up"
-  | "mature"
-  | "explicit"
-  | "unknown";
+export type ContentRating = "general" | "teen-and-up" | "mature" | "explicit" | "unknown";
 
 export type DerivativePolicy =
   | "not-allowed"
@@ -106,7 +95,7 @@ export type WebArchiveRuntime = {
 export type Bridge =
   | { type: "network-proxy" }
   | { type: "local-storage-proxy" }
-  | { type: "input-proxy"; mapping: Map<InputKey, KeyboardKey> }
+  | { type: "input-proxy"; mapping: Map<KateButton, KeyboardKey> }
   | { type: "preserve-render" }
   | { type: "capture-canvas"; selector: string }
   | { type: "pointer-input-proxy"; selector: string; hide_cursor: boolean }
@@ -128,10 +117,7 @@ export type File = {
   data: Uint8Array;
 };
 
-export type BasicFile = Omit<
-  File,
-  "integrity_hash" | "integrity_hash_algorithm"
->;
+export type BasicFile = Omit<File, "integrity_hash" | "integrity_hash_algorithm">;
 
 export type ContextualCapabilityGrant = {
   capability: ContextualCapability;

@@ -6,10 +6,14 @@
 
 import * as UI from "../../ui";
 import type { KateOS } from "../../os";
-import { ChangedSetting, SettingsData } from "../../apis/settings";
 import { Deferred, Observable, clamp, enumerate, unreachable } from "../../../utils";
 import { friendly_gamepad_id } from "../../../friendly/gamepad";
-import { GamepadAxisToKate, GamepadButtonToKate, GamepadMapping, InputKey } from "../../../kernel";
+import {
+  GamepadAxisToKate,
+  GamepadButtonToKate,
+  GamepadMapping,
+  KateButton,
+} from "../../../kernel";
 import { InteractionHandler } from "../../apis";
 
 export class GamepadInputSettings extends UI.SimpleScene {
@@ -770,9 +774,9 @@ export class RemapStandardSettings extends UI.SimpleScene {
     }
   }
 
-  async remap(title: string, current: InputKey | null) {
-    let pressed = new Observable<null | InputKey>(current);
-    const choose_pressed = (key: InputKey | null, title: string) => {
+  async remap(title: string, current: KateButton | null) {
+    let pressed = new Observable<null | KateButton>(current);
+    const choose_pressed = (key: KateButton | null, title: string) => {
       const active = pressed.value === key ? "active" : "";
       return UI.interactive(
         this.os,

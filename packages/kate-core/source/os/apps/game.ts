@@ -6,9 +6,9 @@
 
 import type { KateOS } from "../os";
 import { h } from "../ui/widget";
-import type { InputKey } from "../../kernel";
 import type { KateProcess } from "../apis/processes";
 import { Scene } from "../ui/scenes";
+import { KateButton } from "../../kernel";
 
 export class SceneGame extends Scene {
   constructor(os: KateOS, readonly process: () => KateProcess) {
@@ -25,7 +25,7 @@ export class SceneGame extends Scene {
     this.os.focus_handler.listen(this.canvas, this.handle_key_pressed);
   }
 
-  handle_key_pressed = (x: { key: InputKey; is_repeat: boolean }) => {
+  handle_key_pressed = (x: { key: KateButton; is_repeat: boolean }) => {
     return true;
   };
 

@@ -5,13 +5,9 @@
  */
 
 import { EventStream, unreachable } from "../utils";
-import { KateVirtualInputSource } from "./input/input-source-virtual";
-import { KateButtons } from "./input/hardware-buttons";
-import type { KateButton, ButtonState } from "./input/hardware-buttons";
+import { KateButton } from "./input";
 import { KateButtonInputAggregator } from "./input/button-input";
 const pkg = require("../../package.json");
-
-export type InputKey = KateButton;
 
 export type Resource = "screen-recording" | "transient-storage" | "low-storage" | "trusted-mode";
 
@@ -39,7 +35,6 @@ export class VirtualConsole {
   readonly version_container: HTMLElement | null;
   readonly resources_container: HTMLElement;
   readonly version = pkg?.version == null ? null : `v${pkg.version}`;
-  readonly on_virtual_button_touched = new EventStream<InputKey>();
   readonly on_tick = new EventStream<number>();
   readonly audio_context = new AudioContext();
   readonly resources = new Map<Resource, number>();

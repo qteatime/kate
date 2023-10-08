@@ -7,11 +7,11 @@
 import type { KateOS } from "../os";
 import { h } from "../ui/widget";
 import * as UI from "../ui/widget";
-import type { InputKey } from "../../kernel";
 import * as Db from "../../data";
 import { unreachable } from "../../utils";
 import { SceneMedia } from "./media";
 import { Scene } from "../ui/scenes";
+import { KateButton } from "../../kernel";
 
 export class SceneViewMedia extends Scene {
   private url: string | null = null;
@@ -88,7 +88,7 @@ export class SceneViewMedia extends Scene {
     }
   }
 
-  handle_key_pressed = (x: { key: InputKey; is_repeat: boolean }) => {
+  handle_key_pressed = (x: { key: KateButton; is_repeat: boolean }) => {
     if (x.is_repeat) {
       return false;
     }

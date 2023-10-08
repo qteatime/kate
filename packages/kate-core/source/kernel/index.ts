@@ -9,3 +9,4 @@ export * from "./cart-runtime";
 export * from "./input/input-source-gamepad";
 export * from "./input/input-source-keyboard";
 export * from "./virtual";
+export * from "./input";

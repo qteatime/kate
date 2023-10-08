@@ -6,9 +6,9 @@
 
 import { Cart_v5 } from "./v5";
 import { unreachable } from "../../utils";
-import { InputKey } from "../../kernel";
 import { chars_in_mb } from "../parser-utils";
 import { Bridge, KeyboardKey, Runtime } from "../cart-type";
+import { KateButton } from "../../kernel";
 const keymap = require("../../../../kate-tools/assets/keymap.json");
 
 export function parse_runtime(metadata: Cart_v5.Metadata): Runtime {
@@ -74,7 +74,7 @@ function map_map<A, B, C, D>(map: Map<A, B>, f: (a: A, b: B) => [C, D]): Map<C, 
   return result;
 }
 
-function virtual_key(key: Cart_v5.Virtual_key): InputKey {
+function virtual_key(key: Cart_v5.Virtual_key): KateButton {
   switch (key["@variant"]) {
     case Cart_v5.Virtual_key.$Tags.Capture:
       return "capture";

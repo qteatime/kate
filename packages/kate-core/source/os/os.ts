@@ -26,7 +26,6 @@ import { KateDialog } from "./apis/dialog";
 import { KateCapture } from "./apis/capture";
 import { KateSfx } from "./sfx";
 import { KateSettings } from "./apis/settings";
-import { InputKey } from "../kernel";
 import { KateStorageManager } from "./apis/storage-manager";
 import { KatePlayHabits } from "./apis/play-habits";
 import { KateAppResources } from "./apis/app-resources";
@@ -35,6 +34,7 @@ import { KateCapabilitySupervisor } from "./services/capability-supervisor";
 import { KateAuditSupervisor } from "./services/audit-supervisor";
 import { KateDeviceFile } from "./apis/device-file";
 import { KateFairnessSupervisor } from "./services/fairness-supervisor";
+import { ButtonChangeEvent } from "../kernel";
 
 export type CartChangeReason = "installed" | "removed" | "archived" | "save-data-changed";
 
@@ -175,7 +175,7 @@ export class KateOS {
     return new KateAudioServer(this.kernel);
   }
 
-  handle_virtual_button_feedback = (key: InputKey) => {
+  handle_virtual_button_feedback = (ev: ButtonChangeEvent) => {
     const settings = this.settings.get("input");
     if (settings.haptic_feedback_for_virtual_button) {
       this.kernel.console.vibrate(30);
@@ -192,7 +192,9 @@ export class KateOS {
     const { db, old_version } = await KateDb.kate.open(x.database);
     const settings = await KateSettings.load(db);
     const os = new KateOS(kernel, db, sfx, settings);
-    kernel.console.on_virtual_button_touched.listen(os.handle_virtual_button_feedback);
+    kernel.console.button_input.virtual_source.on_button_changed.listen(
+      os.handle_virtual_button_feedback
+    );
     kernel.keyboard_source.remap(settings.get("input").keyboard_mapping);
     kernel.gamepad_source.remap(settings.get("input").gamepad_mapping.standard);
     kernel.gamepad_source.set_primary(settings.get("input").paired_gamepad);

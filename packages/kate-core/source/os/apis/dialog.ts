@@ -4,8 +4,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
+import { KateButton } from "../../kernel";
 import { Deferred, defer } from "../../utils";
-import type { InputKey } from "../../kernel";
 import type { KateOS } from "../os";
 import { wait } from "../time";
 import * as UI from "../ui";
@@ -306,7 +306,7 @@ export class HUD_Dialog extends Scene {
     try {
       this.canvas.textContent = "";
       this.canvas.appendChild(dialog);
-      const key_handler = (x: { key: InputKey; is_repeat: boolean }) => {
+      const key_handler = (x: { key: KateButton; is_repeat: boolean }) => {
         if (x.key === "x" && !x.is_repeat) {
           result.resolve(cancel_value);
           return true;

@@ -7,7 +7,7 @@
 import { RiskCategory } from "../../capabilities";
 import * as Db from "../../data";
 import type { Database } from "../../db-schema";
-import type { ConsoleCase, GamepadMapping, InputKey } from "../../kernel";
+import type { ConsoleCase, GamepadMapping, KateButton } from "../../kernel";
 import { EventStream } from "../../utils";
 
 export type PlayHabits = {
@@ -17,7 +17,7 @@ export type PlayHabits = {
 
 export type KeyboardToKate = {
   key: string;
-  button: InputKey;
+  button: KateButton;
 };
 
 export type Input = {

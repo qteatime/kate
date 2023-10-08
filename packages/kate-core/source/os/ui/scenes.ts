@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import type { InputKey } from "../../kernel";
+import { KateButton } from "../../kernel";
 import { EventStream, Sets, serialise_error } from "../../utils";
 import { FocusInteraction } from "../apis";
 import type { KateOS } from "../os";
@@ -49,9 +49,9 @@ export abstract class Scene {
 }
 
 export type Action = {
-  key: InputKey[];
+  key: KateButton[];
   label: string;
-  handler: (key: InputKey, is_repeat: boolean, is_long_press: boolean) => void;
+  handler: (key: KateButton, is_repeat: boolean, is_long_press: boolean) => void;
 };
 
 export abstract class SimpleScene extends Scene {
@@ -202,14 +202,14 @@ export abstract class SimpleScene extends Scene {
     }
   };
 
-  handle_key_pressed = (x: { key: InputKey; is_repeat: boolean; is_long_press: boolean }) => {
+  handle_key_pressed = (x: { key: KateButton; is_repeat: boolean; is_long_press: boolean }) => {
     if (x.is_repeat) {
       return false;
     }
 
-    const handler = this.actions.find((h) => h.key.includes(x.key as InputKey));
+    const handler = this.actions.find((h) => h.key.includes(x.key as KateButton));
     if (handler != null) {
-      handler.handler(x.key as InputKey, x.is_repeat, x.is_long_press);
+      handler.handler(x.key as KateButton, x.is_repeat, x.is_long_press);
       return true;
     }
     return false;

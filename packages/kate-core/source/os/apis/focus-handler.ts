@@ -4,17 +4,17 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
+import { KateButton } from "../../kernel";
 import { EventStream } from "../../utils";
-import { InputKey } from "../../kernel/virtual";
 import type { KateOS } from "../os";
 
 export type InteractionHandler = {
-  key: InputKey[];
+  key: KateButton[];
   allow_repeat?: boolean;
   on_click?: boolean;
   on_menu?: boolean;
   label: string;
-  handler: (key: InputKey, is_repeat: boolean) => void;
+  handler: (key: KateButton, is_repeat: boolean) => void;
   enabled?: () => boolean;
 };
 
@@ -28,7 +28,7 @@ export class KateFocusHandler {
   private _previous_traps: FocusInteraction | null = null;
   private _handlers: {
     root: HTMLElement;
-    handler: (ev: { key: InputKey; is_repeat: boolean; is_long_press: boolean }) => boolean;
+    handler: (ev: { key: KateButton; is_repeat: boolean; is_long_press: boolean }) => boolean;
   }[] = [];
   readonly on_focus_changed = new EventStream<HTMLElement | null>();
   readonly on_traps_changed = new EventStream<FocusInteraction | null>();
@@ -42,14 +42,14 @@ export class KateFocusHandler {
 
   listen(
     root: HTMLElement,
-    handler: (ev: { key: InputKey; is_repeat: boolean; is_long_press: boolean }) => boolean
+    handler: (ev: { key: KateButton; is_repeat: boolean; is_long_press: boolean }) => boolean
   ) {
     this._handlers.push({ root, handler });
   }
 
   remove(
     root: HTMLElement,
-    handler: (ev: { key: InputKey; is_repeat: boolean; is_long_press: boolean }) => boolean
+    handler: (ev: { key: KateButton; is_repeat: boolean; is_long_press: boolean }) => boolean
   ) {
     this._handlers = this._handlers.filter((x) => x.root !== root && x.handler !== handler);
   }
@@ -58,7 +58,7 @@ export class KateFocusHandler {
     this.interactives.set(element, interactions);
   }
 
-  private should_handle(key: InputKey) {
+  private should_handle(key: KateButton) {
     return ["up", "down", "left", "right", "o"].includes(key);
   }
 
@@ -101,7 +101,7 @@ export class KateFocusHandler {
     is_repeat,
     is_long_press,
   }: {
-    key: InputKey;
+    key: KateButton;
     is_repeat: boolean;
     is_long_press: boolean;
   }) => {
@@ -123,12 +123,12 @@ export class KateFocusHandler {
       if (traps != null) {
         const trap = traps.handlers.find(
           (x) =>
-            x.key.includes(key as InputKey) &&
+            x.key.includes(key as KateButton) &&
             (!is_repeat || x.allow_repeat) &&
             (x.enabled == null || x.enabled())
         );
         if (trap != null) {
-          trap.handler(key as InputKey, is_repeat);
+          trap.handler(key as KateButton, is_repeat);
           return;
         }
       }
@@ -241,7 +241,7 @@ export class KateFocusHandler {
     this.focus(candidate);
   }
 
-  focus(element: HTMLElement | null, key: InputKey | null = null) {
+  focus(element: HTMLElement | null, key: KateButton | null = null) {
     if (element == null || this._current_root == null) {
       if (key != null) {
         this.os.sfx.play("invalid");
