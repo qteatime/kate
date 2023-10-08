@@ -74,9 +74,13 @@ export class KateGamepadInputSource implements KateButtonInputSource {
   }
 
   resolve_primary() {
-    return (
-      this._gamepads.find((x) => this._primary == null || x.device_id === this._primary) ?? null
-    );
+    const primary = this._gamepads.find((x) => this._primary === x.device_id);
+    if (primary != null) {
+      return primary;
+    } else {
+      const active = this._gamepads.find((x) => x.is_active);
+      return active ?? null;
+    }
   }
 
   reset() {
@@ -161,6 +165,10 @@ export class KateGamepadAdaptor {
 
   get device_id() {
     return this._raw_pad.id;
+  }
+
+  get is_active() {
+    return this.resolve_raw() != null;
   }
 
   resolve_raw() {
