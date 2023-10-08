@@ -37,7 +37,7 @@ export class KateFocusHandler {
   constructor(readonly os: KateOS) {}
 
   setup() {
-    this.os.kernel.console.on_key_pressed.listen(this.handle_input);
+    this.os.kernel.console.button_input.on_button_pressed.listen(this.handle_input);
   }
 
   listen(

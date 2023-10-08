@@ -9,7 +9,7 @@
 // the user to have their own custom mappings.
 
 import { EventStream } from "../../utils";
-import { KateButton } from "./buttons";
+import { KateButton } from "./hardware-buttons";
 import { ButtonChangeEvent, KateButtonInputSource } from "./input-source";
 
 const default_config: Record<KateButton, string> = {

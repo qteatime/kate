@@ -14,7 +14,7 @@
 // everywhere else.
 
 import type { EventStream } from "../../utils";
-import type { KateButton } from "./buttons";
+import type { KateButton } from "./hardware-buttons";
 
 // ## Digital input sources
 //

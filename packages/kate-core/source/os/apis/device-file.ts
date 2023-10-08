@@ -37,7 +37,7 @@ export class KateDeviceFile {
       types: { description: string; accept: { [mime: string]: string[] } }[];
     }
   ): Promise<DeviceFileHandle[]> {
-    this.os.kernel.console.reset_all_keys();
+    this.os.kernel.console.button_input.reset();
 
     let handles: DeviceFileHandle[];
     if ("showOpenFilePicker" in window) {
@@ -100,9 +100,7 @@ export class KateDeviceFile {
       excludeAcceptAllOption: options.strict ?? false,
       types: options.types,
     });
-    return Promise.all(
-      handles.map(async (x) => ({ path: x.name, handle: await x.getFile() }))
-    );
+    return Promise.all(handles.map(async (x) => ({ path: x.name, handle: await x.getFile() })));
   }
 
   async open_directory(requestee: string): Promise<DeviceFileHandle[]> {

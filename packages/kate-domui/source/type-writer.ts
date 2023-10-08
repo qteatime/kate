@@ -73,8 +73,12 @@ export class TypeWriterText extends Widget {
     return element;
   }
 
-  handle_key_pressed = async (key: KateTypes.ExtendedInputKey) => {
-    if (key !== "o") {
+  handle_key_pressed = async (ev: {
+    key: KateTypes.InputKey;
+    is_repeat: boolean;
+    is_long_press: boolean;
+  }) => {
+    if (ev.key !== "o") {
       return;
     }
 
@@ -127,8 +131,8 @@ export class TypeWriterText extends Widget {
         }
         case "wait": {
           const result = defer<void>();
-          KateAPI.input.on_key_pressed.once((key) => {
-            if (key === "o") {
+          KateAPI.input.on_key_pressed.once((ev) => {
+            if (ev.key === "o") {
               result.resolve();
             }
           });

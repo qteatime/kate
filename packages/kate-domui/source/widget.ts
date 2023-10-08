@@ -334,12 +334,12 @@ export class KeyEventMap extends Widget {
     KateAPI.input.on_key_pressed.remove(this.handle_input);
   }
 
-  handle_input = async (key: InputKey) => {
+  handle_input = async (ev: { key: InputKey; is_repeat: boolean; is_long_press: boolean }) => {
     if (!this.active) {
       return;
     }
 
-    const handler = this.mapping[key];
+    const handler = this.mapping[ev.key];
     if (handler != null) {
       this.active = false;
       this.active = await handler();

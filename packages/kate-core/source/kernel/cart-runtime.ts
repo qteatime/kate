@@ -164,7 +164,7 @@ export class CR_Web_archive extends CartRuntime {
     (frame as any).csp =
       "default-src data: blob: 'unsafe-inline' 'unsafe-eval' 'unsafe-inline' 'wasm-unsafe-eval'; navigate-to 'none'";
 
-    this.console.on_input_changed.listen((ev) => {
+    this.console.button_input.on_state_changed.listen((ev) => {
       if (env.is_foreground(env.cart)) {
         channel.send({
           type: "kate:input-state-changed",
@@ -175,11 +175,13 @@ export class CR_Web_archive extends CartRuntime {
     });
 
     let recording = false;
-    this.console.on_key_pressed.listen((key) => {
+    this.console.button_input.on_button_pressed.listen((key) => {
       if (env.is_foreground(env.cart)) {
         channel.send({
           type: "kate:input-key-pressed",
           key: key,
+          is_repeat: key.is_repeat,
+          is_long_press: key.is_long_press,
         });
         if (key.key === "capture") {
           if (key.is_long_press) {

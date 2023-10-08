@@ -5,9 +5,10 @@
  */
 
 import { EventStream, unreachable } from "../utils";
-import { KateVirtualInputSource } from "./input/virtual-input";
-import { KateButtons } from "./input/buttons";
-import type { KateButton, ButtonState } from "./input/buttons";
+import { KateVirtualInputSource } from "./input/input-source-virtual";
+import { KateButtons } from "./input/hardware-buttons";
+import type { KateButton, ButtonState } from "./input/hardware-buttons";
+import { KateButtonInputAggregator } from "./input/button-input";
 const pkg = require("../../package.json");
 
 export type InputKey = KateButton;
@@ -27,8 +28,7 @@ export type ConsoleOptions = {
 };
 
 export class VirtualConsole {
-  private virtual_source: KateVirtualInputSource;
-  private button_state: KateButtons;
+  readonly button_input = new KateButtonInputAggregator();
 
   private is_listening = false;
   private _case: ConsoleCase;
@@ -39,15 +39,6 @@ export class VirtualConsole {
   readonly version_container: HTMLElement | null;
   readonly resources_container: HTMLElement;
   readonly version = pkg?.version == null ? null : `v${pkg.version}`;
-  readonly on_input_changed = new EventStream<{
-    key: InputKey;
-    is_down: boolean;
-  }>();
-  readonly on_key_pressed = new EventStream<{
-    key: InputKey;
-    is_repeat: boolean;
-    is_long_press: boolean;
-  }>();
   readonly on_virtual_button_touched = new EventStream<InputKey>();
   readonly on_tick = new EventStream<number>();
   readonly audio_context = new AudioContext();
@@ -56,16 +47,11 @@ export class VirtualConsole {
   private timer_id: any = null;
   private last_time: number | null = null;
 
-  readonly SPECIAL_FRAMES = 15;
-  readonly REPEAT_FRAMES = 10;
-  readonly REPEAT_RATE = 3;
   readonly FPS = 30;
   readonly ONE_FRAME = Math.ceil(1000 / 30);
 
   constructor(readonly root: HTMLElement, readonly options: ConsoleOptions) {
     this._case = options.case;
-    this.virtual_source = new KateVirtualInputSource(root);
-    this.button_state = new KateButtons();
 
     this.os_root = root.querySelector("#kate-os-root")!;
     this.hud = root.querySelector("#kate-hud")!;
@@ -77,12 +63,6 @@ export class VirtualConsole {
       this.version_container.textContent = this.version;
     }
     this.open_audio_output();
-    this.reset_states();
-  }
-
-  private reset_states() {
-    this.button_state.reset();
-    this.virtual_source.reset();
   }
 
   private start_ticking() {
@@ -125,33 +105,9 @@ export class VirtualConsole {
 
   private do_tick(time: number) {
     this.last_time = time;
-    for (const key of this.button_state.all_changed) {
-      this.virtual_source.update(key.id as any, key.pressed);
-      this.on_input_changed.emit({ key: key.id as any, is_down: key.pressed });
-      this.handle_key_pressed(key);
-    }
+    this.button_input.update(time);
     this.on_tick.emit(time);
-    this.button_state.tick();
-  }
-
-  private handle_key_pressed(key: ButtonState) {
-    const is_special = key.id === "capture";
-    const is_just_released = key.count === -1;
-    const is_just_pressed = key.count === 1;
-    const is_long_press = key.count > 0 && key.count % this.SPECIAL_FRAMES === 0;
-    const is_repeat =
-      key.count >= this.REPEAT_FRAMES && (key.count - this.REPEAT_FRAMES) % this.REPEAT_RATE === 0;
-
-    if (is_special) {
-      if (is_long_press) {
-        this.on_key_pressed.emit({ key: key.id, is_repeat: false, is_long_press: true });
-        this.button_state.force_reset("capture");
-      } else if (is_just_released) {
-        this.on_key_pressed.emit({ key: key.id, is_repeat: false, is_long_press: false });
-      }
-    } else if (is_just_pressed || is_repeat) {
-      this.on_key_pressed.emit({ key: key.id as any, is_repeat: is_repeat, is_long_press: false });
-    }
+    this.button_input.tick();
   }
 
   get case() {
@@ -178,7 +134,7 @@ export class VirtualConsole {
 
   listen() {
     if (this.is_listening) {
-      throw new Error(`listen called twice`);
+      throw new Error(`[kate:virtual] listen called twice`);
     }
     this.is_listening = true;
 
@@ -188,14 +144,11 @@ export class VirtualConsole {
     (screen as any).addEventListener?.("orientationchange", () => this.update_scale(null));
     this.update_scale(null);
 
-    this.virtual_source.setup();
-    this.virtual_source.on_button_changed.listen((change) => {
-      this.update_virtual_key(change.button, change.is_pressed);
-    });
+    this.button_input.setup(this.root);
 
     document.addEventListener("visibilitychange", () => {
       if (document.hidden) {
-        this.reset_all_keys();
+        this.button_input.reset();
       }
     });
 
@@ -224,16 +177,6 @@ export class VirtualConsole {
       console.warn(`[Kate] locking orientation in fullscreen not supported`, error);
       return false;
     }
-  }
-
-  reset_all_keys() {
-    this.button_state.reset();
-    this.virtual_source.reset();
-  }
-
-  update_virtual_key(key: InputKey, state: boolean) {
-    this.button_state.update(key, state);
-    this.virtual_source.update(key, state);
   }
 
   take_resource(resource: Resource) {

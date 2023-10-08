@@ -20,9 +20,7 @@ export class BitsyImporter implements Importer {
     const is_html = GlobPattern.from_pattern("*.html");
     const matches = files.filter((x) => is_html.test(x.relative_path));
     const candidates = (await Promise.all(matches.map(try_bitsy_page))).flat();
-    return candidates.map(
-      (x) => new BitsyImporter(files, make_id(), x.title, x.version, x.file)
-    );
+    return candidates.map((x) => new BitsyImporter(files, make_id(), x.title, x.version, x.file));
   }
 
   public thumbnail: Uint8Array | null = null;
@@ -74,10 +72,12 @@ export class BitsyImporter implements Importer {
                 down: "ArrowDown",
                 x: "KeyX",
                 o: "KeyZ",
-                menu: "ShiftLeft",
-                capture: "KeyC",
-                ltrigger: "KeyA",
-                rtrigger: "KeyS",
+                sparkle: null,
+                menu: null,
+                capture: null,
+                berry: null,
+                ltrigger: null,
+                rtrigger: null,
               }),
             }),
             Cart.Bridge.Capture_canvas({ selector: "#game" }),

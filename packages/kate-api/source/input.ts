@@ -24,8 +24,7 @@ export type InputKey =
 
 export class KateInput {
   #channel: KateIPC;
-  readonly on_key_pressed = new EventStream<InputKey>();
-  readonly on_extended_key_pressed = new EventStream<{
+  readonly on_key_pressed = new EventStream<{
     key: InputKey;
     is_repeat: boolean;
     is_long_press: boolean;
@@ -60,7 +59,6 @@ export class KateInput {
         if (is_down) {
           if (this._state[key] <= 0) {
             this._changed.add(key);
-            this.on_key_pressed.emit(key);
           }
           this._state[key] = Math.max(1, this._state[key]);
         } else {
@@ -77,7 +75,7 @@ export class KateInput {
         this._state[key] = 0;
       }
     });
-    this.#channel.events.key_pressed.listen((key) => this.on_extended_key_pressed.emit(key));
+    this.#channel.events.key_pressed.listen((key) => this.on_key_pressed.emit(key));
     this.timer.on_tick.listen(this.update_key_state);
   }
 

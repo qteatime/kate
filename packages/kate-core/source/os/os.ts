@@ -193,9 +193,9 @@ export class KateOS {
     const settings = await KateSettings.load(db);
     const os = new KateOS(kernel, db, sfx, settings);
     kernel.console.on_virtual_button_touched.listen(os.handle_virtual_button_feedback);
-    kernel.keyboard.remap(settings.get("input").keyboard_mapping);
-    kernel.gamepad.remap(settings.get("input").gamepad_mapping.standard);
-    kernel.gamepad.set_primary(settings.get("input").paired_gamepad);
+    kernel.keyboard_source.remap(settings.get("input").keyboard_mapping);
+    kernel.gamepad_source.remap(settings.get("input").gamepad_mapping.standard);
+    kernel.gamepad_source.set_primary(settings.get("input").paired_gamepad);
     sfx.set_enabled(settings.get("ui").sound_feedback);
     os.set_os_animation(settings.get("ui").animation_effects);
     if (x.set_case_mode !== false) {

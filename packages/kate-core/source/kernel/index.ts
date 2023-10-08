@@ -6,6 +6,6 @@
 
 export * from "./kate";
 export * from "./cart-runtime";
-export * from "./input/gamepad-input";
-export * from "./input/keyboard-input";
+export * from "./input/input-source-gamepad";
+export * from "./input/input-source-keyboard";
 export * from "./virtual";

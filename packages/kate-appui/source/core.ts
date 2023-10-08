@@ -89,12 +89,12 @@ export abstract class UIScene {
 }
 
 export type InteractionHandler = {
-  key: KateTypes.ExtendedInputKey[];
+  key: KateTypes.InputKey[];
   label: string;
   allow_repeat?: boolean;
   on_click?: boolean;
   on_menu?: boolean;
-  handler: (key: KateTypes.ExtendedInputKey, repeat: boolean) => Promise<void>;
+  handler: (key: KateTypes.InputKey, repeat: boolean) => Promise<void>;
 };
 
 export class UIFocus {
@@ -105,9 +105,7 @@ export class UIFocus {
 
   constructor(readonly ui: UI) {
     this.ui.on_scene_changed.listen(this.handle_scene_changed);
-    KateAPI.input.on_extended_key_pressed.listen((x) =>
-      this.handle_key(x.key, x.is_repeat)
-    );
+    KateAPI.input.on_key_pressed.listen((ev) => this.handle_key(ev.key, ev.is_repeat));
   }
 
   get root() {
@@ -132,25 +130,17 @@ export class UIFocus {
     }
   }
 
-  register_interactions(
-    element: HTMLElement,
-    interactions: InteractionHandler[]
-  ) {
+  register_interactions(element: HTMLElement, interactions: InteractionHandler[]) {
     this._interactive.set(element, interactions);
   }
 
   register_scene_handlers(scene: UIScene, interactions: InteractionHandler[]) {
     const handlers0 = this._scene_handlers.get(scene) ?? [];
-    const handlers = handlers0.concat(
-      interactions.filter((x) => !handlers0.includes(x))
-    );
+    const handlers = handlers0.concat(interactions.filter((x) => !handlers0.includes(x)));
     this._scene_handlers.set(scene, handlers);
   }
 
-  deregister_scene_handlers(
-    scene: UIScene,
-    interactions: InteractionHandler[]
-  ) {
+  deregister_scene_handlers(scene: UIScene, interactions: InteractionHandler[]) {
     const handlers0 = this._scene_handlers.get(scene) ?? [];
     const handlers = handlers0.filter((x) => !interactions.includes(x));
     this._scene_handlers.set(scene, handlers);
@@ -180,16 +170,14 @@ export class UIFocus {
     }
 
     const current_focus =
-      root.querySelector(".focus") ??
-      root.querySelector(".kate-ui-focus-target") ??
-      null;
+      root.querySelector(".focus") ?? root.querySelector(".kate-ui-focus-target") ?? null;
 
     if (current_focus instanceof HTMLElement || current_focus == null) {
       this.focus(current_focus);
     }
   }
 
-  handle_key = (key: KateTypes.ExtendedInputKey, repeat: boolean) => {
+  handle_key = (key: KateTypes.InputKey, repeat: boolean) => {
     const current = this.current;
     if (current != null) {
       if (this.handle_current_interaction(current, key, repeat)) {
@@ -300,11 +288,7 @@ export class UIFocus {
     }
   }
 
-  handle_current_interaction(
-    current: HTMLElement,
-    key: KateTypes.ExtendedInputKey,
-    repeat: boolean
-  ) {
+  handle_current_interaction(current: HTMLElement, key: KateTypes.InputKey, repeat: boolean) {
     const interactions = this._interactive.get(current);
     if (interactions == null) {
       return false;
@@ -320,7 +304,7 @@ export class UIFocus {
     }
   }
 
-  handle_scene_interaction(key: KateTypes.ExtendedInputKey, repeat: boolean) {
+  handle_scene_interaction(key: KateTypes.InputKey, repeat: boolean) {
     if (this.ui.current == null) {
       return;
     }
@@ -328,9 +312,7 @@ export class UIFocus {
     if (scene_keys == null) {
       return false;
     }
-    const scene_key = scene_keys?.find(
-      (x) => x.key.includes(key) && (x.allow_repeat || !repeat)
-    );
+    const scene_key = scene_keys?.find((x) => x.key.includes(key) && (x.allow_repeat || !repeat));
     if (scene_key == null) {
       return false;
     } else {

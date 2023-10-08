@@ -10,7 +10,7 @@
 // originating from elsewhere.
 
 import { EventStream, clamp, unreachable } from "../../utils";
-import { KateButton, buttons } from "./buttons";
+import { KateButton, buttons } from "./hardware-buttons";
 import { ButtonChangeEvent, KateButtonInputSource } from "./input-source";
 
 type Direction = "up" | "right" | "down" | "left";
@@ -31,25 +31,31 @@ export class KateVirtualInputSource implements KateButtonInputSource {
   readonly on_button_changed = new EventStream<ButtonChangeEvent>();
 
   private _attached = false;
+  private _root: HTMLElement | null = null;
 
   private thumb_direction: Dpad = Dpad.IDLE;
-  private thumb_range: number;
+  private thumb_range: number | null = null;
   private moving_thumb: boolean = false;
-  private dpad: HTMLElement;
-  private dpad_thumb: HTMLElement;
+  private dpad: HTMLElement | null = null;
+  private dpad_thumb: HTMLElement | null = null;
 
-  private btn_ok: HTMLElement;
-  private btn_cancel: HTMLElement;
-  private btn_sparkle: HTMLElement;
-  private btn_menu: HTMLElement;
-  private btn_capture: HTMLElement;
-  private btn_berry: HTMLElement;
-  private btn_l: HTMLElement;
-  private btn_r: HTMLElement;
+  private btn_ok: HTMLElement | null = null;
+  private btn_cancel: HTMLElement | null = null;
+  private btn_sparkle: HTMLElement | null = null;
+  private btn_menu: HTMLElement | null = null;
+  private btn_capture: HTMLElement | null = null;
+  private btn_berry: HTMLElement | null = null;
+  private btn_l: HTMLElement | null = null;
+  private btn_r: HTMLElement | null = null;
 
-  private subscriptions: { button: HTMLElement; event: string; listener: unknown }[] = [];
+  private assert_setup() {
+    if (!this._attached) {
+      throw new Error(`[kate:virtual-input] virtual input not properly initialised`);
+    }
+  }
 
-  constructor(private root: HTMLElement) {
+  private setup_state(root: HTMLElement) {
+    this._root = root;
     this.dpad = root.querySelector(".kc-dpad")!;
     this.dpad_thumb = root.querySelector(".kc-thumb")!;
     this.thumb_range = Number(this.dpad_thumb.getAttribute("data-range"));
@@ -69,38 +75,31 @@ export class KateVirtualInputSource implements KateButtonInputSource {
     this.btn_r = root.querySelector(".kc-shoulder-right")!;
   }
 
-  setup(): void {
+  setup(root: HTMLElement): void {
     if (this._attached) {
       throw new Error(`[kate:virtual-input] setup() called twice.`);
     }
     this._attached = true;
 
-    this.listen_virtual_button(this.btn_ok, "o");
-    this.listen_virtual_button(this.btn_cancel, "x");
-    this.listen_virtual_button(this.btn_sparkle, "sparkle");
-    this.listen_virtual_button(this.btn_menu, "menu");
-    this.listen_virtual_button(this.btn_capture, "capture");
-    this.listen_virtual_button(this.btn_berry, "berry");
-    this.listen_virtual_button(this.btn_l, "ltrigger");
-    this.listen_virtual_button(this.btn_r, "rtrigger");
+    this.setup_state(root);
+    this.listen_virtual_button(this.btn_ok!, "o");
+    this.listen_virtual_button(this.btn_cancel!, "x");
+    this.listen_virtual_button(this.btn_sparkle!, "sparkle");
+    this.listen_virtual_button(this.btn_menu!, "menu");
+    this.listen_virtual_button(this.btn_capture!, "capture");
+    this.listen_virtual_button(this.btn_berry!, "berry");
+    this.listen_virtual_button(this.btn_l!, "ltrigger");
+    this.listen_virtual_button(this.btn_r!, "rtrigger");
     this.listen_thumb();
   }
 
-  teardown(): void {
-    for (const { button, event, listener } of this.subscriptions) {
-      button.removeEventListener(event, listener as any);
-    }
-    this.subscriptions = [];
-    this._attached = false;
-  }
-
   private listen_thumb() {
-    const area = this.dpad;
-    const thumb = this.dpad_thumb;
+    const area = this.dpad!;
+    const thumb = this.dpad_thumb!;
     let moving: unknown = null;
     const thumb_center_x = thumb.offsetWidth / 2 + thumb.offsetLeft;
     const thumb_center_y = thumb.offsetHeight / 2 + thumb.offsetTop;
-    const range = this.thumb_range;
+    const range = this.thumb_range!;
 
     const on_down = (ev: PointerEvent) => {
       ev.preventDefault();
@@ -140,14 +139,8 @@ export class KateVirtualInputSource implements KateButtonInputSource {
     };
 
     area.addEventListener("pointerdown", on_down);
-    this.root.addEventListener("pointerup", on_up);
+    this._root!.addEventListener("pointerup", on_up);
     area.addEventListener("pointermove", on_move);
-
-    this.subscriptions.push(
-      { button: area, event: "pointerdown", listener: on_down },
-      { button: this.root, event: "pointerup", listener: on_up },
-      { button: area, event: "pointermove", listener: on_move }
-    );
   }
 
   private listen_virtual_button(button: HTMLElement, key: KateButton) {
@@ -166,13 +159,6 @@ export class KateVirtualInputSource implements KateButtonInputSource {
     button.addEventListener("mouseup", on_up);
     button.addEventListener("touchstart", on_down);
     button.addEventListener("touchend", on_up);
-
-    this.subscriptions.push(
-      { button, event: "mousedown", listener: on_down },
-      { button, event: "mouseup", listener: on_up },
-      { button, event: "touchstart", listener: on_down },
-      { button, event: "touchend", listener: on_up }
-    );
   }
 
   reset() {
@@ -182,6 +168,8 @@ export class KateVirtualInputSource implements KateButtonInputSource {
   }
 
   update(button: KateButton, is_down: boolean) {
+    this.assert_setup();
+
     switch (button) {
       case "up":
       case "down":
@@ -191,35 +179,35 @@ export class KateVirtualInputSource implements KateButtonInputSource {
         break;
 
       case "capture":
-        this.update_button(this.btn_capture, is_down);
+        this.update_button(this.btn_capture!, is_down);
         break;
 
       case "menu":
-        this.update_button(this.btn_menu, is_down);
+        this.update_button(this.btn_menu!, is_down);
         break;
 
       case "o":
-        this.update_button(this.btn_ok, is_down);
+        this.update_button(this.btn_ok!, is_down);
         break;
 
       case "x":
-        this.update_button(this.btn_cancel, is_down);
+        this.update_button(this.btn_cancel!, is_down);
         break;
 
       case "ltrigger":
-        this.update_button(this.btn_l, is_down);
+        this.update_button(this.btn_l!, is_down);
         break;
 
       case "rtrigger":
-        this.update_button(this.btn_r, is_down);
+        this.update_button(this.btn_r!, is_down);
         break;
 
       case "berry":
-        this.update_button(this.btn_berry, is_down);
+        this.update_button(this.btn_berry!, is_down);
         break;
 
       case "sparkle":
-        this.update_button(this.btn_sparkle, is_down);
+        this.update_button(this.btn_sparkle!, is_down);
         break;
 
       default:
@@ -227,14 +215,14 @@ export class KateVirtualInputSource implements KateButtonInputSource {
     }
   }
 
-  update_button(button: HTMLElement, is_down: boolean) {
+  private update_button(button: HTMLElement, is_down: boolean) {
     button.classList.toggle("down", is_down);
   }
 
-  update_thumb(direction: Direction, is_down: boolean) {
+  private update_thumb(direction: Direction, is_down: boolean) {
     this.move_thumb(direction, is_down);
     if (!this.moving_thumb) {
-      this.dpad_thumb.style.translate = this.thumb_translate;
+      this.dpad_thumb!.style.translate = this.thumb_translate;
     }
   }
 
@@ -262,8 +250,8 @@ export class KateVirtualInputSource implements KateButtonInputSource {
     }
   }
 
-  get thumb_translate() {
-    const range = this.thumb_range;
+  private get thumb_translate() {
+    const range = this.thumb_range!;
 
     switch (this.thumb_direction) {
       case Dpad.UP_LEFT:

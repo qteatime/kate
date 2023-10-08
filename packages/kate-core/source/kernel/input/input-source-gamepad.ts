@@ -13,7 +13,7 @@
 // the console.
 
 import { EventStream, unreachable } from "../../utils";
-import { KateButton, buttons } from "./buttons";
+import { KateButton, buttons } from "./hardware-buttons";
 import { ButtonChangeEvent, KateButtonInputSource } from "./input-source";
 
 export type GamepadButtonToKate = {
@@ -77,6 +77,12 @@ export class KateGamepadInputSource implements KateButtonInputSource {
     return (
       this._gamepads.find((x) => this._primary == null || x.device_id === this._primary) ?? null
     );
+  }
+
+  reset() {
+    for (const gamepad of this._gamepads) {
+      gamepad.reset();
+    }
   }
 
   pause() {
@@ -164,11 +170,11 @@ export class KateGamepadAdaptor {
 
   remap(mapping: GamepadMapping[]) {
     this.mapping = mapping;
-    this.reset_state();
+    this.reset();
   }
 
   pause() {
-    this.reset_state();
+    this.reset();
     this._paused = true;
   }
 
@@ -176,7 +182,7 @@ export class KateGamepadAdaptor {
     this._paused = false;
   }
 
-  private reset_state() {
+  reset() {
     this._changes = new Map();
     for (const button of buttons) {
       this._state[button] = false;

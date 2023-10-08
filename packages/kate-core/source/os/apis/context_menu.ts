@@ -39,11 +39,11 @@ export class KateContextMenu {
   constructor(readonly os: KateOS) {}
 
   setup() {
-    this.os.kernel.console.on_key_pressed.listen(this.handle_key_press);
+    this.os.kernel.console.button_input.on_button_pressed.listen(this.handle_key_press);
   }
 
   teardown() {
-    this.os.kernel.console.on_key_pressed.remove(this.handle_key_press);
+    this.os.kernel.console.button_input.on_button_pressed.remove(this.handle_key_press);
   }
 
   handle_key_press = (x: { key: InputKey; is_repeat: boolean }) => {

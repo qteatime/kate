@@ -22,9 +22,7 @@ export class RenpyImporter implements Importer {
     const is_renpy_main = GlobPattern.from_pattern("renpy/__init__.py");
     const is_packaged_main = GlobPattern.from_pattern("*/renpy/__init__.py");
     const [main] = files0.filter(
-      (x) =>
-        is_renpy_main.test(x.relative_path) ||
-        is_packaged_main.test(x.relative_path)
+      (x) => is_renpy_main.test(x.relative_path) || is_packaged_main.test(x.relative_path)
     );
     if (main != null) {
       const files1 = maybe_unpackage(main, files0);
@@ -65,9 +63,7 @@ export class RenpyImporter implements Importer {
   async make_cartridge(): Promise<CartConfig> {
     const now = new Date();
     const decoder = new TextDecoder();
-    const runtime_dir = Pathname.from_string("/www/runtimes/renpy").to(
-      this.versions.engine
-    );
+    const runtime_dir = Pathname.from_string("/www/runtimes/renpy").to(this.versions.engine);
 
     const runtime_files: string[] = JSON.parse(
       decoder.decode(
@@ -121,8 +117,10 @@ export class RenpyImporter implements Importer {
                 down: "ArrowDown",
                 x: "Escape",
                 o: "Enter",
+                sparkle: "KeyH",
+                berry: null,
                 menu: "ShiftLeft",
-                capture: "KeyC",
+                capture: null,
                 ltrigger: "PageUp",
                 rtrigger: "ControlLeft",
               }),
@@ -180,18 +178,14 @@ async function get_renpy_title(files: KateTypes.DeviceFileHandle[]) {
 
 async function get_renpy_version(files: KateTypes.DeviceFileHandle[]) {
   const is_version = GlobPattern.from_pattern("game/script_version.txt");
-  const rpy_version_handle = files.find((x) =>
-    is_version.test(x.relative_path)
-  );
+  const rpy_version_handle = files.find((x) => is_version.test(x.relative_path));
   if (rpy_version_handle == null) {
     return null;
   }
 
   const decoder = new TextDecoder();
   const rpy_version = decoder.decode(await rpy_version_handle.read());
-  const [_, major, minor] = rpy_version.match(
-    /\((\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)/
-  )!;
+  const [_, major, minor] = rpy_version.match(/\((\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)/)!;
   switch (major) {
     case "6":
     case "7":
@@ -204,10 +198,7 @@ async function get_renpy_version(files: KateTypes.DeviceFileHandle[]) {
   }
 }
 
-async function make_game_zip(
-  runtime_dir: Pathname,
-  files0: KateTypes.DeviceFileHandle[]
-) {
+async function make_game_zip(runtime_dir: Pathname, files0: KateTypes.DeviceFileHandle[]) {
   const encoder = new TextEncoder();
   const is_game = GlobPattern.from_pattern("game/**");
   const is_remote = is_image.join(is_audio).join(is_video);
@@ -216,24 +207,16 @@ async function make_game_zip(
   );
   const zip = await JSZip.loadAsync(
     (
-      await KateAPI.cart_fs.read_file(
-        runtime_dir.to("renpy.zip").make_relative().as_string()
-      )
+      await KateAPI.cart_fs.read_file(runtime_dir.to("renpy.zip").make_relative().as_string())
     ).bytes
   );
   for (const file of files) {
     zip.file(file.relative_path.make_relative().as_string(), await file.read());
   }
   const game_files = await get_remote_files(files0);
-  zip.file(
-    "game/renpyweb_remote_files.txt",
-    encoder.encode(game_files.remote_rules)
-  );
+  zip.file("game/renpyweb_remote_files.txt", encoder.encode(game_files.remote_rules));
   for (const file of game_files.placeholders) {
-    zip.file(
-      Pathname.from_string(file.path).make_relative().as_string(),
-      file.data
-    );
+    zip.file(Pathname.from_string(file.path).make_relative().as_string(), file.data);
   }
   for (const file of game_files.zipped) {
     zip.file(file.relative_path.make_relative().as_string(), await file.read());
@@ -306,11 +289,7 @@ async function get_remote_files(files: KateTypes.DeviceFileHandle[]) {
   }[] = [];
   const zipped: KateTypes.DeviceFileHandle[] = [];
 
-  function classify(
-    file: KateTypes.DeviceFileHandle,
-    type: RemoteType,
-    remote: boolean
-  ) {
+  function classify(file: KateTypes.DeviceFileHandle, type: RemoteType, remote: boolean) {
     if (remote) {
       const suffix = type === "image" ? "1,1" : "-";
       remotes.push({
@@ -334,11 +313,7 @@ async function get_remote_files(files: KateTypes.DeviceFileHandle[]) {
     const type = get_remote_type(file.relative_path);
     switch (type) {
       case "image": {
-        classify(
-          file,
-          "image",
-          filter.is_remote("image", file.relative_path) ?? false
-        );
+        classify(file, "image", filter.is_remote("image", file.relative_path) ?? false);
         break;
       }
 
@@ -350,11 +325,7 @@ async function get_remote_files(files: KateTypes.DeviceFileHandle[]) {
             : filter.is_remote("voice", file.relative_path) != null
             ? "voice"
             : "music";
-        classify(
-          file,
-          type,
-          filter.is_remote(type, file.relative_path) ?? false
-        );
+        classify(file, type, filter.is_remote(type, file.relative_path) ?? false);
         break;
       }
 
@@ -369,17 +340,13 @@ async function get_remote_files(files: KateTypes.DeviceFileHandle[]) {
     }
   }
 
-  const placeholder_img = new Uint8Array(
-    await (await make_placeholder()).arrayBuffer()
-  );
+  const placeholder_img = new Uint8Array(await (await make_placeholder()).arrayBuffer());
   const placeholders = await Promise.all(
     remotes
       .filter((x) => x.type === "image")
       .map((x) =>
         make_file(
-          Pathname.from_string("_placeholders").join(
-            x.file.relative_path.drop_prefix(["game"])
-          ),
+          Pathname.from_string("_placeholders").join(x.file.relative_path.drop_prefix(["game"])),
           placeholder_img
         )
       )
@@ -414,12 +381,8 @@ class RemoteFilter {
   }
 }
 
-async function get_remote_filter(
-  files: KateTypes.DeviceFileHandle[]
-): Promise<RemoteFilter> {
-  const is_progressive_rules = GlobPattern.from_pattern(
-    "progressive_download.txt"
-  );
+async function get_remote_filter(files: KateTypes.DeviceFileHandle[]): Promise<RemoteFilter> {
+  const is_progressive_rules = GlobPattern.from_pattern("progressive_download.txt");
   const rules = files.find((x) => is_progressive_rules.test(x.relative_path));
   if (rules != null) {
     const decoder = new TextDecoder();
@@ -475,14 +438,8 @@ function make_placeholder() {
   });
 }
 
-function maybe_unpackage(
-  main: KateTypes.DeviceFileHandle,
-  files: KateTypes.DeviceFileHandle[]
-) {
-  if (
-    main.relative_path.starts_with(Pathname.from_string("renpy")) ||
-    !(main as any).__fake
-  ) {
+function maybe_unpackage(main: KateTypes.DeviceFileHandle, files: KateTypes.DeviceFileHandle[]) {
+  if (main.relative_path.starts_with(Pathname.from_string("renpy")) || !(main as any).__fake) {
     return files;
   } else {
     for (const file of files) {
@@ -496,9 +453,7 @@ function maybe_unpackage(
 
 async function maybe_unarchive(files: KateTypes.DeviceFileHandle[]) {
   const is_archive = GlobPatternList.from_patterns(["**/*.rpa", "*.rpa"]);
-  const without_archive = files.filter(
-    (x) => !is_archive.test(x.relative_path)
-  );
+  const without_archive = files.filter((x) => !is_archive.test(x.relative_path));
   const archive_files = files.filter((x) => is_archive.test(x.relative_path));
   const unpacked_files = (
     await Promise.all(

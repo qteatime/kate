@@ -5,19 +5,23 @@
  */
 
 import { KateRuntimes } from "./cart-runtime";
-import { KateGamepadInputSource } from "./input/gamepad-input";
-import { KateKeyboardInputSource } from "./input/keyboard-input";
+import { KateGamepadInputSource } from "./input/input-source-gamepad";
+import { KateKeyboardInputSource } from "./input/input-source-keyboard";
 import { ConsoleOptions, VirtualConsole } from "./virtual";
 
 export class KateKernel {
   readonly runtimes: KateRuntimes;
 
-  private constructor(
-    readonly console: VirtualConsole,
-    readonly keyboard: KateKeyboardInputSource,
-    readonly gamepad: KateGamepadInputSource
-  ) {
+  private constructor(readonly console: VirtualConsole) {
     this.runtimes = new KateRuntimes(console);
+  }
+
+  get gamepad_source() {
+    return this.console.button_input.gamepad_source;
+  }
+
+  get keyboard_source() {
+    return this.console.button_input.keyboard_source;
   }
 
   static from_root(root: HTMLElement, options: Partial<ConsoleOptions>) {
@@ -30,14 +34,8 @@ export class KateKernel {
         scale_to_fit: false,
       },
     });
-    const keyboard = new KateKeyboardInputSource();
-    const gamepad = new KateGamepadInputSource();
     console.listen();
-    keyboard.setup();
-    gamepad.setup();
-    keyboard.on_button_changed.listen((ev) => console.update_virtual_key(ev.button, ev.is_pressed));
-    gamepad.on_button_changed.listen((ev) => console.update_virtual_key(ev.button, ev.is_pressed));
-    return new KateKernel(console, keyboard, gamepad);
+    return new KateKernel(console);
   }
 
   enter_trusted_mode() {

@@ -61,14 +61,14 @@ export class TestStandardMappingSettings extends UI.SimpleScene {
 
   on_attached(): void {
     this.os.kernel.console.on_tick.listen(this.update_gamepad_status);
-    this.os.kernel.gamepad.pause();
+    this.os.kernel.gamepad_source.pause();
     this.index_buttons();
     super.on_attached();
   }
 
   on_detached(): void {
     super.on_detached();
-    this.os.kernel.gamepad.unpause();
+    this.os.kernel.gamepad_source.unpause();
     this.os.kernel.console.on_tick.remove(this.update_gamepad_status);
   }
 
@@ -88,7 +88,7 @@ export class TestStandardMappingSettings extends UI.SimpleScene {
   };
 
   update_gamepad_status = (time: number) => {
-    const gamepad = this.os.kernel.gamepad.resolve_primary()?.resolve_raw();
+    const gamepad = this.os.kernel.gamepad_source.resolve_primary()?.resolve_raw();
     if (gamepad == null) {
       return;
     }
@@ -661,7 +661,7 @@ export class RemapStandardSettings extends UI.SimpleScene {
       message: "Updated standard gamepad mapping",
       extra: this._mapping,
     });
-    this.os.kernel.gamepad.remap(this._mapping);
+    this.os.kernel.gamepad_source.remap(this._mapping);
     this.close();
   };
 
@@ -906,7 +906,7 @@ export class ChooseActiveGamepadSettings extends UI.SimpleScene {
       extra: { id: paired.id },
     });
 
-    this.os.kernel.gamepad.set_primary(paired.id);
+    this.os.kernel.gamepad_source.set_primary(paired.id);
     this.close();
   };
 
@@ -926,12 +926,12 @@ export class ChooseActiveGamepadSettings extends UI.SimpleScene {
   on_attached(): void {
     super.on_attached();
     this.os.kernel.console.on_tick.listen(this.update_gamepads);
-    this.os.kernel.gamepad.pause();
+    this.os.kernel.gamepad_source.pause();
   }
 
   on_detached(): void {
     this.os.kernel.console.on_tick.remove(this.update_gamepads);
-    this.os.kernel.gamepad.unpause();
+    this.os.kernel.gamepad_source.unpause();
     super.on_detached();
   }
 
