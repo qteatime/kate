@@ -18,31 +18,36 @@
   </head>
   <body>
     <input id="kate-installer" type="file" style="display: none" accept=".kart" />
-    <div class="kate-case">
+    <div class="kate-case" data-case-type="handheld">
       <div class="kc-body">
-        <div class="kc-shoulder kc-shoulder-left">
+        <div class="kc-shoulder kc-shoulder-left kc-virtual">
           <div class="kc-shoulder-button"></div>
           <div class="kc-shoulder-hide"></div>
         </div>
-        <div class="kc-shoulder kc-shoulder-right">
+        <div class="kc-shoulder kc-shoulder-right kc-virtual">
           <div class="kc-shoulder-button"></div>
           <div class="kc-shoulder-hide"></div>
         </div>
 
-        <div class="kc-dpad"><div class="kc-thumb" data-range="20"></div></div>
+        <div class="kc-dpad kc-virtual"><div class="kc-thumb" data-range="20"></div></div>
 
-        <div class="kc-screen">
-          <div id="kate-os-root"></div>
-          <div id="kate-hud"></div>
-          <div id="kate-resources"></div>
+        <div class="kc-screen-container">
+          <div class="kc-screen">
+            <div id="kate-os-root"></div>
+            <div id="kate-hud"></div>
+          </div>
+
+          <div class="kc-resources-container">
+            <div id="kate-resources"></div>
+          </div>
         </div>
 
-        <div class="kc-special">
+        <div class="kc-special kc-virtual">
           <div class="kc-small-button kc-berry">🍑</div>
           <div class="kc-small-button kc-capture">🔴</div>
         </div>
 
-        <div class="kc-faces">
+        <div class="kc-faces kc-virtual">
           <div class="kc-button kc-ok">⭕</div>
           <div class="kc-button kc-cancel">❌</div>
           <div class="kc-button kc-sparkle">✨</div>

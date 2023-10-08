@@ -12,7 +12,7 @@ const pkg = require("../../package.json");
 
 export type InputKey = KateKey;
 
-export type Resource = "screen-recording" | "transient-storage" | "low-storage";
+export type Resource = "screen-recording" | "transient-storage" | "low-storage" | "trusted-mode";
 
 export type ConsoleCase = {
   type: "handheld" | "tv" | "fullscreen";
@@ -327,7 +327,7 @@ abstract class Case {
     root.setAttribute("data-case-type", this.case_type);
     root.setAttribute("data-resolution", String(this.screen_height));
     root.style.setProperty("--case-scale", String(scale));
-    root.style.setProperty("--case-downscale", String(Math.max(1, scale)));
+    root.style.setProperty("--case-downscale", String(Math.min(1, scale)));
     root.style.setProperty("--screen-scale", String(screen_scale));
     root.style.setProperty("--screen-width", `${this.screen_width}px`);
     root.style.setProperty("--screen-height", `${this.screen_height}px`);

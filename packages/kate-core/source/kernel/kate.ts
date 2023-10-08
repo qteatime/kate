@@ -40,9 +40,11 @@ export class KateKernel {
 
   enter_trusted_mode() {
     this.console.body.classList.add("trusted-mode");
+    this.console.take_resource("trusted-mode");
   }
 
   exit_trusted_mode() {
     this.console.body.classList.remove("trusted-mode");
+    this.console.release_resource("trusted-mode");
   }
 }
