@@ -66,6 +66,7 @@ export function describe(title: string, setup: (ctx: DescribeContext) => void) {
       { setup: setup.toString() }
     );
 
+    console.log("==", title);
     for (const result of results) {
       if (result.passed) {
         console.log("-- [OK]", result.title);
@@ -74,6 +75,7 @@ export function describe(title: string, setup: (ctx: DescribeContext) => void) {
         console.log(`Reason: ${result.reason}`);
       }
     }
+    console.log("=====");
 
     const failed = results.filter((x) => !x.passed);
     expect(failed.length).toBe(0);
