@@ -633,6 +633,10 @@ w.task("release:cartridges", ["example:all", "ecosystem:all"], () => {
 });
 
 // -- Testing
+w.task("test:setup-playwright", [], () => {
+  playwright(["install", "--with-deps"]);
+});
+
 w.task("test:generate", ["util:build"], () => {
   glomp({
     entry: "packages/util/build/test-assert.js",
@@ -644,6 +648,8 @@ w.task("test:generate", ["util:build"], () => {
 w.task("test:all", ["test:generate", "www:bundle"], () => {
   playwright(["test"]);
 });
+
+w.task("test:ci", ["test:setup-playwright", "test:all"], () => {});
 
 w.task("test:quick", [], () => {
   playwright(["test"]);
