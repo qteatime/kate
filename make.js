@@ -161,6 +161,10 @@ function kart({ config, output }) {
   exec_file("node", ["packages/kate-tools/cli/kart.js", "--output", output, config]);
 }
 
+function playwright(args) {
+  exec_file("node", ["node_modules/playwright/cli.js", ...args]);
+}
+
 function clean_build(root) {
   remove(Path.join(root, "build"), { recursive: true, force: true });
   remove(Path.join(root, "tsconfig.tsbuildinfo"), { force: true });
@@ -635,6 +639,14 @@ w.task("test:generate", ["util:build"], () => {
     out: "tests/unit/test-assert.js",
     name: "Assert",
   });
+});
+
+w.task("test:all", ["test:generate", "www:bundle"], () => {
+  playwright(["test"]);
+});
+
+w.task("test:quick", [], () => {
+  playwright(["test"]);
 });
 
 // -- Multi-project convenience
