@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "composite": true,
+    "strict": true,
+    "rootDir": ".",
+    "module": "commonjs",
+    "target": "ESNext",
+    "lib": ["ESNext", "DOM", "ESNext.Intl"],
+    "experimentalDecorators": true,
+    "incremental": true,
+    "jsx": "react",
+    "declaration": true
+  },
+  "include": ["unit"],
+  "references": [{ "path": "../packages/kate-core" }]
+}
