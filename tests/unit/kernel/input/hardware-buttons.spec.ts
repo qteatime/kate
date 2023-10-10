@@ -1,6 +1,6 @@
-import { describe } from "../util";
+import { describe } from "../../unit";
 
-describe("@kernel button-based input", ({ test, kate, assert_match }) => {
+describe("@kernel hardware buttons", ({ test, kate, assert_match }) => {
   const keys = [
     "up",
     "right",

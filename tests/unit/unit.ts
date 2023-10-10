@@ -1,6 +1,6 @@
 import { type Page, test, expect } from "@playwright/test";
 import * as Path from "path";
-import type { kernel, os } from "../../packages/kate-core";
+import type { kernel, os } from "../../packages/kate-core/build";
 
 export type Kate = {
   kernel: typeof kernel;
@@ -32,9 +32,13 @@ export type DescribeContext = {
   assert_match: <A>(a: A, b: RecPartial<A>, tag?: string) => void;
 };
 
+export async function load(page: Page) {
+  await page.addScriptTag({ path: Path.join(__dirname, "../../www/kate/kate-latest.js") });
+}
+
 export function describe(title: string, setup: (ctx: DescribeContext) => void) {
   test(`${title}`, async ({ page }) => {
-    await page.addScriptTag({ path: Path.join(__dirname, "../../www/kate/kate-latest.js") });
+    await load(page);
     await page.addScriptTag({ path: Path.join(__dirname, "test-assert.js") });
 
     const results = await page.evaluate(

@@ -60,4 +60,19 @@ export class EventStream<A> {
     };
     return stream;
   }
+
+  record() {
+    const trace: A[] = [];
+    const subscriber = this.listen((ev) => trace.push(ev));
+    const stream = this;
+
+    return {
+      get trace() {
+        return trace.slice();
+      },
+      stop() {
+        stream.remove(subscriber);
+      },
+    };
+  }
 }
