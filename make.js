@@ -655,6 +655,16 @@ w.task("test:quick", [], () => {
   playwright(["test"]);
 });
 
+// -- Test server
+w.task("server:start", [], () => {
+  const express = require("express");
+  const app = express();
+  app.use("/", express.static(Path.join(__dirname, "www")));
+  app.listen(3000, "127.0.0.1", () => {
+    console.log("Server started at http://localhost:3000");
+  });
+});
+
 // -- Multi-project convenience
 w.task("dependencies", ["tools:dependencies"], () => {});
 

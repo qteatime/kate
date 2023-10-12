@@ -1,6 +1,7 @@
 import { type Page, test, expect } from "@playwright/test";
 import * as Path from "path";
 import type { kernel, os } from "../../packages/kate-core/build";
+import type { assert_match } from "../deps/utils";
 
 export type Kate = {
   kernel: typeof kernel;
@@ -18,18 +19,10 @@ type Test = {
   action: () => Promise<void> | void;
 };
 
-type RecPartial<T> = {
-  [K in keyof T]?: T[K] extends (infer U)[]
-    ? RecPartial<U>[]
-    : T[K] extends object | undefined
-    ? RecPartial<T[K]>
-    : T[K];
-};
-
 export type DescribeContext = {
   test: (title: string, action: () => Promise<void> | void) => void;
   kate: Kate;
-  assert_match: <A>(a: A, b: RecPartial<A>, tag?: string) => void;
+  assert_match: typeof assert_match;
 };
 
 export async function load(page: Page) {
