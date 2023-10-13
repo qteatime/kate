@@ -295,4 +295,24 @@ describe("@kernel gamepad input source", ({ test, kate, assert_match, MockGamepa
       "remap"
     );
   });
+
+  test("Disconnected gamepads reset the input state", () => {
+    const gp = new MockGamepad("kate");
+    const source = new kate.kernel.KateGamepadInputSource();
+    source.setup();
+    source.remap(default_mapping);
+    const recording = source.on_button_changed.record();
+    gp.connect(source);
+
+    press(gp, "o", true);
+    source.update(gp.timestamp);
+    gp.tick();
+    gp.disconnect(source);
+    source.update(gp.timestamp);
+
+    assert_match(recording.trace, [
+      { button: "o", is_pressed: true },
+      { button: "o", is_pressed: false },
+    ]);
+  });
 });
