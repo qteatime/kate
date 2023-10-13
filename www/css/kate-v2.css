@@ -299,6 +299,7 @@ body {
   position: absolute;
   translate: 0px 0px;
   transform-origin: top left;
+  box-shadow: 0px -1px 2px rgba(0, 0, 0, 0.25);
 }
 
 .kc-shoulder-left .kc-shoulder-button {
@@ -389,39 +390,61 @@ body {
 .kc-button {
   width: 75px;
   height: 75px;
-  background: var(--blue);
   border-radius: 100%;
-  display: flex;
-  justify-content: center;
   font-size: 45px;
   line-height: 70px;
-  box-shadow: 1px 1px 1px #fff, inset 1px 1px 1px rgba(0, 0, 0, 0.2);
-  font-family: "Roboto Mono";
   color: transparent;
-  text-shadow: 0 0 0 #fafafa;
-}
-
-.kc-button.down {
-  background: #9af;
+  background-position: center center;
+  background-size: contain;
+  background-repeat: no-repeat;
 }
 
 .kc-small-button {
   width: 45px;
   height: 45px;
-  background: var(--grey);
   border-radius: 100%;
-  display: flex;
-  justify-content: center;
   font-size: 20px;
   line-height: 45px;
-  box-shadow: 1px 1px 1px #fff, inset 1px 1px 1px rgba(0, 0, 0, 0.2);
-  font-family: "Roboto Mono";
   color: transparent;
-  text-shadow: 0 0 0 #2f2f2f;
+  background-color: #f7f1d8;
+  background-position: center center;
+  background-size: 80%;
+  background-repeat: no-repeat;
 }
 
+.kc-button,
+.kc-small-button {
+  box-shadow: inset 1px 1px 1px #fff, 1px 1px 1px rgba(0, 0, 0, 0.2);
+}
+
+.kc-button.down,
 .kc-small-button.down {
-  background: #fafafa;
+  filter: brightness(75%);
+  box-shadow: 1px 1px 1px #fff, inset 1px 1px 1px rgba(0, 0, 0, 0.2);
+}
+
+.kc-berry {
+  background-image: url("../img/buttons/berry.png");
+}
+
+.kc-capture {
+  background-image: url("../img/buttons/capture.png");
+}
+
+.kc-menu {
+  background-image: url("../img/buttons/menu.png");
+}
+
+.kc-ok {
+  background-image: url("../img/buttons/ok.png");
+}
+
+.kc-cancel {
+  background-image: url("../img/buttons/cancel.png");
+}
+
+.kc-sparkle {
+  background-image: url("../img/buttons/sparkle.png");
 }
 
 /* tv mode */
