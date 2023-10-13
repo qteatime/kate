@@ -11,6 +11,6 @@
     "jsx": "react",
     "declaration": true
   },
-  "include": ["unit", "e2e", "deps"],
+  "include": ["unit", "e2e", "deps", "mocks"],
   "references": [{ "path": "../packages/kate-core" }, { "path": "../packages/util" }]
 }

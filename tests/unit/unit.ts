@@ -2,6 +2,7 @@ import { type Page, test, expect } from "@playwright/test";
 import * as Path from "path";
 import type { kernel, os } from "../../packages/kate-core/build";
 import type { assert_match } from "../deps/utils";
+import { MockGamepad, mock_gamepad } from "../mocks/gamepad";
 
 export type Kate = {
   kernel: typeof kernel;
@@ -22,6 +23,7 @@ type Test = {
 export type DescribeContext = {
   test: (title: string, action: () => Promise<void> | void) => void;
   kate: Kate;
+  MockGamepad: MockGamepad;
   assert_match: typeof assert_match;
 };
 
@@ -32,6 +34,7 @@ export async function load(page: Page) {
 export function describe(title: string, setup: (ctx: DescribeContext) => void) {
   test(`${title}`, async ({ page }) => {
     await load(page);
+    await mock_gamepad(page);
     await page.addScriptTag({ path: Path.join(__dirname, "test-assert.js") });
 
     const results = await page.evaluate(
@@ -41,15 +44,18 @@ export function describe(title: string, setup: (ctx: DescribeContext) => void) {
 
         const kate = (window as any).Kate;
         const assert_match = (window as any).Assert.assert_match;
+        const MockGamepad = (window as any).MockGamepad;
         const test: DescribeContext["test"] = (title, action) => {
           tests.push({ title, action });
         };
+        console.log("mock: ", MockGamepad);
 
-        eval(setup)({ test, kate, assert_match });
+        eval(setup)({ test, kate, assert_match, MockGamepad });
 
         for (const unit of tests) {
           console.log("Running", unit.title);
           try {
+            MockGamepad.reset_slots();
             await unit.action();
             results.push({ title: unit.title, passed: true });
           } catch (e) {

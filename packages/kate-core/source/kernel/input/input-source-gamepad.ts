@@ -39,6 +39,8 @@ export class KateGamepadInputSource implements KateButtonInputSource {
   private _gamepads: KateGamepadAdaptor[] = [];
   private _mapping: GamepadMapping[] = [];
   private _timer_id: unknown = null;
+  private _state: ButtonBit | 0 = 0;
+  private _last_update: number | null = null;
 
   setup() {
     if (this._attached) {
@@ -84,24 +86,26 @@ export class KateGamepadInputSource implements KateButtonInputSource {
   }
 
   reset() {
-    for (const gamepad of this._gamepads) {
-      gamepad.reset();
-    }
+    this.emit_changes(0);
+    this._state = 0;
   }
 
   pause() {
+    this.reset();
     for (const gamepad of this._gamepads) {
       gamepad.pause();
     }
   }
 
   unpause() {
+    this.reset();
     for (const gamepad of this._gamepads) {
       gamepad.unpause();
     }
   }
 
   remap(mapping: GamepadMapping[]) {
+    this.reset();
     this._mapping = mapping;
     for (const gamepad of this._gamepads) {
       gamepad.remap(mapping);
@@ -109,14 +113,19 @@ export class KateGamepadInputSource implements KateButtonInputSource {
   }
 
   update = (time: number) => {
+    if (this._last_update !== null && this._last_update >= time) {
+      return;
+    }
+
+    this._last_update = time;
     const gamepad = this.resolve_primary();
     if (gamepad == null) {
+      this.reset();
       this._timer_id = requestAnimationFrame(this.update);
     } else {
-      gamepad.update(time);
-      for (const [button, is_pressed] of gamepad.changes) {
-        this.on_button_changed.emit({ button, is_pressed });
-      }
+      const new_state = gamepad.current_state;
+      this.emit_changes(new_state);
+      this._state = new_state;
       this._timer_id = requestAnimationFrame(this.update);
     }
   };
@@ -126,6 +135,21 @@ export class KateGamepadInputSource implements KateButtonInputSource {
     this._timer_id = null;
     if (this._gamepads.length > 0) {
       this._timer_id = requestAnimationFrame(this.update);
+    }
+  }
+
+  private *changes(state: number) {
+    const old_state = this._state;
+    for (const button of buttons) {
+      if ((state & ButtonBit[button]) !== (old_state & ButtonBit[button])) {
+        yield { button, is_pressed: (state & ButtonBit[button]) !== 0 };
+      }
+    }
+  }
+
+  private emit_changes(state: number) {
+    for (const { button, is_pressed } of this.changes(state)) {
+      this.on_button_changed.emit({ button, is_pressed });
     }
   }
 }
@@ -147,19 +171,12 @@ enum ButtonBit {
 }
 
 export class KateGamepadAdaptor {
-  private _last_update: number | null = null;
   private _paused: boolean = false;
-  private _state: ButtonBit | 0 = 0;
-  private _changes: Map<KateButton, boolean> = new Map();
 
   constructor(private _raw_pad: Gamepad, private mapping: GamepadMapping[]) {}
 
   is_same(gamepad: Gamepad) {
     return this.id === gamepad.index;
-  }
-
-  get changes() {
-    return this._changes;
   }
 
   get id() {
@@ -181,11 +198,9 @@ export class KateGamepadAdaptor {
 
   remap(mapping: GamepadMapping[]) {
     this.mapping = mapping;
-    this.reset();
   }
 
   pause() {
-    this.reset();
     this._paused = true;
   }
 
@@ -193,31 +208,21 @@ export class KateGamepadAdaptor {
     this._paused = false;
   }
 
-  reset() {
-    this._changes.clear();
-    this._state = 0;
-  }
-
-  update(time: number) {
+  get current_state(): ButtonBit | 0 {
     if (this._paused) {
-      return;
+      return 0;
     }
 
-    this._changes.clear();
     const g = this.resolve_raw();
     if (g == null) {
-      return;
-    }
-    if (this._last_update != null && this._last_update > g.timestamp) {
-      return;
+      return 0;
     }
 
-    this._last_update = time;
-    let new_state = 0;
+    let state = 0;
 
     const add_change = (button: KateButton | null, is_pressed: boolean) => {
       if (button != null && is_pressed) {
-        new_state = new_state | ButtonBit[button];
+        state = state | ButtonBit[button];
       }
     };
 
@@ -249,15 +254,6 @@ export class KateGamepadAdaptor {
       }
     }
 
-    const old_state = this._state;
-    for (const button of buttons) {
-      const state_before = old_state & ButtonBit[button];
-      const state_after = new_state & ButtonBit[button];
-      if (state_before !== state_after) {
-        this._changes.set(button, state_after !== 0);
-      }
-    }
-
-    this._state = new_state;
+    return state;
   }
 }
