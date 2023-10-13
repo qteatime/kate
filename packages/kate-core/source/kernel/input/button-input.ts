@@ -14,7 +14,7 @@ import { KateGamepadInputSource } from "./input-source-gamepad";
 import { KateKeyboardInputSource } from "./input-source-keyboard";
 import { KateVirtualInputSource } from "./input-source-virtual";
 
-export type ButtonChangeEvent = {
+type ButtonChangeEvent = {
   key: KateButton;
   is_down: boolean;
 };

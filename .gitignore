@@ -32,3 +32,4 @@ ecosystem/importer/www
 packages/kate-appui/assets/fonts
 .vscode
 tests/unit/test-assert.js
+/test-results
