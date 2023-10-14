@@ -245,7 +245,7 @@ export class HUD_Dialog extends Scene {
         element.remove();
       });
     } finally {
-      this.os.kernel.console.body.classList.remove("trusted-mode");
+      this.os.kernel.console.body!.classList.remove("trusted-mode");
       this.canvas.textContent = "";
     }
   }

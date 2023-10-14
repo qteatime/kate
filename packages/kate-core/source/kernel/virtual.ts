@@ -8,9 +8,8 @@ import { KateAudioManager } from "./audio";
 import { ConsoleCaseConfig, KateConsoleCase } from "./case";
 import { KateConsoleClock } from "./clock";
 import { KateButtonInputAggregator } from "./input/button-input";
+import { KateResources } from "./resource";
 const pkg = require("../../package.json");
-
-export type Resource = "screen-recording" | "transient-storage" | "low-storage" | "trusted-mode";
 
 export type ConsoleOptions = {
   mode: "native" | "web" | "single";
@@ -23,30 +22,19 @@ export class VirtualConsole {
   readonly clock = new KateConsoleClock();
   readonly audio = new KateAudioManager();
   readonly case: KateConsoleCase;
+  readonly resources = new KateResources();
 
   private is_listening = false;
 
-  readonly body: HTMLElement;
-  readonly device_display: HTMLElement;
-  readonly hud: HTMLElement;
-  readonly os_root: HTMLElement;
-  readonly version_container: HTMLElement | null;
-  readonly resources_container: HTMLElement;
+  readonly body: HTMLElement | null = null;
+  readonly device_display: HTMLElement | null = null;
+  readonly hud: HTMLElement | null = null;
+  readonly os_root: HTMLElement | null = null;
+  readonly version_container: HTMLElement | null = null;
   readonly version = pkg?.version == null ? null : `v${pkg.version}`;
-  readonly resources = new Map<Resource, number>();
 
   constructor(readonly root: HTMLElement, readonly options: ConsoleOptions) {
     this.case = new KateConsoleCase(options.case);
-
-    this.os_root = root.querySelector("#kate-os-root")!;
-    this.hud = root.querySelector("#kate-hud")!;
-    this.device_display = root.querySelector(".kate-screen")!;
-    this.body = root.querySelector(".kc-body")!;
-    this.version_container = root.querySelector("#kate-version");
-    this.resources_container = root.querySelector("#kate-resources")!;
-    if (this.version_container != null && this.version != null) {
-      this.version_container.textContent = this.version;
-    }
   }
 
   private do_tick(time: number) {
@@ -87,32 +75,17 @@ export class VirtualConsole {
     this.clock.on_tick.listen((time) => this.do_tick(time));
 
     this.audio.open();
-  }
 
-  take_resource(resource: Resource) {
-    const refs = this.resources.get(resource) ?? 0;
-    this.resources.set(resource, refs + 1);
-    this.update_resource_display();
-  }
+    this.resources.setup(this.root.querySelector("#kate-resources")!);
 
-  is_resource_taken(resource: Resource) {
-    return (this.resources.get(resource) ?? 0) > 0;
-  }
+    (this as any).os_root = this.root.querySelector("#kate-os-root")!;
+    (this as any).hud = this.root.querySelector("#kate-hud")!;
+    (this as any).device_display = this.root.querySelector(".kate-screen")!;
+    (this as any).body = this.root.querySelector(".kc-body")!;
+    (this as any).version_container = this.root.querySelector("#kate-version");
 
-  release_resource(resource: Resource) {
-    const refs = this.resources.get(resource) ?? 0;
-    this.resources.set(resource, Math.max(0, refs - 1));
-    this.update_resource_display();
-  }
-
-  private update_resource_display() {
-    this.resources_container.textContent = "";
-    for (const [resource, refs] of this.resources.entries()) {
-      if (refs > 0) {
-        const e = document.createElement("div");
-        e.className = `kate-resource kate-resource-${resource}`;
-        this.resources_container.append(e);
-      }
+    if (this.version_container != null && this.version != null) {
+      this.version_container.textContent = this.version;
     }
   }
 }
