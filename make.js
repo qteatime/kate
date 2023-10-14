@@ -649,7 +649,9 @@ w.task("test:all", ["test:generate", "www:bundle"], () => {
   playwright(["test"]);
 });
 
-w.task("test:ci", ["test:setup-playwright", "test:all"], () => {});
+w.task("test:ci", ["test:setup-playwright", "test:generate"], () => {
+  playwright(["test"]);
+});
 
 w.task("test:quick", [], () => {
   playwright(["test"]);
