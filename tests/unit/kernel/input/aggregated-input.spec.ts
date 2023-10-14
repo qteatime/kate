@@ -8,8 +8,7 @@ import { assert_match } from "../../../deps/utils";
 
 async function init(page: Page) {
   await page.goto("/test.html");
-  await load(page);
-  const kate = await page.evaluateHandle(() => (window as any).Kate as Kate);
+  const kate = await load(page);
   await mock_gamepad(page);
   await page.evaluate(() => {
     window.requestAnimationFrame = (() => {}) as any;

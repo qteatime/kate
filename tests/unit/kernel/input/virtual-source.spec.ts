@@ -8,8 +8,7 @@ import type { KateButton } from "../../../../packages/kate-core/source/kernel";
 
 async function init(page: Page) {
   await page.goto("/test.html");
-  await load(page);
-  const kate = await page.evaluateHandle(() => (window as any).Kate as Kate);
+  const kate = await load(page);
   const source = await kate.evaluateHandle((x) => new x.kernel.KateVirtualInputSource());
   await source.evaluate((x) => x.setup(document.querySelector(".kate-case")!));
   const recording = await source.evaluateHandle((x) => x.on_button_changed.record());

@@ -6,8 +6,7 @@ import { type Kate, describe, load } from "../../unit";
 import { assert_match } from "../../../deps/utils";
 
 test("@kernel keyboard input source forwards key presses", async ({ page }) => {
-  await load(page);
-  const kate = await page.evaluateHandle(() => (window as any).Kate as Kate);
+  const kate = await load(page);
   const source = await kate.evaluateHandle((x) => new x.kernel.KateKeyboardInputSource());
   await source.evaluate((x) => x.setup());
   const recording = await source.evaluateHandle((x) => x.on_button_changed.record());
@@ -53,8 +52,7 @@ test("@kernel keyboard input source forwards key presses", async ({ page }) => {
 });
 
 test("@kernel keyboard input source can be remapped", async ({ page }) => {
-  await load(page);
-  const kate = await page.evaluateHandle(() => (window as any).Kate as Kate);
+  const kate = await load(page);
   const source = await kate.evaluateHandle((x) => new x.kernel.KateKeyboardInputSource());
   await source.evaluate((x) => x.setup());
   const recording = await source.evaluateHandle((x) => x.on_button_changed.record());

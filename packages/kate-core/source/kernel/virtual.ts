@@ -4,7 +4,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { EventStream, unreachable } from "../utils";
+import { unreachable } from "../utils";
+import { KateConsoleClock } from "./clock";
 import { KateButtonInputAggregator } from "./input/button-input";
 const pkg = require("../../package.json");
 
@@ -24,6 +25,7 @@ export type ConsoleOptions = {
 
 export class VirtualConsole {
   readonly button_input = new KateButtonInputAggregator();
+  readonly clock = new KateConsoleClock();
 
   private is_listening = false;
   private _case: ConsoleCase;
@@ -34,15 +36,8 @@ export class VirtualConsole {
   readonly version_container: HTMLElement | null;
   readonly resources_container: HTMLElement;
   readonly version = pkg?.version == null ? null : `v${pkg.version}`;
-  readonly on_tick = new EventStream<number>();
   readonly audio_context = new AudioContext();
   readonly resources = new Map<Resource, number>();
-
-  private timer_id: any = null;
-  private last_time: number | null = null;
-
-  readonly FPS = 30;
-  readonly ONE_FRAME = Math.ceil(1000 / 30);
 
   constructor(readonly root: HTMLElement, readonly options: ConsoleOptions) {
     this._case = options.case;
@@ -57,11 +52,6 @@ export class VirtualConsole {
       this.version_container.textContent = this.version;
     }
     this.open_audio_output();
-  }
-
-  private start_ticking() {
-    cancelAnimationFrame(this.timer_id);
-    this.timer_id = requestAnimationFrame(this.tick);
   }
 
   private open_audio_output() {
@@ -79,28 +69,8 @@ export class VirtualConsole {
     }
   }
 
-  private tick = (time: number) => {
-    if (this.last_time == null) {
-      this.last_time = time;
-      this.do_tick(time);
-      this.timer_id = requestAnimationFrame(this.tick);
-      return;
-    }
-
-    const elapsed = time - this.last_time;
-
-    if (elapsed < this.ONE_FRAME) {
-      this.timer_id = requestAnimationFrame(this.tick);
-    } else {
-      this.do_tick(time);
-      this.timer_id = requestAnimationFrame(this.tick);
-    }
-  };
-
   private do_tick(time: number) {
-    this.last_time = time;
     this.button_input.update(time);
-    this.on_tick.emit(time);
     this.button_input.tick();
   }
 
@@ -146,7 +116,8 @@ export class VirtualConsole {
       }
     });
 
-    this.start_ticking();
+    this.clock.setup();
+    this.clock.on_tick.listen((time) => this.do_tick(time));
   }
 
   set_case(kase: ConsoleCase) {
