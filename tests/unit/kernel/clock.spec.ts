@@ -1,3 +1,6 @@
+/* Any copyright is dedicated to the Public Domain.
+ * http://creativecommons.org/publicdomain/zero/1.0/
+ */
 import test, { JSHandle } from "playwright/test";
 import { load } from "../unit";
 import type { KateConsoleClock } from "../../../packages/kate-core/source/kernel";
