@@ -4,7 +4,6 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { unreachable } from "../utils";
 import { KateAudioManager } from "./audio";
 import { ConsoleCaseConfig, KateConsoleCase } from "./case";
 import { KateConsoleClock } from "./clock";

@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { unreachable } from "../../utils";
+import { unreachable } from "../utils";
 
 export type ConsoleCaseConfig = {
   type: "handheld" | "tv" | "fullscreen";

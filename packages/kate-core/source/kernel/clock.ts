@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { EventStream } from "../../utils";
+import { EventStream } from "../utils";
 
 export class KateConsoleClock {
   private _attached = false;
