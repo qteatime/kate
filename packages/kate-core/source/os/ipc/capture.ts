@@ -20,40 +20,25 @@ export default [
 
       try {
         os.sfx.play("shutter");
-        await os.capture.save_screenshot(
-          env.cart.id,
-          payload.data,
-          payload.type
-        );
+        await os.capture.save_screenshot(env.cart.id, payload.data, payload.type);
       } catch (error) {
         console.debug(`[Kate] failed to save screenshot`, error);
-        os.notifications.push_transient(
-          "kate:capture",
-          "Failed to save screenshot",
-          ""
-        );
-        throw new EMessageFailed(
-          "kate.capture.failed",
-          "Failed to save screenshot"
-        );
+        os.notifications.push_transient("kate:capture", "Failed to save screenshot", "");
+        throw new EMessageFailed("kate.capture.failed", "Failed to save screenshot");
       }
       return null;
     }
   ),
 
   handler("kate:capture.start-recording", TC.spec({}), async (os, env) => {
-    os.kernel.console.take_resource("screen-recording");
+    os.kernel.console.resources.take("screen-recording");
     await os.audit_supervisor.log(env.cart.id, {
       resources: ["kate:capture"],
       risk: "low",
       type: "kate.capture.recording-started",
       message: `Screen recording started`,
     });
-    await os.notifications.push_transient(
-      env.cart.id,
-      "Screen recording started",
-      ""
-    );
+    await os.notifications.push_transient(env.cart.id, "Screen recording started", "");
 
     return null;
   }),
@@ -69,19 +54,12 @@ export default [
       await ipc.consume_capture_token(payload.token, env, message as any);
 
       try {
-        os.kernel.console.release_resource("screen-recording");
+        os.kernel.console.resources.release("screen-recording");
         await os.capture.save_video(env.cart.id, payload.data, payload.type);
       } catch (error) {
         console.debug(`[Kate] failed to save recording`, error);
-        os.notifications.push_transient(
-          "kate:capture",
-          "Failed to save screen recording",
-          ""
-        );
-        throw new EMessageFailed(
-          `kate.capture.failed`,
-          "Failed to save recording"
-        );
+        os.notifications.push_transient("kate:capture", "Failed to save screen recording", "");
+        throw new EMessageFailed(`kate.capture.failed`, "Failed to save recording");
       }
       return null;
     }

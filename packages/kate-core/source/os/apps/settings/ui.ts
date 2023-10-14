@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import type { ConsoleCase } from "../../../kernel";
+import type { ConsoleCaseConfig } from "../../../kernel";
 import { Observable, unreachable } from "../../../utils";
 import { SettingsData } from "../../apis/settings";
 import * as UI from "../../ui";
@@ -38,7 +38,7 @@ export class SceneUISettings extends UI.SimpleScene {
     const data = this.os.settings.get("ui");
     const configurable_display = await this.can_change_display_mode();
     const kase = new Observable(
-      configurable_display ? data.case_type : this.os.kernel.console.raw_case
+      configurable_display ? data.case_type : this.os.kernel.console.case.config
     );
 
     return [
@@ -96,9 +96,7 @@ export class SceneUISettings extends UI.SimpleScene {
         click_label: "Change",
         title: "Resolution",
         description: "The size Kate's contents are rendered in",
-        value: UI.dynamic(
-          kase.map<UI.Widgetable>((x) => friendly_resolution(x.resolution))
-        ),
+        value: UI.dynamic(kase.map<UI.Widgetable>((x) => friendly_resolution(x.resolution))),
         on_click: () => {
           this.select_resolution(kase);
         },
@@ -107,8 +105,7 @@ export class SceneUISettings extends UI.SimpleScene {
       UI.when(this.supports_scale_to_fit, [
         UI.toggle_cell(this.os, {
           title: "Scale to fit screen",
-          description:
-            "Scale Kate up to fit the whole screen, might result in blurry images",
+          description: "Scale Kate up to fit the whole screen, might result in blurry images",
           value: kase.map((x) => x.scale_to_fit),
           on_label: "Yes",
           off_label: "No",
@@ -120,11 +117,8 @@ export class SceneUISettings extends UI.SimpleScene {
     ];
   }
 
-  async select_resolution(current: Observable<ConsoleCase>) {
-    const available =
-      current.value.type === "handheld"
-        ? ([480] as const)
-        : ([480, 720] as const);
+  async select_resolution(current: Observable<ConsoleCaseConfig>) {
+    const available = current.value.type === "handheld" ? ([480] as const) : ([480, 720] as const);
     const result = await this.os.dialog.pop_menu(
       "kate:settings",
       "Display resolution",
@@ -144,8 +138,8 @@ export class SceneUISettings extends UI.SimpleScene {
     });
   }
 
-  async set_case(current: Observable<ConsoleCase>, kase: ConsoleCase) {
-    this.os.kernel.console.set_case(kase);
+  async set_case(current: Observable<ConsoleCaseConfig>, kase: ConsoleCaseConfig) {
+    this.os.kernel.console.case.reconfigure(kase);
     current.value = kase;
     if (await this.can_change_display_mode()) {
       await this.os.settings.update("ui", (x) => {
@@ -161,10 +155,7 @@ export class SceneUISettings extends UI.SimpleScene {
     }
   }
 
-  async change<K extends keyof SettingsData["ui"]>(
-    key: K,
-    value: SettingsData["ui"][K]
-  ) {
+  async change<K extends keyof SettingsData["ui"]>(key: K, value: SettingsData["ui"][K]) {
     await this.os.settings.update("ui", (x) => {
       return { ...x, [key]: value };
     });
@@ -178,19 +169,15 @@ export class SceneUISettings extends UI.SimpleScene {
   }
 
   private mode_button(
-    kase: Observable<ConsoleCase>,
-    x: { mode: ConsoleCase["type"]; title: string; image: string }
+    kase: Observable<ConsoleCaseConfig>,
+    x: { mode: ConsoleCaseConfig["type"]; title: string; image: string }
   ) {
-    return UI.choice_button(
-      this.os,
-      UI.vbox(1, [UI.image(x.image), UI.h("div", {}, [x.title])]),
-      {
-        selected: kase.map((k) => k.type === x.mode),
-        on_select: () => {
-          this.set_case(kase, case_defaults(x.mode));
-        },
-      }
-    );
+    return UI.choice_button(this.os, UI.vbox(1, [UI.image(x.image), UI.h("div", {}, [x.title])]), {
+      selected: kase.map((k) => k.type === x.mode),
+      on_select: () => {
+        this.set_case(kase, case_defaults(x.mode));
+      },
+    });
   }
 }
 
@@ -202,7 +189,7 @@ function friendly_resolution(height: number) {
   return `${BASE_WIDTH * factor} x ${BASE_HEIGHT * factor}`;
 }
 
-function case_defaults(type: ConsoleCase["type"]): ConsoleCase {
+function case_defaults(type: ConsoleCaseConfig["type"]): ConsoleCaseConfig {
   switch (type) {
     case "handheld": {
       return { type: "handheld", resolution: 480, scale_to_fit: false };

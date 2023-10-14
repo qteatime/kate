@@ -90,7 +90,7 @@ function add_preamble(dom: Document, context: RuntimeEnv) {
     throw new Error(`Cannot sandbox HTML: aborting insecure cartridge instantiation`);
   }
 
-  const kase = context.console.case;
+  const kase = context.console.case.current;
   const style = dom.createElement("style");
   style.textContent = `
     :root {

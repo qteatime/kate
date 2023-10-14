@@ -204,7 +204,7 @@ export class KateOS {
     sfx.set_enabled(settings.get("ui").sound_feedback);
     os.set_os_animation(settings.get("ui").animation_effects);
     if (x.set_case_mode !== false) {
-      kernel.console.set_case(settings.get("ui").case_type);
+      kernel.console.case.reconfigure(settings.get("ui").case_type);
     }
 
     const min_boot_time = wait(1000);
@@ -235,7 +235,7 @@ export class KateOS {
 
 async function request_persistent_storage(os: KateOS) {
   if (navigator.storage?.persisted == null || navigator.storage?.persist == null) {
-    os.kernel.console.take_resource("transient-storage");
+    os.kernel.console.resources.take("transient-storage");
     return;
   }
 
@@ -246,6 +246,6 @@ async function request_persistent_storage(os: KateOS) {
     }
   }
   if (!(await navigator.storage.persisted())) {
-    os.kernel.console.take_resource("transient-storage");
+    os.kernel.console.resources.take("transient-storage");
   }
 }

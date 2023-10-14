@@ -4,12 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import {
-  foldl,
-  make_empty_thumbnail,
-  make_thumbnail_from_bytes,
-  mb,
-} from "../../utils";
+import { foldl, make_empty_thumbnail, make_thumbnail_from_bytes, mb } from "../../utils";
 import * as Db from "../../data";
 import type { KateOS } from "../os";
 import { KateObjectStore } from "./object-store";
@@ -93,10 +88,7 @@ export class KateStorageManager {
     if (estimate.quota == null || estimate.usage == null) {
       return true;
     } else {
-      return (
-        estimate.usage + size <
-        estimate.quota - KateStorageManager.MINIMUM_FREE_SPACE
-      );
+      return estimate.usage + size < estimate.quota - KateStorageManager.MINIMUM_FREE_SPACE;
     }
   }
 
@@ -105,18 +97,17 @@ export class KateStorageManager {
     if (estimate.quota == null || estimate.usage == null) {
       return;
     }
-    const usage =
-      estimate.usage / (estimate.quota - KateStorageManager.MINIMUM_FREE_SPACE);
+    const usage = estimate.usage / (estimate.quota - KateStorageManager.MINIMUM_FREE_SPACE);
     if (
       usage >= KateStorageManager.ALERT_USAGE_PERCENT &&
-      !this.os.kernel.console.is_resource_taken("low-storage")
+      !this.os.kernel.console.resources.is_taken("low-storage")
     ) {
       await this.os.notifications.push_transient(
         "kate:storage-manager",
         "Low storage space",
         `Your device is running out of storage space. Kate may not be fully operational.`
       );
-      this.os.kernel.console.take_resource("low-storage");
+      this.os.kernel.console.resources.take("low-storage");
     }
   }
 
@@ -137,9 +128,7 @@ export class KateStorageManager {
     return estimate.cartridges.get(cart_id) ?? null;
   }
 
-  async try_estimate_live_cartridge(
-    cart: CartMeta
-  ): Promise<AppStorageDetails> {
+  async try_estimate_live_cartridge(cart: CartMeta): Promise<AppStorageDetails> {
     const { cartridges } = await this.estimate();
     const maybe_cart = cartridges.get(cart.id) ?? null;
     const media = await this.estimate_media();
@@ -148,11 +137,8 @@ export class KateStorageManager {
       count: 0,
     };
     const saves = (await this.estimate_save_data()).get(cart.id) ?? [];
-    const save_versions = new Map<string, Db.CartridgeQuota>(
-      saves.map((x) => [x.version_id, x])
-    );
-    const unversioned =
-      save_versions.get(KateObjectStore.UNVERSIONED_KEY) ?? null;
+    const save_versions = new Map<string, Db.CartridgeQuota>(saves.map((x) => [x.version_id, x]));
+    const unversioned = save_versions.get(KateObjectStore.UNVERSIONED_KEY) ?? null;
     const versioned = save_versions.get(cart.version) ?? null;
 
     const thumbnail = await make_empty_thumbnail(1, 1);
@@ -218,14 +204,9 @@ export class KateStorageManager {
     const save_data_usage = foldl(
       save_data.values(),
       0,
-      (total, quotas) =>
-        total + quotas.reduce((x, quota) => x + quota.current_size_in_bytes, 0)
+      (total, quotas) => total + quotas.reduce((x, quota) => x + quota.current_size_in_bytes, 0)
     );
-    const applications_usage = foldl(
-      applications.values(),
-      0,
-      (total, app) => total + app.size
-    );
+    const applications_usage = foldl(applications.values(), 0, (total, app) => total + app.size);
 
     const totals = {
       quota: device.quota ? device.quota - device.reserved : device.usage,
@@ -251,8 +232,7 @@ export class KateStorageManager {
       const save_versions = new Map<string, Db.CartridgeQuota>(
         save_data_usage.map((x) => [x.version_id, x])
       );
-      const unversioned =
-        save_versions.get(KateObjectStore.UNVERSIONED_KEY) ?? null;
+      const unversioned = save_versions.get(KateObjectStore.UNVERSIONED_KEY) ?? null;
       const versioned = save_versions.get(app.version_id) ?? null;
 
       cartridges.set(id, {

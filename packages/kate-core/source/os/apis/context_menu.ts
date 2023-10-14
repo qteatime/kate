@@ -235,7 +235,7 @@ export class HUD_ContextMenu extends Scene {
     if (document.fullscreenElement) {
       document.exitFullscreen();
     } else {
-      this.os.kernel.console.request_fullscreen();
+      this.os.kernel.console.case.request_fullscreen();
     }
   };
 

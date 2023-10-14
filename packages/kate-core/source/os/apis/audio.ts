@@ -12,7 +12,7 @@ export class KateAudioServer {
   private sources = new Map<string, AudioSource>();
 
   get audio_context() {
-    return this.kernel.console.audio_context;
+    return this.kernel.console.audio.context;
   }
 
   constructor(readonly kernel: KateKernel) {}
@@ -105,11 +105,7 @@ export class AudioChannel {
 export class AudioSource {
   constructor(readonly id: string, readonly buffer: AudioBuffer) {}
 
-  static async from_bytes(
-    server: KateAudioServer,
-    id: string,
-    bytes: Uint8Array
-  ) {
+  static async from_bytes(server: KateAudioServer, id: string, bytes: Uint8Array) {
     const buffer = await server.audio_context.decodeAudioData(bytes.buffer);
     return new AudioSource(id, buffer);
   }

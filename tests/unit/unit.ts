@@ -32,6 +32,7 @@ export type DescribeContext = {
 
 export async function load(page: Page) {
   await page.addScriptTag({ path: Path.join(__dirname, "../../www/kate/kate-latest.js") });
+  return await page.evaluateHandle(() => (window as any).Kate as Kate);
 }
 
 export function describe(title: string, setup: (ctx: DescribeContext) => void) {

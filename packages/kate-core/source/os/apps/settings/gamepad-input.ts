@@ -64,7 +64,7 @@ export class TestStandardMappingSettings extends UI.SimpleScene {
   }
 
   on_attached(): void {
-    this.os.kernel.console.on_tick.listen(this.update_gamepad_status);
+    this.os.kernel.console.clock.on_tick.listen(this.update_gamepad_status);
     this.os.kernel.gamepad_source.pause();
     this.index_buttons();
     super.on_attached();
@@ -73,7 +73,7 @@ export class TestStandardMappingSettings extends UI.SimpleScene {
   on_detached(): void {
     super.on_detached();
     this.os.kernel.gamepad_source.unpause();
-    this.os.kernel.console.on_tick.remove(this.update_gamepad_status);
+    this.os.kernel.console.clock.on_tick.remove(this.update_gamepad_status);
   }
 
   index_buttons = () => {
@@ -929,12 +929,12 @@ export class ChooseActiveGamepadSettings extends UI.SimpleScene {
 
   on_attached(): void {
     super.on_attached();
-    this.os.kernel.console.on_tick.listen(this.update_gamepads);
+    this.os.kernel.console.clock.on_tick.listen(this.update_gamepads);
     this.os.kernel.gamepad_source.pause();
   }
 
   on_detached(): void {
-    this.os.kernel.console.on_tick.remove(this.update_gamepads);
+    this.os.kernel.console.clock.on_tick.remove(this.update_gamepads);
     this.os.kernel.gamepad_source.unpause();
     super.on_detached();
   }

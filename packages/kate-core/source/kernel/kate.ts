@@ -5,8 +5,6 @@
  */
 
 import { KateRuntimes } from "./cart-runtime";
-import { KateGamepadInputSource } from "./input/input-source-gamepad";
-import { KateKeyboardInputSource } from "./input/input-source-keyboard";
 import { ConsoleOptions, VirtualConsole } from "./virtual";
 
 export class KateKernel {
@@ -39,12 +37,12 @@ export class KateKernel {
   }
 
   enter_trusted_mode() {
-    this.console.body.classList.add("trusted-mode");
-    this.console.take_resource("trusted-mode");
+    this.console.body!.classList.add("trusted-mode");
+    this.console.resources.take("trusted-mode");
   }
 
   exit_trusted_mode() {
-    this.console.body.classList.remove("trusted-mode");
-    this.console.release_resource("trusted-mode");
+    this.console.body!.classList.remove("trusted-mode");
+    this.console.resources.release("trusted-mode");
   }
 }

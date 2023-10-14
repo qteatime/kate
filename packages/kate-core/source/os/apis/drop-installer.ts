@@ -20,9 +20,7 @@ export class KateDropInstaller {
 
   async install(files: File[]) {
     const valid = files.filter((x) => x.name.endsWith(".kart"));
-    const status = this.os.status_bar.show(
-      `Installing ${files.length} carts...`
-    );
+    const status = this.os.status_bar.show(`Installing ${files.length} carts...`);
 
     for (const file of valid) {
       if (!file.name.endsWith(".kart")) {
@@ -40,11 +38,7 @@ export class KateDropInstaller {
 export class HUD_DropInstaller extends Scene {
   constructor(readonly manager: KateDropInstaller) {
     super(manager.os, true);
-    (this as any).canvas = UI.h(
-      "div",
-      { class: "kate-hud-drop-installer" },
-      []
-    );
+    (this as any).canvas = UI.h("div", { class: "kate-hud-drop-installer" }, []);
   }
 
   setup() {
@@ -72,9 +66,7 @@ export class HUD_DropInstaller extends Scene {
 
   render() {
     return UI.fragment([
-      UI.h("div", { class: "kate-hud-drop-installer-icon" }, [
-        UI.fa_icon("download", "3x"),
-      ]),
+      UI.h("div", { class: "kate-hud-drop-installer-icon" }, [UI.fa_icon("download", "3x")]),
       UI.h("div", { class: "kate-hud-drop-installer-description" }, [
         "Drop ",
         UI.h("tt", {}, [".kart"]),
