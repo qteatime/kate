@@ -55,12 +55,6 @@
   opacity: 0.4;
 }
 
-.kate-os-button-mapping .kate-icon[data-name="menu"],
-.kate-os-button-mapping .kate-icon[data-name="capture"] {
-  margin-top: 12px;
-  margin-bottom: 10px;
-}
-
 .kate-os-button-mapping.active .kate-icon {
   opacity: 1;
 }

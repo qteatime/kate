@@ -8,80 +8,18 @@
   width: 1em;
   height: 1em;
   font-size: 1em;
-  color: #4f4f4f;
-}
-
-.kate-icon img {
-  width: 1em;
-  height: 1em;
-}
-
-.kate-icon-light img {
-  filter: invert(1);
-}
-
-.kate-icon[data-name="x"],
-.kate-icon[data-name="o"] {
-  background: #4f4f4f;
-  border-radius: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.kate-icon[data-name="x"] img,
-.kate-icon[data-name="o"] img {
-  width: 0.8em;
-  height: 0.8em;
 }
 
 .kate-icon[data-name="ltrigger"],
 .kate-icon[data-name="rtrigger"] {
-  background: #4f4f4f;
   width: 1.5em;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
-.kate-icon[data-name="ltrigger"]::before,
-.kate-icon[data-name="rtrigger"]::before {
-  font-size: 0.6em;
-  font-weight: bold;
-  font-family: var(--font-family-sans);
-  color: #fafafa;
-}
-
-.kate-icon[data-name="ltrigger"] {
-  border-top-left-radius: 0.5em;
-}
-
-.kate-icon[data-name="ltrigger"]::before {
-  content: "L";
-}
-
-.kate-icon[data-name="rtrigger"] {
-  border-top-right-radius: 0.5em;
-}
-
-.kate-icon[data-name="rtrigger"]::before {
-  content: "R";
-}
-
-.kate-icon[data-name="menu"] {
-  border: 1px solid #4f4f4f;
-  height: 0.3em;
-  border-radius: 0.5em;
-  width: 1em;
-  transform: rotate(-27deg);
-}
-
-.kate-icon[data-name="capture"] {
-  background: #4f4f4f;
-  height: 0.3em;
-  border-radius: 0.5em;
-  width: 1em;
-  transform: rotate(27deg);
+.kate-icon img {
+  width: 100%;
+  height: 100%;
+  image-rendering: auto;
+  image-rendering: optimizeQuality;
 }
 
 .kate-os-simple-screen {
@@ -126,17 +64,11 @@
 .kate-os-statusbar .kate-icon {
   width: 16px;
   height: 16px;
-  font-size: 13px;
-}
-
-.kate-os-statusbar .kate-icon[data-name="menu"],
-.kate-os-statusbar .kate-icon[data-name="capture"] {
-  height: 8px;
 }
 
 .kate-os-statusbar .kate-icon[data-name="ltrigger"],
 .kate-os-statusbar .kate-icon[data-name="rtrigger"] {
-  width: 22px;
+  width: 24px;
 }
 
 .kate-ui-hbox {

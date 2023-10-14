@@ -393,26 +393,31 @@ export class Icon extends Widget {
       case "down":
       case "right":
       case "left":
-        return h("div", { class: "kate-icon kate-icon-light", "data-name": this.type }, [
-          h("img", { src: `img/${this.type}.png` }, []),
+        return h("div", { class: "kate-icon", "data-name": this.type }, [
+          h("img", { src: `img/buttons/dpad-${this.type}.png` }, []),
         ]);
       case "ltrigger":
+        return h("div", { class: "kate-icon", "data-name": this.type }, [
+          h("img", { src: `img/buttons/l.png` }, []),
+        ]);
       case "rtrigger":
-      case "menu":
-      case "capture":
-        return h("div", { class: "kate-icon", "data-name": this.type }, []);
+        return h("div", { class: "kate-icon", "data-name": this.type }, [
+          h("img", { src: `img/buttons/r.png` }, []),
+        ]);
       case "x":
         return h("div", { class: "kate-icon", "data-name": this.type }, [
-          h("img", { src: `img/cancel.png` }, []),
+          h("img", { src: `img/buttons/cancel.png` }, []),
         ]);
       case "o":
         return h("div", { class: "kate-icon", "data-name": this.type }, [
-          h("img", { src: `img/ok.png` }, []),
+          h("img", { src: `img/buttons/ok.png` }, []),
         ]);
+      case "menu":
+      case "capture":
       case "berry":
       case "sparkle":
         return h("div", { class: "kate-icon", "data-name": this.type }, [
-          h("img", { src: `img/${this.type}.png` }, []),
+          h("img", { src: `img/buttons/${this.type}.png` }, []),
         ]);
     }
   }
