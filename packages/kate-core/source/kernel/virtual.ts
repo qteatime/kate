@@ -5,6 +5,7 @@
  */
 
 import { unreachable } from "../utils";
+import { KateAudioManager } from "./audio";
 import { KateConsoleClock } from "./clock";
 import { KateButtonInputAggregator } from "./input/button-input";
 const pkg = require("../../package.json");
@@ -26,6 +27,7 @@ export type ConsoleOptions = {
 export class VirtualConsole {
   readonly button_input = new KateButtonInputAggregator();
   readonly clock = new KateConsoleClock();
+  readonly audio = new KateAudioManager();
 
   private is_listening = false;
   private _case: ConsoleCase;
@@ -36,7 +38,6 @@ export class VirtualConsole {
   readonly version_container: HTMLElement | null;
   readonly resources_container: HTMLElement;
   readonly version = pkg?.version == null ? null : `v${pkg.version}`;
-  readonly audio_context = new AudioContext();
   readonly resources = new Map<Resource, number>();
 
   constructor(readonly root: HTMLElement, readonly options: ConsoleOptions) {
@@ -50,22 +51,6 @@ export class VirtualConsole {
     this.resources_container = root.querySelector("#kate-resources")!;
     if (this.version_container != null && this.version != null) {
       this.version_container.textContent = this.version;
-    }
-    this.open_audio_output();
-  }
-
-  private open_audio_output() {
-    this.audio_context.resume().catch((e) => {});
-    if (this.audio_context.state !== "running") {
-      const open_audio_output = () => {
-        this.audio_context.resume().catch((e) => {});
-        window.removeEventListener("touchstart", open_audio_output);
-        window.removeEventListener("click", open_audio_output);
-        window.removeEventListener("keydown", open_audio_output);
-      };
-      window.addEventListener("touchstart", open_audio_output);
-      window.addEventListener("click", open_audio_output);
-      window.addEventListener("keydown", open_audio_output);
     }
   }
 
@@ -118,6 +103,8 @@ export class VirtualConsole {
 
     this.clock.setup();
     this.clock.on_tick.listen((time) => this.do_tick(time));
+
+    this.audio.open();
   }
 
   set_case(kase: ConsoleCase) {
