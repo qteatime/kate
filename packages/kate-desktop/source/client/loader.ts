@@ -49,7 +49,7 @@ async function main() {
     set_case_mode: case_mode == null,
   });
   if (case_mode != null) {
-    kate.console.set_case(case_mode);
+    kate.console.case.reconfigure(case_mode);
   }
 }
 

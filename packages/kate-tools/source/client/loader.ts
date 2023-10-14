@@ -15,7 +15,7 @@ declare var Kate: {
 };
 
 type Config = {
-  case_mode?: kernel.ConsoleCase;
+  case_mode?: kernel.ConsoleCaseConfig;
 };
 
 (window as any).KateNative = null;
@@ -30,23 +30,16 @@ const default_config: Config = {
 
 async function main() {
   try {
-    const config0 = JSON.parse(
-      document.querySelector("#kate-config")!.textContent!
-    );
+    const config0 = JSON.parse(document.querySelector("#kate-config")!.textContent!);
     const config: Config = Object.assign({}, default_config, config0);
 
-    const kate = Kate.kernel.KateKernel.from_root(
-      document.querySelector(".kate")!,
-      {
-        mode: "single",
-        persistent_storage: false,
-        case: config.case_mode,
-      }
-    );
+    const kate = Kate.kernel.KateKernel.from_root(document.querySelector(".kate")!, {
+      mode: "single",
+      persistent_storage: false,
+      case: config.case_mode,
+    });
 
-    const cart_bytes = new Uint8Array(
-      await (await fetch("game.kart")).arrayBuffer()
-    );
+    const cart_bytes = new Uint8Array(await (await fetch("game.kart")).arrayBuffer());
     const cart = Kate.cart.parse(cart_bytes);
     const capabilities = Kate.capabilities.grants_from_cartridge(cart);
 
@@ -56,7 +49,7 @@ async function main() {
     });
 
     if (config.case_mode != null) {
-      kate.console.set_case(config.case_mode);
+      kate.console.case.reconfigure(config.case_mode);
     }
 
     await kate_os.db.transaction(
