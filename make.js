@@ -158,12 +158,11 @@ function electron_name() {
 }
 
 function kart({ config, output }) {
-  exec_file("node", [
-    "packages/kate-tools/cli/kart.js",
-    "--output",
-    output,
-    config,
-  ]);
+  exec_file("node", ["packages/kate-tools/cli/kart.js", "--output", output, config]);
+}
+
+function playwright(args) {
+  exec_file("node", ["node_modules/playwright/cli.js", ...args]);
 }
 
 function clean_build(root) {
@@ -171,10 +170,7 @@ function clean_build(root) {
   remove(Path.join(root, "tsconfig.tsbuildinfo"), { force: true });
 }
 
-function remove(
-  path,
-  { recursive, force } = { recursive: false, force: false }
-) {
+function remove(path, { recursive, force } = { recursive: false, force: false }) {
   if (!FS.existsSync(path) && force) {
     return;
   }
@@ -279,10 +275,7 @@ w.task("schema:generate", [], () => {
 
 w.task("schema:compile", ["ljt:build"], () => {
   for (const file of glob("**/*.json", { cwd: "packages/schema/source" })) {
-    copy(
-      Path.join("packages/schema/source", file),
-      Path.join("packages/schema/build", file)
-    );
+    copy(Path.join("packages/schema/source", file), Path.join("packages/schema/build", file));
   }
   tsc("packages/schema");
 });
@@ -323,10 +316,7 @@ w.task("bridges:generate", ["bridges:compile", "bridges:bundle-api"], () => {
     name: "bridges",
     target: "packages/kate-bridges/source/index.ts",
   });
-  tsc_file(
-    "packages/kate-bridges/source/index.ts",
-    "packages/kate-bridges/build"
-  );
+  tsc_file("packages/kate-bridges/source/index.ts", "packages/kate-bridges/build");
 });
 
 w.task("bridges:build", ["bridges:generate"], () => {});
@@ -334,13 +324,7 @@ w.task("bridges:build", ["bridges:generate"], () => {});
 // -- Core
 w.task(
   "core:compile",
-  [
-    "schema:build",
-    "bridges:build",
-    "util:build",
-    "db-schema:build",
-    "ljt:build",
-  ],
+  ["schema:build", "bridges:build", "util:build", "db-schema:build", "ljt:build"],
   () => {
     tsc("packages/kate-core");
   }
@@ -403,10 +387,7 @@ w.task("tools:build", ["tools:compile", "www:bundle"], () => {
     out: `packages/kate-tools/packaging/web/loader.js`,
     name: "Kate_single_loader",
   });
-  copy(
-    "packages/kate-core/LICENCES.txt",
-    `packages/kate-tools/packaging/web/KATE-LICENCES.txt`
-  );
+  copy("packages/kate-core/LICENCES.txt", `packages/kate-tools/packaging/web/KATE-LICENCES.txt`);
 });
 
 w.task("tools:clean", [], () => {
@@ -467,22 +448,18 @@ w.task("example:hello-world", ["tools:build"], () => {
   });
 });
 
-w.task(
-  "example:boon-scrolling",
-  ["tools:build", "domui:build", "glomp:build"],
-  () => {
-    tsc("examples/boon-scrolling");
-    glomp({
-      entry: "examples/boon-scrolling/build/index.js",
-      out: "examples/boon-scrolling/www/game.js",
-      name: "BoonScrolling",
-    });
-    kart({
-      config: "examples/boon-scrolling/kate.json",
-      output: "examples/boon-scrolling/boon-scrolling.kart",
-    });
-  }
-);
+w.task("example:boon-scrolling", ["tools:build", "domui:build", "glomp:build"], () => {
+  tsc("examples/boon-scrolling");
+  glomp({
+    entry: "examples/boon-scrolling/build/index.js",
+    out: "examples/boon-scrolling/www/game.js",
+    name: "BoonScrolling",
+  });
+  kart({
+    config: "examples/boon-scrolling/kate.json",
+    output: "examples/boon-scrolling/boon-scrolling.kart",
+  });
+});
 
 w.task("example:katchu", ["tools:build", "glomp:build"], () => {
   tsc("examples/katchu");
@@ -504,25 +481,21 @@ w.task(
 );
 
 // -- Ecosystem
-w.task(
-  "ecosystem:importer",
-  ["util:build", "tools:build", "appui:build", "glomp:build"],
-  () => {
-    tsc("ecosystem/importer");
-    remove("ecosystem/importer/www", { recursive: true, force: true });
-    copy_tree("ecosystem/importer/assets", "ecosystem/importer/www");
-    glomp({
-      entry: "ecosystem/importer/build/index.js",
-      out: "ecosystem/importer/www/js/importer.js",
-      name: "KateImporter",
-    });
-    copy_tree("packages/kate-appui/assets", "ecosystem/importer/www/appui");
-    kart({
-      config: "ecosystem/importer/kate.json",
-      output: "ecosystem/importer/kate-importer.kart",
-    });
-  }
-);
+w.task("ecosystem:importer", ["util:build", "tools:build", "appui:build", "glomp:build"], () => {
+  tsc("ecosystem/importer");
+  remove("ecosystem/importer/www", { recursive: true, force: true });
+  copy_tree("ecosystem/importer/assets", "ecosystem/importer/www");
+  glomp({
+    entry: "ecosystem/importer/build/index.js",
+    out: "ecosystem/importer/www/js/importer.js",
+    name: "KateImporter",
+  });
+  copy_tree("packages/kate-appui/assets", "ecosystem/importer/www/appui");
+  kart({
+    config: "ecosystem/importer/kate.json",
+    output: "ecosystem/importer/kate-importer.kart",
+  });
+});
 
 w.task("ecosystem:all", ["ecosystem:importer"], () => {});
 
@@ -579,14 +552,9 @@ w.task("chore:update-versions", [], () => {
         continue;
       }
 
-      const json = JSON.parse(
-        FS.readFileSync(Path.join("packages", pkg, file))
-      );
+      const json = JSON.parse(FS.readFileSync(Path.join("packages", pkg, file)));
       json.version = version;
-      FS.writeFileSync(
-        Path.join("packages", pkg, file),
-        JSON.stringify(json, null, 2)
-      );
+      FS.writeFileSync(Path.join("packages", pkg, file), JSON.stringify(json, null, 2));
       console.log(`--> Updated ${pkg} to ${version}`);
     }
   }
@@ -622,11 +590,7 @@ w.task("release:win:arm64", ["desktop:clean", "desktop:build"], async () => {
   await gen_build.gen_unsigned_zip("win32", "arm64");
 });
 
-w.task(
-  "release:win:all",
-  ["release:win:x64", "release:win:x86", "release:win:arm64"],
-  () => {}
-);
+w.task("release:win:all", ["release:win:x64", "release:win:x86", "release:win:arm64"], () => {});
 
 w.task("release:linux:x64", ["desktop:clean", "desktop:build"], async () => {
   await gen_build.gen_unsigned_zip("linux", "x64");
@@ -653,29 +617,54 @@ w.task("release:cartridges", ["example:all", "ecosystem:all"], () => {
     "examples/boon-scrolling/boon-scrolling.kart",
     "dist/cartridges/examples/boon-scrolling.kart"
   );
-  copy(
-    "examples/hello-world/hello.kart",
-    "dist/cartridges/examples/hello.kart"
-  );
+  copy("examples/hello-world/hello.kart", "dist/cartridges/examples/hello.kart");
   copy("examples/katchu/katchu.kart", "dist/cartridges/examples/katchu.kart");
   FS.mkdirSync("dist/cartridges/ecosystem", { recursive: true });
-  copy(
-    "ecosystem/importer/kate-importer.kart",
-    "dist/cartridges/ecosystem/kate-importer.kart"
-  );
+  copy("ecosystem/importer/kate-importer.kart", "dist/cartridges/ecosystem/kate-importer.kart");
 
   // Generate integrity hashes
   const files = glob("dist/cartridges/**/*.kart");
   const hashes = files.map((file) => {
     const buffer = FS.readFileSync(file);
-    const hash = crypto
-      .createHash("sha256")
-      .update(buffer)
-      .digest()
-      .toString("hex");
+    const hash = crypto.createHash("sha256").update(buffer).digest().toString("hex");
     return `${hash} ${file.replace(/^dist\/cartridges\//, "")}`;
   });
   FS.writeFileSync("dist/cartridges/SHASUM256.txt", hashes.join("\n") + "\n");
+});
+
+// -- Testing
+w.task("test:setup-playwright", [], () => {
+  playwright(["install", "--with-deps"]);
+});
+
+w.task("test:generate", ["util:build"], () => {
+  glomp({
+    entry: "packages/util/build/test-assert.js",
+    out: "tests/unit/test-assert.js",
+    name: "Assert",
+  });
+});
+
+w.task("test:all", ["test:generate", "www:bundle"], () => {
+  playwright(["test"]);
+});
+
+w.task("test:ci", ["test:setup-playwright", "test:generate"], () => {
+  playwright(["test"]);
+});
+
+w.task("test:quick", [], () => {
+  playwright(["test"]);
+});
+
+// -- Test server
+w.task("server:start", [], () => {
+  const express = require("express");
+  const app = express();
+  app.use("/", express.static(Path.join(__dirname, "www")));
+  app.listen(3000, "127.0.0.1", () => {
+    console.log("Server started at http://localhost:3000");
+  });
 });
 
 // -- Multi-project convenience
@@ -715,9 +704,7 @@ w.task("help", [], () => {
 const [task_name] = process.argv.slice(2);
 const task = w.find(task_name);
 if (!task) {
-  throw new Error(
-    `Undefined task ${task_name}. See "make.js help" for available tasks.`
-  );
+  throw new Error(`Undefined task ${task_name}. See "make.js help" for available tasks.`);
 }
 
 assert_root("make");

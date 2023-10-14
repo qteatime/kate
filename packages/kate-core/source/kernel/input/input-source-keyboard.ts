@@ -34,7 +34,7 @@ const default_mapping: Record<string, KateButton> = Object.assign(
 
 export class KateKeyboardInputSource implements KateButtonInputSource {
   readonly on_button_changed = new EventStream<ButtonChangeEvent>();
-  private ignore_repeat = ["menu", "capture"];
+  private ignore_repeat = ["menu", "capture", "berry"];
   private physical_map: { [key: string]: KateButton | null } = default_mapping;
   private attached = false;
 
@@ -51,31 +51,42 @@ export class KateKeyboardInputSource implements KateButtonInputSource {
       throw new Error(`[kate:keyboard] setup() called twice`);
     }
     this.attached = true;
-
-    document.addEventListener("keydown", (ev) => {
-      if (ev.code in this.physical_map) {
-        ev.preventDefault();
-        const button = this.physical_map[ev.code];
-        if (button != null) {
-          if (!this.ignore_repeat.includes(button) || !ev.repeat) {
-            this.on_button_changed.emit({ button, is_pressed: true });
-          }
-        } else {
-          console.warn(`[kate:keyboard] Unmapped key:`, ev.code);
-        }
-      }
-    });
-
-    document.addEventListener("keyup", (ev) => {
-      if (ev.code in this.physical_map) {
-        ev.preventDefault();
-        const button = this.physical_map[ev.code];
-        if (button != null) {
-          this.on_button_changed.emit({ button, is_pressed: false });
-        } else {
-          console.warn(`[kate:keyboard] Unmapped key:`, ev.code);
-        }
-      }
-    });
+    document.addEventListener("keydown", this.handle_keydown);
+    document.addEventListener("keyup", this.handle_keyup);
   }
+
+  teardown() {
+    if (!this.attached) {
+      throw new Error(`[kate:keyboard] teardown() called without setup`);
+    }
+    document.removeEventListener("keydown", this.handle_keydown);
+    document.removeEventListener("keyup", this.handle_keyup);
+    this.attached = false;
+  }
+
+  private handle_keydown = (ev: KeyboardEvent) => {
+    if (ev.code in this.physical_map) {
+      ev.preventDefault();
+      const button = this.physical_map[ev.code];
+      if (button != null) {
+        if (!this.ignore_repeat.includes(button) || !ev.repeat) {
+          this.on_button_changed.emit({ button, is_pressed: true });
+        }
+      } else {
+        console.warn(`[kate:keyboard] Unmapped key:`, ev.code);
+      }
+    }
+  };
+
+  private handle_keyup = (ev: KeyboardEvent) => {
+    if (ev.code in this.physical_map) {
+      ev.preventDefault();
+      const button = this.physical_map[ev.code];
+      if (button != null) {
+        this.on_button_changed.emit({ button, is_pressed: false });
+      } else {
+        console.warn(`[kate:keyboard] Unmapped key:`, ev.code);
+      }
+    }
+  };
 }

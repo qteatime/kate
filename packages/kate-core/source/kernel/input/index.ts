@@ -9,3 +9,4 @@ export * from "./input-source";
 export * from "./input-source-gamepad";
 export * from "./input-source-keyboard";
 export * from "./input-source-virtual";
+export * from "./button-input";

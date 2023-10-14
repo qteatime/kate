@@ -94,7 +94,7 @@ export class KateButtons {
     for (const button of buttons) {
       const state = this.state[button];
       if (state.count !== 0) {
-        state.count = (state.count + 1) | 0 || (state.pressed ? 2 : 0);
+        state.count = (state.count + 1) >>> 0 || (state.pressed ? 2 : 0);
         this.changed.add(button);
       }
     }
