@@ -1,3 +1,6 @@
+/* Any copyright is dedicated to the Public Domain.
+ * http://creativecommons.org/publicdomain/zero/1.0/
+ */
 import { type Page, test, expect } from "@playwright/test";
 import * as Path from "path";
 import type { kernel, os } from "../../packages/kate-core/build";

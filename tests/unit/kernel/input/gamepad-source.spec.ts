@@ -1,3 +1,6 @@
+/* Any copyright is dedicated to the Public Domain.
+ * http://creativecommons.org/publicdomain/zero/1.0/
+ */
 import type { GamepadMapping, KateButton } from "../../../../packages/kate-core/source/kernel";
 import type { MockGamepad } from "../../../mocks/gamepad";
 import { describe } from "../../unit";

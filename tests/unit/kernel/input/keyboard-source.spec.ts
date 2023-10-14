@@ -1,3 +1,6 @@
+/* Any copyright is dedicated to the Public Domain.
+ * http://creativecommons.org/publicdomain/zero/1.0/
+ */
 import { test } from "playwright/test";
 import { type Kate, describe, load } from "../../unit";
 import { assert_match } from "../../../deps/utils";

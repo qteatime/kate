@@ -1,3 +1,6 @@
+/* Any copyright is dedicated to the Public Domain.
+ * http://creativecommons.org/publicdomain/zero/1.0/
+ */
 import test, { Page } from "playwright/test";
 import { Kate, load } from "../../unit";
 import { MockGamepad, mock_gamepad } from "../../../mocks/gamepad";

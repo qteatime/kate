@@ -1,3 +1,6 @@
+/* Any copyright is dedicated to the Public Domain.
+ * http://creativecommons.org/publicdomain/zero/1.0/
+ */
 import { describe } from "../../unit";
 
 describe("@kernel hardware buttons", ({ test, kate, assert_match }) => {
