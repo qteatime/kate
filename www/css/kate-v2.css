@@ -424,27 +424,27 @@ body {
 }
 
 .kc-berry {
-  background-image: url("../img/buttons/berry.png");
+  background-image: url("../img/case/berry.png");
 }
 
 .kc-capture {
-  background-image: url("../img/buttons/capture.png");
+  background-image: url("../img/case/capture.png");
 }
 
 .kc-menu {
-  background-image: url("../img/buttons/menu.png");
+  background-image: url("../img/case/menu.png");
 }
 
 .kc-ok {
-  background-image: url("../img/buttons/ok.png");
+  background-image: url("../img/case/ok.png");
 }
 
 .kc-cancel {
-  background-image: url("../img/buttons/cancel.png");
+  background-image: url("../img/case/cancel.png");
 }
 
 .kc-sparkle {
-  background-image: url("../img/buttons/sparkle.png");
+  background-image: url("../img/case/sparkle.png");
 }
 
 /* tv mode */
