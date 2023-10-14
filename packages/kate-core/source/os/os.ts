@@ -204,7 +204,7 @@ export class KateOS {
     sfx.set_enabled(settings.get("ui").sound_feedback);
     os.set_os_animation(settings.get("ui").animation_effects);
     if (x.set_case_mode !== false) {
-      kernel.console.set_case(settings.get("ui").case_type);
+      kernel.console.case.reconfigure(settings.get("ui").case_type);
     }
 
     const min_boot_time = wait(1000);

@@ -7,7 +7,7 @@
 import { RiskCategory } from "../../capabilities";
 import * as Db from "../../data";
 import type { Database } from "../../db-schema";
-import type { ConsoleCase, GamepadMapping, KateButton } from "../../kernel";
+import type { ConsoleCaseConfig, GamepadMapping, KateButton } from "../../kernel";
 import { EventStream } from "../../utils";
 
 export type PlayHabits = {
@@ -32,7 +32,7 @@ export type Input = {
 export type UI = {
   sound_feedback: boolean;
   animation_effects: boolean;
-  case_type: ConsoleCase;
+  case_type: ConsoleCaseConfig;
 };
 
 export type Security = {
