@@ -43,7 +43,7 @@ export class HUD_DropInstaller extends Scene {
 
   setup() {
     this.manager.os.show_hud(this);
-    const screen = this.manager.os.kernel.console.body!;
+    const screen = this.manager.os.kernel.console.body;
     screen.addEventListener("dragenter", (ev) => {
       this.canvas.classList.add("active");
       screen.classList.add("drag");

@@ -68,7 +68,7 @@ export class KateContextMenu {
   }
 
   in_context() {
-    return this.os.display!.querySelector(".kate-os-hud-context-menu") != null;
+    return this.os.display.querySelector(".kate-os-hud-context-menu") != null;
   }
 }
 

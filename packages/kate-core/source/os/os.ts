@@ -124,7 +124,7 @@ export class KateOS {
       this._scene_stack.push(this._current_scene);
     }
     this._current_scene = scene;
-    scene.attach(this.display!);
+    scene.attach(this.display);
     scene.canvas.classList.remove("kate-os-leaving");
     scene.canvas.classList.add("kate-os-entering");
     this.focus_handler.push_root(scene.canvas);
@@ -163,7 +163,7 @@ export class KateOS {
 
   show_hud(scene: Scene) {
     this._active_hud.push(scene);
-    scene.attach(this.hud_display!);
+    scene.attach(this.hud_display);
   }
 
   hide_hud(scene: Scene) {
@@ -186,7 +186,7 @@ export class KateOS {
   };
 
   set_os_animation(enabled: boolean) {
-    this.display!.classList.toggle("disable-animation", !enabled);
+    this.display.classList.toggle("disable-animation", !enabled);
   }
 
   static async boot(kernel: KateKernel, x: { database?: string; set_case_mode?: boolean } = {}) {
