@@ -52,57 +52,21 @@ export class KeyboardInputSettings extends UI.SimpleScene {
   body() {
     return [
       UI.h("div", { class: "kate-keyboard-mapping-main" }, [
-        UI.h("div", { class: "kate-wireframe" }, [
-          UI.h("div", { class: "kate-wireframe-dpad" }, [
-            UI.h("div", { class: "kate-wireframe-dpad-button kate-wireframe-dpad-up" }, [
-              this.keymap("up"),
-            ]),
-            UI.h(
-              "div",
-              {
-                class: "kate-wireframe-dpad-button kate-wireframe-dpad-right",
-              },
-              [this.keymap("right")]
-            ),
-            UI.h(
-              "div",
-              {
-                class: "kate-wireframe-dpad-button kate-wireframe-dpad-down",
-              },
-              [this.keymap("down")]
-            ),
-            UI.h(
-              "div",
-              {
-                class: "kate-wireframe-dpad-button kate-wireframe-dpad-left",
-              },
-              [this.keymap("left")]
-            ),
-          ]),
-          UI.h("div", { class: "kate-wireframe-shoulder kate-wireframe-shoulder-left" }, [
-            this.keymap("ltrigger"),
-          ]),
-          UI.h(
-            "div",
-            {
-              class: "kate-wireframe-shoulder kate-wireframe-shoulder-right",
-            },
-            [this.keymap("rtrigger")]
-          ),
-          UI.h("div", { class: "kate-wireframe-special kate-wireframe-special-left" }, [
-            this.keymap("capture"),
-          ]),
-          UI.h("div", { class: "kate-wireframe-special kate-wireframe-special-right" }, [
-            this.keymap("menu"),
-          ]),
-          UI.h("div", { class: "kate-wireframe-buttons" }, [
-            UI.h("div", { class: "kate-wireframe-button kate-wireframe-button-x" }, [
-              this.keymap("x"),
-            ]),
-            UI.h("div", { class: "kate-wireframe-button kate-wireframe-button-o" }, [
-              this.keymap("o"),
-            ]),
-          ]),
+        UI.h("div", { class: "kate-keyboard-mapping-left" }, [
+          this.keymap("ltrigger"),
+          this.keymap("capture"),
+          this.keymap("up"),
+          this.keymap("left"),
+          this.keymap("right"),
+          this.keymap("down"),
+        ]),
+        UI.h("div", { class: "kate-keyboard-mapping-right" }, [
+          this.keymap("rtrigger"),
+          this.keymap("menu"),
+          this.keymap("o"),
+          this.keymap("sparkle"),
+          this.keymap("x"),
+          this.keymap("berry"),
         ]),
       ]),
       UI.h("div", { class: "kate-keyboard-mapping-actions" }, [
