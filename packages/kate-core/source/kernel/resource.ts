@@ -28,6 +28,12 @@ export class KateResources {
   release(resource: Resource) {
     const refs = this.resources.get(resource) ?? 0;
     this.resources.set(resource, Math.max(0, refs - 1));
+    if (refs - 1 < 0) {
+      console.warn(
+        `[kernel:resource] releasing more ${resource} references than acquired ones.`,
+        new Error().stack
+      );
+    }
     this.update_display();
   }
 

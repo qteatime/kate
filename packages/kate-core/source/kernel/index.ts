@@ -12,3 +12,4 @@ export * from "./virtual";
 export * from "./input";
 export * from "./clock";
 export * from "./case";
+export * from "./resource";
