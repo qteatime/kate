@@ -11,7 +11,7 @@ import * as Glob from "glob";
 const www_root = Path.join(__dirname, "../packaging/web");
 const asset_root = Path.join(__dirname, "../assets");
 
-const ignored_files = new Set(["index.html", "manifest.json", "worker.js"]);
+const ignored_files = new Set(["index.html", "manifest.json", "worker.js", "test.html"]);
 
 function copy(root: string, from: string, out: string) {
   console.log("-> Copying", from);

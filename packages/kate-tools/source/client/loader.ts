@@ -33,7 +33,7 @@ async function main() {
     const config0 = JSON.parse(document.querySelector("#kate-config")!.textContent!);
     const config: Config = Object.assign({}, default_config, config0);
 
-    const kate = Kate.kernel.KateKernel.from_root(document.querySelector(".kate")!, {
+    const kate = Kate.kernel.KateKernel.from_root(document.querySelector(".kate-case")!, {
       mode: "single",
       persistent_storage: false,
       case: config.case_mode,
