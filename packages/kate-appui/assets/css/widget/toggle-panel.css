@@ -1,0 +1,27 @@
+.kate-ui-toggle-panel {
+  display: grid;
+  grid-template-areas:
+    "title control"
+    "description control";
+  grid-auto-columns: 1fr min-content;
+  padding: 1rem;
+}
+
+.kate-ui-toggle-panel-title {
+  grid-area: title;
+  font-weight: 500;
+  align-self: flex-end;
+}
+
+.kate-ui-toggle-panel-description {
+  grid-area: description;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  margin-top: 0.25rem;
+}
+
+.kate-ui-toggle-panel-control {
+  grid-area: control;
+  padding-left: 2rem;
+  align-self: center;
+}

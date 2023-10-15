@@ -11,8 +11,6 @@ import {
   make_thumbnail_from_bytes,
 } from "../deps/utils";
 import { Importer } from "../importers";
-import { slug } from "../importers/make-cart";
-import { SceneProgress } from "./progress";
 
 export class SceneReview extends UIScene {
   constructor(ui: UI, readonly candidates: Importer[]) {
@@ -26,17 +24,17 @@ export class SceneReview extends UIScene {
 
     return ui.app_screen({
       title: ui.title_bar({
-        left: ui.title([
-          "Kate Importer",
-          ui.fa_icon("caret-right").style({ margin: "0 0.5em" }),
-          "Review",
-        ]),
+        left: ui.title(["Review"]),
         right: ui.fragment([
-          ui.dynamic(
-            current_index.map<Widgetable>(
-              (x) => `${x + 1} of ${this.candidates.length}`
-            )
-          ),
+          ui
+            .stack([
+              ui.strong(["Candidates"]),
+              ui.page_bullet(current_index, {
+                total: this.candidates.length,
+                max_size: 6,
+              }),
+            ])
+            .style({ "align-items": "right" }),
 
           ui.keymap(this, {
             ltrigger: {
@@ -122,16 +120,22 @@ export class SceneReview extends UIScene {
                     }),
                   ]),
                 ]),
-                ui.action_buttons([
-                  ui.text_button("Install", () => {
-                    this.import(x);
-                  }),
-                ]),
               ]),
             ]),
+            ui.floating_button({
+              label: "Install",
+              icon: ui.fa_icon("download"),
+              on_click: () => {
+                this.import(x);
+              },
+            }),
           ]);
         })
       ),
+      status: ui.status_bar([
+        ui.status_icon(["l", "r"], "Select candidate"),
+        ui.status_icon(["cancel"], "Return"),
+      ]),
     });
   }
 
@@ -168,26 +172,28 @@ export class SceneReview extends UIScene {
   }
 
   async import(candidate: Importer) {
-    const progress = SceneProgress.show(this.ui)
-      .set_message("Preparing cartridge...")
-      .set_unknown_progress();
     try {
-      const cartridge = await candidate.make_cartridge();
-      progress.set_message("Packing cartridge...");
-      const bytes = Cart.encode({
-        kate_version: Cart.Kate_version({ major: 0, minor: 29, patch: 1 }),
-        metadata: cartridge.metadata,
-        files: cartridge.files,
+      await this.ui.dialogs.progress({
+        message: ["Preparing cartridge..."],
+        process: async (progress) => {
+          const cartridge = await candidate.make_cartridge();
+          progress.set_message(["Packing cartridge..."]);
+          const bytes = Cart.encode({
+            kate_version: Cart.Kate_version({ major: 0, minor: 29, patch: 1 }),
+            metadata: cartridge.metadata,
+            files: cartridge.files,
+          });
+          progress.set_message(["Preparing to install..."]);
+          await KateAPI.cart_manager.install(bytes);
+        },
       });
-      progress.set_message("Preparing to install...");
-      await KateAPI.cart_manager.install(bytes);
-      progress.close();
     } catch (e) {
-      progress.close();
       console.error(`Failed to import:`, e);
-      await KateAPI.dialogs.message(
-        "Failed to prepare cartridge for installation: unknown internal error"
-      );
+      await this.ui.dialogs.message({
+        message: [
+          "Failed to prepare cartridge for installation: unknown internal error",
+        ],
+      });
     }
   }
 }

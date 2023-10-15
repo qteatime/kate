@@ -1,0 +1,91 @@
+.kate-ui-dialog-root {
+  background: var(--color-backdrop);
+  width: 100%;
+  height: 100%;
+  backdrop-filter: blur(5px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.kate-ui-dialog-absolute-root {
+  background: var(--color-backdrop);
+  width: 100%;
+  height: 100%;
+  backdrop-filter: blur(5px);
+  position: relative;
+  overflow: hidden;
+}
+
+.kate-ui-dialog-container {
+  background: var(--color-bg);
+  border-radius: 10px;
+  box-shadow: 0 0 5px var(--color-shadow);
+  width: 640px;
+}
+
+.kate-ui-dialog-title:not(:empty) {
+  background: var(--header-bg-color);
+  padding: 1rem;
+  color: var(--header-font-color);
+  font-family: var(--font-title);
+  font-size: 1.25rem;
+  border-radius: 10px 10px 0 0;
+  margin: 1px 1px 1.5rem 1px;
+  position: relative;
+}
+
+.kate-ui-dialog-title::after {
+  content: "";
+  display: block;
+  position: absolute;
+  top: calc(100% - 1px);
+  left: 0px;
+  width: 100%;
+  height: 10px;
+  background: var(--header-bg-image) repeat-x bottom left;
+  background-size: 32px 32px;
+  image-rendering: auto;
+}
+
+.kate-ui-dialog-message {
+  padding: 1rem;
+}
+
+.kate-ui-dialog-progress-indicator {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0.5rem 2rem 2rem 1.5rem;
+}
+
+.kate-ui-dialog-actions {
+  background: var(--color-border);
+  display: flex;
+  justify-content: stretch;
+  align-items: stretch;
+  border-radius: 0 0 10px 10px;
+  border-top: 1px solid var(--color-border-d1);
+}
+
+.kate-ui-dialog-actions .kate-ui-text-button {
+  flex-grow: 1;
+  border-radius: 0 0 10px 10px;
+  border: none;
+}
+
+.kate-ui-dialog-pop-menu {
+  position: absolute;
+  bottom: 0px;
+  left: 50%;
+  opacity: 0;
+  translate: -50% 0%;
+  transform-origin: top left;
+  background: var(--color-bg);
+  border-radius: 10px 10px 0 0;
+  width: 640px;
+  padding-bottom: 1rem;
+  animation: kate-ui-pop-menu-in 0.25s ease-out forwards;
+}

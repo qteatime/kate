@@ -4,20 +4,22 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { EventStream } from "./utils";
-import { WidgetDSL, Widgetable, append, replace } from "./widget";
+import { EventStream, Observable, defer, unreachable } from "./utils";
+import { ActionItem, WidgetDSL, Widgetable, append, replace } from "./widget";
 
 export class UI {
   private _current: UIScene | null = null;
   private _stack: UIScene[] = [];
   private _focus: UIFocus;
+  private _dialogs: UIDialogs;
 
   readonly on_scene_changed = new EventStream<UIScene | null>();
 
   readonly dsl = new WidgetDSL(this);
 
-  constructor(readonly root: HTMLElement) {
-    this._focus = new UIFocus(this);
+  constructor(readonly root: HTMLElement, env: InputEnv) {
+    this._focus = new UIFocus(this, env);
+    this._dialogs = new UIDialogs(this);
   }
 
   get current() {
@@ -26,6 +28,14 @@ export class UI {
 
   get focus() {
     return this._focus;
+  }
+
+  get dialogs() {
+    return this._dialogs;
+  }
+
+  get is_last_scene() {
+    return this._stack.length === 0;
   }
 
   push_scene(scene: UIScene) {
@@ -70,6 +80,113 @@ export class UI {
   }
 }
 
+export class UIDialogs {
+  constructor(readonly ui: UI) {}
+
+  async message(x: { title?: Widgetable[]; message: Widgetable[]; events?: DialogEvents }) {
+    const ui = this.ui;
+
+    const deferred = defer<void>();
+    const screen = new MessageDialog(
+      ui,
+      x.title ?? [],
+      x.message,
+      () => {
+        deferred.resolve();
+      },
+      x.events
+    );
+    ui.push_scene(screen);
+    deferred.promise.finally(() => ui.pop_scene(screen));
+    return deferred.promise;
+  }
+
+  async confirm(x: {
+    title?: Widgetable[];
+    message: Widgetable[];
+    confirm_label?: string;
+    cancel_label?: string;
+    dangerous?: boolean;
+    events?: DialogEvents;
+  }) {
+    const ui = this.ui;
+
+    const deferred = defer<boolean>();
+    const screen = new ConfirmDialog(
+      ui,
+      x.title ?? [],
+      x.message,
+      {
+        on_confirm: () => deferred.resolve(true),
+        on_cancel: () => deferred.resolve(false),
+        cancel_label: x.cancel_label,
+        confirm_label: x.confirm_label,
+        dangerous: x.dangerous,
+      },
+      x.events
+    );
+    ui.push_scene(screen);
+    deferred.promise.finally(() => ui.pop_scene(screen));
+    return deferred.promise;
+  }
+
+  async progress<A>(x: {
+    title?: Widgetable[];
+    message: Widgetable[];
+    process: (_: ProgressHandler) => Promise<A>;
+  }) {
+    const ui = this.ui;
+
+    const screen = new ProgressDialog(ui, x.title ?? [], x.message);
+    ui.push_scene(screen);
+    try {
+      return await x.process(new ProgressHandler(screen));
+    } finally {
+      ui.pop_scene(screen);
+    }
+  }
+
+  async pop_menu<A>(x: {
+    title?: Widgetable[];
+    cancel_label?: string;
+    items: PopMenuItem<A>[];
+    cancel_value: A;
+  }): Promise<A> {
+    const ui = this.ui;
+
+    const deferred = defer<A>();
+    const screen = new PopMenuDialog(ui, {
+      title: x.title,
+      cancel_label: x.cancel_label,
+      on_cancel: () => deferred.resolve(x.cancel_value),
+      items: x.items.map((a) => ({
+        icon: a.icon,
+        title: a.title,
+        is_visible: a.is_visible,
+        on_select: () => deferred.resolve(a.value),
+      })),
+    });
+    ui.push_scene(screen);
+    deferred.promise.finally(() => ui.pop_scene(screen));
+    return deferred.promise;
+  }
+}
+
+export class ProgressHandler {
+  constructor(private _scene: ProgressDialog) {}
+
+  set_message(message: Widgetable[]) {
+    this._scene.set_message(message);
+  }
+}
+
+export type PopMenuItem<A> = {
+  icon?: Widgetable;
+  title: Widgetable;
+  value: A;
+  is_visible?: boolean;
+};
+
 export abstract class UIScene {
   readonly canvas: HTMLElement;
 
@@ -78,10 +195,21 @@ export abstract class UIScene {
     this.canvas.className = "kate-ui-scene";
   }
 
-  abstract render(): Widgetable;
+  abstract render(): Widgetable | Promise<Widgetable>;
+
+  async refresh() {
+    try {
+      replace(this.canvas, this.ui.dsl.class("kate-ui-loading", ["Loading..."]));
+      const body = await this.render();
+      replace(this.canvas, body);
+      this.ui.focus.ensure_focus();
+    } catch (e) {
+      replace(this.canvas, this.ui.dsl.class("kate-ui-error", ["Failed to render the screen"]));
+    }
+  }
 
   on_attached(): void {
-    replace(this.canvas, this.render());
+    this.refresh();
   }
   on_detached(): void {}
   on_activated(): void {}
@@ -94,7 +222,16 @@ export type InteractionHandler = {
   allow_repeat?: boolean;
   on_click?: boolean;
   on_menu?: boolean;
+  enabled?: boolean;
   handler: (key: KateTypes.InputKey, repeat: boolean) => Promise<void>;
+};
+
+export type InputEnv = {
+  on_key_pressed: EventStream<{
+    key: KateTypes.InputKey;
+    is_repeat: boolean;
+    is_long_press: boolean;
+  }>;
 };
 
 export class UIFocus {
@@ -102,10 +239,14 @@ export class UIFocus {
   private _scene_handlers = new WeakMap<UIScene, InteractionHandler[]>();
 
   readonly on_focus_changed = new EventStream<HTMLElement | null>();
+  readonly on_handlers_changed = new EventStream<{
+    focus: InteractionHandler[];
+    scene: InteractionHandler[];
+  }>();
 
-  constructor(readonly ui: UI) {
+  constructor(readonly ui: UI, readonly env: InputEnv) {
     this.ui.on_scene_changed.listen(this.handle_scene_changed);
-    KateAPI.input.on_key_pressed.listen((ev) => this.handle_key(ev.key, ev.is_repeat));
+    env.on_key_pressed.listen((x) => this.handle_key(x.key, x.is_repeat));
   }
 
   get root() {
@@ -124,7 +265,16 @@ export class UIFocus {
   get current_interactions() {
     const current = this.current;
     if (current != null) {
-      return this._interactive.get(current) ?? [];
+      return (this._interactive.get(current) ?? []).filter((x) => x.enabled ?? true);
+    } else {
+      return [];
+    }
+  }
+
+  get scene_interactions() {
+    const current = this.ui.current;
+    if (current != null) {
+      return (this._scene_handlers.get(current) ?? []).filter((x) => x.enabled ?? true);
     } else {
       return [];
     }
@@ -132,18 +282,30 @@ export class UIFocus {
 
   register_interactions(element: HTMLElement, interactions: InteractionHandler[]) {
     this._interactive.set(element, interactions);
+    this.on_handlers_changed.emit({
+      focus: this.current_interactions,
+      scene: this.scene_interactions,
+    });
   }
 
   register_scene_handlers(scene: UIScene, interactions: InteractionHandler[]) {
     const handlers0 = this._scene_handlers.get(scene) ?? [];
     const handlers = handlers0.concat(interactions.filter((x) => !handlers0.includes(x)));
     this._scene_handlers.set(scene, handlers);
+    this.on_handlers_changed.emit({
+      focus: this.current_interactions,
+      scene: this.scene_interactions,
+    });
   }
 
   deregister_scene_handlers(scene: UIScene, interactions: InteractionHandler[]) {
     const handlers0 = this._scene_handlers.get(scene) ?? [];
     const handlers = handlers0.filter((x) => !interactions.includes(x));
     this._scene_handlers.set(scene, handlers);
+    this.on_handlers_changed.emit({
+      focus: this.current_interactions,
+      scene: this.scene_interactions,
+    });
   }
 
   focus(element: HTMLElement | null) {
@@ -158,9 +320,13 @@ export class UIFocus {
     }
     if (element != null) {
       element.classList.add("focus");
-      element.scrollIntoView({ block: "center", inline: "center" });
+      this.scroll_into_view(element);
     }
     this.on_focus_changed.emit(element);
+    this.on_handlers_changed.emit({
+      focus: this.current_interactions,
+      scene: this.scene_interactions,
+    });
   }
 
   ensure_focus() {
@@ -232,52 +398,70 @@ export class UIFocus {
       }
     }
 
+    function overlap([a, b]: [number, number], [x, y]: [number, number]) {
+      if (b < x || b > y) {
+        return false;
+      } else {
+        return true;
+      }
+    }
+
+    function horizontal_penalty(x: DOMRect) {
+      if (overlap([x.left, x.right], [bounds.left, bounds.right])) {
+        return 0;
+      } else {
+        const distance = Math.min(Math.abs(x.right - bounds.left), Math.abs(x.left - bounds.right));
+        return distance + 1_000_000;
+      }
+    }
+
+    function vertical_penalty(x: DOMRect) {
+      if (overlap([x.top, x.bottom], [bounds.top, bounds.bottom])) {
+        return 0;
+      } else {
+        const distance = Math.min(Math.abs(x.bottom - bounds.top), Math.abs(x.top - bounds.bottom));
+        return distance + 1_000_000;
+      }
+    }
+
+    function vx(x: DOMRect) {
+      return vertical_distance(x) + horizontal_penalty(x);
+    }
+
+    function hx(x: DOMRect) {
+      return horizontal_distance(x) + vertical_penalty(x);
+    }
+
     let new_focus: HTMLElement | null = null;
     switch (direction) {
       case "left": {
         const candidates = focusable
-          .filter((x) => x.bounds.right <= bounds.right)
-          .sort(
-            (a, b) =>
-              a.bounds.right - b.bounds.right ||
-              vertical_distance(a.bounds) - vertical_distance(b.bounds)
-          );
+          .filter((x) => current == null || x.bounds.right <= bounds.left)
+          .sort((a, b) => hx(b.bounds) - hx(a.bounds));
         new_focus = candidates[0]?.element ?? null;
         break;
       }
 
       case "right": {
         const candidates = focusable
-          .filter((x) => x.bounds.left >= bounds.left)
-          .sort(
-            (a, b) =>
-              a.bounds.left - b.bounds.left ||
-              vertical_distance(a.bounds) - vertical_distance(b.bounds)
-          );
+          .filter((x) => current == null || x.bounds.left >= bounds.right)
+          .sort((a, b) => hx(a.bounds) - hx(b.bounds));
         new_focus = candidates[0]?.element ?? null;
         break;
       }
 
       case "up": {
         const candidates = focusable
-          .filter((x) => x.bounds.bottom <= bounds.bottom)
-          .sort(
-            (a, b) =>
-              a.bounds.bottom - b.bounds.bottom ||
-              horizontal_distance(a.bounds) - horizontal_distance(b.bounds)
-          );
+          .filter((x) => current == null || x.bounds.bottom <= bounds.top)
+          .sort((a, b) => vx(b.bounds) - vx(a.bounds));
         new_focus = candidates[0]?.element ?? null;
         break;
       }
 
       case "down": {
         const candidates = focusable
-          .filter((x) => x.bounds.top >= bounds.top)
-          .sort(
-            (a, b) =>
-              a.bounds.top - b.bounds.top ||
-              horizontal_distance(a.bounds) - horizontal_distance(b.bounds)
-          );
+          .filter((x) => current == null || x.bounds.top >= bounds.bottom)
+          .sort((a, b) => vx(a.bounds) - vx(b.bounds));
         new_focus = candidates[0]?.element ?? null;
         break;
       }
@@ -289,10 +473,7 @@ export class UIFocus {
   }
 
   handle_current_interaction(current: HTMLElement, key: KateTypes.InputKey, repeat: boolean) {
-    const interactions = this._interactive.get(current);
-    if (interactions == null) {
-      return false;
-    }
+    const interactions = this.current_interactions;
     const interaction = interactions.find(
       (x) => x.key.includes(key) && (x.allow_repeat || !repeat)
     );
@@ -308,11 +489,8 @@ export class UIFocus {
     if (this.ui.current == null) {
       return;
     }
-    const scene_keys = this._scene_handlers.get(this.ui.current);
-    if (scene_keys == null) {
-      return false;
-    }
-    const scene_key = scene_keys?.find((x) => x.key.includes(key) && (x.allow_repeat || !repeat));
+    const scene_keys = this.scene_interactions;
+    const scene_key = scene_keys.find((x) => x.key.includes(key) && (x.allow_repeat || !repeat));
     if (scene_key == null) {
       return false;
     } else {
@@ -324,4 +502,183 @@ export class UIFocus {
   handle_scene_changed = () => {
     this.ensure_focus();
   };
+
+  private scroll_into_view(element: HTMLElement) {
+    let origin = { x: element.offsetLeft, y: element.offsetTop };
+    let current = element.offsetParent as HTMLElement;
+    while (current != null) {
+      if (current.classList.contains("kate-ui-scroll-area")) {
+        current.scrollTo({
+          left: origin.x - current.clientWidth / 2 + element.offsetWidth / 2,
+          top: origin.y - current.clientHeight / 2 + element.offsetHeight / 2,
+        });
+        break;
+      } else {
+        origin.x += current.offsetLeft;
+        origin.y += current.offsetTop;
+        current = current.offsetParent as HTMLElement;
+      }
+    }
+  }
+}
+
+type DialogEvents = {
+  on_shown?: () => void;
+  on_hidden?: () => void;
+};
+
+export abstract class BaseDialog extends UIScene {
+  constructor(ui: UI) {
+    super(ui);
+    this.canvas.classList.add("kate-ui-translucent");
+  }
+}
+
+export class MessageDialog extends BaseDialog {
+  constructor(
+    ui: UI,
+    readonly title: Widgetable[],
+    readonly message: Widgetable[],
+    readonly on_action: () => void,
+    readonly events: DialogEvents = {}
+  ) {
+    super(ui);
+  }
+
+  render(): Widgetable {
+    const ui = this.ui.dsl;
+
+    return ui.class("kate-ui-dialog-root", [
+      ui.class("kate-ui-dialog-container kate-ui-dialog-message-box", [
+        ui.class("kate-ui-dialog-title", [...this.title]),
+        ui.class("kate-ui-dialog-message", [...this.message]),
+        ui.class("kate-ui-dialog-actions", [ui.text_button("Ok", () => this.on_action())]),
+      ]),
+      ui.keymap(this, {
+        x: {
+          label: "Cancel",
+          action: () => this.on_action(),
+        },
+      }),
+    ]);
+  }
+
+  override on_activated(): void {
+    super.on_activated();
+    this.events.on_shown?.();
+  }
+
+  override on_deactivated(): void {
+    this.events.on_hidden?.();
+    super.on_deactivated();
+  }
+}
+
+export class ConfirmDialog extends BaseDialog {
+  constructor(
+    ui: UI,
+    readonly title: Widgetable[],
+    readonly message: Widgetable[],
+    readonly options: {
+      on_confirm: () => void;
+      on_cancel: () => void;
+      dangerous?: boolean;
+      confirm_label?: string;
+      cancel_label?: string;
+    },
+    readonly events: DialogEvents = {}
+  ) {
+    super(ui);
+  }
+
+  render(): Widgetable {
+    const ui = this.ui.dsl;
+
+    return ui.class("kate-ui-dialog-root", [
+      ui.class("kate-ui-dialog-container kate-ui-dialog-confirm", [
+        ui.class("kate-ui-dialog-title", [...this.title]),
+        ui.class("kate-ui-dialog-message", [...this.message]),
+        ui
+          .class("kate-ui-dialog-actions", [
+            ui.text_button(this.options.cancel_label ?? "Cancel", () => this.options.on_cancel()),
+            ui.text_button(this.options.confirm_label ?? "Ok", () => this.options.on_confirm()),
+          ])
+          .attr({ "data-dangerous": this.options.dangerous ?? false }),
+      ]),
+      ui.keymap(this, {
+        x: {
+          label: this.options.cancel_label ?? "Cancel",
+          action: () => this.options.on_cancel(),
+        },
+      }),
+    ]);
+  }
+
+  override on_activated(): void {
+    super.on_activated();
+    this.events.on_shown?.();
+  }
+
+  override on_deactivated(): void {
+    this.events.on_hidden?.();
+    super.on_deactivated();
+  }
+}
+
+export class ProgressDialog extends BaseDialog {
+  private _message: Observable<Widgetable>;
+
+  constructor(ui: UI, readonly title: Widgetable[], message: Widgetable[]) {
+    super(ui);
+    this._message = new Observable<Widgetable>(ui.dsl.fragment(message));
+  }
+
+  render() {
+    const ui = this.ui.dsl;
+
+    return ui.class("kate-ui-dialog-root", [
+      ui.class("kate-ui-dialog-container kate-ui-dialog-progress", [
+        ui.class("kate-ui-dialog-title", [...this.title]),
+        ui.class("kate-ui-dialog-message", [ui.dynamic(this._message)]),
+        ui.class("kate-ui-dialog-progress-indicator", [
+          ui.fa_icon("circle-notch", "2x", "solid", "spin"),
+        ]),
+      ]),
+    ]);
+  }
+
+  set_message(message: Widgetable[]) {
+    this._message.value = this.ui.dsl.fragment(message);
+  }
+}
+
+export class PopMenuDialog extends BaseDialog {
+  constructor(
+    ui: UI,
+    readonly options: {
+      title?: Widgetable[];
+      items: ActionItem[];
+      cancel_label?: string;
+      on_cancel: () => void;
+    }
+  ) {
+    super(ui);
+  }
+
+  render(): Widgetable {
+    const ui = this.ui.dsl;
+
+    return ui.class("kate-ui-dialog-absolute-root", [
+      ui.class("kate-ui-dialog-pop-menu", [
+        ui.class("kate-ui-dialog-title", this.options.title ?? []),
+        ui.class("kate-ui-dialog-pop-menu-items", [ui.menu_list(this.options.items)]),
+      ]),
+      ui.keymap(this, {
+        x: {
+          label: this.options.cancel_label ?? "Cancel",
+          action: () => this.options.on_cancel(),
+        },
+      }),
+    ]);
+  }
 }

@@ -1,0 +1,49 @@
+.kate-ui-horizontal-selection {
+  margin-bottom: 1rem;
+}
+
+.kate-ui-horizontal-selection-title {
+  font-weight: 500;
+}
+
+.kate-ui-horizontal-selection-description {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+.kate-ui-horizontal-selection-options {
+  margin-top: 0.5rem;
+}
+
+.kate-ui-horizontal-selection-options > kate-ui-dynamic {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.kate-ui-horizontal-selection-option {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.5rem;
+}
+
+.kate-ui-horizontal-selection-option-icon img {
+  width: 100%;
+}
+
+.kate-ui-horizontal-selection-option-title {
+  font-weight: bold;
+}
+
+.kate-ui-horizontal-selection-option-icon {
+  padding: 1rem;
+}
+
+.kate-ui-horizontal-selection-option:not([data-selected]) {
+  opacity: 0.5;
+  color: var(--color-text-very-muted);
+}

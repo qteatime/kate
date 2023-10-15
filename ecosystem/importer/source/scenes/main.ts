@@ -7,54 +7,77 @@ import { UIScene, Widgetable } from "../deps/appui";
 import { JSZip, _JSZip } from "../deps/jszip";
 import { Pathname } from "../deps/utils";
 import * as Importers from "../importers";
-import { SceneProgress } from "./progress";
 import { SceneReview } from "./review";
 
 export class SceneMain extends UIScene {
   render(): Widgetable {
     const ui = this.ui.dsl;
 
-    return ui.app_screen({
-      title: ui.title_bar({
-        left: ui.title(["Kate Importer"]),
-      }),
-      body: ui.centered([
-        ui.hbox({ gap: 2 }, [
-          ui.icon_button("folder-open", {
-            label: "Import from folder",
-            size: "4x",
-            on_click: () => this.import_from_folder(),
-          }),
-
-          ui.icon_button("file-zipper", {
-            label: "Import from Zip",
-            size: "4x",
-            on_click: () => this.import_from_zip(),
-          }),
+    return ui.two_panel_screen({
+      left: ui.hero({
+        title: "Kate Importer",
+        subtitle: "Emulate non-Kate games in Kate.",
+        content: ui.stack([
+          ui.p([
+            "Choose a game released for another platform. The importer will ",
+            "convert it to a (emulated) Kate cartridge that you can install ",
+            "and play like any other Kate game.",
+          ]),
+          ui.p(["Supported engines:"]),
+          ui.ul([
+            ui.flow([
+              ui.strong(["Ren'Py"]),
+              " ",
+              ui.meta_text(["(7.x, 8.x — PC releases)"]),
+            ]),
+            ui.flow([ui.strong(["Bitsy"]), " ", ui.meta_text(["(HTML)"])]),
+          ]),
         ]),
-      ]),
+      }),
+      right: ui.app_screen({
+        body: ui
+          .vbox({ gap: 2 }, [
+            ui.title(["Import"], "h2"),
+            ui.action_list([
+              {
+                icon: ui.fa_icon("folder-open", "2x"),
+                title: "From folder",
+                description: "Choose a folder directly containing your game",
+                on_select: () => this.import_from_folder(),
+              },
+              {
+                icon: ui.fa_icon("file-zipper", "2x"),
+                title: "From ZIP",
+                description: "Choose a ZIP distribution of your game",
+                on_select: () => this.import_from_zip(),
+              },
+            ]),
+          ])
+          .style({ padding: "2rem 0" }),
+        status: ui.status_bar([ui.status_icon(["ok"], "Import")]),
+      }),
     });
   }
 
   async import_from_folder() {
     const files = await KateAPI.device_files.request_directory();
-
-    const progress = SceneProgress.show(this.ui)
-      .set_message("Analysing game files...")
-      .set_unknown_progress();
-
     try {
-      const candidates = await Importers.candidates(files);
-      progress.close();
+      const candidates = await this.ui.dialogs.progress({
+        message: ["Analysing game files..."],
+        process: async (_) => {
+          return await Importers.candidates(files);
+        },
+      });
       if (candidates.length > 0) {
         this.ui.push_scene(new SceneReview(this.ui, candidates));
       }
     } catch (e) {
-      progress.close();
       console.error(`Failed to prepare candidates:`, e);
-      await KateAPI.dialogs.message(
-        `Failed to import: an unknown internal error occurred while importing.`
-      );
+      await this.ui.dialogs.message({
+        message: [
+          `Failed to import: an unknown internal error occurred while importing.`,
+        ],
+      });
     }
   }
 
@@ -68,23 +91,23 @@ export class SceneMain extends UIScene {
       return;
     }
 
-    const progress = SceneProgress.show(this.ui)
-      .set_message("Unpacking zip file...")
-      .set_unknown_progress();
     try {
-      const files = await unpack_zip(file);
-      progress.set_message("Analysing game files...");
-      const candidates = await Importers.candidates(files);
-      progress.close();
+      const candidates = await this.ui.dialogs.progress({
+        message: ["Unpacking zip file..."],
+        process: async (progress) => {
+          const files = await unpack_zip(file);
+          progress.set_message(["Analysing game files..."]);
+          return await Importers.candidates(files);
+        },
+      });
       if (candidates.length > 0) {
         this.ui.push_scene(new SceneReview(this.ui, candidates));
       }
     } catch (e) {
-      progress.close();
       console.error(`Failed to prepare candidates:`, e);
-      await KateAPI.dialogs.message(
-        `Failed to import the zip file: file might be corrupted.`
-      );
+      await this.ui.dialogs.message({
+        message: [`Failed to import the zip file: file might be corrupted.`],
+      });
     }
   }
 }

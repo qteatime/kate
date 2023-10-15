@@ -1,0 +1,30 @@
+.kate-ui-menu-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.kate-ui-menu-list-item {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+  padding: 1rem;
+  align-items: center;
+}
+
+.kate-ui-menu-list-item:not(:last-child) {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.kate-ui-menu-list-title {
+  font-weight: 500;
+}
+
+.kate-ui-menu-list-item.focus {
+  background: var(--color-focus-menu-bg);
+  border-radius: 0 !important;
+  transition: background-color 0.1s ease-out;
+}
+
+.kate-ui-menu-list-icon img {
+  width: 64px;
+}

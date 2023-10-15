@@ -1,0 +1,43 @@
+.kate-ui-bold-screen {
+  display: flex;
+  height: 100%;
+  flex-wrap: nowrap;
+}
+
+.kate-ui-bold-screen-left {
+  width: 50%;
+  background: var(--header-bg-color);
+  color: var(--header-font-color);
+  padding: 2rem;
+  height: 100%;
+  position: relative;
+  z-index: 30;
+  --color-text: var(--header-font-color);
+  --color-text-muted: var(--header-font-color-muted);
+}
+
+.kate-ui-bold-screen-left::after {
+  content: "";
+  display: block;
+  position: absolute;
+  top: 0px;
+  left: 100%;
+  width: 10px;
+  height: 100%;
+  background: var(--header-bg-image) repeat-y top right;
+  background-size: 32px 32px;
+  image-rendering: auto;
+}
+
+.kate-ui-bold-screen .kate-ui-hero {
+  align-items: flex-start;
+  padding: 0;
+}
+
+.kate-ui-bold-screen .kate-ui-hero-subtitle {
+  font-size: 0.9em;
+}
+
+.kate-ui-bold-screen .kate-ui-hero-title {
+  margin: 0;
+}

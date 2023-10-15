@@ -1,0 +1,46 @@
+.kate-ui-cartridge-chip {
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--color-cream-c);
+  padding: 0.5rem;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin: 0.5rem 0;
+}
+
+.kate-ui-cartridge-chip-thumbnail {
+  width: 64px;
+}
+
+.kate-ui-cartridge-chip-thumbnail img {
+  width: 100%;
+  height: auto;
+}
+
+.kate-ui-cartridge-chip-title {
+  font-weight: 500;
+}
+
+.kate-ui-cartridge-chip-id {
+  font-size: 0.8rem;
+  font-family: var(--font-mono);
+  color: var(--color-text-muted);
+  margin-bottom: 1rem;
+}
+
+.kate-ui-cartridge-chip-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.8rem;
+}
+
+.kate-ui-cartridge-chip-meta-field {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.kate-ui-cartridge-chip-meta-label {
+  font-weight: bold;
+}

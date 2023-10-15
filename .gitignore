@@ -33,3 +33,5 @@ packages/kate-appui/assets/fonts
 .vscode
 tests/unit/test-assert.js
 /test-results
+packages/kate-appui/assets/img/buttons
+packages/kate-appui/www

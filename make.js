@@ -106,7 +106,7 @@ function exec_file_capture(command, args, opts) {
 
 function glomp({ entry, out, name }) {
   const { pack } = require("./packages/glomp/build/index.js");
-  const code = pack(entry, __dirname, name);
+  const code = pack(entry, __dirname, name ?? "Main");
   FS.mkdirSync(Path.dirname(out), { recursive: true });
   FS.writeFileSync(out, code);
   console.log(`-> Glomp packaged (${entry}) to (${out})`);
@@ -352,6 +352,11 @@ w.task("domui:build", ["domui:compile"], () => {});
 w.task("appui:compile", ["api:build", "util:build"], () => {
   tsc("packages/kate-appui");
   copy_tree("www/fonts", "packages/kate-appui/assets/fonts");
+  copy_tree("www/img/buttons", "packages/kate-appui/assets/img/buttons");
+  glomp({
+    entry: "packages/kate-appui/assets/css/index.css",
+    out: "packages/kate-appui/www/kate-appui.css",
+  });
 });
 
 w.task("appui:build", ["appui:compile"], () => {});
@@ -421,10 +426,10 @@ w.task("www:bundle", ["core:build", "glomp:build"], () => {
   });
   copy("packages/kate-core/build/worker.js", "www/worker.js");
   copy("packages/kate-core/RELEASE.txt", `www/kate/RELEASE-latest.txt`);
+  copy("packages/kate-appui/www/kate-appui.css", "www/css/kate-appui.css");
 });
 
-w.task("www:release", ["www:bundle", "www:generate-cache-manifest"], async () => {
-});
+w.task("www:release", ["www:bundle", "www:generate-cache-manifest"], async () => {});
 
 w.task("www:generate-cache-manifest", [], () => {
   const files0 = glob("**/*", { cwd: "www", nodir: true });
@@ -483,7 +488,7 @@ w.task("ecosystem:importer", ["util:build", "tools:build", "appui:build", "glomp
     out: "ecosystem/importer/www/js/importer.js",
     name: "KateImporter",
   });
-  copy_tree("packages/kate-appui/assets", "ecosystem/importer/www/appui");
+  copy("packages/kate-appui/www/kate-appui.css", "ecosystem/importer/www/css/kate-appui.css");
   kart({
     config: "ecosystem/importer/kate.json",
     output: "ecosystem/importer/kate-importer.kart",

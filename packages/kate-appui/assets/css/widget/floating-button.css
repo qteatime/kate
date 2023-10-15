@@ -1,0 +1,15 @@
+.kate-ui-floating-button {
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  background: var(--color-button-bg);
+  border-radius: 2em 0 0 0 !important;
+  color: var(--color-button-text);
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+  align-items: baseline;
+  padding-right: 1rem;
+  border: 1px solid white;
+  border-width: 1px 0 0 1px;
+}
