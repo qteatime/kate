@@ -12,7 +12,7 @@ It's built to be secure, respect your privacy, and give you agency on how you pl
 ## Documentation
 
 A pre-built version of the documentation can be found on:
-https://kate.qteati.me/docs
+https://docs.kate.qteati.me/
 
 To build the documentation from this repository yourself you'll need to have [Python](https://www.python.org/), [Sphinx](https://www.sphinx-doc.org/en/master/), and the [Furo sphinx theme](https://github.com/pradyunsg/furo). Once you have Python you can install the other two with:
 
@@ -33,7 +33,7 @@ The documentation is generated in `docs/build/html`.
 
 The current recommended way of trying out Kate is to use the Web version: https://kate.qteati.me/
 
-For alternative installation options and how to build Kate from source, please refer to the [Kate installation instructions](https://kate.qteati.me/docs/user/manual/intro/install.html).
+For alternative installation options and how to build Kate from source, please refer to the [Kate installation instructions](https://docs.kate.qteati.me/user/manual/intro/install.html).
 
 ## Ecosystem
 
@@ -63,8 +63,8 @@ cartridges have their own licences (usually more permissive than Kate's).
 
 Kate does not accept source contributions currently, since it has not reached a stable release yet. However here are some other ways you can contribute to Kate's development:
 
-- [Try Kate out](https://kate.qteati.me/docs/user/manual/intro/install.html);
-- [Try porting your game to Kate](https://kate.qteati.me/docs/dev/manual/index.html);
+- [Try Kate out](https://docs.kate.qteati.me/user/manual/intro/install.html);
+- [Try porting your game to Kate](https://docs.kate.qteati.me/dev/manual/index.html);
 - Tell other people about Kate;
 - Report things that don't work for you, or that you feel are too cumbersome or unsafe;
 
