@@ -1,0 +1,93 @@
+.kate-ui-action-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.kate-ui-action-list-item {
+  display: grid;
+  grid-template-areas:
+    "icon title value side-icon"
+    "icon description value side-icon";
+  grid-template-columns: 6rem 1fr min-content min-content;
+  padding: 1.25rem 1rem;
+  position: relative;
+}
+
+.kate-ui-action-list-item:not(:last-child) {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.kate-ui-action-list-icon {
+  grid-area: icon;
+  align-self: center;
+  justify-self: center;
+  font-size: 2rem;
+}
+
+.kate-ui-action-list-icon img {
+  width: 64px;
+}
+
+.kate-ui-action-list-title {
+  grid-area: title;
+  font-weight: 500;
+  align-self: flex-end;
+}
+
+.kate-ui-action-list-description {
+  grid-area: description;
+  color: var(--color-text-muted);
+  font-size: 0.8em;
+  margin-top: 0.3rem;
+}
+
+.kate-ui-action-list-item.focus {
+  background: var(--color-focus-action-bg);
+  border-radius: 0 !important;
+  transition: background-color 0.1s ease-out;
+}
+
+.kate-ui-action-list-side-icon:not(:empty) {
+  grid-area: side-icon;
+  padding: 0 2rem;
+  font-size: 1.25rem;
+  align-self: center;
+  color: var(--color-text-very-muted);
+}
+
+.kate-ui-action-list-item[data-dangerous] {
+  color: var(--color-dangerous);
+  position: relative;
+}
+
+.kate-ui-action-list-item[data-dangerous]::before {
+  content: "DANGER";
+  font-size: 0.7em;
+  font-weight: 500;
+  color: var(--color-dangerous-text);
+  background: var(--color-dangerous);
+  height: 100%;
+  padding: 0.3em;
+  position: absolute;
+  top: 0px;
+  left: 1.25rem;
+  text-align: center;
+  text-orientation: mixed;
+  writing-mode: vertical-lr;
+  box-sizing: border-box;
+  letter-spacing: 0.1em;
+  transform: rotate(180deg);
+}
+
+.kate-ui-action-list-item[data-dangerous] .kate-ui-action-list-icon {
+  padding-left: 1.5rem;
+}
+
+.kate-ui-action-list-value {
+  grid-area: value;
+  padding: 0 1rem;
+  align-self: center;
+  color: var(--color-text-very-muted);
+  font-size: 0.9rem;
+  white-space: nowrap;
+}

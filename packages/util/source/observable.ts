@@ -11,7 +11,7 @@ type ObservableValue<T> = T extends Observable<infer A> ? A : never;
 export class Observable<A> {
   readonly stream = new EventStream<A>();
 
-  constructor(private _value: A) {}
+  constructor(private _value: A, private _on_disponse: () => void = () => {}) {}
 
   static from<T>(value: T) {
     if (value instanceof Observable) {
@@ -19,6 +19,18 @@ export class Observable<A> {
     } else {
       return new Observable(value);
     }
+  }
+
+  static from_stream<T>(stream: EventStream<T>, initial: T) {
+    let subscriber: (_: T) => void;
+    const observable = new Observable(initial, () => {
+      stream.remove(subscriber);
+    });
+    subscriber = (value: T) => {
+      observable.value = value;
+    };
+    stream.listen(subscriber);
+    return observable;
   }
 
   static is<T>(x: any): x is Observable<T> {
@@ -38,7 +50,10 @@ export class Observable<A> {
     this.stream.emit(value);
   }
 
-  dispose() {}
+  dispose() {
+    this.stream.dispose();
+    this._on_disponse?.();
+  }
 
   map<B>(fn: (_: A) => B) {
     const result = new Observable(fn(this.value));

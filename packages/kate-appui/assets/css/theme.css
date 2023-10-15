@@ -9,29 +9,62 @@
   --font-sans: "Roboto", sans-serif;
   --font-mono: "Roboto Mono", monospace;
 
-  --color-white: #fafafa;
-  --color-white-d1: #ececea;
-  --color-white-d2: #dcdcda;
-  --color-black: #2f2f2f;
-  --color-black-l1: #5f5f5f;
-  --color-black-l2: #9f9f9f;
-
-  /* palette is Pollen8 by Conker : https://lospec.com/palette-list/pollen8 */
-  --color-primary-d2: #73464c;
-  --color-primary-d1: #ab5675;
-  --color-primary: #ee6a7c;
-  --color-primary-l1: #ffa7a5;
-  --color-primary-l2: #ffe7d6;
-
   --color-text: var(--color-black);
   --color-text-inverted: var(--color-white);
-  --color-text-muted: var(--color-black-l1);
-  --color-text-very-muted: var(--color-black-l2);
+  --color-text-inverted-muted: var(--color-cream-c);
+  --color-text-muted: var(--color-licorice-b);
+  --color-text-very-muted: var(--color-licorice-c);
 
-  --color-border: var(--color-white-d1);
-  --color-border-d1: var(--color-white-d2);
+  --color-border: var(--color-cream-c);
+  --color-border-d1: var(--color-cream-b);
 
   --color-bg: var(--color-white);
+
+  --header-bg-color: var(--color-strawberry-b);
+  --header-bg-image: url("../img/strawberry.png");
+  --header-font-color: var(--color-white);
+  --header-font-color-muted: var(--color-cream-c);
+
+  --button-cancel: url("../img/buttons/cancel.png");
+  --button-capture: url("../img/buttons/capture.png");
+  --button-dpad-down: url("../img/buttons/dpad-down.png");
+  --button-dpad-fill: url("../img/buttons/dpad-fill.png");
+  --button-dpad-horizontal: url("../img/buttons/dpad-horizontal.png");
+  --button-dpad-left: url("../img/buttons/dpad-left.png");
+  --button-dpad-lower: url("../img/buttons/dpad-lower.png");
+  --button-dpad-right: url("../img/buttons/dpad-right.png");
+  --button-dpad-stroke: url("../img/buttons/dpad-stroke.png");
+  --button-dpad-up: url("../img/buttons/dpad-up.png");
+  --button-dpad-upper: url("../img/buttons/dpad-upper.png");
+  --button-dpad-vertical: url("../img/buttons/dpad-vertical.png");
+  --button-l: url("../img/buttons/l.png");
+  --button-menu: url("../img/buttons/menu.png");
+  --button-ok: url("../img/buttons/ok.png");
+  --button-sparkle: url("../img/buttons/sparkle.png");
+  --button-berry: url("../img/buttons/berry.png");
+  --button-r: url("../img/buttons/r.png");
+
+  --color-dark: var(--color-black);
+  --color-dark-muted: var(--color-licorice-b);
+  --color-light: var(--color-white);
+  --color-light-muted: var(--color-cream-c);
+
+  --color-focus-outline: var(--color-strawberry-c);
+  --color-focus-menu-bg: var(--color-strawberry-e);
+  --color-focus-action-bg: var(--color-strawberry-e);
+
+  --color-control-primary: var(--color-strawberry-c);
+  --color-control-bg: var(--color-white);
+  --color-control-border: var(--color-cream-b);
+
+  --color-button-bg: var(--color-strawberry-c);
+  --color-button-text: var(--color-white);
+
+  --color-backdrop: rgba(0, 0, 0, 0.4);
+  --color-shadow: rgba(0, 0, 0, 0.5);
+
+  --color-dangerous: var(--color-strawberry-b);
+  --color-dangerous-text: var(--color-white);
 
   font-size: 16px;
   color: var(--color-text);

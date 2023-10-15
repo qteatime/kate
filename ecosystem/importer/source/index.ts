@@ -7,7 +7,9 @@ import { UI } from "./deps/appui";
 import { SceneMain } from "./scenes/main";
 
 const root = document.querySelector("#canvas")! as HTMLElement;
-const ui = new UI(root);
+const ui = new UI(root, {
+  on_key_pressed: KateAPI.input.on_key_pressed,
+});
 
 async function main() {
   ui.push_scene(new SceneMain(ui));

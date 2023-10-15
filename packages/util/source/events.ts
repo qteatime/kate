@@ -5,10 +5,15 @@
  */
 
 export class EventStream<A> {
+  private is_active: boolean = true;
   private subscribers: ((_: A) => void)[] = [];
   private on_dispose = () => {};
 
   listen(fn: (_: A) => void) {
+    if (!this.is_active) {
+      throw new Error(`listen() on a closed stream.`);
+    }
+
     this.remove(fn);
     this.subscribers.push(fn);
     return fn;
@@ -28,12 +33,18 @@ export class EventStream<A> {
   }
 
   emit(ev: A) {
+    if (!this.is_active) {
+      throw new Error(`emit() on a closed stream`);
+    }
+
     for (const fn of this.subscribers) {
       fn(ev);
     }
   }
 
   dispose() {
+    this.is_active = false;
+    this.subscribers = [];
     this.on_dispose();
   }
 

@@ -1,0 +1,14 @@
+.kate-ui-app-screen {
+  display: flex;
+  flex-direction: column;
+  justify-content: stretch;
+  align-items: stretch;
+  height: 100%;
+}
+
+.kate-ui-app-screen-body {
+  flex-grow: 1;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+}

@@ -2,7 +2,7 @@
   "id": "qteati.me/kate-importer",
   "version": {
     "major": 0,
-    "minor": 4
+    "minor": 5
   },
   "release": {
     "year": 2023,
@@ -61,6 +61,7 @@
     "www/**/*.txt",
     "www/**/*.md",
     "www/**/*.ttf",
+    "www/**/*.png",
     "www/runtimes/**/*",
     "www/runtimes/**/.kate.files.json",
     "thumbnail.png",

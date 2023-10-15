@@ -1,0 +1,208 @@
+p {
+  margin-bottom: 1.5rem;
+}
+
+.kate-ui-bold-screen-right {
+  width: 50%;
+}
+
+.kate-ui-ul {
+  margin-left: 1.5em;
+}
+
+.kate-ui-li {
+  margin-bottom: 0.5em;
+}
+
+.kate-ui-strong {
+  font-weight: 500;
+}
+
+.kate-ui-meta-text {
+  font-size: 0.8em;
+}
+
+.kate-ui-floating-button {
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  background: var(--color-primary);
+  border-radius: 2em 0 0 0 !important;
+  color: var(--color-white);
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+  align-items: baseline;
+  padding-right: 1rem;
+  border: 1px solid white;
+  border-width: 1px 0 0 1px;
+}
+
+.kate-ui-button-icon {
+  width: 1em;
+  height: 1em;
+  vertical-align: middle;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: contain;
+  image-rendering: auto;
+}
+
+.kate-ui-button-icon[data-icon="dpad-down"] {
+  background-image: var(--button-dpad-down);
+}
+
+.kate-ui-button-icon[data-icon="dpad-fill"] {
+  background-image: var(--button-dpad-fill);
+}
+
+.kate-ui-button-icon[data-icon="dpad-horizontal"] {
+  background-image: var(--button-dpad-horizontal);
+}
+
+.kate-ui-button-icon[data-icon="dpad-left"] {
+  background-image: var(--button-dpad-left);
+}
+
+.kate-ui-button-icon[data-icon="dpad-lower"] {
+  background-image: var(--button-dpad-lower);
+}
+
+.kate-ui-button-icon[data-icon="dpad-right"] {
+  background-image: var(--button-dpad-right);
+}
+
+.kate-ui-button-icon[data-icon="dpad-stroke"] {
+  background-image: var(--button-dpad-stroke);
+}
+
+.kate-ui-button-icon[data-icon="dpad-up"] {
+  background-image: var(--button-dpad-up);
+}
+
+.kate-ui-button-icon[data-icon="dpad-upper"] {
+  background-image: var(--button-dpad-upper);
+}
+
+.kate-ui-button-icon[data-icon="dpad-vertical"] {
+  background-image: var(--button-dpad-vertical);
+}
+
+.kate-ui-button-icon[data-icon="menu"] {
+  background-image: var(--button-menu);
+}
+
+.kate-ui-button-icon[data-icon="capture"] {
+  background-image: var(--button-capture);
+}
+
+.kate-ui-button-icon[data-icon="cancel"] {
+  background-image: var(--button-cancel);
+}
+
+.kate-ui-button-icon[data-icon="ok"] {
+  background-image: var(--button-ok);
+}
+
+.kate-ui-button-icon[data-icon="l"] {
+  background-image: var(--button-l);
+  width: 1.5em;
+}
+
+.kate-ui-button-icon[data-icon="r"] {
+  background-image: var(--button-r);
+  width: 1.5em;
+}
+
+.kate-ui-button-icon img {
+  width: 100%;
+  height: 100%;
+}
+
+.kate-ui-statusbar {
+  height: 28px;
+  font-size: 13px;
+  display: flex;
+  flex-direction: row;
+  gap: 1.5rem;
+  justify-content: flex-end;
+  align-items: center;
+  flex-wrap: nowrap;
+  border-top: 1px solid var(--color-border-d1);
+  background: var(--color-border);
+  padding: 0 16px;
+  flex-shrink: 0;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+.kate-ui-status-icon {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5em;
+  align-items: center;
+  flex-wrap: nowrap;
+}
+
+.kate-ui-status-icon-list {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 0.2em;
+}
+
+.kate-ui-scene {
+  z-index: 1;
+}
+
+.kate-ui-title-bar-right {
+  align-self: center;
+  text-align: right;
+}
+
+.kate-ui-stack {
+  display: flex;
+  flex-direction: column;
+}
+
+.kate-ui-page-bullets {
+  display: flex;
+  flex-direction: row;
+  gap: 2px;
+  align-items: center;
+  padding: 5px 0;
+  justify-content: center;
+}
+
+.kate-ui-page-bullet {
+  width: 8px;
+  height: 8px;
+  background: #f7eedb;
+  border-radius: 100%;
+}
+
+.kate-ui-current-page {
+  background: white;
+  font-size: 10px;
+  width: 14px;
+  height: 14px;
+  color: #2f2f2f;
+  text-align: center;
+  line-height: 14px;
+  font-weight: bold;
+  border: 1px solid #f7cedb;
+}
+
+.kate-ui-page-banner {
+  background: #f7eedb;
+  color: #2f2f2f;
+  padding: 2px 4px;
+  border-radius: 2px;
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.kate-ui-translucent {
+  background: none;
+}

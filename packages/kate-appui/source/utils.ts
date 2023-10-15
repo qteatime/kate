@@ -6,3 +6,5 @@
 
 export * from "../../util/build/observable";
 export * from "../../util/build/events";
+export * from "../../util/build/promise";
+export * from "../../util/build/assert";

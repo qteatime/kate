@@ -1,0 +1,54 @@
+:root {
+  /* citron yellow */
+  --color-citron-a: #a29a6c;
+  --color-citron-b: #c0b360;
+  --color-citron-c: #e5cf77;
+  --color-citron-d: #fbec8c;
+
+  /* orange */
+  --color-orange-a: #a08a6d;
+  --color-orange-b: #bb986c;
+  --color-orange-c: #e8aa5a;
+  --color-orange-d: #fdd39d;
+
+  /* strawberry red */
+  --color-strawberry-a: #7e5d5b;
+  --color-strawberry-b: #a83852;
+  --color-strawberry-c: #d73d5a;
+  --color-strawberry-d: #eb8b8d;
+  --color-strawberry-e: #f4e7ea;
+
+  /* grape purple */
+  --color-grape-a: #836d87;
+  --color-grape-b: #b27bad;
+  --color-grape-c: #cf66a7;
+  --color-grape-d: #ef9bc8;
+
+  /* ice blue */
+  --color-ice-a: #68738a;
+  --color-ice-b: #7890b0;
+  --color-ice-c: #689adf;
+  --color-ice-d: #b0dbfa;
+
+  /* mint green */
+  --color-mint-a: #6e9a82;
+  --color-mint-b: #6ba980;
+  --color-mint-c: #6dce9e;
+  --color-mint-d: #abe0d5;
+
+  /* light cream */
+  --color-cream-a: #a2a19d;
+  --color-cream-b: #c3c4ba;
+  --color-cream-c: #f1f2e0;
+  --color-cream-d: #fdfdf2;
+
+  /* dark licorice */
+  --color-licorice-a: #2f3034;
+  --color-licorice-b: #47484b;
+  --color-licorice-c: #67696e;
+  --color-licorice-d: #717983;
+
+  /* neutral */
+  --color-white: #fafafa;
+  --color-black: #2f2f2f;
+}

@@ -9,3 +9,25 @@
     outline-width: 8px;
   }
 }
+
+@keyframes kate-ui-pop-menu-in {
+  from {
+    translate: -50% 100%;
+    opacity: 0;
+  }
+  to {
+    translate: -50% 0%;
+    opacity: 1;
+  }
+}
+
+@keyframes kate-ui-pop-menu-out {
+  from {
+    translate: -50% 0%;
+    opacity: 1;
+  }
+  to {
+    translate: -50% 100%;
+    opacity: 0;
+  }
+}

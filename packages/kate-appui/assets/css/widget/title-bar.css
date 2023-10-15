@@ -1,0 +1,36 @@
+.kate-ui-title-bar {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 0 1rem;
+  height: 64px;
+
+  background: var(--header-bg-color);
+  color: var(--header-font-color);
+  position: relative;
+  z-index: 30;
+
+  --color-text: var(--header-font-color);
+  --color-text-muted: var(--header-font-color-muted);
+}
+
+.kate-ui-title-bar::after {
+  content: "";
+  display: block;
+  position: absolute;
+  top: 100%;
+  left: 0px;
+  width: 100%;
+  height: 10px;
+  background: var(--header-bg-image) repeat-x bottom left;
+  background-size: 32px 32px;
+  image-rendering: auto;
+}
+
+.kate-ui-title-bar .kate-ui-title {
+  line-height: 64px;
+  height: 64px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
