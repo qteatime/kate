@@ -1,3 +1,6 @@
+<!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this
+   - file, You can obtain one at https://mozilla.org/MPL/2.0/. -->
 <!DOCTYPE html>
 <html>
   <head>
@@ -6,84 +9,56 @@
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     />
     <meta name="apple-mobile-web-app-capable" content="yes" />
+    <link rel="manifest" href="manifest.json" />
     <title>Kate</title>
     <link href="css/kate.css" rel="stylesheet" />
     <link href="css/kate-os.css" rel="stylesheet" />
+    <link href="icons/icon256.png" rel="icon" />
+    <link href="icons/icon256.png" rel="apple-touch-icon" />
   </head>
   <body>
-    <input
-      id="kate-installer"
-      type="file"
-      style="display: none"
-      accept=".kart"
-    />
+    <input id="kate-installer" type="file" style="display: none" accept=".kart" />
     <script type="application/json" id="kate-config">
       {{config}}
     </script>
-    <div class="kate" data-case-type="{{case_type}}">
-      <div class="kate-body">
-        <div class="kate-trigger kate-trigger-left">
-          <div class="kate-trigger-button"></div>
-          <div class="kate-trigger-cover"></div>
+    <div class="kate-case" data-case-type="{{case_type}}">
+      <div class="kc-body">
+        <div class="kc-shoulder kc-shoulder-left kc-virtual">
+          <div class="kc-shoulder-button"></div>
+          <div class="kc-shoulder-hide"></div>
         </div>
-        <div class="kate-trigger kate-trigger-right">
-          <div class="kate-trigger-button"></div>
-          <div class="kate-trigger-cover"></div>
+        <div class="kc-shoulder kc-shoulder-right kc-virtual">
+          <div class="kc-shoulder-button"></div>
+          <div class="kc-shoulder-hide"></div>
         </div>
-        <div class="kate-dpad">
-          <div class="kate-dpad-button kate-dpad-up">
-            <img src="img/up.png" />
+
+        <div class="kc-dpad kc-virtual"><div class="kc-thumb" data-range="20"></div></div>
+
+        <div class="kc-screen-container">
+          <div class="kc-screen">
+            <div id="kate-os-root"></div>
+            <div id="kate-hud"></div>
+            <div id="kate-loading">Loading...</div>
           </div>
-          <div class="kate-dpad-button kate-dpad-right">
-            <img src="img/right.png" />
-          </div>
-          <div class="kate-dpad-button kate-dpad-down">
-            <img src="img/down.png" />
-          </div>
-          <div class="kate-dpad-button kate-dpad-left">
-            <img src="img/left.png" />
-          </div>
-          <div class="kate-dpad-mid"></div>
-        </div>
-        <div class="kate-screen">
-          <div id="kate-os-root"></div>
-          <div id="kate-hud"></div>
-          <div id="kate-loading">Loading...</div>
-        </div>
-        <div class="kate-action">
-          <div class="kate-button-bg"></div>
-          <div class="kate-button kate-button-x">
-            <img src="img/cancel.png" />
-          </div>
-          <div class="kate-button kate-button-o">
-            <img src="img/ok.png" />
+
+          <div class="kc-resources-container">
+            <div id="kate-resources"></div>
           </div>
         </div>
-        <div
-          class="kate-special-button kate-special-button-right kate-area-menu"
-        >
-          <div class="kate-bean-button kate-button-menu"></div>
-          <div class="kate-bean-button-label">Menu</div>
+
+        <div class="kc-special kc-virtual">
+          <div class="kc-small-button kc-berry"></div>
+          <div class="kc-small-button kc-capture"></div>
         </div>
-        <div
-          class="kate-special-button kate-special-button-left kate-area-capture"
-        >
-          <div class="kate-bean-button kate-button-capture"></div>
-          <div class="kate-bean-button-label">Capture</div>
+
+        <div class="kc-faces kc-virtual">
+          <div class="kc-button kc-ok"></div>
+          <div class="kc-button kc-cancel"></div>
+          <div class="kc-button kc-sparkle"></div>
+          <div class="kc-small-button kc-menu" style="margin-top: 5px"></div>
         </div>
-        <div class="kate-whiskers kate-whiskers-left">
-          <div class="kate-whisker-item"></div>
-          <div class="kate-whisker-item"></div>
-          <div class="kate-whisker-item"></div>
-        </div>
-        <div class="kate-whiskers kate-whiskers-right">
-          <div class="kate-whisker-item"></div>
-          <div class="kate-whisker-item"></div>
-          <div class="kate-whisker-item"></div>
-        </div>
-        <div class="kate-engraving">=KATE=</div>
-        <div class="kate-version"></div>
-        <div class="kate-resources"></div>
+
+        <div id="kate-version"></div>
       </div>
     </div>
     <script src="kate.js"></script>

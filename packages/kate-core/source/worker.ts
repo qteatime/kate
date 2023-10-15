@@ -8,7 +8,7 @@ interface ExtendableEvent extends Event {
   waitUntil(promise: Promise<any>): void;
 }
 
-const cache_name = "kate-cache-v3";
+const cache_name = "kate-cache-v4";
 
 async function remove_old_caches() {
   for (const key of await caches.keys()) {
@@ -19,14 +19,10 @@ async function remove_old_caches() {
 }
 
 async function update_cache() {
-  const app_files: string[] = await (
-    await fetch("/cache-manifest.json")
-  ).json();
+  const app_files: string[] = await (await fetch("/cache-manifest.json")).json();
   try {
     const cache = await caches.open(cache_name);
-    const existing = new Set(
-      (await cache.keys()).map((x) => new URL(x.url).pathname)
-    );
+    const existing = new Set((await cache.keys()).map((x) => new URL(x.url).pathname));
     const to_add = app_files.filter((x) => !existing.has(x));
     await cache.addAll(to_add);
     console.log("[Kate] Updated cache");
@@ -66,11 +62,8 @@ self.addEventListener("message", async (ev) => {
 async function handle(data: any | null) {
   switch (data?.type) {
     case "refresh-cache": {
-      const version = data?.version ?? null;
-      if (version != null) {
-        await clear_cache();
-        await update_cache();
-      }
+      await clear_cache();
+      await update_cache();
       return null;
     }
 

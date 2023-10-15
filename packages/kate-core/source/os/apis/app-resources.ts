@@ -46,19 +46,15 @@ export class KateAppResources {
 
   async refresh_cache() {
     // ensure we are online by reading a non-cached resource
-    const response = await fetch("/versions.json");
+    const response = await fetch("/worker.js");
     if (!response.ok) {
       throw new Error(`Refreshing the cache requires network access`);
     }
 
-    const version = JSON.parse(localStorage["kate-version"]);
     const refresh = this.send({
       type: "refresh-cache",
-      version: version.version,
     });
-    const timeout = sleep(5000).then((x) =>
-      Promise.reject(new Error("timeout"))
-    );
+    const timeout = sleep(5000).then((x) => Promise.reject(new Error("timeout")));
     await Promise.race([refresh, timeout]);
   }
 }
