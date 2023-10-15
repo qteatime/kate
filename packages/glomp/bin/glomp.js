@@ -16,6 +16,7 @@ const options = {
   },
   name: {
     type: "string",
+    default: "Main",
   },
   out: {
     type: "string",
@@ -32,16 +33,17 @@ const {
 } = parseArgs({ args: process.argv.slice(2), options, allowPositionals: true });
 
 if (!entry || !name || help) {
-  console.error(`Usage: glomp <entry.js> --name Entry [--out <out.js>] [--root build]
+  console.error(`Usage: glomp <entry.js|entry.css> [--name Entry] [--out <out.js>] [--root build]
   
-Merges all modules and files required from 'entry.js' into a single module
-that works in either Node.js or the Browser (but not AMD).
+Merges all modules and files required from 'entry.js' or 'entry.css' into a
+single JS or CSS module. JS modules work in both Node.js and the Browser,
+but not with AMD-style module loaders.
 
 Options:
 
   name <string>
-    Defines the global variable name exported in browsers where no require()
-    is available.
+    Defines the global JS variable name exported in browsers where no
+    require() is available. [default: "Main"]
 
   out <path>
     If defined, the file is written to this path. Otherwise the module is
