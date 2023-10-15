@@ -426,7 +426,6 @@ w.task("www:bundle", ["core:build", "glomp:build"], () => {
   });
   copy("packages/kate-core/build/worker.js", "www/worker.js");
   copy("packages/kate-core/RELEASE.txt", `www/kate/RELEASE-latest.txt`);
-  copy("packages/kate-appui/www/kate-appui.css", "www/css/kate-appui.css");
 });
 
 w.task("www:release", ["www:bundle", "www:generate-cache-manifest"], async () => {});

@@ -8,7 +8,7 @@ import { SceneMain } from "./scenes/main";
 
 const root = document.querySelector("#canvas")! as HTMLElement;
 const ui = new UI(root, {
-  on_key_pressed: KateAPI.input.on_extended_key_pressed,
+  on_key_pressed: KateAPI.input.on_key_pressed,
 });
 
 async function main() {
