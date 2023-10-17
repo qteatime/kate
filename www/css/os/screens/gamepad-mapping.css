@@ -93,6 +93,13 @@
   align-items: center;
   gap: 0.5rem;
   margin-top: 1rem;
+  overflow: scroll;
+  padding: 0.5rem;
+  scrollbar-width: none;
+}
+
+.gamepad-remap-kate-buttons::-webkit-scrollbar {
+  height: 0;
 }
 
 .kate-key-button {

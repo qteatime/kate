@@ -816,11 +816,13 @@ export class RemapStandardSettings extends UI.SimpleScene {
                 choose_pressed("down", "Down"),
                 choose_pressed("left", "Left"),
                 choose_pressed("o", "Ok"),
+                choose_pressed("sparkle", "Sparkle"),
                 choose_pressed("x", "Cancel"),
                 choose_pressed("ltrigger", "L"),
                 choose_pressed("rtrigger", "R"),
                 choose_pressed("menu", "Menu"),
                 choose_pressed("capture", "Capture"),
+                choose_pressed("berry", "Berry"),
                 choose_pressed(null, "None"),
               ]);
             })
