@@ -13,7 +13,7 @@
 }
 
 .kate-os-carts-scroll {
-  overflow: hidden;
+  overflow-x: scroll;
   padding: 5px 0;
   scroll-behavior: smooth;
   scroll-padding: 30px;
@@ -22,7 +22,13 @@
   background-position-x: 560px;
   background-position-y: 150px;
   flex-grow: 1;
+  scrollbar-width: none;
 }
+
+.kate-os-carts-scroll::-webkit-scrollbar {
+  height: 0;
+}
+
 
 .kate-os-carts {
   margin: 15px;
