@@ -15,7 +15,7 @@ export class KateDialog {
   constructor(readonly os: KateOS) {}
 
   async message(id: string, x: { title: string; message: UI.Widgetable }) {
-    const hud = new HUD_Dialog(this, "message");
+    const hud = new HUD_Dialog(this, "message", id);
     try {
       this.os.push_scene(hud);
       return await hud.show(
@@ -40,7 +40,7 @@ export class KateDialog {
       dangerous?: boolean;
     }
   ) {
-    const hud = new HUD_Dialog(this, "confirm");
+    const hud = new HUD_Dialog(this, "confirm", id);
     try {
       this.os.push_scene(hud);
       return await hud.show(
@@ -63,7 +63,7 @@ export class KateDialog {
   }
 
   async progress(id: string, message: UI.Widgetable, process: (_: Progress) => Promise<void>) {
-    const hud = new HUD_Dialog(this, "progress");
+    const hud = new HUD_Dialog(this, "progress", id);
     try {
       this.os.push_scene(hud);
       return await hud.progress(id, message, process);
@@ -161,7 +161,7 @@ export class KateDialog {
     cancel_value: A,
     description: string = "custom"
   ): Deferred<A> {
-    const hud = new HUD_Dialog(this, description);
+    const hud = new HUD_Dialog(this, description, id);
     this.os.push_scene(hud);
     const deferred = hud.custom(id, `kate-hud-dialog-custom ${className}`, contents, cancel_value);
     deferred.promise.finally(() => {
@@ -176,7 +176,7 @@ export class KateDialog {
     buttons: { label: string; value: A }[],
     cancel_value: A
   ) {
-    const hud = new HUD_Dialog(this, "pop-menu");
+    const hud = new HUD_Dialog(this, "pop-menu", id);
     try {
       this.os.push_scene(hud);
       return await hud.pop_menu(id, heading, buttons, cancel_value);
@@ -211,7 +211,11 @@ export class Progress {
 export class HUD_Dialog extends Scene {
   readonly FADE_OUT_TIME_MS = 250;
 
-  constructor(readonly manager: KateDialog, readonly description = "dialog") {
+  constructor(
+    readonly manager: KateDialog,
+    readonly description = "dialog",
+    readonly application_id: string
+  ) {
     super(manager.os, false);
     (this as any).canvas = UI.h("div", { class: "kate-hud-dialog", "data-title": description }, []);
   }
@@ -220,20 +224,9 @@ export class HUD_Dialog extends Scene {
     return null;
   }
 
-  is_trusted(id: string) {
-    return id.startsWith("kate:");
-  }
-
   async progress(id: string, message: UI.Widgetable, process: (_: Progress) => Promise<void>) {
     const progress = new Progress(message);
-    const element = UI.h(
-      "div",
-      {
-        class: "kate-hud-dialog-message",
-        "data-trusted": String(this.is_trusted(id)),
-      },
-      [progress.canvas]
-    );
+    const element = UI.h("div", { class: "kate-hud-dialog-message" }, [progress.canvas]);
     try {
       const result = process(progress);
       this.canvas.textContent = "";
@@ -287,45 +280,32 @@ export class HUD_Dialog extends Scene {
 
   custom<A>(id: string, className: string, content: UI.Widgetable[], cancel_value: A) {
     const result = defer<A>();
-    const dialog = UI.h(
-      "div",
-      {
-        class: `kate-hud-dialog-root ${className}`,
-        "data-trusted": String(this.is_trusted(id)),
-      },
-      [UI.h("div", { class: "kate-hud-dialog-container" }, [...content])]
-    );
+    const dialog = UI.h("div", { class: `kate-hud-dialog-root ${className}` }, [
+      UI.h("div", { class: "kate-hud-dialog-container" }, [...content]),
+    ]);
     dialog.addEventListener("click", (ev) => {
       if (ev.target === dialog) {
         result.resolve(cancel_value);
       }
     });
-    if (this.is_trusted(id)) {
-      this.os.kernel.enter_trusted_mode();
-    }
-    try {
-      this.canvas.textContent = "";
-      this.canvas.appendChild(dialog);
-      const key_handler = (x: { key: KateButton; is_repeat: boolean }) => {
-        if (x.key === "x" && !x.is_repeat) {
-          result.resolve(cancel_value);
-          return true;
-        }
-        return false;
-      };
-      this.os.focus_handler.listen(this.canvas, key_handler);
-      result.promise.finally(() => {
-        this.os.kernel.exit_trusted_mode();
-        this.os.focus_handler.remove(this.canvas, key_handler);
-        setTimeout(async () => {
-          dialog.classList.add("leaving");
-          await wait(this.FADE_OUT_TIME_MS);
-          dialog.remove();
-        });
+    this.canvas.textContent = "";
+    this.canvas.appendChild(dialog);
+    const key_handler = (x: { key: KateButton; is_repeat: boolean }) => {
+      if (x.key === "x" && !x.is_repeat) {
+        result.resolve(cancel_value);
+        return true;
+      }
+      return false;
+    };
+    this.os.focus_handler.listen(this.canvas, key_handler);
+    result.promise.finally(() => {
+      this.os.focus_handler.remove(this.canvas, key_handler);
+      setTimeout(async () => {
+        dialog.classList.add("leaving");
+        await wait(this.FADE_OUT_TIME_MS);
+        dialog.remove();
       });
-    } catch (_) {
-      this.os.kernel.exit_trusted_mode();
-    }
+    });
     return result;
   }
 

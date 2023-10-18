@@ -26,27 +26,18 @@ export class KateNotification {
     this.hud.show(title, message);
   }
 
-  async log(
-    process_id: string,
-    title: string,
-    message: string,
-    allow_failures: boolean = false
-  ) {
+  async log(process_id: string, title: string, message: string, allow_failures: boolean = false) {
     try {
-      await this.os.db.transaction(
-        [Db.notifications],
-        "readwrite",
-        async (t) => {
-          const notifications = t.get_table1(Db.notifications);
-          await notifications.put({
-            type: "basic",
-            process_id,
-            time: new Date(),
-            title,
-            message,
-          });
-        }
-      );
+      await this.os.db.transaction([Db.notifications], "readwrite", async (t) => {
+        const notifications = t.get_table1(Db.notifications);
+        await notifications.put({
+          type: "basic",
+          process_id,
+          time: new Date(),
+          title,
+          message,
+        });
+      });
     } catch (error) {
       console.error(`[Kate] failed to store audit log:`, error, {
         process_id,
@@ -65,6 +56,8 @@ export class KateNotification {
 }
 
 export class HUD_Toaster extends Scene {
+  readonly application_id = "kate:notifications";
+
   readonly NOTIFICATION_WAIT_TIME_MS = 5000;
   readonly FADE_OUT_TIME_MS = 250;
 

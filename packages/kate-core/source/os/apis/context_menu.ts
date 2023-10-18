@@ -73,6 +73,8 @@ export class KateContextMenu {
 }
 
 export class HUD_ContextMenu extends Scene {
+  readonly application_id = "kate:context-menu";
+
   readonly on_close = new EventStream<void>();
 
   constructor(readonly os: KateOS, readonly context: KateContextMenu) {

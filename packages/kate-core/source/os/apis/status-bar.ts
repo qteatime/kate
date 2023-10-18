@@ -24,6 +24,8 @@ export class KateStatusBar {
 }
 
 export class HUD_StatusBar extends Scene {
+  readonly application_id = "kate:status-bar";
+
   private _timer: any = null;
   readonly STATUS_LINE_TIME_MS = 5000;
 
@@ -37,19 +39,14 @@ export class HUD_StatusBar extends Scene {
   }
 
   show(content: Widgetable) {
-    const status = new KateStatus(
-      this,
-      h("div", { class: "kate-hud-status-item" }, [content])
-    );
+    const status = new KateStatus(this, h("div", { class: "kate-hud-status-item" }, [content]));
     this.canvas.appendChild(status.canvas);
     this.tick();
     return status;
   }
 
   refresh() {
-    const items = Array.from(
-      this.canvas.querySelectorAll(".kate-hud-status-item")
-    );
+    const items = Array.from(this.canvas.querySelectorAll(".kate-hud-status-item"));
     if (items.length === 0) {
       this.canvas.classList.remove("active");
     } else {
@@ -59,9 +56,7 @@ export class HUD_StatusBar extends Scene {
 
   private tick() {
     clearTimeout(this._timer);
-    const items = Array.from(
-      this.canvas.querySelectorAll(".kate-hud-status-item")
-    );
+    const items = Array.from(this.canvas.querySelectorAll(".kate-hud-status-item"));
     if (items.length > 0) {
       this.canvas.classList.add("active");
       const current = items.findIndex((x) => x.classList.contains("active"));

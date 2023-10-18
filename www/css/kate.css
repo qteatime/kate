@@ -140,12 +140,17 @@ body {
   border-radius: 100%;
 }
 
-.kate-resource-trusted-mode {
+.kate-current-process-indicator {
   font-family: "Font Awesome 6 Free";
 }
 
-.kate-resource-trusted-mode::before {
+.kate-current-process-indicator[data-trusted]::before {
   content: "\f023";
+  display: block;
+}
+
+.kate-current-process-indicator:not([data-trusted])::before {
+  content: "\f219";
   display: block;
 }
 
