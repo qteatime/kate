@@ -39,6 +39,7 @@ export function bool_text(x: boolean | null) {
 export class SceneAboutKate extends SimpleScene {
   icon = "cat";
   title = ["About Kate"];
+  readonly application_id = "kate:about";
 
   body_container(body: UI.Widgetable[]): HTMLElement {
     return h("div", { class: "kate-os-scroll kate-os-content kate-about-bg" }, [...body]);

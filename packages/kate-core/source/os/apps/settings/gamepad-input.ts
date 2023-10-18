@@ -17,6 +17,7 @@ import {
 import { InteractionHandler } from "../../apis";
 
 export class GamepadInputSettings extends UI.SimpleScene {
+  readonly application_id = "kate:settings:input";
   icon = "gamepad";
   title = ["Gamepad settings"];
 
@@ -49,6 +50,7 @@ export class GamepadInputSettings extends UI.SimpleScene {
 }
 
 export class TestStandardMappingSettings extends UI.SimpleScene {
+  readonly application_id = "kate:settings:input";
   icon = "gamepad";
   title = ["Test gamepad input"];
   subtitle = "Hold any button to exit";
@@ -401,6 +403,7 @@ type ConfigMode = {
 };
 
 export class RemapStandardSettings extends UI.SimpleScene {
+  readonly application_id = "kate:settings:input";
   private mode = new Observable<ConfigMode>(config_modes[0]);
   private updated = new Observable<boolean>(false);
   private _mapping: GamepadMapping[];
@@ -875,6 +878,7 @@ type PairedGamepad = {
 };
 
 export class ChooseActiveGamepadSettings extends UI.SimpleScene {
+  readonly application_id = "kate:settings:input";
   icon = "gamepad";
   title = ["Choose active gamepad"];
 

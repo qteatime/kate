@@ -21,7 +21,9 @@ import {
 } from "./widget";
 
 export abstract class Scene {
+  abstract readonly application_id: string;
   readonly canvas: HTMLElement;
+
   constructor(protected os: KateOS, upscaled: boolean) {
     this.canvas = h("div", { class: `kate-os-screen ${upscaled ? "upscaled" : ""}` }, []);
   }
@@ -41,6 +43,7 @@ export abstract class Scene {
   abstract render(): Widgetable;
 
   on_attached() {}
+
   on_detached() {}
 
   close() {

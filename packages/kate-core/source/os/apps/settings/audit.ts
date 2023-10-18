@@ -5,11 +5,7 @@
  */
 
 import { AuditMessage, AuditResource } from "../../../data";
-import {
-  Observable,
-  fine_grained_relative_date,
-  unreachable,
-} from "../../../utils";
+import { Observable, fine_grained_relative_date, unreachable } from "../../../utils";
 import { Audit } from "../../apis";
 import type { KateOS } from "../../os";
 import * as UI from "../../ui";
@@ -28,6 +24,7 @@ function format_retention(days: number) {
 }
 
 export class SceneAudit extends UI.SimpleScene {
+  readonly application_id = "kate:settings:audit";
   icon = "eye";
   title = ["Audit"];
 
@@ -40,11 +37,7 @@ export class SceneAudit extends UI.SimpleScene {
         click_label: "Change",
         title: `Log retention period`,
         description: `Log entries older than this will be removed automatically to save storage space.`,
-        value: UI.dynamic(
-          config.map<UI.Widgetable>((x) =>
-            format_retention(x.log_retention_days)
-          )
-        ),
+        value: UI.dynamic(config.map<UI.Widgetable>((x) => format_retention(x.log_retention_days))),
         on_click: () => {
           this.select_retention_days(config);
         },
@@ -55,8 +48,7 @@ export class SceneAudit extends UI.SimpleScene {
       UI.link_card(this.os, {
         icon: "eye",
         title: "Audit log",
-        description:
-          "See all actions taken on your behalf and any errors that happened.",
+        description: "See all actions taken on your behalf and any errors that happened.",
         on_click: () => {
           this.os.push_scene(new SceneAuditLog(this.os));
         },
@@ -95,6 +87,7 @@ export class SceneAudit extends UI.SimpleScene {
 }
 
 export class SceneAuditLog extends UI.SimpleScene {
+  readonly application_id = "kate:settings:audit";
   icon = "eye";
   title = ["Audit log"];
   page = new Observable(0);
@@ -158,9 +151,7 @@ export class SceneAuditLog extends UI.SimpleScene {
       UI.dynamic(
         this.current.map<UI.Widgetable>((current) => {
           return UI.klass("kate-ui-logview", [
-            UI.klass("kate-ui-logview-data", [
-              ...current.logs.map((x) => this.render_entry(x)),
-            ]),
+            UI.klass("kate-ui-logview-data", [...current.logs.map((x) => this.render_entry(x))]),
           ]);
         })
       ),
@@ -172,25 +163,17 @@ export class SceneAuditLog extends UI.SimpleScene {
       this.os,
       UI.h("div", { class: "kate-ui-logview-entry", "data-risk": x.risk }, [
         UI.h("div", { class: "kate-ui-logview-entry-heading" }, [
-          UI.h(
-            "div",
-            { class: "kate-ui-logview-process", title: x.process_id },
-            [x.process_id]
-          ),
-          UI.h(
-            "div",
-            { class: "kate-ui-logview-date", title: x.time.toISOString() },
-            [fine_grained_relative_date(x.time)]
-          ),
+          UI.h("div", { class: "kate-ui-logview-process", title: x.process_id }, [x.process_id]),
+          UI.h("div", { class: "kate-ui-logview-date", title: x.time.toISOString() }, [
+            fine_grained_relative_date(x.time),
+          ]),
           UI.h("div", { class: "kate-ui-logview-resources" }, [
             ...[...x.resources.values()].map(render_resource),
           ]),
         ]),
         UI.h("div", { class: "kate-ui-logview-entry-message" }, [x.message]),
         UI.when(x.extra != null, [
-          UI.h("div", { class: "kate-ui-logview-extra" }, [
-            JSON.stringify(x.extra, null, 2),
-          ]),
+          UI.h("div", { class: "kate-ui-logview-extra" }, [JSON.stringify(x.extra, null, 2)]),
         ]),
       ]),
       [
@@ -208,6 +191,7 @@ export class SceneAuditLog extends UI.SimpleScene {
 }
 
 export class SceneAuditEntry extends UI.SimpleScene {
+  readonly application_id = "kate:settings:audit";
   icon = "eye";
   title = ["Audit log"];
 
@@ -224,11 +208,7 @@ export class SceneAuditEntry extends UI.SimpleScene {
     },
   ];
 
-  constructor(
-    os: KateOS,
-    readonly logview: SceneAuditLog,
-    readonly entry: AuditMessage
-  ) {
+  constructor(os: KateOS, readonly logview: SceneAuditLog, readonly entry: AuditMessage) {
     super(os);
   }
 
@@ -238,32 +218,18 @@ export class SceneAuditEntry extends UI.SimpleScene {
     return [
       UI.scroll([
         UI.h("div", { class: "kate-ui-audit-entry" }, [
-          UI.h(
-            "div",
-            { class: "kate-ui-logview-entry-heading", "data-risk": x.risk },
-            [
-              UI.h(
-                "div",
-                { class: "kate-ui-logview-process", title: x.process_id },
-                [x.process_id]
-              ),
-              UI.h("div", { class: "kate-ui-logview-risk" }, [
-                `(${x.risk} risk)`,
-              ]),
-              UI.h(
-                "div",
-                { class: "kate-ui-logview-date", title: x.time.toISOString() },
-                [fine_grained_relative_date(x.time)]
-              ),
-              UI.h("div", { class: "kate-ui-logview-resources" }, [
-                ...[...x.resources.values()].map(render_resource),
-              ]),
-            ]
-          ),
-          UI.h("div", { class: "kate-ui-audit-entry-message" }, [x.message]),
-          UI.h("div", { class: "kate-ui-audit-entry-extra" }, [
-            JSON.stringify(x.extra, null, 2),
+          UI.h("div", { class: "kate-ui-logview-entry-heading", "data-risk": x.risk }, [
+            UI.h("div", { class: "kate-ui-logview-process", title: x.process_id }, [x.process_id]),
+            UI.h("div", { class: "kate-ui-logview-risk" }, [`(${x.risk} risk)`]),
+            UI.h("div", { class: "kate-ui-logview-date", title: x.time.toISOString() }, [
+              fine_grained_relative_date(x.time),
+            ]),
+            UI.h("div", { class: "kate-ui-logview-resources" }, [
+              ...[...x.resources.values()].map(render_resource),
+            ]),
           ]),
+          UI.h("div", { class: "kate-ui-audit-entry-message" }, [x.message]),
+          UI.h("div", { class: "kate-ui-audit-entry-extra" }, [JSON.stringify(x.extra, null, 2)]),
         ]),
       ]),
     ];

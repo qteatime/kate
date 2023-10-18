@@ -11,6 +11,10 @@ import { Scene } from "../ui/scenes";
 import { KateButton } from "../../kernel";
 
 export class SceneGame extends Scene {
+  get application_id(): string {
+    return this.process().cart.id;
+  }
+
   constructor(os: KateOS, readonly process: () => KateProcess) {
     super(os, false);
   }

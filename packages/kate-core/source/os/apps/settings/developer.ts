@@ -8,6 +8,7 @@ import { SettingsData } from "../../apis";
 import * as UI from "../../ui";
 
 export class SceneDeveloperSettings extends UI.SimpleScene {
+  readonly application_id = "kate:settings:developer";
   icon = "code";
   title = ["Developer settings"];
 
