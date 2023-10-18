@@ -14,6 +14,8 @@ import { Scene } from "../ui/scenes";
 import { KateButton } from "../../kernel";
 
 export class SceneViewMedia extends Scene {
+  readonly application_id = "kate:media";
+
   private url: string | null = null;
 
   constructor(os: KateOS, readonly media_list: SceneMedia, readonly media: Db.Media) {

@@ -12,16 +12,15 @@ import { SimpleScene } from "../ui/scenes";
 import { SceneViewMedia } from "./view-media";
 
 export class SceneMedia extends SimpleScene {
+  readonly application_id = "kate:media";
+
   icon = "images";
   title = ["Media gallery"];
   subtitle = h("div", { class: "kate-os-media-status" }, []);
 
   private media = new Map<HTMLElement, Db.Media>();
 
-  constructor(
-    os: KateOS,
-    readonly filter: null | { id: string; title: string }
-  ) {
+  constructor(os: KateOS, readonly filter: null | { id: string; title: string }) {
     super(os);
   }
 
@@ -91,9 +90,7 @@ export class SceneMedia extends SimpleScene {
     if (duration == null) {
       return null;
     } else {
-      return h("div", { class: "kate-os-video-duration" }, [
-        this.format_duration(duration),
-      ]);
+      return h("div", { class: "kate-os-video-duration" }, [this.format_duration(duration)]);
     }
   }
 
@@ -128,8 +125,7 @@ export class SceneMedia extends SimpleScene {
     for (const [button, meta] of this.media) {
       if (meta.id === id) {
         if (button.classList.contains("focus")) {
-          const new_focus =
-            button.previousElementSibling ?? button.nextElementSibling ?? null;
+          const new_focus = button.previousElementSibling ?? button.nextElementSibling ?? null;
           this.os.focus_handler.focus(new_focus as HTMLElement | null);
           button.remove();
           this.media.delete(button);

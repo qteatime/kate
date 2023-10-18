@@ -11,6 +11,7 @@ import { Deferred, Observable, defer } from "../../../utils";
 import { ButtonChangeEvent, KateButton } from "../../../kernel";
 
 export class KeyboardInputSettings extends UI.SimpleScene {
+  readonly application_id = "kate:settings:input";
   icon = "keyboard";
   title = ["Keyboard mapping"];
 

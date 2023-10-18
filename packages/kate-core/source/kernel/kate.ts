@@ -36,13 +36,8 @@ export class KateKernel {
     return new KateKernel(console);
   }
 
-  enter_trusted_mode() {
-    this.console.body!.classList.add("trusted-mode");
-    this.console.resources.take("trusted-mode");
-  }
-
-  exit_trusted_mode() {
-    this.console.body!.classList.remove("trusted-mode");
-    this.console.resources.release("trusted-mode");
+  set_running_process(application_id: string, trusted: boolean) {
+    this.console.body!.classList.toggle("trusted-mode", trusted);
+    this.console.resources.set_running_process({ application_id, trusted });
   }
 }

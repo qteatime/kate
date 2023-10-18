@@ -9,6 +9,8 @@ import { Scene } from "../ui/scenes";
 import type { KateOS } from "../os";
 
 export class HUD_LoadIndicator extends Scene {
+  readonly application_id = "kate:loading";
+
   constructor(os: KateOS) {
     super(os, true);
   }

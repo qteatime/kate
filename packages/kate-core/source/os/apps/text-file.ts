@@ -11,6 +11,8 @@ import { Scene } from "../ui/scenes";
 import { KateButton } from "../../kernel";
 
 export class SceneTextFile extends Scene {
+  readonly application_id = "kate:view-document";
+
   constructor(
     os: KateOS,
     private title: string,

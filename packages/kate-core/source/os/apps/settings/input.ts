@@ -9,6 +9,7 @@ import { GamepadInputSettings } from "./gamepad-input";
 import { KeyboardInputSettings } from "./keyboard-input";
 
 export class SceneInputSettings extends UI.SimpleScene {
+  readonly application_id = "kate:settings:input";
   icon = "gamepad";
   title = ["Controller & Sensors"];
 
@@ -37,8 +38,7 @@ export class SceneInputSettings extends UI.SimpleScene {
       UI.link_card(this.os, {
         icon: "gamepad",
         title: "Control Kate with a standard gamepad",
-        description:
-          "Select a gamepad and configure how it maps to Kate buttons",
+        description: "Select a gamepad and configure how it maps to Kate buttons",
         on_click: () => {
           this.os.push_scene(new GamepadInputSettings(this.os));
         },

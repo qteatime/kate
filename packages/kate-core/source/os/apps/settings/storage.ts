@@ -11,6 +11,7 @@ import * as UI from "../../ui";
 import { SceneMedia } from "../media";
 
 export class SceneStorageSettings extends UI.SimpleScene {
+  readonly application_id = "kate:settings:storage";
   icon = "hard-drive";
   title = ["Storage"];
 
@@ -41,9 +42,7 @@ export class SceneStorageSettings extends UI.SimpleScene {
 
     return [
       UI.section({
-        title: `Storage summary (${from_bytes(
-          estimates.totals.quota ?? used_total
-        )})`,
+        title: `Storage summary (${from_bytes(estimates.totals.quota ?? used_total)})`,
         contents: [
           UI.stack_bar({
             total: estimates.totals.quota ?? used_total,
@@ -52,9 +51,7 @@ export class SceneStorageSettings extends UI.SimpleScene {
               estimates.totals.quota != null
                 ? {
                     title: "Free",
-                    display_value: from_bytes(
-                      estimates.totals.quota - estimates.totals.used
-                    ),
+                    display_value: from_bytes(estimates.totals.quota - estimates.totals.used),
                   }
                 : undefined,
             components: [
@@ -92,9 +89,9 @@ export class SceneStorageSettings extends UI.SimpleScene {
       title: x.title,
       click_label: "Details",
       value: from_bytes(x.usage.total_in_bytes),
-      description: `Last used: ${relative_date(
-        x.dates.last_used
-      )} | Last updated: ${relative_date(x.dates.last_modified)}`,
+      description: `Last used: ${relative_date(x.dates.last_used)} | Last updated: ${relative_date(
+        x.dates.last_modified
+      )}`,
       on_click: () => {
         this.os.push_scene(new SceneCartridgeStorageSettings(this.os, x));
       },
@@ -103,6 +100,7 @@ export class SceneStorageSettings extends UI.SimpleScene {
 }
 
 export class SceneCartridgeStorageSettings extends UI.SimpleScene {
+  readonly application_id = "kate:settings:storage";
   icon = "hard-drive";
   get title() {
     return [this.app.title];
@@ -123,9 +121,7 @@ export class SceneCartridgeStorageSettings extends UI.SimpleScene {
       return;
     }
 
-    const app = await this.os.storage_manager.try_estimate_cartridge(
-      this.app.id
-    );
+    const app = await this.os.storage_manager.try_estimate_cartridge(this.app.id);
     let body: UI.Widgetable[];
     if (app != null) {
       this.app = app;
@@ -157,23 +153,18 @@ export class SceneCartridgeStorageSettings extends UI.SimpleScene {
         )})`,
         click_label: "Manage",
         on_click: () => {
-          this.os.push_scene(
-            new SceneMedia(this.os, { id: this.app.id, title: this.app.title })
-          );
+          this.os.push_scene(new SceneMedia(this.os, { id: this.app.id, title: this.app.title }));
         },
       }),
       UI.link_card(this.os, {
         icon: "hard-drive",
         title: "Manage save data",
         description: `${from_bytes(
-          this.app.usage.data.size_in_bytes +
-            this.app.usage.shared_data.size_in_bytes
+          this.app.usage.data.size_in_bytes + this.app.usage.shared_data.size_in_bytes
         )}`,
         click_label: "Manage",
         on_click: () => {
-          this.os.push_scene(
-            new SceneCartridgeSaveDataSettings(this.os, this.app)
-          );
+          this.os.push_scene(new SceneCartridgeSaveDataSettings(this.os, this.app));
         },
       }),
       UI.when(this.os.kernel.console.options.mode !== "single", [
@@ -202,34 +193,26 @@ export class SceneCartridgeStorageSettings extends UI.SimpleScene {
           `,
           ]),
         ]),
-        UI.when(
-          this.app.status === "active" &&
-            !this.os.processes.is_running(this.app.id),
-          [
-            UI.vspace(16),
-            UI.button_panel(this.os, {
-              title: "Archive cartridge",
-              description: `Cartridge files will be deleted, save data and media will be kept.
+        UI.when(this.app.status === "active" && !this.os.processes.is_running(this.app.id), [
+          UI.vspace(16),
+          UI.button_panel(this.os, {
+            title: "Archive cartridge",
+            description: `Cartridge files will be deleted, save data and media will be kept.
                             Reinstalling the cartridge will bring it back to the current state`,
-              dangerous: true,
-              on_click: () => this.archive_cartridge(),
-            }),
-          ]
-        ),
-        UI.when(
-          this.app.status !== "inactive" &&
-            !this.os.processes.is_running(this.app.id),
-          [
-            UI.vspace(16),
-            UI.button_panel(this.os, {
-              title: "Delete all data",
-              description: `Cartridge files and save data will be deleted, media will be kept.
+            dangerous: true,
+            on_click: () => this.archive_cartridge(),
+          }),
+        ]),
+        UI.when(this.app.status !== "inactive" && !this.os.processes.is_running(this.app.id), [
+          UI.vspace(16),
+          UI.button_panel(this.os, {
+            title: "Delete all data",
+            description: `Cartridge files and save data will be deleted, media will be kept.
                             Reinstalling will not restore the save data.`,
-              dangerous: true,
-              on_click: () => this.delete_all_data(),
-            }),
-          ]
-        ),
+            dangerous: true,
+            on_click: () => this.delete_all_data(),
+          }),
+        ]),
       ],
     });
   }
@@ -300,8 +283,7 @@ export class SceneCartridgeStorageSettings extends UI.SimpleScene {
             component("Cartridge", this.app.usage.cartridge_size_in_bytes),
             component(
               "Saves",
-              this.app.usage.data.size_in_bytes +
-                this.app.usage.shared_data.size_in_bytes
+              this.app.usage.data.size_in_bytes + this.app.usage.shared_data.size_in_bytes
             ),
             component("Media", this.app.usage.media.size_in_bytes),
           ],
@@ -312,6 +294,7 @@ export class SceneCartridgeStorageSettings extends UI.SimpleScene {
 }
 
 class SceneCartridgeSaveDataSettings extends UI.SimpleScene {
+  readonly application_id = "kate:settings:storage";
   icon = "hard-drive";
   get title() {
     return [this.app.title];
@@ -332,9 +315,7 @@ class SceneCartridgeSaveDataSettings extends UI.SimpleScene {
       return;
     }
 
-    const app = await this.os.storage_manager.try_estimate_cartridge(
-      this.app.id
-    );
+    const app = await this.os.storage_manager.try_estimate_cartridge(this.app.id);
     let body: UI.Widgetable[];
     if (app != null) {
       this.app = app;
@@ -385,13 +366,10 @@ class SceneCartridgeSaveDataSettings extends UI.SimpleScene {
             free: {
               title: "Free",
               display_value: from_bytes(
-                this.app.quota.data.size_in_bytes -
-                  this.app.usage.data.size_in_bytes
+                this.app.quota.data.size_in_bytes - this.app.usage.data.size_in_bytes
               ),
             },
-            components: [
-              component("In use", this.app.usage.data.size_in_bytes),
-            ],
+            components: [component("In use", this.app.usage.data.size_in_bytes)],
           }),
         ]),
         UI.vspace(16),
@@ -404,13 +382,10 @@ class SceneCartridgeSaveDataSettings extends UI.SimpleScene {
             free: {
               title: "Free",
               display_value: from_bytes(
-                this.app.quota.shared_data.size_in_bytes -
-                  this.app.usage.shared_data.size_in_bytes
+                this.app.quota.shared_data.size_in_bytes - this.app.usage.shared_data.size_in_bytes
               ),
             },
-            components: [
-              component("In use", this.app.usage.shared_data.size_in_bytes),
-            ],
+            components: [component("In use", this.app.usage.shared_data.size_in_bytes)],
           }),
         ]),
       ],
@@ -427,15 +402,8 @@ class SceneCartridgeSaveDataSettings extends UI.SimpleScene {
       ok: "Delete save data",
     });
     if (ok) {
-      await this.os.processes.terminate(
-        this.app.id,
-        "kate:settings",
-        "Deleted save data."
-      );
-      await this.os.object_store.delete_cartridge_data(
-        this.app.id,
-        this.app.version_id
-      );
+      await this.os.processes.terminate(this.app.id, "kate:settings", "Deleted save data.");
+      await this.os.object_store.delete_cartridge_data(this.app.id, this.app.version_id);
       await this.os.audit_supervisor.log("kate:settings", {
         resources: ["kate:storage"],
         risk: "low",

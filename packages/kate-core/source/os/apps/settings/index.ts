@@ -15,6 +15,7 @@ import { SceneStorageSettings } from "./storage";
 import { SceneUISettings } from "./ui";
 
 export class SceneSettings extends UI.SimpleScene {
+  readonly application_id = "kate:settings";
   icon = "gear";
   title = ["Settings"];
 
@@ -34,8 +35,7 @@ export class SceneSettings extends UI.SimpleScene {
       UI.link_card(this.os, {
         icon: "gamepad",
         title: "Controller & Sensors",
-        description:
-          "Configure virtual buttons, keyboard, gamepad, and other input sources",
+        description: "Configure virtual buttons, keyboard, gamepad, and other input sources",
         on_click: () => {
           this.os.push_scene(new SceneInputSettings(this.os));
         },
@@ -44,8 +44,7 @@ export class SceneSettings extends UI.SimpleScene {
       UI.link_card(this.os, {
         icon: "window-maximize",
         title: "User Interface",
-        description:
-          "Configure appearance and audio/visual feedback for KateOS",
+        description: "Configure appearance and audio/visual feedback for KateOS",
         on_click: () => {
           this.os.push_scene(new SceneUISettings(this.os));
         },
@@ -66,8 +65,7 @@ export class SceneSettings extends UI.SimpleScene {
         UI.link_card(this.os, {
           icon: "key",
           title: "Permissions",
-          description:
-            "What cartridges are allowed to do with your device and data",
+          description: "What cartridges are allowed to do with your device and data",
           on_click: () => {
             this.os.push_scene(new ScenePermissions(this.os));
           },
@@ -86,8 +84,7 @@ export class SceneSettings extends UI.SimpleScene {
       UI.link_card(this.os, {
         icon: "eye",
         title: "Audit",
-        description:
-          "See what your console and cartridges have been doing behind the scenes",
+        description: "See what your console and cartridges have been doing behind the scenes",
         on_click: () => {
           this.os.push_scene(new SceneAudit(this.os));
         },

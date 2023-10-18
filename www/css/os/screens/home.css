@@ -14,6 +14,7 @@
 
 .kate-os-carts-scroll {
   overflow-x: scroll;
+  overflow-y: hidden;
   padding: 5px 0;
   scroll-behavior: smooth;
   scroll-padding: 30px;
@@ -28,7 +29,6 @@
 .kate-os-carts-scroll::-webkit-scrollbar {
   height: 0;
 }
-
 
 .kate-os-carts {
   margin: 15px;

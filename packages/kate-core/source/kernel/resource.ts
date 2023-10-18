@@ -4,15 +4,30 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-export type Resource = "screen-recording" | "transient-storage" | "low-storage" | "trusted-mode";
+export type Resource = "screen-recording" | "transient-storage" | "low-storage";
+export type RunningProcessMeta = {
+  application_id: string;
+  trusted: boolean;
+};
 
 export class KateResources {
   readonly resources = new Map<Resource, number>();
+  private running_process: RunningProcessMeta | null = null;
 
   constructor(private _root: HTMLElement) {
     if (_root == null) {
       throw new Error(`[kernel:resources] invalid HTML tree`);
     }
+  }
+
+  set_running_process(process: RunningProcessMeta | null) {
+    console.debug(
+      `[kernel:resource] changed running process to ${process?.application_id ?? null} (trusted: ${
+        process?.trusted ?? null
+      })`
+    );
+    this.running_process = process;
+    this.update_display();
   }
 
   take(resource: Resource) {
@@ -45,6 +60,13 @@ export class KateResources {
         e.className = `kate-resource kate-resource-${resource}`;
         this._root.append(e);
       }
+    }
+    if (this.running_process != null) {
+      const e = document.createElement("div");
+      e.className = "kate-resource kate-current-process-indicator";
+      e.title = this.running_process.application_id;
+      e.toggleAttribute("data-trusted", this.running_process.trusted);
+      this._root.append(e);
     }
   }
 }

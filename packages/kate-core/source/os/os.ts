@@ -128,6 +128,7 @@ export class KateOS {
     scene.canvas.classList.remove("kate-os-leaving");
     scene.canvas.classList.add("kate-os-entering");
     this.focus_handler.push_root(scene.canvas);
+    this.kernel.set_running_process(scene.application_id, this.is_trusted(scene.application_id));
     wait(300).then((_) => scene.canvas.classList.remove("kate-os-entering"));
   }
 
@@ -149,7 +150,13 @@ export class KateOS {
         popped_scene.detach();
         popped_scene.canvas.classList.remove("kate-os-leaving");
       });
-      this._current_scene = this._scene_stack.pop() ?? null;
+      const scene = (this._current_scene = this._scene_stack.pop() ?? null);
+      if (scene != null) {
+        this.kernel.set_running_process(
+          scene.application_id,
+          this.is_trusted(scene.application_id)
+        );
+      }
     } else {
       popped_scene.detach();
       this._scene_stack = this._scene_stack.filter((x) => x !== popped_scene);
@@ -187,6 +194,12 @@ export class KateOS {
 
   set_os_animation(enabled: boolean) {
     this.display.classList.toggle("disable-animation", !enabled);
+  }
+
+  private is_trusted(id: string) {
+    // FIXME: this should rather rely on application signatures, but it's
+    // currently "safe enough" in that cartridges' ids are very restricted.
+    return id.startsWith("kate:");
   }
 
   static async boot(kernel: KateKernel, x: { database?: string; set_case_mode?: boolean } = {}) {

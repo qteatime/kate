@@ -46,3 +46,35 @@ test("@kernel resources are ref-counted", async ({ page }) => {
   await resources.evaluate((x) => x.take("screen-recording"));
   await expect(page.locator("#kate-resources .kate-resource-screen-recording")).toBeAttached();
 });
+
+test("@kernel resources has an idea of running processes", async ({ page }) => {
+  await page.goto("/test.html");
+  const kate = await load(page);
+  const resources = await kate.evaluateHandle(
+    (x) => new x.kernel.KateResources(document.querySelector("#kate-resources")!)
+  );
+
+  await expect(page.locator("#kate-resources")).toBeEmpty();
+  await resources.evaluate((x) => x.set_running_process({ application_id: "kate", trusted: true }));
+  await expect(page.locator("#kate-resources .kate-current-process-indicator")).toHaveAttribute(
+    "data-trusted",
+    ""
+  );
+  await expect(page.locator("#kate-resources .kate-current-process-indicator")).toHaveAttribute(
+    "title",
+    "kate"
+  );
+  await resources.evaluate((x) =>
+    x.set_running_process({ application_id: "cartridge", trusted: false })
+  );
+  await expect(page.locator("#kate-resources .kate-current-process-indicator")).not.toHaveAttribute(
+    "data-trusted",
+    ""
+  );
+  await expect(page.locator("#kate-resources .kate-current-process-indicator")).toHaveAttribute(
+    "title",
+    "cartridge"
+  );
+  await resources.evaluate((x) => x.set_running_process(null));
+  await expect(page.locator("#kate-resources")).toBeEmpty();
+});

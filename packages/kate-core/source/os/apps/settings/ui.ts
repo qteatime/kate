@@ -10,6 +10,7 @@ import { SettingsData } from "../../apis/settings";
 import * as UI from "../../ui";
 
 export class SceneUISettings extends UI.SimpleScene {
+  readonly application_id = "kate:settings:ui";
   icon = "window-maximize";
   title = ["User Interface"];
 

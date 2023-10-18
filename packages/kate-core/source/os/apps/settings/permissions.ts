@@ -20,6 +20,7 @@ type Risk = {
 };
 
 export class ScenePermissions extends UI.SimpleScene {
+  readonly application_id = "kate:settings:permissions";
   icon = "key";
   title = ["Permissions"];
 
@@ -54,9 +55,7 @@ export class ScenePermissions extends UI.SimpleScene {
         };
       })
     );
-    const cartridges = cartridges1.sort((a, b) =>
-      Capability.compare_risk(a.risk, b.risk)
-    );
+    const cartridges = cartridges1.sort((a, b) => Capability.compare_risk(a.risk, b.risk));
     const security = new Observable(this.os.settings.get("security"));
 
     return [
@@ -87,9 +86,7 @@ export class ScenePermissions extends UI.SimpleScene {
 
   render_cartridge_summary(x: Risk) {
     return UI.link_card(this.os, {
-      icon: x.cart.thumbnail_dataurl
-        ? UI.image(x.cart.thumbnail_dataurl)
-        : UI.no_thumbnail(),
+      icon: x.cart.thumbnail_dataurl ? UI.image(x.cart.thumbnail_dataurl) : UI.no_thumbnail(),
       title: x.cart.metadata.presentation.title,
       click_label: "Details",
       value: x.risk,
@@ -121,10 +118,7 @@ export class ScenePermissions extends UI.SimpleScene {
     this.set_security(current, { prompt_for: result });
   }
 
-  async set_security(
-    current: Observable<Security>,
-    changes: Partial<Security>
-  ) {
+  async set_security(current: Observable<Security>, changes: Partial<Security>) {
     current.value = { ...current.value, ...changes };
     await this.os.settings.update("security", (_) => current.value);
     await this.os.audit_supervisor.log("kate:settings", {
@@ -138,6 +132,7 @@ export class ScenePermissions extends UI.SimpleScene {
 }
 
 export class SceneCartridgePermissions extends UI.SimpleScene {
+  readonly application_id = "kate:settings:permissions";
   icon = "key";
   get title() {
     return [this.cart.metadata.presentation.title];
@@ -148,9 +143,7 @@ export class SceneCartridgePermissions extends UI.SimpleScene {
   }
 
   async body() {
-    const grants0 = await this.os.capability_supervisor.all_grants(
-      this.cart.id
-    );
+    const grants0 = await this.os.capability_supervisor.all_grants(this.cart.id);
     const grants = grants0.sort((a, b) =>
       Capability.compare_risk(a.risk_category(), b.risk_category())
     );

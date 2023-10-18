@@ -9,6 +9,7 @@ import { coarse_time_from_minutes, relative_date } from "../../../utils";
 import * as UI from "../../ui";
 
 export class ScenePlayHabitsSettings extends UI.SimpleScene {
+  readonly application_id = "kate:settings:play-habits";
   icon = "calendar";
   title = ["Play habits"];
 
@@ -34,23 +35,20 @@ export class ScenePlayHabitsSettings extends UI.SimpleScene {
       UI.toggle_cell(this.os, {
         value: data.recently_played,
         title: "Record last played time",
-        description:
-          "Track and store (locally) the last time you played a cartridge.",
+        description: "Track and store (locally) the last time you played a cartridge.",
         on_changed: this.handle_last_played_change,
       }),
       UI.toggle_cell(this.os, {
         value: data.play_times,
         title: "Record total play time",
-        description:
-          "Track and store (locally) how many minutes you've played a cartridge.",
+        description: "Track and store (locally) how many minutes you've played a cartridge.",
         on_changed: this.handle_play_time_change,
       }),
 
       UI.vspace(16),
       UI.button_panel(this.os, {
         title: "Delete all stored play habits",
-        description:
-          "Remove habits of uninstalled games, reset habits of installed games.",
+        description: "Remove habits of uninstalled games, reset habits of installed games.",
         on_click: this.handle_delete,
         dangerous: true,
       }),
@@ -64,9 +62,7 @@ export class ScenePlayHabitsSettings extends UI.SimpleScene {
   async load_history(container: HTMLElement) {
     container.textContent = "";
     const items = [];
-    const carts = new Map(
-      (await this.os.cart_manager.list_all()).map((x) => [x.id, x])
-    );
+    const carts = new Map((await this.os.cart_manager.list_all()).map((x) => [x.id, x]));
     const all_habits = await this.os.play_habits.all_in_database();
     const history = all_habits.map((x) => {
       const cart = carts.get(x.id) ?? null;
@@ -88,9 +84,7 @@ export class ScenePlayHabitsSettings extends UI.SimpleScene {
                 entry.title,
                 entry.installed
                   ? null
-                  : UI.h("em", { style: "margin-left: 8px" }, [
-                      "(not installed)",
-                    ]),
+                  : UI.h("em", { style: "margin-left: 8px" }, ["(not installed)"]),
               ]),
               description: UI.fragment([
                 entry.play_time === 0
@@ -119,9 +113,7 @@ export class ScenePlayHabitsSettings extends UI.SimpleScene {
     UI.append(new UI.VBox(1, [...items]), container);
   }
 
-  handle_play_entry_options = async (
-    entry: PlayHabits & { title: string; installed: boolean }
-  ) => {
+  handle_play_entry_options = async (entry: PlayHabits & { title: string; installed: boolean }) => {
     const result = await this.os.dialog.pop_menu(
       "kate:settings",
       `${entry.title}`,
@@ -143,9 +135,7 @@ export class ScenePlayHabitsSettings extends UI.SimpleScene {
           message: `Play habits deleted for ${entry.id}`,
           extra: { cartridge: entry.id },
         });
-        await this.load_history(
-          this.canvas.querySelector(".play-habit-history")!
-        );
+        await this.load_history(this.canvas.querySelector(".play-habit-history")!);
         return;
       }
     }
@@ -168,9 +158,7 @@ export class ScenePlayHabitsSettings extends UI.SimpleScene {
         type: "kate.habits.deleted.all",
         message: "Play habits deleted for all cartridges",
       });
-      await this.load_history(
-        this.canvas.querySelector(".play-habit-history")!
-      );
+      await this.load_history(this.canvas.querySelector(".play-habit-history")!);
     }
   };
 

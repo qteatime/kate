@@ -16,6 +16,7 @@ import { Cart, ContentRating, ReleaseType } from "../../cart";
 import { SceneCartridgePermissions } from "./settings/permissions";
 
 export class SceneHome extends SimpleScene {
+  readonly application_id = "kate:home";
   icon = "diamond";
   title = ["Start"];
   subtitle = "Recently played and favourites";
@@ -49,9 +50,7 @@ export class SceneHome extends SimpleScene {
             [rating_icon(x.metadata.classification.rating)]
           ),
         ]),
-        h("div", { class: "kate-os-carts-title" }, [
-          x.metadata.presentation.title,
-        ]),
+        h("div", { class: "kate-os-carts-title" }, [x.metadata.presentation.title]),
       ]),
       [
         {
@@ -74,25 +73,15 @@ export class SceneHome extends SimpleScene {
   }
 
   async show_carts(list: HTMLElement) {
-    const recency = (
-      cart: Db.CartMeta,
-      habits_map: Map<string, Db.PlayHabits>
-    ) => {
+    const recency = (cart: Db.CartMeta, habits_map: Map<string, Db.PlayHabits>) => {
       const habits = habits_map.get(cart.id);
-      return Math.max(
-        habits?.last_played?.getTime() ?? 0,
-        cart.updated_at.getTime()
-      );
+      return Math.max(habits?.last_played?.getTime() ?? 0, cart.updated_at.getTime());
     };
 
     try {
       const carts0 = await this.os.cart_manager.list_by_status("active");
-      const habits = await this.os.play_habits.try_get_all(
-        carts0.map((x) => x.id)
-      );
-      const carts = carts0.sort(
-        (a, b) => recency(b, habits) - recency(a, habits)
-      );
+      const habits = await this.os.play_habits.try_get_all(carts0.map((x) => x.id));
+      const carts = carts0.sort((a, b) => recency(b, habits) - recency(a, habits));
       list.textContent = "";
       this.cart_map = new Map();
       for (const x of carts) {
@@ -105,9 +94,7 @@ export class SceneHome extends SimpleScene {
           (list.firstElementChild as HTMLElement) ??
           null
       );
-      const qs = this.canvas.querySelector(
-        ".kate-os-quickstart"
-      ) as HTMLElement;
+      const qs = this.canvas.querySelector(".kate-os-quickstart") as HTMLElement;
       qs.classList.toggle("hidden", carts.length !== 0);
     } catch (error) {
       console.error("[Kate] Failed to load cartridges", error);
@@ -144,16 +131,13 @@ export class SceneHome extends SimpleScene {
     );
     switch (result) {
       case "manage-data": {
-        const app = await this.os.storage_manager.try_estimate_cartridge(
-          cart.id
-        );
+        const app = await this.os.storage_manager.try_estimate_cartridge(cart.id);
         if (app != null) {
           this.os.push_scene(new SceneCartridgeStorageSettings(this.os, app));
         } else {
           await this.os.dialog.message("kate:home", {
             title: "Failed to read cartridge",
-            message:
-              "An unknown error happened while reading the cartridge details.",
+            message: "An unknown error happened while reading the cartridge details.",
           });
         }
         break;
@@ -169,20 +153,12 @@ export class SceneHome extends SimpleScene {
       }
 
       case "legal": {
-        this.show_legal_notice(
-          "Legal notices",
-          cart,
-          cart.metadata.legal.licence_path
-        );
+        this.show_legal_notice("Legal notices", cart, cart.metadata.legal.licence_path);
         break;
       }
 
       case "privacy": {
-        this.show_legal_notice(
-          "Privacy policy",
-          cart,
-          cart.metadata.legal.privacy_policy_path
-        );
+        this.show_legal_notice("Privacy policy", cart, cart.metadata.legal.privacy_policy_path);
         break;
       }
 
@@ -192,26 +168,14 @@ export class SceneHome extends SimpleScene {
     }
   }
 
-  private async show_legal_notice(
-    title: string,
-    cart: Db.CartMeta,
-    path: string | null
-  ) {
+  private async show_legal_notice(title: string, cart: Db.CartMeta, path: string | null) {
     if (path == null) {
       return;
     }
-    const licence_file = await this.os.cart_manager.read_file_by_path(
-      cart.id,
-      path
-    );
+    const licence_file = await this.os.cart_manager.read_file_by_path(cart.id, path);
     const decoder = new TextDecoder();
     const licence = decoder.decode(licence_file.data);
-    const legal = new SceneTextFile(
-      this.os,
-      title,
-      cart.metadata.presentation.title,
-      licence
-    );
+    const legal = new SceneTextFile(this.os, title, cart.metadata.presentation.title, licence);
     this.os.push_scene(legal);
   }
 

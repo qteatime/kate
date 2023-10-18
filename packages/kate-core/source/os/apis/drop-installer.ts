@@ -36,6 +36,8 @@ export class KateDropInstaller {
 }
 
 export class HUD_DropInstaller extends Scene {
+  readonly application_id = "kate:drop-installer";
+
   constructor(readonly manager: KateDropInstaller) {
     super(manager.os, true);
     (this as any).canvas = UI.h("div", { class: "kate-hud-drop-installer" }, []);
