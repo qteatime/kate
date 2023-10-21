@@ -226,12 +226,21 @@ export type InteractionHandler = {
   handler: (key: KateTypes.InputKey, repeat: boolean) => Promise<void>;
 };
 
+type KeyPressedEvent = {
+  key: KateTypes.InputKey;
+  is_repeat: boolean;
+  is_long_press: boolean;
+};
+
+type PointerClickEvent = {
+  button: "primary" | "alternate";
+  location: { x: number; y: number };
+};
+
 export type InputEnv = {
-  on_key_pressed: EventStream<{
-    key: KateTypes.InputKey;
-    is_repeat: boolean;
-    is_long_press: boolean;
-  }>;
+  on_key_pressed: EventStream<KeyPressedEvent>;
+
+  on_pointer_click: EventStream<PointerClickEvent>;
 };
 
 export class UIFocus {
@@ -247,6 +256,7 @@ export class UIFocus {
   constructor(readonly ui: UI, readonly env: InputEnv) {
     this.ui.on_scene_changed.listen(this.handle_scene_changed);
     env.on_key_pressed.listen((x) => this.handle_key(x.key, x.is_repeat));
+    env.on_pointer_click.listen(this.handle_pointer_click);
   }
 
   get root() {
@@ -356,6 +366,28 @@ export class UIFocus {
 
     if (key === "up" || key === "right" || key === "down" || key === "left") {
       this.handle_focus_change(key);
+    }
+  };
+
+  handle_pointer_click = (ev: PointerClickEvent) => {
+    const [target] = Array.from(document.elementsFromPoint(ev.location.x, ev.location.y)).filter(
+      (x) => x.classList.contains("kate-ui-focus-target")
+    );
+    if (target != null) {
+      switch (ev.button) {
+        case "primary": {
+          target.dispatchEvent(new MouseEvent("click"));
+          break;
+        }
+
+        case "alternate": {
+          target.dispatchEvent(new MouseEvent("contextmenu"));
+          break;
+        }
+
+        default:
+          throw unreachable(ev.button);
+      }
     }
   };
 

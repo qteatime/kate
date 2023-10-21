@@ -7,6 +7,8 @@
 import type { KateTimer } from "./timer";
 import { EventStream } from "./util";
 
+export type PointerButton = "primary" | "alternate";
+
 export type PointerLocation = {
   x: number;
   y: number;
@@ -14,13 +16,12 @@ export type PointerLocation = {
 
 export type PointerClick = {
   location: PointerLocation;
-  button: number;
+  button: PointerButton;
 };
 
 export class KatePointerInput {
   readonly on_moved = new EventStream<PointerLocation>();
   readonly on_clicked = new EventStream<PointerClick>();
-  readonly on_alternate = new EventStream<PointerClick>();
   readonly on_down = new EventStream<PointerClick>();
   readonly on_up = new EventStream<PointerClick>();
 
@@ -68,6 +69,15 @@ export class KatePointerInput {
 
     this._started = true;
 
+    function to_button(id: number): PointerButton {
+      switch (id) {
+        case 0:
+          return "primary";
+        default:
+          return "alternate";
+      }
+    }
+
     cover.addEventListener("mousemove", (ev) => {
       this._location.x = ev.pageX;
       this._location.y = ev.pageY;
@@ -78,7 +88,7 @@ export class KatePointerInput {
       this._buttons.set(ev.button, 1);
       this.on_down.emit({
         location: this.location,
-        button: ev.button,
+        button: to_button(ev.button),
       });
     });
 
@@ -86,7 +96,7 @@ export class KatePointerInput {
       this._buttons.set(ev.button, -1);
       this.on_up.emit({
         location: this.location,
-        button: ev.button,
+        button: to_button(ev.button),
       });
     });
 
@@ -94,15 +104,15 @@ export class KatePointerInput {
       ev.preventDefault();
       this.on_clicked.emit({
         location: this.location,
-        button: ev.button,
+        button: "primary",
       });
     });
 
     cover.addEventListener("contextmenu", (ev) => {
       ev.preventDefault();
-      this.on_alternate.emit({
+      this.on_clicked.emit({
         location: this.location,
-        button: ev.button,
+        button: "alternate",
       });
     });
 
