@@ -51,7 +51,7 @@ Viewing and managing
 
 Screenshots and video recordings taken from games are stored locally in
 Kate and can be viewed from the **Media Gallery** application. You can
-access this application by holding down |btn_menu_text| and selecting
+access this application by pressing |btn_berry_text| and selecting
 **Media Gallery** (if you do so while running a cartridge, the gallery
 will be filtered to media you've captured from that cartridge).
 

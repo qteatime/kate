@@ -42,7 +42,11 @@ Handheld Mode
 This is the default case mode for the Kate emulator, but it's optimised for
 smartphones (and marginally for tablet devices). It includes virtual
 buttons on the sides and on the top, which can be pressed on a touch-capable
-device instead of requiring a physical gamepad or keyboard.
+device instead of requiring a physical gamepad or keyboard, and it tries to
+maximise the area used for the screen as much as possible. This is also why
+it uses a thumbstick instead of the usual D-Pad (you can hold the thumbstick
+and move it like you would a regular analog thumbstick, but without the
+nice physical feedback).
 
 In handheld mode the screen resolution is locked to 800x480. The recommended
 host device's resolution must be at least 1040x490 pixels to be able to house

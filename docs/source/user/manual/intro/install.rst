@@ -46,8 +46,9 @@ then put this file in your server.
 If you don't know how to run a web server, or would rather not manage a
 server on your own, but still want the added control and privacy of having
 your own Kate instance, services like Netlify or Digital Ocean's App Platform
-will let you upload a the zip file above and get a managed server for free
-(up to certain usage limits). Other similar managed services exist elsewhere.
+will let you upload the zip file above and get a managed server. Be sure to
+check their usage prices and compare before you sign up for anything.
+Other similar managed services exist elsewhere.
 
 .. important::
 
@@ -398,7 +399,7 @@ Compatibility matrix
 --------------------
 
 Web version
-'''''''''''
+"""""""""""
 
 We aim to support the latest version of all mainstream browsers. The
 web version of Kate has been tested and runs on the following browsers:
@@ -429,7 +430,7 @@ Installing the web app works in the following device/OSs:
 
 
 Native version
-''''''''''''''
+""""""""""""""
 
 The native version works on Windows 10+ (x64 and ARM64 architectures),
 and on Linux (x64, ARM64, and ARMv7L). It should work on MacOS (x64 and ARM64)
