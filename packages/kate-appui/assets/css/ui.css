@@ -102,58 +102,6 @@
   color: var(--color-text-muted);
 }
 
-.kate-ui-steps {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  padding: 2rem 0;
-  gap: 1rem;
-}
-
-.kate-ui-step-actions {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  padding: 0rem 8rem;
-  gap: 1rem;
-}
-
-.kate-ui-text-button {
-  padding: 1rem 2rem;
-  border: 1px solid var(--color-border-d1);
-  border-radius: 4px;
-  text-transform: uppercase;
-  font-weight: 500;
-}
-
-.kate-ui-step-view {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-  justify-content: center;
-  padding: 0 1rem;
-}
-
-.kate-ui-step-actions > * {
-  flex-basis: 33%;
-}
-
-.kate-ui-step-next {
-  display: flex;
-  justify-content: right;
-}
-
-.kate-ui-step-icon {
-  width: 8px;
-  height: 8px;
-  background: var(--color-black-l2);
-  border-radius: 100%;
-}
-
-.kate-ui-step-icon.active {
-  background: var(--color-primary);
-}
-
 .kate-ui-hbox {
   display: flex;
   flex-direction: row;
@@ -200,4 +148,12 @@
   padding: 0.5rem 3rem;
   font-weight: bold;
   text-transform: uppercase;
+}
+
+.kate-ui-text-button {
+  padding: 1rem 2rem;
+  border: 1px solid var(--color-border-d1);
+  border-radius: 4px;
+  text-transform: uppercase;
+  font-weight: 500;
 }

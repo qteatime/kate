@@ -1,3 +1,8 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
 @import url("./scroll-area.css");
 @import url("./cartridge-box.css");
 @import url("./title-bar.css");
@@ -14,3 +19,5 @@
 @import url("./select-panel.css");
 @import url("./horizontal-selection.css");
 @import url("./floating-button.css");
+@import url("./multistep.css");
+@import url("./select-list.css");

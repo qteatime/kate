@@ -66,6 +66,9 @@
   --color-dangerous: var(--color-strawberry-b);
   --color-dangerous-text: var(--color-white);
 
+  --color-steps-inactive: var(--color-licorice-d);
+  --color-steps-active: var(--color-strawberry-c);
+
   font-size: 16px;
   color: var(--color-text);
   font-family: var(--font-sans);
