@@ -147,6 +147,7 @@ export class KateDialog {
             }),
           ]),
         ]),
+        UI.h("div", { class: "kate-hud-virtual-keyboard-placeholder" }, []),
       ],
       null,
       "text-input"
