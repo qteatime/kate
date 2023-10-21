@@ -23,40 +23,52 @@ templates_path = ['_templates']
 exclude_patterns = []
 
 rst_epilog = """
-.. |btn_cancel| image:: /icons/cancel_24.png
+.. |btn_berry| image:: /icons/berry_32.png
+   :height: 1em
+   :alt: Berry button
+   :align: middle
+
+.. |btn_cancel| image:: /icons/cancel_32.png
    :height: 1em
    :alt: Cancel button (a.k.a. X)
    :align: middle
 
-.. |btn_capture| image:: /icons/capture_24.png
+.. |btn_capture| image:: /icons/capture_32.png
    :height: 1em
    :alt: Capture button
    :align: middle
 
-.. |btn_dpad| image:: /icons/dpad_24.png
+.. |btn_dpad| image:: /icons/dpad_32.png
    :height: 1em
    :alt: D-Pad
    :align: middle
 
-.. |btn_l| image:: /icons/l_24.png
+.. |btn_l| image:: /icons/l_32.png
    :height: 1em
-   :alt: Left trigger
+   :alt: Left shoulder button
    :align: middle
 
-.. |btn_menu| image:: /icons/menu_24.png
+.. |btn_menu| image:: /icons/menu_32.png
    :height: 1em
    :alt: Menu button
    :align: middle
 
-.. |btn_ok| image:: /icons/ok_24.png
+.. |btn_ok| image:: /icons/ok_32.png
    :height: 1em
    :alt: Ok button (a.k.a. O)
    :align: middle
 
-.. |btn_r| image:: /icons/r_24.png
+.. |btn_r| image:: /icons/r_32.png
    :height: 1em
-   :alt: Right trigger
+   :alt: Right shoulder button
    :align: middle
+
+.. |btn_sparkle| image:: /icons/sparkle_32.png
+   :height: 1em
+   :alt: Sparkle button
+   :align: middle
+
+.. |btn_berry_text| replace:: |btn_berry| *(Berry button)*
 
 .. |btn_menu_text| replace:: |btn_menu| *(Menu button)*
 
