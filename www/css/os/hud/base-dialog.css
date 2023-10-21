@@ -51,3 +51,16 @@
 .kate-hud-dialog-container > * {
   width: 100%;
 }
+
+.kate-hud-virtual-keyboard-placeholder {
+  display: block;
+  overflow: hidden;
+  flex-grow: 0;
+  flex-shrink: 1;
+  background: var(--color-border);
+  height: env(keyboard-inset-height, 0px);
+}
+
+.kate-ui-text-input-container {
+  max-height: 100%;
+}

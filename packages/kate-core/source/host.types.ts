@@ -14,6 +14,10 @@ declare global {
       lock(keyCodes: string[]): Promise<void>;
       unlock(): void;
     };
+
+    virtualKeyboard?: {
+      overlaysContent: boolean;
+    };
   }
 
   interface KeyboardLayoutMap {

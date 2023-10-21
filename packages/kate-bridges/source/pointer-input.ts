@@ -4,6 +4,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
+import type { PointerButton } from "../../kate-api/source/pointer-input";
+
 // This proxy translates Kate's pointer input API (mouse movement/click)
 // into regular web pointer events. You provide an element that will
 // receive the events.
@@ -29,6 +31,16 @@ void (function () {
   function do_monitor(element: HTMLElement) {
     const pointer = KateAPI.pointer_input;
     const bounds = element.getBoundingClientRect();
+    function to_button_id(button: PointerButton) {
+      switch (button) {
+        case "primary":
+          return 0;
+        case "alternate":
+          return 1;
+        default:
+          throw new Error(`invalid button ${button}`);
+      }
+    }
     function translate_location(ev: KateTypes.PointerLocation) {
       return {
         x: ev.x - bounds.x,
@@ -54,7 +66,7 @@ void (function () {
         screenY: loc.y,
         clientX: loc.x,
         clientY: loc.y,
-        button: ev0.button,
+        button: to_button_id(ev0.button),
       });
     }
 
@@ -76,11 +88,8 @@ void (function () {
     });
 
     pointer.on_clicked.listen((ev0) => {
-      element.dispatchEvent(make_press_event("click", ev0));
-    });
-
-    pointer.on_alternate.listen((ev0) => {
-      element.dispatchEvent(make_press_event("contextmenu", ev0));
+      const type = ev0.button === "primary" ? "click" : "contextmenu";
+      element.dispatchEvent(make_press_event(type, ev0));
     });
   }
 

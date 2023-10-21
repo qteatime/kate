@@ -43,6 +43,10 @@ async function main() {
     return null;
   });
 
+  if ("virtualKeyboard" in navigator && navigator.virtualKeyboard != null) {
+    navigator.virtualKeyboard.overlaysContent = true;
+  }
+
   // Run Kate
   const kate = Kate.kernel.KateKernel.from_root(document.querySelector(".kate-case")!, {
     mode: "web",
