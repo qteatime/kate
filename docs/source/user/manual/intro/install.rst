@@ -33,6 +33,7 @@ for the time needed to address security and debugging issues.
 
 The public instance has plans for maintenance for at least until 2028.
 
+.. _running your own kate instance:
 
 Running your own Kate instance
 """"""""""""""""""""""""""""""

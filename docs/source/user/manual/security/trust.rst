@@ -6,6 +6,8 @@ generally the case with dangerous or irreversible actions, such as
 deleting data from the database. But it might also arise from things
 like granting access to files or more storage space for a cartridge.
 
+
+
 When the emulator prompts you for consent in these cases, there will
 be a distinctive indicator (called the "Trust Frame") to show that the
 request is truly coming from the Kate emulator, and not from a malicious
