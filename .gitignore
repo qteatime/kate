@@ -35,3 +35,6 @@ tests/unit/test-assert.js
 /test-results
 packages/kate-appui/assets/img/buttons
 packages/kate-appui/www
+ecosystem/**/LICENCE.txt
+examples/**/LICENCE.txt
+packages/**/LICENCE.txt

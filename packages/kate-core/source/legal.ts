@@ -4,4 +4,4 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-export const notice = require("../LICENCES.txt!text") as string;
+export const notice = require("../LICENCE.txt!text") as string;

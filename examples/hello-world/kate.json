@@ -2,12 +2,12 @@
   "id": "qteati.me/hello-world",
   "version": {
     "major": 1,
-    "minor": 1
+    "minor": 2
   },
   "release": {
     "year": 2023,
-    "month": 2,
-    "day": 13
+    "month": 10,
+    "day": 19
   },
   "metadata": {
     "presentation": {
@@ -23,7 +23,7 @@
       "rating": "general"
     },
     "legal": {
-      "licence_path": "LICENCE",
+      "licence_path": "LICENCE.txt",
       "derivative_policy": "commercial-use"
     },
     "accessibility": {
@@ -43,7 +43,7 @@
   "security": {
     "capabilities": []
   },
-  "files": ["*.css", "*.js", "*.html", "thumbnail.png", "LICENCE"],
+  "files": ["*.css", "*.js", "*.html", "thumbnail.png", "LICENCE.txt"],
   "platform": {
     "type": "web-archive",
     "html": "index.html",

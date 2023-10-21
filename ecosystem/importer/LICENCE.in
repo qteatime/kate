@@ -1,0 +1,160 @@
+Copyright (c) 2023 Q.
+
+The Kate Importer is released under the terms of the Mozilla Public Licence,
+v. 2.0. A copy of the MPL is included in this file, but you can also obtain
+one at https://mozilla.org/MPL/2.0/.
+
+You may get a copy of the source code at https://github.com/qteatime/kate.
+Information on how to build the Kate Importer from the source code is also
+included there. Official releases will always be distributed at
+https://github.com/qteatime/kate, and you're encouraged to audit any
+modifications if you've got your copy of the Kate Importer cartridge elsewhere.
+
+There are other components that make up the Kate Importer project and which
+are available under different terms. Full text for all relevant licences is
+included here, after attributions, in the goal of making them offline-friendly.
+
+This software contains portions of code, fonts, images, and sounds by
+third-parties, specified below.
+
+-------------------------------------------------------------------------------
+
+## Fonts:
+
+Font Awesome 6 Free (c) 2023 Fonticons, Inc. (https://fontawesome.com)
+Licensed under the SIL Open Font License (font files),
+Creative Commons 4.0 Attribution International license (icons), and
+MIT (CSS source code).
+
+---
+
+Poppins (c) 2020 The Poppins Project Authors
+(https://github.com/itfoundry/Poppins)
+Licensed under the SIL Open Font License.
+
+---
+
+Roboto and Roboto Mono (c) Google
+(https://fonts.google.com/specimen/Roboto/about)
+Licensed under the Apache License 2.0.
+
+_______________________________________________________________________________
+
+## Themes
+
+The Candy Pop colour theme for Kate is based on a the Pollen8 palette
+by Conker (https://lospec.com/palette-list/pollen8)
+
+_______________________________________________________________________________
+
+## Code
+
+The Kate Importer also contains other components released under their own
+licence terms, including free software released under LGPL. These components
+are listed below:
+
+  - JSZip (MIT or GPL)
+  - Ren'Py (MIT)
+  - Python (Python License)
+  - Pygame_SDL2 (MIT license, GNU LGPL)
+  - SDL2 (Zlib License)
+  - SDL2_image (Zlib License)
+  - SDL2_ttf (Zlib License)
+  - Freetype (Zlib License)
+  - Fribidi (GNU LGPL)
+  - ffmpeg (GNU LGPL)
+  - libjpeg-turbo (GNU LGPL)
+  - libpng (PNG License)
+  - zlib (Zlib License)
+  - bzip2 (Bzip2 License)
+  - pyobjc (MIT License)
+  - GLEW (Modified BSD, MIT License)
+  - pyjnius (MIT License)
+  - ANGLE (Modified BSD License)
+  - requests (Apache License 2.0)
+  - certifi (Mozilla Public License 2.0)
+  - urllib3 (MIT License)
+  - chardet (GNU LGPL)
+  - libusb (GNU LGPL)
+  - tinyfiledialogs (Zlib License)
+
+For the purposes of LGPL compliance, all source code that Kate uses and
+depends on is located in one of the following repositories:
+
+https://github.com/renpy/renpy (Ren'Py)
+https://github.com/renpy/pygame_sdl2 (Pygame_SDL2)
+https://github.com/renpy/renpy-build (Ren'Py Dependencies)
+https://github.com/renpy/renpyweb (Ren'Py Web)
+https://github.com/qteatime/kate (Kate and Kate Importer)
+https://github.com/qteatime/jszip (JSZip)
+
+
+-------------------------------------------------------------------------------
+
+Full licence terms are provided below.
+
+-------------------------------------------------------------------------------
+
+## MIT licence
+
+{{support/licences/MIT.txt}}
+
+_______________________________________________________________________________
+
+## Python licence
+
+{{support/licences/Python.txt}}
+
+_______________________________________________________________________________
+
+## GNU LGPL
+
+{{support/licences/LGPL2.txt}}
+
+_______________________________________________________________________________
+
+## Zlib licence
+
+{{support/licences/Zlib.txt}}
+
+_______________________________________________________________________________
+
+## PNG licence
+
+{{support/licences/PNG.txt}}
+
+_______________________________________________________________________________
+
+## Bzip2 licence
+
+{{support/licences/Bzip2.txt}}
+
+_______________________________________________________________________________
+
+## Modified BSD licence
+
+{{support/licences/Modified-BSD.txt}}
+
+_______________________________________________________________________________
+
+## Apache 2.0 licence
+
+{{support/licences/Apache2.txt}}
+
+_______________________________________________________________________________
+
+## Mozilla Public Licence 2.0
+
+{{support/licences/MPL2.txt}}
+
+_______________________________________________________________________________
+
+## Creative Commons 4.0 Attribution International licence
+
+{{support/licences/CC4-BY.txt}}
+
+_______________________________________________________________________________
+
+## SIL Open Font Licence
+
+{{support/licences/SIL.txt}}

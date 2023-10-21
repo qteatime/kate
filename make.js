@@ -70,6 +70,12 @@ class Task {
   }
 }
 
+function kart_name(directory, name) {
+  const json = JSON.parse(FS.readFileSync(Path.join(directory, "kate.json"), "utf-8"));
+  const version = `${json.version.major}.${json.version.minor}`;
+  return Path.join(directory, `${name}-v${version}.kart`);
+}
+
 function exec(command, opts) {
   console.log("$>", command);
   execSync(command, { stdio: ["inherit", "inherit", "inherit"], ...opts });
@@ -211,13 +217,28 @@ function make_npm_package({ source, build }) {
   cp("package.json");
   mcp("package-lock.json");
   mcp("README.md");
-  copy("LICENCE", Path.join(to, "LICENCE"));
+  copy("LICENCE.txt", Path.join(to, "LICENCE.txt"));
   build({ from, to, copy: cp, maybe_copy: mcp, copy_tree: ct, glomp_deps });
   console.log("--> Dry-running npm-pack for", source);
   exec("npm pack --dry-run", { cwd: to });
 }
 
 const w = new World();
+
+// -- Licences
+w.task("licences:generate", [], () => {
+  for (const file of glob("**/LICENCE.in")) {
+    const target = Path.join(Path.dirname(file), "LICENCE.txt");
+    if (!FS.existsSync(target)) {
+      console.log("-> Generating", target);
+      let data = FS.readFileSync(file, "utf-8");
+      data = data.replace(/\{\{([^\}]+)\}\}/g, (_, path) => {
+        return FS.readFileSync(path, "utf-8");
+      });
+      FS.writeFileSync(target, data);
+    }
+  }
+});
 
 // -- Util
 w.task("util:compile", [], () => {
@@ -237,7 +258,7 @@ w.task("glomp:clean", [], () => {
   clean_build("packages/glomp");
 });
 
-w.task("glomp:make-npm-package", ["glomp:clean", "glomp:build"], () => {
+w.task("glomp:make-npm-package", ["licences:generate", "glomp:clean", "glomp:build"], () => {
   make_npm_package({
     source: "glomp",
     build: (b) => {
@@ -392,14 +413,14 @@ w.task("tools:build", ["tools:compile", "www:bundle"], () => {
     out: `packages/kate-tools/packaging/web/loader.js`,
     name: "Kate_single_loader",
   });
-  copy("packages/kate-core/LICENCES.txt", `packages/kate-tools/packaging/web/KATE-LICENCES.txt`);
+  copy("packages/kate-core/LICENCE.txt", `packages/kate-tools/packaging/web/KATE-LICENCE.txt`);
 });
 
 w.task("tools:clean", [], () => {
   clean_build("packages/kate-tools");
 });
 
-w.task("tools:make-npm-package", ["tools:clean", "tools:build"], () => {
+w.task("tools:make-npm-package", ["licences:generate", "tools:clean", "tools:build"], () => {
   make_npm_package({
     source: "kate-tools",
     build: (b) => {
@@ -413,7 +434,7 @@ w.task("tools:make-npm-package", ["tools:clean", "tools:build"], () => {
 });
 
 // -- WWW
-w.task("www:bundle", ["core:build", "glomp:build"], () => {
+w.task("www:bundle", ["licences:generate", "core:build", "glomp:build"], () => {
   glomp({
     entry: "packages/kate-core/build/index.js",
     out: `www/kate/kate-latest.js`,
@@ -438,27 +459,31 @@ w.task("www:generate-cache-manifest", [], () => {
 });
 
 // -- Examples
-w.task("example:hello-world", ["tools:build"], () => {
+w.task("example:hello-world", ["licences:generate", "tools:build"], () => {
   kart({
     config: "examples/hello-world/kate.json",
-    output: "examples/hello-world/hello.kart",
+    output: kart_name("examples/hello-world", "hello-world"),
   });
 });
 
-w.task("example:boon-scrolling", ["tools:build", "domui:build", "glomp:build"], () => {
-  tsc("examples/boon-scrolling");
-  glomp({
-    entry: "examples/boon-scrolling/build/index.js",
-    out: "examples/boon-scrolling/www/game.js",
-    name: "BoonScrolling",
-  });
-  kart({
-    config: "examples/boon-scrolling/kate.json",
-    output: "examples/boon-scrolling/boon-scrolling.kart",
-  });
-});
+w.task(
+  "example:boon-scrolling",
+  ["licences:generate", "tools:build", "domui:build", "glomp:build"],
+  () => {
+    tsc("examples/boon-scrolling");
+    glomp({
+      entry: "examples/boon-scrolling/build/index.js",
+      out: "examples/boon-scrolling/www/game.js",
+      name: "BoonScrolling",
+    });
+    kart({
+      config: "examples/boon-scrolling/kate.json",
+      output: kart_name("examples/boon-scrolling", "boon-scrolling"),
+    });
+  }
+);
 
-w.task("example:katchu", ["tools:build", "glomp:build"], () => {
+w.task("example:katchu", ["licences:generate", "tools:build", "glomp:build"], () => {
   tsc("examples/katchu");
   glomp({
     entry: "examples/katchu/build/index.js",
@@ -467,7 +492,7 @@ w.task("example:katchu", ["tools:build", "glomp:build"], () => {
   });
   kart({
     config: "examples/katchu/kate.json",
-    output: "examples/katchu/katchu.kart",
+    output: kart_name("examples/katchu", "katchu"),
   });
 });
 
@@ -478,21 +503,25 @@ w.task(
 );
 
 // -- Ecosystem
-w.task("ecosystem:importer", ["util:build", "tools:build", "appui:build", "glomp:build"], () => {
-  tsc("ecosystem/importer");
-  remove("ecosystem/importer/www", { recursive: true, force: true });
-  copy_tree("ecosystem/importer/assets", "ecosystem/importer/www");
-  glomp({
-    entry: "ecosystem/importer/build/index.js",
-    out: "ecosystem/importer/www/js/importer.js",
-    name: "KateImporter",
-  });
-  copy("packages/kate-appui/www/kate-appui.css", "ecosystem/importer/www/css/kate-appui.css");
-  kart({
-    config: "ecosystem/importer/kate.json",
-    output: "ecosystem/importer/kate-importer.kart",
-  });
-});
+w.task(
+  "ecosystem:importer",
+  ["licences:generate", "util:build", "tools:build", "appui:build", "glomp:build"],
+  () => {
+    tsc("ecosystem/importer");
+    remove("ecosystem/importer/www", { recursive: true, force: true });
+    copy_tree("ecosystem/importer/assets", "ecosystem/importer/www");
+    glomp({
+      entry: "ecosystem/importer/build/index.js",
+      out: "ecosystem/importer/www/js/importer.js",
+      name: "KateImporter",
+    });
+    copy("packages/kate-appui/www/kate-appui.css", "ecosystem/importer/www/css/kate-appui.css");
+    kart({
+      config: "ecosystem/importer/kate.json",
+      output: kart_name("ecosystem/importer", "kate-importer"),
+    });
+  }
+);
 
 w.task("ecosystem:all", ["ecosystem:importer"], () => {});
 

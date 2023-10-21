@@ -2,12 +2,12 @@
   "id": "qteati.me/katchu",
   "version": {
     "major": 1,
-    "minor": 1
+    "minor": 2
   },
   "release": {
     "year": 2023,
-    "month": 4,
-    "day": 7
+    "month": 10,
+    "day": 19
   },
   "metadata": {
     "presentation": {
@@ -23,7 +23,7 @@
       "rating": "general"
     },
     "legal": {
-      "licence_path": "LICENCE",
+      "licence_path": "LICENCE.txt",
       "derivative_policy": "commercial-use"
     },
     "accessibility": {
@@ -50,7 +50,7 @@
     "images/*.png",
     "audio/*.wav",
     "thumbnail.png",
-    "LICENCE"
+    "LICENCE.txt"
   ],
   "platform": {
     "type": "web-archive",
