@@ -258,7 +258,7 @@ w.task("glomp:clean", [], () => {
   clean_build("packages/glomp");
 });
 
-w.task("glomp:make-npm-package", ["licences:generate", "glomp:clean", "glomp:build"], () => {
+w.task("glomp:make-npm-package", ["licences:generate", "glomp:build"], () => {
   make_npm_package({
     source: "glomp",
     build: (b) => {
@@ -420,7 +420,7 @@ w.task("tools:clean", [], () => {
   clean_build("packages/kate-tools");
 });
 
-w.task("tools:make-npm-package", ["licences:generate", "tools:clean", "tools:build"], () => {
+w.task("tools:make-npm-package", ["licences:generate", "tools:build"], () => {
   make_npm_package({
     source: "kate-tools",
     build: (b) => {
@@ -570,6 +570,32 @@ w.task("chore:clean-tsc-cache", [], () => {
   }
 });
 
+w.task("chore:clean-artifacts", [], () => {
+  const packages = [
+    "ecosystem/importer",
+    "examples/boon-scrolling",
+    "examples/hello-world",
+    "examples/katchu",
+    "packages/db-schema",
+    "packages/glomp",
+    "packages/kate-api",
+    "packages/kate-appui",
+    "packages/kate-bridges",
+    "packages/kate-core",
+    "packages/kate-desktop",
+    "packages/kate-domui",
+    "packages/kate-tools",
+    "packages/ljt-vm",
+    "packages/schema",
+    "packages/util",
+  ];
+
+  for (const pkg of packages) {
+    console.log(`-> Removing artifacts in ${pkg}`);
+    clean_build(pkg);
+  }
+});
+
 w.task("chore:update-versions", [], () => {
   const version = require("./package.json").version;
   for (const pkg of ["kate-tools", "kate-core", "kate-desktop"]) {
@@ -604,29 +630,29 @@ w.task("docs:clean", [], async () => {
 w.task("docs:clean-build", ["docs:clean", "docs:build"], async () => {});
 
 // -- Generating releases
-w.task("release:win:x64", ["desktop:clean", "desktop:build"], async () => {
+w.task("release:win:x64", ["desktop:build"], async () => {
   await gen_build.gen_unsigned_zip("win32", "x64");
 });
 
-w.task("release:win:x86", ["desktop:clean", "desktop:build"], async () => {
+w.task("release:win:x86", ["desktop:build"], async () => {
   await gen_build.gen_unsigned_zip("win32", "ia32");
 });
 
-w.task("release:win:arm64", ["desktop:clean", "desktop:build"], async () => {
+w.task("release:win:arm64", ["desktop:build"], async () => {
   await gen_build.gen_unsigned_zip("win32", "arm64");
 });
 
 w.task("release:win:all", ["release:win:x64", "release:win:x86", "release:win:arm64"], () => {});
 
-w.task("release:linux:x64", ["desktop:clean", "desktop:build"], async () => {
+w.task("release:linux:x64", ["desktop:build"], async () => {
   await gen_build.gen_unsigned_zip("linux", "x64");
 });
 
-w.task("release:linux:armv7l", ["desktop:clean", "desktop:build"], async () => {
+w.task("release:linux:armv7l", ["desktop:build"], async () => {
   await gen_build.gen_unsigned_zip("linux", "armv7l");
 });
 
-w.task("release:linux:arm64", ["desktop:clean", "desktop:build"], async () => {
+w.task("release:linux:arm64", ["desktop:build"], async () => {
   await gen_build.gen_unsigned_zip("linux", "arm64");
 });
 
@@ -637,16 +663,18 @@ w.task(
 );
 
 w.task("release:cartridges", ["example:all", "ecosystem:all"], () => {
+  function copy_all(root) {
+    const files = glob("**/*.kart", { cwd: root });
+    for (const file of files) {
+      const target = Path.join("dist/cartridges", root, Path.basename(file));
+      FS.mkdirSync(Path.dirname(target), { recursive: true });
+      copy(Path.join(root, file), target);
+    }
+  }
+
   // Copy all cartridges
-  FS.mkdirSync("dist/cartridges/examples", { recursive: true });
-  copy(
-    "examples/boon-scrolling/boon-scrolling.kart",
-    "dist/cartridges/examples/boon-scrolling.kart"
-  );
-  copy("examples/hello-world/hello.kart", "dist/cartridges/examples/hello.kart");
-  copy("examples/katchu/katchu.kart", "dist/cartridges/examples/katchu.kart");
-  FS.mkdirSync("dist/cartridges/ecosystem", { recursive: true });
-  copy("ecosystem/importer/kate-importer.kart", "dist/cartridges/ecosystem/kate-importer.kart");
+  copy_all("examples");
+  copy_all("ecosystem");
 
   // Generate integrity hashes
   const files = glob("dist/cartridges/**/*.kart");
@@ -657,6 +685,12 @@ w.task("release:cartridges", ["example:all", "ecosystem:all"], () => {
   });
   FS.writeFileSync("dist/cartridges/SHASUM256.txt", hashes.join("\n") + "\n");
 });
+
+w.task(
+  "release:preview",
+  ["www:release", "release:cartridges", "tools:make-npm-package", "release:linux:all"],
+  () => {}
+);
 
 // -- Testing
 w.task("test:setup-playwright", [], () => {
