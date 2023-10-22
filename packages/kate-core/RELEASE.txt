@@ -54,6 +54,8 @@ cartridges to try stealing information by spoofing system dialogs.
 The trusted mode now shows up as a padlock in the resource indicators panel,
 on top of having the usual pastel pink background.
 
+PRs: #30
+
 
 Memory-friendly cartridge format
 --------------------------------
@@ -113,3 +115,6 @@ Minor bugfixes
 
   * Kate handles more types of gamepads now and has better primary gamepad
     behaviour (PRs: #23).
+
+  * Improved support for virtual keyboards in Kate's text input dialog
+    (PRs: #31).
