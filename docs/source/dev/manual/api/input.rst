@@ -152,6 +152,11 @@ Button            Identifier
 |btn_berry|       ``berry``
 ================  =====================================
 
+.. warning::
+
+  ``ltrigger`` and ``rtrigger`` will be renamed to ``l`` and ``r`` in the
+  next version and the current identifiers will be deprecated.
+
 |btn_berry| and |btn_capture| are special in that Kate distinguishes between
 a short and long press. This also means that state changes for these buttons
 is delayed until the player releases the button, so Kate can decide whether
