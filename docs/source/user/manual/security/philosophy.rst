@@ -227,7 +227,7 @@ indicator and immediately know that it's a Kate indicator, and not, possibly,
 an application trying to trick you with a very elaborate copy of what your
 Kate screen looks like.
 
-To that end Kate introduces the :doc:`Resource Indicator Band <indicators>`,
+To that end Kate introduces the :doc:`Resource Indicator Band <trust>`,
 which we discuss in more details in its specific section.
 
 
