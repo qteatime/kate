@@ -6,20 +6,33 @@ Kate is made possible thanks to the amazing work of other people
 shared under permissive licences. The software and assets that
 make up Kate are listed here.
 
-Kate's original source code is released under the :ref:`MIT licence`.
-This means that there's no charge to using Kate, and it also means
-that you can modify and share it without any limit. But you need to
-keep the licence terms and attribution with all copies you share.
 
-Likewise, there are no limits imposed on anything you make with
-(or from) Kate, granted you abide by the licence terms above.
+Kate's licence and your rights
+------------------------------
 
-Kate's original non-code assets, such as the illustration of the
-Kate mascot and virtual button icons, are released under the
-CC0 1.0 Universal Licence. This means that they're essentially
-in the public domain.
+Up until version 0.23.8, Kate was released under the MIT licence.
+But from 0.23.10 onwards, Kate is released under the terms of the
+Mozilla Public Licence, v2.0.  A copy of the MPL is included in this file,
+but you can also obtain one at https://mozilla.org/MPL/2.0/.
 
-Some of the UI sounds are currently generated with jsfxr.
+You can read the reasoning of this change in the
+`GitHub patch that introduced it <https://github.com/qteatime/kate/pull/22>`_,
+but the short version is that releasing it under the MPL allows better
+transparency (and consequently security and auditability) for players
+using modified versions of Kate.
+
+You may get a copy of the source code at https://github.com/qteatime/kate.
+Information on how to build Kate from the source code is also
+included there. Official releases will always be distributed at
+https://github.com/qteatime/kate, and you're encouraged to audit any
+modifications if you've got your copy of Kate elsewhere.
+
+There are other components that make up the Kate Importer project and which
+are available under different terms. Full text for all relevant licences is
+included here, after attributions, in the goal of making them offline-friendly.
+
+This software contains portions of code, fonts, images, and sounds by
+third-parties, specified below.
 
 Full text for all relevant licences are included here after
 attributions, in the goal of making them offline-friendly.
