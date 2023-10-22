@@ -33,9 +33,11 @@ As a developer, by making a game for Kate you get to:
   least offer an option to make a web export [#f1]_; and
 
 * Avoid having to optimise your asset sizes for streaming on the web,
-  so players don't have to wait a long time to start the game.
+  like you would with a regular web-based game. This means you can
+  have games with gigabytes in size that still start up instantly,
+  as all download is done upfront and the files are installed locally.
 
-On top of the APIs that are provided in the web platform, Kate adds its
+On top of the APIs that are provided in the web platform Kate adds its
 own game-specific APIs that have a baseline expectation among players.
 This means that you don't need to keep re-explaining yourself.
 
