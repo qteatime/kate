@@ -46,20 +46,41 @@ export class KatePointerInput {
     return { x: this.x, y: this.y };
   }
 
-  frames_pressed(button: number) {
-    return this._buttons.get(button) ?? 0;
+  private to_id(button: number): PointerButton {
+    return button === 0 ? "primary" : "alternate";
   }
 
-  is_pressed(button: number) {
-    return (this._buttons.get(button) ?? 0) > 0;
+  frames_pressed(button: PointerButton) {
+    switch (button) {
+      case "primary": {
+        return this._buttons.get(0) ?? 0;
+      }
+
+      case "alternate": {
+        let frames = 0;
+        for (const [index, pressed] of this._buttons) {
+          if (index > 0 && pressed > frames) {
+            frames = pressed;
+          }
+          if (index > 0 && frames === 0 && pressed < frames) {
+            frames = pressed;
+          }
+        }
+        return frames;
+      }
+    }
   }
 
-  is_just_pressed(button: number) {
-    return (this._buttons.get(button) ?? 0) === 1;
+  is_pressed(button: PointerButton) {
+    return this.frames_pressed(button) > 0;
   }
 
-  is_just_released(button: number) {
-    return (this._buttons.get(button) ?? 0) === -1;
+  is_just_pressed(button: PointerButton) {
+    return this.frames_pressed(button) === 1;
+  }
+
+  is_just_released(button: PointerButton) {
+    return this.frames_pressed(button) === -1;
   }
 
   monitor(cover: HTMLElement) {
@@ -69,15 +90,6 @@ export class KatePointerInput {
 
     this._started = true;
 
-    function to_button(id: number): PointerButton {
-      switch (id) {
-        case 0:
-          return "primary";
-        default:
-          return "alternate";
-      }
-    }
-
     cover.addEventListener("mousemove", (ev) => {
       this._location.x = ev.pageX;
       this._location.y = ev.pageY;
@@ -85,18 +97,20 @@ export class KatePointerInput {
     });
 
     cover.addEventListener("mousedown", (ev) => {
+      const button = this.to_id(ev.button);
       this._buttons.set(ev.button, 1);
       this.on_down.emit({
         location: this.location,
-        button: to_button(ev.button),
+        button: button,
       });
     });
 
     cover.addEventListener("mouseup", (ev) => {
+      const button = this.to_id(ev.button);
       this._buttons.set(ev.button, -1);
       this.on_up.emit({
         location: this.location,
-        button: to_button(ev.button),
+        button: button,
       });
     });
 
