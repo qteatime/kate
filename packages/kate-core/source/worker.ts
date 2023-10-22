@@ -8,7 +8,7 @@ interface ExtendableEvent extends Event {
   waitUntil(promise: Promise<any>): void;
 }
 
-const cache_name = "kate-cache-v4";
+const cache_name = "kate-cache-v5";
 
 async function remove_old_caches() {
   for (const key of await caches.keys()) {
