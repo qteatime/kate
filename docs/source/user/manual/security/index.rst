@@ -16,5 +16,4 @@ details. It's focused on players' feelings of safety and material harm.
    sandboxing
    privacy
    trust
-   indicators
    audit

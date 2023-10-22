@@ -16,7 +16,7 @@ receive your computer's IP address. (since it
 has to know where to send a reply back to—this happens for any website).
 An IP address may provide to the server a rough estimate of your physical
 location (e.g.: the country you're accessing the website from). The browser
-also sends some information about your device to the server which will
+also sends some information about your device to the server which
 may disclose your operating system, browser version, and other technical
 details.
 
@@ -32,14 +32,14 @@ receive back malicious code that would have access to all data in your
 Kate's database (but not other data in your device!).
 
 Barring major crisis, Kate's public instance has a solid maintenance
-plan until at least 2028. For archival uses, you should rather consider
+plan until 2028. For archival purposes you should rather consider
 :ref:`running your own Kate instance` or using the :ref:`native application`.
 
 
 Running Kate offline
 --------------------
 
-If you install Kate web application from the public instance, but run it
+If you install the Kate web application from the public instance, but run it
 without any network access, then no data leaves your computer as the files
 are all loaded from your device's local cache. Do note that if you run it
 with a network connection, then your browser may make a network connection
@@ -71,6 +71,11 @@ Information stored locally includes:
    played them. You can choose to not have this data collected under
    ``Settings -> Play habits``. You can also delete any previously collected
    data (all of it, or for specific cartridges) from the same screen.
+
+**Audit log**
+   This includes things like what cartridges were installed, what permissions
+   were granted, and similar changes to Kate's database. Logs are subject to
+   the retention you specify in ``Settings -> Audit log``.
 
 You can erase all data Kate has stored locally and reset the console by going
 to ``Settings -> Diagnostics & Recovery`` and using the ``Delete all data``

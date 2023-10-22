@@ -107,15 +107,15 @@ All of the configuration below has to be done in the Deck's desktop mode.
   shortcuts for installed PWAs created directly.
 
   To address this you can either give Chrome access to write files in the
-  `~/.local/share/applications` and `~/.local/share/icons` directories:
+  ``~/.local/share/applications`` and ``~/.local/share/icons`` directories:
 
-  ```shell
-  $ flatpak override --user --filesystem=~/.local/share/applications:create com.google.Chrome
-  $ flatpak override --user --filesystem=~/.local/share/icons:create com.google.Chrome
-  ```
+  .. code-block:: shell
+
+    $ flatpak override --user --filesystem=~/.local/share/applications:create com.google.Chrome
+    $ flatpak override --user --filesystem=~/.local/share/icons:create com.google.Chrome
 
   Or you can create the ``.desktop`` file for your PWA manually in
-  ``~/.local/share/applications``. For example, creating a ``Kate.desktop``
+  ``~/.local/share/applications```. For example, creating a ``Kate.desktop``
   file in that folder with a text editor, you can have it look like the
   following:
 
@@ -143,9 +143,9 @@ All of the configuration below has to be done in the Deck's desktop mode.
   Since Steam Deck is a fairly specific device with a fairly specific OS,
   you can give Chrome read-only access to it to get the gamepad working.
 
-  ```shell
-  $ flatpak --override --user --filesystem=/run/udev:ro com.google.Chrome
-  ```
+  .. code-block:: shell
+
+    $ flatpak --override --user --filesystem=/run/udev:ro com.google.Chrome
 
 **Add Kate to your library as a non-Steam game:**
   To launch Kate from the Deck's gaming mode you'll need to add it to your
@@ -153,7 +153,7 @@ All of the configuration below has to be done in the Deck's desktop mode.
   desktop mode, then in the bottom left click "Add a Game", and select
   "Add a Non-Steam Game".
 
-  From the list that opens search for `Kate` (or the name you gave it if
+  From the list that opens search for ``Kate`` (or the name you gave it if
   you wrote your own ``.desktop`` file), check the checkbox beside the name,
   and click "Add selected Programs".
 

@@ -72,6 +72,10 @@ To this end Kate places all these different components in a different
 sandbox to make sure that, even if one of the components has a bug or is
 faulty in some way, it cannot compromise the entire system, only itself.
 
+.. note::
+
+  Component sandboxing is not fully implemented yet.
+
 
 .. _process sandboxing:
 
