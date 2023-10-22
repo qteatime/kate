@@ -526,7 +526,11 @@ w.task(
 w.task("ecosystem:all", ["ecosystem:importer"], () => {});
 
 // -- Desktop app
-w.task("desktop:compile", [], () => {
+w.task("desktop:setup", [], () => {
+  copy("node_modules/electron/electron.d.ts", "packages/kate-desktop/source/electron.d.ts");
+});
+
+w.task("desktop:compile", ["desktop:setup"], () => {
   tsc("packages/kate-desktop");
 });
 
@@ -689,7 +693,15 @@ w.task("release:cartridges", ["example:all", "ecosystem:all"], () => {
 w.task(
   "release:preview",
   ["www:release", "release:cartridges", "tools:make-npm-package", "release:linux:all"],
-  () => {}
+  () => {
+    const version = require("./package.json").version;
+    if (!/^\d+\.\d+\.\d+$/.test(version)) {
+      throw new Error(`invalid kate version: ${version}`);
+    }
+    copy_tree("www", "dist/www");
+    exec(`zip -r ../kate-www-v${version}.zip *`, { cwd: "dist/www" });
+    exec(`zip -r ../standard-cartridges-v${version}.zip *`, { cwd: "dist/cartridges" });
+  }
 );
 
 // -- Testing

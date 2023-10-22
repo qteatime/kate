@@ -13,7 +13,10 @@ const Streams = require("stream/promises");
 const Crypto = require("crypto");
 const electron_checksum = require("./electron-checksum");
 
-const version = "v27.0.2";
+const version = require("../package.json").devDependencies.electron;
+if (!/^\d+\.\d+\.\d+$/.test(version)) {
+  throw new Error(`Invalid version for electron: ${version}`);
+}
 
 function fetch(url) {
   return new Promise((resolve, reject) => {
