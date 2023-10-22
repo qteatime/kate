@@ -69,6 +69,20 @@ Code dependencies
         | Copyright (c) 2009-2023 Isaac Z. Schlueter and Contributors
         | ISC licence
 
+**Kate Importer**
+  The Kate Importer cartridge uses:
+
+  * `Ren'Py <https://www.renpy.org/>`_
+      | Copyright (c) Tom Rothamel and Contributors
+      | Largely MIT licensed
+      | (Ren'Py includes dependencies under other licences as well.
+        The `Ren'Py licence page <https://www.renpy.org/doc/html/license.html>`_
+        includes all details)
+
+  * `JSZip <https://github.com/Stuk/jszip>`_
+      | Copyright (c) 2009-2016 Stuart Knightley, David Duponchel, Franz Buchinger, António Afonso
+      | Dual licensed under MIT or GPLv3.
+
 **Kate Native**
    The Kate Native application uses:
 
@@ -96,28 +110,28 @@ SIL Open Font License
 This license is copied below, and is also available with a FAQ at:
 http://scripts.sil.org/OFL
 
-.. include:: licences/sil.txt
+.. include:: ../../../support/licences/SIL.txt
    :literal:
 
 
 Apache License 2.0
 ''''''''''''''''''
 
-.. include:: licences/apache.txt
+.. include:: ../../../support/licences/Apache2.txt
    :literal:
 
 
 Creative Commons 4.0 Attribution International
 ''''''''''''''''''''''''''''''''''''''''''''''
 
-.. include:: licences/cc4.txt
+.. include:: ../../../support/licences/CC4-BY.txt
    :literal:
 
 
 CC0 1.0 Universal Licence
 '''''''''''''''''''''''''
 
-.. include:: licences/cc0.txt
+.. include:: ../../../support/licences/CC0.txt
    :literal:
 
 
@@ -126,12 +140,18 @@ CC0 1.0 Universal Licence
 MIT licence
 '''''''''''
 
-.. include:: licences/mit.txt
+.. include:: ../../../support/licences/MIT.txt
    :literal:
 
 
 ISC licence
 '''''''''''
 
-.. include:: licences/isc.txt
+.. include:: ../../../support/licences/ISC.txt
    :literal:
+
+Mozilla Public Licence v2.0
+'''''''''''''''''''''''''''
+
+.. include:: ../../../support/licences/MPL2.txt
+  :literal:
