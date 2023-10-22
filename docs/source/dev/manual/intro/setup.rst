@@ -5,23 +5,25 @@ Installing the emulator
 -----------------------
 
 To run games in Kate you'll need an emulator. The recommended way of testing
-the games is to use the web-based emulator, which you can open in a modern
+the games is to use the web-based emulator. The Kate developers maintain a
+public instance of Kate on the internet, which you can open in a modern
 browser by accessing https://kate.qteati.me
 
 The :doc:`intallation instructions section </user/manual/intro/install>` goes
 into more details about what browsers are supported, specific instructions
-for platforms like Steam Deck, and alternative installation options.
+for platforms like Steam Deck, and alternative installation options, including
+running your own Kate web emulator instance.
 
 
 Installing the developer tools
 ------------------------------
 
-The tools used for developing Kate games require `Node.js <https://nodejs.org/en>` [#f1]_
+The tools used for developing Kate games require `Node.js <https://nodejs.org/en>`_ [#f1]_
 to be installed, so you'll need a device capable of installing it. Node.js
 supports Windows, MacOS, and Linux.
 
 You'll also need to be familiar with the :term:`command line`, and with the
-`basics of web development <https://developer.mozilla.org/en-US/docs/Learn>`.
+`basics of web development <https://developer.mozilla.org/en-US/docs/Learn>`_.
 
 Once you have Node.js installed, you can install all tools necessary for
 building Kate games from the command line:
@@ -37,7 +39,8 @@ building Kate games from the command line:
    regular user, not with the administrator account. You should not type
    the ``$`` when running these commands.
 
-   No part of Kate (and its tools) require administrator privileges, and
+   With the exception of the native Kate OS for Raspberry Pi, no part of
+   Kate (and its tools) requires administrator privileges, and
    they never will.
 
 After running this command you should have two new applications available

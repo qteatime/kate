@@ -25,19 +25,11 @@ emulator, there are two ways you can install a cartridge:
    In a laptop or desktop computer, you can drag-and-drop one or more
    ``.kart`` files directly onto the console to install them.
 
-   .. raw:: html
-
-      <video src="../../../_static/video/kate-dnd.webm" controls>
-
 
 **Use the "Install cartridge" button**
-   From the Start screen in Kate, you can hold down |btn_menu_text| and
-   select ``Install cartridge``. This will open a file picker so you can
+   From the Start screen in Kate, you can press |btn_berry_text| and
+   select ``Install cartridge``. This will open a file picker where you can
    select the ``.kart`` files that you want to install.
-
-   .. raw:: html
-
-      <video src="../../../_static/video/kate-install-cartridge.webm" controls>
 
 
 Your library
@@ -83,9 +75,10 @@ cannot access data on your device or use the internet in any way. By
 sandboxing all cartridges Kate greatly limits the possible impacts to
 your device or data, even if you end up running a malicious cartridge.
 
-In the future, cartridges will be able to request special permissions
-to do things with your device or data, which puts you in control of what
-you're comfortable or not in letting the cartridge do.
+Cartridges that need more privileges can request special permissions
+to do things with your device or data. This puts you in control of what
+you're comfortable or not in letting the cartridge do, just like in mobile
+phone OSs.
 
 Details are discussed in the
 :doc:`Security and Privacy <../security/index>` section.
@@ -97,35 +90,9 @@ Credits and licences
 Each Kate cartridge contains, embedded within it, the way the cartridge
 is licensed to you—how the developers expect you to use the cartridge.
 You can read the licence text by pressing |btn_menu_text| in the library and
-choosing ``Legal notices``. Or holding down |btn_menu_text| while running a
+choosing ``Legal notices``. Or pressing |btn_berry_text| while running a
 cartridge and selecting ``Legal notices``.
 
-There are three portions to this screen:
-
-**The specific licence the cartridge uses**
-   Games may be released under open-source permissive licences, such
-   as `Creative Commons <https://creativecommons.org/>`_, or they may
-   be released under proprietary, restricted licences. Unless otherwise
-   stated, the cartridge contents belongs to its original developers,
-   and it is they who decide in what ways you can engage with the
-   cartridge.
-
-**The cartridge allowances**
-   Kate has a philosophy of giving players control over how they run
-   their games. This is very important from an accessibility perspective,
-   as players with particular accessibility needs **may have to** modify
-   the cartridge in ways the original developer did not intend to be able
-   to play it at all.
-
-   The allowances section of the cartridge's licence summarises these
-   allowances, so you can make your changes while staying compliant and
-   respectful of the developer's wishes.
-
-**The licence text**
-   This is the full licence text that developers may include in their
-   cartridge. The text is legally binding, whereas the other sections
-   of the cartridge's legal notices are just informative summaries.
-
-   This text often contains the full game credits, as well as legal
-   notices of any third-party software/assets that the cartridge
-   includes.
+Cartridges that have use the internet or link to an internet location in
+any way also include a privacy policy, which you can find in the same menu
+the legal notices are available.

@@ -1,14 +1,14 @@
 Sandboxing
 ==========
 
-In order to protect your security and privacy, Kate assumes that all
-cartridges you run are potentially malicious and preemptively limits
+In order to protect your security and privacy Kate assumes that all
+cartridges you run are potentially malicious, and preemptively limits
 what they can do. This way, if that assumption ever turns out to be
 true, the cartridge is very unlikely to be able to do any real damage
 anyway.
 
 This technique of limiting programs is called :term:`sandboxing`. The
-cartridge runs with very restricted permissions, so you always know
+cartridge runs with very restricted permissions so you always know
 what you can expect from it, and it's easier to assess the risks of
 running something.
 
@@ -33,10 +33,10 @@ by default, cartridges in Kate can do exactly six things:
 Cartridges cannot access the internet, they cannot access your camera, or
 your microphone, or your location, or any other feature your device happens
 to have. These restrictions are enforced for both security and privacy.
-Without them, there's not much damage a cartridge can do, even if it turns
+Without them there's not much damage a cartridge can do, even if it turns
 out to be malicious.
 
-By doing this, Kate makes it possible for you to download any ``.kart`` file,
+By doing this Kate makes it possible for you to download any ``.kart`` file,
 from anywhere, install it in the emulator, and play the game without having
 to be as careful as with native executables. This sandbox is about
 mitigating any possible damage (and all material damage), rather than
@@ -58,11 +58,11 @@ to be subject to different levels of scrutinity when it comes to security.
 We can only guarantee that the cartridge sandboxing truly protects you if
 Kate works correctly, after all.
 
-Even though Kate is made out of several components, there's only one that
+Even though Kate is made out of several components there's only one that
 needs heavy scrutinity to guarantee our security promises: the Kate Kernel.
 This component is at the core of Kate, and it's what handles all cartridge
 sandboxing and general data management in Kate. Bugs in the Kate Kernel are
-extremely dangerous, as they can break all Kate's security promises.
+extremely dangerous as they can break all of Kate's security promises.
 
 However, bugs in other components of Kate should not be as dangerous. A bug
 in the media gallery should *not* cause the cartridge sandboxing to stop
@@ -71,6 +71,10 @@ working—and if it does, Kate has failed as a secure software project.
 To this end Kate places all these different components in a different
 sandbox to make sure that, even if one of the components has a bug or is
 faulty in some way, it cannot compromise the entire system, only itself.
+
+.. note::
+
+  Component sandboxing is not fully implemented yet.
 
 
 .. _process sandboxing:
@@ -110,7 +114,7 @@ addresses this increase, again, with sandboxing. The native process
 has unrestricted access to your device, but it only exposes harmless
 features to the other Kate processes. That way, a bug in one of the
 non-native Kate process (or a malicious cartridge running in Kate)
-can't gain further access to your device through the native process'
+cannot gain further access to your device through the native process'
 capabilities.
 
 Bugs in the native process itself are still dangerous, however, because
@@ -126,10 +130,10 @@ OSs do less well here as sandboxing is often not backwards compatible with
 legacy applications.
 
 Kate's native executable version is not currently sandboxed, but there are
-plans to only ship native executables that work with the OS native sandbox.
+plans to ship native executables that work with the OS native sandbox.
 This means that, on Windows, the Kate native executable would be distributed
 as a Windows Store application with limited capabilities. On Linux (and Steam OS)
 we're looking into distributing Kate's native executable using
-`Flatpak <https://flatpak.org/>`_ and `Snap <https://snapcraft.io/>`_, which
-both add OS-level sandboxing to Linux, and thus limit any damage the
+`Flatpak <https://flatpak.org/>`_ and `Snap <https://snapcraft.io/>`_, both of
+which add OS-level sandboxing to Linux and thus limit any damage the
 native process could cause.

@@ -48,8 +48,10 @@ To specify your own mapping, you'd write this bridge configuration as follows:
           "left": "ArrowLeft",
           "x": "Escape",
           "o": "Enter",
+          "sparkle": "KeyC",
           "menu": "ShiftLeft",
           "capture": "ControlLeft",
+          "berry": "KeyQ",
           "l": "PageUp",
           "r": "PageDown"
         }
@@ -72,8 +74,10 @@ Button         Keyboard key
 |btn_dpad|     Arrow keys
 |btn_cancel|   Escape
 |btn_ok|       Enter
+|btn_sparkle|  C
 |btn_menu|     Left Shift
 |btn_capture|  Left Control
+|btn_berry|    Q
 |btn_l|        Page Up
 |btn_r|        Page Down
 ============== ===============================
@@ -87,8 +91,10 @@ Button         Keyboard key
 |btn_dpad|     Arrow keys
 |btn_cancel|   X
 |btn_ok|       Z
+|btn_sparkle|  C
 |btn_menu|     Left Shift
-|btn_capture|  C
+|btn_berry|    Q
+|btn_capture|  F
 |btn_l|        A
 |btn_r|        S
 ============== ===============================

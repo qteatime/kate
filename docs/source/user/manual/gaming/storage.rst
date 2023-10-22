@@ -122,7 +122,7 @@ in the resource indicator bar.
 .. important::
 
    This space is not necessarily the amount of space you have remaining
-   in your device, if you're running Kate from a web browser. That's because
+   in your device if you're running Kate from a web browser. That's because
    web browsers define a smaller storage quota to ensure web pages won't
    negatively affect your device's performance.
    

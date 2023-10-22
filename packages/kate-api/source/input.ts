@@ -39,6 +39,8 @@ export class KateInput {
     capture: 0,
     x: 0,
     o: 0,
+    sparkle: 0,
+    berry: 0,
     ltrigger: 0,
     rtrigger: 0,
   });
