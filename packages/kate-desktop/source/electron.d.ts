@@ -1,4 +1,4 @@
-// Type definitions for Electron 26.3.0
+// Type definitions for Electron 27.0.2
 // Project: http://electronjs.org/
 // Definitions by: The Electron Team <https://github.com/electron/electron>
 // Definitions: https://github.com/electron/typescript-definitions
@@ -568,9 +568,9 @@ declare namespace Electron {
      * `CFBundleURLTypes` key, and set `NSPrincipalClass` to `AtomApplication`.
      *
      * As with the `open-file` event, be sure to register a listener for the `open-url`
-     * event early in your application startup to detect if the the application being
-     * is being opened to handle a URL. If you register the listener in response to a
-     * `ready` event, you'll miss URLs that trigger the launch of your application.
+     * event early in your application startup to detect if the application is being
+     * opened to handle a URL. If you register the listener in response to a `ready`
+     * event, you'll miss URLs that trigger the launch of your application.
      *
      * @platform darwin
      */
@@ -1607,6 +1607,9 @@ declare namespace Electron {
      *
      * **Note:** Unity launcher requires a `.desktop` file to work. For more
      * information, please read the Unity integration documentation.
+     *
+     * **Note:** On macOS, you need to ensure that your application has the permission
+     * to display notifications for this method to work.
      *
      * @platform linux,darwin
      */
@@ -2684,8 +2687,9 @@ declare namespace Electron {
      */
     getBrowserView(): BrowserView | null;
     /**
-     * an array of all BrowserViews that have been attached with `addBrowserView` or
-     * `setBrowserView`.
+     * a sorted by z-index array of all BrowserViews that have been attached with
+     * `addBrowserView` or `setBrowserView`. The top-most BrowserView is the last
+     * element of the array.
      *
      * **Note:** The BrowserView API is currently experimental and may change or be
      * removed in future Electron releases.
@@ -3487,24 +3491,16 @@ declare namespace Electron {
      * Adds a vibrancy effect to the browser window. Passing `null` or an empty string
      * will remove the vibrancy effect on the window.
      *
-     * Note that `appearance-based`, `light`, `dark`, `medium-light`, and `ultra-dark`
-     * have been deprecated and will be removed in an upcoming version of macOS.
-     *
      * @platform darwin
      */
     setVibrancy(
       type:
         | (
-            | "appearance-based"
-            | "light"
-            | "dark"
             | "titlebar"
             | "selection"
             | "menu"
             | "popover"
             | "sidebar"
-            | "medium-light"
-            | "ultra-dark"
             | "header"
             | "sheet"
             | "window"
@@ -3542,6 +3538,12 @@ declare namespace Electron {
      * Shows and gives focus to the window.
      */
     show(): void;
+    /**
+     * Shows or hides the tab overview when native tabs are enabled.
+     *
+     * @platform darwin
+     */
+    showAllTabs(): void;
     /**
      * Same as `webContents.showDefinitionForSelection()`.
      *
@@ -3696,6 +3698,13 @@ declare namespace Electron {
      * fullscreen mode.
      */
     simpleFullScreen: boolean;
+    /**
+     * A `string` (optional) property that is equal to the `tabbingIdentifier` passed
+     * to the `BrowserWindow` constructor or `undefined` if none was set.
+     *
+     * @platform darwin
+     */
+    readonly tabbingIdentifier?: string;
     /**
      * A `string` property that determines the title of the native window.
      *
@@ -3981,25 +3990,19 @@ declare namespace Electron {
     useContentSize?: boolean;
     /**
      * Add a type of vibrancy effect to the window, only on macOS. Can be
-     * `appearance-based`, `light`, `dark`, `titlebar`, `selection`, `menu`, `popover`,
-     * `sidebar`, `medium-light`, `ultra-dark`, `header`, `sheet`, `window`, `hud`,
-     * `fullscreen-ui`, `tooltip`, `content`, `under-window`, or `under-page`. Please
-     * note that `appearance-based`, `light`, `dark`, `medium-light`, and `ultra-dark`
-     * are deprecated and have been removed in macOS Catalina (10.15).
+     * `appearance-based`, `titlebar`, `selection`, `menu`, `popover`, `sidebar`,
+     * `header`, `sheet`, `window`, `hud`, `fullscreen-ui`, `tooltip`, `content`,
+     * `under-window`, or `under-page`.
      *
      * @platform darwin
      */
     vibrancy?:
       | "appearance-based"
-      | "light"
-      | "dark"
       | "titlebar"
       | "selection"
       | "menu"
       | "popover"
       | "sidebar"
-      | "medium-light"
-      | "ultra-dark"
       | "header"
       | "sheet"
       | "window"
@@ -6440,6 +6443,8 @@ declare namespace Electron {
     sendSync(channel: string, ...args: any[]): any;
     /**
      * Sends a message to a window with `webContentsId` via `channel`.
+     *
+     * @deprecated
      */
     sendTo(webContentsId: number, channel: string, ...args: any[]): void;
     /**
@@ -6466,12 +6471,16 @@ declare namespace Electron {
      * ipcRenderer.sendTo for more information. This only applies to messages sent from
      * a different renderer. Messages sent directly from the main process set
      * `event.senderId` to `0`.
+     *
+     * @deprecated
      */
     senderId: number;
     /**
      * Whether the message sent via ipcRenderer.sendTo was sent by the main frame. This
      * is relevant when `nodeIntegrationInSubFrames` is enabled in the originating
      * `webContents`.
+     *
+     * @deprecated
      */
     senderIsMainFrame?: boolean;
   }
@@ -6783,7 +6792,7 @@ declare namespace Electron {
      * `about`, `services`, `hide`, `hideOthers`, `unhide`, `quit`, `startSpeaking`,
      * `stopSpeaking`, `zoom`, `front`, `appMenu`, `fileMenu`, `editMenu`, `viewMenu`,
      * `shareMenu`, `recentDocuments`, `toggleTabBar`, `selectNextTab`,
-     * `selectPreviousTab`, `mergeAllWindows`, `clearRecentDocuments`,
+     * `selectPreviousTab`, `showAllTabs`, `mergeAllWindows`, `clearRecentDocuments`,
      * `moveTabToNewWindow` or `windowMenu`
      */
     role?:
@@ -6826,6 +6835,7 @@ declare namespace Electron {
       | "toggleTabBar"
       | "selectNextTab"
       | "selectPreviousTab"
+      | "showAllTabs"
       | "mergeAllWindows"
       | "clearRecentDocuments"
       | "moveTabToNewWindow"
@@ -7377,6 +7387,13 @@ declare namespace Electron {
      *
      * This event is not guaranteed to be emitted in all cases where the notification
      * is closed.
+     *
+     * On Windows, the `close` event can be emitted in one of three ways: programmatic
+     * dismissal with `notification.close()`, by the user closing the notification, or
+     * via system timeout. If a notification is in the Action Center after the initial
+     * `close` event is emitted, a call to `notification.close()` will remove the
+     * notification from the action center but the `close` event will not be emitted
+     * again.
      */
     on(event: "close", listener: (event: Event) => void): this;
     once(event: "close", listener: (event: Event) => void): this;
@@ -7493,6 +7510,12 @@ declare namespace Electron {
     static isSupported(): boolean;
     /**
      * Dismisses the notification.
+     *
+     * On Windows, calling `notification.close()` while the notification is visible on
+     * screen will dismiss the notification and remove it from the Action Center. If
+     * `notification.close()` is called after the notification is no longer visible on
+     * screen, calling `notification.close()` will try remove it from the Action
+     * Center.
      */
     close(): void;
     /**
@@ -7970,14 +7993,6 @@ declare namespace Electron {
   interface Product {
     // Docs: https://electronjs.org/docs/api/structures/product
 
-    /**
-     * The total size of the content, in bytes.
-     */
-    contentLengths: number[];
-    /**
-     * A string that identifies the version of the content.
-     */
-    contentVersion: string;
     /**
      * 3 character code presenting a product's currency based on the ISO 4217 standard.
      */
@@ -10346,102 +10361,6 @@ declare namespace Electron {
     addListener(event: "color-changed", listener: (event: Event) => void): this;
     removeListener(event: "color-changed", listener: (event: Event) => void): this;
     /**
-     * **Deprecated:** Should use the new `updated` event on the `nativeTheme` module.
-     *
-     * @deprecated
-     * @platform win32
-     */
-    on(
-      event: "high-contrast-color-scheme-changed",
-      listener: (
-        event: Event,
-        /**
-         * `true` if a high contrast theme is being used, `false` otherwise.
-         */
-        highContrastColorScheme: boolean
-      ) => void
-    ): this;
-    once(
-      event: "high-contrast-color-scheme-changed",
-      listener: (
-        event: Event,
-        /**
-         * `true` if a high contrast theme is being used, `false` otherwise.
-         */
-        highContrastColorScheme: boolean
-      ) => void
-    ): this;
-    addListener(
-      event: "high-contrast-color-scheme-changed",
-      listener: (
-        event: Event,
-        /**
-         * `true` if a high contrast theme is being used, `false` otherwise.
-         */
-        highContrastColorScheme: boolean
-      ) => void
-    ): this;
-    removeListener(
-      event: "high-contrast-color-scheme-changed",
-      listener: (
-        event: Event,
-        /**
-         * `true` if a high contrast theme is being used, `false` otherwise.
-         */
-        highContrastColorScheme: boolean
-      ) => void
-    ): this;
-    /**
-     * **Deprecated:** Should use the new `updated` event on the `nativeTheme` module.
-     *
-     * @deprecated
-     * @platform win32
-     */
-    on(
-      event: "inverted-color-scheme-changed",
-      listener: (
-        event: Event,
-        /**
-         * `true` if an inverted color scheme (a high contrast color scheme with light text
-         * and dark backgrounds) is being used, `false` otherwise.
-         */
-        invertedColorScheme: boolean
-      ) => void
-    ): this;
-    once(
-      event: "inverted-color-scheme-changed",
-      listener: (
-        event: Event,
-        /**
-         * `true` if an inverted color scheme (a high contrast color scheme with light text
-         * and dark backgrounds) is being used, `false` otherwise.
-         */
-        invertedColorScheme: boolean
-      ) => void
-    ): this;
-    addListener(
-      event: "inverted-color-scheme-changed",
-      listener: (
-        event: Event,
-        /**
-         * `true` if an inverted color scheme (a high contrast color scheme with light text
-         * and dark backgrounds) is being used, `false` otherwise.
-         */
-        invertedColorScheme: boolean
-      ) => void
-    ): this;
-    removeListener(
-      event: "inverted-color-scheme-changed",
-      listener: (
-        event: Event,
-        /**
-         * `true` if an inverted color scheme (a high contrast color scheme with light text
-         * and dark backgrounds) is being used, `false` otherwise.
-         */
-        invertedColorScheme: boolean
-      ) => void
-    ): this;
-    /**
      * A promise that resolves with `true` if consent was granted and `false` if it was
      * denied. If an invalid `mediaType` is passed, the promise will be rejected. If an
      * access request was denied and later is changed through the System Preferences
@@ -10490,17 +10409,6 @@ declare namespace Electron {
      */
     getAnimationSettings(): AnimationSettings;
     /**
-     * | `null` - Can be `dark`, `light` or `unknown`.
-     *
-     * Gets the macOS appearance setting that you have declared you want for your
-     * application, maps to NSApplication.appearance. You can use the
-     * `setAppLevelAppearance` API to set this value.
-     *
-     * @deprecated
-     * @platform darwin
-     */
-    getAppLevelAppearance(): "dark" | "light" | "unknown";
-    /**
      * The system color setting in RGB hexadecimal form (`#ABCDEF`). See the Windows
      * docs and the macOS docs for more details.
      *
@@ -10543,7 +10451,6 @@ declare namespace Electron {
         | "window"
         | "window-frame"
         | "window-text"
-        | "alternate-selected-control-text"
         | "control-background"
         | "control"
         | "control-text"
@@ -10708,14 +10615,6 @@ declare namespace Electron {
      */
     removeUserDefault(key: string): void;
     /**
-     * Sets the appearance setting for your application, this should override the
-     * system default and override the value of `getEffectiveAppearance`.
-     *
-     * @deprecated
-     * @platform darwin
-     */
-    setAppLevelAppearance(appearance: ("dark" | "light") | null): void;
-    /**
      * Set the value of `key` in `NSUserDefaults`.
      *
      * Note that `type` should match actual type of `value`. An exception is thrown if
@@ -10814,20 +10713,13 @@ declare namespace Electron {
      */
     unsubscribeWorkspaceNotification(id: number): void;
     /**
-     * A `string` property that can be `dark`, `light` or `unknown`. It determines the
-     * macOS appearance setting for your application. This maps to values in:
-     * NSApplication.appearance. Setting this will override the system default as well
-     * as the value of `getEffectiveAppearance`.
+     * A `boolean` property which determines whether the app avoids using
+     * semitransparent backgrounds. This maps to
+     * NSWorkspace.accessibilityDisplayShouldReduceTransparency
      *
-     * Possible values that can be set are `dark` and `light`, and possible return
-     * values are `dark`, `light`, and `unknown`.
-     *
-     * This property is only available on macOS 10.14 Mojave or newer.
-     *
-     * @deprecated
      * @platform darwin
      */
-    appLevelAppearance: "dark" | "light" | "unknown";
+    accessibilityDisplayShouldReduceTransparency(): boolean;
     /**
      * A `string` property that can be `dark`, `light` or `unknown`.
      *
@@ -14464,6 +14356,11 @@ declare namespace Electron {
      */
     getBackgroundThrottling(): boolean;
     /**
+     * the current title of the DevTools window. This will only be visible if DevTools
+     * is opened in `undocked` or `detach` mode.
+     */
+    getDevToolsTitle(): string;
+    /**
      * If _offscreen rendering_ is enabled returns the current frame rate.
      */
     getFrameRate(): number;
@@ -14478,15 +14375,6 @@ declare namespace Electron {
      * The operating system `pid` of the associated renderer process.
      */
     getOSProcessId(): number;
-    /**
-     * Get the system printer list.
-     *
-     *
-     * **Deprecated:** Should use the new `contents.getPrintersAsync` API.
-     *
-     * @deprecated
-     */
-    getPrinters(): PrinterInfo[];
     /**
      * Get the system printer list.
      *
@@ -14811,6 +14699,11 @@ declare namespace Electron {
      * when the page becomes backgrounded. This also affects the Page Visibility API.
      */
     setBackgroundThrottling(allowed: boolean): void;
+    /**
+     * Changes the title of the DevTools window to `title`. This will only be visible
+     * if DevTools is opened in `undocked` or `detach` mode.
+     */
+    setDevToolsTitle(title: string): void;
     /**
      * Uses the `devToolsWebContents` as the target `WebContents` to show devtools.
      *
@@ -17125,13 +17018,13 @@ declare namespace Electron {
      */
     enableBuiltInResolver?: boolean;
     /**
-     * Can be "off", "automatic" or "secure". Configures the DNS-over-HTTP mode. When
-     * "off", no DoH lookups will be performed. When "automatic", DoH lookups will be
+     * Can be 'off', 'automatic' or 'secure'. Configures the DNS-over-HTTP mode. When
+     * 'off', no DoH lookups will be performed. When 'automatic', DoH lookups will be
      * performed first if DoH is available, and insecure DNS lookups will be performed
-     * as a fallback. When "secure", only DoH lookups will be performed. Defaults to
-     * "automatic".
+     * as a fallback. When 'secure', only DoH lookups will be performed. Defaults to
+     * 'automatic'.
      */
-    secureDnsMode?: string;
+    secureDnsMode?: "off" | "automatic" | "secure";
     /**
      * A list of DNS-over-HTTP server templates. See RFC8484 § 3 for details on the
      * template format. Most servers support the POST method; the template for such
@@ -17531,6 +17424,10 @@ declare namespace Electron {
      * Defaults to `Impact`.
      */
     fantasy?: string;
+    /**
+     * Defaults to `Latin Modern Math`.
+     */
+    math?: string;
   }
 
   interface Details {
@@ -18030,10 +17927,10 @@ declare namespace Electron {
 
   interface InsertCSSOptions {
     /**
-     * Can be either 'user' or 'author'. Sets the cascade origin of the inserted
-     * stylesheet. Default is 'author'.
+     * Can be 'user' or 'author'. Sets the cascade origin of the inserted stylesheet.
+     * Default is 'author'.
      */
-    cssOrigin?: string;
+    cssOrigin?: "user" | "author";
   }
 
   interface IpcMessageEvent extends DOMEvent {
@@ -18208,10 +18105,10 @@ declare namespace Electron {
      * `showSubstitutions`, `toggleSmartQuotes`, `toggleSmartDashes`,
      * `toggleTextReplacement`, `startSpeaking`, `stopSpeaking`, `zoom`, `front`,
      * `appMenu`, `fileMenu`, `editMenu`, `viewMenu`, `shareMenu`, `recentDocuments`,
-     * `toggleTabBar`, `selectNextTab`, `selectPreviousTab`, `mergeAllWindows`,
-     * `clearRecentDocuments`, `moveTabToNewWindow` or `windowMenu` - Define the action
-     * of the menu item, when specified the `click` property will be ignored. See
-     * roles.
+     * `toggleTabBar`, `selectNextTab`, `selectPreviousTab`, `showAllTabs`,
+     * `mergeAllWindows`, `clearRecentDocuments`, `moveTabToNewWindow` or `windowMenu`
+     * - Define the action of the menu item, when specified the `click` property will
+     * be ignored. See roles.
      */
     role?:
       | "undo"
@@ -18257,6 +18154,7 @@ declare namespace Electron {
       | "toggleTabBar"
       | "selectNextTab"
       | "selectPreviousTab"
+      | "showAllTabs"
       | "mergeAllWindows"
       | "clearRecentDocuments"
       | "moveTabToNewWindow"
@@ -18905,6 +18803,10 @@ declare namespace Electron {
      * `true`.
      */
     activate?: boolean;
+    /**
+     * A title for the DevTools window (only in `undocked` or `detach` mode).
+     */
+    title?: string;
   }
 
   interface OpenDialogOptions {
@@ -19239,8 +19141,8 @@ declare namespace Electron {
       | Size;
     margins?: Margins;
     /**
-     * Paper ranges to print, e.g., '1-5, 8, 11-13'. Defaults to the empty string,
-     * which means print all pages.
+     * Page ranges to print, e.g., '1-5, 8, 11-13'. Defaults to the empty string, which
+     * means print all pages.
      */
     pageRanges?: string;
     /**
