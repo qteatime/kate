@@ -23,10 +23,10 @@ Managing stored data
 
 Save data is associated with a specific cartridge, so you can manage it
 from the cartridge's storage screen. You can get to this screen by either
-holding down |btn_menu_text| to bring up the context menu, selecting
-``Storage``, and then the cartridge you want. Or by using the ``Manage Data``
-option for a cartridge in the library, or in the context menu while the
-cartridge is running.
+pressing |btn_berry_text| to bring up the context menu, selecting
+``Settings -> Storage``, and then the cartridge you want. Or by using the
+``Manage Data`` option for a cartridge in the library. When you're running
+a cartridge, the ``Storage`` button in the context menu will also work.
 
 The cartridge storage page includes a summary of all data related to
 the cartridge that Kate is storing; you can check the save data in

@@ -181,7 +181,6 @@
 <li class="toctree-l3"><a class="reference internal" href="../security/sandboxing.html">Sandboxing</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../security/privacy.html">Privacy policy</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../security/trust.html">Trust and consent</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../security/indicators.html">Resource indicators</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../security/audit.html">Audit logs</a></li>
 </ul>
 </li>
@@ -316,64 +315,26 @@
 <h1>Tech specs<a class="headerlink" href="#tech-specs" title="Permalink to this heading">#</a></h1>
 <section id="the-console">
 <h2>The console<a class="headerlink" href="#the-console" title="Permalink to this heading">#</a></h2>
-<p>Kate is a handheld console that uses 2020s technology to recreate some
-of the feelings of early 2000s and 2010s technology. It sports a cat-themed
-case, specific security feedback channels, and a slot-loading mini-disc drive!</p>
-<img alt="../../../_images/spec.svg" src="../../../_images/spec.svg" /><div class="table-wrapper docutils container">
-<table class="docutils align-default">
-<thead>
-<tr class="row-odd"><th class="head"><p>Item</p></th>
-<th class="head"><p>Description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>(1)</p></td>
-<td><p>Left shoulder trigger (<a class="reference internal" href="../../../_images/l_24.png"><img alt="Left trigger" class="align-middle" src="../../../_images/l_24.png" style="height: 1em;" /></a>)</p></td>
-</tr>
-<tr class="row-odd"><td><p>(2)</p></td>
-<td><p>Right shoulder trigger (<a class="reference internal" href="../../../_images/r_24.png"><img alt="Right trigger" class="align-middle" src="../../../_images/r_24.png" style="height: 1em;" /></a>)</p></td>
-</tr>
-<tr class="row-even"><td><p>(3)</p></td>
-<td><p>D-Pad (<a class="reference internal" href="../../../_images/dpad_24.png"><img alt="D-Pad" class="align-middle" src="../../../_images/dpad_24.png" style="height: 1em;" /></a>)</p></td>
-</tr>
-<tr class="row-odd"><td><p>(4)</p></td>
-<td><p>4” capacitive touch screen (800x480, 5:3)</p></td>
-</tr>
-<tr class="row-even"><td><p>(5)</p></td>
-<td><p>Face buttons: <a class="reference internal" href="../../../_images/cancel_24.png"><img alt="Cancel button (a.k.a. X)" class="align-middle" src="../../../_images/cancel_24.png" style="height: 1em;" /></a> (<em>a.k.a. “Cancel”</em>) and <a class="reference internal" href="../../../_images/ok_24.png"><img alt="Ok button (a.k.a. O)" class="align-middle" src="../../../_images/ok_24.png" style="height: 1em;" /></a> (<em>a.k.a. “Ok”</em>)</p></td>
-</tr>
-<tr class="row-odd"><td><p>(6)</p></td>
-<td><p>Slot-loading mini CD/DVD drive (or SD card slot)</p></td>
-</tr>
-<tr class="row-even"><td><p>(7)</p></td>
-<td><p><a class="reference internal" href="../../../_images/capture_24.png"><img alt="Capture button" class="align-middle" src="../../../_images/capture_24.png" style="height: 1em;" /></a> <em>(Capture button)</em></p></td>
-</tr>
-<tr class="row-odd"><td><p>(8)</p></td>
-<td><p><a class="reference internal" href="../../../_images/menu_24.png"><img alt="Menu button" class="align-middle" src="../../../_images/menu_24.png" style="height: 1em;" /></a> <em>(Menu button)</em></p></td>
-</tr>
-<tr class="row-even"><td><p>(9)</p></td>
-<td><p>Left speakers</p></td>
-</tr>
-<tr class="row-odd"><td><p>(10)</p></td>
-<td><p>Right speakers</p></td>
-</tr>
-<tr class="row-even"><td><p>(11)</p></td>
-<td><p>Volume buttons (+, -)</p></td>
-</tr>
-<tr class="row-odd"><td><p>(12)</p></td>
-<td><p>Power/Sleep button</p></td>
-</tr>
-<tr class="row-even"><td><p>(13)</p></td>
-<td><p>USB Type-C port</p></td>
-</tr>
-<tr class="row-odd"><td><p>(14)</p></td>
-<td><p>Device status, Trust indicator, and Resource indicator leds</p></td>
-</tr>
-<tr class="row-even"><td><p>(15)</p></td>
-<td><p>Headphone jack</p></td>
-</tr>
-</tbody>
-</table>
+<p>Kate is a console that uses 2020s technology to recreate some
+of the feelings of early 2000s and 2010s technology and culture.
+It sports a cute strawberry cake × cats themed case,
+specific security feedback channels, and a proper cartridge slot.</p>
+<p>The hardware comes in two versions. The initial hand-held (Pancake) version:</p>
+<img alt="../../../_images/handheld.png" src="../../../_images/handheld.png" />
+<p>And the shiny new mini-Kate box (Cheesecake) version, which you can certainly
+hold in one hand but not really see much without plugging it to some external
+display through HDMI:</p>
+<img alt="../../../_images/box.png" src="../../../_images/box.png" />
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The hardware, 3d models for the case design, operating system, and all
+other components are planned to be released as open-source in 2024, so
+you will be able to build your own physical Kate console from these parts.</p>
+<p>Right now only the <a class="reference internal" href="install.html"><span class="doc">Kate Emulator</span></a> is available
+as an early technology preview. The physical console will run the same
+software specification and thus be compatible with all Kate cartridges
+that run in the emulator, but with the hardware limitations specified
+below, unless you build your console using custom hardware.</p>
 </div>
 </section>
 <section id="computing-power">
@@ -392,7 +353,7 @@ needed to play the game, as well as the recommended version.</p>
 </thead>
 <tbody>
 <tr class="row-even"><td><p><strong>CPU</strong></p></td>
-<td><p>1.4GHz (4 cores)</p></td>
+<td><p>1.8GHz (4 cores)</p></td>
 <td><p>1.8GHz (4 cores)</p></td>
 <td><p>2.4GHz (4 cores)</p></td>
 </tr>
@@ -406,8 +367,20 @@ needed to play the game, as well as the recommended version.</p>
 <td><p>64 GB</p></td>
 <td><p>128 GB</p></td>
 </tr>
+<tr class="row-odd"><td><p><strong>SoC</strong></p></td>
+<td><p>Raspberry Pi 4*</p></td>
+<td><p>Raspberry Pi 4*</p></td>
+<td><p>Raspberry Pi 5*</p></td>
+</tr>
 </tbody>
 </table>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The cases and operating system are designed to use off-the-shelf Raspberry Pi
+boards. You should be able to use other SoCs, but you’ll need to modify at least
+the case and PCB designs, and you might need to patch Raspberry OS-specific
+components if you’re using another Linux distribution.</p>
 </div>
 </section>
 <section id="graphics">
@@ -425,13 +398,12 @@ provide the needed functionality.</p>
 </section>
 <section id="input">
 <h2>Input<a class="headerlink" href="#input" title="Permalink to this heading">#</a></h2>
-<p>Kate has a total of 8 digital input buttons and 2 analog buttons used for
-controlling games:</p>
+<p>Kate has a total of 12 digital input buttons used for controlling games:</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="../../../_images/ok_24.png"><img alt="Ok button (a.k.a. O)" class="align-middle" src="../../../_images/ok_24.png" style="height: 1em;" /></a> <em>(Ok)</em> and <a class="reference internal" href="../../../_images/cancel_24.png"><img alt="Cancel button (a.k.a. X)" class="align-middle" src="../../../_images/cancel_24.png" style="height: 1em;" /></a> <em>(Cancel)</em> face buttons;</p></li>
-<li><p><a class="reference internal" href="../../../_images/dpad_24.png"><img alt="D-Pad" class="align-middle" src="../../../_images/dpad_24.png" style="height: 1em;" /></a> <em>(D-Pad)</em>;</p></li>
-<li><p><a class="reference internal" href="../../../_images/capture_24.png"><img alt="Capture button" class="align-middle" src="../../../_images/capture_24.png" style="height: 1em;" /></a> <em>(Capture button)</em> and <a class="reference internal" href="../../../_images/menu_24.png"><img alt="Menu button" class="align-middle" src="../../../_images/menu_24.png" style="height: 1em;" /></a> <em>(Menu button)</em>;</p></li>
-<li><p><a class="reference internal" href="../../../_images/l_24.png"><img alt="Left trigger" class="align-middle" src="../../../_images/l_24.png" style="height: 1em;" /></a> and <a class="reference internal" href="../../../_images/r_24.png"><img alt="Right trigger" class="align-middle" src="../../../_images/r_24.png" style="height: 1em;" /></a> analog triggers;</p></li>
+<li><p><a class="reference internal" href="../../../_images/ok_32.png"><img alt="Ok button (a.k.a. O)" class="align-middle" src="../../../_images/ok_32.png" style="height: 1em;" /></a> <em>(Ok)</em>, <a class="reference internal" href="../../../_images/sparkle_32.png"><img alt="Sparkle button" class="align-middle" src="../../../_images/sparkle_32.png" style="height: 1em;" /></a> <em>(Sparkle)</em>, <a class="reference internal" href="../../../_images/menu_32.png"><img alt="Menu button" class="align-middle" src="../../../_images/menu_32.png" style="height: 1em;" /></a> <em>(Menu)</em>, and <a class="reference internal" href="../../../_images/cancel_32.png"><img alt="Cancel button (a.k.a. X)" class="align-middle" src="../../../_images/cancel_32.png" style="height: 1em;" /></a> <em>(Cancel)</em> face buttons;</p></li>
+<li><p><a class="reference internal" href="../../../_images/dpad_32.png"><img alt="D-Pad" class="align-middle" src="../../../_images/dpad_32.png" style="height: 1em;" /></a> <em>(D-Pad)</em>;</p></li>
+<li><p><a class="reference internal" href="../../../_images/capture_32.png"><img alt="Capture button" class="align-middle" src="../../../_images/capture_32.png" style="height: 1em;" /></a> <em>(Capture button)</em> and <a class="reference internal" href="../../../_images/berry_32.png"><img alt="Berry button" class="align-middle" src="../../../_images/berry_32.png" style="height: 1em;" /></a> <em>(Berry button)</em>;</p></li>
+<li><p><a class="reference internal" href="../../../_images/l_32.png"><img alt="Left shoulder button" class="align-middle" src="../../../_images/l_32.png" style="height: 1em;" /></a> and <a class="reference internal" href="../../../_images/r_32.png"><img alt="Right shoulder button" class="align-middle" src="../../../_images/r_32.png" style="height: 1em;" /></a> shoulder buttons;</p></li>
 </ul>
 <p>It also has a capacitive touch screen with support to 10 touch points,
 a haptics module for vibration, a 3-axis gyroscope sensor, and a 3-axis
@@ -442,22 +414,15 @@ bluetooth or directly through USB.</p>
 <section id="cartridges">
 <h2>Cartridges<a class="headerlink" href="#cartridges" title="Permalink to this heading">#</a></h2>
 <p>Games for Kate can be made with many different technologies, and are shared
-as ROM files, which Kate calls a “cartridge”. These cartridges can contain
-up to 512 MB of data <a class="footnote-reference brackets" href="#f1" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>. Because Kate includes a mini CD/DVD drive, one
-inexpensive form of sharing and archiving these games offline is to burn
-them to a mini CD/DVD.</p>
+as ROM files, which Kate calls a “cartridge”. The ROM files incldue all the
+data needed to run the game. There are no limits for the ROM file size.</p>
 <p>Kate never runs the ROM files directly; rather they’re copied into the
 console in a more efficient format upon installation. From that point on,
 as long as you don’t archive the game in Kate, it can be played without
-needing to keep the file around or insert the disc <a class="footnote-reference brackets" href="#f2" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.</p>
+needing to keep the file around or insert the disc <a class="footnote-reference brackets" href="#f1" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>.</p>
 <aside class="footnote-list brackets">
 <aside class="footnote brackets" id="f1" role="note">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
-<p>There are plans to lift the 512 MB limitation in the future, but
-it requires reworking the cartridge format first.</p>
-</aside>
-<aside class="footnote brackets" id="f2" role="note">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
 <p>Kate cartridges contain no form of <a class="reference internal" href="../../../glossary.html#term-Copy-protection"><span class="xref std std-term">copy-protection</span></a>, and rather
 rely on players being respectful of game developers’ wishes regarding
 sharing and modifying the game—such wishes are included in the cartridge’s

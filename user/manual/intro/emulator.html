@@ -181,7 +181,6 @@
 <li class="toctree-l3"><a class="reference internal" href="../security/sandboxing.html">Sandboxing</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../security/privacy.html">Privacy policy</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../security/trust.html">Trust and consent</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../security/indicators.html">Resource indicators</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../security/audit.html">Audit logs</a></li>
 </ul>
 </li>
@@ -314,19 +313,19 @@
         <article role="main">
           <section id="emulator">
 <h1>Emulator<a class="headerlink" href="#emulator" title="Permalink to this heading">#</a></h1>
-<p>The Kate emulator can transform any relatively modern (later than 2015)
-device with a modern web browser into a Kate console. In this case, the
+<p>The Kate emulator can transform any relatively modern (released later than 2015)
+device with a modern web browser into a Kate console. In this case the
 Kate features are limited by the features present in the device running
 the emulator.</p>
-<p>To run the Kate emulator, the device must still provide the same
+<p>To run the Kate emulator, the device must still provide at least the same
 <a class="reference internal" href="hardware.html#hardware-computing-power"><span class="std std-ref">Computing Power</span></a> and the same
 <a class="reference internal" href="hardware.html#hardware-graphics"><span class="std std-ref">Graphical Power</span></a> as the Kate physical
 hardware.</p>
 <p>That is, the recommended configuration is:</p>
 <ul class="simple">
-<li><p><strong>CPU</strong>: 1.8GHz (quad-core);</p></li>
-<li><p><strong>RAM</strong>: 2 GB;</p></li>
-<li><p><strong>Storage</strong>: 64 GB;</p></li>
+<li><p><strong>CPU</strong>: 1.8GHz (quad-core) or 2.4GHz (quad-core);</p></li>
+<li><p><strong>RAM</strong>: 2 GB+;</p></li>
+<li><p><strong>Storage</strong>: 64 GB+;</p></li>
 <li><p><strong>Display</strong>: 800x480 or higher;</p></li>
 <li><p><strong>GPU</strong>: support for OpenGL ES 3.1;</p></li>
 </ul>
@@ -335,21 +334,25 @@ hardware.</p>
 <h2>Case modes<a class="headerlink" href="#case-modes" title="Permalink to this heading">#</a></h2>
 <p>The emulator supports different case modes, both for aesthetic purposes
 and for device input purposes. You can change which case mode your
-emulator uses by holding down <a class="reference internal" href="../../../_images/menu_24.png"><img alt="Menu button" class="align-middle" src="../../../_images/menu_24.png" style="height: 1em;" /></a> <em>(Menu button)</em>, then selecting
+emulator uses by pressing <a class="reference internal" href="../../../_images/berry_32.png"><img alt="Berry button" class="align-middle" src="../../../_images/berry_32.png" style="height: 1em;" /></a> <em>(Berry button)</em>, then selecting
 <code class="docutils literal notranslate"><span class="pre">Settings</span> <span class="pre">-&gt;</span> <span class="pre">User</span> <span class="pre">Interface</span></code> and picking from one of the three
 available modes.</p>
 <section id="handheld-mode">
 <span id="emulator-hand-held-mode"></span><h3>Handheld Mode<a class="headerlink" href="#handheld-mode" title="Permalink to this heading">#</a></h3>
 <img alt="../../../_images/handheld-mode.png" src="../../../_images/handheld-mode.png" />
-<p>This is the default case mode for the Kate emulator. It includes virtual
+<p>This is the default case mode for the Kate emulator, but it’s optimised for
+smartphones (and marginally for tablet devices). It includes virtual
 buttons on the sides and on the top, which can be pressed on a touch-capable
-device. This way you can use Kate even when no physical gamepad or keyboard
-is available.</p>
+device instead of requiring a physical gamepad or keyboard, and it tries to
+maximise the area used for the screen as much as possible. This is also why
+it uses a thumbstick instead of the usual D-Pad (you can hold the thumbstick
+and move it like you would a regular analog thumbstick, but without the
+nice physical feedback).</p>
 <p>In handheld mode the screen resolution is locked to 800x480. The recommended
-host device’s resolution must be at least 1310x570 pixels to be able to house
+host device’s resolution must be at least 1040x490 pixels to be able to house
 the whole emulator UI comfortably. In devices with a smaller screen resolution,
-the emulator will scale down the UI, which might result in blurry text and
-images.</p>
+the emulator will scale down the UI favouring speed, which might result in
+lower image quality.</p>
 </section>
 <section id="tv-mode">
 <h3>TV Mode<a class="headerlink" href="#tv-mode" title="Permalink to this heading">#</a></h3>
@@ -366,13 +369,7 @@ to fit the emulator UI comfortably.</p>
 <h3>Fullscreen Mode<a class="headerlink" href="#fullscreen-mode" title="Permalink to this heading">#</a></h3>
 <img alt="../../../_images/fullscreen-mode.png" src="../../../_images/fullscreen-mode.png" />
 <p>In fullscreen mode the screen takes the whole space available for the
-emulator. Kate also overlays its <a class="reference internal" href="../security/indicators.html"><span class="doc">security indicators</span></a>
-on top of it: a contiguous line of 3 pixels at the very top of the screen
-is used to display the trust mode and the resource indicators. This
-means that, on smaller resolutions, the game screen might be slightly
-covered, but there is no way to disable this overlay, as it’s a
-security mechanism.</p>
-<p>The fullscreen mode otherwise has the same resolution as the TV mode:
+emulator. It has the same resolution options as the TV mode:
 800x480 and 1200x720 pixels.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -386,8 +383,8 @@ launch the emulator with the fullscreen flag: <code class="docutils literal notr
 <section id="input">
 <h2>Input<a class="headerlink" href="#input" title="Permalink to this heading">#</a></h2>
 <p>Kate supports several different input methods. Games are encouraged to
-provide alternative inputs, so even if your device doesn’t support all
-of the input methods, the game is still playable.</p>
+provide alternative inputs so the game is still playable even if your device
+doesn’t support all of the input methods.</p>
 <section id="pointer-input">
 <h3>Pointer input<a class="headerlink" href="#pointer-input" title="Permalink to this heading">#</a></h3>
 <p>Kate supports pointer inputs (mouse, trackpad, stylus, touch, etc).
@@ -396,8 +393,8 @@ able to control games that offer pointer input options.</p>
 </section>
 <section id="kate-buttons">
 <h3>Kate buttons<a class="headerlink" href="#kate-buttons" title="Permalink to this heading">#</a></h3>
-<p>Kate has 8 digital input buttons and 2 analog ones which are used
-to control most games. In the emulator you can:</p>
+<p>Kate has 12 digital input buttons which are used to control most games.
+In the emulator you can:</p>
 <dl>
 <dt><strong>Use the virtual buttons</strong></dt><dd><p>In hand-held mode, if you have a device with
 a touch screen, like a smartphone or tablet, you can touch the virtual
@@ -406,9 +403,10 @@ buttons to control Kate. You’ll need to select hand-held mode from
 </dd>
 <dt><strong>Use your keyboard</strong></dt><dd><p>You can configure the how the keyboard keys map to
 Kate buttons from <code class="docutils literal notranslate"><span class="pre">Settings</span> <span class="pre">-&gt;</span> <span class="pre">Controllers</span> <span class="pre">&amp;</span> <span class="pre">Sensors</span> <span class="pre">-&gt;</span> <span class="pre">Control</span> <span class="pre">Kate</span>
-<span class="pre">with</span> <span class="pre">a</span> <span class="pre">keyboard</span></code>. The default is arrow keys for the <a class="reference internal" href="../../../_images/dpad_24.png"><img alt="D-Pad" class="align-middle" src="../../../_images/dpad_24.png" style="height: 1em;" /></a> <em>(D-Pad)</em>; <code class="docutils literal notranslate"><span class="pre">X</span></code> and <code class="docutils literal notranslate"><span class="pre">Z</span></code>
-for <a class="reference internal" href="../../../_images/cancel_24.png"><img alt="Cancel button (a.k.a. X)" class="align-middle" src="../../../_images/cancel_24.png" style="height: 1em;" /></a> and <a class="reference internal" href="../../../_images/ok_24.png"><img alt="Ok button (a.k.a. O)" class="align-middle" src="../../../_images/ok_24.png" style="height: 1em;" /></a>; <code class="docutils literal notranslate"><span class="pre">A</span></code> and <code class="docutils literal notranslate"><span class="pre">S</span></code> for <a class="reference internal" href="../../../_images/l_24.png"><img alt="Left trigger" class="align-middle" src="../../../_images/l_24.png" style="height: 1em;" /></a> and <a class="reference internal" href="../../../_images/r_24.png"><img alt="Right trigger" class="align-middle" src="../../../_images/r_24.png" style="height: 1em;" /></a>; <code class="docutils literal notranslate"><span class="pre">C</span></code>
-for <a class="reference internal" href="../../../_images/capture_24.png"><img alt="Capture button" class="align-middle" src="../../../_images/capture_24.png" style="height: 1em;" /></a> <em>(Capture button)</em>, and <code class="docutils literal notranslate"><span class="pre">Left</span> <span class="pre">Shift</span></code> for <a class="reference internal" href="../../../_images/menu_24.png"><img alt="Menu button" class="align-middle" src="../../../_images/menu_24.png" style="height: 1em;" /></a> <em>(Menu button)</em>.</p>
+<span class="pre">with</span> <span class="pre">a</span> <span class="pre">keyboard</span></code>. The default is arrow keys for the <a class="reference internal" href="../../../_images/dpad_32.png"><img alt="D-Pad" class="align-middle" src="../../../_images/dpad_32.png" style="height: 1em;" /></a> <em>(D-Pad)</em>;
+<code class="docutils literal notranslate"><span class="pre">Left</span> <span class="pre">Shift</span></code>, <code class="docutils literal notranslate"><span class="pre">Z</span></code>, <code class="docutils literal notranslate"><span class="pre">X</span></code>, and <code class="docutils literal notranslate"><span class="pre">C</span></code> for <a class="reference internal" href="../../../_images/menu_32.png"><img alt="Menu button" class="align-middle" src="../../../_images/menu_32.png" style="height: 1em;" /></a>, <a class="reference internal" href="../../../_images/ok_32.png"><img alt="Ok button (a.k.a. O)" class="align-middle" src="../../../_images/ok_32.png" style="height: 1em;" /></a>,
+<a class="reference internal" href="../../../_images/cancel_32.png"><img alt="Cancel button (a.k.a. X)" class="align-middle" src="../../../_images/cancel_32.png" style="height: 1em;" /></a>, and <a class="reference internal" href="../../../_images/sparkle_32.png"><img alt="Sparkle button" class="align-middle" src="../../../_images/sparkle_32.png" style="height: 1em;" /></a>; <code class="docutils literal notranslate"><span class="pre">A</span></code> and <code class="docutils literal notranslate"><span class="pre">S</span></code> for <a class="reference internal" href="../../../_images/l_32.png"><img alt="Left shoulder button" class="align-middle" src="../../../_images/l_32.png" style="height: 1em;" /></a> and <a class="reference internal" href="../../../_images/r_32.png"><img alt="Right shoulder button" class="align-middle" src="../../../_images/r_32.png" style="height: 1em;" /></a>;
+<code class="docutils literal notranslate"><span class="pre">F</span></code> for <a class="reference internal" href="../../../_images/capture_32.png"><img alt="Capture button" class="align-middle" src="../../../_images/capture_32.png" style="height: 1em;" /></a> <em>(Capture button)</em>, and <code class="docutils literal notranslate"><span class="pre">Q</span></code> for <a class="reference internal" href="../../../_images/berry_32.png"><img alt="Berry button" class="align-middle" src="../../../_images/berry_32.png" style="height: 1em;" /></a> <em>(Berry button)</em>.</p>
 <img alt="../../../_images/keyboard.png" src="../../../_images/keyboard.png" />
 </dd>
 <dt><strong>Use a standard gamepad</strong></dt><dd><p>You can configure how the gamepad maps to Kate

@@ -181,7 +181,6 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../user/manual/security/sandboxing.html">Sandboxing</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../user/manual/security/privacy.html">Privacy policy</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../user/manual/security/trust.html">Trust and consent</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../user/manual/security/indicators.html">Resource indicators</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../user/manual/security/audit.html">Audit logs</a></li>
 </ul>
 </li>
@@ -364,7 +363,7 @@ change events. This method requires no synchronisation with the Kate timer
 since all changes are propagated as discrete events, but requires you
 to write your code in an event-driven manner.</p>
 <p>For example:</p>
-<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="nx">KateAPI</span><span class="p">.</span><span class="nx">input</span><span class="p">.</span><span class="nx">on_key_pressed</span><span class="p">.</span><span class="nx">listen</span><span class="p">(</span><span class="nx">key</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="nx">KateAPI</span><span class="p">.</span><span class="nx">input</span><span class="p">.</span><span class="nx">on_key_pressed</span><span class="p">.</span><span class="nx">listen</span><span class="p">(({</span><span class="w"> </span><span class="nx">key</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">key</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s2">&quot;menu&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="nx">show_menu_screen</span><span class="p">();</span>
 <span class="w">  </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">key</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s2">&quot;o&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
@@ -379,10 +378,10 @@ to write your code in an event-driven manner.</p>
 <p>The Kate buttons API (<code class="docutils literal notranslate"><span class="pre">input</span></code>) allows a cartridge to react to buttons pressed
 in the standard Kate gamepad. This gamepad is made out of:</p>
 <ul class="simple">
-<li><p>A four-directions D-pad (<a class="reference internal" href="../../../_images/dpad_24.png"><img alt="D-Pad" class="align-middle" src="../../../_images/dpad_24.png" style="height: 1em;" /></a>);</p></li>
-<li><p>Two face buttons: <a class="reference internal" href="../../../_images/ok_24.png"><img alt="Ok button (a.k.a. O)" class="align-middle" src="../../../_images/ok_24.png" style="height: 1em;" /></a> <em>(Ok)</em> and <a class="reference internal" href="../../../_images/cancel_24.png"><img alt="Cancel button (a.k.a. X)" class="align-middle" src="../../../_images/cancel_24.png" style="height: 1em;" /></a> <em>(Cancel)</em>;</p></li>
-<li><p>Two analog shoulder triggers: <a class="reference internal" href="../../../_images/l_24.png"><img alt="Left trigger" class="align-middle" src="../../../_images/l_24.png" style="height: 1em;" /></a> and <a class="reference internal" href="../../../_images/r_24.png"><img alt="Right trigger" class="align-middle" src="../../../_images/r_24.png" style="height: 1em;" /></a>; and</p></li>
-<li><p>Two special buttons: <a class="reference internal" href="../../../_images/capture_24.png"><img alt="Capture button" class="align-middle" src="../../../_images/capture_24.png" style="height: 1em;" /></a> <em>(Capture button)</em> and <a class="reference internal" href="../../../_images/menu_24.png"><img alt="Menu button" class="align-middle" src="../../../_images/menu_24.png" style="height: 1em;" /></a> <em>(Menu button)</em>.</p></li>
+<li><p>A four-directions D-pad (<a class="reference internal" href="../../../_images/dpad_32.png"><img alt="D-Pad" class="align-middle" src="../../../_images/dpad_32.png" style="height: 1em;" /></a>);</p></li>
+<li><p>Four face buttons: <a class="reference internal" href="../../../_images/ok_32.png"><img alt="Ok button (a.k.a. O)" class="align-middle" src="../../../_images/ok_32.png" style="height: 1em;" /></a> <em>(Ok)</em>, <a class="reference internal" href="../../../_images/cancel_32.png"><img alt="Cancel button (a.k.a. X)" class="align-middle" src="../../../_images/cancel_32.png" style="height: 1em;" /></a> <em>(Cancel)</em>, <a class="reference internal" href="../../../_images/sparkle_32.png"><img alt="Sparkle button" class="align-middle" src="../../../_images/sparkle_32.png" style="height: 1em;" /></a> <em>(Sparkle)</em>, and <a class="reference internal" href="../../../_images/menu_32.png"><img alt="Menu button" class="align-middle" src="../../../_images/menu_32.png" style="height: 1em;" /></a> <em>(Menu)</em>;</p></li>
+<li><p>Two shoulder buttons: <a class="reference internal" href="../../../_images/l_32.png"><img alt="Left shoulder button" class="align-middle" src="../../../_images/l_32.png" style="height: 1em;" /></a> and <a class="reference internal" href="../../../_images/r_32.png"><img alt="Right shoulder button" class="align-middle" src="../../../_images/r_32.png" style="height: 1em;" /></a>; and</p></li>
+<li><p>Two special buttons: <a class="reference internal" href="../../../_images/capture_32.png"><img alt="Capture button" class="align-middle" src="../../../_images/capture_32.png" style="height: 1em;" /></a> <em>(Capture button)</em> and <a class="reference internal" href="../../../_images/berry_32.png"><img alt="Berry button" class="align-middle" src="../../../_images/berry_32.png" style="height: 1em;" /></a> <em>(Berry button)</em>.</p></li>
 </ul>
 <p>Although your cartridge reacts to these Kate buttons, a player may be
 interacting with it through other means. E.g.: players running a Kate
@@ -438,31 +437,42 @@ referred to as <code class="docutils literal notranslate"><span class="pre">Inpu
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p><a class="reference internal" href="../../../_images/ok_24.png"><img alt="Ok button (a.k.a. O)" class="align-middle" src="../../../_images/ok_24.png" style="height: 1em;" /></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../../../_images/ok_32.png"><img alt="Ok button (a.k.a. O)" class="align-middle" src="../../../_images/ok_32.png" style="height: 1em;" /></a></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">o</span></code></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../../../_images/cancel_24.png"><img alt="Cancel button (a.k.a. X)" class="align-middle" src="../../../_images/cancel_24.png" style="height: 1em;" /></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../../../_images/cancel_32.png"><img alt="Cancel button (a.k.a. X)" class="align-middle" src="../../../_images/cancel_32.png" style="height: 1em;" /></a></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">x</span></code></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../../../_images/dpad_24.png"><img alt="D-Pad" class="align-middle" src="../../../_images/dpad_24.png" style="height: 1em;" /></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../../../_images/sparkle_32.png"><img alt="Sparkle button" class="align-middle" src="../../../_images/sparkle_32.png" style="height: 1em;" /></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">sparkle</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../../../_images/menu_32.png"><img alt="Menu button" class="align-middle" src="../../../_images/menu_32.png" style="height: 1em;" /></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">menu</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../../../_images/dpad_32.png"><img alt="D-Pad" class="align-middle" src="../../../_images/dpad_32.png" style="height: 1em;" /></a></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">up</span></code>, <code class="docutils literal notranslate"><span class="pre">right</span></code>, <code class="docutils literal notranslate"><span class="pre">down</span></code>, <code class="docutils literal notranslate"><span class="pre">left</span></code></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../../../_images/l_24.png"><img alt="Left trigger" class="align-middle" src="../../../_images/l_24.png" style="height: 1em;" /></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../../../_images/l_32.png"><img alt="Left shoulder button" class="align-middle" src="../../../_images/l_32.png" style="height: 1em;" /></a></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">ltrigger</span></code></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../../../_images/r_24.png"><img alt="Right trigger" class="align-middle" src="../../../_images/r_24.png" style="height: 1em;" /></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../../../_images/r_32.png"><img alt="Right shoulder button" class="align-middle" src="../../../_images/r_32.png" style="height: 1em;" /></a></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">rtrigger</span></code></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="../../../_images/menu_24.png"><img alt="Menu button" class="align-middle" src="../../../_images/menu_24.png" style="height: 1em;" /></a></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">menu</span></code> and <code class="docutils literal notranslate"><span class="pre">long_menu</span></code></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../../../_images/capture_32.png"><img alt="Capture button" class="align-middle" src="../../../_images/capture_32.png" style="height: 1em;" /></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">capture</span></code></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="../../../_images/capture_24.png"><img alt="Capture button" class="align-middle" src="../../../_images/capture_24.png" style="height: 1em;" /></a></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">capture</span></code> and <code class="docutils literal notranslate"><span class="pre">long_capture</span></code></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../../../_images/berry_32.png"><img alt="Berry button" class="align-middle" src="../../../_images/berry_32.png" style="height: 1em;" /></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">berry</span></code></p></td>
 </tr>
 </tbody>
 </table>
 </div>
-<p><a class="reference internal" href="../../../_images/menu_24.png"><img alt="Menu button" class="align-middle" src="../../../_images/menu_24.png" style="height: 1em;" /></a> and <a class="reference internal" href="../../../_images/capture_24.png"><img alt="Capture button" class="align-middle" src="../../../_images/capture_24.png" style="height: 1em;" /></a> are special in that Kate distinguishes between
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><code class="docutils literal notranslate"><span class="pre">ltrigger</span></code> and <code class="docutils literal notranslate"><span class="pre">rtrigger</span></code> will be renamed to <code class="docutils literal notranslate"><span class="pre">l</span></code> and <code class="docutils literal notranslate"><span class="pre">r</span></code> in the
+next version and the current identifiers will be deprecated.</p>
+</div>
+<p><a class="reference internal" href="../../../_images/berry_32.png"><img alt="Berry button" class="align-middle" src="../../../_images/berry_32.png" style="height: 1em;" /></a> and <a class="reference internal" href="../../../_images/capture_32.png"><img alt="Capture button" class="align-middle" src="../../../_images/capture_32.png" style="height: 1em;" /></a> are special in that Kate distinguishes between
 a short and long press. This also means that state changes for these buttons
 is delayed until the player releases the button, so Kate can decide whether
 to report that as a “short” or “long” press.</p>
@@ -470,21 +480,27 @@ to report that as a “short” or “long” press.</p>
 repeat presses if the player presses the button and doesn’t release it
 for a long period of time.</p>
 <dl class="py class">
-<dt class="sig sig-object py" id="KateAPI.input.ExtendedKeyPressedEvent">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">KateAPI.input.</span></span><span class="sig-name descname"><span class="pre">ExtendedKeyPressedEvent</span></span><a class="headerlink" href="#KateAPI.input.ExtendedKeyPressedEvent" title="Permalink to this definition">#</a></dt>
-<dd><p>Represents an extended key pressed, so contains <code class="docutils literal notranslate"><span class="pre">long_menu</span></code> and <code class="docutils literal notranslate"><span class="pre">long_capture</span></code>
-as possible key identifiers.</p>
+<dt class="sig sig-object py" id="KateAPI.input.KeyPressedEvent">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">KateAPI.input.</span></span><span class="sig-name descname"><span class="pre">KeyPressedEvent</span></span><a class="headerlink" href="#KateAPI.input.KeyPressedEvent" title="Permalink to this definition">#</a></dt>
+<dd><p>Represents a key being pressed.</p>
 <dl class="py property">
-<dt class="sig sig-object py" id="KateAPI.input.ExtendedKeyPressedEvent.key">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">key</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#KateAPI.input.InputKey" title="KateAPI.input.InputKey"><span class="pre">InputKey</span></a></em><a class="headerlink" href="#KateAPI.input.ExtendedKeyPressedEvent.key" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="KateAPI.input.KeyPressedEvent.key">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">key</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#KateAPI.input.InputKey" title="KateAPI.input.InputKey"><span class="pre">InputKey</span></a></em><a class="headerlink" href="#KateAPI.input.KeyPressedEvent.key" title="Permalink to this definition">#</a></dt>
 <dd><p>The key that was pressed.</p>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="KateAPI.input.ExtendedKeyPressedEvent.is_repeat">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_repeat</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">boolean</span></em><a class="headerlink" href="#KateAPI.input.ExtendedKeyPressedEvent.is_repeat" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="KateAPI.input.KeyPressedEvent.is_repeat">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_repeat</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">boolean</span></em><a class="headerlink" href="#KateAPI.input.KeyPressedEvent.is_repeat" title="Permalink to this definition">#</a></dt>
 <dd><p>True if the key was pressed in a previous frame, but remains pressed in
 this one.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="KateAPI.input.KeyPressedEvent.is_long_press">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_long_press</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">boolean</span></em><a class="headerlink" href="#KateAPI.input.KeyPressedEvent.is_long_press" title="Permalink to this definition">#</a></dt>
+<dd><p>True if the key is special (<code class="docutils literal notranslate"><span class="pre">berry</span></code> or <code class="docutils literal notranslate"><span class="pre">capture</span></code>) and the player
+has held it for longer than the long-press threshold.</p>
 </dd></dl>
 
 </dd></dl>
@@ -497,24 +513,10 @@ states. These are forwarded directly from the Kate Kernel and propagated
 to any listener in the cartridge.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="KateAPI.input.on_key_pressed">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">KateAPI.input.</span></span><span class="sig-name descname"><span class="pre">on_key_pressed</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="events.html#KateAPI.events.EventStream" title="KateAPI.events.EventStream"><span class="pre">EventStream</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#KateAPI.input.InputKey" title="KateAPI.input.InputKey"><span class="pre">InputKey</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#KateAPI.input.on_key_pressed" title="Permalink to this definition">#</a></dt>
-<dd><p>Emitted whenever the player presses a button, without delay. Therefore
-it does not distinguish between short and long presses.</p>
-<p>The data in the event is a string containing one of the <a class="reference internal" href="#button-identifiers"><span class="std std-ref">Button identifiers</span></a>.</p>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="KateAPI.input.on_extended_key_pressed">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">KateAPI.input.</span></span><span class="sig-name descname"><span class="pre">on_extended_key_pressed</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="events.html#KateAPI.events.EventStream" title="KateAPI.events.EventStream"><span class="pre">EventStream</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#KateAPI.input.ExtendedKeyPressedEvent" title="KateAPI.input.ExtendedKeyPressedEvent"><span class="pre">ExtendedKeyPressedEvent</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#KateAPI.input.on_extended_key_pressed" title="Permalink to this definition">#</a></dt>
-<dd><p>Emitted when the player presses a button (or in the case of
-<a class="reference internal" href="../../../_images/menu_24.png"><img alt="Menu button" class="align-middle" src="../../../_images/menu_24.png" style="height: 1em;" /></a> and <a class="reference internal" href="../../../_images/capture_24.png"><img alt="Capture button" class="align-middle" src="../../../_images/capture_24.png" style="height: 1em;" /></a>, when the player releases the button).</p>
-<p>This event distinguishes between short and long presses, which means that
-there will be a delay to report presses to <a class="reference internal" href="../../../_images/menu_24.png"><img alt="Menu button" class="align-middle" src="../../../_images/menu_24.png" style="height: 1em;" /></a> and <a class="reference internal" href="../../../_images/capture_24.png"><img alt="Capture button" class="align-middle" src="../../../_images/capture_24.png" style="height: 1em;" /></a>.
-And other buttons may have events firing multiple times while the player
-is holding down the button—e.g.: holding down <a class="reference internal" href="../../../_images/ok_24.png"><img alt="Ok button (a.k.a. O)" class="align-middle" src="../../../_images/ok_24.png" style="height: 1em;" /></a> for several seconds
-would cause multiple events to be emitted with the identifier <code class="docutils literal notranslate"><span class="pre">o</span></code>. The
-first one would have <code class="docutils literal notranslate"><span class="pre">is_repeat</span></code> set to false, whereas the subsequent
-ones would have <code class="docutils literal notranslate"><span class="pre">is_repeat</span></code> set to true.</p>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">KateAPI.input.</span></span><span class="sig-name descname"><span class="pre">on_key_pressed</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="events.html#KateAPI.events.EventStream" title="KateAPI.events.EventStream"><span class="pre">EventStream</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#KateAPI.input.KeyPressedEvent" title="KateAPI.input.KeyPressedEvent"><span class="pre">KeyPressedEvent</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#KateAPI.input.on_key_pressed" title="Permalink to this definition">#</a></dt>
+<dd><p>Emitted whenever the player presses a button, with some delay for special
+keys. Repeat presses may trigger this event multiple times for the same
+key, and in that case <code class="docutils literal notranslate"><span class="pre">is_repeat</span></code> will be set to true.</p>
 </dd></dl>
 
 </section>
@@ -722,6 +724,13 @@ context menu instead of painting that location.</p>
 <section id="id3">
 <h4>Types<a class="headerlink" href="#id3" title="Permalink to this heading">#</a></h4>
 <dl class="py class">
+<dt class="sig sig-object py" id="KateAPI.pointer_input.PointerButton">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">KateAPI.pointer_input.</span></span><span class="sig-name descname"><span class="pre">PointerButton</span></span><a class="headerlink" href="#KateAPI.pointer_input.PointerButton" title="Permalink to this definition">#</a></dt>
+<dd><p>A string representing the button of a pointer device.
+Can be either <code class="docutils literal notranslate"><span class="pre">primary</span></code> or <code class="docutils literal notranslate"><span class="pre">alternate</span></code>.</p>
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="KateAPI.pointer_input.PointerClick">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">KateAPI.pointer_input.</span></span><span class="sig-name descname"><span class="pre">PointerClick</span></span><a class="headerlink" href="#KateAPI.pointer_input.PointerClick" title="Permalink to this definition">#</a></dt>
 <dd><p>Represents the click of a button at a particular pointer coordinate.</p>
@@ -733,38 +742,11 @@ context menu instead of painting that location.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="KateAPI.pointer_input.PointerClick.button">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">button</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">number</span></em><a class="headerlink" href="#KateAPI.pointer_input.PointerClick.button" title="Permalink to this definition">#</a></dt>
-<dd><p>The button that was pressed. This is the same constant used by
-the <a class="reference internal" href="../../../glossary.html#term-DOM-pointer-events"><span class="xref std std-term">DOM pointer events</span></a>, and can be one of:</p>
-<div class="table-wrapper docutils container">
-<table class="docutils align-default">
-<thead>
-<tr class="row-odd"><th class="head"><p>Id</p></th>
-<th class="head"><p>Description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">0</span></code></p></td>
-<td><p>Left mouse, touch contact, pen contact</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">1</span></code></p></td>
-<td><p>Middle mouse</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">2</span></code></p></td>
-<td><p>Right mouse, pen barrel button</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">3</span></code></p></td>
-<td><p>X1 (back) mouse</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">4</span></code></p></td>
-<td><p>X2 (forward) mouse</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">5</span></code></p></td>
-<td><p>Pen eraser button</p></td>
-</tr>
-</tbody>
-</table>
-</div>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">button</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#KateAPI.pointer_input.PointerButton" title="KateAPI.pointer_input.PointerButton"><span class="pre">PointerButton</span></a></em><a class="headerlink" href="#KateAPI.pointer_input.PointerClick.button" title="Permalink to this definition">#</a></dt>
+<dd><p>The button that was pressed. <code class="docutils literal notranslate"><span class="pre">primary</span></code> is for the primary button on
+a mouse or a pen making contact with the digitizer. <code class="docutils literal notranslate"><span class="pre">alternate</span></code> is
+the code for <em>every other button</em>, as Kate does not distinguishes
+between different alternate buttons.</p>
 </dd></dl>
 
 </dd></dl>
@@ -778,14 +760,7 @@ your own synchronisation when listening to them.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="KateAPI.pointer_input.on_clicked">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">KateAPI.pointer_input.</span></span><span class="sig-name descname"><span class="pre">on_clicked</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="events.html#KateAPI.events.EventStream" title="KateAPI.events.EventStream"><span class="pre">EventStream</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#KateAPI.pointer_input.PointerClick" title="KateAPI.pointer_input.PointerClick"><span class="pre">PointerClick</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#KateAPI.pointer_input.on_clicked" title="Permalink to this definition">#</a></dt>
-<dd><p>Emitted whenever the primary pointer button is pressed.</p>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="KateAPI.pointer_input.on_alternate">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">KateAPI.pointer_input.</span></span><span class="sig-name descname"><span class="pre">on_alternate</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="events.html#KateAPI.events.EventStream" title="KateAPI.events.EventStream"><span class="pre">EventStream</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#KateAPI.pointer_input.PointerClick" title="KateAPI.pointer_input.PointerClick"><span class="pre">PointerClick</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#KateAPI.pointer_input.on_alternate" title="Permalink to this definition">#</a></dt>
-<dd><p>Emitted whenever the alternate pointer button is pressed
-(e.g.: right mouse button).</p>
+<dd><p>Emitted whenever a pointer button is pressed.</p>
 </dd></dl>
 
 <dl class="py property">
@@ -811,7 +786,7 @@ released.</p>
 synchronise your calls with the <a class="reference internal" href="timer.html#module-KateAPI.timer" title="KateAPI.timer: Schedule functions in synchrony with Kate's refresh rate."><code class="xref py py-mod docutils literal notranslate"><span class="pre">KateAPI.timer</span></code></a> API.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="KateAPI.pointer_input.frames_pressed">
-<span class="sig-prename descclassname"><span class="pre">KateAPI.pointer_input.</span></span><span class="sig-name descname"><span class="pre">frames_pressed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">button</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">number</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">number</span></span></span><a class="headerlink" href="#KateAPI.pointer_input.frames_pressed" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">KateAPI.pointer_input.</span></span><span class="sig-name descname"><span class="pre">frames_pressed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">button</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#KateAPI.pointer_input.PointerButton" title="KateAPI.pointer_input.PointerButton"><span class="pre">PointerButton</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">number</span></span></span><a class="headerlink" href="#KateAPI.pointer_input.frames_pressed" title="Permalink to this definition">#</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>button</strong> – The identifier of the button to query.</p>
@@ -822,7 +797,7 @@ synchronise your calls with the <a class="reference internal" href="timer.html#m
 
 <dl class="py function">
 <dt class="sig sig-object py" id="KateAPI.pointer_input.is_pressed">
-<span class="sig-prename descclassname"><span class="pre">KateAPI.pointer_input.</span></span><span class="sig-name descname"><span class="pre">is_pressed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">button</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">number</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">boolean</span></span></span><a class="headerlink" href="#KateAPI.pointer_input.is_pressed" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">KateAPI.pointer_input.</span></span><span class="sig-name descname"><span class="pre">is_pressed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">button</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#KateAPI.pointer_input.PointerButton" title="KateAPI.pointer_input.PointerButton"><span class="pre">PointerButton</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">boolean</span></span></span><a class="headerlink" href="#KateAPI.pointer_input.is_pressed" title="Permalink to this definition">#</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>button</strong> – The identifier of the button to query.</p>
@@ -834,7 +809,7 @@ call does not have to be synchronised with the Timer API.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="KateAPI.pointer_input.is_just_pressed">
-<span class="sig-prename descclassname"><span class="pre">KateAPI.pointer_input.</span></span><span class="sig-name descname"><span class="pre">is_just_pressed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">button</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">number</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">boolean</span></span></span><a class="headerlink" href="#KateAPI.pointer_input.is_just_pressed" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">KateAPI.pointer_input.</span></span><span class="sig-name descname"><span class="pre">is_just_pressed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">button</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#KateAPI.pointer_input.PointerButton" title="KateAPI.pointer_input.PointerButton"><span class="pre">PointerButton</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">boolean</span></span></span><a class="headerlink" href="#KateAPI.pointer_input.is_just_pressed" title="Permalink to this definition">#</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>button</strong> – The identifier of the button to query.</p>
@@ -846,7 +821,7 @@ if your update function is synchronised with the Timer API.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="KateAPI.pointer_input.is_just_released">
-<span class="sig-prename descclassname"><span class="pre">KateAPI.pointer_input.</span></span><span class="sig-name descname"><span class="pre">is_just_released</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">button</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">number</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">boolean</span></span></span><a class="headerlink" href="#KateAPI.pointer_input.is_just_released" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">KateAPI.pointer_input.</span></span><span class="sig-name descname"><span class="pre">is_just_released</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">button</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#KateAPI.pointer_input.PointerButton" title="KateAPI.pointer_input.PointerButton"><span class="pre">PointerButton</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">boolean</span></span></span><a class="headerlink" href="#KateAPI.pointer_input.is_just_released" title="Permalink to this definition">#</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>button</strong> – The identifier of the button to query.</p>
@@ -925,16 +900,16 @@ if your update function is synchronised with the Timer API.</p>
 </li>
 <li><a class="reference internal" href="#button-identifiers">Button identifiers</a><ul>
 <li><a class="reference internal" href="#KateAPI.input.InputKey"><code class="docutils literal notranslate"><span class="pre">InputKey</span></code></a></li>
-<li><a class="reference internal" href="#KateAPI.input.ExtendedKeyPressedEvent"><code class="docutils literal notranslate"><span class="pre">ExtendedKeyPressedEvent</span></code></a><ul>
-<li><a class="reference internal" href="#KateAPI.input.ExtendedKeyPressedEvent.key"><code class="docutils literal notranslate"><span class="pre">ExtendedKeyPressedEvent.key</span></code></a></li>
-<li><a class="reference internal" href="#KateAPI.input.ExtendedKeyPressedEvent.is_repeat"><code class="docutils literal notranslate"><span class="pre">ExtendedKeyPressedEvent.is_repeat</span></code></a></li>
+<li><a class="reference internal" href="#KateAPI.input.KeyPressedEvent"><code class="docutils literal notranslate"><span class="pre">KeyPressedEvent</span></code></a><ul>
+<li><a class="reference internal" href="#KateAPI.input.KeyPressedEvent.key"><code class="docutils literal notranslate"><span class="pre">KeyPressedEvent.key</span></code></a></li>
+<li><a class="reference internal" href="#KateAPI.input.KeyPressedEvent.is_repeat"><code class="docutils literal notranslate"><span class="pre">KeyPressedEvent.is_repeat</span></code></a></li>
+<li><a class="reference internal" href="#KateAPI.input.KeyPressedEvent.is_long_press"><code class="docutils literal notranslate"><span class="pre">KeyPressedEvent.is_long_press</span></code></a></li>
 </ul>
 </li>
 </ul>
 </li>
 <li><a class="reference internal" href="#events">Events</a><ul>
 <li><a class="reference internal" href="#KateAPI.input.on_key_pressed"><code class="docutils literal notranslate"><span class="pre">on_key_pressed</span></code></a></li>
-<li><a class="reference internal" href="#KateAPI.input.on_extended_key_pressed"><code class="docutils literal notranslate"><span class="pre">on_extended_key_pressed</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#querying-button-states">Querying button states</a><ul>
@@ -970,6 +945,7 @@ if your update function is synchronised with the Timer API.</p>
 </li>
 <li><a class="reference internal" href="#pointer-buttons">Pointer buttons</a><ul>
 <li><a class="reference internal" href="#id3">Types</a><ul>
+<li><a class="reference internal" href="#KateAPI.pointer_input.PointerButton"><code class="docutils literal notranslate"><span class="pre">PointerButton</span></code></a></li>
 <li><a class="reference internal" href="#KateAPI.pointer_input.PointerClick"><code class="docutils literal notranslate"><span class="pre">PointerClick</span></code></a><ul>
 <li><a class="reference internal" href="#KateAPI.pointer_input.PointerClick.location"><code class="docutils literal notranslate"><span class="pre">PointerClick.location</span></code></a></li>
 <li><a class="reference internal" href="#KateAPI.pointer_input.PointerClick.button"><code class="docutils literal notranslate"><span class="pre">PointerClick.button</span></code></a></li>
@@ -979,7 +955,6 @@ if your update function is synchronised with the Timer API.</p>
 </li>
 <li><a class="reference internal" href="#id4">Events</a><ul>
 <li><a class="reference internal" href="#KateAPI.pointer_input.on_clicked"><code class="docutils literal notranslate"><span class="pre">on_clicked</span></code></a></li>
-<li><a class="reference internal" href="#KateAPI.pointer_input.on_alternate"><code class="docutils literal notranslate"><span class="pre">on_alternate</span></code></a></li>
 <li><a class="reference internal" href="#KateAPI.pointer_input.on_down"><code class="docutils literal notranslate"><span class="pre">on_down</span></code></a></li>
 <li><a class="reference internal" href="#KateAPI.pointer_input.on_up"><code class="docutils literal notranslate"><span class="pre">on_up</span></code></a></li>
 </ul>

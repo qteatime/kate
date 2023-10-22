@@ -179,7 +179,6 @@
 <li class="toctree-l3"><a class="reference internal" href="user/manual/security/sandboxing.html">Sandboxing</a></li>
 <li class="toctree-l3"><a class="reference internal" href="user/manual/security/privacy.html">Privacy policy</a></li>
 <li class="toctree-l3"><a class="reference internal" href="user/manual/security/trust.html">Trust and consent</a></li>
-<li class="toctree-l3"><a class="reference internal" href="user/manual/security/indicators.html">Resource indicators</a></li>
 <li class="toctree-l3"><a class="reference internal" href="user/manual/security/audit.html">Audit logs</a></li>
 </ul>
 </li>
@@ -432,8 +431,6 @@
 </li>
         <li><a href="dev/manual/api/events.html#KateAPI.events.EventStream">EventStream (class in KateAPI.events)</a>
 </li>
-        <li><a href="dev/manual/api/input.html#KateAPI.input.ExtendedKeyPressedEvent">ExtendedKeyPressedEvent (class in KateAPI.input)</a>
-</li>
     </ul></td>
   </tr></table>
 </section>
@@ -512,6 +509,8 @@
         </ul></li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="dev/manual/api/input.html#KateAPI.input.KeyPressedEvent.is_long_press">is_long_press (KateAPI.input.KeyPressedEvent property)</a>
+</li>
         <li><a href="dev/manual/api/input.html#KateAPI.input.is_paused">is_paused (in module KateAPI.input)</a>
 </li>
         <li><a href="dev/manual/api/input.html#KateAPI.input.is_pressed">is_pressed() (in module KateAPI.input)</a>
@@ -520,7 +519,7 @@
           <li><a href="dev/manual/api/input.html#KateAPI.pointer_input.is_pressed">(in module KateAPI.pointer_input)</a>
 </li>
         </ul></li>
-        <li><a href="dev/manual/api/input.html#KateAPI.input.ExtendedKeyPressedEvent.is_repeat">is_repeat (KateAPI.input.ExtendedKeyPressedEvent property)</a>
+        <li><a href="dev/manual/api/input.html#KateAPI.input.KeyPressedEvent.is_repeat">is_repeat (KateAPI.input.KeyPressedEvent property)</a>
 </li>
     </ul></td>
   </tr></table>
@@ -588,12 +587,14 @@
           <li><a href="dev/manual/api/timer.html#module-KateAPI.timer">module</a>
 </li>
         </ul></li>
-        <li><a href="dev/manual/api/input.html#KateAPI.input.ExtendedKeyPressedEvent.key">key (KateAPI.input.ExtendedKeyPressedEvent property)</a>
+        <li><a href="dev/manual/api/input.html#KateAPI.input.KeyPressedEvent.key">key (KateAPI.input.KeyPressedEvent property)</a>
 
         <ul>
           <li><a href="dev/manual/api/store.html#KateAPI.store.ObjectMetadata.key">(KateAPI.store.ObjectMetadata property)</a>
 </li>
         </ul></li>
+        <li><a href="dev/manual/api/input.html#KateAPI.input.KeyPressedEvent">KeyPressedEvent (class in KateAPI.input)</a>
+</li>
     </ul></td>
   </tr></table>
 </section>
@@ -691,20 +692,16 @@
 </li>
         <li><a href="dev/manual/api/store.html#KateAPI.store.ObjectMetadata">ObjectMetadata (class in KateAPI.store)</a>
 </li>
-        <li><a href="dev/manual/api/input.html#KateAPI.pointer_input.on_alternate">on_alternate (in module KateAPI.pointer_input)</a>
-</li>
         <li><a href="dev/manual/api/input.html#KateAPI.pointer_input.on_clicked">on_clicked (in module KateAPI.pointer_input)</a>
 </li>
         <li><a href="dev/manual/api/input.html#KateAPI.pointer_input.on_down">on_down (in module KateAPI.pointer_input)</a>
 </li>
-        <li><a href="dev/manual/api/input.html#KateAPI.input.on_extended_key_pressed">on_extended_key_pressed (in module KateAPI.input)</a>
-</li>
         <li><a href="dev/manual/api/input.html#KateAPI.input.on_key_pressed">on_key_pressed (in module KateAPI.input)</a>
+</li>
+        <li><a href="dev/manual/api/input.html#KateAPI.pointer_input.on_moved">on_moved (in module KateAPI.pointer_input)</a>
 </li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="dev/manual/api/input.html#KateAPI.pointer_input.on_moved">on_moved (in module KateAPI.pointer_input)</a>
-</li>
         <li><a href="dev/manual/api/timer.html#KateAPI.timer.on_tick">on_tick (in module KateAPI.timer)</a>
 </li>
         <li><a href="dev/manual/api/input.html#KateAPI.pointer_input.on_up">on_up (in module KateAPI.pointer_input)</a>
@@ -738,6 +735,8 @@
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="glossary.html#term-Pointer-input"><strong>Pointer (input)</strong></a>
+</li>
+        <li><a href="dev/manual/api/input.html#KateAPI.pointer_input.PointerButton">PointerButton (class in KateAPI.pointer_input)</a>
 </li>
         <li><a href="dev/manual/api/input.html#KateAPI.pointer_input.PointerClick">PointerClick (class in KateAPI.pointer_input)</a>
 </li>

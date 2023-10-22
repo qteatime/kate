@@ -181,7 +181,6 @@
 <li class="toctree-l3"><a class="reference internal" href="../security/sandboxing.html">Sandboxing</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../security/privacy.html">Privacy policy</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../security/trust.html">Trust and consent</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../security/indicators.html">Resource indicators</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../security/audit.html">Audit logs</a></li>
 </ul>
 </li>
@@ -327,14 +326,14 @@ play it.</p>
 <span id="id1"></span><h2>Installing cartridges<a class="headerlink" href="#installing-cartridges" title="Permalink to this heading">#</a></h2>
 <p>Once you have a <code class="docutils literal notranslate"><span class="pre">.kart</span></code> cartridge file you can install it in Kate. In the
 emulator, there are two ways you can install a cartridge:</p>
-<dl>
+<dl class="simple">
 <dt><strong>Drag-and-drop the cartridge file on the emulator</strong></dt><dd><p>In a laptop or desktop computer, you can drag-and-drop one or more
 <code class="docutils literal notranslate"><span class="pre">.kart</span></code> files directly onto the console to install them.</p>
-<video src="../../../_static/video/kate-dnd.webm" controls></dd>
-<dt><strong>Use the “Install cartridge” button</strong></dt><dd><p>From the Start screen in Kate, you can hold down <a class="reference internal" href="../../../_images/menu_24.png"><img alt="Menu button" class="align-middle" src="../../../_images/menu_24.png" style="height: 1em;" /></a> <em>(Menu button)</em> and
-select <code class="docutils literal notranslate"><span class="pre">Install</span> <span class="pre">cartridge</span></code>. This will open a file picker so you can
+</dd>
+<dt><strong>Use the “Install cartridge” button</strong></dt><dd><p>From the Start screen in Kate, you can press <a class="reference internal" href="../../../_images/berry_32.png"><img alt="Berry button" class="align-middle" src="../../../_images/berry_32.png" style="height: 1em;" /></a> <em>(Berry button)</em> and
+select <code class="docutils literal notranslate"><span class="pre">Install</span> <span class="pre">cartridge</span></code>. This will open a file picker where you can
 select the <code class="docutils literal notranslate"><span class="pre">.kart</span></code> files that you want to install.</p>
-<video src="../../../_static/video/kate-install-cartridge.webm" controls></dd>
+</dd>
 </dl>
 </section>
 <section id="your-library">
@@ -346,7 +345,7 @@ either when you last played a cartridge, or when you last installed it.</p>
 <a class="reference internal" href="play-habits.html"><span class="doc">Play Habits</span></a> feature, which records this information locally. You can
 enable or disable the play habits tracking from the <code class="docutils literal notranslate"><span class="pre">Settings</span></code>.</p>
 <p>You can play cartridges from your library by clicking them, tapping them,
-or pressing <a class="reference internal" href="../../../_images/ok_24.png"><img alt="Ok button (a.k.a. O)" class="align-middle" src="../../../_images/ok_24.png" style="height: 1em;" /></a> while they’re focused.</p>
+or pressing <a class="reference internal" href="../../../_images/ok_32.png"><img alt="Ok button (a.k.a. O)" class="align-middle" src="../../../_images/ok_32.png" style="height: 1em;" /></a> while they’re focused.</p>
 </section>
 <section id="storage-usage">
 <h2>Storage usage<a class="headerlink" href="#storage-usage" title="Permalink to this heading">#</a></h2>
@@ -355,7 +354,7 @@ your device, so you can run it offline and without needing the original
 cartridge file at any time.</p>
 <p>If you need to delete data to make space up for new games, you may
 consider <a class="reference internal" href="../../../glossary.html#term-Archiving"><span class="xref std std-term">archiving the cartridge</span></a>. You can do
-so from the cartridge’s storage page (from the home screen, press <a class="reference internal" href="../../../_images/menu_24.png"><img alt="Menu button" class="align-middle" src="../../../_images/menu_24.png" style="height: 1em;" /></a> <em>(Menu button)</em>
+so from the cartridge’s storage page (from the home screen, press <a class="reference internal" href="../../../_images/menu_32.png"><img alt="Menu button" class="align-middle" src="../../../_images/menu_32.png" style="height: 1em;" /></a> <em>(Menu button)</em>
 and select <code class="docutils literal notranslate"><span class="pre">Manage</span> <span class="pre">data</span></code>).</p>
 <p>When archiving a cartridge, the cartridge data is removed from your local
 device, but metadata (which Kate uses to display the cartridge), save data,
@@ -369,9 +368,10 @@ cartridge at a later point in time and continue from where you left off.</p>
 cannot access data on your device or use the internet in any way. By
 sandboxing all cartridges Kate greatly limits the possible impacts to
 your device or data, even if you end up running a malicious cartridge.</p>
-<p>In the future, cartridges will be able to request special permissions
-to do things with your device or data, which puts you in control of what
-you’re comfortable or not in letting the cartridge do.</p>
+<p>Cartridges that need more privileges can request special permissions
+to do things with your device or data. This puts you in control of what
+you’re comfortable or not in letting the cartridge do, just like in mobile
+phone OSs.</p>
 <p>Details are discussed in the
 <a class="reference internal" href="../security/index.html"><span class="doc">Security and Privacy</span></a> section.</p>
 </section>
@@ -379,35 +379,12 @@ you’re comfortable or not in letting the cartridge do.</p>
 <h2>Credits and licences<a class="headerlink" href="#credits-and-licences" title="Permalink to this heading">#</a></h2>
 <p>Each Kate cartridge contains, embedded within it, the way the cartridge
 is licensed to you—how the developers expect you to use the cartridge.
-You can read the licence text by pressing <a class="reference internal" href="../../../_images/menu_24.png"><img alt="Menu button" class="align-middle" src="../../../_images/menu_24.png" style="height: 1em;" /></a> <em>(Menu button)</em> in the library and
-choosing <code class="docutils literal notranslate"><span class="pre">Legal</span> <span class="pre">notices</span></code>. Or holding down <a class="reference internal" href="../../../_images/menu_24.png"><img alt="Menu button" class="align-middle" src="../../../_images/menu_24.png" style="height: 1em;" /></a> <em>(Menu button)</em> while running a
+You can read the licence text by pressing <a class="reference internal" href="../../../_images/menu_32.png"><img alt="Menu button" class="align-middle" src="../../../_images/menu_32.png" style="height: 1em;" /></a> <em>(Menu button)</em> in the library and
+choosing <code class="docutils literal notranslate"><span class="pre">Legal</span> <span class="pre">notices</span></code>. Or pressing <a class="reference internal" href="../../../_images/berry_32.png"><img alt="Berry button" class="align-middle" src="../../../_images/berry_32.png" style="height: 1em;" /></a> <em>(Berry button)</em> while running a
 cartridge and selecting <code class="docutils literal notranslate"><span class="pre">Legal</span> <span class="pre">notices</span></code>.</p>
-<p>There are three portions to this screen:</p>
-<dl>
-<dt><strong>The specific licence the cartridge uses</strong></dt><dd><p>Games may be released under open-source permissive licences, such
-as <a class="reference external" href="https://creativecommons.org/">Creative Commons</a>, or they may
-be released under proprietary, restricted licences. Unless otherwise
-stated, the cartridge contents belongs to its original developers,
-and it is they who decide in what ways you can engage with the
-cartridge.</p>
-</dd>
-<dt><strong>The cartridge allowances</strong></dt><dd><p>Kate has a philosophy of giving players control over how they run
-their games. This is very important from an accessibility perspective,
-as players with particular accessibility needs <strong>may have to</strong> modify
-the cartridge in ways the original developer did not intend to be able
-to play it at all.</p>
-<p>The allowances section of the cartridge’s licence summarises these
-allowances, so you can make your changes while staying compliant and
-respectful of the developer’s wishes.</p>
-</dd>
-<dt><strong>The licence text</strong></dt><dd><p>This is the full licence text that developers may include in their
-cartridge. The text is legally binding, whereas the other sections
-of the cartridge’s legal notices are just informative summaries.</p>
-<p>This text often contains the full game credits, as well as legal
-notices of any third-party software/assets that the cartridge
-includes.</p>
-</dd>
-</dl>
+<p>Cartridges that have use the internet or link to an internet location in
+any way also include a privacy policy, which you can find in the same menu
+the legal notices are available.</p>
 </section>
 </section>
 

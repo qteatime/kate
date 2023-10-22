@@ -181,7 +181,6 @@
 <li class="toctree-l3"><a class="reference internal" href="sandboxing.html">Sandboxing</a></li>
 <li class="toctree-l3 current current-page"><a class="current reference internal" href="#">Privacy policy</a></li>
 <li class="toctree-l3"><a class="reference internal" href="trust.html">Trust and consent</a></li>
-<li class="toctree-l3"><a class="reference internal" href="indicators.html">Resource indicators</a></li>
 <li class="toctree-l3"><a class="reference internal" href="audit.html">Audit logs</a></li>
 </ul>
 </li>
@@ -318,42 +317,37 @@
 and data about the cartridges you play never leaves your device. That said,
 there are a few things that may be a cause for concern, depending on your
 personal privacy context.</p>
-<section id="the-web-emulator">
-<h2>The web emulator<a class="headerlink" href="#the-web-emulator" title="Permalink to this heading">#</a></h2>
-<p>When using the web emulator, at &lt;<a class="reference external" href="https://kate.qteati.me">https://kate.qteati.me</a>&gt;, the server at
-the end of that address will receive your computer’s IP address. (since it
+<section id="the-web-based-emulator">
+<h2>The web-based emulator<a class="headerlink" href="#the-web-based-emulator" title="Permalink to this heading">#</a></h2>
+<p>When using the web emulator through the public instance,
+at <a class="reference external" href="https://kate.qteati.me">https://kate.qteati.me</a>, the server at the end of that address will
+receive your computer’s IP address. (since it
 has to know where to send a reply back to—this happens for any website).
 An IP address may provide to the server a rough estimate of your physical
 location (e.g.: the country you’re accessing the website from). The browser
-also sends some information about your device to the server which will
+also sends some information about your device to the server which
 may disclose your operating system, browser version, and other technical
 details.</p>
-<p>Kate developers do not have any tracking code and do not store or have access
-to this information. However, the server is controlled by GitHub,
-and we can make no guarantees about their internal processes with this data.
-You can <a class="reference external" href="https://docs.github.com/en/pages/getting-started-with-github-pages/about-github-pages#data-collection">read GitHub’s privacy statements here</a>.</p>
+<p>The public instance does not have any tracking code, however access information
+is logged for debugging and security purposes. This data is kept for the
+duration necessary to debug issues and protect the server itself from
+malicious traffic.</p>
 <p>More troubling, however, is that all data stored locally in Kate’s database
-is available for any code loaded from &lt;<a class="reference external" href="https://kate.qteati.me/">https://kate.qteati.me/</a>&gt;. This means
+is available for any code loaded from <a class="reference external" href="https://kate.qteati.me/">https://kate.qteati.me/</a>. This means
 that if the server, domain, or your connection are compromised, you may
 receive back malicious code that would have access to all data in your
 Kate’s database (but not other data in your device!).</p>
-<p>Barring major crisis, Kate’s domain and servers have a solid maintenance
-plan until at least 2026. For archival uses, you should rather consider
-running the whole emulator locally.</p>
-</section>
-<section id="the-updater">
-<h2>The updater<a class="headerlink" href="#the-updater" title="Permalink to this heading">#</a></h2>
-<p>When accessing the update feature in <code class="docutils literal notranslate"><span class="pre">About</span> <span class="pre">Kate</span></code>, your IP and some
-information about your browser and OS will be sent to Kate’s server.
-See above for the privacy implications of this.</p>
+<p>Barring major crisis, Kate’s public instance has a solid maintenance
+plan until 2028. For archival purposes you should rather consider
+<a class="reference internal" href="../intro/install.html#running-your-own-kate-instance"><span class="std std-ref">Running your own Kate instance</span></a> or using the <a class="reference internal" href="../intro/install.html#native-application"><span class="std std-ref">Native application</span></a>.</p>
 </section>
 <section id="running-kate-offline">
 <h2>Running Kate offline<a class="headerlink" href="#running-kate-offline" title="Permalink to this heading">#</a></h2>
-<p>If you install the Kate web application, but run it without any network
-access, then no data leaves your computer as the files are all loaded from
-your device’s local cache. Do note that if you run it with a network
-connection, then Kate will make a network connection to &lt;<a class="reference external" href="https://kate.qteati.me">https://kate.qteati.me</a>&gt;
-to check for updates.</p>
+<p>If you install the Kate web application from the public instance, but run it
+without any network access, then no data leaves your computer as the files
+are all loaded from your device’s local cache. Do note that if you run it
+with a network connection, then your browser may make a network connection
+to <a class="reference external" href="https://kate.qteati.me">https://kate.qteati.me</a> to check for updates.</p>
 </section>
 <section id="locally-collected-data">
 <h2>Locally collected data<a class="headerlink" href="#locally-collected-data" title="Permalink to this heading">#</a></h2>
@@ -363,32 +357,31 @@ control some of the data Kate collects from the <code class="docutils literal no
 <p>Information stored locally includes:</p>
 <dl class="simple">
 <dt><strong>The Kate settings</strong></dt><dd><p>Things like connected gamepads, keyboard configuration, and accessibility
-options are stored under settings. You can remove this data by going to
+options are stored under settings. You can remove all this data by going to
 <code class="docutils literal notranslate"><span class="pre">Settings</span> <span class="pre">-&gt;</span> <span class="pre">Diagnostics</span> <span class="pre">&amp;</span> <span class="pre">Recovery</span></code> and using the
 <code class="docutils literal notranslate"><span class="pre">Restore</span> <span class="pre">default</span> <span class="pre">settings</span></code> button.</p>
 </dd>
-<dt><strong>Cartridges and save data</strong></dt><dd><p>This includes cartridges you install, and any data they store in your device.
+<dt><strong>Cartridges and save data</strong></dt><dd><p>This includes cartridges you install and any data they store in your device.
 You can remove this data by going to <code class="docutils literal notranslate"><span class="pre">Settings</span> <span class="pre">-&gt;</span> <span class="pre">Storage</span></code> and using one
 of the <a class="reference internal" href="../gaming/storage.html"><span class="doc">cartridge data management options</span></a>.</p>
 </dd>
-<dt><strong>Play habits</strong></dt><dd><p>This includes things like when you last ran a cartridge and how much you’ve
+<dt><strong>Play habits</strong></dt><dd><p>This includes things like when you last ran a cartridge and for how long you’ve
 played them. You can choose to not have this data collected under
 <code class="docutils literal notranslate"><span class="pre">Settings</span> <span class="pre">-&gt;</span> <span class="pre">Play</span> <span class="pre">habits</span></code>. You can also delete any previously collected
 data (all of it, or for specific cartridges) from the same screen.</p>
 </dd>
-<dt><strong>Update channel and version</strong></dt><dd><p>Kate tracks which version you’re running and which updates it can offer
-you. You can change the update channel from the <code class="docutils literal notranslate"><span class="pre">About</span> <span class="pre">Kate</span></code> screen,
-however fully removing this data is only possible if you erase all data
-in the Kate database, resetting the console.</p>
+<dt><strong>Audit log</strong></dt><dd><p>This includes things like what cartridges were installed, what permissions
+were granted, and similar changes to Kate’s database. Logs are subject to
+the retention you specify in <code class="docutils literal notranslate"><span class="pre">Settings</span> <span class="pre">-&gt;</span> <span class="pre">Audit</span> <span class="pre">log</span></code>.</p>
 </dd>
 </dl>
 <p>You can erase all data Kate has stored locally and reset the console by going
 to <code class="docutils literal notranslate"><span class="pre">Settings</span> <span class="pre">-&gt;</span> <span class="pre">Diagnostics</span> <span class="pre">&amp;</span> <span class="pre">Recovery</span></code> and using the <code class="docutils literal notranslate"><span class="pre">Delete</span> <span class="pre">all</span> <span class="pre">data</span></code>
 button.</p>
-<p>When running the web version of Kate, you can also remove all data using your
+<p>When running the web version of Kate you can also remove all data using your
 browser’s “Clear cookies and site data” feature. You should make sure to clear
 <em>all</em> data used by Kate if using this, as otherwise the browser will leave
-Kate in an inconsistent state and the emulator will never be able to start
+Kate in an inconsistent state and the emulator will not be able to start
 again afterwards.</p>
 </section>
 </section>
@@ -449,8 +442,7 @@ again afterwards.</p>
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Privacy policy</a><ul>
-<li><a class="reference internal" href="#the-web-emulator">The web emulator</a></li>
-<li><a class="reference internal" href="#the-updater">The updater</a></li>
+<li><a class="reference internal" href="#the-web-based-emulator">The web-based emulator</a></li>
 <li><a class="reference internal" href="#running-kate-offline">Running Kate offline</a></li>
 <li><a class="reference internal" href="#locally-collected-data">Locally collected data</a></li>
 </ul>

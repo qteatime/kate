@@ -181,7 +181,6 @@
 <li class="toctree-l3"><a class="reference internal" href="sandboxing.html">Sandboxing</a></li>
 <li class="toctree-l3"><a class="reference internal" href="privacy.html">Privacy policy</a></li>
 <li class="toctree-l3"><a class="reference internal" href="trust.html">Trust and consent</a></li>
-<li class="toctree-l3"><a class="reference internal" href="indicators.html">Resource indicators</a></li>
 <li class="toctree-l3"><a class="reference internal" href="audit.html">Audit logs</a></li>
 </ul>
 </li>
@@ -319,9 +318,9 @@ all the catalog of games, pick whatever you like, and just run it. You know
 it’s going to run reasonably well on your console, and it won’t cause any
 damages to your device.</p>
 <p>Unfortunately, developing for a console has not been historically too
-democratic. As an individual, it’s harder to get your game on a console.
+democratic. As an individual it’s harder to get your game on a console.
 And even when you do, it’s not something you can do free of cost. Or for
-any small game you wish to publish. In that sense, gaming on computer is
+any small game you wish to publish. In that sense gaming on a computer is
 much better.</p>
 <p>But gaming on a computer is less than ideal. You start by browing the catalog
 of games and choosing the ones you like, as usual, but now, rather than rushing
@@ -333,21 +332,21 @@ to play it, you’re forced to ask yourself a lot of questions:</p>
 <li><p>How do I run this on my computer?</p></li>
 <li><p>Do I trust the person who made this game?</p></li>
 <li><p>Oh, no, when I try to run it it shows me a scary security dialogue…</p></li>
-<li><p>The developer says I can totally trust them and just ignore the security warning.</p></li>
-<li><p>It runs… and then crashes 2 minutes later…</p></li>
+<li><p>It runs… and then crashes 2 minutes later but I have no idea why…</p></li>
 <li><p>It runs now, but the gamepad I’m using is not the one they use in the screen
 so I never know which buttons to press.</p></li>
 </ul>
 <p>And so on, and so forth. Every time you run a video game on your computer,
-on top of all this additional effort, there’s this ever looming shadow of
-“what if this is actually a virus and it does bad things on my computer?”
-It’s always there, in a way that isn’t really a concern in console gaming.</p>
+on top of all this additional effort from non-standard hardware, there’s this
+ever looming shadow of “what if this is actually a virus and it does bad things
+on my computer?” It’s always there, in a way that isn’t really a concern in
+console gaming.</p>
 <p>Kate’s safety philosophy is that gaming on a computer should be like gaming
 on consoles: pain-free and with no risks attached. But it should maintain
 the same democratic “everyone can publish a video game” aspect computer
 games have.</p>
-<section id="the-safety-to-install-a-game">
-<h2>The safety to install a game<a class="headerlink" href="#the-safety-to-install-a-game" title="Permalink to this heading">#</a></h2>
+<section id="installing-games-safely">
+<h2>Installing games, safely<a class="headerlink" href="#installing-games-safely" title="Permalink to this heading">#</a></h2>
 <p>Installing computer games is tricky. Some games are distributed as a ZIP
 archive. Some games are distributed as an installer application. Some
 games are distributed as a collection of files, or as a single file,
@@ -361,17 +360,23 @@ else in your computer might. Or you might end up accidentally deleting some
 of them. You might even need to move the folder containing the game files
 around. But none of these actions are safe—doing so might corrupt the game
 beyond repair, and there’s no way to know beforehand if it will.</p>
+<p>Worse still: if the game <em>is</em> corrupted, there’s no way of knowing how you
+can make it work again. Simply reinstalling it <strong>might not be sufficient</strong>
+because data might be laying around in folders outside of the control of
+the installer that make <em>your entire computer</em> incompatible with a new
+installation!</p>
 <p>Kate aims to do away with any lack of safety during installation: you get
 exactly one cartridge file, and there’s exactly one way of installing and
 uninstalling it, regardless of which device or operating system you use.
 Once you install, there are no ways of corrupting the installed game files
-by just using your device.</p>
+by just using your device. Even if you delete data the game has saved after
+installation.</p>
 <p>How Kate does this is described in the <a class="reference internal" href="../gaming/cartridges.html"><span class="doc">cartridges section</span></a>.</p>
 </section>
-<section id="the-safety-to-run-a-game">
-<h2>The safety to run a game<a class="headerlink" href="#the-safety-to-run-a-game" title="Permalink to this heading">#</a></h2>
+<section id="running-a-game-safely">
+<h2>Running a game, safely<a class="headerlink" href="#running-a-game-safely" title="Permalink to this heading">#</a></h2>
 <p>Computer games are generally not <a class="reference internal" href="../../../glossary.html#term-Sandboxing"><span class="xref std std-term">sandboxed</span></a>. This means that when
-they run on your computer, they can do anything you, as the computer user,
+they run on your computer they can do anything you, as the computer user,
 could do. If you can delete every file in your computer, so can the game.
 If you can modify every file in your computer, so can the game. If you can
 send things to your friend via a messaging app, the game might be able to
@@ -391,8 +396,8 @@ change anything about the problem above.</p>
 <p>Operating system vendors are betting on the idea that “if a lot of people run
 this without complaining, it’s <em>probably</em> safe”, but that only works if the
 game is very popular and you’re not the first person to install it. It doesn’t
-prevent any harm and damage from being caused, but it <em>might</em> avoid it from
-damaging every user.</p>
+prevent any harm and damage from being caused, but it <em>might</em> avoid a scenario
+where a lot of users are harmed.</p>
 <p>So you have the same problem, but worse: now developers need to pay significant
 amounts of money to release their games with a “i made this” seal. You, as the
 player, do not get any real security out of this. And you’ll still see the same
@@ -408,12 +413,12 @@ Even if they happen to be malicious. In this case there’s no need for
 signatures, and there’s no need for thinking about whether or not you trust the
 developer. You just run the game, the worst thing that could happen is
 the game crashing.</p>
-<p>How Kate the whole sandbox thing works is described in the
+<p>How the whole sandbox thing works is described in the
 <a class="reference internal" href="sandboxing.html"><span class="doc">sandboxing section</span></a>.</p>
 </section>
-<section id="the-safety-to-know-you-can-play">
-<h2>The safety to know you can play<a class="headerlink" href="#the-safety-to-know-you-can-play" title="Permalink to this heading">#</a></h2>
-<p>When you buy a console game, you generally expect that it will work with
+<section id="knowing-you-can-play-a-game">
+<h2>Knowing you <em>can</em> play a game<a class="headerlink" href="#knowing-you-can-play-a-game" title="Permalink to this heading">#</a></h2>
+<p>When you buy a console game you generally expect that it will work with
 the console you have—after all, there’s only one hardware the developers
 need to test on. Console game bugs are generally of the “if you press X
 when standing near a cliff and holding a meelee weapon while wearing
@@ -445,7 +450,7 @@ are subject to the same sandboxing and isolation principle that cartridges
 are, both for security and to make sure they can’t break the baseline
 expectations Kate relies on—otherwise we’d end up in the same place
 Windows and Linux are in, where there’s no real baseline developers can
-expect when publishing their games, because every user may have modified
+expect when publishing their games because every user may have modified
 core aspects of their computers.</p>
 <p>Going further, Kate also attempts to address problems that are not
 technical in nature. Cartridges’ metadata can contain information on
@@ -458,55 +463,55 @@ context at the moment.</p>
 to the <a class="reference internal" href="../intro/emulator.html"><span class="doc">emulator requirements</span></a>. Mods and
 accessibility support guidelines are still not implemented.</p>
 </section>
-<section id="the-safety-for-your-data">
-<h2>The safety for your data<a class="headerlink" href="#the-safety-for-your-data" title="Permalink to this heading">#</a></h2>
-<p>When you a video game, or any other application, it’s very hard to know
+<section id="keeping-your-data-safe">
+<h2>Keeping your data safe<a class="headerlink" href="#keeping-your-data-safe" title="Permalink to this heading">#</a></h2>
+<p>When you run a video game, or any other application, it’s very hard to know
 what data it can access. This is true even for phone apps, which are
 <a class="reference internal" href="../../../glossary.html#term-Sandboxing"><span class="xref std std-term">sandboxed</span></a>, and thus limited in what they can do.</p>
 <p>This is made worse when a video game (or app) has internet access. Now,
-whatever information it has managed to access, can travel outside of
+whatever information it has managed to access can travel outside of
 your computer and to someone else, without your consent, or, really, even
 without your knowledge. Given that people have more of their lives stored
-in their computers nowadays, privacy is a much bigger concern now.</p>
+in their computers nowadays privacy is a much bigger concern now.</p>
 <p>There are a few different ways of addressing this problem, but Kate just
 picks the simplest one to explain: no cartridge in Kate has access to
 the internet, and no cartridge in Kate has access to your device’s storage.
-In essence what this means is that the only data a cartridge can read
+In essence, what this means is that the only data a cartridge can read
 is what you provide them with, and the only thing they can do with this
-data is process locally—they can never make any piece of data leave your device.</p>
+data is process locally—they can never make any piece of data leave your device,
+unless you specifically give the cartridge more permissions.</p>
 </section>
-<section id="the-safety-to-know-what-s-happening">
-<h2>The safety to know what’s happening<a class="headerlink" href="#the-safety-to-know-what-s-happening" title="Permalink to this heading">#</a></h2>
-<p>Computers in general (including consoles) are very complex, and very powerful.
+<section id="feeling-safe-by-knowing-what-s-happening">
+<h2>Feeling safe by knowing what’s happening<a class="headerlink" href="#feeling-safe-by-knowing-what-s-happening" title="Permalink to this heading">#</a></h2>
+<p>Computers in general (including consoles) are very complex and very powerful.
 But they’re generally a kind of black box: there are many things that are
-always happening in a computer that you will have no knowledge of. But some
-of these things have significant impact on your device’s security and your
-privacy and safety.</p>
+always happening in a computer that you will have no knowledge of. And some
+of these things have significant impact on your device’s security, your
+privacy, and safety.</p>
 <p>Operating systems tend to use a screen (and perhaps some additional channels,
 such as sounds or LEDs) to let you know about some of these things. For
 example, the battery indicator in a phone will let you know when it’s safe
 to use your phone, and when you should be rushing to find a power outlet
 to avoid losing your past 2 hours of work.</p>
-<p>Kate takes a very principled approach to these sorts of indicators. In Kate,
+<p>Kate takes a very principled approach to these sorts of indicators. In Kate
 an indicator should exist to communicate everything potentially unsafe (or
 that requires more of your attention), and all such indicators should be
 impossible to mimic by any cartridge. You should be able to look at the
 indicator and immediately know that it’s a Kate indicator, and not, possibly,
 an application trying to trick you with a very elaborate copy of what your
 Kate screen looks like.</p>
-<p>To that end Kate introduces the <a class="reference internal" href="trust.html"><span class="doc">Trust Frame</span></a> and the
-<a class="reference internal" href="indicators.html"><span class="doc">Resource Indicator Band</span></a>, which we discuss in more details in their
-specific sections.</p>
+<p>To that end Kate introduces the <a class="reference internal" href="trust.html"><span class="doc">Resource Indicator Band</span></a>,
+which we discuss in more details in its specific section.</p>
 </section>
-<section id="the-safety-to-trust">
-<h2>The safety to trust<a class="headerlink" href="#the-safety-to-trust" title="Permalink to this heading">#</a></h2>
+<section id="trust-but-safely">
+<h2>Trust, but safely<a class="headerlink" href="#trust-but-safely" title="Permalink to this heading">#</a></h2>
 <p>Although Kate makes several promises about security and privacy, there will
 always be the question of whether you can trust these promises or not. This
-goes for all software, and all computers and digital devices that you have.
+goes for all software, and all computers and digital devices that you use.
 Answering the question is complicated because both hardware and software
 have very complex machinery, and you would need to understand all of it,
 and all of their implications, before you can answer the question.</p>
-<p>This is aggravated by the fact that there’s a lot of the pieces, particularly
+<p>This is aggravated by the fact that there’s a lot of pieces, particularly
 with hardware, that you can’t even inspect yourself, and thus have no way
 of understanding. No way to independently audit.</p>
 <p>Which leaves you with one recourse: trust that whoever is selling you these
@@ -521,17 +526,17 @@ solid.</p>
 <li><p>The Kate OS and emulator are open source and independently auditable;
 users can verify what Kate does (and doesn’t do) by
 <a class="reference external" href="https://github.com/qteatime/kate">looking at the code on GitHub</a>.</p></li>
-<li><p>Kate Native and the Kate Tools only depend on open source software, and
-thus are also independently auditable. Kate Native relies on
+<li><p>Kate Native, the Kate Tools, and core cartridges only depend on open source
+software. They’re thus are also independently auditable. Kate Native relies on
 GitHub’s <a class="reference external" href="https://github.com/electron/electron">Electron</a> and Google’s
 <a class="reference external" href="https://www.chromium.org/Home/">Chromium</a>. Kate Tools relies on
 <a class="reference external" href="https://github.com/nodejs/node">Node.js</a>. By choosing projects with
-dedicated security teams, Kate also benefits from the security improvements
+dedicated security teams Kate also benefits from the security improvements
 done to them.</p></li>
 <li><p>Kate has multiple levels of <a class="reference internal" href="sandboxing.html"><span class="doc">sandboxing</span></a> to ensure that,
 even if there are bugs in the code, or even when running malicious cartridges,
 we can still make some baseline guarantees about your security and privacy.</p></li>
-<li><p>Kate engages in <a class="reference internal" href="../../../glossary.html#term-Threat-model"><span class="xref std std-term">threat modelling</span></a>, where both technical, personal, and
+<li><p>Kate engages in <a class="reference internal" href="../../../glossary.html#term-Threat-model"><span class="xref std std-term">threat modelling</span></a>, where technical, personal, and
 social risks have to be cautiously assessed for every feature added to Kate.</p></li>
 <li><p>Kate uses <a class="reference internal" href="../../../glossary.html#term-Formal-model"><span class="xref std std-term">formal modelling</span></a>, where mathematical models are used to
 help design and verify a system, to make sure features added to Kate are
@@ -603,12 +608,12 @@ can cause wider damage.</p></li>
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Safety philosophy</a><ul>
-<li><a class="reference internal" href="#the-safety-to-install-a-game">The safety to install a game</a></li>
-<li><a class="reference internal" href="#the-safety-to-run-a-game">The safety to run a game</a></li>
-<li><a class="reference internal" href="#the-safety-to-know-you-can-play">The safety to know you can play</a></li>
-<li><a class="reference internal" href="#the-safety-for-your-data">The safety for your data</a></li>
-<li><a class="reference internal" href="#the-safety-to-know-what-s-happening">The safety to know what’s happening</a></li>
-<li><a class="reference internal" href="#the-safety-to-trust">The safety to trust</a></li>
+<li><a class="reference internal" href="#installing-games-safely">Installing games, safely</a></li>
+<li><a class="reference internal" href="#running-a-game-safely">Running a game, safely</a></li>
+<li><a class="reference internal" href="#knowing-you-can-play-a-game">Knowing you <em>can</em> play a game</a></li>
+<li><a class="reference internal" href="#keeping-your-data-safe">Keeping your data safe</a></li>
+<li><a class="reference internal" href="#feeling-safe-by-knowing-what-s-happening">Feeling safe by knowing what’s happening</a></li>
+<li><a class="reference internal" href="#trust-but-safely">Trust, but safely</a></li>
 </ul>
 </li>
 </ul>

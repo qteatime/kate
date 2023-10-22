@@ -61,7 +61,7 @@ For example:
 
 .. code-block:: javascript
 
-  KateAPI.input.on_key_pressed.listen(key => {
+  KateAPI.input.on_key_pressed.listen(({ key }) => {
     if (key === "menu") {
       show_menu_screen();
     } else if (key === "o") {
@@ -80,9 +80,9 @@ The Kate buttons API (``input``) allows a cartridge to react to buttons pressed
 in the standard Kate gamepad. This gamepad is made out of:
 
 * A four-directions D-pad (|btn_dpad|);
-* Two face buttons: |btn_ok| *(Ok)* and |btn_cancel| *(Cancel)*;
-* Two analog shoulder triggers: |btn_l| and |btn_r|; and
-* Two special buttons: |btn_capture_text| and |btn_menu_text|.
+* Four face buttons: |btn_ok| *(Ok)*, |btn_cancel| *(Cancel)*, |btn_sparkle| *(Sparkle)*, and |btn_menu| *(Menu)*;
+* Two shoulder buttons: |btn_l| and |btn_r|; and
+* Two special buttons: |btn_capture_text| and |btn_berry_text|.
 
 Although your cartridge reacts to these Kate buttons, a player may be
 interacting with it through other means. E.g.: players running a Kate
@@ -143,14 +143,21 @@ Button            Identifier
 ================  =====================================
 |btn_ok|          ``o``
 |btn_cancel|      ``x``
+|btn_sparkle|     ``sparkle``
+|btn_menu|        ``menu``
 |btn_dpad|        ``up``, ``right``, ``down``, ``left``
 |btn_l|           ``ltrigger``
 |btn_r|           ``rtrigger``
-|btn_menu|        ``menu`` and ``long_menu``
-|btn_capture|     ``capture`` and ``long_capture``
+|btn_capture|     ``capture``
+|btn_berry|       ``berry``
 ================  =====================================
 
-|btn_menu| and |btn_capture| are special in that Kate distinguishes between
+.. warning::
+
+  ``ltrigger`` and ``rtrigger`` will be renamed to ``l`` and ``r`` in the
+  next version and the current identifiers will be deprecated.
+
+|btn_berry| and |btn_capture| are special in that Kate distinguishes between
 a short and long press. This also means that state changes for these buttons
 is delayed until the player releases the button, so Kate can decide whether
 to report that as a "short" or "long" press.
@@ -160,10 +167,9 @@ repeat presses if the player presses the button and doesn't release it
 for a long period of time.
 
 
-.. py:class:: ExtendedKeyPressedEvent
+.. py:class:: KeyPressedEvent
   
-  Represents an extended key pressed, so contains ``long_menu`` and ``long_capture``
-  as possible key identifiers.
+  Represents a key being pressed.
 
   .. py:property:: key
     :type: InputKey
@@ -176,6 +182,12 @@ for a long period of time.
     True if the key was pressed in a previous frame, but remains pressed in
     this one.
 
+  .. py:property:: is_long_press
+    :type: boolean
+
+    True if the key is special (``berry`` or ``capture``) and the player
+    has held it for longer than the long-press threshold.
+
 
 Events
 ''''''
@@ -186,27 +198,11 @@ to any listener in the cartridge.
 
 
 .. py:property:: on_key_pressed
-   :type: EventStream[InputKey]
+   :type: EventStream[KeyPressedEvent]
 
-   Emitted whenever the player presses a button, without delay. Therefore
-   it does not distinguish between short and long presses.
-
-   The data in the event is a string containing one of the :ref:`button identifiers`.
-
-
-.. py:property:: on_extended_key_pressed
-   :type: EventStream[ExtendedKeyPressedEvent]
-
-   Emitted when the player presses a button (or in the case of
-   |btn_menu| and |btn_capture|, when the player releases the button).
-
-   This event distinguishes between short and long presses, which means that
-   there will be a delay to report presses to |btn_menu| and |btn_capture|.
-   And other buttons may have events firing multiple times while the player
-   is holding down the button—e.g.: holding down |btn_ok| for several seconds
-   would cause multiple events to be emitted with the identifier ``o``. The
-   first one would have ``is_repeat`` set to false, whereas the subsequent
-   ones would have ``is_repeat`` set to true.
+   Emitted whenever the player presses a button, with some delay for special
+   keys. Repeat presses may trigger this event multiple times for the same
+   key, and in that case ``is_repeat`` will be set to true.
 
 
 Querying button states
@@ -414,6 +410,11 @@ context menu instead of painting that location.
 Types
 """""
 
+.. py:class:: PointerButton
+
+  A string representing the button of a pointer device.
+  Can be either ``primary`` or ``alternate``.
+
 .. py:class:: PointerClick
   
   Represents the click of a button at a particular pointer coordinate.
@@ -424,21 +425,12 @@ Types
     The coordinates where the pointer was at the time the click happened.
 
   .. py:property:: button
-    :type: number
+    :type: PointerButton
 
-    The button that was pressed. This is the same constant used by
-    the :term:`DOM pointer events`, and can be one of:
-
-    ===== ======================================
-    Id    Description
-    ===== ======================================
-    ``0`` Left mouse, touch contact, pen contact
-    ``1`` Middle mouse
-    ``2`` Right mouse, pen barrel button
-    ``3`` X1 (back) mouse
-    ``4`` X2 (forward) mouse
-    ``5`` Pen eraser button
-    ===== ======================================
+    The button that was pressed. ``primary`` is for the primary button on
+    a mouse or a pen making contact with the digitizer. ``alternate`` is
+    the code for *every other button*, as Kate does not distinguishes
+    between different alternate buttons.
 
 Events
 """"""
@@ -450,13 +442,7 @@ your own synchronisation when listening to them.
 .. py:property:: on_clicked
   :type: EventStream[PointerClick]
 
-  Emitted whenever the primary pointer button is pressed.
-
-.. py:property:: on_alternate
-  :type: EventStream[PointerClick]
-
-  Emitted whenever the alternate pointer button is pressed
-  (e.g.: right mouse button).
+  Emitted whenever a pointer button is pressed.
 
 .. py:property:: on_down
   :type: EventStream[PointerClick]
@@ -479,27 +465,27 @@ Querying state
 Button states update at 30 FPS. In order to query them you'll need to
 synchronise your calls with the :py:mod:`KateAPI.timer` API.
 
-.. py:function:: frames_pressed(button: number) -> number
+.. py:function:: frames_pressed(button: PointerButton) -> number
 
   :param button: The identifier of the button to query.
 
   Returns the number of frames the button has been pressed for.
 
-.. py:function:: is_pressed(button: number) -> boolean
+.. py:function:: is_pressed(button: PointerButton) -> boolean
 
   :param button: The identifier of the button to query.
 
   Returns true if the button is pressed at all at the time this is called. This
   call does not have to be synchronised with the Timer API.
 
-.. py:function:: is_just_pressed(button: number) -> boolean
+.. py:function:: is_just_pressed(button: PointerButton) -> boolean
 
   :param button: The identifier of the button to query.
 
   Returns true if the button was pressed during this frame. This only makes sense
   if your update function is synchronised with the Timer API.
 
-.. py:function:: is_just_released(button: number) -> boolean
+.. py:function:: is_just_released(button: PointerButton) -> boolean
 
   :param button: The identifier of the button to query.
 

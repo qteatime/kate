@@ -345,7 +345,7 @@ R
     security/privacy-impacting things happening at the moment in
     the console, such as having your screen recorded.
 
-    See :doc:`the resource indicators section <user/manual/security/indicators>`
+    See :doc:`the resource indicators section <user/manual/security/trust>`
     for details.
 
   ROM
@@ -435,9 +435,9 @@ T
     general public.
 
   Trust frame
-    A distinct visual element that Kate uses to tell players when a
-    potentially dangerous dialog comes from the Kate emulator itself,
-    rather than a malicious cartridge trying to trick players.
+    A distinct visual element that Kate uses to tell players when the
+    screen you're looking at comes from the Kate emulator itself,
+    rather than from a regular cartridge.
 
     See the :doc:`trust and consent section <user/manual/security/trust>`
     for details.

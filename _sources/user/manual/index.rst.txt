@@ -7,7 +7,7 @@ The Kate User Manual
    Kate is still in development, and this book is a work in progress.
 
 
-Kate is a :term:`fantasy hand-held console <fantasy console>` for small
+Kate is a :term:`fantasy console <fantasy console>` for small
 2d games, particularly story-rich ones. Being a fantasy console, you'll
 likely be running these games in the Kate :term:`emulator`, rather than
 an actual Kate device. The emulator runs directly on your browser, but

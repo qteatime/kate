@@ -181,7 +181,6 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../user/manual/security/sandboxing.html">Sandboxing</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../user/manual/security/privacy.html">Privacy policy</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../user/manual/security/trust.html">Trust and consent</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../user/manual/security/indicators.html">Resource indicators</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../user/manual/security/audit.html">Audit logs</a></li>
 </ul>
 </li>
@@ -340,9 +339,11 @@ which you can then upload to platforms like Itch.io as a web game.</p></li>
 <li><p>Use the same tools you’re already familiar with, as long as they at
 least offer an option to make a web export <a class="footnote-reference brackets" href="#f1" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>; and</p></li>
 <li><p>Avoid having to optimise your asset sizes for streaming on the web,
-so players don’t have to wait a long time to start the game.</p></li>
+like you would with a regular web-based game. This means you can
+have games with gigabytes in size that still start up instantly,
+as all download is done upfront and the files are installed locally.</p></li>
 </ul>
-<p>On top of the APIs that are provided in the web platform, Kate adds its
+<p>On top of the APIs that are provided in the web platform Kate adds its
 own game-specific APIs that have a baseline expectation among players.
 This means that you don’t need to keep re-explaining yourself.</p>
 <p>These APIs include things like safe and reliable persistent storage

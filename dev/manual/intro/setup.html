@@ -181,7 +181,6 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../user/manual/security/sandboxing.html">Sandboxing</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../user/manual/security/privacy.html">Privacy policy</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../user/manual/security/trust.html">Trust and consent</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../user/manual/security/indicators.html">Resource indicators</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../user/manual/security/audit.html">Audit logs</a></li>
 </ul>
 </li>
@@ -317,19 +316,21 @@
 <section id="installing-the-emulator">
 <h2>Installing the emulator<a class="headerlink" href="#installing-the-emulator" title="Permalink to this heading">#</a></h2>
 <p>To run games in Kate you’ll need an emulator. The recommended way of testing
-the games is to use the web-based emulator, which you can open in a modern
+the games is to use the web-based emulator. The Kate developers maintain a
+public instance of Kate on the internet, which you can open in a modern
 browser by accessing <a class="reference external" href="https://kate.qteati.me">https://kate.qteati.me</a></p>
 <p>The <a class="reference internal" href="../../../user/manual/intro/install.html"><span class="doc">intallation instructions section</span></a> goes
 into more details about what browsers are supported, specific instructions
-for platforms like Steam Deck, and alternative installation options.</p>
+for platforms like Steam Deck, and alternative installation options, including
+running your own Kate web emulator instance.</p>
 </section>
 <section id="installing-the-developer-tools">
 <h2>Installing the developer tools<a class="headerlink" href="#installing-the-developer-tools" title="Permalink to this heading">#</a></h2>
-<p>The tools used for developing Kate games require <cite>Node.js &lt;https://nodejs.org/en&gt;</cite> <a class="footnote-reference brackets" href="#f1" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>
+<p>The tools used for developing Kate games require <a class="reference external" href="https://nodejs.org/en">Node.js</a> <a class="footnote-reference brackets" href="#f1" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>
 to be installed, so you’ll need a device capable of installing it. Node.js
 supports Windows, MacOS, and Linux.</p>
 <p>You’ll also need to be familiar with the <a class="reference internal" href="../../../glossary.html#term-Command-line"><span class="xref std std-term">command line</span></a>, and with the
-<cite>basics of web development &lt;https://developer.mozilla.org/en-US/docs/Learn&gt;</cite>.</p>
+<a class="reference external" href="https://developer.mozilla.org/en-US/docs/Learn">basics of web development</a>.</p>
 <p>Once you have Node.js installed, you can install all tools necessary for
 building Kate games from the command line:</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>npm<span class="w"> </span>install<span class="w"> </span>-g<span class="w"> </span>@qteatime/kate-tools
@@ -340,7 +341,8 @@ building Kate games from the command line:</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">$</span></code> just indicates that you should run these commands as your
 regular user, not with the administrator account. You should not type
 the <code class="docutils literal notranslate"><span class="pre">$</span></code> when running these commands.</p>
-<p>No part of Kate (and its tools) require administrator privileges, and
+<p>With the exception of the native Kate OS for Raspberry Pi, no part of
+Kate (and its tools) requires administrator privileges, and
 they never will.</p>
 </div>
 <p>After running this command you should have two new applications available

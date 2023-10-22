@@ -1,21 +1,21 @@
 Emulator
 ========
 
-The Kate emulator can transform any relatively modern (later than 2015)
-device with a modern web browser into a Kate console. In this case, the
+The Kate emulator can transform any relatively modern (released later than 2015)
+device with a modern web browser into a Kate console. In this case the
 Kate features are limited by the features present in the device running
 the emulator.
 
-To run the Kate emulator, the device must still provide the same
+To run the Kate emulator, the device must still provide at least the same
 :ref:`Computing Power <hardware computing power>` and the same
 :ref:`Graphical Power <hardware graphics>` as the Kate physical
 hardware.
 
 That is, the recommended configuration is:
 
-* **CPU**: 1.8GHz (quad-core);
-* **RAM**: 2 GB;
-* **Storage**: 64 GB;
+* **CPU**: 1.8GHz (quad-core) or 2.4GHz (quad-core);
+* **RAM**: 2 GB+;
+* **Storage**: 64 GB+;
 * **Display**: 800x480 or higher;
 * **GPU**: support for OpenGL ES 3.1;
 
@@ -27,7 +27,7 @@ Case modes
 
 The emulator supports different case modes, both for aesthetic purposes
 and for device input purposes. You can change which case mode your
-emulator uses by holding down |btn_menu_text|, then selecting
+emulator uses by pressing |btn_berry_text|, then selecting
 ``Settings -> User Interface`` and picking from one of the three
 available modes.
 
@@ -39,16 +39,20 @@ Handheld Mode
 
 .. image:: img/handheld-mode.png
 
-This is the default case mode for the Kate emulator. It includes virtual
+This is the default case mode for the Kate emulator, but it's optimised for
+smartphones (and marginally for tablet devices). It includes virtual
 buttons on the sides and on the top, which can be pressed on a touch-capable
-device. This way you can use Kate even when no physical gamepad or keyboard
-is available.
+device instead of requiring a physical gamepad or keyboard, and it tries to
+maximise the area used for the screen as much as possible. This is also why
+it uses a thumbstick instead of the usual D-Pad (you can hold the thumbstick
+and move it like you would a regular analog thumbstick, but without the
+nice physical feedback).
 
 In handheld mode the screen resolution is locked to 800x480. The recommended
-host device's resolution must be at least 1310x570 pixels to be able to house
+host device's resolution must be at least 1040x490 pixels to be able to house
 the whole emulator UI comfortably. In devices with a smaller screen resolution,
-the emulator will scale down the UI, which might result in blurry text and
-images.
+the emulator will scale down the UI favouring speed, which might result in
+lower image quality.
 
 
 TV Mode
@@ -72,14 +76,7 @@ Fullscreen Mode
 .. image:: img/fullscreen-mode.png
 
 In fullscreen mode the screen takes the whole space available for the
-emulator. Kate also overlays its :doc:`security indicators </user/manual/security/indicators>`
-on top of it: a contiguous line of 3 pixels at the very top of the screen
-is used to display the trust mode and the resource indicators. This
-means that, on smaller resolutions, the game screen might be slightly
-covered, but there is no way to disable this overlay, as it's a
-security mechanism.
-
-The fullscreen mode otherwise has the same resolution as the TV mode:
+emulator. It has the same resolution options as the TV mode:
 800x480 and 1200x720 pixels.
 
 .. note::
@@ -94,8 +91,8 @@ Input
 -----
 
 Kate supports several different input methods. Games are encouraged to
-provide alternative inputs, so even if your device doesn't support all
-of the input methods, the game is still playable.
+provide alternative inputs so the game is still playable even if your device
+doesn't support all of the input methods.
 
 
 Pointer input
@@ -109,8 +106,8 @@ able to control games that offer pointer input options.
 Kate buttons
 ''''''''''''
 
-Kate has 8 digital input buttons and 2 analog ones which are used
-to control most games. In the emulator you can:
+Kate has 12 digital input buttons which are used to control most games.
+In the emulator you can:
 
 **Use the virtual buttons**
    In hand-held mode, if you have a device with
@@ -121,9 +118,10 @@ to control most games. In the emulator you can:
 **Use your keyboard**
    You can configure the how the keyboard keys map to
    Kate buttons from ``Settings -> Controllers & Sensors -> Control Kate
-   with a keyboard``. The default is arrow keys for the |btn_dpad_text|; ``X`` and ``Z``
-   for |btn_cancel| and |btn_ok|; ``A`` and ``S`` for |btn_l| and |btn_r|; ``C``
-   for |btn_capture_text|, and ``Left Shift`` for |btn_menu_text|.
+   with a keyboard``. The default is arrow keys for the |btn_dpad_text|;
+   ``Left Shift``, ``Z``, ``X``, and ``C`` for |btn_menu|, |btn_ok|,
+   |btn_cancel|, and |btn_sparkle|; ``A`` and ``S`` for |btn_l| and |btn_r|;
+   ``F`` for |btn_capture_text|, and ``Q`` for |btn_berry_text|.
 
    .. image:: img/keyboard.png
 

@@ -181,7 +181,6 @@
 <li class="toctree-l3"><a class="reference internal" href="../security/sandboxing.html">Sandboxing</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../security/privacy.html">Privacy policy</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../security/trust.html">Trust and consent</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../security/indicators.html">Resource indicators</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../security/audit.html">Audit logs</a></li>
 </ul>
 </li>
@@ -314,36 +313,60 @@
         <article role="main">
           <section id="installing">
 <h1>Installing<a class="headerlink" href="#installing" title="Permalink to this heading">#</a></h1>
-<p>The recommended way of getting your hands on Kate is to use the web-based
-emulator. This runs directly in your browser, no installation necessary:</p>
-<blockquote>
-<div><p><a class="reference external" href="https://kate.qteati.me">https://kate.qteati.me</a></p>
-</div></blockquote>
-<p>To run the web-based emulator you’ll need a modern browser. Kate supports
-the latest versions of Chrome (desktop and Android), Edge, Opera, and Firefox.</p>
-<p>If you want to run Kate offline, you’ll need to install it. There are a
-few different options to do so (ranked from most recommended to least
-recommended):</p>
+<p>You can install the Kate Emulator in almost every modern device that has
+a modern web browser. You can also install the Kate Emulator natively on
+Windows and Linux (including Steam OS and Chrome OS). MacOS support will
+come soon.</p>
+<p>The Web version can be installed as a Web Application on supported
+browsers: Chrome (desktop and Android), Safari (iOS), and Edge (Windows 10+).
+Installing the web application will allow you to run Kate offline, but you’ll
+have less integration with the underlying device.</p>
+<p>The currently recommended installation options are, in order:</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="#web-application"><span class="std std-ref">Web Application</span></a> (available on Windows, Linux, Steam Deck, Android);</p></li>
-<li><p><a class="reference internal" href="#pre-built-binaries"><span class="std std-ref">Pre-built binaries</span></a> (available on Linux and Windows);</p></li>
-<li><p><a class="reference internal" href="#building-from-source"><span class="std std-ref">Building from source</span></a> (available on Linux and Windows);</p></li>
+<li><p><a class="reference internal" href="#web-application"><span class="std std-ref">Web Application</span></a> (available on Windows, Linux, Chrome OS, Steam OS, Android);</p></li>
+<li><p><a class="reference internal" href="#native-application"><span class="std std-ref">Native application</span></a> (available on Windows and Linux);</p></li>
 </ul>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>The web version should be compatible with other platforms with a modern
-browser, but these devices are not currently part of the testing pipeline.
-Once they are, they will be added here as officially supported as well.</p>
-<p>Safari on iOS is tested and known not to work with many of the features
-Kate provides, as those are not implemented in Safari yet (or have
-incompatible behaviour in Safari).</p>
-</div>
 <section id="web-application">
 <span id="id1"></span><h2>Web Application<a class="headerlink" href="#web-application" title="Permalink to this heading">#</a></h2>
-<p>You can install the web version of the emulator (<a class="reference external" href="https://kate.qteati.me/">https://kate.qteati.me/</a>)
-in your device as a web app. This will allow you to run Kate without an
-internet connection, and is the only option available on mobile phones.</p>
-<p>To install:</p>
+<p>If you just want to try Kate out, the developers maintain a public version
+of the application that you can access on any device. Just open
+<a class="reference external" href="https://kate.qteati.me/">https://kate.qteati.me/</a> on your browser.</p>
+<p>Note that, for security and debugging purposes, all accesses to the public
+instance are logged (including IP addresses and similar information your
+device sends to the server when connecting). This information is retained
+for the time needed to address security and debugging issues.</p>
+<p>The public instance has plans for maintenance for at least until 2028.</p>
+<section id="running-your-own-kate-instance">
+<span id="id2"></span><h3>Running your own Kate instance<a class="headerlink" href="#running-your-own-kate-instance" title="Permalink to this heading">#</a></h3>
+<p>Rather than depending on the public instance, you can run your own private
+Kate instance on any server. To do so, please download the <code class="docutils literal notranslate"><span class="pre">kate-www.zip</span></code>
+file from the
+<a class="reference external" href="https://github.com/qteatime/kate/releases">Kate Releases page on GitHub</a>,
+then put this file in your server.</p>
+<p>If you don’t know how to run a web server, or would rather not manage a
+server on your own, but still want the added control and privacy of having
+your own Kate instance, services like Netlify or Digital Ocean’s App Platform
+will let you upload the zip file above and get a managed server. Be sure to
+check their usage prices and compare before you sign up for anything.
+Other similar managed services exist elsewhere.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Kate <strong>must absolutely be served over HTTPS, with a valid SSL certificate</strong>.
+Again, managed services will handle this for you automatically,
+but if you’re running your own server you’ll need to configure a proper
+HTTPS connection, as most of the browser APIs that Kate relies are not
+available over unencrypted HTTP.</p>
+</div>
+</section>
+<section id="installing-as-a-pwa">
+<h3>Installing as a PWA<a class="headerlink" href="#installing-as-a-pwa" title="Permalink to this heading">#</a></h3>
+<p>You can install any web instance of Kate as a
+<a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps">Progressive Web App (PWA)</a>.
+This will allow you to run Kate even when you’re not connected to the internet,
+as all files and data needed are installed locally on your device. This is
+the only option to have an offline experience in mobile phones.</p>
+<p>To install Kate as a PWA you first access your Kate instance on a supported
+browser and operating system, then:</p>
 <ul class="simple">
 <li><p>On <strong>Windows 10+</strong>: open the page in Microsoft Edge, then choose
 <code class="docutils literal notranslate"><span class="pre">Apps</span> <span class="pre">-&gt;</span> <span class="pre">Install</span> <span class="pre">site</span> <span class="pre">as</span> <span class="pre">an</span> <span class="pre">app</span></code> from the menu;</p></li>
@@ -352,18 +375,39 @@ from the menu;</p></li>
 <li><p>On <strong>Chrome for Windows/Linux</strong>: you’ll find the <code class="docutils literal notranslate"><span class="pre">Install</span></code> button in the
 address bar.</p></li>
 </ul>
-<section id="chrome-on-steam-deck">
-<h3>Chrome on Steam Deck<a class="headerlink" href="#chrome-on-steam-deck" title="Permalink to this heading">#</a></h3>
-<p>Chrome runs on the Steam Deck using <a class="reference external" href="https://flatpak.org/">Flatpak</a>, which
-adds an OS sandbox around it. This means that Chrome will not, by default,
-have the necessary access to create the desktop shortcuts for Kate
-(which you can then add as a “non-Steam game” from within Steam in
-Desktop mode).</p>
-<p>If you want to have a desktop shortcut you can either give Chrome access
-to write to <cite>~/.local/share/applications</cite> and <cite>~/.local/share/icons</cite>. Or,
-more conservatively, you can create the <cite>.desktop</cite> file yourself. Either way,
-you’ll probably want to run Kate in true fullscreen mode, which you can do by
-making sure your <cite>.desktop</cite> file looks like this:</p>
+<p>You might also be prompted to install the page as an App when you first visit it.</p>
+</section>
+<section id="web-applications-on-steam-deck">
+<h3>Web applications on Steam Deck<a class="headerlink" href="#web-applications-on-steam-deck" title="Permalink to this heading">#</a></h3>
+<p>If you run Chrome on Steam Deck you’ll be able to install Kate as an App, and
+then have it added to your Steam library as a “non-steam game”. This allows
+you to access Kate directly from Steam’s gaming mode, and consequently play
+any Kate game from there as well.</p>
+<p>However, Chrome runs using <a class="reference external" href="https://flatpak.org/">Flatpak</a> by default, and
+the default sandbox configuration is a bit too restrictive for running Kate
+properly. Enabling Kate in Steam Deck’s gaming mode thus takes a little bit
+of effort and some being comfortable with running commands in the command line.
+All of the configuration below has to be done in the Deck’s desktop mode.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Though this mentions Chrome, the same goes for Firefox or Microsoft Edge if
+they’re running as a Flatpak. You’ll need to replace the <code class="docutils literal notranslate"><span class="pre">com.google.Chrome</span></code>
+parts with the unique id of another browser (e.g.: <code class="docutils literal notranslate"><span class="pre">com.microsoft.Edge</span></code>).</p>
+</div>
+<dl>
+<dt><strong>Allow Chrome to create application configurations for installed PWAs:</strong></dt><dd><p>By default Chrome ships with little file system access, which is a good
+default, but that default also prevents you from having application
+shortcuts for installed PWAs created directly.</p>
+<p>To address this you can either give Chrome access to write files in the
+<code class="docutils literal notranslate"><span class="pre">~/.local/share/applications</span></code> and <code class="docutils literal notranslate"><span class="pre">~/.local/share/icons</span></code> directories:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>flatpak<span class="w"> </span>override<span class="w"> </span>--user<span class="w"> </span>--filesystem<span class="o">=</span>~/.local/share/applications:create<span class="w"> </span>com.google.Chrome
+$<span class="w"> </span>flatpak<span class="w"> </span>override<span class="w"> </span>--user<span class="w"> </span>--filesystem<span class="o">=</span>~/.local/share/icons:create<span class="w"> </span>com.google.Chrome
+</pre></div>
+</div>
+<p>Or you can create the <code class="docutils literal notranslate"><span class="pre">.desktop</span></code> file for your PWA manually in
+<code class="docutils literal notranslate"><span class="pre">~/.local/share/applications`</span></code>. For example, creating a <code class="docutils literal notranslate"><span class="pre">Kate.desktop</span></code>
+file in that folder with a text editor, you can have it look like the
+following:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env xdg-open</span>
 <span class="p">[</span><span class="n">Desktop</span> <span class="n">Entry</span><span class="p">]</span>
 <span class="n">Version</span><span class="o">=</span><span class="mf">1.0</span>
@@ -375,20 +419,57 @@ making sure your <cite>.desktop</cite> file looks like this:</p>
 <span class="n">TryExec</span><span class="o">=/</span><span class="n">var</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">flatpak</span><span class="o">/</span><span class="n">exports</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">com</span><span class="o">.</span><span class="n">google</span><span class="o">.</span><span class="n">Chrome</span>
 </pre></div>
 </div>
-<p>When you first run Kate, it’ll launch in <a class="reference internal" href="emulator.html#emulator-hand-held-mode"><span class="std std-ref">Handheld case mode</span></a>. You
-can hold down <a class="reference internal" href="../../../_images/menu_24.png"><img alt="Menu button" class="align-middle" src="../../../_images/menu_24.png" style="height: 1em;" /></a> <em>(Menu button)</em>, then go to <code class="docutils literal notranslate"><span class="pre">Settings</span> <span class="pre">-&gt;</span> <span class="pre">User</span> <span class="pre">interface</span></code> and change
-to fullscreen mode instead, since you can just use the physical Steam Deck
-controller.</p>
+<p>The additional <code class="docutils literal notranslate"><span class="pre">--start-fullscreen</span></code> and <code class="docutils literal notranslate"><span class="pre">--no-default-browser-check</span></code> are
+optional, but you’ll usually want to run Kate in fullscreen on the Deck.</p>
+</dd>
+<dt><strong>Allow Chrome to read the Steam gamepad input (and other devices):</strong></dt><dd><p>By default Chrome will not have access to read gamepad input because it
+interacts with gamepads through <a class="reference external" href="https://en.wikipedia.org/wiki/Udev">udev</a>
+and the flatpak does not grant access to it on the basis that the API is
+not stable.</p>
+<p>Since Steam Deck is a fairly specific device with a fairly specific OS,
+you can give Chrome read-only access to it to get the gamepad working.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>flatpak<span class="w"> </span>--override<span class="w"> </span>--user<span class="w"> </span>--filesystem<span class="o">=</span>/run/udev:ro<span class="w"> </span>com.google.Chrome
+</pre></div>
+</div>
+</dd>
+<dt><strong>Add Kate to your library as a non-Steam game:</strong></dt><dd><p>To launch Kate from the Deck’s gaming mode you’ll need to add it to your
+Steam library as a non-Steam game. To do so open the Steam client in
+desktop mode, then in the bottom left click “Add a Game”, and select
+“Add a Non-Steam Game”.</p>
+<p>From the list that opens search for <code class="docutils literal notranslate"><span class="pre">Kate</span></code> (or the name you gave it if
+you wrote your own <code class="docutils literal notranslate"><span class="pre">.desktop</span></code> file), check the checkbox beside the name,
+and click “Add selected Programs”.</p>
+<p>That’s it, you can go back to gaming mode.</p>
+</dd>
+<dt><strong>Make sure you can control Kate properly:</strong></dt><dd><p>When you first launch Kate it’ll likely be in handheld mode. First, make
+sure the controller layout for Kate is set to <code class="docutils literal notranslate"><span class="pre">Gamepad</span> <span class="pre">with</span> <span class="pre">Mouse</span> <span class="pre">Trackpad</span></code>,
+as otherwise you won’t be able to use the pointer input some games
+(e.g.: Ren’Py visual novels) rely on.</p>
+<p>Also note that if you haven’t given the browser access to udev you’ll need
+to configure your own layout that sends keyboard input to Kate instead.
+Even if you use Steam’s built-in template, it might be useful to assign
+some of the back buttons to <code class="docutils literal notranslate"><span class="pre">Enter</span></code> and <code class="docutils literal notranslate"><span class="pre">Escape</span></code> because the Deck’s
+file picker is a bit annoying to use with the trackpad.</p>
+<p>Once you can control Kate with the Steam gamepad, press <a class="reference internal" href="../../../_images/berry_32.png"><img alt="Berry button" class="align-middle" src="../../../_images/berry_32.png" style="height: 1em;" /></a> <em>(Berry button)</em>
+(the menu button on the right of the Deck), then select
+<code class="docutils literal notranslate"><span class="pre">Settings</span> <span class="pre">-&gt;</span> <span class="pre">User</span> <span class="pre">Interface</span></code> and switch to Fullscreen Mode.</p>
+<p>You might also want to swap <a class="reference internal" href="../../../_images/ok_32.png"><img alt="Ok button (a.k.a. O)" class="align-middle" src="../../../_images/ok_32.png" style="height: 1em;" /></a> and <a class="reference internal" href="../../../_images/cancel_32.png"><img alt="Cancel button (a.k.a. X)" class="align-middle" src="../../../_images/cancel_32.png" style="height: 1em;" /></a> in
+<code class="docutils literal notranslate"><span class="pre">Settings</span> <span class="pre">-&gt;</span> <span class="pre">Controller</span> <span class="pre">&amp;</span> <span class="pre">Sensors</span> <span class="pre">-&gt;</span> <span class="pre">Control</span> <span class="pre">Kate</span> <span class="pre">with</span> <span class="pre">a</span> <span class="pre">standard</span> <span class="pre">gamepad</span> <span class="pre">-&gt;</span>
+<span class="pre">Configure</span> <span class="pre">standard</span> <span class="pre">mapping</span></code>. By default you confirm things in Kate with
+the <code class="docutils literal notranslate"><span class="pre">B</span></code> button on the deck, and cancel with <code class="docutils literal notranslate"><span class="pre">A</span></code>, but Steam OS uses the
+opposite configuration out of the box.</p>
+</dd>
+</dl>
 </section>
 <section id="caveats">
 <h3>Caveats<a class="headerlink" href="#caveats" title="Permalink to this heading">#</a></h3>
-<p>The web application option is practical, but depends on a website that
+<p>Using the public Kate instance is practical, but depends on a website that
 is external to your device. As such, it’s not the recommended option for
 video game archival.</p>
 <p>The security properties depend on the domain it uses (<code class="docutils literal notranslate"><span class="pre">kate.qteati.me</span></code>)
 taking you to the same computer for ever. Since the authors of Kate are
 neither immortal nor immune to financial problems, it’s less clear if they
-would still own and maintain the domain in 5 years or longer.</p>
+would still own and maintain the domain after 5 years.</p>
 <p>In the less bad scenario, the domain is not renewed, and the Kate emulator
 stops working as soon as you clear the cached files. In the worse scenario,
 a domain takeover (where e.g.: someone else buys the domain and routes it
@@ -398,12 +479,18 @@ permissions you’ve granted the domain; this poses a significant risk,
 but the risk applies to web sites in general.</p>
 </section>
 </section>
-<section id="pre-built-binaries">
-<span id="id2"></span><h2>Pre-built binaries<a class="headerlink" href="#pre-built-binaries" title="Permalink to this heading">#</a></h2>
+<section id="native-application">
+<span id="id3"></span><h2>Native application<a class="headerlink" href="#native-application" title="Permalink to this heading">#</a></h2>
+<p>Kate can run as a native application by using
+<a class="reference external" href="https://www.electronjs.org/">Electron</a>. These releases are currently
+<strong>unsandboxed and unsigned</strong>. This means that they will have fairly wide
+access to your device and will trigger a warning about the lack of code
+signature.</p>
 <p><a class="reference external" href="https://github.com/qteatime/kate/releases">Pre-built versions of Kate are released on GitHub</a>. You’ll
 need to download the right compressed archive for your OS and
 <a class="reference internal" href="#cpu-architecture">CPU architecture</a>, then extract it somewhere in your computer. After that
 you’ll be able to run the Kate emulator from the provided executable.</p>
+<p>You can also <a class="reference internal" href="#build-kate-from-source">build Kate from source</a> yourself.</p>
 <section id="windows-10-or-more-recent">
 <h3>Windows 10 (or more recent)<a class="headerlink" href="#windows-10-or-more-recent" title="Permalink to this heading">#</a></h3>
 <ol class="arabic simple">
@@ -426,14 +513,14 @@ you’ll be able to run the Kate emulator from the provided executable.</p>
 <a class="reference internal" href="#building-from-source">Building from source</a> yourself.</p>
 </div>
 </section>
-<section id="linux">
-<h3>Linux<a class="headerlink" href="#linux" title="Permalink to this heading">#</a></h3>
+<section id="linux-including-steamos-and-raspberry-pi">
+<h3>Linux (including SteamOS and Raspberry Pi)<a class="headerlink" href="#linux-including-steamos-and-raspberry-pi" title="Permalink to this heading">#</a></h3>
 <ol class="arabic simple">
 <li><p>Download one of the following:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">kate-linux-x64.tar.gz</span></code> — for Intel/AMD 64-bit processors (e.g.: Intel i7);</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">kate-linux-x64.tar.gz</span></code> — for Intel/AMD 64-bit processors (e.g.: Intel i7, Steam Deck);</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">kate-linux-armv7l.tar.gz</span></code> — for ARMv7 32-bit processors (e.g.: Raspberry Pi 3);</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">kate-linux-arm64.tar.gz</span></code> — for ARM 64-bit processors (e.g.: Raspberry Pi 4);</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">kate-linux-arm64.tar.gz</span></code> — for ARM 64-bit processors (e.g.: Raspberry Pi 4 and 5);</p></li>
 </ul>
 </li>
 <li><p>Extract the file somewhere in your computer;</p>
@@ -455,11 +542,11 @@ can run <code class="docutils literal notranslate"><span class="pre">uname</span
 download the <code class="docutils literal notranslate"><span class="pre">x64</span></code> version of Kate.</p>
 <p>Another way of checking your processor’s architecture is to open
 <a class="reference external" href="https://kate.qteati.me/">https://kate.qteati.me/</a> in a Chromium-based browser (Chrome, Opera, Edge,
-Brave, etc.), hold <a class="reference internal" href="../../../_images/menu_24.png"><img alt="Menu button" class="align-middle" src="../../../_images/menu_24.png" style="height: 1em;" /></a> <em>(Menu button)</em> for a second, then open <code class="docutils literal notranslate"><span class="pre">About</span> <span class="pre">Kate</span></code>.
+Brave, etc.), press <a class="reference internal" href="../../../_images/berry_32.png"><img alt="Berry button" class="align-middle" src="../../../_images/berry_32.png" style="height: 1em;" /></a> <em>(Berry button)</em>, then select <code class="docutils literal notranslate"><span class="pre">About</span> <span class="pre">Kate</span></code>.
 Your processor architecture should be listed under <code class="docutils literal notranslate"><span class="pre">Host</span> <span class="pre">-&gt;</span> <span class="pre">Architecture</span></code>.</p>
 </section>
-<section id="pre-built-caveats">
-<span id="id3"></span><h3>Caveats<a class="headerlink" href="#pre-built-caveats" title="Permalink to this heading">#</a></h3>
+<section id="caveats-of-pre-built-binaries">
+<span id="pre-built-caveats"></span><h3>Caveats of pre-built binaries<a class="headerlink" href="#caveats-of-pre-built-binaries" title="Permalink to this heading">#</a></h3>
 <p>The pre-built binaries are not <a class="reference external" href="https://en.wikipedia.org/wiki/Code_signing">code-signed</a>. This means that the OS cannot
 verify where it came from, and modern Windows versions will warn you about
 this.</p>
@@ -470,21 +557,20 @@ yourself to be more assured of its provenance.</p>
 operating system will not restrict what the native binary can do, and will
 instead grant it all permissions your user has. In the case Electron or
 Chromium (the technologies that Kate uses) are compromised, they can cause
-significant damage to your computer. One goal of stable release is to have
-the OS sandbox the whole native binary to avoid this.</p>
+significant damage to your computer. One goal of the stable release is to have
+the OS sandbox the whole native binary to avoid this, but we’re not there yet.</p>
 <p>Kate itself and all cartridges are sandboxed using <a class="reference external" href="https://chromium.googlesource.com/chromium/src/+/HEAD/docs/design/sandbox.md">Chromium’s sandbox</a>,
 so in the event that Kate is compromised, or you run a malicious cartridge,
-there is very little damage they can do to your computer.</p>
-</section>
+there is likely little damage they can do to your computer.</p>
 </section>
 <section id="building-from-source">
-<span id="id4"></span><h2>Building from source<a class="headerlink" href="#building-from-source" title="Permalink to this heading">#</a></h2>
+<span id="build-kate-from-source"></span><span id="id4"></span><h3>Building from source<a class="headerlink" href="#building-from-source" title="Permalink to this heading">#</a></h3>
 <p>Building Kate from source allows you to audit the code and have more
 assurance about the provenance of all its components. To compile Kate
 you’ll need to have <a class="reference external" href="https://nodejs.org/en">Node.js 18 or more recent</a> installed.</p>
 <section id="bootstrapping">
-<h3>Bootstrapping<a class="headerlink" href="#bootstrapping" title="Permalink to this heading">#</a></h3>
-<p>Before you can build Kate, you’ll need to prepare your environment and
+<h4>Bootstrapping<a class="headerlink" href="#bootstrapping" title="Permalink to this heading">#</a></h4>
+<p>Before you can build Kate you’ll need to prepare your environment and
 download the applications it depends on to build. This can be done
 automatically by running the included bootstrap script:</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>node<span class="w"> </span>support/bootstrap.js<span class="w"> </span>--npm-install<span class="w"> </span>--download-electron<span class="w"> </span>--unzip-electron<span class="w"> </span>--build
@@ -493,15 +579,15 @@ automatically by running the included bootstrap script:</p>
 <p>You’ll need <code class="docutils literal notranslate"><span class="pre">Extract-Archive</span></code> on Windows’ PowerShell, or <code class="docutils literal notranslate"><span class="pre">unzip</span></code> on
 MacOS/Linux for this to work.</p>
 <p>To bootstrap manually, you’ll need the <code class="docutils literal notranslate"><span class="pre">glob</span></code> and <code class="docutils literal notranslate"><span class="pre">typescript</span></code> packages
-for Node.js, and you’ll need Electron 24.1.2. You can download the right
+for Node.js, and you’ll need Electron 26.3.0. You can download the right
 <code class="docutils literal notranslate"><span class="pre">electron-*.zip</span></code> for your OS/architecture from the
-<a class="reference external" href="https://github.com/electron/electron/releases/tag/v24.1.2">Electron releases page</a>, then extract it to the <code class="docutils literal notranslate"><span class="pre">electron/</span></code> directory.</p>
+<a class="reference external" href="https://github.com/electron/electron/releases/tag/v26.3.0">Electron releases page</a>, then extract it to the <code class="docutils literal notranslate"><span class="pre">electron/</span></code> directory.</p>
 <p>Note that some sub-packages also have dependencies that need to be installed.
 See the <code class="docutils literal notranslate"><span class="pre">dependencies</span></code> task in <code class="docutils literal notranslate"><span class="pre">make.js</span></code> for what to do if you want to
 avoid any network requests.</p>
 </section>
 <section id="building-kate">
-<h3>Building Kate<a class="headerlink" href="#building-kate" title="Permalink to this heading">#</a></h3>
+<h4>Building Kate<a class="headerlink" href="#building-kate" title="Permalink to this heading">#</a></h4>
 <p>After setting up, you can run <code class="docutils literal notranslate"><span class="pre">node</span> <span class="pre">make</span> <span class="pre">all</span></code> to build all Kate components:</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>node<span class="w"> </span>make<span class="w"> </span>all
 </pre></div>
@@ -515,7 +601,7 @@ then drag-and-drop any of the <code class="docutils literal notranslate"><span c
 Open the cartridge to check if you can play cartridges correctly.</p>
 </section>
 <section id="generating-native-builds">
-<h3>Generating native builds<a class="headerlink" href="#generating-native-builds" title="Permalink to this heading">#</a></h3>
+<h4>Generating native builds<a class="headerlink" href="#generating-native-builds" title="Permalink to this heading">#</a></h4>
 <p>Under Windows you can run the following to generate a Kate release:</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>node<span class="w"> </span>make<span class="w"> </span>release:win:x64
 </pre></div>
@@ -524,16 +610,17 @@ Open the cartridge to check if you can play cartridges correctly.</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>node<span class="w"> </span>make<span class="w"> </span>release:linux:x64
 </pre></div>
 </div>
-<p>Both of these will download Electron from the <a class="reference external" href="https://github.com/electron/electron/releases/tag/v24.1.2">Electron releases page</a> on
+<p>Both of these will download Electron from the <a class="reference external" href="https://github.com/electron/electron/releases/tag/v26.3.0">Electron releases page</a> on
 GitHub. If you’d rather do that manually, either download the zip file or
 compile Electron from source yourself, then place the zip in the <code class="docutils literal notranslate"><span class="pre">.cache</span></code>
 folder, with the same name as the one in the releases page.</p>
 </section>
 <section id="id5">
-<h3>Caveats<a class="headerlink" href="#id5" title="Permalink to this heading">#</a></h3>
+<h4>Caveats<a class="headerlink" href="#id5" title="Permalink to this heading">#</a></h4>
 <p>The same caveats as with the <a class="reference internal" href="#pre-built-caveats"><span class="std std-ref">pre-built binaries</span></a>
 applies. Electron in itself is unsandboxed, only the Kate kernel and
 cartridge processes run inside of a sandbox.</p>
+</section>
 </section>
 </section>
 <section id="compatibility-matrix">
@@ -569,7 +656,7 @@ web version of Kate has been tested and runs on the following browsers:</p>
 </tr>
 <tr class="row-even"><td><p>Chrome for Android</p></td>
 <td><p>108+</p></td>
-<td><p>Android 9</p></td>
+<td><p>Android 9, Android 13</p></td>
 </tr>
 </tbody>
 </table>
@@ -602,7 +689,6 @@ yet for it.</p>
 <ul>
 <li><p>Ubuntu 20.04 (x64);</p></li>
 <li><p>Raspbery Pi OS (based on Debian 11) (ARMv7L, ARM64);</p></li>
-<li><p>SteamOS (x64);</p></li>
 </ul>
 </li>
 </ul>
@@ -669,22 +755,24 @@ stopped supporting those versions in Chromium.</p>
             <ul>
 <li><a class="reference internal" href="#">Installing</a><ul>
 <li><a class="reference internal" href="#web-application">Web Application</a><ul>
-<li><a class="reference internal" href="#chrome-on-steam-deck">Chrome on Steam Deck</a></li>
+<li><a class="reference internal" href="#running-your-own-kate-instance">Running your own Kate instance</a></li>
+<li><a class="reference internal" href="#installing-as-a-pwa">Installing as a PWA</a></li>
+<li><a class="reference internal" href="#web-applications-on-steam-deck">Web applications on Steam Deck</a></li>
 <li><a class="reference internal" href="#caveats">Caveats</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#pre-built-binaries">Pre-built binaries</a><ul>
+<li><a class="reference internal" href="#native-application">Native application</a><ul>
 <li><a class="reference internal" href="#windows-10-or-more-recent">Windows 10 (or more recent)</a></li>
-<li><a class="reference internal" href="#linux">Linux</a></li>
+<li><a class="reference internal" href="#linux-including-steamos-and-raspberry-pi">Linux (including SteamOS and Raspberry Pi)</a></li>
 <li><a class="reference internal" href="#how-do-i-know-what-s-my-cpu-architecture">How do I know what’s my CPU architecture?</a></li>
-<li><a class="reference internal" href="#pre-built-caveats">Caveats</a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#caveats-of-pre-built-binaries">Caveats of pre-built binaries</a></li>
 <li><a class="reference internal" href="#building-from-source">Building from source</a><ul>
 <li><a class="reference internal" href="#bootstrapping">Bootstrapping</a></li>
 <li><a class="reference internal" href="#building-kate">Building Kate</a></li>
 <li><a class="reference internal" href="#generating-native-builds">Generating native builds</a></li>
 <li><a class="reference internal" href="#id5">Caveats</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><a class="reference internal" href="#compatibility-matrix">Compatibility matrix</a><ul>

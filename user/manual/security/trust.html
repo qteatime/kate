@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
-<link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Resource indicators" href="indicators.html" /><link rel="prev" title="Privacy policy" href="privacy.html" />
+<link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Audit logs" href="audit.html" /><link rel="prev" title="Privacy policy" href="privacy.html" />
 
     <!-- Generated with Sphinx 6.2.1 and Furo 2023.03.27 -->
         <title>Trust and consent - Kate 0.23.8 documentation</title>
@@ -181,7 +181,6 @@
 <li class="toctree-l3"><a class="reference internal" href="sandboxing.html">Sandboxing</a></li>
 <li class="toctree-l3"><a class="reference internal" href="privacy.html">Privacy policy</a></li>
 <li class="toctree-l3 current current-page"><a class="current reference internal" href="#">Trust and consent</a></li>
-<li class="toctree-l3"><a class="reference internal" href="indicators.html">Resource indicators</a></li>
 <li class="toctree-l3"><a class="reference internal" href="audit.html">Audit logs</a></li>
 </ul>
 </li>
@@ -314,49 +313,119 @@
         <article role="main">
           <section id="trust-and-consent">
 <h1>Trust and consent<a class="headerlink" href="#trust-and-consent" title="Permalink to this heading">#</a></h1>
-<p>Sometimes you will take actions in Kate that require consent. This is
-generally the case with dangerous or irreversible actions, such as
-deleting data from the database. But it might also arise from things
-like granting access to files or more storage space for a cartridge.</p>
-<p>When the emulator prompts you for consent in these cases, there will
-be a distinctive indicator (called the “Trust Frame”) to show that the
-request is truly coming from the Kate emulator, and not from a malicious
-cartridge mimicing the same UI.</p>
-<section id="hand-held-and-tv-modes">
-<h2>Hand-held and TV modes<a class="headerlink" href="#hand-held-and-tv-modes" title="Permalink to this heading">#</a></h2>
-<p>In hand-held and TV mode, this distinct indicator takes the form of
-a red-ish border surrounding the screen. In this case the dialog
-is coming from the Kate emulator because there are no black borders
-between the console’s case and the screen:</p>
-<img alt="../../../_images/trust-frame.png" src="../../../_images/trust-frame.png" />
-<p>Because the border around the screen is outside of the screen the
-cartridge has access to show things on, there’s no way for a cartridge
-to mimic this indicator.</p>
+<p>Sometimes there will be things happening in Kate which require your
+attention. This is often the case with dangerous or irreversible
+actions, such as deleting things from the database. But it might
+also arise from things that have more of a potential for harm,
+such as recording videos from a Kate screen.</p>
+<p>For these cases Kate relies on the resource indicator to communicate
+what’s happening and what level of risk you’re currently taking. The
+resource indicator is designed to make it impossible for any cartridge
+to mimic, so you can always trust that the information comes from the
+trusted Kate code.</p>
+<section id="the-resource-indicator-bar">
+<h2>The resource indicator bar<a class="headerlink" href="#the-resource-indicator-bar" title="Permalink to this heading">#</a></h2>
+<p>The indicator bar is a small bar of icons that’s always displayed on the
+top-right of the screen in Kate. For example, if you launch a cartridge
+you might notice a small diamond icon in this bar:</p>
+<img alt="../../../_images/untrusted.png" src="../../../_images/untrusted.png" />
+<p>This indicates that Kate is currently showing you a regular cartridge
+screen, and that screen is not necessarily subject to the same privacy
+policy and security guarantees that Kate has, so you should be more
+cautious about what information you share with it.</p>
+<p>On the other hand, when Kate shows you a screen that comes from Kate’s
+own code, you’ll see this same bar with a distinct pink background and
+a padlock where the diamond icon would be. Where this happens you can
+be assured that any interaction you have on that screen and any
+information you share will be subject to Kate’s privacy policy and
+security guarantees.</p>
+<img alt="../../../_images/trusted.png" src="../../../_images/trusted.png" />
 </section>
-<section id="fullscreen-mode">
-<h2>Fullscreen mode<a class="headerlink" href="#fullscreen-mode" title="Permalink to this heading">#</a></h2>
-<p>When running Kate in fullscreen mode, the trust frame takes a different
-shape. It’s indicated by a 3 pixels tall contiguous line at the very
-top of the screen, along with the <a class="reference internal" href="indicators.html"><span class="doc">resource indicator band</span></a>
-at the top-right. Like the trust frame in hand-held and TV modes, the
-one in fullscreen mode will also change colour when a dialog
-presented on the screen to get your consent comes from Kate itself.</p>
-<img alt="../../../_images/fullscreen-trust.png" src="../../../_images/fullscreen-trust.png" />
-<p>Because the trust indicators in fullscreen mode are always on top of the
-screen, there’s likewise no way for a cartridge to mimic it, so you will
-always know what dialogs are trustworthy and which ones are presented
-by the cartridge when you look at the trust frame.</p>
+<section id="background-actions">
+<h2>Background actions<a class="headerlink" href="#background-actions" title="Permalink to this heading">#</a></h2>
+<p>Besides indicating whether you can trust that the current screen comes from
+Kate’s own code or not, the resource indicator bar also houses other icons
+to show things happening in the background in the console. For example,
+when Kate is recording your screen you’ll see a small “recording” icon
+in this bar. Any other background action that might pose some risk will
+likewise be shown there.</p>
+<img alt="../../../_images/recording.png" src="../../../_images/recording.png" />
+<p>Icons for background actions are shown in the bar simply for informational
+purposes, so you can make more informed risk assessments. They don’t
+require any action from your side.</p>
+</section>
+<section id="warning-icons">
+<h2>Warning icons<a class="headerlink" href="#warning-icons" title="Permalink to this heading">#</a></h2>
+<p>Sometimes your Kate installation or the device configuration will be in a
+status that might pose a risk to your data. For example, if you’re running
+low on storage space, it might not be possible to save your game. Or, if
+you’re running Kate without persistent storage, cartridges that you install
+might be gone when you close the emulator or turn off your Kate device.
+For these cases you’ll see a warning icon in the screen, and you can use
+the resource icon table in this page for suggested actions.</p>
+<p>For example, in the image above the console is running without persistent
+storage (e.g.: this may happen if you run it in an anonymous window, or if
+you run in Chrome without installing Kate as a web app):</p>
+<img alt="../../../_images/temporary-storage.png" src="../../../_images/temporary-storage.png" />
+</section>
+<section id="resource-icons">
+<span id="resource-indicator-icons"></span><h2>Resource icons<a class="headerlink" href="#resource-icons" title="Permalink to this heading">#</a></h2>
+<div class="table-wrapper docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Icon</p></th>
+<th class="head"><p>What is it used for?</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference internal" href="../../../_images/temporary-storage1.png"><img alt="icon_tmp_storage" src="../../../_images/temporary-storage1.png" style="width: 32px;" /></a></p></td>
+<td><dl>
+<dt><strong>Temporary storage</strong></dt><dd><p>Used in the web version of Kate to
+indicate when the emulator is operating on a
+<a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/API/Storage_API#bucket_modes">Best-Effort storage mode</a>, and so the browser
+may decide to erase the console data if you
+start running out of space.</p>
+<p>Adding to favourites or
+<a class="reference internal" href="../intro/install.html#web-application"><span class="std std-ref">installing as a web app</span></a>
+may solve the issue in Chrome and Safari.
+In Firefox you’ll need to grant the
+“Persistent Storage” permission to the page.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../../../_images/low-storage.png"><img alt="icon_low_storage" src="../../../_images/low-storage.png" style="width: 32px;" /></a></p></td>
+<td><dl>
+<dt><strong>Low storage</strong></dt><dd><p>Used to indicate that the device’s storage has
+very little free space, which might impact all
+of Kate’s functions that store data.</p>
+<p><a class="reference internal" href="../../../glossary.html#term-Archiving"><span class="xref std std-term">Archiving</span></a> or
+<a class="reference internal" href="../gaming/storage.html"><span class="doc">deleting data</span></a>
+is advised.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../../../_images/recording1.png"><img alt="icon_recording" src="../../../_images/recording1.png" style="width: 32px;" /></a></p></td>
+<td><dl class="simple">
+<dt><strong>Recording screen</strong></dt><dd><p>Used to indicate when a cartridge is currently
+recording the screen using the provided Capture
+API.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
 </section>
 <section id="note-on-non-visual-cues">
 <h2>Note on non-visual cues<a class="headerlink" href="#note-on-non-visual-cues" title="Permalink to this heading">#</a></h2>
-<p>Currently Kate uses only visual cues for the trust frame, and the cues
-are colour-based. This is a problem for colour-blind players, and it
-may be a problem for players who have another vision disability or
-cannot look at the screen for one reason or another.</p>
-<p>A future version of Kate will expand these channels to non-visual and
-non-colour-based ones as well, but that requires more research on
-forms of communicating this information through non-visual channels
-in ways that can’t be mimic’d.</p>
+<p>Currently Kate uses only visual cues for the trust frame. This is a problem
+for players who have certain vision disabilities and rely on other output
+channels, such as a screen reader. In the future Kate will expand these
+security feedback channels to non-visual channels as well, but that requires
+more research and experiments.</p>
 </section>
 </section>
 
@@ -365,12 +434,12 @@ in ways that can’t be mimic’d.</p>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="indicators.html">
+          <a class="next-page" href="audit.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Resource indicators</div>
+                <div class="title">Audit logs</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
@@ -416,8 +485,10 @@ in ways that can’t be mimic’d.</p>
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Trust and consent</a><ul>
-<li><a class="reference internal" href="#hand-held-and-tv-modes">Hand-held and TV modes</a></li>
-<li><a class="reference internal" href="#fullscreen-mode">Fullscreen mode</a></li>
+<li><a class="reference internal" href="#the-resource-indicator-bar">The resource indicator bar</a></li>
+<li><a class="reference internal" href="#background-actions">Background actions</a></li>
+<li><a class="reference internal" href="#warning-icons">Warning icons</a></li>
+<li><a class="reference internal" href="#resource-icons">Resource icons</a></li>
 <li><a class="reference internal" href="#note-on-non-visual-cues">Note on non-visual cues</a></li>
 </ul>
 </li>
