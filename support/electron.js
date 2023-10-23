@@ -13,8 +13,8 @@ const Streams = require("stream/promises");
 const Crypto = require("crypto");
 const electron_checksum = require("./electron-checksum");
 
-const version = require("../package.json").devDependencies.electron;
-if (!/^\d+\.\d+\.\d+$/.test(version)) {
+const version = `v${require("../package.json").devDependencies.electron}`;
+if (!/^v\d+\.\d+\.\d+$/.test(version)) {
   throw new Error(`Invalid version for electron: ${version}`);
 }
 
