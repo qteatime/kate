@@ -526,11 +526,7 @@ w.task(
 w.task("ecosystem:all", ["ecosystem:importer"], () => {});
 
 // -- Desktop app
-w.task("desktop:setup", [], () => {
-  copy("node_modules/electron/electron.d.ts", "packages/kate-desktop/source/electron.d.ts");
-});
-
-w.task("desktop:compile", ["desktop:setup"], () => {
+w.task("desktop:compile", [], () => {
   tsc("packages/kate-desktop");
 });
 
