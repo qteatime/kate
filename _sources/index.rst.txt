@@ -22,6 +22,11 @@ cover aspects from how to use Kate to its philosophy and security guarantees.
    New to Kate? Confused about how Kate works? This explains how to
    install it and all features in the console.
 
+:doc:`Kate's Importer Manual <user/importer/index>`
+   The Kate Importer lets you install and play games made for other
+   platforms in Kate. This manual explains what's supported, how it
+   works, and what the limitations are.
+
 
 Game developer books
 ====================
@@ -85,6 +90,7 @@ Indices and tables
   :hidden:
 
   user/manual/index
+  user/importer/index
 
 .. toctree::
   :caption: Game developer books
