@@ -9,7 +9,7 @@
 project = 'Kate'
 copyright = '2023, Q.'
 author = 'Q.'
-release = "0.23.8"
+release = "0.23.10"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
