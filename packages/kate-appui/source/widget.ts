@@ -790,6 +790,7 @@ export class WidgetDSL {
       {
         key: ["o"],
         label: "Edit",
+        on_click: true,
         handler: async () => {
           const new_value = await KateAPI.dialogs.text_input(x.query ?? "", {
             type: "text",
