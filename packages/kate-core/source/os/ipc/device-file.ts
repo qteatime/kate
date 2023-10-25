@@ -9,26 +9,22 @@ import type { KateOS } from "../os";
 import { TC, make_id } from "../../utils";
 import { EMessageFailed, auth_handler, handler } from "./handlers";
 import { DeviceFileHandle } from "../apis";
+import * as UI from "../ui";
 
 type HandleId = string & { __handle_id: true };
 export class KateDeviceFileIPC {
-  private _handles = new WeakMap<
-    HTMLIFrameElement,
-    Map<HandleId, DeviceFileHandle>
-  >();
+  private _handles = new WeakMap<HTMLIFrameElement, Map<HandleId, DeviceFileHandle>>();
 
   expose(env: RuntimeEnv, handle: DeviceFileHandle) {
     const id = make_id() as HandleId;
-    const handles =
-      this._handles.get(env.frame) ?? new Map<HandleId, DeviceFileHandle>();
+    const handles = this._handles.get(env.frame) ?? new Map<HandleId, DeviceFileHandle>();
     handles.set(id, handle);
     this._handles.set(env.frame, handles);
     return { id, path: handle.path };
   }
 
   async resolve(os: KateOS, env: RuntimeEnv, id: HandleId) {
-    const handles =
-      this._handles.get(env.frame) ?? new Map<HandleId, DeviceFileHandle>();
+    const handles = this._handles.get(env.frame) ?? new Map<HandleId, DeviceFileHandle>();
     const handle = handles.get(id);
     if (handle != null) {
       return handle;
@@ -49,6 +45,31 @@ const handle_id = TC.str as (_: any) => HandleId;
 
 const device_ipc = new KateDeviceFileIPC();
 
+async function assert_allowed(
+  os: KateOS,
+  cart_id: string,
+  type: "files" | "directories",
+  ok: string
+) {
+  const allowed = await os.dialog.confirm("kate:device-file", {
+    title: `Allow access to your ${type}?`,
+    message: UI.stack([
+      UI.paragraph([
+        UI.strong([UI.mono_text([cart_id])]),
+        ` wants read-only access to one of your ${type}. `,
+        `It will be able to read what you select until you close the cartridge.`,
+      ]),
+    ]),
+    cancel: "Cancel",
+    ok: ok,
+    dangerous: true,
+  });
+  if (!allowed) {
+    console.error(`[kate:device-file] Denied access to ${type} to ${cart_id}`);
+    throw new EMessageFailed("kate.device-file.not-allowed", `Not allowed`);
+  }
+}
+
 export default [
   auth_handler(
     "kate:device-fs.request-file",
@@ -64,25 +85,20 @@ export default [
     }),
     { capabilities: [{ type: "request-device-files" }] },
     async (os, env, ipc, { multiple, strict, types }) => {
-      return await os.fairness_supervisor.with_resource(
-        env.cart.id,
-        "modal-dialog",
-        async () => {
-          const handles = await os.device_file.open_file(env.cart.id, {
-            multiple,
-            strict,
-            types: [
-              {
-                description: "",
-                accept: Object.fromEntries(
-                  types.map((x) => [x.type, x.extensions])
-                ),
-              },
-            ],
-          });
-          return handles.map((x) => device_ipc.expose(env, x));
-        }
-      );
+      return await os.fairness_supervisor.with_resource(env.cart.id, "modal-dialog", async () => {
+        await assert_allowed(os, env.cart.id, "files", "Select file");
+        const handles = await os.device_file.open_file(env.cart.id, {
+          multiple,
+          strict,
+          types: [
+            {
+              description: "",
+              accept: Object.fromEntries(types.map((x) => [x.type, x.extensions])),
+            },
+          ],
+        });
+        return handles.map((x) => device_ipc.expose(env, x));
+      });
     }
   ),
 
@@ -91,14 +107,11 @@ export default [
     TC.spec({}),
     { capabilities: [{ type: "request-device-files" }] },
     async (os, env, ipc, _) => {
-      return await os.fairness_supervisor.with_resource(
-        env.cart.id,
-        "modal-dialog",
-        async () => {
-          const handles = await os.device_file.open_directory(env.cart.id);
-          return handles.map((x) => device_ipc.expose(env, x));
-        }
-      );
+      return await os.fairness_supervisor.with_resource(env.cart.id, "modal-dialog", async () => {
+        await assert_allowed(os, env.cart.id, "directories", "Select directory");
+        const handles = await os.device_file.open_directory(env.cart.id);
+        return handles.map((x) => device_ipc.expose(env, x));
+      });
     }
   ),
 
