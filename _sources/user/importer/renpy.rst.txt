@@ -127,6 +127,44 @@ Ren'Py on PC. However, the following limitations apply:
   in viewports, and there you can generally use the scrollbars directly.
 
 
+Performance of emulated games
+-----------------------------
+
+The performance of games running with the Ren'Py web runtime is significantly
+worse than running with the native Python runtimes that are used on PC and
+MacOS releases. Older machines may struggle with running games that would
+be fine if ran outside of Kate, and newer machines will often spend
+considerable CPU power to run the game (which may e.g.: make captures and
+Kate's own context menu feel sluggish at times).
+
+There are several reasons for this, some of which may be addressed in a future
+version of the Ren'Py importer, and some of which are more fundamental and
+cannot be improved much:
+
+* Ren'Py web uses several layers of emulation. When you run a Ren'Py game
+  natively on PC/Mac, you generally have one layer of emulation above your
+  computer, so: ``Native processor -> Python processor -> The Ren'Py game``.
+
+  When you run the same game in Kate you'll have two layers of emulation:
+  ``Native processor -> Browser WASM processor -> Python processor ->
+  The Ren'Py game``. The addition of one layer degrades performance
+  significantly in this case because the ``Python processor`` that Ren'Py
+  and Ren'Py web use has been designed to run by your computer's native
+  processor, and the Browser WASM processor has different characteristics.
+  This mismatch of features requires the WASM processor to do a lot more
+  work to run the same ``Python processor``.
+
+* Ren'Py web was designed for streaming games in a web browser. This is why
+  it uses ZIP files for sending the intial files to start the game and
+  downloads other files on demand. In Kate these features are not necessary,
+  and their use leads to longer startup times and more CPU usage, as
+  Ren'Py web needs to decompress ZIP files before it can run the game.
+
+  This might be improved in the future by forking Ren'Py web and modifying
+  it to be more friendly to Kate's architecture; that should provide
+  improvements to startup time and image loading during game play.
+
+
 Known limitations
 -----------------
 

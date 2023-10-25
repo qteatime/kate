@@ -35,7 +35,8 @@ Getting the Importer
 The Kate Importer is released as a standard cartridge. Download the
 ``standard-cartridges.zip`` file from either the
 `GitHub releases page <https://github.com/qteatime/kate/releases>`_ or the
-`Itch.io stable mirror <https://qteatime.itch.io/kate-importer>`_.
+`Itch.io stable mirror <https://qteatime.itch.io/kate-importer>`_. You'll
+find the importer cartridge inside this ZIP file.
 
 To install, you can drag-and-drop the ``kate-importer.kart`` file on a Kate
 emulator, or use |btn_berry_text| to bring the context menu and select
@@ -45,7 +46,7 @@ emulator, or use |btn_berry_text| to bring the context menu and select
 Capabilities
 ------------
 
-The Importer needs two capabilities:
+The Importer needs two powerful capabilities (and a modal-dialog one):
 
 * ``Ask to access your files``: this gives the Importer read-only access to
   the file you choose to share with the Importer. It's needed to be able to
