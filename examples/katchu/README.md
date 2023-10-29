@@ -8,4 +8,4 @@ Run `node make example:katchu` or `node make example:all` at the root of this re
 
 ## Licence
 
-Code is released under MIT license, the same as the rest of this repository. Included thumbnail and images are released under a [Creative Commons 4.0](https://creativecommons.org/licenses/by/4.0/) licence.
+Code is released under MIT licence. Included thumbnail and images are released under a [Creative Commons 4.0](https://creativecommons.org/licenses/by/4.0/) licence.

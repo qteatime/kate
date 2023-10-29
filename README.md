@@ -59,6 +59,10 @@ cartridges have their own licences (usually more permissive than Kate's).
 
 - [**Kat'chu**](examples/katchu/): An older-style handheld arcade where you shoot for the highest score in 30 seconds (uses the timer, cartridge, audio, input, capture, and storage APIs).
 
+- [**A certain autumn evening**](examples/a-certain-autumn-evening/): A
+  micro visual novel (~900 words) that show cases how Ren'Py games can be
+  published as Kate cartridges.
+
 ## Contributing to Kate
 
 Kate does not accept source contributions currently, since it has not reached a stable release yet. However here are some other ways you can contribute to Kate's development:

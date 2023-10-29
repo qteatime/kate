@@ -1,0 +1,61 @@
+{
+  "id": "qteati.me/a-certain-autumn-evening",
+  "version": {
+    "major": 1,
+    "minor": 0
+  },
+  "release": {
+    "year": 2023,
+    "month": 10,
+    "day": 29
+  },
+  "root": "autumn-1.0-web",
+  "metadata": {
+    "presentation": {
+      "author": "Q.",
+      "title": "A certain autumn evening",
+      "tagline": "On your evening stroll you meet a peculiar being.",
+      "release_type": "regular",
+      "thumbnail_path": "kate-autumn-thumbnail.png"
+    },
+    "classification": {
+      "genre": ["visual-novel"],
+      "tags": ["gothic", "horror", "hand-drawn", "short", "watercolor"],
+      "rating": "general"
+    },
+    "legal": {
+      "licence_path": "LICENCE.txt",
+      "derivative_policy": "commercial-use"
+    },
+    "accessibility": {
+      "input_methods": ["buttons", "pointer"],
+      "languages": [
+        {
+          "iso_code": "en",
+          "interface": true,
+          "audio": false,
+          "text": true
+        }
+      ],
+      "provisions": [
+        "high-contrast",
+        "voiced-text"
+      ],
+      "average_completion": {"unit": "minutes", "value": 5},
+      "average_session": {"unit": "minutes", "value": 5}
+    }
+  },
+  "platform": {
+    "type": "web-archive",
+    "html": "index.html",
+    "recipe": {
+      "type": "renpy",
+      "pointer_support": true,
+      "save_data": "unversioned",
+      "renpy_version": "8.1"
+    },
+    "bridges": [
+      {"type": "input-proxy", "mapping": "kate"}
+    ]
+  }
+}

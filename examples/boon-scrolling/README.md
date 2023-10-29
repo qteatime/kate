@@ -16,4 +16,4 @@ Run `node make example:boon-scrolling` or `node make example:all` at the root of
 
 ## Licence
 
-Code is released under MIT license, the same as the rest of this repository. Assets are released under a [Creative Commons 4.0](https://creativecommons.org/licenses/by/4.0/) licence.
+Code is released under MIT license. Assets are released under a [Creative Commons 4.0](https://creativecommons.org/licenses/by/4.0/) licence.
