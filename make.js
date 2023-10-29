@@ -691,7 +691,7 @@ w.task(
   ["www:release", "release:cartridges", "tools:make-npm-package", "release:linux:all"],
   () => {
     const version = require("./package.json").version;
-    if (!/^\d+\.\d+\.\d+$/.test(version)) {
+    if (!/^\d+\.\d+\.\d+(\-[\w\d]+)?$/.test(version)) {
       throw new Error(`invalid kate version: ${version}`);
     }
     copy_tree("www", "dist/www");
