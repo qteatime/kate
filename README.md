@@ -151,7 +151,7 @@ file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 Where dependencies are used, they remain under their specific licences.
 If a package includes more specific licence, it'll have its own `LICENCE.txt`
-file. Otherwise `LICENCE.MPL.txt` at the root of this repository applies.
+file. Otherwise `LICENCE.txt` at the root of this repository applies.
 See those files for all details and legally-binding texts, this section is
 merely informational.
 
