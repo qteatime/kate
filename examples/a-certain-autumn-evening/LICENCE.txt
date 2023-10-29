@@ -1,0 +1,42 @@
+Copyright (c) 2023 Q.
+
+"A certain autumn evening."'s source code is distributed under the terms of
+the MIT licence. The usage policy for original images is described in
+https://qteati.me/usage-policy/
+
+You may find a copy of the source code at https://github.com/qteatime/kate
+
+-----------------------------------------------------------------------
+
+This software contains portions of code, fonts, images, and sounds by
+thirdy-parties, speficied below.
+
+-----------------------------------------------------------------------
+
+## Fonts:
+
+- DejaVu Sans
+  (c) Bitstream, Inc.; (c) Tavmjong Bah
+  (Bitstream Vera Licence - https://dejavu-fonts.github.io/License.html)
+
+- Open Dyslexic
+  (c) Abbie Gonzalez
+  (SIL Open Font Licence - https://opendyslexic.org/)
+
+-----------------------------------------------------------------------
+
+## Images:
+
+- Q.
+  (Creative Commons 4.0 BY --- https://creativecommons.org/licenses/by/4.0/)
+  (additional recommendations: https://qteati.me/usage-policy/)
+
+-----------------------------------------------------------------------
+
+## Code
+
+A certain autumn night uses Ren'Py, which includes components in several
+different licences (including LGPL). A complete list of software and
+licence information for Ren'Py is available at
+http://www.renpy.org/doc/html/license.html
+
