@@ -9,7 +9,6 @@
     "month": 10,
     "day": 29
   },
-  "root": "autumn-1.0-web",
   "metadata": {
     "presentation": {
       "author": "Q.",
@@ -37,12 +36,9 @@
           "text": true
         }
       ],
-      "provisions": [
-        "high-contrast",
-        "voiced-text"
-      ],
-      "average_completion": {"unit": "minutes", "value": 5},
-      "average_session": {"unit": "minutes", "value": 5}
+      "provisions": ["high-contrast", "voiced-text"],
+      "average_completion": { "unit": "minutes", "value": 5 },
+      "average_session": { "unit": "minutes", "value": 5 }
     }
   },
   "platform": {
@@ -54,8 +50,6 @@
       "save_data": "unversioned",
       "renpy_version": "8.1"
     },
-    "bridges": [
-      {"type": "input-proxy", "mapping": "kate"}
-    ]
+    "bridges": [{ "type": "input-proxy", "mapping": "kate" }]
   }
 }

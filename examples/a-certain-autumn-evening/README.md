@@ -20,8 +20,8 @@ requires manual steps and cannot be fully automated currently.
    at the same level `a-certain-autumn-evening` is at.
 
 3. Copy `kate.json`, `kate-autumn-thumbnail.png`, and `LICENCE.txt` from
-   this folder to `autumn-1.0-dists`; the Ren'Py launcher does not copy
-   these files automatically for web builds.
+   this folder to `autumn-1.0-dists/autumn-1.0-web`; the Ren'Py launcher
+   does not copy these files automatically for web builds.
 
 4. Build a Kate cartridge with Kart by running the following in the
    command line, while in the `autumn-1.0-dists` folder:
