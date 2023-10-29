@@ -5,6 +5,12 @@ Games made with `Ren'Py <https://www.renpy.org/>`_ can run on Kate with
 little configuration, granted they work with the Ren'Py web export.
 Text input is not yet supported.
 
+The game
+`A certain autumn evening <https://github.com/qteatime/kate/tree/main/examples/a-certain-autumn-evening>`_
+included in the ``examples/`` folder in Kate can be taken as a sample of
+what a Ren'Py game published for Kate can look like, and the necessary
+configuration.
+
 
 Kart configuration
 ------------------
