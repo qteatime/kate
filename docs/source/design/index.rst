@@ -14,8 +14,8 @@ Kernel design
 .. toctree::
   :maxdepth: 1
 
-  00XX-capabilities
-  00XX-live-audit
+  kernel/K0001-capabilities
+  kernel/K0002-live-audit
 
 
 API design
@@ -24,6 +24,6 @@ API design
 .. toctree::
   :maxdepth: 1
 
-  0101-object-storage
-  01XX-external-url
-  01XX-device-file-access
+  api/A0001-object-storage
+  api/A0002-external-url
+  api/A0003-device-file-access
