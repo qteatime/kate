@@ -1,5 +1,5 @@
 #A0002 — External URL navigation
-===============================
+================================
 
 :Author: Q\.
 :Started: 2023-06-25
@@ -427,13 +427,13 @@ We have two scenarios for these popups:
   protocol: here we want to give people an indication of where they're
   going so they can do some risk assessment.
 
-  .. image:: img/external-url-dialog.png
+  .. image:: ../img/external-url-dialog.png
 
 * The URL uses an insecure protocol: this is the case where the URL is using
   plain HTTP. We want to make sure the user understands that their connection
   can be spied upon and tampered with, but we won't block the request.
 
-  .. image:: img/external-url-insecure.png
+  .. image:: ../img/external-url-insecure.png
 
 The only difference between the two dialogs is that insecure protocols include
 an additional warning about the privacy and security implications of navigating

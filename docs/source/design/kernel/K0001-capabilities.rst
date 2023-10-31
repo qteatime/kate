@@ -1,5 +1,5 @@
 #K0001 — Capabilities
-====================
+=====================
 
 :Author: Q\.
 :Started: 2023-07-24
@@ -272,7 +272,7 @@ Capabilities are granted in three distinct moments:
 
 The following graph illustrates how capability grants are managed:
 
-.. image:: img/capability-grants.svg
+.. image:: ../img/capability-grants.svg
 
 
 Enforcement
@@ -286,7 +286,7 @@ the API if it has a grant for that capability.
 
 The following graph illustrates this process:
 
-.. image:: img/capability-enforcement.svg
+.. image:: ../img/capability-enforcement.svg
 
 It's important to note that there are two distinct parts here: requesting
 *access to* the API, and performing *actions in* the API. Both of these go

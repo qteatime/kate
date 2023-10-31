@@ -1,4 +1,4 @@
-#K0002 - Live auditing
+#K0002 — Live auditing
 ======================
 
 :Author: Q\.
@@ -46,7 +46,7 @@ A log entry contains the following fields:
     input mappings will affect the "settings" resource.
 
   - **The risk category for this action**. This is the same risk categories
-    as in :doc:`00XX-capabilities`, but here we want to highlight specific
+    as in :doc:`K0001-capabilities`, but here we want to highlight specific
     log entries based on their potential auditing value.
 
   - **The process responsible for this action**. That is, on whose behalf was
