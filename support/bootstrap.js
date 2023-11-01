@@ -42,7 +42,7 @@ async function main() {
 
     if (FS.existsSync("electron")) {
       console.log("> First cleaning up electron/ directory...");
-      FS.rmdirSync("electron", { recursive: true, force: true });
+      FS.rmSync("electron", { recursive: true, force: true });
     }
     electron.unzip(electron.make_name(), "electron");
   }
