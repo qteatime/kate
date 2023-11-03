@@ -25,11 +25,7 @@ export class SceneMain extends UIScene {
           ]),
           ui.p(["Supported engines:"]),
           ui.ul([
-            ui.flow([
-              ui.strong(["Ren'Py"]),
-              " ",
-              ui.meta_text(["(7.x, 8.x — PC releases)"]),
-            ]),
+            ui.flow([ui.strong(["Ren'Py"]), " ", ui.meta_text(["(7.x, 8.x — PC releases)"])]),
             ui.flow([ui.strong(["Bitsy"]), " ", ui.meta_text(["(HTML)"])]),
           ]),
         ]),
@@ -70,13 +66,15 @@ export class SceneMain extends UIScene {
       });
       if (candidates.length > 0) {
         this.ui.push_scene(new SceneReview(this.ui, candidates));
+      } else {
+        await this.ui.dialogs.message({
+          message: [`No importable game found in the selected folder.`],
+        });
       }
     } catch (e) {
       console.error(`Failed to prepare candidates:`, e);
       await this.ui.dialogs.message({
-        message: [
-          `Failed to import: an unknown internal error occurred while importing.`,
-        ],
+        message: [`Failed to import: an unknown internal error occurred while importing.`],
       });
     }
   }
@@ -102,6 +100,10 @@ export class SceneMain extends UIScene {
       });
       if (candidates.length > 0) {
         this.ui.push_scene(new SceneReview(this.ui, candidates));
+      } else {
+        await this.ui.dialogs.message({
+          message: [`No importable game found in the selected ZIP file.`],
+        });
       }
     } catch (e) {
       console.error(`Failed to prepare candidates:`, e);
