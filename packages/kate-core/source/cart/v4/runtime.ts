@@ -28,8 +28,9 @@ function bridge(x: Cart_v4.Bridge): Bridge {
   switch (x["@variant"]) {
     case Cart_v4.Bridge.$Tags.Input_proxy: {
       return {
-        type: "input-proxy",
+        type: "keyboard-input-proxy-v2",
         mapping: map_map(x.mapping, (a, b) => [virtual_key(a), keyboard_key(b)]),
+        selector: "legacy",
       };
     }
     case Cart_v4.Bridge.$Tags.Local_storage_proxy: {

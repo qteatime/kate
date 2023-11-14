@@ -50,6 +50,6 @@
       "save_data": "unversioned",
       "renpy_version": "8.1"
     },
-    "bridges": [{ "type": "input-proxy", "mapping": "kate" }]
+    "bridges": [{ "type": "keyboard-input-proxy-v2", "mapping": "kate", "selector": "window" }]
   }
 }

@@ -1414,7 +1414,7 @@ export namespace Accessibility_provision {
 
 
 
-export type Bridge = Bridge.Network_proxy | Bridge.Local_storage_proxy | Bridge.Input_proxy | Bridge.Preserve_WebGL_render | Bridge.Capture_canvas | Bridge.Pointer_input_proxy | Bridge.IndexedDB_proxy | Bridge.Renpy_web_tweaks | Bridge.External_URL_handler;
+export type Bridge = Bridge.Network_proxy | Bridge.Local_storage_proxy | Bridge.Input_proxy | Bridge.Preserve_WebGL_render | Bridge.Capture_canvas | Bridge.Pointer_input_proxy | Bridge.IndexedDB_proxy | Bridge.Renpy_web_tweaks | Bridge.External_URL_handler | Bridge.Keyboard_input_proxy_v2;
 
 export namespace Bridge {
  export const tag = 24;
@@ -1428,7 +1428,8 @@ export namespace Bridge {
     Pointer_input_proxy = 5,
     IndexedDB_proxy = 6,
     Renpy_web_tweaks = 7,
-    External_URL_handler = 8
+    External_URL_handler = 8,
+    Keyboard_input_proxy_v2 = 9
  }
 
  
@@ -1627,6 +1628,29 @@ export namespace Bridge {
    readonly '@variant': $Tags.External_URL_handler;
    readonly '@variant-name': 'External-URL-handler';
    
+ }
+
+
+  
+ export function Keyboard_input_proxy_v2(x: {readonly 'mapping': Map<Virtual_key, Keyboard_key>,readonly 'selector': Keyboard_input_selector}): Bridge {
+   return {
+     '@name': 'Bridge',
+     '@tag': 24,
+     '@version': 0,
+     '@variant': $Tags.Keyboard_input_proxy_v2,
+     '@variant-name': 'Keyboard-input-proxy-v2',
+     ...x
+   }
+ }
+
+ export interface Keyboard_input_proxy_v2 {
+   readonly '@name': 'Bridge';
+   readonly '@tag': 24;
+   readonly '@version': 0;
+   readonly '@variant': $Tags.Keyboard_input_proxy_v2;
+   readonly '@variant-name': 'Keyboard-input-proxy-v2';
+   readonly 'mapping': Map<Virtual_key, Keyboard_key>
+    readonly 'selector': Keyboard_input_selector
  }
 
 }
@@ -2095,6 +2119,109 @@ export namespace Contextual_capability {
    readonly '@variant': $Tags.Show_dialogs;
    readonly '@variant-name': 'Show-dialogs';
    
+ }
+
+}
+
+
+
+export type Keyboard_input_selector = Keyboard_input_selector.Window | Keyboard_input_selector.Document | Keyboard_input_selector.Legacy | Keyboard_input_selector.CSS;
+
+export namespace Keyboard_input_selector {
+ export const tag = 29;
+
+ export const enum $Tags {
+   Window = 0,
+    Document = 1,
+    Legacy = 2,
+    CSS = 3
+ }
+
+ 
+ export function Window(x: {}): Keyboard_input_selector {
+   return {
+     '@name': 'Keyboard-input-selector',
+     '@tag': 29,
+     '@version': 0,
+     '@variant': $Tags.Window,
+     '@variant-name': 'Window',
+     ...x
+   }
+ }
+
+ export interface Window {
+   readonly '@name': 'Keyboard-input-selector';
+   readonly '@tag': 29;
+   readonly '@version': 0;
+   readonly '@variant': $Tags.Window;
+   readonly '@variant-name': 'Window';
+   
+ }
+
+
+  
+ export function Document(x: {}): Keyboard_input_selector {
+   return {
+     '@name': 'Keyboard-input-selector',
+     '@tag': 29,
+     '@version': 0,
+     '@variant': $Tags.Document,
+     '@variant-name': 'Document',
+     ...x
+   }
+ }
+
+ export interface Document {
+   readonly '@name': 'Keyboard-input-selector';
+   readonly '@tag': 29;
+   readonly '@version': 0;
+   readonly '@variant': $Tags.Document;
+   readonly '@variant-name': 'Document';
+   
+ }
+
+
+  
+ export function Legacy(x: {}): Keyboard_input_selector {
+   return {
+     '@name': 'Keyboard-input-selector',
+     '@tag': 29,
+     '@version': 0,
+     '@variant': $Tags.Legacy,
+     '@variant-name': 'Legacy',
+     ...x
+   }
+ }
+
+ export interface Legacy {
+   readonly '@name': 'Keyboard-input-selector';
+   readonly '@tag': 29;
+   readonly '@version': 0;
+   readonly '@variant': $Tags.Legacy;
+   readonly '@variant-name': 'Legacy';
+   
+ }
+
+
+  
+ export function CSS(x: {readonly 'selector': string}): Keyboard_input_selector {
+   return {
+     '@name': 'Keyboard-input-selector',
+     '@tag': 29,
+     '@version': 0,
+     '@variant': $Tags.CSS,
+     '@variant-name': 'CSS',
+     ...x
+   }
+ }
+
+ export interface CSS {
+   readonly '@name': 'Keyboard-input-selector';
+   readonly '@tag': 29;
+   readonly '@version': 0;
+   readonly '@variant': $Tags.CSS;
+   readonly '@variant-name': 'CSS';
+   readonly 'selector': string
  }
 
 }

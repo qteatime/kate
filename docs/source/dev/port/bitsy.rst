@@ -43,7 +43,7 @@ This recipe includes the following bridges:
 
   {
     "bridges": [
-      {"type": "input-proxy", "mapping": "kate"},
+      {"type": "keyboard-input-proxy-v2", "mapping": "kate", "selector": "document"},
       {"type": "capture-canvas", "selector": "#game"}
     ]
   }

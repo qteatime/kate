@@ -139,6 +139,15 @@ const bridges = T.tagged_choice<Bridge, Bridge["type"]>("type", {
       T.dictionary(T.str)
     ),
   }),
+  "keyboard-input-proxy-v2": T.spec({
+    type: T.constant("input-proxy" as const),
+    mapping: T.or3(
+      T.constant("defaults" as const),
+      T.constant("kate" as const),
+      T.dictionary(T.str)
+    ),
+    selector: T.short_str(255),
+  }),
   "preserve-webgl-render": T.spec({
     type: T.constant("preserve-webgl-render" as const),
   }),
@@ -325,9 +334,11 @@ type ContextualCapability =
 type Bridge =
   | { type: "network-proxy" }
   | { type: "local-storage-proxy" }
+  | { type: "input-proxy"; mapping: KeyMapping }
   | {
-      type: "input-proxy";
+      type: "keyboard-input-proxy-v2";
       mapping: KeyMapping;
+      selector: string;
     }
   | { type: "preserve-webgl-render" }
   | { type: "capture-canvas"; selector: string }
@@ -712,7 +723,7 @@ function make_capability(json: Capability) {
 
 function save(metadata: Cart.Metadata, files: Cart.File[], output: string) {
   const bytes = Cart.encode({
-    kate_version: Cart.Kate_version({ major: 0, minor: 23, patch: 9 }),
+    kate_version: Cart.Kate_version({ major: 0, minor: 24, patch: 2 }),
     metadata: metadata,
     files: files,
   });
@@ -731,9 +742,18 @@ function make_bridge(x: Bridge): Cart.Bridge[] {
     }
 
     case "input-proxy": {
+      return make_bridge({
+        type: "keyboard-input-proxy-v2",
+        mapping: x.mapping,
+        selector: "legacy",
+      });
+    }
+
+    case "keyboard-input-proxy-v2": {
       return [
-        Cart.Bridge.Input_proxy({
+        Cart.Bridge.Keyboard_input_proxy_v2({
           mapping: new Map(Object.entries(get_mapping(x.mapping)).map(make_key_pair)),
+          selector: make_keyboard_input_selector(x.selector),
         }),
       ];
     }
@@ -769,6 +789,19 @@ function make_bridge(x: Bridge): Cart.Bridge[] {
 
     default:
       throw unreachable(x, `Unknown bridge: ${(x as any).type}`);
+  }
+}
+
+function make_keyboard_input_selector(x: string) {
+  switch (x) {
+    case "window":
+      return Cart.Keyboard_input_selector.Window({});
+    case "document":
+      return Cart.Keyboard_input_selector.Document({});
+    case "legacy":
+      return Cart.Keyboard_input_selector.Legacy({});
+    default:
+      return Cart.Keyboard_input_selector.CSS({ selector: x });
   }
 }
 
@@ -865,7 +898,7 @@ function apply_recipe(json: ReturnType<typeof config>): ReturnType<typeof config
           type: "web-archive",
           html: json.platform.html,
           bridges: select_bridges([
-            { type: "input-proxy", mapping: "kate" },
+            { type: "keyboard-input-proxy-v2", mapping: "kate", selector: "document" },
             { type: "capture-canvas", selector: "#game" },
             ...json.platform.bridges,
           ]),
@@ -939,7 +972,7 @@ function apply_recipe(json: ReturnType<typeof config>): ReturnType<typeof config
           html: json.platform.html,
           bridges: select_bridges([
             { type: "network-proxy" },
-            { type: "input-proxy", mapping: "defaults" },
+            { type: "keyboard-input-proxy-v2", mapping: "defaults", selector: "window" },
             ...(recipe.pointer_support
               ? [
                   {

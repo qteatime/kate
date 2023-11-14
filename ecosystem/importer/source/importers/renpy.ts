@@ -109,7 +109,7 @@ export class RenpyImporter implements Importer {
           "html-path": "/index.html",
           bridges: [
             Cart.Bridge.Network_proxy({}),
-            Cart.Bridge.Input_proxy({
+            Cart.Bridge.Keyboard_input_proxy_v2({
               mapping: make_mapping({
                 up: "ArrowUp",
                 right: "ArrowRight",
@@ -124,6 +124,7 @@ export class RenpyImporter implements Importer {
                 ltrigger: "PageUp",
                 rtrigger: "ControlLeft",
               }),
+              selector: Cart.Keyboard_input_selector.Window({}),
             }),
             Cart.Bridge.Pointer_input_proxy({
               selector: "#canvas",

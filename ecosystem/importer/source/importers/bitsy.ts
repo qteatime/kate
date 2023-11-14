@@ -64,7 +64,8 @@ export class BitsyImporter implements Importer {
         runtime: Cart.Runtime.Web_archive({
           "html-path": this.entry.relative_path.as_string(),
           bridges: [
-            Cart.Bridge.Input_proxy({
+            Cart.Bridge.Keyboard_input_proxy_v2({
+              selector: Cart.Keyboard_input_selector.Document({}),
               mapping: make_mapping({
                 up: "ArrowUp",
                 right: "ArrowRight",

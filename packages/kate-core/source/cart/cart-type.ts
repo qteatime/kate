@@ -95,7 +95,8 @@ export type WebArchiveRuntime = {
 export type Bridge =
   | { type: "network-proxy" }
   | { type: "local-storage-proxy" }
-  | { type: "input-proxy"; mapping: Map<KateButton, KeyboardKey> }
+  | { type: "input-proxy"; mapping: Map<KateButton, KeyboardKey> } // @deprecated
+  | { type: "keyboard-input-proxy-v2"; mapping: Map<KateButton, KeyboardKey>; selector: string }
   | { type: "preserve-render" }
   | { type: "capture-canvas"; selector: string }
   | { type: "pointer-input-proxy"; selector: string; hide_cursor: boolean }
