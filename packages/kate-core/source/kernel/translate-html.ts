@@ -142,9 +142,22 @@ function apply_bridge(
     }
 
     case "input-proxy": {
-      const code = bridges["input.js"];
+      apply_bridge(
+        { type: "keyboard-input-proxy-v2", mapping: bridge.mapping, selector: "legacy" },
+        reference,
+        dom,
+        context
+      );
+      break;
+    }
+
+    case "keyboard-input-proxy-v2": {
+      const code = bridges["keyboard-input.js"];
       const keys = JSON.stringify(generate_proxied_key_mappings(bridge.mapping), null, 2);
-      const full_source = `const key_mapping = ${keys};\n${code}`;
+      const full_source = `
+        const KEY_MAPPING = ${keys};
+        const SELECTOR = ${JSON.stringify(bridge.selector)};
+        ${code}`;
       append_proxy(full_source);
       break;
     }

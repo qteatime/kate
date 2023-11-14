@@ -990,6 +990,32 @@
             {
               "name": "External-URL-handler",
               "fields": []
+            },
+            {
+              "name": "Keyboard-input-proxy-v2",
+              "fields": [
+                {
+                  "name": "mapping",
+                  "type": {
+                    "op": "map",
+                    "keys": {
+                      "op": "union",
+                      "id": 25
+                    },
+                    "values": {
+                      "op": "record",
+                      "id": 26
+                    }
+                  }
+                },
+                {
+                  "name": "selector",
+                  "type": {
+                    "op": "union",
+                    "id": 29
+                  }
+                }
+              ]
             }
           ]
         }
@@ -1126,6 +1152,40 @@
             {
               "name": "Show-dialogs",
               "fields": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "union",
+      "name": "Keyboard-input-selector",
+      "id": 29,
+      "versions": [
+        {
+          "variants": [
+            {
+              "name": "Window",
+              "fields": []
+            },
+            {
+              "name": "Document",
+              "fields": []
+            },
+            {
+              "name": "Legacy",
+              "fields": []
+            },
+            {
+              "name": "CSS",
+              "fields": [
+                {
+                  "name": "selector",
+                  "type": {
+                    "op": "text"
+                  }
+                }
+              ]
             }
           ]
         }

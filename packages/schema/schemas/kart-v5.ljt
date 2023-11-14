@@ -195,6 +195,7 @@ union Bridge {
 
   type Local-storage-proxy {}
 
+  // @deprecated
   type Input-proxy {
     field mapping: Virtual-key -> Keyboard-key;
   }
@@ -219,6 +220,11 @@ union Bridge {
   }
 
   type External-URL-handler {}
+
+  type Keyboard-input-proxy-v2 {
+    field mapping: Virtual-key -> Keyboard-key;
+    field selector: Keyboard-input-selector;
+  }
 }
 
 union Virtual-key {
@@ -262,4 +268,13 @@ union Contextual-capability {
 
   // low risk: annoyance, denial-of-service
   type Show-dialogs {}
+}
+
+union Keyboard-input-selector {
+  type Window {}
+  type Document {}
+  type Legacy {}
+  type CSS {
+    field selector: Text;
+  }
 }

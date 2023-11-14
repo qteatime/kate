@@ -27,10 +27,12 @@ export function parse_runtime(metadata: Cart_v5.Metadata): Runtime {
 function bridge(x: Cart_v5.Bridge): Bridge {
   switch (x["@variant"]) {
     case Cart_v5.Bridge.$Tags.Input_proxy: {
-      return {
-        type: "input-proxy",
-        mapping: map_map(x.mapping, (a, b) => [virtual_key(a), keyboard_key(b)]),
-      };
+      return bridge(
+        Cart_v5.Bridge.Keyboard_input_proxy_v2({
+          mapping: x.mapping,
+          selector: Cart_v5.Keyboard_input_selector.Legacy({}),
+        })
+      );
     }
     case Cart_v5.Bridge.$Tags.Local_storage_proxy: {
       return { type: "local-storage-proxy" };
@@ -60,6 +62,13 @@ function bridge(x: Cart_v5.Bridge): Bridge {
     case Cart_v5.Bridge.$Tags.External_URL_handler: {
       return { type: "external-url-handler" };
     }
+    case Cart_v5.Bridge.$Tags.Keyboard_input_proxy_v2: {
+      return {
+        type: "keyboard-input-proxy-v2",
+        mapping: map_map(x.mapping, (a, b) => [virtual_key(a), keyboard_key(b)]),
+        selector: keyboard_selector(x.selector),
+      };
+    }
     default:
       throw unreachable(x);
   }
@@ -72,6 +81,21 @@ function map_map<A, B, C, D>(map: Map<A, B>, f: (a: A, b: B) => [C, D]): Map<C, 
     result.set(k1, v1);
   }
   return result;
+}
+
+function keyboard_selector(x: Cart_v5.Keyboard_input_selector): string {
+  switch (x["@variant"]) {
+    case Cart_v5.Keyboard_input_selector.$Tags.CSS:
+      return x.selector;
+    case Cart_v5.Keyboard_input_selector.$Tags.Document:
+      return "document";
+    case Cart_v5.Keyboard_input_selector.$Tags.Window:
+      return "window";
+    case Cart_v5.Keyboard_input_selector.$Tags.Legacy:
+      return "legacy";
+    default:
+      throw unreachable(x);
+  }
 }
 
 function virtual_key(key: Cart_v5.Virtual_key): KateButton {

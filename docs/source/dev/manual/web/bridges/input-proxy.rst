@@ -15,6 +15,14 @@ only supports mapping one Kate button press to one keyboard key press.
 Using in Kart
 -------------
 
+.. since:: 0.24.2
+
+  ``input-proxy`` is deprecated in favour of ``keyboard-input-proxy-v2``.
+  The configuration is the same, but the latter accepts a new ``selector``
+  field to support more engines and games. Usage of the older ``input-proxy``
+  bridge will be automatically converted to ``keyboard-input-proxy-v2`` at
+  runtime.
+
 To add this bridge to your cartridge, you specify the following in your
 ``kate.json`` configuration:
 
@@ -23,8 +31,9 @@ To add this bridge to your cartridge, you specify the following in your
   {
     "bridges": [
       {
-        "type": "input-proxy",
-        "mapping": "defaults"
+        "type": "keyboard-input-proxy-v2",
+        "mapping": "defaults",
+        "selector": "window"
       }
     ]
   }
@@ -33,6 +42,11 @@ The ``mapping`` configuration specifies how Kate buttons are translated
 to keyboard key presses. There are pre-defined mappings, such as ``default``,
 and the possibility of specifying your own mappings.
 
+The ``selector`` configuration specifies where the keyboard events that
+Kate generates should be sent to. It can be ``window``, ``document``, or
+an arbitrary CSS selector with the element your game listens to for events
+(e.g.: in Godot that would be the canvas you're rendering to).
+
 To specify your own mapping, you'd write this bridge configuration as follows:
 
 .. code-block:: json
@@ -40,7 +54,7 @@ To specify your own mapping, you'd write this bridge configuration as follows:
   {
     "bridges": [
       {
-        "type": "input-proxy",
+        "type": "keyboard-input-proxy-v2",
         "mapping": {
           "up": "ArrowUp",
           "right": "ArrowRight",
