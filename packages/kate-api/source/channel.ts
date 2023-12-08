@@ -9,6 +9,20 @@ import type { InputKey } from "./input";
 
 type Payload = { [key: string]: any };
 
+type StateChangedEvent = { button: InputKey; is_pressed: boolean };
+type KeyPressedEvent = {
+  key: InputKey;
+  is_repeat: boolean;
+  is_long_press: boolean;
+};
+
+type PairingMessage = { type: "kate:pairing-ready" } | unknown;
+
+type ProcessMessage =
+  | { type: "kate:reply"; id: string; ok: boolean; value: unknown }
+  | { type: "kate:input-state-changed"; payload: StateChangedEvent }
+  | { type: "kate:input-key-pressed"; payload: KeyPressedEvent };
+
 export class KateIPC {
   readonly #secret: string;
   readonly #pending: Map<string, Deferred<any>>;
@@ -17,12 +31,8 @@ export class KateIPC {
   #server: Window;
   #port: MessagePort | null = null;
   readonly events = {
-    input_state_changed: new EventStream<{ key: InputKey; is_down: boolean }>(),
-    key_pressed: new EventStream<{
-      key: InputKey;
-      is_repeat: boolean;
-      is_long_press: boolean;
-    }>(),
+    input_state_changed: new EventStream<StateChangedEvent>(),
+    key_pressed: new EventStream<KeyPressedEvent>(),
     take_screenshot: new EventStream<{ token: string }>(),
     start_recording: new EventStream<{ token: string }>(),
     stop_recording: new EventStream<void>(),
@@ -51,7 +61,7 @@ export class KateIPC {
     }
     this.#initialised = true;
     this.#begin_pairing();
-    window.addEventListener("message", this.handle_message);
+    window.addEventListener("message", this.handle_pairing_message);
   }
 
   #begin_pairing() {
@@ -70,6 +80,7 @@ export class KateIPC {
         console.debug(`[kate:game] Paired`);
         this.#paired = true;
         this.#port = ev.data.port;
+        this.#port!.onmessage = this.handle_message;
       }
     };
 
@@ -108,14 +119,20 @@ export class KateIPC {
     this.#do_send(this.#make_id(), type, payload, transfer);
   }
 
-  private handle_message = (ev: MessageEvent<any>) => {
-    switch (ev.data.type) {
-      case "kate:pairing-ready": {
+  private handle_pairing_message = (ev: MessageEvent<PairingMessage>) => {
+    switch ((ev.data as any)?.type) {
+      case "kate:pairing-ready":
         console.debug(`[kate:game] Kate is ready to pair the process`);
         this.#begin_pairing();
         break;
-      }
 
+      default:
+        console.warn(`[kate:game] Unhandled message type ${(ev.data as any)?.type}`, ev);
+    }
+  };
+
+  private handle_message = (ev: MessageEvent<ProcessMessage>) => {
+    switch (ev.data.type) {
       case "kate:reply": {
         const pending = this.#pending.get(ev.data.id);
         if (pending != null) {
@@ -130,37 +147,37 @@ export class KateIPC {
       }
 
       case "kate:input-state-changed": {
-        this.events.input_state_changed.emit({
-          key: ev.data.key,
-          is_down: ev.data.is_down,
-        });
+        this.events.input_state_changed.emit(ev.data.payload);
         break;
       }
 
       case "kate:input-key-pressed": {
-        this.events.key_pressed.emit(ev.data.key);
+        this.events.key_pressed.emit(ev.data.payload);
         break;
       }
 
-      case "kate:paused": {
-        this.events.paused.emit(ev.data.state);
-        break;
-      }
+      default:
+        console.warn(`[kate:game] Unhandled message type ${(ev.data as any)?.type}`, ev);
 
-      case "kate:take-screenshot": {
-        this.events.take_screenshot.emit({ token: ev.data.token });
-        break;
-      }
+      // case "kate:paused": {
+      //   this.events.paused.emit(ev.data.state);
+      //   break;
+      // }
 
-      case "kate:start-recording": {
-        this.events.start_recording.emit({ token: ev.data.token });
-        break;
-      }
+      // case "kate:take-screenshot": {
+      //   this.events.take_screenshot.emit({ token: ev.data.token });
+      //   break;
+      // }
 
-      case "kate:stop-recording": {
-        this.events.stop_recording.emit();
-        break;
-      }
+      // case "kate:start-recording": {
+      //   this.events.start_recording.emit({ token: ev.data.token });
+      //   break;
+      // }
+
+      // case "kate:stop-recording": {
+      //   this.events.stop_recording.emit();
+      //   break;
+      // }
     }
   };
 }

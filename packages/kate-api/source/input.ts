@@ -56,7 +56,7 @@ export class KateInput {
   }
 
   setup() {
-    this.#channel.events.input_state_changed.listen(({ key, is_down }) => {
+    this.#channel.events.input_state_changed.listen(({ button: key, is_pressed: is_down }) => {
       if (!this._paused) {
         if (is_down) {
           if (this._state[key] <= 0) {

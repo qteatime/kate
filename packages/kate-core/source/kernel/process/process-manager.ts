@@ -24,8 +24,8 @@ export interface IFileSystem {
 }
 
 export class Process {
-  private port: MessagePort | null = null;
-  private state = PairingState.NEEDS_PAIRING;
+  private _port: MessagePort | null = null;
+  private _state = PairingState.NEEDS_PAIRING;
   private _paused: boolean = false;
   readonly capture_tokens = new Set<string>();
   on_system_event = new EventStream<SystemEvent>();
@@ -40,20 +40,24 @@ export class Process {
   ) {}
 
   // == Pairing
+  get is_paired() {
+    return this._state === PairingState.PAIRED;
+  }
+
   async pair() {
-    if (this.port !== null || this.state !== PairingState.NEEDS_PAIRING) {
+    if (this._port !== null || this._state !== PairingState.NEEDS_PAIRING) {
       throw new Error(`[kate:process] pair() called on paired process ${this.id}`);
     }
     const result = defer<void>();
-    this.state = PairingState.WAITING_PAIRING;
+    this._state = PairingState.WAITING_PAIRING;
     this.on_system_event.emit({ type: "pairing", process: this });
     console.debug(`[kate:process] ${this.id} waiting for pairing`);
 
     const on_message = (ev: MessageEvent) => {
       if (
         ev.source !== this.frame.contentWindow ||
-        this.port != null ||
-        this.state !== PairingState.WAITING_PAIRING
+        this._port != null ||
+        this._state !== PairingState.WAITING_PAIRING
       ) {
         return;
       }
@@ -84,9 +88,9 @@ export class Process {
   private do_pair(port: MessagePort) {
     console.debug(`[kate:process] paired ${this.id}`);
     const channel = new MessageChannel();
-    this.port = channel.port1;
-    this.state = PairingState.PAIRED;
-    this.port.onmessage = this.handle_port_message;
+    this._port = channel.port1;
+    this._state = PairingState.PAIRED;
+    this._port.onmessage = this.handle_port_message;
     port.postMessage(
       {
         type: "kate:paired",
@@ -99,10 +103,10 @@ export class Process {
 
   // == Messaging
   send(message: unknown, transfer: Transferable[] = []) {
-    if (this.port == null) {
+    if (this._port == null) {
       throw new Error(`[kate:process] send() called before process ${this.id} was paired`);
     } else {
-      this.port.postMessage(message, transfer);
+      this._port.postMessage(message, transfer);
     }
   }
 
@@ -135,7 +139,7 @@ export class Process {
   kill() {
     this.frame.src = "about:blank";
     this.frame.remove();
-    this.port?.close();
+    this._port?.close();
     this.on_system_event.emit({ type: "killed", process: this });
   }
 

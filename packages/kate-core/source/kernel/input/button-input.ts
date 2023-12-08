@@ -13,11 +13,7 @@ import { ButtonState, KateButton, KateButtons } from "./hardware-buttons";
 import { KateGamepadInputSource } from "./input-source-gamepad";
 import { KateKeyboardInputSource } from "./input-source-keyboard";
 import { KateVirtualInputSource } from "./input-source-virtual";
-
-type ButtonChangeEvent = {
-  key: KateButton;
-  is_down: boolean;
-};
+import type { ButtonChangeEvent } from "./input-source";
 
 export type ButtonPressedEvent = {
   key: KateButton;
@@ -70,7 +66,7 @@ export class KateButtonInputAggregator {
     for (const key of this.state.all_changed) {
       this.virtual_source.update(key.id, key.pressed);
       if (key.count === 1 || key.count === -1) {
-        this.on_state_changed.emit({ key: key.id, is_down: key.pressed });
+        this.on_state_changed.emit({ button: key.id, is_pressed: key.pressed });
       }
       this.handle_button_pressed(key);
     }
