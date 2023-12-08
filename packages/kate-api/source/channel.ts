@@ -12,8 +12,10 @@ type Payload = { [key: string]: any };
 export class KateIPC {
   readonly #secret: string;
   readonly #pending: Map<string, Deferred<any>>;
+  #paired: boolean;
   #initialised: boolean;
   #server: Window;
+  #port: MessagePort | null = null;
   readonly events = {
     input_state_changed: new EventStream<{ key: InputKey; is_down: boolean }>(),
     key_pressed: new EventStream<{
@@ -32,6 +34,7 @@ export class KateIPC {
     this.#pending = new Map();
     this.#initialised = false;
     this.#server = server;
+    this.#paired = false;
   }
 
   #make_id() {
@@ -47,18 +50,48 @@ export class KateIPC {
       throw new Error(`setup() called twice`);
     }
     this.#initialised = true;
+    this.#begin_pairing();
     window.addEventListener("message", this.handle_message);
   }
 
-  #do_send(id: string, type: string, payload: Payload, transfer: Transferable[] = []) {
+  #begin_pairing() {
+    if (this.#paired) {
+      return;
+    }
+
+    console.debug(`[kate:game] Starting pairing attempt`);
+    const channel = new MessageChannel();
+    channel.port1.onmessage = (ev) => {
+      if (this.#paired) {
+        return;
+      }
+
+      if (ev.data?.type === "kate:paired" && ev.data?.port instanceof MessagePort) {
+        console.debug(`[kate:game] Paired`);
+        this.#paired = true;
+        this.#port = ev.data.port;
+      }
+    };
+
     this.#server.postMessage(
+      {
+        type: "kate:pair",
+        secret: this.#secret,
+        port: channel.port2,
+      },
+      "*",
+      [channel.port2]
+    );
+  }
+
+  #do_send(id: string, type: string, payload: Payload, transfer: Transferable[] = []) {
+    this.#port!.postMessage(
       {
         type: type,
         secret: this.#secret,
         id: id,
         payload: payload,
       },
-      "*",
       transfer
     );
   }
@@ -72,11 +105,17 @@ export class KateIPC {
   }
 
   async send_and_ignore_result(type: string, payload: Payload, transfer: Transferable[] = []) {
-    this.#do_send(this.#make_id(), type, payload);
+    this.#do_send(this.#make_id(), type, payload, transfer);
   }
 
   private handle_message = (ev: MessageEvent<any>) => {
     switch (ev.data.type) {
+      case "kate:pairing-ready": {
+        console.debug(`[kate:game] Kate is ready to pair the process`);
+        this.#begin_pairing();
+        break;
+      }
+
       case "kate:reply": {
         const pending = this.#pending.get(ev.data.id);
         if (pending != null) {

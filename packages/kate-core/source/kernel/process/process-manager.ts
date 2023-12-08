@@ -15,7 +15,6 @@ export type SystemEvent =
   | { type: "pairing"; process: Process }
   | { type: "paired"; process: Process }
   | { type: "unexpected-message"; process: Process; message: unknown }
-  | { type: "too-much-buffering"; process: Process; buffer_length: number }
   | { type: "message-received"; process: Process; payload: unknown }
   | { type: "paused"; process: Process; state: boolean }
   | { type: "killed"; process: Process };
@@ -25,10 +24,8 @@ export interface IFileSystem {
 }
 
 export class Process {
-  readonly BUFFER_LIMIT = 256;
   private port: MessagePort | null = null;
   private state = PairingState.NEEDS_PAIRING;
-  private _message_buffer: { data: unknown; transfer: Transferable[] }[] = [];
   private _paused: boolean = false;
   readonly capture_tokens = new Set<string>();
   on_system_event = new EventStream<SystemEvent>();
@@ -89,7 +86,7 @@ export class Process {
     const channel = new MessageChannel();
     this.port = channel.port1;
     this.state = PairingState.PAIRED;
-    port.onmessage = this.handle_port_message;
+    this.port.onmessage = this.handle_port_message;
     port.postMessage(
       {
         type: "kate:paired",
@@ -98,26 +95,12 @@ export class Process {
       [channel.port2]
     );
     this.on_system_event.emit({ type: "paired", process: this });
-
-    const buffer = this._message_buffer.slice();
-    this._message_buffer = [];
-    for (const message of buffer) {
-      this.send(message.data, message.transfer);
-    }
   }
 
   // == Messaging
   send(message: unknown, transfer: Transferable[] = []) {
     if (this.port == null) {
-      this._message_buffer.push({ data: message, transfer });
-      if (this._message_buffer.length > this.BUFFER_LIMIT) {
-        this.on_system_event.emit({
-          type: "too-much-buffering",
-          process: this,
-          buffer_length: this._message_buffer.length,
-        });
-      }
-      return;
+      throw new Error(`[kate:process] send() called before process ${this.id} was paired`);
     } else {
       this.port.postMessage(message, transfer);
     }

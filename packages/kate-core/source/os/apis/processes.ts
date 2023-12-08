@@ -67,6 +67,7 @@ export class KateProcesses {
     this._running = process;
     this.os.push_scene(scene);
     this._scenes.set(process, scene);
+    await process.pair();
     return process;
   }
 

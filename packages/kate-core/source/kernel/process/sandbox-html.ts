@@ -73,11 +73,11 @@ function add_preamble(dom: Document, context: RuntimeEnv) {
   script.textContent = `
   void function() {
     var KATE_SECRET = ${JSON.stringify(context.secret)};
-    ${bridges["kate-api.js"]};
-    
     let script = document.getElementById(${JSON.stringify(id)});
     script.remove();
     script = null;
+
+    ${bridges["kate-api.js"]};
 
     Object.defineProperty(navigator, "userAgent", {
       value: ${JSON.stringify(user_agent)},
