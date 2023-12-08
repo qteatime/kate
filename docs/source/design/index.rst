@@ -17,6 +17,7 @@ Kernel design
   kernel/K0001-capabilities
   kernel/K0002-live-audit
   kernel/K0003-resource-band
+  kernel/K0004-processes
 
 
 API design
