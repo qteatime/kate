@@ -43,7 +43,7 @@ function make_sandboxed_iframe() {
   const frame = document.createElement("iframe");
   frame.className = "kate-game-frame kate-game-frame-defaults";
   (frame as any).sandbox = "allow-scripts";
-  frame.allow = "autoplay";
+  frame.allow = "autoplay *; gamepad (); storage-access ()";
   (frame as any).csp =
     "default-src data: blob: 'unsafe-inline' 'unsafe-eval' 'unsafe-inline' 'wasm-unsafe-eval'; navigate-to 'none'";
   frame.scrolling = "no";
