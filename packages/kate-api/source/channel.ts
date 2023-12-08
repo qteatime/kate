@@ -21,7 +21,8 @@ type PairingMessage = { type: "kate:pairing-ready" } | unknown;
 type ProcessMessage =
   | { type: "kate:reply"; id: string; ok: boolean; value: unknown }
   | { type: "kate:input-state-changed"; payload: StateChangedEvent }
-  | { type: "kate:input-key-pressed"; payload: KeyPressedEvent };
+  | { type: "kate:input-key-pressed"; payload: KeyPressedEvent }
+  | { type: "kate:paused"; state: boolean };
 
 export class KateIPC {
   readonly #secret: string;
@@ -120,14 +121,19 @@ export class KateIPC {
   }
 
   private handle_pairing_message = (ev: MessageEvent<PairingMessage>) => {
-    switch ((ev.data as any)?.type) {
+    if (ev.data == null || typeof ev.data !== "object") {
+      return;
+    }
+    const data = ev.data as { type: string };
+
+    switch (data.type) {
       case "kate:pairing-ready":
         console.debug(`[kate:game] Kate is ready to pair the process`);
         this.#begin_pairing();
         break;
 
       default:
-        console.warn(`[kate:game] Unhandled message type ${(ev.data as any)?.type}`, ev);
+        console.warn(`[kate:game] Unhandled top-level message type ${data.type}`, ev);
     }
   };
 
@@ -156,13 +162,13 @@ export class KateIPC {
         break;
       }
 
+      case "kate:paused": {
+        this.events.paused.emit(ev.data.state);
+        break;
+      }
+
       default:
         console.warn(`[kate:game] Unhandled message type ${(ev.data as any)?.type}`, ev);
-
-      // case "kate:paused": {
-      //   this.events.paused.emit(ev.data.state);
-      //   break;
-      // }
 
       // case "kate:take-screenshot": {
       //   this.events.take_screenshot.emit({ token: ev.data.token });

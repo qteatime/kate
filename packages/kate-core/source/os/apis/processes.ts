@@ -68,6 +68,7 @@ export class KateProcesses {
     this.os.push_scene(scene);
     this._scenes.set(process, scene);
     await process.pair();
+    this.os.ipc.add_process(process);
     return process;
   }
 
@@ -177,6 +178,7 @@ export class KateProcesses {
   notify_exit(process: Process) {
     if (process === this._running) {
       this._running = null;
+      this.os.ipc.remove_process(process);
       const scene = this._scenes.get(process);
       scene?.close();
     }
