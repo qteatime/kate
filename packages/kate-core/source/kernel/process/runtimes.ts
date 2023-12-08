@@ -12,13 +12,11 @@ export type RuntimeEnvConfig = {
   on_playtime_update: (time: number) => void;
 };
 
-export async function spawn(manager: ProcessManager, env: RuntimeEnvConfig) {
+export async function spawn(env: RuntimeEnvConfig) {
   const cart = env.cart;
   switch (cart.runtime.type) {
     case "web-archive": {
-      const process = await spawn_web(env);
-      manager.register(process);
-      return process;
+      return await spawn_web(env);
     }
   }
 }

@@ -168,7 +168,7 @@ export class ProcessManager {
 
   // == Spawning
   async spawn(env: RuntimeEnvConfig) {
-    const process = await spawn(this, env);
+    const process = await spawn(env);
     this.register(process);
     return process;
   }
