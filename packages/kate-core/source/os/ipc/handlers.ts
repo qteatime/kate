@@ -5,7 +5,7 @@
  */
 
 import { CapabilityType, GrantConfiguration } from "../../data";
-import type { RuntimeEnv } from "../../kernel";
+import { Process } from "../../kernel";
 import type { KateOS } from "../os";
 import type { KateIPCServer } from "./ipc";
 
@@ -23,7 +23,7 @@ export type Handler<A, B> = {
   };
   handler: (
     os: KateOS,
-    env: RuntimeEnv,
+    process: Process,
     ipc: KateIPCServer,
     payload: A,
     raw_message: unknown

@@ -10,7 +10,6 @@ export type RuntimeEnvConfig = {
   filesystem: IFileSystem;
   local_storage: unknown;
   on_playtime_update: (time: number) => void;
-  is_foreground: (cart: Cart.CartMeta) => boolean;
 };
 
 export async function spawn(manager: ProcessManager, env: RuntimeEnvConfig) {

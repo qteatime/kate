@@ -6,16 +6,15 @@
 
 import type { KateOS } from "../os";
 import { h } from "../ui/widget";
-import type { KateProcess } from "../apis/processes";
 import { Scene } from "../ui/scenes";
-import { KateButton } from "../../kernel";
+import { KateButton, Process } from "../../kernel";
 
 export class SceneGame extends Scene {
   get application_id(): string {
-    return this.process().cart.id;
+    return this.process.cartridge.id;
   }
 
-  constructor(os: KateOS, readonly process: () => KateProcess) {
+  constructor(os: KateOS, readonly process: Process) {
     super(os, false);
   }
 
@@ -36,22 +35,20 @@ export class SceneGame extends Scene {
   handle_focus_changed = (focus: HTMLElement | null) => {
     if (focus === this.canvas) {
       setTimeout(() => {
-        this.process().unpause();
+        this.process.unpause();
       });
     } else {
-      this.process().pause();
+      this.process.pause();
     }
   };
 
   focus_frame = (ev: Event) => {
     ev.preventDefault();
-    const node = this.process().runtime.node;
-    if (node instanceof HTMLIFrameElement) {
-      node.focus();
-    }
+    const node = this.process.frame;
+    node.focus();
   };
 
   render() {
-    return h("div", { class: "kate-os-game" }, [this.process().runtime.node]);
+    return h("div", { class: "kate-os-game" }, [this.process.frame]);
   }
 }

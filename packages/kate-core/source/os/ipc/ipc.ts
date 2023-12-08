@@ -4,7 +4,6 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import type { RuntimeEnv } from "../../kernel";
 import type { KateOS } from "../os";
 import { EMessageFailed, type Handler } from "./handlers";
 import { TC } from "../../utils";
@@ -17,6 +16,7 @@ import BrowserMessages from "./browser";
 import DeviceFileMessages from "./device-file";
 import CartManagerMessages from "./cart-manager";
 import DialogMessages from "./dialog";
+import { Process } from "../../kernel";
 
 type Message = {
   type: string;
@@ -24,7 +24,7 @@ type Message = {
 };
 
 export class KateIPCServer {
-  private _handlers = new Map<string, RuntimeEnv>();
+  private _handlers = new Map<string, Process>();
   private _messages: Map<string, Handler<any, any>>;
   private _initialised = false;
   private TRACE_MESSAGES = false;
@@ -57,20 +57,20 @@ export class KateIPCServer {
     window.addEventListener("message", this.handle_message);
   }
 
-  add_process(env: RuntimeEnv) {
-    if (this._handlers.has(env.secret)) {
+  add_process(process: Process) {
+    if (this._handlers.has(process.secret)) {
       throw new Error(`Duplicated secret when constructing IPC channel`);
     }
 
-    this._handlers.set(env.secret, env);
-    return new KateIPCChannel(this, env);
+    this._handlers.set(process.secret, process);
+    return new KateIPCChannel(this, process);
   }
 
-  remove_process(process: RuntimeEnv) {
+  remove_process(process: Process) {
     this._handlers.delete(process.secret);
   }
 
-  send(process: RuntimeEnv, message: { [key: string]: any }) {
+  send(process: Process, message: { [key: string]: any }) {
     process.frame.contentWindow?.postMessage(message, "*");
   }
 
@@ -142,10 +142,7 @@ export class KateIPCServer {
     }
   };
 
-  private async mark_suspicious_activity(
-    ev: MessageEvent,
-    handler: RuntimeEnv
-  ) {
+  private async mark_suspicious_activity(ev: MessageEvent, handler: Process) {
     if (handler != null) {
       console.debug(`[Kate] suspicious IPC activity`, {
         message: ev.data,
@@ -154,7 +151,7 @@ export class KateIPCServer {
       });
       this._handlers.delete(handler.secret);
       await this.os.processes.terminate(
-        handler.cart.id,
+        handler.cartridge.id,
         "kate:ipc",
         "suspicious IPC activity"
       );
@@ -170,26 +167,22 @@ export class KateIPCServer {
     return null;
   }
 
-  async consume_capture_token(
-    token: string,
-    env: RuntimeEnv,
-    message: Message
-  ) {
-    if (!env.capture_tokens.has(token)) {
+  async consume_capture_token(token: string, process: Process, message: Message) {
+    if (!process.capture_tokens.has(token)) {
       await this.mark_suspicious_activity(
         {
           data: message,
-          source: env.frame.contentWindow,
+          source: process.frame.contentWindow,
         } as any,
-        env
+        process
       );
       throw new Error(`Invalid capture token.`);
     }
-    env.capture_tokens.delete(token);
+    process.capture_tokens.delete(token);
   }
 
   async process_message(
-    env: RuntimeEnv,
+    process: Process,
     message: Message
   ): Promise<{ ok: boolean; value: any } | null> {
     const handler = this._messages.get(message.type);
@@ -201,37 +194,34 @@ export class KateIPCServer {
     for (const capability of handler.auth.capabilities) {
       if (
         !(await this.os.capability_supervisor.is_allowed(
-          env.cart.id,
+          process.cartridge.id,
           capability.type,
           capability.configuration ?? {}
         ))
       ) {
         console.error(
-          `[kate:ipc] Denied ${env.cart.id} access to ${message.type}: missing ${capability.type}`,
+          `[kate:ipc] Denied ${process.cartridge.id} access to ${message.type}: missing ${capability.type}`,
           message
         );
         if (handler.auth.fail_silently) {
           return null;
         } else {
-          throw new EMessageFailed(
-            "kate.ipc.access-denied",
-            `Operation not allowed`
-          );
+          throw new EMessageFailed("kate.ipc.access-denied", `Operation not allowed`);
         }
       }
     }
-    return await handler.handler(this.os, env, this, payload, message);
+    return await handler.handler(this.os, process, this, payload, message);
   }
 }
 
 export class KateIPCChannel {
-  constructor(readonly server: KateIPCServer, readonly env: RuntimeEnv) {}
+  constructor(readonly server: KateIPCServer, readonly process: Process) {}
 
   send(message: { [key: string]: any }) {
-    this.server.send(this.env, message);
+    this.server.send(this.process, message);
   }
 
   dispose() {
-    this.server.remove_process(this.env);
+    this.server.remove_process(this.process);
   }
 }

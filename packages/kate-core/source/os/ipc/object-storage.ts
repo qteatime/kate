@@ -62,8 +62,8 @@ export default [
   handler(
     "kate:store.list-buckets",
     TC.spec({ versioned: TC.bool, count: TC.optional(undefined, TC.int) }),
-    async (os, env, ipc, { versioned, count }) => {
-      const store = os.object_store.cartridge(env.cart, versioned);
+    async (os, process, ipc, { versioned, count }) => {
+      const store = os.object_store.cartridge(process.cartridge, versioned);
       const buckets = await store.list_buckets(count);
       return buckets.map(public_repr.bucket);
     }
@@ -72,8 +72,8 @@ export default [
   handler(
     "kate:store.add-bucket",
     TC.spec({ versioned: TC.bool, name: bucket_name }),
-    async (os, env, ipc, { versioned, name }) => {
-      const store = os.object_store.cartridge(env.cart, versioned);
+    async (os, process, ipc, { versioned, name }) => {
+      const store = os.object_store.cartridge(process.cartridge, versioned);
       await store.add_bucket(name);
       return null;
     }
@@ -82,8 +82,8 @@ export default [
   handler(
     "kate:store.ensure-bucket",
     TC.spec({ versioned: TC.bool, name: bucket_name }),
-    async (os, env, ipc, { versioned, name }) => {
-      const store = os.object_store.cartridge(env.cart, versioned);
+    async (os, process, ipc, { versioned, name }) => {
+      const store = os.object_store.cartridge(process.cartridge, versioned);
       await store.ensure_bucket(name);
       return null;
     }
@@ -92,8 +92,8 @@ export default [
   handler(
     "kate:store.delete-bucket",
     TC.spec({ versioned: TC.bool, name: bucket_name }),
-    async (os, env, ipc, { versioned, name }) => {
-      const store = os.object_store.cartridge(env.cart, versioned);
+    async (os, process, ipc, { versioned, name }) => {
+      const store = os.object_store.cartridge(process.cartridge, versioned);
       const bucket = await store.get_bucket(name);
       await bucket.delete_bucket();
       return null;
@@ -106,8 +106,8 @@ export default [
       versioned: TC.bool,
       bucket_name: bucket_name,
     }),
-    async (os, env, ipc, { versioned, bucket_name }) => {
-      const store = os.object_store.cartridge(env.cart, versioned);
+    async (os, process, ipc, { versioned, bucket_name }) => {
+      const store = os.object_store.cartridge(process.cartridge, versioned);
       const bucket = await store.get_bucket(bucket_name);
       return await bucket.count();
     }
@@ -120,8 +120,8 @@ export default [
       bucket_name,
       count: TC.optional(undefined, TC.int),
     }),
-    async (os, env, ipc, { versioned, bucket_name, count }) => {
-      const store = os.object_store.cartridge(env.cart, versioned);
+    async (os, process, ipc, { versioned, bucket_name, count }) => {
+      const store = os.object_store.cartridge(process.cartridge, versioned);
       const bucket = await store.get_bucket(bucket_name);
       const entries = await bucket.list_metadata(count);
       return entries.map(public_repr.storage_entry);
@@ -135,8 +135,8 @@ export default [
       bucket_name,
       key: TC.str,
     }),
-    async (os, env, ipc, { versioned, bucket_name, key }) => {
-      const store = os.object_store.cartridge(env.cart, versioned);
+    async (os, process, ipc, { versioned, bucket_name, key }) => {
+      const store = os.object_store.cartridge(process.cartridge, versioned);
       const bucket = await store.get_bucket(bucket_name);
       const entry = await bucket.read(key);
       return public_repr.storage_entry_with_data(entry);
@@ -150,8 +150,8 @@ export default [
       bucket_name,
       key: TC.str,
     }),
-    async (os, env, ipc, { versioned, bucket_name, key }) => {
-      const store = os.object_store.cartridge(env.cart, versioned);
+    async (os, process, ipc, { versioned, bucket_name, key }) => {
+      const store = os.object_store.cartridge(process.cartridge, versioned);
       const bucket = await store.get_bucket(bucket_name);
       const entry = await bucket.try_read(key);
       return entry == null ? null : public_repr.storage_entry_with_data(entry);
@@ -168,13 +168,8 @@ export default [
       metadata: TC.dictionary(TC.anything()),
       data: TC.anything(),
     }),
-    async (
-      os,
-      env,
-      ipc,
-      { versioned, bucket_name, key, type, metadata, data }
-    ) => {
-      const store = os.object_store.cartridge(env.cart, versioned);
+    async (os, process, ipc, { versioned, bucket_name, key, type, metadata, data }) => {
+      const store = os.object_store.cartridge(process.cartridge, versioned);
       const bucket = await store.get_bucket(bucket_name);
       await bucket.write(key, {
         type: type,
@@ -195,13 +190,8 @@ export default [
       metadata: TC.dictionary(TC.anything()),
       data: TC.anything(),
     }),
-    async (
-      os,
-      env,
-      ipc,
-      { versioned, bucket_name, key, type, metadata, data }
-    ) => {
-      const store = os.object_store.cartridge(env.cart, versioned);
+    async (os, process, ipc, { versioned, bucket_name, key, type, metadata, data }) => {
+      const store = os.object_store.cartridge(process.cartridge, versioned);
       const bucket = await store.get_bucket(bucket_name);
       await bucket.create(key, {
         type: type,
@@ -219,8 +209,8 @@ export default [
       bucket_name,
       key: TC.str,
     }),
-    async (os, env, ipc, { versioned, bucket_name, key }) => {
-      const store = os.object_store.cartridge(env.cart, versioned);
+    async (os, process, ipc, { versioned, bucket_name, key }) => {
+      const store = os.object_store.cartridge(process.cartridge, versioned);
       const bucket = await store.get_bucket(bucket_name);
       await bucket.delete(key);
       return null;
@@ -232,8 +222,8 @@ export default [
     TC.spec({
       versioned: TC.bool,
     }),
-    async (os, env, ipc, { versioned }) => {
-      const store = os.object_store.cartridge(env.cart, versioned);
+    async (os, process, ipc, { versioned }) => {
+      const store = os.object_store.cartridge(process.cartridge, versioned);
       const usage = await store.usage();
       return public_repr.storage_usage(usage);
     }

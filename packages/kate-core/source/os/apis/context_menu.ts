@@ -87,7 +87,7 @@ export class HUD_ContextMenu extends Scene {
         UI.fa_icon_button("expand", "Fullscreen").on_clicked(this.on_toggle_fullscreen),
       ]);
     const emulator = this.os.kernel.console;
-    const cart = this.os.processes.running?.cart;
+    const cart = this.os.processes.running?.cartridge;
 
     return UI.h("div", { class: "kate-os-hud-context-menu" }, [
       UI.h("div", { class: "kate-os-hud-context-menu-backdrop" }, []),
@@ -178,8 +178,8 @@ export class HUD_ContextMenu extends Scene {
     const process = this.os.processes.running;
     if (process != null) {
       const media = new SceneMedia(this.os, {
-        id: process.cart.id,
-        title: process.cart.metadata.presentation.title,
+        id: process.cartridge.id,
+        title: process.cartridge.metadata.presentation.title,
       });
       this.os.push_scene(media);
     } else {
@@ -193,7 +193,7 @@ export class HUD_ContextMenu extends Scene {
     if (process == null) {
       throw new Error(`on_manage_data() called without a running process`);
     }
-    const app = await this.os.storage_manager.try_estimate_live_cartridge(process.cart);
+    const app = await this.os.storage_manager.try_estimate_live_cartridge(process.cartridge);
     this.os.push_scene(new SceneCartridgeStorageSettings(this.os, app));
   };
 
@@ -202,7 +202,7 @@ export class HUD_ContextMenu extends Scene {
     if (process == null) {
       throw new Error(`on_permissions() called without a running process`);
     }
-    this.os.push_scene(new SceneCartridgePermissions(this.os, process.cart));
+    this.os.push_scene(new SceneCartridgePermissions(this.os, process.cartridge));
   };
 
   on_legal_notices = async (title: string, path: string | null) => {
@@ -212,13 +212,13 @@ export class HUD_ContextMenu extends Scene {
       return;
     }
 
-    const licence_file = await process.runtime.read_file(path);
+    const licence_file = await process.file_system.read(path);
     const decoder = new TextDecoder();
     const licence = decoder.decode(licence_file.data);
     const legal = new SceneTextFile(
       this.os,
       title,
-      process.cart.metadata.presentation.title,
+      process.cartridge.metadata.presentation.title,
       licence
     );
     this.os.push_scene(legal);
@@ -285,7 +285,7 @@ export class HUD_ContextMenu extends Scene {
 
   on_close_game = async () => {
     this.close();
-    await this.os.processes.running?.exit();
+    await this.os.processes.running?.kill();
   };
 
   on_return = async () => {

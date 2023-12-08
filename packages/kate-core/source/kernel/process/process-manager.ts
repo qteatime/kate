@@ -1,6 +1,7 @@
 import { EventStream, defer } from "../../utils";
 import * as Cart from "../../cart";
 import type { VirtualConsole } from "../virtual";
+import { RuntimeEnvConfig, spawn } from "./runtimes";
 
 export enum PairingState {
   NEEDS_PAIRING,
@@ -29,6 +30,7 @@ export class Process {
   private state = PairingState.NEEDS_PAIRING;
   private _message_buffer: { data: unknown; transfer: Transferable[] }[] = [];
   private _paused: boolean = false;
+  readonly capture_tokens = new Set<string>();
   on_system_event = new EventStream<SystemEvent>();
 
   constructor(
@@ -163,6 +165,13 @@ export class Process {
 export class ProcessManager {
   private processes = new Map<ProcessId, Process>();
   readonly on_system_event = new EventStream<SystemEvent>();
+
+  // == Spawning
+  async spawn(env: RuntimeEnvConfig) {
+    const process = await spawn(this, env);
+    this.register(process);
+    return process;
+  }
 
   // == Process registration
   register(process: Process) {
