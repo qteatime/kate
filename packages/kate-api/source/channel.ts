@@ -28,6 +28,7 @@ type ProcessMessage =
   | { type: "kate:take-screenshot"; token: string };
 
 const MAX_BUFFER = 1024;
+const HEARTBEAT_DELAY = 1000 * 10; // 10 seconds
 
 export class KateIPC {
   readonly #secret: string;
@@ -71,6 +72,14 @@ export class KateIPC {
     this.#initialised = true;
     this.#begin_pairing();
     window.addEventListener("message", this.handle_pairing_message);
+    this.#heartbeat();
+  }
+
+  #heartbeat() {
+    if (this.#paired) {
+      this.send_and_ignore_result("heartbeat", {}, []);
+    }
+    setTimeout(() => this.#heartbeat(), HEARTBEAT_DELAY);
   }
 
   #begin_pairing() {

@@ -4,10 +4,11 @@ import type { VirtualConsole } from "../virtual";
 import { RuntimeEnvConfig, spawn } from "./runtimes";
 import { ButtonChangeEvent, ButtonPressedEvent } from "../input";
 
-export enum PairingState {
+export enum ProcessState {
   NEEDS_PAIRING,
   WAITING_PAIRING,
   PAIRED,
+  KILLED,
 }
 
 export type ProcessId = string & { __process_id: true };
@@ -18,7 +19,8 @@ export type SystemEvent =
   | { type: "unexpected-message"; process: Process; message: unknown }
   | { type: "message-received"; process: Process; payload: unknown }
   | { type: "paused"; process: Process; state: boolean }
-  | { type: "killed"; process: Process };
+  | { type: "killed"; process: Process }
+  | { type: "heartbeat"; process: Process };
 
 export type ProcessMessage =
   | { type: "kate:reply"; id: string; ok: boolean; value: unknown }
@@ -34,8 +36,9 @@ export interface IFileSystem {
 }
 
 export class Process {
+  private _started: number;
   private _port: MessagePort | null = null;
-  private _state = PairingState.NEEDS_PAIRING;
+  private _state = ProcessState.NEEDS_PAIRING;
   private _paused: boolean = false;
   on_system_event = new EventStream<SystemEvent>();
 
@@ -46,19 +49,25 @@ export class Process {
     readonly file_system: IFileSystem,
     readonly cartridge: Cart.CartMeta,
     readonly console: VirtualConsole
-  ) {}
+  ) {
+    this._started = performance.now();
+  }
+
+  get runtime() {
+    return performance.now() - this._started;
+  }
 
   // == Pairing
   get is_paired() {
-    return this._state === PairingState.PAIRED;
+    return this._state === ProcessState.PAIRED;
   }
 
   async pair() {
-    if (this._port !== null || this._state !== PairingState.NEEDS_PAIRING) {
+    if (this._port !== null || this._state !== ProcessState.NEEDS_PAIRING) {
       throw new Error(`[kate:process] pair() called on paired process ${this.id}`);
     }
     const result = defer<void>();
-    this._state = PairingState.WAITING_PAIRING;
+    this._state = ProcessState.WAITING_PAIRING;
     this.on_system_event.emit({ type: "pairing", process: this });
     console.debug(`[kate:process] ${this.id} waiting for pairing`);
 
@@ -66,7 +75,7 @@ export class Process {
       if (
         ev.source !== this.frame.contentWindow ||
         this._port != null ||
-        this._state !== PairingState.WAITING_PAIRING
+        this._state !== ProcessState.WAITING_PAIRING
       ) {
         return;
       }
@@ -98,7 +107,7 @@ export class Process {
     console.debug(`[kate:process] paired ${this.id}`);
     const channel = new MessageChannel();
     this._port = channel.port1;
-    this._state = PairingState.PAIRED;
+    this._state = ProcessState.PAIRED;
     this._port.onmessage = this.handle_port_message;
     port.postMessage(
       {
@@ -145,7 +154,12 @@ export class Process {
   }
 
   // == Killing
+  get is_killed() {
+    return this._state === ProcessState.KILLED;
+  }
+
   kill() {
+    this._state = ProcessState.KILLED;
     this.frame.src = "about:blank";
     this.frame.remove();
     this._port?.close();
@@ -154,7 +168,11 @@ export class Process {
 
   // == Callbacks
   private handle_port_message = (ev: MessageEvent) => {
-    this.on_system_event.emit({ type: "message-received", process: this, payload: ev.data });
+    if (ev.data?.type === "heartbeat") {
+      this.on_system_event.emit({ type: "heartbeat", process: this });
+    } else {
+      this.on_system_event.emit({ type: "message-received", process: this, payload: ev.data });
+    }
   };
 }
 

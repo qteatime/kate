@@ -57,7 +57,6 @@ export class KateProcesses {
           return file;
         },
       },
-      on_playtime_update: (time) => {},
     });
     return await this.display_process(process);
   }
@@ -125,11 +124,8 @@ export class KateProcesses {
             return { mime: file.mime, data: file.data, path: path };
           },
         },
-        on_playtime_update: async (time) => {
-          await this.os.play_habits.increase_play_time(id, time);
-        },
       });
-      await this.os.play_habits.update_last_played(id, new Date());
+      await this.os.play_habits.track(process);
       return this.display_process(process);
     } catch (error) {
       this._running = null;

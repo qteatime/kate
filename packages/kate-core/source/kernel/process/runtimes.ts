@@ -9,7 +9,6 @@ export type RuntimeEnvConfig = {
   cart: Cart.CartMeta;
   filesystem: IFileSystem;
   local_storage: unknown;
-  on_playtime_update: (time: number) => void;
 };
 
 export async function spawn(env: RuntimeEnvConfig) {
