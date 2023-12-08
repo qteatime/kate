@@ -24,6 +24,8 @@ type ProcessMessage =
   | { type: "kate:input-key-pressed"; payload: KeyPressedEvent }
   | { type: "kate:paused"; state: boolean };
 
+const MAX_BUFFER = 1024;
+
 export class KateIPC {
   readonly #secret: string;
   readonly #pending: Map<string, Deferred<any>>;
@@ -32,6 +34,7 @@ export class KateIPC {
   #server: Window;
   #port: MessagePort | null = null;
   #pairing_waiter: Deferred<void>;
+  #buffered: number = 0;
   readonly events = {
     input_state_changed: new EventStream<StateChangedEvent>(),
     key_pressed: new EventStream<KeyPressedEvent>(),
@@ -100,7 +103,12 @@ export class KateIPC {
   }
 
   async #do_send(id: string, type: string, payload: Payload, transfer: Transferable[] = []) {
+    this.#buffered += 1;
+    if (this.#buffered > MAX_BUFFER) {
+      throw new Error(`Too many messages buffered`);
+    }
     await this.#pairing_waiter.promise;
+    this.#buffered -= 1;
     this.#port!.postMessage(
       {
         type: type,
