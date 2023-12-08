@@ -81,6 +81,7 @@ export class KateOS {
   ) {
     this.cart_manager = new CartManager(this);
     this.processes = new KateProcesses(this);
+    this.processes.setup();
     this.object_store = new KateObjectStore(this);
     this.context_menu = new KateContextMenu(this);
     this.context_menu.setup();

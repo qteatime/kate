@@ -195,6 +195,9 @@ export class ProcessManager {
 
   // == Callbacks
   private propagate_process_event = (ev: SystemEvent) => {
+    if (ev.type === "killed") {
+      this.unregister(ev.process.id);
+    }
     this.on_system_event.emit(ev);
   };
 }

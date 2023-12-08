@@ -10,11 +10,12 @@ import { SceneGame } from "../apps/game";
 import { HUD_LoadIndicator } from "../apps/load-screen";
 import type { Scene } from "../ui";
 import { serialise_error } from "../../utils";
-import { Process } from "../../kernel";
+import { Process, SystemEvent } from "../../kernel";
 
 export class KateProcesses {
   private _running: Process | null = null;
   private _scenes = new WeakMap<Process, Scene>();
+  private _initialised = false;
 
   constructor(readonly os: KateOS) {}
 
@@ -24,6 +25,14 @@ export class KateProcesses {
 
   get running() {
     return this._running;
+  }
+
+  setup() {
+    if (this._initialised) {
+      throw new Error(`[kate:processes] Process manager initialised twice`);
+    }
+    this._initialised = true;
+    this.os.kernel.processes.on_system_event.listen(this.handle_system_event);
   }
 
   async run_from_cartridge(bytes: Uint8Array) {
@@ -57,6 +66,7 @@ export class KateProcesses {
     const scene = new SceneGame(this.os, process);
     this._running = process;
     this.os.push_scene(scene);
+    this._scenes.set(process, scene);
     return process;
   }
 
@@ -138,6 +148,30 @@ export class KateProcesses {
       this.os.hide_hud(loading);
     }
   }
+
+  handle_system_event = (ev: SystemEvent) => {
+    switch (ev.type) {
+      case "killed": {
+        this.notify_exit(ev.process);
+        break;
+      }
+
+      case "unexpected-message": {
+        console.warn(`Unexpected message received from ${ev.process.id}`);
+        this.os.audit_supervisor
+          .log(ev.process.id, {
+            type: "kate.process.unexpected-message",
+            message: `Unexpected message received from ${ev.process.id}`,
+            risk: "low",
+            resources: ["kate:cartridge"],
+            extra: ev.message,
+          })
+          .catch(() => {});
+        ev.process.kill();
+        break;
+      }
+    }
+  };
 
   notify_exit(process: Process) {
     if (process === this._running) {
