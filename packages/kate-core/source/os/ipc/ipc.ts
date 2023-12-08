@@ -6,7 +6,7 @@
 
 import type { KateOS } from "../os";
 import { EMessageFailed, type Handler } from "./handlers";
-import { TC } from "../../utils";
+import { TC, make_id } from "../../utils";
 import CaptureMessages from "./capture";
 import CartFSMessages from "./cart_fs";
 import NotificationMessages from "./notification";
@@ -26,6 +26,7 @@ type Message = {
 
 export class KateIPCServer {
   private _handlers = new WeakMap<Process, (_: SystemEvent) => void>();
+  private _capture_tokens = new WeakMap<Process, Set<string>>();
   private _messages: Map<string, Handler<any, any>>;
   private TRACE_MESSAGES = false;
 
@@ -65,6 +66,16 @@ export class KateIPCServer {
     if (handler != null) {
       process.on_system_event.remove(handler);
     }
+  }
+
+  initiate_capture(process: Process) {
+    const token = make_id();
+    if (!this._capture_tokens.has(process)) {
+      this._capture_tokens.set(process, new Set());
+    }
+    const tokens = this._capture_tokens.get(process)!;
+    tokens.add(token);
+    return token;
   }
 
   handle_message = async (process: Process, ev: SystemEvent) => {
@@ -132,11 +143,12 @@ export class KateIPCServer {
   }
 
   async consume_capture_token(token: string, process: Process, message: Message) {
-    if (!process.capture_tokens.has(token)) {
+    const tokens = this._capture_tokens.get(process);
+    if (tokens == null || !tokens.has(token)) {
       await this.mark_suspicious_activity(message, process);
       throw new Error(`Invalid capture token.`);
     }
-    process.capture_tokens.delete(token);
+    tokens.delete(token);
   }
 
   async process_message(

@@ -10,6 +10,8 @@ import { Scene } from "../ui/scenes";
 import { ButtonChangeEvent, ButtonPressedEvent, KateButton, Process } from "../../kernel";
 
 export class SceneGame extends Scene {
+  private is_recording;
+
   get application_id(): string {
     return this.process.cartridge.id;
   }
@@ -24,6 +26,7 @@ export class SceneGame extends Scene {
 
   constructor(os: KateOS, readonly process: Process) {
     super(os, false);
+    this.is_recording = false;
   }
 
   on_attached(): void {
@@ -48,7 +51,27 @@ export class SceneGame extends Scene {
 
   handle_button_pressed = (ev: ButtonPressedEvent) => {
     if (this.is_active) {
-      this.process.send({ type: "kate:input-key-pressed", payload: ev });
+      switch (ev.key) {
+        case "berry":
+          break;
+
+        case "capture": {
+          const token = this.os.ipc.initiate_capture(this.process);
+          if (ev.is_long_press && !this.is_recording) {
+            this.process.send({ type: "kate:start-recording", token: token });
+            this.is_recording = true;
+          } else if (ev.is_long_press && this.is_recording) {
+            this.process.send({ type: "kate:stop-recording" });
+            this.is_recording = false;
+          } else {
+            this.process.send({ type: "kate:take-screenshot", token: token });
+          }
+          break;
+        }
+
+        default:
+          this.process.send({ type: "kate:input-key-pressed", payload: ev });
+      }
     }
   };
 

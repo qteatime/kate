@@ -2,6 +2,7 @@ import { EventStream, defer } from "../../utils";
 import * as Cart from "../../cart";
 import type { VirtualConsole } from "../virtual";
 import { RuntimeEnvConfig, spawn } from "./runtimes";
+import { ButtonChangeEvent, ButtonPressedEvent } from "../input";
 
 export enum PairingState {
   NEEDS_PAIRING,
@@ -19,6 +20,15 @@ export type SystemEvent =
   | { type: "paused"; process: Process; state: boolean }
   | { type: "killed"; process: Process };
 
+export type ProcessMessage =
+  | { type: "kate:reply"; id: string; ok: boolean; value: unknown }
+  | { type: "kate:input-state-changed"; payload: ButtonChangeEvent }
+  | { type: "kate:input-key-pressed"; payload: ButtonPressedEvent }
+  | { type: "kate:paused"; state: boolean }
+  | { type: "kate:start-recording"; token: string }
+  | { type: "kate:stop-recording" }
+  | { type: "kate:take-screenshot"; token: string };
+
 export interface IFileSystem {
   read(path: string): Promise<Cart.BasicFile>;
 }
@@ -27,7 +37,6 @@ export class Process {
   private _port: MessagePort | null = null;
   private _state = PairingState.NEEDS_PAIRING;
   private _paused: boolean = false;
-  readonly capture_tokens = new Set<string>();
   on_system_event = new EventStream<SystemEvent>();
 
   constructor(
@@ -102,7 +111,7 @@ export class Process {
   }
 
   // == Messaging
-  send(message: unknown, transfer: Transferable[] = []) {
+  send(message: ProcessMessage, transfer: Transferable[] = []) {
     if (this._port == null) {
       throw new Error(`[kate:process] send() called before process ${this.id} was paired`);
     } else {

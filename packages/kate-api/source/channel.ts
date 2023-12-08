@@ -9,8 +9,8 @@ import type { InputKey } from "./input";
 
 type Payload = { [key: string]: any };
 
-type StateChangedEvent = { button: InputKey; is_pressed: boolean };
-type KeyPressedEvent = {
+type ButtonChangedEvent = { button: InputKey; is_pressed: boolean };
+type ButtonPressedEvent = {
   key: InputKey;
   is_repeat: boolean;
   is_long_press: boolean;
@@ -20,9 +20,12 @@ type PairingMessage = { type: "kate:pairing-ready" } | unknown;
 
 type ProcessMessage =
   | { type: "kate:reply"; id: string; ok: boolean; value: unknown }
-  | { type: "kate:input-state-changed"; payload: StateChangedEvent }
-  | { type: "kate:input-key-pressed"; payload: KeyPressedEvent }
-  | { type: "kate:paused"; state: boolean };
+  | { type: "kate:input-state-changed"; payload: ButtonChangedEvent }
+  | { type: "kate:input-key-pressed"; payload: ButtonPressedEvent }
+  | { type: "kate:paused"; state: boolean }
+  | { type: "kate:start-recording"; token: string }
+  | { type: "kate:stop-recording" }
+  | { type: "kate:take-screenshot"; token: string };
 
 const MAX_BUFFER = 1024;
 
@@ -36,8 +39,8 @@ export class KateIPC {
   #pairing_waiter: Deferred<void>;
   #buffered: number = 0;
   readonly events = {
-    input_state_changed: new EventStream<StateChangedEvent>(),
-    key_pressed: new EventStream<KeyPressedEvent>(),
+    input_state_changed: new EventStream<ButtonChangedEvent>(),
+    key_pressed: new EventStream<ButtonPressedEvent>(),
     take_screenshot: new EventStream<{ token: string }>(),
     start_recording: new EventStream<{ token: string }>(),
     stop_recording: new EventStream<void>(),
@@ -179,23 +182,23 @@ export class KateIPC {
         break;
       }
 
+      case "kate:take-screenshot": {
+        this.events.take_screenshot.emit({ token: ev.data.token });
+        break;
+      }
+
+      case "kate:start-recording": {
+        this.events.start_recording.emit({ token: ev.data.token });
+        break;
+      }
+
+      case "kate:stop-recording": {
+        this.events.stop_recording.emit();
+        break;
+      }
+
       default:
         console.warn(`[kate:game] Unhandled message type ${(ev.data as any)?.type}`, ev);
-
-      // case "kate:take-screenshot": {
-      //   this.events.take_screenshot.emit({ token: ev.data.token });
-      //   break;
-      // }
-
-      // case "kate:start-recording": {
-      //   this.events.start_recording.emit({ token: ev.data.token });
-      //   break;
-      // }
-
-      // case "kate:stop-recording": {
-      //   this.events.stop_recording.emit();
-      //   break;
-      // }
     }
   };
 }
