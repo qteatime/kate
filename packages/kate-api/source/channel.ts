@@ -31,6 +31,7 @@ export class KateIPC {
   #initialised: boolean;
   #server: Window;
   #port: MessagePort | null = null;
+  #pairing_waiter: Deferred<void>;
   readonly events = {
     input_state_changed: new EventStream<StateChangedEvent>(),
     key_pressed: new EventStream<KeyPressedEvent>(),
@@ -46,6 +47,7 @@ export class KateIPC {
     this.#initialised = false;
     this.#server = server;
     this.#paired = false;
+    this.#pairing_waiter = defer();
   }
 
   #make_id() {
@@ -82,6 +84,7 @@ export class KateIPC {
         this.#paired = true;
         this.#port = ev.data.port;
         this.#port!.onmessage = this.handle_message;
+        this.#pairing_waiter.resolve();
       }
     };
 
@@ -96,7 +99,8 @@ export class KateIPC {
     );
   }
 
-  #do_send(id: string, type: string, payload: Payload, transfer: Transferable[] = []) {
+  async #do_send(id: string, type: string, payload: Payload, transfer: Transferable[] = []) {
+    await this.#pairing_waiter.promise;
     this.#port!.postMessage(
       {
         type: type,
