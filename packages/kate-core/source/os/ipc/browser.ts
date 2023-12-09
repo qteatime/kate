@@ -15,20 +15,13 @@ export default [
       fail_silently: true,
       capabilities: [{ type: "open-urls" }],
     },
-    async (os, env, ipc, { url }) => {
+    async (os, process, ipc, { url }) => {
       try {
-        await os.fairness_supervisor.with_resource(
-          env.cart.id,
-          "modal-dialog",
-          async () => {
-            await os.browser.open(env.cart.id, url);
-          }
-        );
+        await os.fairness_supervisor.with_resource(process, "modal-dialog", async () => {
+          await os.browser.open(process.cartridge.id, url);
+        });
       } catch (error) {
-        console.error(
-          `Failed to open ${url} at the request of ${env.cart.id}:`,
-          error
-        );
+        console.error(`Failed to open ${url} at the request of ${process.cartridge.id}:`, error);
       }
 
       return null;
@@ -42,18 +35,14 @@ export default [
       fail_silently: true,
       capabilities: [{ type: "download-files" }],
     },
-    async (os, env, ipc, { filename, data }) => {
+    async (os, process, ipc, { filename, data }) => {
       try {
-        await os.fairness_supervisor.with_resource(
-          env.cart.id,
-          "modal-dialog",
-          async () => {
-            await os.browser.download(env.cart.id, filename, data);
-          }
-        );
+        await os.fairness_supervisor.with_resource(process, "modal-dialog", async () => {
+          await os.browser.download(process.cartridge.id, filename, data);
+        });
       } catch (error) {
         console.error(
-          `Failed to download ${filename} at the request of ${env.cart.id}:`,
+          `Failed to download ${filename} at the request of ${process.cartridge.id}:`,
           error
         );
       }

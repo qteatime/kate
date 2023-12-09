@@ -81,6 +81,7 @@ export class KateOS {
   ) {
     this.cart_manager = new CartManager(this);
     this.processes = new KateProcesses(this);
+    this.processes.setup();
     this.object_store = new KateObjectStore(this);
     this.context_menu = new KateContextMenu(this);
     this.context_menu.setup();
@@ -93,7 +94,6 @@ export class KateOS {
     this.status_bar = new KateStatusBar(this);
     this.status_bar.setup();
     this.ipc = new KateIPCServer(this);
-    this.ipc.setup();
     this.dialog = new KateDialog(this);
     this.capture = new KateCapture(this);
     this.play_habits = new KatePlayHabits(this);

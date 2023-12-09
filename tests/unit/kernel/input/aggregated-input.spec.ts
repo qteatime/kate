@@ -58,11 +58,11 @@ test("@kernel aggregate inputs from all sources", async ({ page }) => {
   assert_match(
     await state.evaluate((x) => x.trace),
     [
-      { key: "up", is_down: true },
-      { key: "sparkle", is_down: true },
-      { key: "up", is_down: false },
-      { key: "sparkle", is_down: false },
-      { key: "x", is_down: true },
+      { button: "up", is_pressed: true },
+      { button: "sparkle", is_pressed: true },
+      { button: "up", is_pressed: false },
+      { button: "sparkle", is_pressed: false },
+      { button: "x", is_pressed: true },
     ],
     "state"
   );

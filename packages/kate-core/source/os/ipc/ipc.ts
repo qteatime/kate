@@ -4,10 +4,9 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import type { RuntimeEnv } from "../../kernel";
 import type { KateOS } from "../os";
 import { EMessageFailed, type Handler } from "./handlers";
-import { TC } from "../../utils";
+import { TC, make_id } from "../../utils";
 import CaptureMessages from "./capture";
 import CartFSMessages from "./cart_fs";
 import NotificationMessages from "./notification";
@@ -17,16 +16,18 @@ import BrowserMessages from "./browser";
 import DeviceFileMessages from "./device-file";
 import CartManagerMessages from "./cart-manager";
 import DialogMessages from "./dialog";
+import { Process, SystemEvent } from "../../kernel";
 
 type Message = {
   type: string;
+  id: string;
   payload: unknown;
 };
 
 export class KateIPCServer {
-  private _handlers = new Map<string, RuntimeEnv>();
+  private _handlers = new WeakMap<Process, (_: SystemEvent) => void>();
+  private _capture_tokens = new WeakMap<Process, Set<string>>();
   private _messages: Map<string, Handler<any, any>>;
-  private _initialised = false;
   private TRACE_MESSAGES = false;
 
   constructor(readonly os: KateOS) {
@@ -48,148 +49,110 @@ export class KateIPCServer {
     }
   }
 
-  setup() {
-    if (this._initialised) {
-      throw new Error(`setup() called twice`);
-    }
-
-    this._initialised = true;
-    window.addEventListener("message", this.handle_message);
-  }
-
-  add_process(env: RuntimeEnv) {
-    if (this._handlers.has(env.secret)) {
+  add_process(process: Process) {
+    if (this._handlers.has(process)) {
       throw new Error(`Duplicated secret when constructing IPC channel`);
     }
 
-    this._handlers.set(env.secret, env);
-    return new KateIPCChannel(this, env);
+    const handler = (ev: SystemEvent) => {
+      this.handle_message(process, ev);
+    };
+    this._handlers.set(process, handler);
+    process.on_system_event.listen(handler);
   }
 
-  remove_process(process: RuntimeEnv) {
-    this._handlers.delete(process.secret);
+  remove_process(process: Process) {
+    const handler = this._handlers.get(process);
+    if (handler != null) {
+      process.on_system_event.remove(handler);
+    }
   }
 
-  send(process: RuntimeEnv, message: { [key: string]: any }) {
-    process.frame.contentWindow?.postMessage(message, "*");
+  initiate_capture(process: Process) {
+    const token = make_id();
+    if (!this._capture_tokens.has(process)) {
+      this._capture_tokens.set(process, new Set());
+    }
+    const tokens = this._capture_tokens.get(process)!;
+    tokens.add(token);
+    return token;
   }
 
-  handle_message = async (ev: MessageEvent<any>) => {
-    const secret = ev.data.secret;
-    const type = ev.data.type;
-    const id = ev.data.id;
-    const payload = ev.data.payload;
-    if (
-      typeof secret === "string" &&
-      typeof type === "string" &&
-      typeof id === "string" &&
-      typeof payload === "object"
-    ) {
-      if (this.TRACE_MESSAGES) {
-        console.debug("kate-ipc <==", { type, id, payload });
+  handle_message = async (process: Process, ev: SystemEvent) => {
+    if (this.TRACE_MESSAGES) {
+      console.debug(`[kate:ipc] <=== ${process.id}`, ev);
+    }
+
+    switch (ev.type) {
+      case "killed": {
+        this.remove_process(process);
+        break;
       }
-      const handler = this._handlers.get(secret);
-      if (handler != null) {
-        if (handler.frame.contentWindow !== ev.source) {
-          const suspicious_handler = this.handler_for_window(ev.source);
-          if (suspicious_handler != null) {
-            this.mark_suspicious_activity(ev, suspicious_handler);
-          }
+
+      case "message-received": {
+        if (ev.payload == null || typeof ev.payload !== "object") {
+          console.warn(`[kate:ipc] malformed IPC message from ${process.id}`, ev);
           return;
         }
+        const payload = ev.payload as Message;
+        if (typeof payload.id !== "string" || typeof payload.type !== "string") {
+          console.warn(`[kate:ipc] malformed IPC message from ${process.id}`, ev);
+          return;
+        }
+
         try {
-          const result = await this.process_message(handler, {
-            type: type as any,
-            payload,
-          });
+          const result = await this.process_message(process, payload);
           if (this.TRACE_MESSAGES) {
-            console.debug("kate-ipc ==>", { id, ok: true, value: result });
-          }
-          handler.frame.contentWindow?.postMessage(
-            {
-              type: "kate:reply",
-              id: id,
+            console.debug(`[kate:ipc] ===> ${process.id}`, {
+              id: payload.id,
               ok: true,
               value: result,
-            },
-            "*"
-          );
-        } catch (error) {
-          console.error(`[Kate] Error handling ${type}`, {
-            payload,
-            error,
+            });
+          }
+          process.send({
+            type: "kate:reply",
+            id: payload.id,
+            ok: true,
+            value: result,
           });
-          handler.frame.contentWindow?.postMessage(
-            {
-              type: "kate:reply",
-              id: id,
-              ok: false,
-              value: {
-                code: "kate.unknown-error",
-                type: type,
-                payload: payload,
-              },
-            },
-            "*"
+        } catch (error: unknown) {
+          console.error(
+            `[kate:ipc] Error handling ${payload.type} from ${process.id}`,
+            payload,
+            error
           );
-        }
-      } else {
-        const handler = this.handler_for_window(ev.source);
-        if (handler != null) {
-          this.mark_suspicious_activity(ev, handler);
+          process.send({
+            type: "kate:reply",
+            id: payload.id,
+            ok: false,
+            value: {
+              code: "kate.unknown-error",
+              type: payload.type,
+              payload: payload.payload,
+            },
+          });
         }
       }
     }
   };
 
-  private async mark_suspicious_activity(
-    ev: MessageEvent,
-    handler: RuntimeEnv
-  ) {
-    if (handler != null) {
-      console.debug(`[Kate] suspicious IPC activity`, {
-        message: ev.data,
-        source: ev.source,
-        origin: ev.origin,
-      });
-      this._handlers.delete(handler.secret);
-      await this.os.processes.terminate(
-        handler.cart.id,
-        "kate:ipc",
-        "suspicious IPC activity"
-      );
-    }
+  private async mark_suspicious_activity(ev: Message, process: Process) {
+    console.debug(`[Kate] suspicious IPC activity from ${process.id}`, ev);
+    this.remove_process(process);
+    await this.os.processes.terminate(process.cartridge.id, "kate:ipc", "suspicious IPC activity");
   }
 
-  private handler_for_window(window: unknown) {
-    for (const [key, env] of this._handlers.entries()) {
-      if (env.frame.contentWindow === window) {
-        return env;
-      }
-    }
-    return null;
-  }
-
-  async consume_capture_token(
-    token: string,
-    env: RuntimeEnv,
-    message: Message
-  ) {
-    if (!env.capture_tokens.has(token)) {
-      await this.mark_suspicious_activity(
-        {
-          data: message,
-          source: env.frame.contentWindow,
-        } as any,
-        env
-      );
+  async consume_capture_token(token: string, process: Process, message: Message) {
+    const tokens = this._capture_tokens.get(process);
+    if (tokens == null || !tokens.has(token)) {
+      await this.mark_suspicious_activity(message, process);
       throw new Error(`Invalid capture token.`);
     }
-    env.capture_tokens.delete(token);
+    tokens.delete(token);
   }
 
   async process_message(
-    env: RuntimeEnv,
+    process: Process,
     message: Message
   ): Promise<{ ok: boolean; value: any } | null> {
     const handler = this._messages.get(message.type);
@@ -201,37 +164,22 @@ export class KateIPCServer {
     for (const capability of handler.auth.capabilities) {
       if (
         !(await this.os.capability_supervisor.is_allowed(
-          env.cart.id,
+          process.cartridge.id,
           capability.type,
           capability.configuration ?? {}
         ))
       ) {
         console.error(
-          `[kate:ipc] Denied ${env.cart.id} access to ${message.type}: missing ${capability.type}`,
+          `[kate:ipc] Denied ${process.cartridge.id} access to ${message.type}: missing ${capability.type}`,
           message
         );
         if (handler.auth.fail_silently) {
           return null;
         } else {
-          throw new EMessageFailed(
-            "kate.ipc.access-denied",
-            `Operation not allowed`
-          );
+          throw new EMessageFailed("kate.ipc.access-denied", `Operation not allowed`);
         }
       }
     }
-    return await handler.handler(this.os, env, this, payload, message);
-  }
-}
-
-export class KateIPCChannel {
-  constructor(readonly server: KateIPCServer, readonly env: RuntimeEnv) {}
-
-  send(message: { [key: string]: any }) {
-    this.server.send(this.env, message);
-  }
-
-  dispose() {
-    this.server.remove_process(this.env);
+    return await handler.handler(this.os, process, this, payload, message);
   }
 }

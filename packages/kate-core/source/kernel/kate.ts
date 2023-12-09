@@ -4,14 +4,13 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { KateRuntimes } from "./cart-runtime";
+import { ProcessManager } from "./process";
 import { ConsoleOptions, VirtualConsole } from "./virtual";
 
 export class KateKernel {
-  readonly runtimes: KateRuntimes;
-
+  readonly processes;
   private constructor(readonly console: VirtualConsole) {
-    this.runtimes = new KateRuntimes(console);
+    this.processes = new ProcessManager();
   }
 
   get gamepad_source() {

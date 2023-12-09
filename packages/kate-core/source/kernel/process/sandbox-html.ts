@@ -4,13 +4,15 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { bridges } from "../bridges";
-import * as Cart from "../cart";
-import { make_id, unreachable, file_to_dataurl, Pathname } from "../utils";
-import { RuntimeEnv } from "./cart-runtime";
-import { KateButton } from "./input";
+import { bridges } from "../../bridges";
+import * as Cart from "../../cart";
+import { make_id, unreachable, file_to_dataurl, Pathname } from "../../utils";
+import { RuntimeEnvConfig } from "./runtimes";
+import { KateButton } from "./../input";
 
-export async function translate_html(html: string, context: RuntimeEnv) {
+type RuntimeEnv = RuntimeEnvConfig & { secret: string };
+
+export async function sandbox_html(html: string, context: RuntimeEnv) {
   const dom = new DOMParser().parseFromString(html, "text/html");
   const preamble = add_preamble(dom, context);
   add_bridges(preamble, dom, context);
@@ -71,11 +73,11 @@ function add_preamble(dom: Document, context: RuntimeEnv) {
   script.textContent = `
   void function() {
     var KATE_SECRET = ${JSON.stringify(context.secret)};
-    ${bridges["kate-api.js"]};
-    
     let script = document.getElementById(${JSON.stringify(id)});
     script.remove();
     script = null;
+
+    ${bridges["kate-api.js"]};
 
     Object.defineProperty(navigator, "userAgent", {
       value: ${JSON.stringify(user_agent)},
@@ -332,7 +334,7 @@ async function transform_css_urls(base: Pathname, source: string, context: Runti
 }
 
 async function try_get_file(path: string, env: RuntimeEnv) {
-  return await env.read_file(path);
+  return await env.filesystem.read(path);
 }
 
 async function try_get_text_file(path: string, env: RuntimeEnv) {

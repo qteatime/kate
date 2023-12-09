@@ -20,21 +20,21 @@ void (function () {
   let dispatch: (ev: Event) => void = (ev: Event) => {};
 
   const on_key_update = ({
-    key: kate_key,
-    is_down,
+    button: kate_key,
+    is_pressed,
   }: {
-    key: KateTypes.InputKey;
-    is_down: boolean;
+    button: KateTypes.InputKey;
+    is_pressed: boolean;
   }) => {
     if (!paused) {
       const data = KEY_MAPPING[kate_key];
       if (data) {
-        if (is_down) {
+        if (is_pressed) {
           down.add(kate_key);
         } else {
           down.delete(kate_key);
         }
-        const type = is_down ? "keydown" : "keyup";
+        const type = is_pressed ? "keydown" : "keyup";
         const [key, code, keyCode] = data;
         const key_ev = new KeyboardEvent(type, { key, code, keyCode });
         dispatch(key_ev);
@@ -49,7 +49,7 @@ void (function () {
     events.paused.listen((state) => {
       if (state === true) {
         for (const key of down) {
-          on_key_update({ key, is_down: false });
+          on_key_update({ button: key, is_pressed: false });
         }
       }
       paused = state;

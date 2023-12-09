@@ -4,32 +4,32 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import type { RuntimeEnv } from "../../kernel";
 import type { KateOS } from "../os";
 import { TC, make_id } from "../../utils";
 import { EMessageFailed, auth_handler, handler } from "./handlers";
 import { DeviceFileHandle } from "../apis";
 import * as UI from "../ui";
+import { Process } from "../../kernel";
 
 type HandleId = string & { __handle_id: true };
 export class KateDeviceFileIPC {
   private _handles = new WeakMap<HTMLIFrameElement, Map<HandleId, DeviceFileHandle>>();
 
-  expose(env: RuntimeEnv, handle: DeviceFileHandle) {
+  expose(process: Process, handle: DeviceFileHandle) {
     const id = make_id() as HandleId;
-    const handles = this._handles.get(env.frame) ?? new Map<HandleId, DeviceFileHandle>();
+    const handles = this._handles.get(process.frame) ?? new Map<HandleId, DeviceFileHandle>();
     handles.set(id, handle);
-    this._handles.set(env.frame, handles);
+    this._handles.set(process.frame, handles);
     return { id, path: handle.path };
   }
 
-  async resolve(os: KateOS, env: RuntimeEnv, id: HandleId) {
-    const handles = this._handles.get(env.frame) ?? new Map<HandleId, DeviceFileHandle>();
+  async resolve(os: KateOS, process: Process, id: HandleId) {
+    const handles = this._handles.get(process.frame) ?? new Map<HandleId, DeviceFileHandle>();
     const handle = handles.get(id);
     if (handle != null) {
       return handle;
     } else {
-      await os.audit_supervisor.log(env.cart.id, {
+      await os.audit_supervisor.log(process.cartridge.id, {
         resources: ["device-fs", "error"],
         risk: "high",
         type: "kate.device-fs.file.resolve-failed",
@@ -84,10 +84,10 @@ export default [
       ),
     }),
     { capabilities: [{ type: "request-device-files" }] },
-    async (os, env, ipc, { multiple, strict, types }) => {
-      return await os.fairness_supervisor.with_resource(env.cart.id, "modal-dialog", async () => {
-        await assert_allowed(os, env.cart.id, "files", "Select file");
-        const handles = await os.device_file.open_file(env.cart.id, {
+    async (os, process, ipc, { multiple, strict, types }) => {
+      return await os.fairness_supervisor.with_resource(process, "modal-dialog", async () => {
+        await assert_allowed(os, process.cartridge.id, "files", "Select file");
+        const handles = await os.device_file.open_file(process.cartridge.id, {
           multiple,
           strict,
           types: [
@@ -97,7 +97,7 @@ export default [
             },
           ],
         });
-        return handles.map((x) => device_ipc.expose(env, x));
+        return handles.map((x) => device_ipc.expose(process, x));
       });
     }
   ),
@@ -106,11 +106,11 @@ export default [
     "kate:device-fs.request-directory",
     TC.spec({}),
     { capabilities: [{ type: "request-device-files" }] },
-    async (os, env, ipc, _) => {
-      return await os.fairness_supervisor.with_resource(env.cart.id, "modal-dialog", async () => {
-        await assert_allowed(os, env.cart.id, "directories", "Select directory");
-        const handles = await os.device_file.open_directory(env.cart.id);
-        return handles.map((x) => device_ipc.expose(env, x));
+    async (os, process, ipc, _) => {
+      return await os.fairness_supervisor.with_resource(process, "modal-dialog", async () => {
+        await assert_allowed(os, process.cartridge.id, "directories", "Select directory");
+        const handles = await os.device_file.open_directory(process.cartridge.id);
+        return handles.map((x) => device_ipc.expose(process, x));
       });
     }
   ),

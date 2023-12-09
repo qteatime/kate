@@ -14,8 +14,8 @@ export default [
       title: TC.str,
       message: TC.str,
     }),
-    async (os, env, ipc, { title, message }) => {
-      await os.notifications.push_transient(env.cart.id, title, message);
+    async (os, process, ipc, { title, message }) => {
+      await os.notifications.push_transient(process.cartridge.id, title, message);
       return null;
     }
   ),

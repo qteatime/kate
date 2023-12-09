@@ -18,25 +18,16 @@ export default [
       max_length: TC.optional(undefined, TC.int),
     }),
     { fail_silently: true, capabilities: [{ type: "show-dialogs" }] },
-    async (
-      os,
-      env,
-      ipc,
-      { type, message, initial_value, placeholder, max_length }
-    ) => {
-      return await os.fairness_supervisor.with_resource(
-        env.cart.id,
-        "modal-dialog",
-        async () => {
-          const result = await os.dialog.text_input(env.cart.id, message, {
-            max_length: max_length ?? undefined,
-            type: type,
-            initial_value,
-            placeholder,
-          });
-          return result;
-        }
-      );
+    async (os, process, ipc, { type, message, initial_value, placeholder, max_length }) => {
+      return await os.fairness_supervisor.with_resource(process, "modal-dialog", async () => {
+        const result = await os.dialog.text_input(process.cartridge.id, message, {
+          max_length: max_length ?? undefined,
+          type: type,
+          initial_value,
+          placeholder,
+        });
+        return result;
+      });
     }
   ),
 
@@ -44,15 +35,11 @@ export default [
     "kate:dialog.message",
     TC.spec({ message: TC.str }),
     { fail_silently: true, capabilities: [{ type: "show-dialogs" }] },
-    async (os, env, ipc, { message }) => {
-      return await os.fairness_supervisor.with_resource(
-        env.cart.id,
-        "modal-dialog",
-        async () => {
-          await os.dialog.message(env.cart.id, { title: "", message });
-          return null;
-        }
-      );
+    async (os, process, ipc, { message }) => {
+      return await os.fairness_supervisor.with_resource(process, "modal-dialog", async () => {
+        await os.dialog.message(process.cartridge.id, { title: "", message });
+        return null;
+      });
     }
   ),
 ];
