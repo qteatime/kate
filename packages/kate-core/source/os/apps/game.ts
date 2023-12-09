@@ -80,6 +80,10 @@ export class SceneGame extends Scene {
   };
 
   handle_focus_changed = (focus: HTMLElement | null) => {
+    if (!this.process.is_paired) {
+      return;
+    }
+
     if (focus === this.canvas) {
       setTimeout(() => {
         this.process.unpause();

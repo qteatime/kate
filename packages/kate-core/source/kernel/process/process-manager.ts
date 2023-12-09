@@ -1,4 +1,4 @@
-import { EventStream, defer } from "../../utils";
+import { EventStream, defer, sleep } from "../../utils";
 import * as Cart from "../../cart";
 import type { VirtualConsole } from "../virtual";
 import { RuntimeEnvConfig, spawn } from "./runtimes";
@@ -40,6 +40,7 @@ export class Process {
   private _port: MessagePort | null = null;
   private _state = ProcessState.NEEDS_PAIRING;
   private _paused: boolean = false;
+  readonly MAX_PAIRING_WAIT = 1000; // 1 second
   on_system_event = new EventStream<SystemEvent>();
 
   constructor(
@@ -67,6 +68,10 @@ export class Process {
       throw new Error(`[kate:process] pair() called on paired process ${this.id}`);
     }
     const result = defer<void>();
+    sleep(this.MAX_PAIRING_WAIT).then(() =>
+      result.reject(new Error(`[kate] Process ${this.id} took too long to pair`))
+    );
+
     this._state = ProcessState.WAITING_PAIRING;
     this.on_system_event.emit({ type: "pairing", process: this });
     console.debug(`[kate:process] ${this.id} waiting for pairing`);

@@ -66,8 +66,17 @@ export class KateProcesses {
     this._running = process;
     this.os.push_scene(scene);
     this._scenes.set(process, scene);
-    await process.pair();
     this.os.ipc.add_process(process);
+    await process.pair().catch(async (e) => {
+      await this.os.audit_supervisor.log(process.id, {
+        risk: "high",
+        type: "kate.process.pairing-crashed",
+        message: `Pairing ${process.id} took too long; cartridge may be corrupted.`,
+        resources: ["error", "kate:cartridge"],
+      });
+      process.kill();
+      throw e;
+    });
     return process;
   }
 
