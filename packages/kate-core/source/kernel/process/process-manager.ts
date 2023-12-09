@@ -100,6 +100,7 @@ export class Process {
           this.do_pair(port);
           result.resolve();
         } else {
+          console.warn(`[kate:process] Got unexpected message from ${this.id} frame`);
           this.on_system_event.emit({
             type: "unexpected-message",
             process: this,
