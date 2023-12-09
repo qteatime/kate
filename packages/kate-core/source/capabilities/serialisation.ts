@@ -5,11 +5,7 @@
  */
 
 import { CartMeta, ContextualCapability } from "../cart";
-import type {
-  AnyCapabilityGrant,
-  CapabilityGrant,
-  CapabilityType,
-} from "../data/capability";
+import type { AnyCapabilityGrant, CapabilityGrant, CapabilityType } from "../data/capability";
 import { unreachable } from "../utils";
 import {
   AnyCapability,
@@ -27,14 +23,10 @@ export function parse(grant: AnyCapabilityGrant) {
       return OpenURLs.parse(grant as CapabilityGrant<"open-urls">);
     }
     case "request-device-files": {
-      return RequestDeviceFiles.parse(
-        grant as CapabilityGrant<"request-device-files">
-      );
+      return RequestDeviceFiles.parse(grant as CapabilityGrant<"request-device-files">);
     }
     case "install-cartridges": {
-      return InstallCartridges.parse(
-        grant as CapabilityGrant<"install-cartridges">
-      );
+      return InstallCartridges.parse(grant as CapabilityGrant<"install-cartridges">);
     }
     case "download-files": {
       return DownloadFiles.parse(grant as CapabilityGrant<"download-files">);
@@ -47,10 +39,7 @@ export function parse(grant: AnyCapabilityGrant) {
   }
 }
 
-export function from_metadata(
-  cart_id: string,
-  capability: ContextualCapability
-) {
+export function from_metadata(cart_id: string, capability: ContextualCapability) {
   switch (capability.type) {
     case "open-urls": {
       return OpenURLs.from_metadata(cart_id, capability);

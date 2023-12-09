@@ -73,6 +73,7 @@ export class KateVirtualInputSource implements KateButtonInputSource {
 
     this.btn_l = root.querySelector(".kc-shoulder-left")!;
     this.btn_r = root.querySelector(".kc-shoulder-right")!;
+    console.debug(`[kate:virtual-input] Initialised virtual input adaptor`);
   }
 
   setup(root: HTMLElement): void {

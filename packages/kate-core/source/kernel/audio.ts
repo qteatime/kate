@@ -12,6 +12,7 @@ export class KateAudioManager {
     if (this.context.state !== "running") {
       const open_audio_output = () => {
         this.context.resume().catch((e) => {});
+        console.debug(`[kate:audio] Initialised audio context`, this.context.state);
         window.removeEventListener("touchstart", open_audio_output);
         window.removeEventListener("click", open_audio_output);
         window.removeEventListener("keydown", open_audio_output);

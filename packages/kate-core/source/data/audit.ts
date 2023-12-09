@@ -105,9 +105,7 @@ export class AuditStore {
       return 0;
     }
 
-    const candidates = candidates0.filter(
-      (x) => now.getTime() - x.time.getTime() > min_diff
-    );
+    const candidates = candidates0.filter((x) => now.getTime() - x.time.getTime() > min_diff);
     for (const entry of candidates) {
       await this.logs.delete(entry.id);
     }

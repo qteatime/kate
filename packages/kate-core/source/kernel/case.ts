@@ -29,6 +29,7 @@ export class KateConsoleCase {
     window.addEventListener("orientationchange", () => this.update_scale(null));
     (screen as any).addEventListener?.("orientationchange", () => this.update_scale(null));
     this.update_scale(null);
+    console.debug(`[kate:case] Initialised console case`);
   }
 
   get current() {
@@ -58,6 +59,7 @@ export class KateConsoleCase {
   }
 
   private update_scale(old_case: BaseConsoleCase | null) {
+    console.debug(`[kate:case] Updating console case to `, this._config);
     this.current.transition(old_case, this._root!);
     window.scrollTo({ left: 0, top: 0 });
     document.body.scroll({ left: 0, top: 0 });

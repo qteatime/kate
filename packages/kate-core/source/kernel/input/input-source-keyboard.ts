@@ -53,6 +53,7 @@ export class KateKeyboardInputSource implements KateButtonInputSource {
     this.attached = true;
     document.addEventListener("keydown", this.handle_keydown);
     document.addEventListener("keyup", this.handle_keyup);
+    console.debug(`[kate:keyboard] Initialised keyboard adaptor`);
   }
 
   teardown() {
@@ -62,6 +63,7 @@ export class KateKeyboardInputSource implements KateButtonInputSource {
     document.removeEventListener("keydown", this.handle_keydown);
     document.removeEventListener("keyup", this.handle_keyup);
     this.attached = false;
+    console.debug(`[kate:sandbox] Disabled keyboard adaptor`);
   }
 
   private handle_keydown = (ev: KeyboardEvent) => {

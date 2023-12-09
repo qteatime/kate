@@ -23,10 +23,7 @@ export type GrantConfiguration = ValidateGrantConfig<{
 
 export type CapabilityType = ContextualCapability["type"];
 
-export type SerialisedCapability = Pick<
-  AnyCapabilityGrant,
-  "cart_id" | "name" | "granted"
->;
+export type SerialisedCapability = Pick<AnyCapabilityGrant, "cart_id" | "name" | "granted">;
 
 export type CapabilityGrant<T extends CapabilityType> = {
   cart_id: string;
@@ -37,11 +34,7 @@ export type CapabilityGrant<T extends CapabilityType> = {
 
 export type AnyCapabilityGrant = CapabilityGrant<CapabilityType>;
 
-export const capability_grant = kate.table2<
-  AnyCapabilityGrant,
-  "cart_id",
-  "name"
->({
+export const capability_grant = kate.table2<AnyCapabilityGrant, "cart_id", "name">({
   since: 12,
   name: "capability_grants",
   path: ["cart_id", "name"],
@@ -67,13 +60,9 @@ export class CapabilityStore {
     mode: IDBTransactionMode,
     fn: (store: CapabilityStore) => Promise<A>
   ) {
-    return db.transaction(
-      CapabilityStore.tables_by_kind(kind),
-      mode,
-      async (txn) => {
-        return await fn(new CapabilityStore(txn));
-      }
-    );
+    return db.transaction(CapabilityStore.tables_by_kind(kind), mode, async (txn) => {
+      return await fn(new CapabilityStore(txn));
+    });
   }
 
   get grants() {
@@ -110,9 +99,7 @@ export class CapabilityStore {
 
   async update_grant(cart_id: string, capability: Capability.AnyCapability) {
     if (capability.cart_id !== cart_id) {
-      throw new Error(
-        `Inconsistent cartridge for capability ${capability.type}`
-      );
+      throw new Error(`Inconsistent cartridge for capability ${capability.type}`);
     }
 
     const changes = capability.serialise();

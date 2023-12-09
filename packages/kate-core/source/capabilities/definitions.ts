@@ -29,9 +29,7 @@ export abstract class Capability<T extends CapabilityType> {
   abstract risk_category(): RiskCategory;
 }
 
-export abstract class SwitchCapability<
-  T extends CapabilityType
-> extends Capability<T> {
+export abstract class SwitchCapability<T extends CapabilityType> extends Capability<T> {
   readonly grant_type = "switch";
   abstract grant_configuration: boolean;
   abstract update(grant: boolean): void;
@@ -106,10 +104,7 @@ export class RequestDeviceFiles extends SwitchCapability<"request-device-files">
   }
 
   static parse(grant: CapabilityGrant<RequestDeviceFiles["type"]>) {
-    if (
-      grant.name !== "request-device-files" ||
-      grant.granted.type !== "switch"
-    ) {
+    if (grant.name !== "request-device-files" || grant.granted.type !== "switch") {
       throw new Error(`Unexpected capability: ${grant.name}`);
     }
     return new RequestDeviceFiles(grant.cart_id, grant.granted.value);
@@ -150,10 +145,7 @@ export class InstallCartridges extends SwitchCapability<"install-cartridges"> {
   }
 
   static parse(grant: CapabilityGrant<InstallCartridges["type"]>) {
-    if (
-      grant.name !== "install-cartridges" ||
-      grant.granted.type !== "switch"
-    ) {
+    if (grant.name !== "install-cartridges" || grant.granted.type !== "switch") {
       throw new Error(`Unexpected capability: ${grant.name}`);
     }
     return new InstallCartridges(grant.cart_id, grant.granted.value);

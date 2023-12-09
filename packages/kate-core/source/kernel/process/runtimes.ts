@@ -17,16 +17,16 @@ export type RuntimeEnvConfig = {
   local_storage: unknown;
 };
 
-export async function spawn(env: RuntimeEnvConfig) {
+export async function spawn(env: RuntimeEnvConfig, trace: boolean) {
   const cart = env.cart;
   switch (cart.runtime.type) {
     case "web-archive": {
-      return await spawn_web(env);
+      return await spawn_web(env, trace);
     }
   }
 }
 
-async function spawn_web(env: RuntimeEnvConfig) {
+async function spawn_web(env: RuntimeEnvConfig, trace: boolean) {
   const secret = make_id();
   const frame = make_sandboxed_iframe();
   const process = new Process(
@@ -40,7 +40,7 @@ async function spawn_web(env: RuntimeEnvConfig) {
   const index_file = await env.filesystem.read(env.cart.runtime.html_path);
   const decoder = new TextDecoder();
   const index_html = decoder.decode(index_file.data);
-  const index = await sandbox_html(index_html, { ...env, secret });
+  const index = await sandbox_html(index_html, { ...env, secret, trace });
   frame.src = URL.createObjectURL(new Blob([index], { type: "text/html" }));
   return process;
 }

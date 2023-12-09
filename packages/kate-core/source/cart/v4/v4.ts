@@ -22,10 +22,7 @@ const MAGIC = Number(
       .join("")
 );
 
-const valid_id = regex(
-  "id",
-  /^[a-z0-9\-]+(\.[a-z0-9\-]+)*\/[a-z0-9\-]+(\.[a-z0-9\-]+)*$/
-);
+const valid_id = regex("id", /^[a-z0-9\-]+(\.[a-z0-9\-]+)*\/[a-z0-9\-]+(\.[a-z0-9\-]+)*$/);
 
 function version_string(version: Cart_v4.Version) {
   return `${version.major}.${version.minor}`;

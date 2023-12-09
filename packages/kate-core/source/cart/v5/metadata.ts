@@ -27,25 +27,19 @@ export function parse_metadata(meta: Cart_v5.Metadata): Metadata {
   };
 }
 
-function parse_presentation(
-  block: Cart_v5.Meta_presentation
-): Metadata["presentation"] {
+function parse_presentation(block: Cart_v5.Meta_presentation): Metadata["presentation"] {
   return {
     title: str(block.title, 255),
     author: str(block.author, 255),
     tagline: str(block.tagline, 255),
     description: str(block.description, 10_000),
     release_type: release_kind(block["release-type"]),
-    thumbnail_path: block["thumbnail-path"]
-      ? str(block["thumbnail-path"], 1_024)
-      : null,
+    thumbnail_path: block["thumbnail-path"] ? str(block["thumbnail-path"], 1_024) : null,
     banner_path: block["banner-path"] ? str(block["banner-path"], 1_024) : null,
   };
 }
 
-function parse_classification(
-  block: Cart_v5.Meta_classification
-): Metadata["classification"] {
+function parse_classification(block: Cart_v5.Meta_classification): Metadata["classification"] {
   return {
     genre: new Set(block.genre.map((x) => genre(x))),
     tags: new Set(
@@ -62,18 +56,14 @@ function parse_classification(
 function parse_legal(block: Cart_v5.Meta_legal): Metadata["legal"] {
   return {
     derivative_policy: derivative_policy(block["derivative-policy"]),
-    licence_path: block["licence-path"]
-      ? str(block["licence-path"], 1_024)
-      : null,
+    licence_path: block["licence-path"] ? str(block["licence-path"], 1_024) : null,
     privacy_policy_path: block["privacy-policy-path"]
       ? str(block["privacy-policy-path"], 1_024)
       : null,
   };
 }
 
-function parse_accessibility(
-  block: Cart_v5.Meta_accessibility
-): Metadata["accessibility"] {
+function parse_accessibility(block: Cart_v5.Meta_accessibility): Metadata["accessibility"] {
   return {
     input_methods: new Set(block["input-methods"].map(input_method)),
     languages: list(block.languages.map(language), 255),
@@ -175,9 +165,7 @@ function derivative_policy(x: Cart_v5.Derivative_policy): DerivativePolicy {
   }
 }
 
-function accessibility_provision(
-  x: Cart_v5.Accessibility_provision
-): AccessibilityProvision {
+function accessibility_provision(x: Cart_v5.Accessibility_provision): AccessibilityProvision {
   switch (x["@variant"]) {
     case Cart_v5.Accessibility_provision.$Tags.Configurable_difficulty:
       return "configurable-difficulty";
@@ -207,10 +195,7 @@ function input_method(x: Cart_v5.Input_method): InputMethod {
   }
 }
 
-const valid_language = regex(
-  "language iso-code",
-  /^[a-z]{2}(?:[\-_][a-zA-Z_]{2,})?$/
-);
+const valid_language = regex("language iso-code", /^[a-z]{2}(?:[\-_][a-zA-Z_]{2,})?$/);
 
 function language(x: Cart_v5.Language): Language {
   return {
@@ -223,11 +208,7 @@ function language(x: Cart_v5.Language): Language {
 
 const tag = regex("tag", /^[a-z\-]+$/);
 
-function assign<K extends keyof Metadata>(
-  result: Partial<Metadata>,
-  key: K,
-  value: Metadata[K]
-) {
+function assign<K extends keyof Metadata>(result: Partial<Metadata>, key: K, value: Metadata[K]) {
   if (key in result) {
     throw new Error(`Duplicated metadata block: ${key}`);
   }

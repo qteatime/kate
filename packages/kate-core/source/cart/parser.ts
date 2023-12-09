@@ -46,10 +46,7 @@ export async function verify_integrity(cart: Cart) {
 }
 
 async function check_file_integrity(file: File) {
-  const hash = await crypto.subtle.digest(
-    file.integrity_hash_algorithm,
-    file.data.buffer
-  );
+  const hash = await crypto.subtle.digest(file.integrity_hash_algorithm, file.data.buffer);
   return byte_equals(new Uint8Array(hash), file.integrity_hash);
 }
 

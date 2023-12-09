@@ -23,6 +23,7 @@ export class KateConsoleClock {
     }
     this._attached = true;
     this._timer_id = requestAnimationFrame(this.tick);
+    console.debug(`[kate:clock] Initialised console clock`);
   }
 
   private tick = (time: number) => {

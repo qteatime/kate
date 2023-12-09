@@ -10,7 +10,7 @@ import { make_id, unreachable, file_to_dataurl, Pathname } from "../../utils";
 import { RuntimeEnvConfig } from "./runtimes";
 import { KateButton } from "./../input";
 
-type RuntimeEnv = RuntimeEnvConfig & { secret: string };
+type RuntimeEnv = RuntimeEnvConfig & { secret: string; trace: boolean };
 
 export async function sandbox_html(html: string, context: RuntimeEnv) {
   const dom = new DOMParser().parseFromString(html, "text/html");
@@ -72,7 +72,8 @@ function add_preamble(dom: Document, context: RuntimeEnv) {
   script.id = id;
   script.textContent = `
   void function() {
-    var KATE_SECRET = ${JSON.stringify(context.secret)};
+    const KATE_SECRET = ${JSON.stringify(context.secret)};
+    const KATE_TRACE = ${JSON.stringify(context.trace)};
     let script = document.getElementById(${JSON.stringify(id)});
     script.remove();
     script = null;
@@ -137,6 +138,7 @@ function apply_bridge(
     }
   };
 
+  console.debug(`[kate:sandbox] Applied ${bridge.type} bridge in ${context.cart.id}`);
   switch (bridge.type) {
     case "network-proxy": {
       append_proxy(bridges["standard-network.js"]);
@@ -242,6 +244,7 @@ async function inline_all_scripts(dom: Document, context: RuntimeEnv) {
     const src = script.getAttribute("src");
     if (src != null && src.trim() !== "") {
       const real_path = Pathname.from_string(src).normalise().make_absolute().as_string();
+      console.debug(`[kate:sandbox] Inlining script ${real_path} in ${context.cart.id}`);
       const contents = await get_text_file(real_path, context);
       script.removeAttribute("src");
       script.removeAttribute("type");
@@ -254,6 +257,7 @@ async function inline_all_links(dom: Document, context: RuntimeEnv) {
   for (const link of Array.from(dom.querySelectorAll("link"))) {
     const href = link.getAttribute("href") ?? "";
     const path = Pathname.from_string(href).normalise().make_absolute();
+    console.debug(`[kate:sandbox] Inlining link ${path.as_string()} in ${context.cart.id}`);
     if (link.rel === "stylesheet") {
       await inline_css(link, path, dom, context);
     } else {
@@ -295,6 +299,9 @@ async function transform_css_imports(base: Pathname, source: string, context: Ru
       imports.map(async (url_string) => {
         const url_path = Pathname.from_string(JSON.parse(url_string));
         const path = base.join(url_path);
+        console.debug(
+          `[kate:sandbox] Inlining CSS import ${path.as_string()} in ${context.cart.id}`
+        );
         const style0 = await get_text_file(path.as_string(), context);
         const style = await transform_css(path.dirname(), style0, context);
         return [url_string, style] as const;
@@ -321,6 +328,7 @@ async function transform_css_urls(base: Pathname, source: string, context: Runti
       imports.map(async (url_string) => {
         const url_path = Pathname.from_string(JSON.parse(url_string));
         const path = base.join(url_path).as_string();
+        console.debug(`[kate:sandbox] Inlining CSS resource ${path} in ${context.cart.id}`);
         const data_url = await get_data_url(path, context);
         return [url_string, data_url] as const;
       })

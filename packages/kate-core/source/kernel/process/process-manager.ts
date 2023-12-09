@@ -10,6 +10,8 @@ import type { VirtualConsole } from "../virtual";
 import { RuntimeEnvConfig, spawn } from "./runtimes";
 import { ButtonChangeEvent, ButtonPressedEvent } from "../input";
 
+const trace_messages = new URL(document.URL).searchParams.get("trace") === "true";
+
 export enum ProcessState {
   NEEDS_PAIRING,
   WAITING_PAIRING,
@@ -136,6 +138,9 @@ export class Process {
     if (this._port == null) {
       throw new Error(`[kate:process] send() called before process ${this.id} was paired`);
     } else {
+      if (trace_messages) {
+        console.debug(`[kate:process:ipc] ${this.id} => frame:`, message);
+      }
       this._port.postMessage(message, transfer);
     }
   }
@@ -153,6 +158,7 @@ export class Process {
     this._paused = true;
     this.send({ type: "kate:paused", state: true });
     this.on_system_event.emit({ type: "paused", process: this, state: true });
+    console.debug(`[kate:process] Paused ${this.id}`);
   }
 
   unpause() {
@@ -163,6 +169,7 @@ export class Process {
     this._paused = false;
     this.send({ type: "kate:paused", state: false });
     this.on_system_event.emit({ type: "paused", process: this, state: false });
+    console.debug(`[kate:process] Unpaused ${this.id}`);
   }
 
   // == Killing
@@ -176,6 +183,7 @@ export class Process {
     this.frame.remove();
     this._port?.close();
     this.on_system_event.emit({ type: "killed", process: this });
+    console.debug(`[kate:process] Killed process ${this.id}`);
   }
 
   // == Callbacks
@@ -194,7 +202,7 @@ export class ProcessManager {
 
   // == Spawning
   async spawn(env: RuntimeEnvConfig) {
-    const process = await spawn(env);
+    const process = await spawn(env, trace_messages);
     this.register(process);
     return process;
   }
@@ -207,6 +215,7 @@ export class ProcessManager {
 
     this.processes.set(process.id, process);
     process.on_system_event.listen(this.propagate_process_event);
+    console.debug(`[kate:process] Registered process ${process.id}`);
   }
 
   unregister(id: ProcessId) {
@@ -217,6 +226,7 @@ export class ProcessManager {
 
     this.processes.delete(id);
     existing.on_system_event.remove(this.propagate_process_event);
+    console.debug(`[kate:process] De-registered process ${id}`);
   }
 
   // == Callbacks

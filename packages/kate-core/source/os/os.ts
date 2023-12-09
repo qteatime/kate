@@ -38,6 +38,8 @@ import { ButtonChangeEvent } from "../kernel";
 
 export type CartChangeReason = "installed" | "removed" | "archived" | "save-data-changed";
 
+const trace_messages = new URL(document.URL).searchParams.get("trace") === "true";
+
 export class KateOS {
   private _scene_stack: Scene[] = [];
   private _active_hud: Scene[] = [];
@@ -62,6 +64,7 @@ export class KateOS {
   readonly capability_supervisor: KateCapabilitySupervisor;
   readonly audit_supervisor: KateAuditSupervisor;
   readonly fairness_supervisor: KateFairnessSupervisor;
+  readonly TRACE_ENABLED = trace_messages;
 
   readonly events = {
     on_cart_inserted: new EventStream<Cart.CartMeta>(),
@@ -120,6 +123,7 @@ export class KateOS {
   }
 
   push_scene(scene: Scene) {
+    console.debug(`[kate:os] Entering ${scene.application_id}`);
     if (this._current_scene != null) {
       this._scene_stack.push(this._current_scene);
     }
@@ -133,6 +137,7 @@ export class KateOS {
   }
 
   pop_scene(scene0: Scene) {
+    console.debug(`[kate:os] Leaving ${scene0.application_id}`);
     const popped_scene =
       this._current_scene === scene0
         ? this._current_scene
@@ -204,10 +209,14 @@ export class KateOS {
 
   static async boot(kernel: KateKernel, x: { database?: string; set_case_mode?: boolean } = {}) {
     // Setup OS
+    console.debug(`[kate:os] Starting OS boot sequence`);
     const sfx = await KateSfx.make(kernel);
+    console.debug(`[kate:os] Opening the Kate database`);
     const { db, old_version } = await KateDb.kate.open(x.database);
+    console.debug(`[kate:os] Loading player settings`);
     const settings = await KateSettings.load(db);
     const os = new KateOS(kernel, db, sfx, settings);
+    console.debug(`[kate:os] Initialising and configuring OS services`);
     kernel.console.button_input.virtual_source.on_button_changed.listen(
       os.handle_virtual_button_feedback
     );
@@ -220,19 +229,23 @@ export class KateOS {
       kernel.console.case.reconfigure(settings.get("ui").case_type);
     }
 
+    console.debug(`[kate:os] Booting...`);
     const min_boot_time = wait(1000);
     const boot_screen = new SceneBoot(os, true);
 
     // Perform boot operations (migrations, etc)
+    console.debug(`[kate:os] Ensuring we have persistent storage`);
     await request_persistent_storage(os);
     os.push_scene(boot_screen);
 
+    console.debug(`[kate:os] Running database migrations...`);
     await KateDb.kate.run_data_migration(old_version, db, (migration, current, total) => {
       boot_screen.set_message(
         `Updating database (${current} of ${total}): ${migration.description}`
       );
     });
 
+    console.debug(`[kate:os] Launching audit supervisor`);
     await os.audit_supervisor.start();
 
     boot_screen.set_message("");
@@ -241,6 +254,7 @@ export class KateOS {
     boot_screen.close();
 
     // Show start screen
+    console.debug(`[kate:os] Boot done. Launching home screen`);
     os.push_scene(new SceneHome(os));
     return os;
   }

@@ -35,14 +35,10 @@ export class KateObjectStore {
   }
 
   async delete_cartridge_data(cart_id: string, version_id: string) {
-    await Db.ObjectStorage.transaction(
-      this.os.db,
-      "readwrite",
-      async (store) => {
-        await store.delete_partitions_and_quota(cart_id);
-        await store.initialise_partitions(cart_id, version_id);
-      }
-    );
+    await Db.ObjectStorage.transaction(this.os.db, "readwrite", async (store) => {
+      await store.delete_partitions_and_quota(cart_id);
+      await store.initialise_partitions(cart_id, version_id);
+    });
     this.os.events.on_cart_changed.emit({
       id: cart_id,
       reason: "save-data-changed",
@@ -50,20 +46,16 @@ export class KateObjectStore {
   }
 
   async usage_estimates() {
-    return this.os.db.transaction(
-      [Db.cartridge_quota],
-      "readonly",
-      async (t) => {
-        const quota = t.get_index1(Db.idx_os_quota_by_cartridge);
-        const result = new Map<string, Db.CartridgeQuota[]>();
-        for (const entry of await quota.get_all()) {
-          const versions = result.get(entry.cartridge_id) ?? [];
-          versions.push(entry);
-          result.set(entry.cartridge_id, versions);
-        }
-        return result;
+    return this.os.db.transaction([Db.cartridge_quota], "readonly", async (t) => {
+      const quota = t.get_index1(Db.idx_os_quota_by_cartridge);
+      const result = new Map<string, Db.CartridgeQuota[]>();
+      for (const entry of await quota.get_all()) {
+        const versions = result.get(entry.cartridge_id) ?? [];
+        versions.push(entry);
+        result.set(entry.cartridge_id, versions);
       }
-    );
+      return result;
+    });
   }
 }
 
@@ -78,10 +70,7 @@ export class CartridgeObjectStore {
     return this.store.os.db;
   }
 
-  private transaction<A>(
-    mode: IDBTransactionMode,
-    fn: (txn: Db.ObjectStorage) => Promise<A>
-  ) {
+  private transaction<A>(mode: IDBTransactionMode, fn: (txn: Db.ObjectStorage) => Promise<A>) {
     return Db.ObjectStorage.transaction(this.db, mode, fn);
   }
 
@@ -100,11 +89,7 @@ export class CartridgeObjectStore {
 
   async ensure_bucket(name: string) {
     const bucket = await this.transaction("readwrite", async (storage) => {
-      const bucket = await storage.partitions.try_get([
-        this.cartridge_id,
-        this.version,
-        name,
-      ]);
+      const bucket = await storage.partitions.try_get([this.cartridge_id, this.version, name]);
       if (bucket == null) {
         return storage.add_bucket(this.cartridge_id, this.version, name);
       } else {
@@ -116,11 +101,7 @@ export class CartridgeObjectStore {
 
   async get_bucket(name: string) {
     const bucket = await this.transaction("readonly", async (storage) => {
-      return await storage.partitions.get([
-        this.cartridge_id,
-        this.version,
-        name,
-      ]);
+      return await storage.partitions.get([this.cartridge_id, this.version, name]);
     });
     return new CartridgeBucket(this, bucket);
   }
@@ -137,29 +118,20 @@ export class CartridgeObjectStore {
 
   async list_buckets(count?: number) {
     const buckets = await this.transaction("readonly", async (storage) => {
-      return await storage.partitions_by_version.get_all(
-        [this.cartridge_id, this.version],
-        count
-      );
+      return await storage.partitions_by_version.get_all([this.cartridge_id, this.version], count);
     });
     return buckets.map((x) => new CartridgeBucket(this, x));
   }
 }
 
 export class CartridgeBucket {
-  constructor(
-    readonly parent: CartridgeObjectStore,
-    readonly bucket: Db.OSPartition
-  ) {}
+  constructor(readonly parent: CartridgeObjectStore, readonly bucket: Db.OSPartition) {}
 
   private get db() {
     return this.parent.store.os.db;
   }
 
-  private transaction<A>(
-    mode: IDBTransactionMode,
-    fn: (txn: Db.ObjectStorage) => Promise<A>
-  ) {
+  private transaction<A>(mode: IDBTransactionMode, fn: (txn: Db.ObjectStorage) => Promise<A>) {
     return Db.ObjectStorage.transaction(this.db, mode, fn);
   }
 
@@ -175,10 +147,7 @@ export class CartridgeBucket {
 
   async list_metadata(count?: number) {
     return await this.transaction("readonly", async (storage) => {
-      return storage.entries_by_bucket.get_all(
-        this.bucket.unique_bucket_id,
-        count
-      );
+      return storage.entries_by_bucket.get_all(this.bucket.unique_bucket_id, count);
     });
   }
 
@@ -190,10 +159,7 @@ export class CartridgeBucket {
 
   async read(key: string) {
     return await this.transaction("readonly", async (storage) => {
-      const metadata = await storage.entries.get([
-        this.bucket.unique_bucket_id,
-        key,
-      ]);
+      const metadata = await storage.entries.get([this.bucket.unique_bucket_id, key]);
       const data = await storage.data.get([this.bucket.unique_bucket_id, key]);
       return { ...metadata, data: data.data };
     });
@@ -201,31 +167,19 @@ export class CartridgeBucket {
 
   async try_read(key: string) {
     return await this.transaction("readonly", async (storage) => {
-      const metadata = await storage.entries.try_get([
-        this.bucket.unique_bucket_id,
-        key,
-      ]);
+      const metadata = await storage.entries.try_get([this.bucket.unique_bucket_id, key]);
       if (metadata == null) {
         return null;
       } else {
-        const data = await storage.data.get([
-          this.bucket.unique_bucket_id,
-          key,
-        ]);
+        const data = await storage.data.get([this.bucket.unique_bucket_id, key]);
         return { ...metadata, data: data.data };
       }
     });
   }
 
-  async create(
-    key: string,
-    entry: { type: string; metadata: unknown; data: unknown }
-  ) {
+  async create(key: string, entry: { type: string; metadata: unknown; data: unknown }) {
     const size =
-      estimate(entry.data) +
-      estimate(entry.metadata) +
-      estimate(entry.type) +
-      estimate(key);
+      estimate(entry.data) + estimate(entry.metadata) + estimate(entry.type) + estimate(key);
     await this.transaction("readwrite", async (storage) => {
       await storage.add_entry(
         this.parent.cartridge_id,
@@ -242,15 +196,9 @@ export class CartridgeBucket {
     });
   }
 
-  async write(
-    key: string,
-    entry: { type: string; metadata: unknown; data: unknown }
-  ) {
+  async write(key: string, entry: { type: string; metadata: unknown; data: unknown }) {
     const size =
-      estimate(entry.data) +
-      estimate(entry.metadata) +
-      estimate(entry.type) +
-      estimate(key);
+      estimate(entry.data) + estimate(entry.metadata) + estimate(entry.type) + estimate(key);
     await this.transaction("readwrite", async (storage) => {
       await storage.write_entry(
         this.parent.cartridge_id,

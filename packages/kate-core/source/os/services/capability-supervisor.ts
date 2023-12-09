@@ -5,22 +5,15 @@
  */
 
 import { AnyCapability, Capability } from "../../capabilities";
-import {
-  CapabilityStore,
-  CapabilityType,
-  GrantConfiguration,
-} from "../../data/capability";
+import { CapabilityStore, CapabilityType, GrantConfiguration } from "../../data/capability";
 import type { KateOS } from "../os";
 
 export class KateCapabilitySupervisor {
   constructor(readonly os: KateOS) {}
 
   async all_grants(cart_id: string) {
-    return await CapabilityStore.transaction(
-      this.os.db,
-      "capability",
-      "readonly",
-      async (store) => store.read_all_grants(cart_id)
+    return await CapabilityStore.transaction(this.os.db, "capability", "readonly", async (store) =>
+      store.read_all_grants(cart_id)
     );
   }
 

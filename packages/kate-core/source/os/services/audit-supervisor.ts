@@ -29,17 +29,11 @@ export class KateAuditSupervisor {
 
   private async gc() {
     try {
+      console.debug(`[kate:audit] Garbage-collecting old audit entries...`);
       const config = this.os.settings.get("audit");
-      const removed = await AuditStore.transaction(
-        this.os.db,
-        "readwrite",
-        async (store) => {
-          return await store.garbage_collect_logs(
-            config.log_retention_days,
-            this.PRESSURE_MARK
-          );
-        }
-      );
+      const removed = await AuditStore.transaction(this.os.db, "readwrite", async (store) => {
+        return await store.garbage_collect_logs(config.log_retention_days, this.PRESSURE_MARK);
+      });
       if (removed > 0) {
         await this.log("kate:audit", {
           resources: ["kate:audit"],

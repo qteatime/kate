@@ -8,12 +8,7 @@ import * as Cart from "../../cart";
 import * as Capability from "../../capabilities";
 import type { KateOS } from "../os";
 import * as Db from "../../data";
-import {
-  from_bytes,
-  gb,
-  make_thumbnail_from_bytes,
-  serialise_error,
-} from "../../utils";
+import { from_bytes, gb, make_thumbnail_from_bytes, serialise_error } from "../../utils";
 
 export class CartManager {
   readonly CARTRIDGE_SIZE_LIMIT = gb(1.4);
@@ -25,81 +20,49 @@ export class CartManager {
   constructor(readonly os: KateOS) {}
 
   async list_all() {
-    return await Db.CartStore.transaction(
-      this.os.db,
-      "meta",
-      "readonly",
-      async (store) => {
-        return store.list();
-      }
-    );
+    return await Db.CartStore.transaction(this.os.db, "meta", "readonly", async (store) => {
+      return store.list();
+    });
   }
 
   async list_by_status(status?: Db.CartridgeStatus): Promise<Db.CartMeta[]> {
-    return await Db.CartStore.transaction(
-      this.os.db,
-      "meta",
-      "readonly",
-      async (store) => {
-        return store.list_by_status(status);
-      }
-    );
+    return await Db.CartStore.transaction(this.os.db, "meta", "readonly", async (store) => {
+      return store.list_by_status(status);
+    });
   }
 
   // -- Retrieval
   async read_files_by_cart(id: string) {
-    return await Db.CartStore.transaction(
-      this.os.db,
-      "all",
-      "readonly",
-      async (store) => {
-        const cart_meta = await store.meta.get(id);
-        const cart_files = await Promise.all(
-          cart_meta.files.map(
-            (x) => [x.path, store.files.get([id, x.id])] as const
-          )
-        );
-        return new Map(cart_files);
-      }
-    );
+    return await Db.CartStore.transaction(this.os.db, "all", "readonly", async (store) => {
+      const cart_meta = await store.meta.get(id);
+      const cart_files = await Promise.all(
+        cart_meta.files.map((x) => [x.path, store.files.get([id, x.id])] as const)
+      );
+      return new Map(cart_files);
+    });
   }
 
   async read_file_by_path(cart_id: string, path: string) {
-    return await Db.CartStore.transaction(
-      this.os.db,
-      "all",
-      "readonly",
-      async (store) => {
-        const cart = await store.meta.get(cart_id);
-        const file_id = cart.files.find((x) => x.path === path)?.id;
-        if (file_id == null) {
-          throw new Error(`File not found: ${path}`);
-        }
-        return store.files.get([cart_id, file_id]);
+    return await Db.CartStore.transaction(this.os.db, "all", "readonly", async (store) => {
+      const cart = await store.meta.get(cart_id);
+      const file_id = cart.files.find((x) => x.path === path)?.id;
+      if (file_id == null) {
+        throw new Error(`File not found: ${path}`);
       }
-    );
+      return store.files.get([cart_id, file_id]);
+    });
   }
 
   async read_file_by_id(id: string, file_id: string) {
-    return await Db.CartStore.transaction(
-      this.os.db,
-      "files",
-      "readonly",
-      async (store) => {
-        return store.files.get([id, file_id]);
-      }
-    );
+    return await Db.CartStore.transaction(this.os.db, "files", "readonly", async (store) => {
+      return store.files.get([id, file_id]);
+    });
   }
 
   async try_read_metadata(id: string) {
-    return await Db.CartStore.transaction(
-      this.os.db,
-      "meta",
-      "readonly",
-      async (store) => {
-        return store.meta.try_get(id);
-      }
-    );
+    return await Db.CartStore.transaction(this.os.db, "meta", "readonly", async (store) => {
+      return store.meta.try_get(id);
+    });
   }
 
   async read_metadata(id: string) {
@@ -123,15 +86,12 @@ export class CartManager {
       return;
     }
 
-    const estimated_unpacked_size =
-      file.size + this.os.object_store.default_quota.maximum_size * 2;
+    const estimated_unpacked_size = file.size + this.os.object_store.default_quota.maximum_size * 2;
     if (!(await this.os.storage_manager.can_fit(estimated_unpacked_size))) {
       this.os.notifications.push_transient(
         "kate:cart-manager",
         "Installation failed",
-        `${file.name} (${from_bytes(
-          estimated_unpacked_size
-        )}) exceeds the storage capacity.`
+        `${file.name} (${from_bytes(estimated_unpacked_size)}) exceeds the storage capacity.`
       );
       return;
     }
@@ -164,9 +124,7 @@ export class CartManager {
 
   async install(cart: Cart.Cart) {
     if (this.os.kernel.console.options.mode === "single") {
-      throw new Error(
-        `Cartridge installation is not available in single mode.`
-      );
+      throw new Error(`Cartridge installation is not available in single mode.`);
     }
 
     const old_meta = await this.try_read_metadata(cart.id);
@@ -176,10 +134,7 @@ export class CartManager {
       const old_title = old_meta.metadata.presentation.title;
       const old_version = old_meta.version;
       if (old_meta.status === "active") {
-        if (
-          old_version === version &&
-          !this.os.settings.get("developer").allow_version_overwrite
-        ) {
+        if (old_version === version && !this.os.settings.get("developer").allow_version_overwrite) {
           await this.os.notifications.push_transient(
             "kate:cart-manager",
             `Cartridge not installed`,
@@ -272,14 +227,9 @@ export class CartManager {
     if (this.os.processes.is_running(cart_id)) {
       throw new Error(`archive() called while cartridge is running.`);
     }
-    await Db.CartStore.transaction(
-      this.os.db,
-      "all",
-      "readwrite",
-      async (store) => {
-        await store.archive(cart_id);
-      }
-    );
+    await Db.CartStore.transaction(this.os.db, "all", "readwrite", async (store) => {
+      await store.archive(cart_id);
+    });
     this.os.events.on_cart_archived.emit(cart_id);
     this.os.events.on_cart_changed.emit({ id: cart_id, reason: "archived" });
   }
@@ -291,11 +241,7 @@ export class CartManager {
 
     const meta = await this.read_metadata(cart_id);
     await this.os.db.transaction(
-      [
-        ...Db.CartStore.tables,
-        ...Db.ObjectStorage.tables,
-        ...Db.PlayHabitsStore.tables,
-      ],
+      [...Db.CartStore.tables, ...Db.ObjectStorage.tables, ...Db.PlayHabitsStore.tables],
       "readwrite",
       async (txn) => {
         await new Db.CartStore(txn).remove(cart_id);
@@ -339,12 +285,7 @@ export class CartManager {
   }
 }
 
-function maybe_make_file_url(
-  path: string | null,
-  cart: Cart.Cart,
-  width: number,
-  height: number
-) {
+function maybe_make_file_url(path: string | null, cart: Cart.Cart, width: number, height: number) {
   if (path == null) {
     return null;
   } else {

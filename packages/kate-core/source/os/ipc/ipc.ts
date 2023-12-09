@@ -28,7 +28,6 @@ export class KateIPCServer {
   private _handlers = new WeakMap<Process, (_: SystemEvent) => void>();
   private _capture_tokens = new WeakMap<Process, Set<string>>();
   private _messages: Map<string, Handler<any, any>>;
-  private TRACE_MESSAGES = false;
 
   constructor(readonly os: KateOS) {
     this._messages = new Map();
@@ -59,12 +58,14 @@ export class KateIPCServer {
     };
     this._handlers.set(process, handler);
     process.on_system_event.listen(handler);
+    console.debug(`[kate:ipc] Registered handlers for ${process.id}`);
   }
 
   remove_process(process: Process) {
     const handler = this._handlers.get(process);
     if (handler != null) {
       process.on_system_event.remove(handler);
+      console.debug(`[kate:ipc] De-registered handlers for ${process.id}`);
     }
   }
 
@@ -79,7 +80,7 @@ export class KateIPCServer {
   }
 
   handle_message = async (process: Process, ev: SystemEvent) => {
-    if (this.TRACE_MESSAGES) {
+    if (this.os.TRACE_ENABLED) {
       console.debug(`[kate:ipc] <=== ${process.id}`, ev);
     }
 
@@ -102,7 +103,7 @@ export class KateIPCServer {
 
         try {
           const result = await this.process_message(process, payload);
-          if (this.TRACE_MESSAGES) {
+          if (this.os.TRACE_ENABLED) {
             console.debug(`[kate:ipc] ===> ${process.id}`, {
               id: payload.id,
               ok: true,

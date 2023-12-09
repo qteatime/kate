@@ -6,15 +6,7 @@
 
 import { KateOS } from "../os";
 import * as Db from "../../data";
-import {
-  make_id,
-  unreachable,
-  load_image,
-  make_thumbnail,
-  mb,
-  from_bytes,
-  kb,
-} from "../../utils";
+import { make_id, unreachable, load_image, make_thumbnail, mb, from_bytes, kb } from "../../utils";
 
 declare global {
   function showSaveFilePicker(options?: {
@@ -45,29 +37,25 @@ export class KateCapture {
   ) {
     const file_id = make_id();
     const { thumbnail, length } = await this.make_thumbnail(data, mime, kind);
-    await this.os.db.transaction(
-      [Db.media_store, Db.media_files],
-      "readwrite",
-      async (t) => {
-        const media = t.get_table1(Db.media_store);
-        const files = t.get_table1(Db.media_files);
+    await this.os.db.transaction([Db.media_store, Db.media_files], "readwrite", async (t) => {
+      const media = t.get_table1(Db.media_store);
+      const files = t.get_table1(Db.media_files);
 
-        await files.add({
-          id: file_id,
-          mime: mime,
-          data: data,
-        });
-        await media.add({
-          id: file_id,
-          cart_id: game_id,
-          kind: kind,
-          time: new Date(),
-          thumbnail_dataurl: thumbnail,
-          video_length: length,
-          size: data.length,
-        });
-      }
-    );
+      await files.add({
+        id: file_id,
+        mime: mime,
+        data: data,
+      });
+      await media.add({
+        id: file_id,
+        cart_id: game_id,
+        kind: kind,
+        time: new Date(),
+        thumbnail_dataurl: thumbnail,
+        video_length: length,
+        size: data.length,
+      });
+    });
     return file_id;
   }
 
@@ -134,89 +122,61 @@ export class KateCapture {
   }
 
   async list() {
-    const files = await this.os.db.transaction(
-      [Db.media_store],
-      "readonly",
-      async (t) => {
-        const media = t.get_table1(Db.media_store);
-        return media.get_all();
-      }
-    );
+    const files = await this.os.db.transaction([Db.media_store], "readonly", async (t) => {
+      const media = t.get_table1(Db.media_store);
+      return media.get_all();
+    });
     return files;
   }
 
   async list_by_game(id: string) {
-    const files = await this.os.db.transaction(
-      [Db.media_store],
-      "readonly",
-      async (t) => {
-        const media = t.get_index1(Db.idx_media_store_by_cart);
-        return media.get_all(id);
-      }
-    );
+    const files = await this.os.db.transaction([Db.media_store], "readonly", async (t) => {
+      const media = t.get_index1(Db.idx_media_store_by_cart);
+      return media.get_all(id);
+    });
     return files;
   }
 
   async read_metadata(id: string) {
-    return await this.os.db.transaction(
-      [Db.media_store],
-      "readonly",
-      async (t) => {
-        const media = t.get_table1(Db.media_store);
-        return media.get(id);
-      }
-    );
+    return await this.os.db.transaction([Db.media_store], "readonly", async (t) => {
+      const media = t.get_table1(Db.media_store);
+      return media.get(id);
+    });
   }
 
   async read_file(id: string) {
-    return await this.os.db.transaction(
-      [Db.media_files],
-      "readonly",
-      async (t) => {
-        const media = t.get_table1(Db.media_files);
-        return media.get(id);
-      }
-    );
+    return await this.os.db.transaction([Db.media_files], "readonly", async (t) => {
+      const media = t.get_table1(Db.media_files);
+      return media.get(id);
+    });
   }
 
   async delete(file_id: string) {
-    await this.os.db.transaction(
-      [Db.media_store, Db.media_files],
-      "readwrite",
-      async (t) => {
-        const media = t.get_table1(Db.media_store);
-        const files = t.get_table1(Db.media_files);
+    await this.os.db.transaction([Db.media_store, Db.media_files], "readwrite", async (t) => {
+      const media = t.get_table1(Db.media_store);
+      const files = t.get_table1(Db.media_files);
 
-        await media.delete(file_id);
-        await files.delete(file_id);
-      }
-    );
+      await media.delete(file_id);
+      await files.delete(file_id);
+    });
   }
 
   async usage_estimates() {
-    return await this.os.db.transaction(
-      [Db.media_store],
-      "readonly",
-      async (t) => {
-        const store = t.get_index1(Db.idx_media_store_by_cart);
-        const result = new Map<string, { size: number; count: number }>();
-        for (const entry of await store.get_all()) {
-          const previous = result.get(entry.cart_id) ?? { size: 0, count: 0 };
-          result.set(entry.cart_id, {
-            size: previous.size + entry.size,
-            count: previous.count + 1,
-          });
-        }
-        return result;
+    return await this.os.db.transaction([Db.media_store], "readonly", async (t) => {
+      const store = t.get_index1(Db.idx_media_store_by_cart);
+      const result = new Map<string, { size: number; count: number }>();
+      for (const entry of await store.get_all()) {
+        const previous = result.get(entry.cart_id) ?? { size: 0, count: 0 };
+        result.set(entry.cart_id, {
+          size: previous.size + entry.size,
+          count: previous.count + 1,
+        });
       }
-    );
+      return result;
+    });
   }
 
-  private async make_thumbnail(
-    data: Uint8Array,
-    type: string,
-    kind: "image" | "video"
-  ) {
+  private async make_thumbnail(data: Uint8Array, type: string, kind: "image" | "video") {
     const blob = new Blob([data], { type: type });
     const url = URL.createObjectURL(blob);
     try {
@@ -224,11 +184,7 @@ export class KateCapture {
         case "image": {
           const img = await load_image(url);
           return {
-            thumbnail: make_thumbnail(
-              this.THUMBNAIL_WIDTH,
-              this.THUMBNAIL_HEIGHT,
-              img
-            ),
+            thumbnail: make_thumbnail(this.THUMBNAIL_WIDTH, this.THUMBNAIL_HEIGHT, img),
             length: null,
           };
         }

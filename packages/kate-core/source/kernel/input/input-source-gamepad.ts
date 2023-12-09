@@ -58,6 +58,8 @@ export class KateGamepadInputSource implements KateButtonInputSource {
       this.disconnect(ev.gamepad);
       this.schedule_update();
     });
+
+    console.debug(`[kate:gamepad] Initialised gamepad adaptor`);
   }
 
   private connect(gamepad: Gamepad) {

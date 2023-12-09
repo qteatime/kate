@@ -23,12 +23,7 @@ export type OSPartition = {
   /* An universally unique id for the bucket in the storage */
   unique_bucket_id: string;
 };
-export const os_partition = kate.table3<
-  OSPartition,
-  "cartridge_id",
-  "version_id",
-  "bucket_name"
->({
+export const os_partition = kate.table3<OSPartition, "cartridge_id", "version_id", "bucket_name">({
   since: 9,
   name: "object_store_partition",
   path: ["cartridge_id", "version_id", "bucket_name"],
@@ -112,11 +107,7 @@ export type CartridgeQuota = {
   /* Current number of buckets in storage */
   current_buckets_in_storage: number;
 };
-export const cartridge_quota = kate.table2<
-  CartridgeQuota,
-  "cartridge_id",
-  "version_id"
->({
+export const cartridge_quota = kate.table2<CartridgeQuota, "cartridge_id", "version_id">({
   since: 9,
   name: "cartridge_quota",
   path: ["cartridge_id", "version_id"],
@@ -194,11 +185,7 @@ export class ObjectStorage {
     return this.transaction.get_index1(idx_os_quota_by_cartridge);
   }
 
-  async add_bucket(
-    cartridge_id: CartridgeId,
-    version: VersionId,
-    name: string
-  ) {
+  async add_bucket(cartridge_id: CartridgeId, version: VersionId, name: string) {
     const id = make_id();
     const bucket = {
       cartridge_id: cartridge_id,
@@ -223,22 +210,11 @@ export class ObjectStorage {
     return bucket;
   }
 
-  async remove_bucket(
-    cartridge_id: CartridgeId,
-    version_id: VersionId,
-    name: string
-  ) {
+  async remove_bucket(cartridge_id: CartridgeId, version_id: VersionId, name: string) {
     const bucket = await this.partitions.get([cartridge_id, version_id, name]);
-    const entries = await this.entries_by_bucket.get_all(
-      bucket.unique_bucket_id
-    );
+    const entries = await this.entries_by_bucket.get_all(bucket.unique_bucket_id);
     for (const entry of entries) {
-      await this.delete_entry(
-        cartridge_id,
-        version_id,
-        bucket.bucket_name,
-        entry.key
-      );
+      await this.delete_entry(cartridge_id, version_id, bucket.bucket_name, entry.key);
     }
     await this.partitions.delete([cartridge_id, version_id, name]);
     const quota = await this.quota.get([cartridge_id, version_id]);
@@ -389,10 +365,7 @@ export class ObjectStorage {
       });
     }
 
-    const unversioned_quota = await this.quota.try_get([
-      cartridge_id,
-      "<unversioned>",
-    ]);
+    const unversioned_quota = await this.quota.try_get([cartridge_id, "<unversioned>"]);
     if (unversioned_quota == null) {
       this.partitions.add({
         cartridge_id,
@@ -417,17 +390,11 @@ export class ObjectStorage {
   async delete_partitions_and_quota(cart_id: string) {
     const partitions = await this.partitions_by_cartridge.get_all(cart_id);
     for (const partition of partitions) {
-      for (const entry of await this.entries_by_bucket.get_all(
-        partition.unique_bucket_id
-      )) {
+      for (const entry of await this.entries_by_bucket.get_all(partition.unique_bucket_id)) {
         await this.entries.delete([partition.unique_bucket_id, entry.key]);
         await this.data.delete([partition.unique_bucket_id, entry.key]);
       }
-      await this.partitions.delete([
-        cart_id,
-        partition.version_id,
-        partition.bucket_name,
-      ]);
+      await this.partitions.delete([cart_id, partition.version_id, partition.bucket_name]);
     }
 
     for (const quota of await this.quota_by_cartridge.get_all(cart_id)) {

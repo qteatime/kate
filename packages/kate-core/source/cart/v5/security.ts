@@ -5,23 +5,16 @@
  */
 
 import { unreachable } from "../../utils";
-import {
-  ContextualCapability,
-  ContextualCapabilityGrant,
-  Security,
-} from "../cart-type";
+import { ContextualCapability, ContextualCapabilityGrant, Security } from "../cart-type";
 import { Cart_v5 } from "./v5";
 
 export function parse_security(metadata: Cart_v5.Metadata): Security {
   return {
-    contextual_capabilities:
-      metadata.security.capabilities.map(parse_capability),
+    contextual_capabilities: metadata.security.capabilities.map(parse_capability),
   };
 }
 
-function parse_capability(
-  capability: Cart_v5.Capability.Contextual
-): ContextualCapabilityGrant {
+function parse_capability(capability: Cart_v5.Capability.Contextual): ContextualCapabilityGrant {
   return {
     reason: capability.reason,
     capability: parse_contextual_capability(capability.capability),

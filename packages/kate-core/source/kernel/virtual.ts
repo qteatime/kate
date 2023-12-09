@@ -95,5 +95,6 @@ export class VirtualConsole {
     if (this.version_container != null && this.version != null) {
       this.version_container.textContent = this.version;
     }
+    console.debug(`[kate:virtual] Initialised virtual console`);
   }
 }

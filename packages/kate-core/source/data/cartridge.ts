@@ -133,11 +133,7 @@ export class CartStore {
     return nodes;
   }
 
-  async insert(
-    cart: Cart.Cart,
-    thumbnail_url: string | null,
-    banner_url: string | null
-  ) {
+  async insert(cart: Cart.Cart, thumbnail_url: string | null, banner_url: string | null) {
     const now = new Date();
     const files = await this.install_files(cart);
     const old_meta = await this.meta.try_get(cart.id);

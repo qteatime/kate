@@ -12,9 +12,7 @@ export type RiskCategory = "none" | "low" | "medium" | "high" | "critical";
 
 export function risk_from_cartridge(cart: CartMeta): RiskCategory {
   const capabilities = grants_from_cartridge(cart);
-  return capabilities
-    .map((x) => x.risk_category())
-    .reduce(combine_risk, "none");
+  return capabilities.map((x) => x.risk_category()).reduce(combine_risk, "none");
 }
 
 export function risk_from_grants(grants: AnyCapability[]) {

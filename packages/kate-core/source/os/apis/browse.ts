@@ -15,28 +15,19 @@ export class KateBrowser {
 
   async open(requestee: string, url: URL) {
     if (!this.SUPPORTED_PROTOCOLS.includes(url.protocol)) {
-      console.error(
-        `Blocked ${requestee} from opening URL with unsupported protocol ${url}`
-      );
+      console.error(`Blocked ${requestee} from opening URL with unsupported protocol ${url}`);
       return;
     }
     if (url.username !== "" || url.password !== "") {
-      console.error(
-        `Blocked ${requestee} from opening URL with authentication details ${url}`
-      );
+      console.error(`Blocked ${requestee} from opening URL with authentication details ${url}`);
       return;
     }
 
     const ok = await this.os.dialog.confirm("kate:browser", {
       title: "Navigate outside of Kate?",
       message: UI.stack([
-        UI.paragraph([
-          UI.strong([UI.mono_text([requestee])]),
-          " wants to open:",
-        ]),
-        UI.h("div", { class: "kate-ui-highlight-url", title: url.toString() }, [
-          shorten(url),
-        ]),
+        UI.paragraph([UI.strong([UI.mono_text([requestee])]), " wants to open:"]),
+        UI.h("div", { class: "kate-ui-highlight-url", title: url.toString() }, [shorten(url)]),
       ]),
       dangerous: true,
       cancel: "Cancel",
@@ -106,8 +97,7 @@ function shorten(url: URL) {
     case "https:": {
       const domain = shorten_mid(url.hostname, MAX_DOMAIN);
       const port = url.port ? UI.mono_text([`:${url.port}`]) : null;
-      const protocol =
-        url.protocol === "http:" ? UI.mono_text(["http://"]) : "";
+      const protocol = url.protocol === "http:" ? UI.mono_text(["http://"]) : "";
       return UI.flow([
         protocol,
         domain,
