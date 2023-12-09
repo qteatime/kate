@@ -1,0 +1,34 @@
+/*
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Resource-Policy: same-origin
+  Cross-Origin-Embedder-Policy: require-corp
+  X-Content-Type-Options: nosniff
+
+/
+  X-Frame-Options: DENY
+  Permissions-Policy: document-domain=(), camera=(), display-capture=(), geolocation=(), local-fonts=(), microphone=(), midi=(), payment=(), serial=(), usb=()
+  Referrer-Policy: no-referrer
+
+/index.html
+  X-Frame-Options: DENY
+
+/*.js
+  Content-Type: application/javascript
+
+/*.json
+  Content-Type: application/json
+
+/*.css
+  Content-Type: text/css
+
+/*.png
+  Content-Type: image/png
+
+/*.wav
+  Content-Type: audio/wav
+
+/*.svg
+  Content-Type: image/svg
+
+/*.ttf
+  Content-Type: font/ttf
