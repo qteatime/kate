@@ -686,19 +686,19 @@ w.task("release:cartridges", ["example:all", "ecosystem:all"], () => {
   FS.writeFileSync("dist/cartridges/SHASUM256.txt", hashes.join("\n") + "\n");
 });
 
-w.task(
-  "release:preview",
-  ["www:release", "release:cartridges", "tools:make-npm-package", "release:linux:all"],
-  () => {
-    const version = require("./package.json").version;
-    if (!/^\d+\.\d+\.\d+(\-[\w\d]+)?$/.test(version)) {
-      throw new Error(`invalid kate version: ${version}`);
-    }
-    copy_tree("www", "dist/www");
-    exec(`zip -r ../kate-www-v${version}.zip *`, { cwd: "dist/www" });
-    exec(`zip -r ../standard-cartridges-v${version}.zip *`, { cwd: "dist/cartridges" });
+w.task("release:preview", ["www:release", "release:cartridges", "tools:make-npm-package"], () => {
+  const version = require("./package.json").version;
+  if (!/^\d+\.\d+\.\d+(\-[\w\d]+)?$/.test(version)) {
+    throw new Error(`invalid kate version: ${version}`);
   }
-);
+  copy_tree("www", "dist/www");
+  const index0 = FS.readFileSync("www/index.html", "utf-8");
+  const index1 = index0.replace(/<title>Kate<\/title>/, "<title>Kate (Nightly)</title>");
+  const index2 = index1.replace(/manifest\.json/, "nightly-manifest.json");
+  FS.writeFileSync("dist/www/index.html", index2);
+  exec(`zip -r ../kate-www-v${version}.zip *`, { cwd: "dist/www" });
+  exec(`zip -r ../standard-cartridges-v${version}.zip *`, { cwd: "dist/cartridges" });
+});
 
 // -- Testing
 w.task("test:setup-playwright", [], () => {
