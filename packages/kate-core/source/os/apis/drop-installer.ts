@@ -45,25 +45,33 @@ export class HUD_DropInstaller extends Scene {
 
   setup() {
     this.manager.os.show_hud(this);
-    const screen = this.manager.os.kernel.console.body;
-    screen.addEventListener("dragenter", (ev) => {
+    const body = this.manager.os.kernel.console.body;
+    let contexts = 0;
+    body.addEventListener("dragenter", (ev) => {
+      contexts += 1;
+      console.log("drag enter", ev.target, contexts);
       this.canvas.classList.add("active");
-      screen.classList.add("drag");
+      body.classList.add("drag");
     });
-    screen.addEventListener("dragleave", (ev) => {
-      this.canvas.classList.remove("active");
-      screen.classList.remove("drag");
+    body.addEventListener("dragleave", (ev) => {
+      contexts -= 1;
+      console.log("drag leave", ev.target, contexts);
+      if (contexts <= 0) {
+        this.canvas.classList.remove("active");
+        body.classList.remove("drag");
+      }
     });
-    screen.addEventListener("dragover", (ev) => {
+    body.addEventListener("dragover", (ev) => {
       ev.preventDefault();
       ev.dataTransfer!.dropEffect = "copy";
     });
-    screen.addEventListener("drop", (ev) => {
+    body.addEventListener("drop", (ev) => {
       ev.preventDefault();
       this.canvas.classList.remove("active");
-      screen.classList.remove("drag");
+      body.classList.remove("drag");
       this.manager.install([...(ev.dataTransfer!.files as any)]);
     });
+    console.debug(`[kate:drop-installer] Initialised drop-installer service`);
   }
 
   render() {
