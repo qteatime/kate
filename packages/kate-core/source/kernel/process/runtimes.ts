@@ -49,9 +49,11 @@ function make_sandboxed_iframe() {
   const frame = document.createElement("iframe");
   frame.className = "kate-game-frame kate-game-frame-defaults";
   (frame as any).sandbox = "allow-scripts";
-  frame.allow = "autoplay *; gamepad (); storage-access ()";
+  frame.allow =
+    "autoplay *; ch-save-data 'none'; ch-ua 'none'; ch-ua-mobile 'none'; ch-ua-platform 'none';" +
+    "gamepad 'none'; picture-in-picture 'none'; storage-access 'none'; sync-xhr 'none'; unload 'none'";
   (frame as any).csp =
-    "default-src data: blob: 'unsafe-inline' 'unsafe-eval' 'unsafe-inline' 'wasm-unsafe-eval'; navigate-to 'none'";
+    "default-src data: blob: 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'; navigate-to 'none'";
   frame.scrolling = "no";
   return frame;
 }
