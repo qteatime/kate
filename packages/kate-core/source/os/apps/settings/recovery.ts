@@ -32,6 +32,15 @@ export class SceneRecovery extends UI.SimpleScene {
           }),
         ]
       ),
+
+      UI.when(this.os.app_resources.has_update != null, [
+        UI.button_panel(this.os, {
+          title: `Force-update to v${this.os.app_resources.has_update}`,
+          description: "Force-update Kate to the version above. The application will reload.",
+          on_click: this.force_update,
+          dangerous: false,
+        }),
+      ]),
       UI.vdivider(),
 
       UI.button_panel(this.os, {
@@ -76,6 +85,19 @@ export class SceneRecovery extends UI.SimpleScene {
       title: "",
       message: "All settings reverted to defaults.",
     });
+  };
+
+  force_update = async () => {
+    const updated = await this.os.app_resources.force_update();
+    if (!updated) {
+      await this.os.dialog.message("kate:recovery", {
+        title: "Failed to update",
+        message: "Could not update the application",
+      });
+      return;
+    } else {
+      location.reload();
+    }
   };
 
   refresh_cache = async () => {

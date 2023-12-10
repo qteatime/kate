@@ -256,6 +256,10 @@ export class KateOS {
     // Show start screen
     console.debug(`[kate:os] Boot done. Launching home screen`);
     os.push_scene(new SceneHome(os));
+
+    // Check for updates
+    await os.app_resources.listen_for_updates();
+
     return os;
   }
 }

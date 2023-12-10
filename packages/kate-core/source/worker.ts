@@ -71,6 +71,15 @@ async function handle(data: any | null) {
       return null;
     }
 
+    case "version": {
+      return version;
+    }
+
+    case "force-update": {
+      (self as any).skipWaiting();
+      return null;
+    }
+
     default:
       throw new Error(`[kate:worker] Unknown message ${data?.type}`);
   }
