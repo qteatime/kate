@@ -4,9 +4,11 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
+import * as FS from "fs";
 import * as Path from "path";
 import { parseArgs } from "util";
-import { app, BrowserWindow, ipcMain } from "electron";
+import * as NodeUrl from "url";
+import { app, BrowserWindow, ipcMain, session, protocol, net } from "electron";
 import * as SystemInformation from "./system-information";
 
 const args = parseArgs({
@@ -37,11 +39,85 @@ const createWindow = (fullscreen: boolean) => {
     },
   });
 
-  win.loadFile(Path.join(__dirname, "www/index.html"));
+  win.loadURL("kate://app/index.html");
   return win;
 };
 
+protocol.registerSchemesAsPrivileged([
+  {
+    scheme: "kate",
+    privileges: {
+      standard: true,
+      secure: true,
+      allowServiceWorkers: true,
+      supportFetchAPI: true,
+      stream: true,
+    },
+  },
+]);
+
+function mime(x: string) {
+  switch (Path.extname(x)) {
+    case ".js":
+      return "application/javascript";
+    case ".json":
+      return "application/json";
+    case ".css":
+      return "text/css";
+    case ".png":
+      return "image/png";
+    case ".wav":
+      return "audio/wav";
+    case ".svg":
+      return "image/svg";
+    case ".ttf":
+      return "font/ttf";
+    case ".html":
+      return "text/html";
+    default:
+      return "application/octet-stream";
+  }
+}
+
 app.whenReady().then(() => {
+  const root = Path.resolve(__dirname, "www");
+  session.defaultSession.protocol.handle("kate", async (request) => {
+    const url = new URL(request.url);
+    switch (url.host) {
+      case "app": {
+        const pathname = url.pathname.replace(/^\//, "");
+        const path = Path.resolve(root, pathname);
+        const real_file = FS.realpathSync(path);
+        if (!real_file.startsWith(root)) {
+          return new Response(null, { status: 403 });
+        }
+
+        const file = NodeUrl.pathToFileURL(real_file);
+        const response = await net.fetch(file.toString());
+        return new Response(response.body, {
+          headers: {
+            "Content-Type": mime(pathname),
+            "Cross-Origin-Opener-Policy": "same-origin",
+            "Cross-Origin-Resource-Policy": "same-origin",
+            "Cross-Origin-Embedder-Policy": "require-corp",
+            "Content-Security-Policy":
+              "default-src blob: data: 'self' 'unsafe-eval' 'unsafe-inline', object-src 'none', navigate-to 'self'",
+            "Permissions-Policy":
+              "document-domain=(), camera=(), display-capture=(), geolocation=(), local-fonts=(), microphone=(), midi=(), payment=(), serial=(), usb=()",
+            "X-Content-Type-Options": "nosniff",
+            "X-Frame-Options": "DENY",
+            "Referrer-Policy": "no-referrer",
+          },
+          status: response.status,
+          statusText: response.statusText,
+        });
+      }
+
+      default:
+        return new Response(null, { status: 403 });
+    }
+  });
+
   const win = createWindow(is_fullscreen);
 
   ipcMain.handle("kate:get-system-info", async (_ev) => {
