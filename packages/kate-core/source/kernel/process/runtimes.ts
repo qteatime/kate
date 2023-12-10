@@ -41,7 +41,7 @@ async function spawn_web(env: RuntimeEnvConfig, trace: boolean) {
   const decoder = new TextDecoder();
   const index_html = decoder.decode(index_file.data);
   const index = await sandbox_html(index_html, { ...env, secret, trace });
-  frame.src = URL.createObjectURL(new Blob([index], { type: "text/html" }));
+  frame.srcdoc = index;
   return process;
 }
 
