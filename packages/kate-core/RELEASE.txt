@@ -17,3 +17,34 @@ them on the document/window. This is necessary because every engine out
 there decides to listen to events in a different place, so Ren'Py
 listens to window events, Bitsy to document events, and Godot to canvas
 events.
+
+
+!!SECURITY!!
+More stable process handling
+----------------------------
+
+The previous code for handling sandboxed processes in Kate was still in
+its proof-of-concept stage. This release includes a rewrite of the process
+handling to make it more stable and prepare for a future multi-process Kate.
+
+Along with the changes, sandboxed processes are no longer using a Blob URL,
+and rather pass the HTML directly into the frame. This removes one avenue
+of privilege escalation where attackers could trick users to cooperate in
+opening the blob URL outside of the frame, and then having their code execute
+with the same privileges as Kate.
+
+Note that this change does not yet address the issues with speculative
+side-channel attacks (Spectre, etc.), as Browsers do not offer any
+guarantee that a frame will be rendered in a separate process. The issue
+is however mitigated in Kate as sandboxed processes do not have network
+or navigation access.
+
+
+Minor fixes and improvements
+----------------------------
+
+* The drop-installer indicator now shows up more reliably when dragging
+  files over the console;
+
+* Plugins are now fully disabled in sandboxed processes, which makes it harder
+  for cartridges to escape their sandboxes;
