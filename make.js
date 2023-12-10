@@ -445,7 +445,11 @@ w.task("www:bundle", ["licences:generate", "core:build", "glomp:build"], () => {
     out: `www/loader.js`,
     name: "Kate_webloader",
   });
-  copy("packages/kate-core/build/worker.js", "www/worker.js");
+  const version = require("./package.json").version;
+  const worker0 = FS.readFileSync("packages/kate-core/build/worker.js", "utf-8");
+  const worker = worker0.replace(/{{VERSION}}/, version);
+  FS.writeFileSync("www/worker.js", worker);
+  console.log("-> Wrote versioned www/worker.js");
   copy("packages/kate-core/RELEASE.txt", `www/kate/RELEASE-latest.txt`);
 });
 
