@@ -690,6 +690,16 @@ w.task("release:cartridges", ["example:all", "ecosystem:all"], () => {
   FS.writeFileSync("dist/cartridges/SHASUM256.txt", hashes.join("\n") + "\n");
 });
 
+w.task("release:www", ["www:release", "release:cartridges", "tools:make-npm-package"], () => {
+  const version = require("./package.json").version;
+  if (!/^\d+\.\d+\.\d+(\-[\w\d]+)?$/.test(version)) {
+    throw new Error(`invalid kate version: ${version}`);
+  }
+  copy_tree("www", "dist/www");
+  exec(`zip -r ../kate-www-v${version}.zip *`, { cwd: "dist/www" });
+  exec(`zip -r ../standard-cartridges-v${version}.zip *`, { cwd: "dist/cartridges" });
+});
+
 w.task("release:preview", ["www:release", "release:cartridges", "tools:make-npm-package"], () => {
   const version = require("./package.json").version;
   if (!/^\d+\.\d+\.\d+(\-[\w\d]+)?$/.test(version)) {
