@@ -50,10 +50,11 @@ function make_sandboxed_iframe() {
   frame.className = "kate-game-frame kate-game-frame-defaults";
   (frame as any).sandbox = "allow-scripts";
   frame.allow =
-    "autoplay *; ch-save-data 'none'; ch-ua 'none'; ch-ua-mobile 'none'; ch-ua-platform 'none';" +
+    "autoplay *; ch-save-data 'none'; ch-ua 'none'; ch-ua-mobile 'none'; ch-ua-platform 'none'; " +
     "gamepad 'none'; picture-in-picture 'none'; storage-access 'none'; sync-xhr 'none'; unload 'none'";
   (frame as any).csp =
-    "default-src data: blob: 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'; navigate-to 'none'";
+    "default-src data: blob: 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'; navigate-to 'none'; " +
+    "object-src 'none'";
   frame.scrolling = "no";
   return frame;
 }
