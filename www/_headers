@@ -2,15 +2,11 @@
   Cross-Origin-Opener-Policy: same-origin
   Cross-Origin-Resource-Policy: same-origin
   Cross-Origin-Embedder-Policy: require-corp
-  X-Content-Type-Options: nosniff
-
-/
-  X-Frame-Options: DENY
+  Content-Security-Policy: default-src blob: data: 'self' 'unsafe-eval' 'unsafe-inline', object-src 'none', navigate-to 'self'
   Permissions-Policy: document-domain=(), camera=(), display-capture=(), geolocation=(), local-fonts=(), microphone=(), midi=(), payment=(), serial=(), usb=()
-  Referrer-Policy: no-referrer
-
-/index.html
+  X-Content-Type-Options: nosniff
   X-Frame-Options: DENY
+  Referrer-Policy: no-referrer
 
 /*.js
   Content-Type: application/javascript
