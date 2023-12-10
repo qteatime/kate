@@ -8,12 +8,14 @@ interface ExtendableEvent extends Event {
   waitUntil(promise: Promise<any>): void;
 }
 
-const cache_name = `kate-cache-{{VERSION}}`;
+const version = "{{VERSION}}";
+const cache_name = `kate-cache-${version}`;
 
 async function remove_old_caches() {
   for (const key of await caches.keys()) {
     if (key !== cache_name) {
       await caches.delete(key);
+      console.debug(`[kate:worker] Removed cache ${key}`);
     }
   }
 }
@@ -22,12 +24,14 @@ async function update_cache() {
   const app_files: string[] = ["/"].concat(await (await fetch("/cache-manifest.json")).json());
   try {
     const cache = await caches.open(cache_name);
-    const existing = new Set((await cache.keys()).map((x) => new URL(x.url).pathname));
-    const to_add = app_files.filter((x) => !existing.has(x));
-    await cache.addAll(to_add);
-    console.log("[Kate] Updated cache");
+    for (const entry of app_files) {
+      await cache.add(new Request(entry, { cache: "reload" }));
+    }
+    console.debug(`[kate:worker] Updated cache to ${version}`);
+    return true;
   } catch (e) {
-    console.error("[Kate] cache unavailable", e);
+    console.error("[kate:worker] cache unavailable", e);
+    return false;
   }
 }
 
@@ -49,7 +53,7 @@ self.addEventListener("message", async (ev) => {
       value: answer,
     });
   } catch (e) {
-    console.error("Failed to process message", ev, "Reason: ", e);
+    console.error("[kate:worker] Failed to process message", ev, "Reason: ", e);
     reply_channel?.postMessage({
       type: "reply",
       id: ev.data?.id,
@@ -68,11 +72,12 @@ async function handle(data: any | null) {
     }
 
     default:
-      throw new Error(`Unknown message ${data?.type}`);
+      throw new Error(`[kate:worker] Unknown message ${data?.type}`);
   }
 }
 
 self.addEventListener("install", (ev0: any) => {
+  console.debug(`[kate:worker] Installing worker ${version}`);
   const ev = ev0 as ExtendableEvent;
   ev.waitUntil(update_cache());
 });
@@ -87,6 +92,7 @@ self.addEventListener("fetch", (ev0: any) => {
 });
 
 self.addEventListener("activate", (ev0: any) => {
+  console.debug(`[kate:worker] Activating worker ${version}`);
   const ev = ev0 as ExtendableEvent;
   ev.waitUntil(remove_old_caches());
 });
