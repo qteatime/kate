@@ -1,7 +1,7 @@
 #A0003 — Device file access
 ===========================
 
-:Author: Q\.
+:Author: Niini
 :Started: 2023-08-12
 :Last updated: 2023-08-12
 :Status: PoC in progress

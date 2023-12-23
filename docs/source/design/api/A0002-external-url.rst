@@ -1,7 +1,7 @@
 #A0002 — External URL navigation
 ================================
 
-:Author: Q\.
+:Author: Niini
 :Started: 2023-06-25
 :Last updated: 2023-07-23
 :Status: PoC in progress

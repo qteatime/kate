@@ -1,7 +1,7 @@
 #K0003 — Resource band
 ======================
 
-:Author: Q\.
+:Author: Niini
 :Started: 2023-10-31
 :Last updated: 2023-10-31
 :Status: Proof of concept

@@ -1,7 +1,7 @@
 #A0001 — Object Store API
 =========================
 
-:Author: Q\.
+:Author: Niini
 :Started: 2023-04-18
 :Last updated: 2023-06-11
 :Status: M1 Shipped

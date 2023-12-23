@@ -1,7 +1,7 @@
 #K0004 — Processes
 ==================
 
-:Author: Q\.
+:Author: Niini
 :Started: 2023-12-08
 :Last updated: 2023-12-08
 :Status: Design in progress

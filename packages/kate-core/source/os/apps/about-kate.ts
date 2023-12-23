@@ -53,7 +53,7 @@ export class SceneAboutKate extends SimpleScene {
       h("div", { class: "kate-os-about-box" }, [
         h("div", { class: "kate-os-about-content" }, [
           h("h2", {}, ["Kate", UI.hspace(10), this.os.kernel.console.version]),
-          h("div", { class: "kt-meta" }, ["Copyright (c) 2023 Q."]),
+          h("div", { class: "kt-meta" }, ["Copyright (c) 2023 Niini"]),
           UI.vspace(32),
           UI.vbox(0.5, [
             UI.text_button(this.os, "Licensing information", {

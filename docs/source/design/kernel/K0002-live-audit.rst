@@ -1,7 +1,7 @@
 #K0002 — Live auditing
 ======================
 
-:Author: Q\.
+:Author: Niini
 :Started: 2023-08-11
 :Last updated: 2023-08-11
 :Status: Design in progress

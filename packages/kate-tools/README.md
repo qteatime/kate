@@ -18,4 +18,4 @@ See `kart help` and `kate-dist help`.
 
 ## Licence
 
-Copyright (c) Q., licensed under MIT.
+Copyright (c) Niini, licensed under MIT.

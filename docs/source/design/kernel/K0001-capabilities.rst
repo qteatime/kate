@@ -1,7 +1,7 @@
 #K0001 — Capabilities
 =====================
 
-:Author: Q\.
+:Author: Niini
 :Started: 2023-07-24
 :Last updated: 2023-07-24
 :Status: Design in progress
