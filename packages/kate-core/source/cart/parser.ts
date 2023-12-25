@@ -13,7 +13,7 @@ const parsers = [
   { detect: v5.detect, parse: v5.parse_v5 },
 ];
 
-export async function try_parse(data: Blob | File) {
+export async function try_parse(data: Blob) {
   for (const parser of parsers) {
     if (await parser.detect(data)) {
       return await parser.parse(data);
@@ -23,7 +23,7 @@ export async function try_parse(data: Blob | File) {
   return null;
 }
 
-export async function parse(data: Blob | File) {
+export async function parse(data: Blob) {
   const cart = await try_parse(data);
   if (cart == null) {
     throw new Error(`No suitable parsers found`);

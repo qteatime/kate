@@ -32,14 +32,14 @@ function date(x: Cart_v4.Date): Date {
   return new Date(x.year, x.month - 1, x.day, 0, 0, 0, 0);
 }
 
-export async function detect(x: Blob | File): Promise<boolean> {
+export async function detect(x: Blob): Promise<boolean> {
   const buffer = await x.slice(0, 10).arrayBuffer();
   const view = new DataView(buffer);
   const magic_header = view.getUint32(0, false);
   return magic_header === MAGIC;
 }
 
-export async function parse_v4(x: Blob | File): Promise<DataCart | null> {
+export async function parse_v4(x: Blob): Promise<DataCart | null> {
   const buffer = await x.arrayBuffer();
   const view = new DataView(buffer);
   const magic_header = view.getUint32(0, false);
