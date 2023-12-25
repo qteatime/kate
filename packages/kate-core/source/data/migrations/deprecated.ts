@@ -114,3 +114,17 @@ export const idx_cartridge_quota_by_cartridge = cartridge_quota.index1({
   multi_entry: false,
   unique: false,
 });
+
+// == v16 ======================================================================
+export type MediaFile = {
+  id: string;
+  mime: string;
+  data: Uint8Array;
+};
+export const media_files = kate.table1<MediaFile, "id">({
+  since: 4,
+  deprecated_since: 16,
+  name: "media_files",
+  path: "id",
+  auto_increment: false,
+});

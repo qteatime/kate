@@ -37,9 +37,8 @@ export class SceneViewMedia extends Scene {
 
   async on_attached(): Promise<void> {
     this.os.focus_handler.listen(this.canvas, this.handle_key_pressed);
-    const file = await this.os.capture.read_file(this.media.id);
-    const blob = new Blob([file.data], { type: file.mime });
-    this.url = URL.createObjectURL(blob);
+    const { handle } = await this.os.capture.read_file(this.media.id);
+    this.url = URL.createObjectURL(handle);
     this.render_media(this.url);
   }
 

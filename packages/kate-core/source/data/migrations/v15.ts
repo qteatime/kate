@@ -39,7 +39,7 @@ kate.data_migration({
         continue;
       }
       console.debug(`[kate:db] Migrating files for ${cartridge.id} ${cartridge.version}`);
-      const bucket = await partition.create();
+      const bucket = await partition.create(null);
       try {
         const nodes = new Map<string, Node>();
         for (const file of cartridge.files) {
