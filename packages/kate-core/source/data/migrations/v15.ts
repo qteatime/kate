@@ -4,9 +4,10 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { cart_meta_v3, cart_meta_v2, cart_files } from "../cartridge";
+import { cart_meta_v3, CartridgeStatus } from "../cartridge";
 import { kate } from "../db";
 import { KateFileStore, PersistentKey } from "../../os/apis/file-store";
+import { cart_files_v2, cart_meta_v2 } from "./deprecated";
 
 type CartId = string;
 type Path = string;
@@ -16,6 +17,9 @@ type Files = {
   nodes: Map<Path, Node>;
 };
 
+// -- Deprecated
+
+// -- Migrations
 kate.data_migration({
   id: "v15/files",
   description: "Migrating cartridge files to new format",
@@ -39,8 +43,8 @@ kate.data_migration({
       const bucket = await partition.create();
       const nodes = new Map<string, Node>();
       for (const file of cartridge.files) {
-        const data = await db.transaction([cart_files], "readonly", async (txn) => {
-          return txn.get_table2(cart_files).get([cartridge.id, file.id]);
+        const data = await db.transaction([cart_files_v2], "readonly", async (txn) => {
+          return txn.get_table2(cart_files_v2).get([cartridge.id, file.id]);
         });
         const integrity = new Uint8Array(await crypto.subtle.digest("SHA-256", data.data));
         const handle = await bucket.put(data.data);
@@ -57,10 +61,10 @@ kate.data_migration({
     }
 
     // -- Then migrate table records and erase the existing ones
-    await db.transaction([cart_meta_v2, cart_meta_v3, cart_files], "readwrite", async (txn) => {
+    await db.transaction([cart_meta_v2, cart_meta_v3, cart_files_v2], "readwrite", async (txn) => {
       const cv2 = txn.get_table1(cart_meta_v2);
       const cv3 = txn.get_table1(cart_meta_v3);
-      const files = txn.get_table2(cart_files);
+      const files = txn.get_table2(cart_files_v2);
 
       for (const cartridge of await cv2.get_all()) {
         if (cartridge.status === "active") {

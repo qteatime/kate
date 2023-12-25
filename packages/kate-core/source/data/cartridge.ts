@@ -6,42 +6,11 @@
 
 import * as Cart from "../cart";
 import type { Database, Transaction } from "../db-schema";
-import type { PersistentKey } from "../os";
+import type { KateOS, PersistentKey } from "../os";
 import { make_id, unreachable } from "../utils";
 import { kate } from "./db";
 
 export type CartridgeStatus = "active" | "inactive" | "archived";
-
-export type CartMeta_v2 = {
-  id: string;
-  version: string;
-  release_date: Date;
-  format_version: "v4";
-  thumbnail_dataurl: string | null;
-  banner_dataurl: string | null;
-  metadata: Cart.Metadata;
-  runtime: Cart.Runtime;
-  security: Cart.Security;
-  files: { path: string; id: string; size: number }[];
-  installed_at: Date;
-  updated_at: Date;
-  status: CartridgeStatus;
-};
-export const cart_meta_v2 = kate.table1<CartMeta_v2, "id">({
-  since: 3,
-  deprecated_since: 15,
-  name: "cart_meta_v2",
-  path: "id",
-  auto_increment: false,
-});
-export const idx_cart_by_status_v2 = cart_meta_v2.index1({
-  since: 13,
-  deprecated_since: 15,
-  name: "by_status_v2",
-  path: "status",
-  multi_entry: false,
-  unique: false,
-});
 
 export type CartMeta_v3 = {
   id: string;
@@ -74,21 +43,7 @@ export const idx_cart_by_status = cart_meta_v3.index1({
   unique: false,
 });
 
-export type CartFile = {
-  id: string;
-  file_id: string;
-  mime: string;
-  data: Uint8Array;
-};
-export const cart_files = kate.table2<CartFile, "id", "file_id">({
-  since: 3,
-  deprecated_since: 15,
-  name: "cart_files_v2",
-  path: ["id", "file_id"],
-  auto_increment: false,
-});
-
-type TransactionKind = "meta" | "files" | "all";
+type TransactionKind = "meta";
 
 export class CartStore {
   constructor(readonly transaction: Transaction) {}
@@ -104,16 +59,12 @@ export class CartStore {
     });
   }
 
-  static tables = [cart_meta_v3, cart_files];
+  static tables = [cart_meta_v3];
 
   static tables_by_kind(kind: TransactionKind) {
     switch (kind) {
       case "meta":
         return [cart_meta_v3];
-      case "files":
-        return [cart_files];
-      case "all":
-        return CartStore.tables;
       default:
         throw unreachable(kind, "transaction kind");
     }
@@ -127,22 +78,11 @@ export class CartStore {
     return this.transaction.get_index1(idx_cart_by_status);
   }
 
-  get files() {
-    return this.transaction.get_table2(cart_files);
-  }
-
-  private async remove_files(cart_id: string) {
-    const meta = await this.meta.get(cart_id);
-    for (const file of meta.files) {
-      await this.files.delete([cart_id, file.id]);
-    }
-    return meta;
-  }
-
   async archive(cart_id: string) {
-    const meta = await this.remove_files(cart_id);
+    const meta = await this.meta.get(cart_id);
     await this.meta.put({
       ...meta,
+      bucket_key: null,
       files: [],
       updated_at: new Date(),
       status: "archived",
@@ -172,7 +112,6 @@ export class CartStore {
   }
 
   async remove(cart_id: string) {
-    await this.remove_files(cart_id);
     await this.meta.delete(cart_id);
   }
 

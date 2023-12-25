@@ -46,6 +46,11 @@ export class KateFileStore {
     );
   }
 
+  async from_key(key: PersistentKey) {
+    const partition = await this.get_partition(key.partition);
+    return await partition.get(key.bucket);
+  }
+
   private initialise_references(partition: PartitionId) {
     const refs = this._references.get(partition) ?? new Map();
     this._references.set(partition, refs);

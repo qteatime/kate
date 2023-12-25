@@ -41,43 +41,59 @@ export class CartManager {
   }
 
   // -- Retrieval
-  async read_files_by_cart(id: string) {
-    return await Db.CartStore.transaction(this.os.db, "all", "readonly", async (store) => {
-      const cart_meta = await store.meta.get(id);
-      const cart_files = await Promise.all(
-        cart_meta.files.map((x) => [x.path, store.files.get([id, x.id])] as const)
-      );
-      return new Map(cart_files);
-    });
+  private async get_bucket_and_meta(cart_id: string) {
+    const meta = await this.read_metadata(cart_id);
+    if (meta.bucket_key == null) {
+      throw new Error(`[kate:cart-manager] Cannot read files in an archived cartridge`);
+    }
+    const bucket = await this.os.file_store.from_key(meta.bucket_key);
+    return { bucket, meta };
   }
 
-  async read_file_by_path(cart_id: string, path: string) {
-    return await Db.CartStore.transaction(this.os.db, "all", "readonly", async (store) => {
-      const cart = await store.meta.get(cart_id);
-      const file_id = cart.files.find((x) => x.path === path)?.id;
-      if (file_id == null) {
-        throw new Error(`File not found: ${path}`);
-      }
-      return store.files.get([cart_id, file_id]);
-    });
+  async read_files_by_cart(cart_id: string) {
+    const { bucket, meta } = await this.get_bucket_and_meta(cart_id);
+    const nodes = await Promise.all(
+      meta.files.map(async (x) => [x.path, await bucket.file(x.id).read()] as const)
+    );
+    return new Map(nodes);
   }
 
-  async read_file_by_id(id: string, file_id: string) {
-    return await Db.CartStore.transaction(this.os.db, "files", "readonly", async (store) => {
-      return store.files.get([id, file_id]);
-    });
+  async read_file_by_path(cart_id: string, path: string): Promise<Cart.DataFile> {
+    const { bucket, meta } = await this.get_bucket_and_meta(cart_id);
+    const node = meta.files.find((x) => x.path === path);
+    if (node == null) {
+      throw new Error(`[kate:cart-manager] File not found ${cart_id} :: ${path}`);
+    }
+    const handle = await bucket.file(node.id).read();
+    return {
+      ...node,
+      data: new Uint8Array(await handle.arrayBuffer()),
+    };
   }
 
-  async try_read_metadata(id: string) {
+  async read_file_by_id(cart_id: string, file_id: string): Promise<Cart.DataFile> {
+    const { bucket, meta } = await this.get_bucket_and_meta(cart_id);
+    const node = meta.files.find((x) => x.id === file_id);
+    if (node == null) {
+      throw new Error(`[kate:cart-manager] File not found ${cart_id} :: ${file_id}`);
+    }
+    const handle = await bucket.file(node.id).read();
+    return {
+      ...node,
+      data: new Uint8Array(await handle.arrayBuffer()),
+    };
+  }
+
+  async try_read_metadata(cart_id: string) {
     return await Db.CartStore.transaction(this.os.db, "meta", "readonly", async (store) => {
-      return store.meta.try_get(id);
+      return store.meta.try_get(cart_id);
     });
   }
 
-  async read_metadata(id: string) {
-    const metadata = await this.try_read_metadata(id);
+  async read_metadata(cart_id: string) {
+    const metadata = await this.try_read_metadata(cart_id);
     if (metadata == null) {
-      throw new Error(`Cartridge not found: ${id}`);
+      throw new Error(`Cartridge not found: ${cart_id}`);
     }
     return metadata;
   }
@@ -260,9 +276,14 @@ export class CartManager {
     if (this.os.processes.is_running(cart_id)) {
       throw new Error(`archive() called while cartridge is running.`);
     }
-    await Db.CartStore.transaction(this.os.db, "all", "readwrite", async (store) => {
+    const { bucket_key } = await this.read_metadata(cart_id);
+    await Db.CartStore.transaction(this.os.db, "meta", "readwrite", async (store) => {
       await store.archive(cart_id);
     });
+    if (bucket_key != null) {
+      const partition = await this.os.file_store.get_partition(bucket_key.partition);
+      await partition.release_persistent(bucket_key);
+    }
     this.os.events.on_cart_archived.emit(cart_id);
     this.os.events.on_cart_changed.emit({ id: cart_id, reason: "archived" });
   }
