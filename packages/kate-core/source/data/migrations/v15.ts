@@ -40,24 +40,27 @@ kate.data_migration({
       }
       console.debug(`[kate:db] Migrating files for ${cartridge.id} ${cartridge.version}`);
       const bucket = await partition.create();
-      const nodes = new Map<string, Node>();
-      for (const file of cartridge.files) {
-        const data = await db.transaction([cart_files_v2], "readonly", async (txn) => {
-          return txn.get_table2(cart_files_v2).get([cartridge.id, file.id]);
+      try {
+        const nodes = new Map<string, Node>();
+        for (const file of cartridge.files) {
+          const data = await db.transaction([cart_files_v2], "readonly", async (txn) => {
+            return txn.get_table2(cart_files_v2).get([cartridge.id, file.id]);
+          });
+          const integrity = new Uint8Array(await crypto.subtle.digest("SHA-256", data.data));
+          const handle = await bucket.put(data.data);
+          nodes.set(file.path, { mime: data.mime, integrity, id: handle.id });
+        }
+        buckets.set(cartridge.id, {
+          key: await partition.persist(bucket, {
+            type: "cartridge",
+            id: cartridge.id,
+            version: cartridge.version,
+          }),
+          nodes,
         });
-        const integrity = new Uint8Array(await crypto.subtle.digest("SHA-256", data.data));
-        const handle = await bucket.put(data.data);
-        nodes.set(file.path, { mime: data.mime, integrity, id: handle.id });
+      } finally {
+        partition.release(bucket);
       }
-      buckets.set(cartridge.id, {
-        key: await partition.persist(bucket, {
-          type: "cartridge",
-          id: cartridge.id,
-          version: cartridge.version,
-        }),
-        nodes,
-      });
-      partition.release(bucket);
     }
 
     // -- Then migrate table records and erase the existing ones

@@ -133,7 +133,7 @@ export class KateFilePartition {
     if (key.partition !== this.id) {
       throw new Error(`[kate:file-store] release_persistent() called with invalid key`);
     }
-    await lock(this.lock_name(key.bucket), async () => {
+    await this.lock(key.bucket, async () => {
       const header = await this.get_header(key.bucket);
       const keys = header.persistent_keys.filter((x) => x.id !== key.id);
       await this.write_header(key.bucket, { ...header, persistent_keys: keys });
@@ -143,7 +143,7 @@ export class KateFilePartition {
   }
 
   async persist(bucket: KateFileBucket, holder: Holder): Promise<PersistentKey> {
-    return await lock(this.lock_name(bucket.id), async () => {
+    return await this.lock(bucket.id, async () => {
       const header = await this.get_header(bucket.id);
       const id = make_id();
       const key = { partition: this.id, bucket: bucket.id, id, holder };
@@ -165,7 +165,7 @@ export class KateFilePartition {
   }
 
   private async attempt_gc(id: BucketId): Promise<boolean> {
-    return await lock(this.lock_name(id), async () => {
+    return await this.lock(id, async () => {
       if (await this.elligible_for_gc(id)) {
         console.debug(`[kate:file-store:gc] deleting ${this.id}/${id} (reason: no more refs)`);
         await this.root.removeEntry(id, { recursive: true });
@@ -201,6 +201,7 @@ export class KateFilePartition {
     this.store.os.kernel.console.resources.take("gc");
     try {
       for await (const [name, _handle] of this.root.entries()) {
+        await this.mark_persistent_refs(name as BucketId);
         const removed = await this.attempt_gc(name as BucketId);
         if (!removed) {
           console.debug(`[kate:file-store:gc] Keeping ${this.id}/${name}: still has references`);
@@ -230,6 +231,35 @@ export class KateFilePartition {
     }
 
     return set.size > 0;
+  }
+
+  private async mark_persistent_refs(id: BucketId) {
+    return await this.lock(id, async () => {
+      const header = await this.get_header(id);
+      const alive: PersistentKey[] = [];
+      for (const key of header.persistent_keys) {
+        if (await this.is_holder_alive(key.holder)) {
+          alive.push(key);
+        }
+      }
+      if (header.persistent_keys.length !== alive.length) {
+        header.persistent_keys = alive;
+        await this.write_header(id, header);
+      }
+    });
+  }
+
+  private async is_holder_alive(holder: Holder) {
+    switch (holder.type) {
+      case "cartridge": {
+        const meta = await this.store.os.cart_manager.try_read_metadata(holder.id);
+        return meta?.bucket_key != null && meta?.version === holder.version;
+      }
+    }
+  }
+
+  private lock<T>(id: BucketId, fn: () => Promise<T>) {
+    return lock(this.lock_name(id), fn);
   }
 
   private lock_name(id: BucketId) {

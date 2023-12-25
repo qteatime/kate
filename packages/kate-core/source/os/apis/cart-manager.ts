@@ -52,41 +52,48 @@ export class CartManager {
 
   async read_files_by_cart(cart_id: string) {
     const { partition, bucket, meta } = await this.get_bucket_and_meta(cart_id);
-    const nodes = await Promise.all(
-      meta.files.map(async (x) => [x.path, await bucket.file(x.id).read()] as const)
-    );
-    partition.release(bucket);
-    return new Map(nodes);
+    try {
+      const nodes = await Promise.all(
+        meta.files.map(async (x) => [x.path, await bucket.file(x.id).read()] as const)
+      );
+      return new Map(nodes);
+    } finally {
+      partition.release(bucket);
+    }
   }
 
   async read_file_by_path(cart_id: string, path: string): Promise<Cart.DataFile> {
     const { partition, bucket, meta } = await this.get_bucket_and_meta(cart_id);
-    const node = meta.files.find((x) => x.path === path);
-    if (node == null) {
-      throw new Error(`[kate:cart-manager] File not found ${cart_id} :: ${path}`);
+    try {
+      const node = meta.files.find((x) => x.path === path);
+      if (node == null) {
+        throw new Error(`[kate:cart-manager] File not found ${cart_id} :: ${path}`);
+      }
+      const handle = await bucket.file(node.id).read();
+      return {
+        ...node,
+        data: new Uint8Array(await handle.arrayBuffer()),
+      };
+    } finally {
+      partition.release(bucket);
     }
-    const handle = await bucket.file(node.id).read();
-    const result = {
-      ...node,
-      data: new Uint8Array(await handle.arrayBuffer()),
-    };
-    partition.release(bucket);
-    return result;
   }
 
   async read_file_by_id(cart_id: string, file_id: string): Promise<Cart.DataFile> {
     const { partition, bucket, meta } = await this.get_bucket_and_meta(cart_id);
-    const node = meta.files.find((x) => x.id === file_id);
-    if (node == null) {
-      throw new Error(`[kate:cart-manager] File not found ${cart_id} :: ${file_id}`);
+    try {
+      const node = meta.files.find((x) => x.id === file_id);
+      if (node == null) {
+        throw new Error(`[kate:cart-manager] File not found ${cart_id} :: ${file_id}`);
+      }
+      const handle = await bucket.file(node.id).read();
+      return {
+        ...node,
+        data: new Uint8Array(await handle.arrayBuffer()),
+      };
+    } finally {
+      partition.release(bucket);
     }
-    const handle = await bucket.file(node.id).read();
-    const result = {
-      ...node,
-      data: new Uint8Array(await handle.arrayBuffer()),
-    };
-    partition.release(bucket);
-    return result;
   }
 
   async try_read_metadata(cart_id: string) {
@@ -191,25 +198,29 @@ export class CartManager {
     const { bucket, mapping } = await cart_partition.from_stream(
       readable_stream_from_iterable(files)
     );
-    const cart_meta: Cart.BucketCart = {
-      ...cart,
-      files: {
-        location: await cart_partition.persist(bucket, {
-          type: "cartridge",
-          id: cart.id,
-          version: cart.version,
-        }),
-        nodes: cart.files.map((node) => {
-          return {
-            ...node,
-            data: null,
-            size: node.data.byteLength,
-            id: mapping.get(node.path)!,
-          };
-        }),
-      },
-    };
-    cart_partition.release(bucket);
+    let cart_meta: Cart.BucketCart;
+    try {
+      cart_meta = {
+        ...cart,
+        files: {
+          location: await cart_partition.persist(bucket, {
+            type: "cartridge",
+            id: cart.id,
+            version: cart.version,
+          }),
+          nodes: cart.files.map((node) => {
+            return {
+              ...node,
+              data: null,
+              size: node.data.byteLength,
+              id: mapping.get(node.path)!,
+            };
+          }),
+        },
+      };
+    } finally {
+      cart_partition.release(bucket);
+    }
 
     const grants = Capability.grants_from_cartridge(cart_meta);
     const thumbnail = await maybe_make_file_url(
