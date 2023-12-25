@@ -32,9 +32,16 @@ function date(x: Cart_v5.Date): Date {
   return new Date(x.year, x.month - 1, x.day, 0, 0, 0, 0);
 }
 
-export function parse_v5(x: Uint8Array): DataCart | null {
+export async function detect(x: Blob | File): Promise<boolean> {
+  const buffer = await x.slice(0, 10).arrayBuffer();
+  return check_header(new Uint8Array(buffer));
+}
+
+export async function parse_v5(file: Blob | File): Promise<DataCart | null> {
+  const buffer = await file.arrayBuffer();
+  const x = new Uint8Array(buffer);
   if (!check_header(x)) {
-    return null;
+    throw new Error(`invalid v5 header`);
   }
 
   const cart = Cart_v5.decode(x);

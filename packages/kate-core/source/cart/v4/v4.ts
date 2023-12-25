@@ -32,18 +32,26 @@ function date(x: Cart_v4.Date): Date {
   return new Date(x.year, x.month - 1, x.day, 0, 0, 0, 0);
 }
 
-export function parse_v4(x: Uint8Array): DataCart | null {
-  const view = new DataView(x.buffer);
+export async function detect(x: Blob | File): Promise<boolean> {
+  const buffer = await x.slice(0, 10).arrayBuffer();
+  const view = new DataView(buffer);
+  const magic_header = view.getUint32(0, false);
+  return magic_header === MAGIC;
+}
+
+export async function parse_v4(x: Blob | File): Promise<DataCart | null> {
+  const buffer = await x.arrayBuffer();
+  const view = new DataView(buffer);
   const magic_header = view.getUint32(0, false);
   if (magic_header !== MAGIC) {
-    return null;
+    throw new Error(`invalid v4 header`);
   }
   const version = view.getUint32(4, true);
   if (version !== 4) {
-    return null;
+    throw new Error(`invalid v4 header`);
   }
 
-  const cart = Cart_v4.decode(x);
+  const cart = Cart_v4.decode(new Uint8Array(buffer));
   const meta = Metadata.parse_metadata(cart);
   const runtime = Runtime.parse_runtime(cart);
   const security = Security.parse_security(cart);

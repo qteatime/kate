@@ -4,25 +4,27 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { DataCart, DataFile, File } from "./cart-type";
-import { parse_v4 } from "./v4/v4";
-import { parse_v5 } from "./v5/v5";
+import { DataCart, DataFile } from "./cart-type";
+import * as v4 from "./v4/v4";
+import * as v5 from "./v5/v5";
 
-const parsers = [parse_v5, parse_v4];
+const parsers = [
+  { detect: v4.detect, parse: v4.parse_v4 },
+  { detect: v5.detect, parse: v5.parse_v5 },
+];
 
-export function try_parse(data: Uint8Array) {
+export async function try_parse(data: Blob | File) {
   for (const parser of parsers) {
-    const cart = parser(data);
-    if (cart != null) {
-      return cart;
+    if (await parser.detect(data)) {
+      return await parser.parse(data);
     }
   }
 
   return null;
 }
 
-export function parse(data: Uint8Array) {
-  const cart = try_parse(data);
+export async function parse(data: Blob | File) {
+  const cart = await try_parse(data);
   if (cart == null) {
     throw new Error(`No suitable parsers found`);
   }

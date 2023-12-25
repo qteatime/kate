@@ -134,8 +134,7 @@ export class CartManager {
     }
 
     try {
-      const buffer = await file.arrayBuffer();
-      const cart = Cart.parse(new Uint8Array(buffer));
+      const cart = await Cart.parse(file);
       const errors = await Cart.verify_integrity(cart);
       if (errors.length !== 0) {
         console.error(`Corrupted cartridge ${cart.id}`, errors);
