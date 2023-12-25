@@ -33,7 +33,7 @@ function date(x: Cart_v5.Date): Date {
 }
 
 export async function detect(x: Blob): Promise<boolean> {
-  const buffer = await x.slice(0, 10).arrayBuffer();
+  const buffer = await x.slice(0, 8).arrayBuffer();
   return check_header(new Uint8Array(buffer));
 }
 

@@ -33,10 +33,11 @@ function date(x: Cart_v4.Date): Date {
 }
 
 export async function detect(x: Blob): Promise<boolean> {
-  const buffer = await x.slice(0, 10).arrayBuffer();
+  const buffer = await x.slice(0, 8).arrayBuffer();
   const view = new DataView(buffer);
   const magic_header = view.getUint32(0, false);
-  return magic_header === MAGIC;
+  const version = view.getUint32(4, true);
+  return magic_header === MAGIC && version === 4;
 }
 
 export async function parse_v4(x: Blob): Promise<DataCart | null> {

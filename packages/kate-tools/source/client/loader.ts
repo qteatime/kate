@@ -40,7 +40,8 @@ async function main() {
     });
 
     const cart_bytes = new Uint8Array(await (await fetch("game.kart")).arrayBuffer());
-    const cart = Kate.cart.parse(cart_bytes);
+    const blob = new Blob([cart_bytes]);
+    const cart = await Kate.cart.parse(blob);
     const capabilities = Kate.capabilities.grants_from_cartridge(cart);
 
     const kate_os = await Kate.os.KateOS.boot(kate, {
