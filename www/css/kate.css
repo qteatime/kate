@@ -154,6 +154,15 @@ body {
   display: block;
 }
 
+.kate-resource-gc {
+  font-family: "Font Awesome 6 Free";
+}
+
+.kate-resource-gc::before {
+  content: "\f1b8";
+  display: block;
+}
+
 .kate-resource-transient-storage {
   font-family: "Font Awesome 6 Free";
 }

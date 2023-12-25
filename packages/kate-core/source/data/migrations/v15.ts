@@ -8,6 +8,7 @@ import { cart_meta_v3, CartridgeStatus } from "../cartridge";
 import { kate } from "../db";
 import { KateFileStore, PersistentKey } from "../../os/apis/file-store";
 import { cart_files_v2, cart_meta_v2 } from "./deprecated";
+import type { KateOS } from "../../os";
 
 type CartId = string;
 type Path = string;
@@ -17,15 +18,13 @@ type Files = {
   nodes: Map<Path, Node>;
 };
 
-// -- Deprecated
-
 // -- Migrations
 kate.data_migration({
   id: "v15/files",
   description: "Migrating cartridge files to new format",
   since: 15,
-  async process(db) {
-    const store = new KateFileStore();
+  async process(db, os) {
+    const store = (os as KateOS).file_store;
     const partition = await store.get_partition("cartridge");
     const buckets = new Map<CartId, Files>();
 
@@ -58,6 +57,7 @@ kate.data_migration({
         }),
         nodes,
       });
+      partition.release(bucket);
     }
 
     // -- Then migrate table records and erase the existing ones

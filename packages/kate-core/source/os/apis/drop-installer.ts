@@ -49,13 +49,11 @@ export class HUD_DropInstaller extends Scene {
     let contexts = 0;
     body.addEventListener("dragenter", (ev) => {
       contexts += 1;
-      console.log("drag enter", ev.target, contexts);
       this.canvas.classList.add("active");
       body.classList.add("drag");
     });
     body.addEventListener("dragleave", (ev) => {
       contexts -= 1;
-      console.log("drag leave", ev.target, contexts);
       if (contexts <= 0) {
         this.canvas.classList.remove("active");
         body.classList.remove("drag");

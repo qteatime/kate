@@ -46,42 +46,47 @@ export class CartManager {
     if (meta.bucket_key == null) {
       throw new Error(`[kate:cart-manager] Cannot read files in an archived cartridge`);
     }
-    const bucket = await this.os.file_store.from_key(meta.bucket_key);
-    return { bucket, meta };
+    const { partition, bucket } = await this.os.file_store.from_key(meta.bucket_key);
+    return { partition, bucket, meta };
   }
 
   async read_files_by_cart(cart_id: string) {
-    const { bucket, meta } = await this.get_bucket_and_meta(cart_id);
+    const { partition, bucket, meta } = await this.get_bucket_and_meta(cart_id);
     const nodes = await Promise.all(
       meta.files.map(async (x) => [x.path, await bucket.file(x.id).read()] as const)
     );
+    partition.release(bucket);
     return new Map(nodes);
   }
 
   async read_file_by_path(cart_id: string, path: string): Promise<Cart.DataFile> {
-    const { bucket, meta } = await this.get_bucket_and_meta(cart_id);
+    const { partition, bucket, meta } = await this.get_bucket_and_meta(cart_id);
     const node = meta.files.find((x) => x.path === path);
     if (node == null) {
       throw new Error(`[kate:cart-manager] File not found ${cart_id} :: ${path}`);
     }
     const handle = await bucket.file(node.id).read();
-    return {
+    const result = {
       ...node,
       data: new Uint8Array(await handle.arrayBuffer()),
     };
+    partition.release(bucket);
+    return result;
   }
 
   async read_file_by_id(cart_id: string, file_id: string): Promise<Cart.DataFile> {
-    const { bucket, meta } = await this.get_bucket_and_meta(cart_id);
+    const { partition, bucket, meta } = await this.get_bucket_and_meta(cart_id);
     const node = meta.files.find((x) => x.id === file_id);
     if (node == null) {
       throw new Error(`[kate:cart-manager] File not found ${cart_id} :: ${file_id}`);
     }
     const handle = await bucket.file(node.id).read();
-    return {
+    const result = {
       ...node,
       data: new Uint8Array(await handle.arrayBuffer()),
     };
+    partition.release(bucket);
+    return result;
   }
 
   async try_read_metadata(cart_id: string) {
@@ -204,6 +209,7 @@ export class CartManager {
         }),
       },
     };
+    cart_partition.release(bucket);
 
     const grants = Capability.grants_from_cartridge(cart_meta);
     const thumbnail = await maybe_make_file_url(

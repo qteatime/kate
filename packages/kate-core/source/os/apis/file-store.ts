@@ -8,11 +8,12 @@
 // bucket-based storage with process-specified quotas and keeps track of
 // them for proper garbage-collection.
 
-import { iterate_stream, lock, make_id } from "../../utils";
+import { iterate_stream, lock, make_id, sleep } from "../../utils";
+import type { KateOS } from "../os";
 
 type PartitionId = "temporary" | "cartridge";
 type BucketId = string & { __bucket_id: true };
-type BucketRefs = Map<BucketId, Set<KateFileBucket>>;
+type BucketRefs = Map<BucketId, Set<WeakRef<KateFileBucket>>>;
 
 type Header = {
   persistent_keys: PersistentKey[];
@@ -33,7 +34,9 @@ export type PersistentKey = {
 
 export class KateFileStore {
   private _references = new Map<PartitionId, BucketRefs>();
-  constructor() {}
+  constructor(readonly os: KateOS) {}
+
+  private partition_ids: PartitionId[] = ["temporary", "cartridge"];
 
   async get_partition(partition: PartitionId) {
     const root = await navigator.storage.getDirectory();
@@ -48,7 +51,7 @@ export class KateFileStore {
 
   async from_key(key: PersistentKey) {
     const partition = await this.get_partition(key.partition);
-    return await partition.get(key.bucket);
+    return { partition, bucket: await partition.get(key.bucket) };
   }
 
   private initialise_references(partition: PartitionId) {
@@ -56,9 +59,28 @@ export class KateFileStore {
     this._references.set(partition, refs);
     return refs;
   }
+
+  async gc() {
+    console.debug(`[kate:file-store:gc] Starting regular GC...`);
+    this.os.kernel.console.resources.take("gc");
+    try {
+      for (const id of this.partition_ids) {
+        const partition = await this.get_partition(id);
+        await partition.gc();
+      }
+    } finally {
+      this.os.kernel.console.resources.release("gc");
+    }
+  }
 }
 
 export class KateFilePartition {
+  readonly _finalisers = new FinalizationRegistry<BucketId>((id) => {
+    if (!this.has_memory_refs(id)) {
+      this.attempt_gc(id);
+    }
+  });
+
   constructor(
     readonly store: KateFileStore,
     readonly id: PartitionId,
@@ -88,11 +110,17 @@ export class KateFilePartition {
     return this.record_memory_reference(new KateFileBucket(id, this, bucket));
   }
 
-  async release(bucket: KateFileBucket) {
+  release(bucket: KateFileBucket) {
     const refs = this._references.get(bucket.id);
     if (refs != null) {
-      refs.delete(bucket);
-      if (refs.size === 0) {
+      for (const ref of refs) {
+        const value = ref.deref();
+        if (value === bucket) {
+          refs.delete(ref);
+          break;
+        }
+      }
+      if (this.has_memory_refs(bucket.id)) {
         console.debug(
           `[kate:file-store:gc] scheduling ${this.id}/${bucket.id} for deletion (reason: no more memory-refs)`
         );
@@ -131,7 +159,8 @@ export class KateFilePartition {
       this._references.set(bucket.id, new Set());
     }
     const refs = this._references.get(bucket.id)!;
-    refs.add(bucket);
+    this._finalisers.register(bucket, bucket.id);
+    refs.add(new WeakRef(bucket));
     return bucket;
   }
 
@@ -163,19 +192,44 @@ export class KateFilePartition {
   }
 
   private async elligible_for_gc(id: BucketId) {
-    const memory_refs = this._references.get(id) ?? new Set();
     const persistent_refs = (await this.get_header(id)).persistent_keys;
-    return memory_refs.size === 0 && persistent_refs.length === 0;
+    return !this.has_memory_refs(id) && persistent_refs.length === 0;
   }
 
   async gc() {
     console.debug(`[kate:file-store:gc] Starting garbage collection for ${this.id}`);
-    for await (const [name, _handle] of this.root.entries()) {
-      const removed = await this.attempt_gc(name as BucketId);
-      if (!removed) {
-        console.debug(`[kate:file-store:gc] Keeping ${this.id}/${name}: still has references`);
+    this.store.os.kernel.console.resources.take("gc");
+    try {
+      for await (const [name, _handle] of this.root.entries()) {
+        const removed = await this.attempt_gc(name as BucketId);
+        if (!removed) {
+          console.debug(`[kate:file-store:gc] Keeping ${this.id}/${name}: still has references`);
+        }
+        await sleep(1000);
+      }
+    } finally {
+      this.store.os.kernel.console.resources.release("gc");
+    }
+  }
+
+  private has_memory_refs(id: BucketId) {
+    const set = this._references.get(id);
+    if (set == null) {
+      return false;
+    }
+
+    let limit = 100;
+    for (const ref of set.values()) {
+      const underlying = ref.deref();
+      if (underlying == null) {
+        set.delete(ref);
+      }
+      if (--limit <= 0) {
+        break;
       }
     }
+
+    return set.size > 0;
   }
 
   private lock_name(id: BucketId) {

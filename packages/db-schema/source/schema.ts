@@ -47,13 +47,14 @@ export class DatabaseSchema {
   async run_data_migration(
     old_version: number,
     db: Database,
+    args: unknown[],
     progress: (migration: DataMigration, current: number, total: number) => void
   ) {
     const migrations = this.data_migrations.filter((x) => x.is_needed(old_version, this.version));
     let current = 1;
     for (const migration of migrations) {
       progress(migration, current, migrations.length);
-      await migration.run(old_version, db);
+      await migration.run(old_version, db, args);
       current += 1;
     }
   }
@@ -62,7 +63,7 @@ export class DatabaseSchema {
     id: string;
     since: number;
     description: string;
-    process: (_: Database) => Promise<void>;
+    process: (_: Database, ...args: unknown[]) => Promise<void>;
   }) {
     this.data_migrations.push(new DataMigration(x.id, x.since, x.description, x.process));
   }
@@ -337,7 +338,7 @@ export class DataMigration {
     readonly id: string,
     readonly version: number,
     readonly description: string,
-    readonly process: (_: Database) => Promise<void>
+    readonly process: (_: Database, ...args: unknown[]) => Promise<void>
   ) {}
 
   private done(): string[] {
@@ -359,9 +360,9 @@ export class DataMigration {
     return old_version <= this.version && this.version <= new_version;
   }
 
-  async run(old_version: number, db: Database) {
+  async run(old_version: number, db: Database, args: unknown[]) {
     if (this.is_needed(old_version, db.version)) {
-      await this.process(db);
+      await this.process(db, ...args);
       this.mark_done();
     }
   }

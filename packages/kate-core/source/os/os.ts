@@ -110,7 +110,7 @@ export class KateOS {
     this.capability_supervisor = new KateCapabilitySupervisor(this);
     this.audit_supervisor = new KateAuditSupervisor(this);
     this.fairness_supervisor = new KateFairnessSupervisor(this);
-    this.file_store = new KateFileStore();
+    this.file_store = new KateFileStore(this);
   }
 
   get display() {
@@ -242,7 +242,7 @@ export class KateOS {
     os.push_scene(boot_screen);
 
     console.debug(`[kate:os] Running database migrations...`);
-    await KateDb.kate.run_data_migration(old_version, db, (migration, current, total) => {
+    await KateDb.kate.run_data_migration(old_version, db, [os], (migration, current, total) => {
       boot_screen.set_message(
         `Updating database (${current} of ${total}): ${migration.description}`
       );
@@ -262,6 +262,11 @@ export class KateOS {
 
     // Check for updates
     await os.app_resources.listen_for_updates();
+
+    // GC old buckets in the background
+    os.file_store.gc().catch((e) => {
+      console.error(`[kate:file-store:gc] Unhandled error in GC`, e);
+    });
 
     return os;
   }
