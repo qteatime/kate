@@ -21,7 +21,7 @@ import { KateDropInstaller } from "./apis/drop-installer";
 import { KateFocusHandler } from "./apis/focus-handler";
 import { KateStatusBar } from "./apis/status-bar";
 import { KateIPCServer } from "./ipc";
-import { KateAudioServer, KateObjectStore } from "./apis";
+import { KateAudioServer, KateFileStore, KateObjectStore } from "./apis";
 import { KateDialog } from "./apis/dialog";
 import { KateCapture } from "./apis/capture";
 import { KateSfx } from "./sfx";
@@ -60,6 +60,7 @@ export class KateOS {
   readonly app_resources: KateAppResources;
   readonly browser: KateBrowser;
   readonly device_file: KateDeviceFile;
+  readonly file_store: KateFileStore;
   // Services
   readonly capability_supervisor: KateCapabilitySupervisor;
   readonly audit_supervisor: KateAuditSupervisor;
@@ -82,6 +83,7 @@ export class KateOS {
     readonly sfx: KateSfx,
     readonly settings: KateSettings
   ) {
+    // TODO: move setup functions outside
     this.cart_manager = new CartManager(this);
     this.processes = new KateProcesses(this);
     this.processes.setup();
@@ -108,6 +110,7 @@ export class KateOS {
     this.capability_supervisor = new KateCapabilitySupervisor(this);
     this.audit_supervisor = new KateAuditSupervisor(this);
     this.fairness_supervisor = new KateFairnessSupervisor(this);
+    this.file_store = new KateFileStore();
   }
 
   get display() {

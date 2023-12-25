@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { Cart, File } from "./cart-type";
+import { DataCart, DataFile, File } from "./cart-type";
 import { parse_v4 } from "./v4/v4";
 import { parse_v5 } from "./v5/v5";
 
@@ -29,7 +29,7 @@ export function parse(data: Uint8Array) {
   return cart;
 }
 
-export async function verify_integrity(cart: Cart) {
+export async function verify_integrity(cart: DataCart) {
   const errors = [
     ...check_file_exists(cart.metadata.presentation.thumbnail_path, cart),
     ...check_file_exists(cart.metadata.presentation.banner_path, cart),
@@ -45,12 +45,12 @@ export async function verify_integrity(cart: Cart) {
   return errors;
 }
 
-async function check_file_integrity(file: File) {
+async function check_file_integrity(file: DataFile) {
   const hash = await crypto.subtle.digest(file.integrity_hash_algorithm, file.data.buffer);
   return byte_equals(new Uint8Array(hash), file.integrity_hash);
 }
 
-function check_file_exists(path: string | null, cart: Cart) {
+function check_file_exists(path: string | null, cart: DataCart) {
   if (path == null) {
     return [];
   } else {

@@ -12,7 +12,7 @@ import { Action, SimpleScene } from "../ui/scenes";
 import { SceneTextFile } from "./text-file";
 import { HUD_LoadIndicator } from "./load-screen";
 import { SceneCartridgeStorageSettings } from "./settings/storage";
-import { Cart, ContentRating, ReleaseType } from "../../cart";
+import { ContentRating, ReleaseType } from "../../cart";
 import { SceneCartridgePermissions } from "./settings/permissions";
 
 export class SceneHome extends SimpleScene {
@@ -23,9 +23,9 @@ export class SceneHome extends SimpleScene {
 
   readonly actions: Action[] = [];
 
-  private cart_map = new Map<Element, Db.CartMeta>();
+  private cart_map = new Map<Element, Db.CartMeta_v3>();
 
-  render_cart(x: Db.CartMeta) {
+  render_cart(x: Db.CartMeta_v3) {
     return UI.interactive(
       this.os,
       h("div", { class: "kate-os-carts-box" }, [
@@ -73,7 +73,7 @@ export class SceneHome extends SimpleScene {
   }
 
   async show_carts(list: HTMLElement) {
-    const recency = (cart: Db.CartMeta, habits_map: Map<string, Db.PlayHabits>) => {
+    const recency = (cart: Db.CartMeta_v3, habits_map: Map<string, Db.PlayHabits>) => {
       const habits = habits_map.get(cart.id);
       return Math.max(habits?.last_played?.getTime() ?? 0, cart.updated_at.getTime());
     };
@@ -113,7 +113,7 @@ export class SceneHome extends SimpleScene {
     }
   }
 
-  async show_pop_menu(cart: Db.CartMeta) {
+  async show_pop_menu(cart: Db.CartMeta_v3) {
     const result = await this.os.dialog.pop_menu(
       "kate:home",
       cart.metadata.presentation.title,
@@ -168,7 +168,7 @@ export class SceneHome extends SimpleScene {
     }
   }
 
-  private async show_legal_notice(title: string, cart: Db.CartMeta, path: string | null) {
+  private async show_legal_notice(title: string, cart: Db.CartMeta_v3, path: string | null) {
     if (path == null) {
       return;
     }

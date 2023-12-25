@@ -5,7 +5,7 @@
  */
 
 import * as Cart_v5 from "../../../../schema/build/kart-v5";
-import { Cart, CartMeta } from "../cart-type";
+import { DataCart } from "../cart-type";
 import { regex, str } from "../parser-utils";
 import * as Metadata from "./metadata";
 import * as Runtime from "./runtime";
@@ -32,7 +32,7 @@ function date(x: Cart_v5.Date): Date {
   return new Date(x.year, x.month - 1, x.day, 0, 0, 0, 0);
 }
 
-export function parse_v5(x: Uint8Array): Cart | null {
+export function parse_v5(x: Uint8Array): DataCart | null {
   if (!check_header(x)) {
     return null;
   }
@@ -46,32 +46,12 @@ export function parse_v5(x: Uint8Array): Cart | null {
   return {
     id: str(valid_id(cart.metadata.identification.id), 255),
     version: version_string(cart.metadata.identification.version),
+    minimum_kate_version: { major: 0, minor: 23, patch: 10 },
     release_date: date(cart.metadata.identification["release-date"]),
     metadata: meta,
     security: security,
     runtime: runtime,
     files: files,
-  };
-}
-
-export function parse_v4_metadata(x: Uint8Array): CartMeta | null {
-  if (!check_header(x)) {
-    return null;
-  }
-
-  const header = Cart_v5.decode_header(x);
-  const metadata = Cart_v5.decode_metadata(x, header);
-  const meta = Metadata.parse_metadata(metadata);
-  const runtime = Runtime.parse_runtime(metadata);
-  const security = Security.parse_security(metadata);
-
-  return {
-    id: str(valid_id(metadata.identification.id), 255),
-    version: version_string(metadata.identification.version),
-    release_date: date(metadata.identification["release-date"]),
-    metadata: meta,
-    security: security,
-    runtime: runtime,
   };
 }
 

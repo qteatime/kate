@@ -4,7 +4,14 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { KateButton } from "../kernel";
+import type { KateButton } from "../kernel";
+import type { PersistentKey } from "../os";
+
+export type KateVersion = {
+  major: number;
+  minor: number;
+  patch: number;
+};
 
 export type Metadata = {
   presentation: {
@@ -115,10 +122,19 @@ export type File = {
   mime: string;
   integrity_hash: Uint8Array;
   integrity_hash_algorithm: "SHA-256";
+  size: number;
+  id: string; // a id inside a bucket
+};
+
+export type DataFile = {
+  path: string;
+  mime: string;
+  integrity_hash: Uint8Array;
+  integrity_hash_algorithm: "SHA-256";
   data: Uint8Array;
 };
 
-export type BasicFile = Omit<File, "integrity_hash" | "integrity_hash_algorithm">;
+export type BasicFile = Omit<DataFile, "integrity_hash" | "integrity_hash_algorithm">;
 
 export type ContextualCapabilityGrant = {
   capability: ContextualCapability;
@@ -136,14 +152,23 @@ export type Security = {
   contextual_capabilities: ContextualCapabilityGrant[];
 };
 
-export type Cart = {
+export type CartMeta = {
   id: string;
   version: string;
   release_date: Date;
+  minimum_kate_version: KateVersion;
   metadata: Metadata;
   runtime: Runtime;
   security: Security;
-  files: File[];
 };
 
-export type CartMeta = Omit<Cart, "files">;
+export type DataCart = CartMeta & {
+  files: DataFile[];
+};
+
+export type BucketCart = CartMeta & {
+  files: {
+    location: PersistentKey;
+    nodes: File[];
+  };
+};

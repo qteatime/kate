@@ -8,7 +8,7 @@ import { foldl, make_empty_thumbnail, make_thumbnail_from_bytes, mb } from "../.
 import * as Db from "../../data";
 import type { KateOS } from "../os";
 import { KateObjectStore } from "./object-store";
-import { Cart, CartMeta } from "../../cart";
+import { CartMeta } from "../../cart";
 
 export type AppStorageDetails = {
   id: string;

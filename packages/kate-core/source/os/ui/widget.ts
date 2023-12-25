@@ -941,19 +941,16 @@ export function no_thumbnail(text: string = "") {
   return h("div", { class: "kate-no-thumbnail" }, [text]);
 }
 
-export function cartridge_chip(cart: Cart.CartMeta | Cart.Cart) {
+export function cartridge_chip(cart: Cart.CartMeta) {
   const risk = capabilities.risk_from_cartridge(cart);
-  const thumbnail_url = cart.metadata.presentation.thumbnail_path;
-  const thumbnail_file =
-    thumbnail_url == null
-      ? null
-      : (cart as Cart.Cart).files?.find((x) => x.path === thumbnail_url) ?? null;
 
   return h("div", { class: "kate-ui-cartridge-chip", "data-risk": risk }, [
     h("div", { class: "kate-ui-cartridge-chip-thumbnail" }, [
-      thumbnail_file == null
-        ? no_thumbnail()
-        : load_image_from_bytes("application/octet-stream", thumbnail_file.data),
+      no_thumbnail(),
+      // TODO: reimplement
+      // thumbnail_file == null
+      //   ? no_thumbnail()
+      //   : load_image_from_bytes("application/octet-stream", thumbnail_file.data),
     ]),
     h("div", { class: "kate-ui-cartridge-chip-info" }, [
       h("div", { class: "kate-ui-cartridge-chip-title" }, [cart.metadata.presentation.title]),

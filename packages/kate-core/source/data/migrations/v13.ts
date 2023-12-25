@@ -5,7 +5,7 @@
  */
 
 import { capability_grant } from "../capability";
-import { cart_meta } from "../cartridge";
+import { cart_meta_v2 } from "../cartridge";
 import { media_store } from "../media";
 import { cartridge_quota, os_entry, os_partition } from "../object-storage";
 
@@ -18,7 +18,7 @@ capability_grant.index1({
   unique: false,
 });
 
-cart_meta.index1({
+cart_meta_v2.index1({
   since: 10,
   deleted_since: 13,
   name: "by_status",

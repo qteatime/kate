@@ -8,8 +8,7 @@
 // bucket-based storage with process-specified quotas and keeps track of
 // them for proper garbage-collection.
 
-import { lock, make_id } from "../../utils";
-import type { KateOS } from "../os";
+import { iterate_stream, lock, make_id } from "../../utils";
 
 type PartitionId = "temporary" | "cartridge";
 type BucketId = string & { __bucket_id: true };
@@ -19,11 +18,22 @@ type Header = {
   persistent_keys: PersistentKey[];
 };
 
-type PersistentKey = { bucket: BucketId; partition: PartitionId; id: string; description: string };
+export type Holder = {
+  type: "cartridge";
+  id: string;
+  version: string;
+};
+
+export type PersistentKey = {
+  bucket: BucketId;
+  partition: PartitionId;
+  id: string;
+  holder: Holder;
+};
 
 export class KateFileStore {
   private _references = new Map<PartitionId, BucketRefs>();
-  constructor(readonly os: KateOS) {}
+  constructor() {}
 
   async get_partition(partition: PartitionId) {
     const root = await navigator.storage.getDirectory();
@@ -58,6 +68,16 @@ export class KateFilePartition {
     return this.record_memory_reference(new KateFileBucket(id, this, bucket));
   }
 
+  async from_stream(stream: ReadableStream<{ path: string; data: Uint8Array }>) {
+    const bucket = await this.create();
+    const mapping = new Map<string, string>();
+    for await (const entry of iterate_stream(stream)) {
+      const file = await bucket.put(entry.data);
+      mapping.set(entry.path, file.id);
+    }
+    return { bucket, mapping };
+  }
+
   async get(id: BucketId) {
     const bucket = await this.root.getDirectoryHandle(id);
     return this.record_memory_reference(new KateFileBucket(id, this, bucket));
@@ -89,11 +109,11 @@ export class KateFilePartition {
     this.attempt_gc(key.bucket);
   }
 
-  async persist(bucket: KateFileBucket, description: string): Promise<PersistentKey> {
+  async persist(bucket: KateFileBucket, holder: Holder): Promise<PersistentKey> {
     return await lock(this.lock_name(bucket.id), async () => {
       const header = await this.get_header(bucket.id);
       const id = make_id();
-      const key = { partition: this.id, bucket: bucket.id, id, description };
+      const key = { partition: this.id, bucket: bucket.id, id, holder };
       header.persistent_keys.push(key);
       await this.write_header(bucket.id, header);
       console.debug(`[kate:file-store] acquired persistent reference to ${this.id}/${bucket.id}`);
@@ -176,6 +196,10 @@ export class KateFileBucket {
     await writer.write(data);
     await writer.close();
     console.debug(`[kate:file-store] Wrote ${this.path}/${id}`);
+    return new KateFile(this, id);
+  }
+
+  file(id: string) {
     return new KateFile(this, id);
   }
 }

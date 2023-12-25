@@ -7,7 +7,7 @@
 import { Database, Transaction } from "../db-schema";
 import { kate } from "./db";
 import * as Capability from "../capabilities";
-import { Cart, CartMeta, ContextualCapability } from "../cart";
+import { ContextualCapability } from "../cart";
 
 export type GrantType = { type: "switch"; value: boolean };
 

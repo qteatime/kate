@@ -40,7 +40,7 @@ export default [
         if (!should_install) {
           return null;
         }
-        await os.cart_manager.install(cart);
+        await os.cart_manager.install(cart, cart.files);
         return null;
       });
     }

@@ -8,7 +8,16 @@ import * as Cart from "../../cart";
 import * as Capability from "../../capabilities";
 import type { KateOS } from "../os";
 import * as Db from "../../data";
-import { from_bytes, gb, make_thumbnail_from_bytes, serialise_error } from "../../utils";
+import {
+  from_bytes,
+  gb,
+  make_thumbnail_from_bytes,
+  map,
+  readable_stream_from_iterable,
+  serialise_error,
+  zip,
+} from "../../utils";
+import { KateFileBucket } from "./file-store";
 
 export class CartManager {
   readonly CARTRIDGE_SIZE_LIMIT = gb(1.4);
@@ -25,7 +34,7 @@ export class CartManager {
     });
   }
 
-  async list_by_status(status?: Db.CartridgeStatus): Promise<Db.CartMeta[]> {
+  async list_by_status(status?: Db.CartridgeStatus): Promise<Db.CartMeta_v3[]> {
     return await Db.CartStore.transaction(this.os.db, "meta", "readonly", async (store) => {
       return store.list_by_status(status);
     });
@@ -104,7 +113,7 @@ export class CartManager {
         console.error(`Corrupted cartridge ${cart.id}`, errors);
         throw new Error(`Corrupted cartridge ${cart.id}`);
       }
-      await this.install(cart);
+      await this.install(cart, cart.files);
     } catch (error) {
       console.error(`Failed to install ${file.name}:`, error);
       await this.os.audit_supervisor.log("kate:cart-manager", {
@@ -122,7 +131,7 @@ export class CartManager {
     }
   }
 
-  async install(cart: Cart.Cart) {
+  async install(cart: Cart.DataCart, files: Iterable<{ path: string; data: Uint8Array }>) {
     if (this.os.kernel.console.options.mode === "single") {
       throw new Error(`Cartridge installation is not available in single mode.`);
     }
@@ -157,17 +166,41 @@ export class CartManager {
       }
     }
 
-    const grants = Capability.grants_from_cartridge(cart);
+    const cart_partition = await this.os.file_store.get_partition("cartridge");
+    const { bucket, mapping } = await cart_partition.from_stream(
+      readable_stream_from_iterable(files)
+    );
+    const cart_meta: Cart.BucketCart = {
+      ...cart,
+      files: {
+        location: await cart_partition.persist(bucket, {
+          type: "cartridge",
+          id: cart.id,
+          version: cart.version,
+        }),
+        nodes: cart.files.map((node) => {
+          return {
+            ...node,
+            data: null,
+            size: node.data.byteLength,
+            id: mapping.get(node.path)!,
+          };
+        }),
+      },
+    };
 
+    const grants = Capability.grants_from_cartridge(cart_meta);
     const thumbnail = await maybe_make_file_url(
-      cart.metadata.presentation.thumbnail_path,
-      cart,
+      cart_meta.metadata.presentation.thumbnail_path,
+      cart_meta,
+      bucket,
       this.THUMBNAIL_WIDTH,
       this.THUMBNAIL_HEIGHT
     );
     const banner = await maybe_make_file_url(
-      cart.metadata.presentation.banner_path,
-      cart,
+      cart_meta.metadata.presentation.banner_path,
+      cart_meta,
+      bucket,
       this.BANNER_WIDTH,
       this.BANNER_HEIGHT
     );
@@ -190,7 +223,7 @@ export class CartManager {
         if (old_meta != null) {
           await carts.archive(old_meta.id);
         }
-        await carts.insert(cart, thumbnail, banner);
+        await carts.insert(cart_meta, thumbnail, banner);
         await habits.initialise(cart.id);
         await object_store.initialise_partitions(cart.id, cart.version);
         await capabilities.initialise_grants(cart.id, grants);
@@ -215,7 +248,7 @@ export class CartManager {
       `New game installed`,
       `${cart.metadata.presentation.title} is ready to play!`
     );
-    this.os.events.on_cart_inserted.emit(cart);
+    this.os.events.on_cart_inserted.emit(cart_meta);
     this.os.events.on_cart_changed.emit({
       id: cart.id,
       reason: "installed",
@@ -265,7 +298,7 @@ export class CartManager {
         status: Db.CartridgeStatus;
         thumbnail_url: string | null;
         banner_url: string | null;
-        meta: Db.CartMeta;
+        meta: Db.CartMeta_v3;
         version_id: string;
         size: number;
       }
@@ -285,14 +318,22 @@ export class CartManager {
   }
 }
 
-function maybe_make_file_url(path: string | null, cart: Cart.Cart, width: number, height: number) {
+async function maybe_make_file_url(
+  path: string | null,
+  cart: Cart.BucketCart,
+  bucket: KateFileBucket,
+  width: number,
+  height: number
+) {
   if (path == null) {
     return null;
   } else {
-    const file = cart.files.find((x) => x.path === path);
+    const file = cart.files.nodes.find((x) => x.path === path);
     if (file == null) {
       throw new Error(`File not found: ${path}`);
     }
-    return make_thumbnail_from_bytes(width, height, file.mime, file.data);
+    const handle = await bucket.file(file.id).read();
+    const data = new Uint8Array(await handle.arrayBuffer());
+    return make_thumbnail_from_bytes(width, height, file.mime, data);
   }
 }

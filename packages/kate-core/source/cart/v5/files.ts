@@ -5,14 +5,14 @@
  */
 
 import { Cart_v5 } from "./v5";
-import type { File } from "../cart-type";
+import type { DataFile, File } from "../cart-type";
 import { str } from "../parser-utils";
 
 export function parse_files(files: Cart_v5.File[]) {
   return files.map(parse_file);
 }
 
-export function parse_file(file: Cart_v5.File): File {
+export function parse_file(file: Cart_v5.File): DataFile {
   return {
     path: str(file.path, 1_024),
     mime: str(file.mime, 255),
