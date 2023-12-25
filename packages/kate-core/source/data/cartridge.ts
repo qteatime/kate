@@ -29,14 +29,14 @@ export type CartMeta_v2 = {
 };
 export const cart_meta_v2 = kate.table1<CartMeta_v2, "id">({
   since: 3,
-  deprecated_since: 16,
+  deprecated_since: 15,
   name: "cart_meta_v2",
   path: "id",
   auto_increment: false,
 });
 export const idx_cart_by_status_v2 = cart_meta_v2.index1({
   since: 13,
-  deprecated_since: 16,
+  deprecated_since: 15,
   name: "by_status_v2",
   path: "status",
   multi_entry: false,
@@ -61,13 +61,13 @@ export type CartMeta_v3 = {
   status: CartridgeStatus;
 };
 export const cart_meta_v3 = kate.table1<CartMeta_v3, "id">({
-  since: 16,
+  since: 15,
   name: "cart_meta_v3",
   path: "id",
   auto_increment: false,
 });
 export const idx_cart_by_status = cart_meta_v3.index1({
-  since: 16,
+  since: 15,
   name: "by_status",
   path: "status",
   multi_entry: false,
@@ -82,7 +82,7 @@ export type CartFile = {
 };
 export const cart_files = kate.table2<CartFile, "id", "file_id">({
   since: 3,
-  deprecated_since: 16,
+  deprecated_since: 15,
   name: "cart_files_v2",
   path: ["id", "file_id"],
   auto_increment: false,
