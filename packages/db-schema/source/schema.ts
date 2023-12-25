@@ -14,38 +14,34 @@ export class DatabaseSchema {
   async open(override_name?: string) {
     const name = override_name ?? this.name;
 
-    return new Promise<{ db: Database; old_version: number }>(
-      (resolve, reject) => {
-        const request = indexedDB.open(name, this.version);
-        let old_version: number = this.version;
+    return new Promise<{ db: Database; old_version: number }>((resolve, reject) => {
+      const request = indexedDB.open(name, this.version);
+      let old_version: number = this.version;
 
-        request.onerror = (ev) => {
-          console.error(`[Kate] failed to open database`, request.error);
-          reject(new Error(`Unable to open database`));
-        };
-        request.onsuccess = (ev) => {
-          resolve({
-            db: new Database(request.result),
-            old_version,
-          });
-        };
-        request.onupgradeneeded = (ev) => {
-          old_version = ev.oldVersion;
-          const request = ev.target as IDBRequest;
-          const db = request.result;
-          const transaction = request.transaction!;
-          for (const table of this.tables) {
-            table.upgrade(db, transaction, old_version);
-          }
-        };
-      }
-    );
+      request.onerror = (ev) => {
+        console.error(`[Kate] failed to open database`, request.error);
+        reject(new Error(`Unable to open database`));
+      };
+      request.onsuccess = (ev) => {
+        resolve({
+          db: new Database(request.result),
+          old_version,
+        });
+      };
+      request.onupgradeneeded = (ev) => {
+        old_version = ev.oldVersion;
+        const request = ev.target as IDBRequest;
+        const db = request.result;
+        const transaction = request.transaction!;
+        for (const table of this.tables) {
+          table.upgrade(db, transaction, old_version);
+        }
+      };
+    });
   }
 
   needs_data_migration(old_version: number) {
-    return this.data_migrations.some((x) =>
-      x.is_needed(old_version, this.version)
-    );
+    return this.data_migrations.some((x) => x.is_needed(old_version, this.version));
   }
 
   async run_data_migration(
@@ -53,9 +49,7 @@ export class DatabaseSchema {
     db: Database,
     progress: (migration: DataMigration, current: number, total: number) => void
   ) {
-    const migrations = this.data_migrations.filter((x) =>
-      x.is_needed(old_version, this.version)
-    );
+    const migrations = this.data_migrations.filter((x) => x.is_needed(old_version, this.version));
     let current = 1;
     for (const migration of migrations) {
       progress(migration, current, migrations.length);
@@ -65,15 +59,12 @@ export class DatabaseSchema {
   }
 
   data_migration(x: {
-    id: number;
+    id: string;
     since: number;
     description: string;
     process: (_: Database) => Promise<void>;
   }) {
-    this.data_migrations.push(
-      new DataMigration(x.id, x.since, x.description, x.process)
-    );
-    this.data_migrations.sort((a, b) => a.id - b.id);
+    this.data_migrations.push(new DataMigration(x.id, x.since, x.description, x.process));
   }
 
   table1<S, K extends keyof S>(x: {
@@ -163,7 +154,9 @@ export abstract class TableSchema<S> {
     }
 
     if (this.deleted_since != null && old_version >= this.deleted_since) {
-      db.deleteObjectStore(this.name);
+      if (db.objectStoreNames.contains(this.name)) {
+        db.deleteObjectStore(this.name);
+      }
     }
   }
 
@@ -216,10 +209,7 @@ export abstract class TableSchema<S> {
   }
 }
 
-export class TableSchema1<
-  Schema,
-  Id extends keyof Schema
-> extends TableSchema<Schema> {
+export class TableSchema1<Schema, Id extends keyof Schema> extends TableSchema<Schema> {
   readonly __schema1!: Schema;
   readonly __k1!: Id;
   readonly __kt1!: Schema[Id];
@@ -299,7 +289,9 @@ abstract class IndexSchema {
     }
     if (this.deleted_since != null && old_version >= this.deleted_since) {
       const store = transaction.objectStore(this.table.name);
-      store.deleteIndex(this.name);
+      if (store.indexNames.contains(this.name)) {
+        store.deleteIndex(this.name);
+      }
     }
   }
 }
@@ -321,11 +313,7 @@ export class IndexSchema1<S, K1 extends keyof S> extends IndexSchema {
   }
 }
 
-export class IndexSchema2<
-  S,
-  K1 extends keyof S,
-  K2 extends keyof S
-> extends IndexSchema {
+export class IndexSchema2<S, K1 extends keyof S, K2 extends keyof S> extends IndexSchema {
   readonly __schema2!: S;
   readonly __k1!: K1;
   readonly __kt1!: S[K1];
@@ -346,13 +334,13 @@ export class IndexSchema2<
 
 export class DataMigration {
   constructor(
-    readonly id: number,
+    readonly id: string,
     readonly version: number,
     readonly description: string,
     readonly process: (_: Database) => Promise<void>
   ) {}
 
-  private done(): number[] {
+  private done(): string[] {
     return JSON.parse(localStorage["kate:migrations:done"] ?? "[]");
   }
 

@@ -29,17 +29,11 @@ type QueryArray<T> = T extends [infer A, infer B, infer C]
   : T | IRange<T>;
 
 export class Range {
-  static from<A>(
-    key: A,
-    x: { inclusive: boolean } = { inclusive: true }
-  ): IRange<A> {
+  static from<A>(key: A, x: { inclusive: boolean } = { inclusive: true }): IRange<A> {
     return IDBKeyRange.lowerBound(key, !x.inclusive) as IRange<A>;
   }
 
-  static to<A>(
-    key: A,
-    x: { inclusive: boolean } = { inclusive: true }
-  ): IRange<A> {
+  static to<A>(key: A, x: { inclusive: boolean } = { inclusive: true }): IRange<A> {
     return IDBKeyRange.upperBound(key, !x.inclusive) as IRange<A>;
   }
 
@@ -51,12 +45,7 @@ export class Range {
       upper_inclusive: true,
     }
   ): IRange<A> {
-    return IDBKeyRange.bound(
-      lower,
-      upper,
-      !x.lower_inclusive,
-      !x.upper_inclusive
-    ) as IRange<A>;
+    return IDBKeyRange.bound(lower, upper, !x.lower_inclusive, !x.upper_inclusive) as IRange<A>;
   }
 
   static exactly<A>(key: A): IRange<A> {
@@ -107,11 +96,7 @@ export class Database {
         trans.commit();
       } catch (error) {
         trans.abort();
-        console.error(
-          `[Kate] internal error while running transaction:`,
-          error,
-          request.error
-        );
+        console.error(`[Kate] internal error while running transaction:`, error, request.error);
         reject(error);
       }
     });
@@ -130,17 +115,13 @@ export class Transaction {
   }
 
   get_table1<T extends TableSchema1<any, any>>(table: T) {
-    return new Table<T["__schema1"], T["__kt1"], T["__k1"]>(
-      this.trans.objectStore(table.name)
-    );
+    return new Table<T["__schema1"], T["__kt1"], T["__k1"]>(this.trans.objectStore(table.name));
   }
 
   get_table2<T extends TableSchema2<any, any, any>>(table: T) {
-    return new Table<
-      T["__schema2"],
-      [T["__kt1"], T["__kt2"]],
-      [T["__k1"], T["__k2"]]
-    >(this.trans.objectStore(table.name));
+    return new Table<T["__schema2"], [T["__kt1"], T["__kt2"]], [T["__k1"], T["__k2"]]>(
+      this.trans.objectStore(table.name)
+    );
   }
 
   get_table3<T extends TableSchema3<any, any, any, any>>(table: T) {
@@ -153,18 +134,14 @@ export class Transaction {
 
   get_index1<I extends IndexSchema1<any, any>>(index: I) {
     const store = this.trans.objectStore(index.table.name);
-    return new Index<I["__schema1"], I["__kt1"], I["__k1"]>(
-      store.index(index.name)
-    );
+    return new Index<I["__schema1"], I["__kt1"], I["__k1"]>(store.index(index.name));
   }
 
   get_index2<I extends IndexSchema2<any, any, any>>(index: I) {
     const store = this.trans.objectStore(index.table.name);
-    return new Index<
-      I["__schema2"],
-      [I["__kt1"], I["__kt2"]],
-      [I["__k1"], I["__k2"]]
-    >(store.index(index.name));
+    return new Index<I["__schema2"], [I["__kt1"], I["__kt2"]], [I["__k1"], I["__k2"]]>(
+      store.index(index.name)
+    );
   }
 }
 
