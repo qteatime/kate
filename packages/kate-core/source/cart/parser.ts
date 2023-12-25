@@ -4,32 +4,34 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { Cart, File } from "./cart-type";
-import { parse_v4 } from "./v4/v4";
-import { parse_v5 } from "./v5/v5";
+import { DataCart, DataFile } from "./cart-type";
+import * as v4 from "./v4/v4";
+import * as v5 from "./v5/v5";
 
-const parsers = [parse_v5, parse_v4];
+const parsers = [
+  { detect: v4.detect, parse: v4.parse_v4 },
+  { detect: v5.detect, parse: v5.parse_v5 },
+];
 
-export function try_parse(data: Uint8Array) {
+export async function try_parse(data: Blob) {
   for (const parser of parsers) {
-    const cart = parser(data);
-    if (cart != null) {
-      return cart;
+    if (await parser.detect(data)) {
+      return await parser.parse(data);
     }
   }
 
   return null;
 }
 
-export function parse(data: Uint8Array) {
-  const cart = try_parse(data);
+export async function parse(data: Blob) {
+  const cart = await try_parse(data);
   if (cart == null) {
     throw new Error(`No suitable parsers found`);
   }
   return cart;
 }
 
-export async function verify_integrity(cart: Cart) {
+export async function verify_integrity(cart: DataCart) {
   const errors = [
     ...check_file_exists(cart.metadata.presentation.thumbnail_path, cart),
     ...check_file_exists(cart.metadata.presentation.banner_path, cart),
@@ -45,12 +47,12 @@ export async function verify_integrity(cart: Cart) {
   return errors;
 }
 
-async function check_file_integrity(file: File) {
+async function check_file_integrity(file: DataFile) {
   const hash = await crypto.subtle.digest(file.integrity_hash_algorithm, file.data.buffer);
   return byte_equals(new Uint8Array(hash), file.integrity_hash);
 }
 
-function check_file_exists(path: string | null, cart: Cart) {
+function check_file_exists(path: string | null, cart: DataCart) {
   if (path == null) {
     return [];
   } else {

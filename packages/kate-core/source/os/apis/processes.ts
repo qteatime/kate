@@ -40,7 +40,8 @@ export class KateProcesses {
       throw new Error(`a process is already running`);
     }
 
-    const cart = Cart.parse(bytes);
+    const file = new Blob([bytes], { type: "application/octet-stream" });
+    const cart = await Cart.parse(file);
     const file_map = new Map(cart.files.map((x) => [x.path, x] as const));
 
     const storage = await this.os.object_store.cartridge(cart, false).get_local_storage();

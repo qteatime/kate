@@ -20,7 +20,8 @@ export default [
           throw new EMessageFailed("kate.os.not-available", "Feature not available in single mode");
         }
 
-        const cart = Cart.parse(cartridge);
+        const file = new Blob([cartridge]);
+        const cart = await Cart.parse(file);
         const errors = await Cart.verify_integrity(cart);
         if (errors.length !== 0) {
           console.error(`Corrupted cartridge ${cart.id}`, errors);
@@ -40,7 +41,7 @@ export default [
         if (!should_install) {
           return null;
         }
-        await os.cart_manager.install(cart);
+        await os.cart_manager.install(cart, cart.files);
         return null;
       });
     }

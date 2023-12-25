@@ -4,4 +4,5 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import "./v13";
+import "./deprecated";
+import "./v15";

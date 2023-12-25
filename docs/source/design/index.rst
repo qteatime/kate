@@ -18,6 +18,7 @@ Kernel design
   kernel/K0002-live-audit
   kernel/K0003-resource-band
   kernel/K0004-processes
+  kernel/K0005-partitioned-file-storage
 
 
 API design

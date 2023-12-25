@@ -13,7 +13,7 @@ import * as Capability from "../../../capabilities";
 import * as UI from "../../ui";
 
 type Risk = {
-  cart: Db.CartMeta;
+  cart: Db.CartMeta_v3;
   grants: Capability.AnyCapability[];
   risk: Capability.RiskCategory;
   potential_risk: Capability.RiskCategory;

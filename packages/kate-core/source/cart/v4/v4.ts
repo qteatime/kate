@@ -5,7 +5,7 @@
  */
 
 import * as Cart_v4 from "../../../../schema/build/kart-v4";
-import { Cart, CartMeta } from "../cart-type";
+import { DataCart } from "../cart-type";
 import { regex, str } from "../parser-utils";
 import * as Metadata from "./metadata";
 import * as Runtime from "./runtime";
@@ -32,18 +32,27 @@ function date(x: Cart_v4.Date): Date {
   return new Date(x.year, x.month - 1, x.day, 0, 0, 0, 0);
 }
 
-export function parse_v4(x: Uint8Array): Cart | null {
-  const view = new DataView(x.buffer);
+export async function detect(x: Blob): Promise<boolean> {
+  const buffer = await x.slice(0, 8).arrayBuffer();
+  const view = new DataView(buffer);
+  const magic_header = view.getUint32(0, false);
+  const version = view.getUint32(4, true);
+  return magic_header === MAGIC && version === 4;
+}
+
+export async function parse_v4(x: Blob): Promise<DataCart | null> {
+  const buffer = await x.arrayBuffer();
+  const view = new DataView(buffer);
   const magic_header = view.getUint32(0, false);
   if (magic_header !== MAGIC) {
-    return null;
+    throw new Error(`invalid v4 header`);
   }
   const version = view.getUint32(4, true);
   if (version !== 4) {
-    return null;
+    throw new Error(`invalid v4 header`);
   }
 
-  const cart = Cart_v4.decode(x);
+  const cart = Cart_v4.decode(new Uint8Array(buffer));
   const meta = Metadata.parse_metadata(cart);
   const runtime = Runtime.parse_runtime(cart);
   const security = Security.parse_security(cart);
@@ -53,16 +62,10 @@ export function parse_v4(x: Uint8Array): Cart | null {
     id: str(valid_id(cart.id), 255),
     version: version_string(cart.version),
     release_date: date(cart["release-date"]),
+    minimum_kate_version: { major: 0, minor: 23, patch: 10 },
     metadata: meta,
     security: security,
     runtime: runtime,
     files: files,
   };
-}
-
-export function parse_v4_metadata(x: Uint8Array): CartMeta | null {
-  if (x.length > mb(64)) {
-    console.warn(`v4 cartridge too big for parsing metadata`);
-  }
-  return parse_v4(x);
 }
