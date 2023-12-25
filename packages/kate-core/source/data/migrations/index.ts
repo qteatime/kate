@@ -5,5 +5,4 @@
  */
 
 import "./deprecated";
-import "./v13";
 import "./v15";
