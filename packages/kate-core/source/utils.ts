@@ -21,3 +21,7 @@ export * from "../../util/build/iterable";
 export * from "../../util/build/math";
 export * from "../../util/build/time";
 export * from "../../util/build/serialise";
+
+export function lock<T>(name: string, fn: () => Promise<T>): Promise<T> {
+  return navigator.locks.request(name, fn);
+}

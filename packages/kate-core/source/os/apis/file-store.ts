@@ -8,7 +8,7 @@
 // bucket-based storage with process-specified quotas and keeps track of
 // them for proper garbage-collection.
 
-import { make_id } from "../../utils";
+import { lock, make_id } from "../../utils";
 import type { KateOS } from "../os";
 
 type PartitionId = "temporary" | "cartridge";
@@ -80,7 +80,7 @@ export class KateFilePartition {
     if (key.partition !== this.id) {
       throw new Error(`[kate:file-store] release_persistent() called with invalid key`);
     }
-    await navigator.locks.request(this.lock_name(key.bucket), async (lock) => {
+    await lock(this.lock_name(key.bucket), async () => {
       const header = await this.get_header(key.bucket);
       const keys = header.persistent_keys.filter((x) => x.id !== key.id);
       await this.write_header(key.bucket, { ...header, persistent_keys: keys });
@@ -90,7 +90,7 @@ export class KateFilePartition {
   }
 
   async persist(bucket: KateFileBucket, description: string): Promise<PersistentKey> {
-    return await navigator.locks.request(this.lock_name(bucket.id), async (lock) => {
+    return await lock(this.lock_name(bucket.id), async () => {
       const header = await this.get_header(bucket.id);
       const id = make_id();
       const key = { partition: this.id, bucket: bucket.id, id, description };
@@ -111,7 +111,7 @@ export class KateFilePartition {
   }
 
   private async attempt_gc(id: BucketId): Promise<boolean> {
-    return await navigator.locks.request(this.lock_name(id), async () => {
+    return await lock(this.lock_name(id), async () => {
       if (await this.elligible_for_gc(id)) {
         console.debug(`[kate:file-store:gc] deleting ${this.id}/${id} (reason: no more refs)`);
         await this.root.removeEntry(id, { recursive: true });
