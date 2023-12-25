@@ -18,6 +18,10 @@ declare global {
     virtualKeyboard?: {
       overlaysContent: boolean;
     };
+
+    locks: {
+      request<T>(name: string, callback: (lock: Lock) => Promise<T>): Promise<T>;
+    };
   }
 
   interface KeyboardLayoutMap {
