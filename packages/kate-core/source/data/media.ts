@@ -14,6 +14,9 @@ export type Media = {
   thumbnail_dataurl: string;
   video_length: number | null;
   size: number;
+  // since v16
+  file_id: string;
+  mime: string;
 };
 export const media_store = kate.table1<Media, "id">({
   since: 4,
@@ -26,16 +29,4 @@ export const idx_media_store_by_cart = media_store.index1({
   name: "by_cart_v2",
   path: "cart_id",
   unique: false,
-});
-
-export type MediaFile = {
-  id: string;
-  mime: string;
-  data: Uint8Array;
-};
-export const media_files = kate.table1<MediaFile, "id">({
-  since: 4,
-  name: "media_files",
-  path: "id",
-  auto_increment: false,
 });

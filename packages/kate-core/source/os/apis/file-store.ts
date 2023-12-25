@@ -8,22 +8,25 @@
 // bucket-based storage with process-specified quotas and keeps track of
 // them for proper garbage-collection.
 
-import { iterate_stream, lock, make_id, sleep } from "../../utils";
+import { iterate_stream, lock, make_id, sleep, unreachable } from "../../utils";
 import type { KateOS } from "../os";
 
-type PartitionId = "temporary" | "cartridge";
+type PartitionId = "temporary" | "cartridge" | "kernel";
 type BucketId = string & { __bucket_id: true };
 type BucketRefs = Map<BucketId, Set<WeakRef<KateFileBucket>>>;
+type KernelResource = "media";
 
 type Header = {
   persistent_keys: PersistentKey[];
 };
 
-export type Holder = {
-  type: "cartridge";
-  id: string;
-  version: string;
-};
+export type Holder =
+  | {
+      type: "cartridge";
+      id: string;
+      version: string;
+    }
+  | { type: "kernel"; resource: KernelResource };
 
 export type PersistentKey = {
   bucket: BucketId;
@@ -36,7 +39,7 @@ export class KateFileStore {
   private _references = new Map<PartitionId, BucketRefs>();
   constructor(readonly os: KateOS) {}
 
-  private partition_ids: PartitionId[] = ["temporary", "cartridge"];
+  private non_sticky_partitions: PartitionId[] = ["temporary", "cartridge"];
 
   async get_partition(partition: PartitionId) {
     const root = await navigator.storage.getDirectory();
@@ -47,6 +50,17 @@ export class KateFileStore {
       refs,
       await root.getDirectoryHandle(partition, { create: true })
     );
+  }
+
+  async get_kernel_bucket(name: KernelResource) {
+    const partition = await this.get_partition("kernel");
+    if (!(await partition.exists(name as BucketId))) {
+      const bucket = await partition.create(name as BucketId);
+      await partition.persist(bucket, { type: "kernel", resource: name });
+      return bucket;
+    } else {
+      return partition.get(name as BucketId);
+    }
   }
 
   async from_key(key: PersistentKey) {
@@ -64,7 +78,7 @@ export class KateFileStore {
     console.debug(`[kate:file-store:gc] Starting regular GC...`);
     this.os.kernel.console.resources.take("gc");
     try {
-      for (const id of this.partition_ids) {
+      for (const id of this.non_sticky_partitions) {
         const partition = await this.get_partition(id);
         await partition.gc();
       }
@@ -88,15 +102,24 @@ export class KateFilePartition {
     readonly root: FileSystemDirectoryHandle
   ) {}
 
-  async create() {
-    const id = make_id() as BucketId;
+  async create(name: string | null) {
+    const id = (name ?? make_id()) as BucketId;
     const bucket = await this.root.getDirectoryHandle(id, { create: true });
     await this.write_header(id, { persistent_keys: [] });
     return this.record_memory_reference(new KateFileBucket(id, this, bucket));
   }
 
+  async exists(id: BucketId) {
+    try {
+      await this.root.getDirectoryHandle(id);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
   async from_stream(stream: ReadableStream<{ path: string; data: Uint8Array }>) {
-    const bucket = await this.create();
+    const bucket = await this.create(null);
     const mapping = new Map<string, string>();
     for await (const entry of iterate_stream(stream)) {
       const file = await bucket.put(entry.data);
@@ -255,6 +278,13 @@ export class KateFilePartition {
         const meta = await this.store.os.cart_manager.try_read_metadata(holder.id);
         return meta?.bucket_key != null && meta?.version === holder.version;
       }
+
+      case "kernel": {
+        return true;
+      }
+
+      default:
+        throw unreachable(holder);
     }
   }
 

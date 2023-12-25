@@ -35,28 +35,33 @@ export class KateCapture {
     mime: string,
     kind: "image" | "video"
   ) {
-    const file_id = make_id();
     const { thumbnail, length } = await this.make_thumbnail(data, mime, kind);
-    await this.os.db.transaction([Db.media_store, Db.media_files], "readwrite", async (t) => {
-      const media = t.get_table1(Db.media_store);
-      const files = t.get_table1(Db.media_files);
+    const bucket = await this.os.file_store.get_kernel_bucket("media");
+    const file = await bucket.put(data);
+    const entry_id = make_id();
 
-      await files.add({
-        id: file_id,
-        mime: mime,
-        data: data,
+    try {
+      await this.os.db.transaction([Db.media_store], "readwrite", async (t) => {
+        const media = t.get_table1(Db.media_store);
+
+        await media.add({
+          id: entry_id,
+          cart_id: game_id,
+          kind: kind,
+          time: new Date(),
+          thumbnail_dataurl: thumbnail,
+          video_length: length,
+          size: data.length,
+          mime: mime,
+          file_id: file.id,
+        });
       });
-      await media.add({
-        id: file_id,
-        cart_id: game_id,
-        kind: kind,
-        time: new Date(),
-        thumbnail_dataurl: thumbnail,
-        video_length: length,
-        size: data.length,
-      });
-    });
-    return file_id;
+
+      return entry_id;
+    } catch (e) {
+      await file.delete();
+      throw new Error(`[kate:capture] Failed to store capture`);
+    }
   }
 
   async save_screenshot(game_id: string, data: Uint8Array, type: string) {
@@ -145,20 +150,22 @@ export class KateCapture {
   }
 
   async read_file(id: string) {
-    return await this.os.db.transaction([Db.media_files], "readonly", async (t) => {
-      const media = t.get_table1(Db.media_files);
-      return media.get(id);
-    });
+    const meta = await this.read_metadata(id);
+    const bucket = await this.os.file_store.get_kernel_bucket("media");
+    const file = bucket.file(meta.file_id);
+    return { handle: await file.read(), mime: meta.mime };
   }
 
   async delete(file_id: string) {
-    await this.os.db.transaction([Db.media_store, Db.media_files], "readwrite", async (t) => {
+    const meta = await this.os.db.transaction([Db.media_store], "readwrite", async (t) => {
       const media = t.get_table1(Db.media_store);
-      const files = t.get_table1(Db.media_files);
 
+      const meta = await media.get(file_id);
       await media.delete(file_id);
-      await files.delete(file_id);
+      return meta;
     });
+    const bucket = await this.os.file_store.get_kernel_bucket("media");
+    await bucket.file(meta.file_id).delete();
   }
 
   async usage_estimates() {
