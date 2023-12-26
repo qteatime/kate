@@ -103,14 +103,19 @@ export function encode_header(header: Cart.Header) {
 
 export function encode_files(size: number) {
   let count = size;
+  let offset = BigInt(encode_magic().byteLength) + 4n;
 
   return {
     size: new LJT.Encoder().uint32(size).to_bytes(),
+    current_offset() {
+      return offset;
+    },
     encode_file(data: Uint8Array) {
       if (count <= 0) {
         throw new Error(`Trying to encode more files than size allows`);
       }
       count -= 1;
+      offset += BigInt(data.byteLength) + 4n;
       return encode_file_data(data);
     },
     close() {

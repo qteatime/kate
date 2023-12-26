@@ -126,9 +126,11 @@ export type File = {
   id: string; // a id inside a bucket
 };
 
-export type UncommitedFile = Omit<File, "id">;
+export type UncommitedFile = Omit<File, "id"> & {
+  offset: number | null;
+};
 
-export type DataFile = UncommitedFile & {
+export type DataFile = Omit<File, "id"> & {
   data: Uint8Array;
 };
 

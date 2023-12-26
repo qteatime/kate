@@ -168,6 +168,7 @@ export async function make_file(path: Pathname, data: Uint8Array) {
       mime: mime_type(path),
       integrity: new Uint8Array(integrity),
       "hash-algorithm": Cart.Hash_algorithm.Sha_512({}),
+      offset: 0n,
       size: data.length,
     }),
     data,

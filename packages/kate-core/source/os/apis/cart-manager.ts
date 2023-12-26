@@ -71,7 +71,11 @@ export class CartManager {
       }
       const handle = await bucket.file(node.id).read();
       return {
-        ...node,
+        path: node.path,
+        mime: node.mime,
+        integrity_hash: node.integrity_hash,
+        integrity_hash_algorithm: node.integrity_hash_algorithm,
+        size: node.size,
         data: new Uint8Array(await handle.arrayBuffer()),
       };
     } finally {
@@ -227,7 +231,11 @@ export class CartManager {
           }),
           nodes: cart.files.map((node, i) => {
             return {
-              ...node,
+              path: node.path,
+              mime: node.mime,
+              integrity_hash: node.integrity_hash,
+              integrity_hash_algorithm: node.integrity_hash_algorithm,
+              size: node.size,
               id: ids[i],
             };
           }),

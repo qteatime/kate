@@ -709,6 +709,7 @@ async function files(patterns: Kart["files"], root: string, base_dir: string, wr
     const mime = mime_table[ext] ?? "application/octet-stream";
     const data = load_file(path, root, base_dir);
     const integrity = await Crypto.subtle.digest("SHA-512", data.buffer);
+    const offset = encoder.current_offset() + 4n;
 
     result.push(
       Cart.Meta_file({
@@ -716,12 +717,13 @@ async function files(patterns: Kart["files"], root: string, base_dir: string, wr
         mime: mime,
         integrity: new Uint8Array(integrity),
         "hash-algorithm": Hash_algorithm.Sha_512({}),
+        offset: offset,
         size: data.byteLength,
       })
     );
 
     await writer.write(encoder.encode_file(data));
-    console.log(`> Added ${make_absolute(path)} (${from_bytes(data.byteLength)})`);
+    console.log(`> Added ${make_absolute(path)} (${from_bytes(data.byteLength)}`);
   }
 
   encoder.close();

@@ -89,6 +89,7 @@ type Meta-file {
   field mime: Text;
   field integrity: Raw-bytes;
   field hash-algorithm: Hash-algorithm;
+  field offset: Uint64;
   field size: Uint32;
 }
 

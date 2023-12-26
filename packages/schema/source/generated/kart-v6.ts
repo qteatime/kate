@@ -242,10 +242,11 @@ export interface Meta_file {
   readonly 'mime': string;
   readonly 'integrity': Uint8Array;
   readonly 'hash-algorithm': Hash_algorithm;
+  readonly 'offset': UInt64;
   readonly 'size': UInt32
 }
 
-export function Meta_file(x: {readonly 'path': string,readonly 'mime': string,readonly 'integrity': Uint8Array,readonly 'hash-algorithm': Hash_algorithm,readonly 'size': UInt32}): Meta_file {
+export function Meta_file(x: {readonly 'path': string,readonly 'mime': string,readonly 'integrity': Uint8Array,readonly 'hash-algorithm': Hash_algorithm,readonly 'offset': UInt64,readonly 'size': UInt32}): Meta_file {
  return {
    '@name': 'Meta-file',
    '@tag': 9,

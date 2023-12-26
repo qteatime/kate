@@ -18,6 +18,7 @@ export function parse_file(file: Cart_v6.Meta_file): UncommitedFile {
     mime: str(file.mime, 255),
     integrity_hash: file.integrity,
     integrity_hash_algorithm: hash_algorithm(file["hash-algorithm"]),
+    offset: file.offset === 0n ? null : ensure_safe_integer(file.offset),
     size: file.size,
   };
 }
@@ -28,4 +29,11 @@ function hash_algorithm(x: Cart_v6.Hash_algorithm) {
     case t.$Tags.Sha_512:
       return "SHA-512" as const;
   }
+}
+
+function ensure_safe_integer(x: bigint) {
+  if (x < 0 || x >= BigInt(Number.MAX_SAFE_INTEGER)) {
+    throw new RangeError(`Unsafe offset ${x}`);
+  }
+  return Number(x);
 }

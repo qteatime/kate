@@ -39,8 +39,7 @@ async function main() {
       case: config.case_mode,
     });
 
-    const cart_bytes = new Uint8Array(await (await fetch("game.kart")).arrayBuffer());
-    const blob = new Blob([cart_bytes]);
+    const blob = await (await fetch("game.kart")).blob();
     const cart = await Kate.cart.parse_metadata(blob, kate.version);
     const capabilities = Kate.capabilities.grants_from_cartridge(cart);
 
@@ -74,7 +73,7 @@ async function main() {
       window.removeEventListener("touchstart", start);
 
       try {
-        await kate_os.processes.run_from_cartridge(cart_bytes);
+        await kate_os.processes.run_from_cartridge(blob);
         document.querySelector("#kate-loading")?.remove();
       } catch (error) {
         alert(`Kate failed to run the cartridge: ${error}`);

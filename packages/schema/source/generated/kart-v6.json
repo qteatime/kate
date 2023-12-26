@@ -446,6 +446,12 @@
               }
             },
             {
+              "name": "offset",
+              "type": {
+                "op": "uint64"
+              }
+            },
+            {
               "name": "size",
               "type": {
                 "op": "uint32"
