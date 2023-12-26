@@ -7,10 +7,12 @@
 import * as Path from "path";
 import * as FS from "fs";
 import * as Crypto from "crypto";
-import { kart_v5 as Cart } from "./deps/schema";
-import { enumerate, from_bytes, unreachable } from "./deps/util";
+import * as Stream from "stream";
+import { kart_v6 as Cart, kart_v6 } from "./deps/schema";
+import { Pathname, enumerate, from_bytes, unreachable } from "./deps/util";
 import * as Glob from "glob";
-import { Spec as T } from "./deps/util";
+import { Spec as T, bytes_to_hex } from "./deps/util";
+import { Hash_algorithm } from "../../schema/build/kart-v6";
 const keymap = require("../assets/keymap.json") as {
   [key: string]: {
     key: string;
@@ -18,6 +20,37 @@ const keymap = require("../assets/keymap.json") as {
     key_code: number;
   };
 };
+
+const spec_version = Cart.Kate_version({
+  major: 0,
+  minor: 24,
+  patch: 2,
+});
+
+class KartWriter {
+  private offset = 0n;
+  private web_stream: WritableStream<Uint8Array>;
+  private writer;
+
+  constructor(readonly stream: FS.WriteStream) {
+    this.web_stream = Stream.Writable.toWeb(stream);
+    this.writer = this.web_stream.getWriter();
+  }
+
+  async write(bytes: Uint8Array) {
+    await this.writer.write(bytes);
+    this.offset += BigInt(bytes.byteLength);
+  }
+
+  async close() {
+    await this.writer.close();
+    this.stream.close();
+  }
+
+  get current_offset() {
+    return this.offset;
+  }
+}
 
 const genre = T.one_of([
   "action",
@@ -414,39 +447,34 @@ function load_file(path0: string, root: string, base_dir: string) {
   return new Uint8Array(FS.readFileSync(assert_base(path, root)));
 }
 
-function load_text_file(path0: string, root: string, base_dir: string) {
-  const path = Path.resolve(base_dir, path0);
-  return FS.readFileSync(assert_base(path, root), "utf-8");
-}
-
-function assert_file_exists(path0: string, root: string, base_dir: string) {
-  const path = Path.resolve(base_dir, path0);
-  if (!FS.existsSync(path)) {
-    throw new Error(`Missing file ${path0} in ${root}`);
+function assert_file_in_archive(path: string, archive: Cart.Meta_file[]) {
+  const expected = Pathname.from_string(path).make_absolute().as_string();
+  const node = archive.find((x) => x.path === expected);
+  if (node == null) {
+    throw new Error(`Missing file ${path} in cartridge`);
   }
 }
 
-function maybe_load_text_file(path: string | null, root: string, base_dir: string) {
-  if (path == null) {
-    return "";
-  } else {
-    return load_text_file(path, root, base_dir);
-  }
-}
-
-function metadata(x: Kart["metadata"], root: string, base_dir: string) {
+function metadata(json: Kart, archive: Cart.Meta_file[]) {
+  const x = json.metadata;
   if (x.presentation.thumbnail_path != null) {
-    assert_file_exists(x.presentation.thumbnail_path, root, base_dir);
+    assert_file_in_archive(x.presentation.thumbnail_path, archive);
   }
   if (x.presentation.banner_path != null) {
-    assert_file_exists(x.presentation.banner_path, root, base_dir);
+    assert_file_in_archive(x.presentation.banner_path, archive);
   }
   if (x.legal?.licence_path != null) {
-    assert_file_exists(x.legal.licence_path, root, base_dir);
+    assert_file_in_archive(x.legal.licence_path, archive);
   }
   if (x.legal?.privacy_policy_path != null) {
-    assert_file_exists(x.legal.privacy_policy_path, root, base_dir);
+    assert_file_in_archive(x.legal.privacy_policy_path, archive);
   }
+
+  const identification = Cart.Meta_identification({
+    id: json.id,
+    version: make_version(json.version),
+    "release-date": make_date(json.release),
+  });
 
   const presentation = Cart.Meta_presentation({
     title: x.presentation.title,
@@ -487,7 +515,21 @@ function metadata(x: Kart["metadata"], root: string, base_dir: string) {
       : null,
   });
 
-  return { presentation, classification, legal, accessibility } as const;
+  const security = make_security(json.security);
+  const runtime = make_runtime(json.platform);
+
+  return Cart.Metadata({
+    identification,
+    presentation,
+    classification,
+    accessibility,
+    legal,
+    runtime,
+    security,
+    files: archive,
+    "signed-by": [],
+    signature: null,
+  });
 }
 
 function make_genre(x: Genre): Cart.Genre {
@@ -648,27 +690,43 @@ function make_absolute(path: string) {
   }
 }
 
-async function files(patterns: Kart["files"], root: string, base_dir: string) {
-  const paths = [...new Set(patterns.flatMap((x) => Glob.sync(x, { cwd: base_dir })))];
-
-  const result: Cart.File[] = [];
-  for (const path of paths) {
-    if (FS.statSync(Path.resolve(base_dir, path)).isFile()) {
-      const ext = Path.extname(path);
-      const mime = mime_table[ext] ?? "application/octet-stream";
-      const data = load_file(path, root, base_dir);
-      const integrity = await Crypto.subtle.digest("SHA-256", data.buffer);
-      result.push(
-        Cart.File({
-          path: make_absolute(path),
-          mime: mime,
-          integrity: new Uint8Array(integrity),
-          data: load_file(path, root, base_dir),
-          signature: null,
-        })
-      );
+async function files(patterns: Kart["files"], root: string, base_dir: string, writer: KartWriter) {
+  const paths: string[] = [];
+  const candidates = new Set(patterns.flatMap((x) => Glob.sync(x, { cwd: base_dir })));
+  for (const candidate of candidates) {
+    if (FS.statSync(Path.resolve(base_dir, candidate)).isFile()) {
+      paths.push(candidate);
     }
   }
+
+  const encoder = kart_v6.encode_files(paths.length);
+  await writer.write(encoder.size);
+
+  console.log(`:: Adding ${paths.length} files to the cartridge`);
+  const result: Cart.Meta_file[] = [];
+  for (const path of paths) {
+    const ext = Path.extname(path);
+    const mime = mime_table[ext] ?? "application/octet-stream";
+    const data = load_file(path, root, base_dir);
+    const integrity = await Crypto.subtle.digest("SHA-512", data.buffer);
+    const offset = encoder.current_offset() + 4n;
+
+    result.push(
+      Cart.Meta_file({
+        path: make_absolute(path),
+        mime: mime,
+        integrity: new Uint8Array(integrity),
+        "hash-algorithm": Hash_algorithm.Sha_512({}),
+        offset: offset,
+        size: data.byteLength,
+      })
+    );
+
+    await writer.write(encoder.encode_file(data));
+    console.log(`> Added ${make_absolute(path)} (${from_bytes(data.byteLength)}`);
+  }
+
+  encoder.close();
 
   return result;
 }
@@ -719,16 +777,6 @@ function make_capability(json: Capability) {
     default:
       throw unreachable(json, "capability");
   }
-}
-
-function save(metadata: Cart.Metadata, files: Cart.File[], output: string) {
-  const bytes = Cart.encode({
-    kate_version: Cart.Kate_version({ major: 0, minor: 24, patch: 2 }),
-    metadata: metadata,
-    files: files,
-  });
-  console.log(`> Total size: ${from_bytes(bytes.byteLength)}`);
-  FS.writeFileSync(output, bytes);
 }
 
 function make_bridge(x: Bridge): Cart.Bridge[] {
@@ -1044,34 +1092,53 @@ export async function make_cartridge(path: string, output: string) {
     base_dir = new_base_dir;
   }
 
-  const meta = metadata(json.metadata, dir_root, base_dir);
-  const archive = await files(json.files, dir_root, base_dir);
-  show_archive(archive);
+  const writer = new KartWriter(FS.createWriteStream(output));
+  try {
+    await writer.write(kart_v6.encode_magic());
+    const file_offset = writer.current_offset;
+    const archive = await files(json.files, dir_root, base_dir, writer);
+    const meta_offset = writer.current_offset;
+    const meta = metadata(json, archive);
+    await writer.write(kart_v6.encode_metadata(meta));
+    const header_offset = writer.current_offset;
+    await writer.write(
+      kart_v6.encode_header(
+        Cart.Header({
+          "minimum-kate-version": spec_version,
+          "content-location": Cart.Binary_location({
+            offset: file_offset,
+            size: meta_offset - file_offset,
+          }),
+          "metadata-location": Cart.Binary_location({
+            offset: meta_offset,
+            size: header_offset - meta_offset,
+          }),
+        })
+      )
+    );
+    const total_size = writer.current_offset;
+    await writer.close();
 
-  assert_file_exists(x.html, dir_root, base_dir);
+    console.log(`> Total size ${from_bytes(total_size)}`);
+  } catch (e: any) {
+    console.log(`> Packaging failed, removing corrupted file.`);
+    try {
+      await writer.close();
+    } catch (_) {}
+    if (FS.existsSync(output)) {
+      FS.unlinkSync(output);
+    }
+    throw new Error(`Failed to generate cartridge: ${e?.stack ?? e}`);
+  }
+}
 
+function make_runtime(x: Kart["platform"]) {
   switch (x.type) {
     case "web-archive": {
-      save(
-        Cart.Metadata({
-          ...meta,
-          identification: Cart.Meta_identification({
-            id: json.id,
-            version: make_version(json.version),
-            "release-date": make_date(json.release),
-          }),
-          runtime: Cart.Runtime.Web_archive({
-            "html-path": make_absolute(x.html),
-            bridges: x.bridges.flatMap(make_bridge),
-          }),
-          security: make_security(json.security),
-          signature: null,
-          "signed-by": [],
-        }),
-        archive,
-        output
-      );
-      break;
+      return Cart.Runtime.Web_archive({
+        "html-path": make_absolute(x.html),
+        bridges: x.bridges.flatMap(make_bridge),
+      });
     }
 
     default:
@@ -1081,12 +1148,4 @@ export async function make_cartridge(path: string, output: string) {
 
 function show_details(json: unknown) {
   console.log(`> Cartridge build rules:\n${JSON.stringify(json, null, 2)}\n`);
-}
-
-function show_archive(archive: Cart.File[]) {
-  console.log(`> Cartridge contents:\n`);
-  for (const file of archive) {
-    console.log(`:: ${file.path} (${from_bytes(file.data.byteLength)})`);
-  }
-  console.log("");
 }

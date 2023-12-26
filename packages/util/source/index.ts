@@ -14,3 +14,4 @@ export * from "./unit";
 export * from "./time";
 export * from "./serialise";
 export * from "./glob-match";
+export * from "./semver";

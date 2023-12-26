@@ -35,14 +35,18 @@ export class KateProcesses {
     this.os.kernel.processes.on_system_event.listen(this.handle_system_event);
   }
 
-  async run_from_cartridge(bytes: Uint8Array) {
+  async run_from_cartridge(blob: Blob) {
     if (this.is_busy) {
       throw new Error(`a process is already running`);
     }
 
-    const file = new Blob([bytes], { type: "application/octet-stream" });
-    const cart = await Cart.parse(file);
-    const file_map = new Map(cart.files.map((x) => [x.path, x] as const));
+    const cart = await Cart.parse_metadata(blob, this.os.kernel.version);
+    const has_proper_offset = cart.files.every((x) => x.offset !== null);
+    const file_map = new Map(cart.files.map((x) => [x.path, x]));
+    let data_map: Map<string, Cart.DataFile> | null = null;
+    if (!has_proper_offset) {
+      data_map = (await Cart.parse_whole(blob, this.os.kernel.version)).file_map;
+    }
 
     const storage = await this.os.object_store.cartridge(cart, false).get_local_storage();
     const process = await this.os.kernel.processes.spawn({
@@ -51,11 +55,29 @@ export class KateProcesses {
       local_storage: storage,
       filesystem: {
         read: async (path) => {
-          const file = file_map.get(path);
-          if (file == null) {
+          const node = file_map.get(path);
+          if (node == null) {
             throw new Error(`File not found in ${cart.id}: ${path}`);
           }
-          return file;
+          if (data_map != null) {
+            const data = data_map.get(path)!.data;
+            return {
+              path: node.path,
+              mime: node.mime,
+              data,
+            };
+          } else if (node.offset != null) {
+            const data = new Uint8Array(
+              await blob.slice(node.offset, node.offset + node.size).arrayBuffer()
+            );
+            return {
+              path: node.path,
+              mime: node.mime,
+              data,
+            };
+          } else {
+            throw new Error(`Cannot read file ${path} in ${cart.id}`);
+          }
         },
       },
     });

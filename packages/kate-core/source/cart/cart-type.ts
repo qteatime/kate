@@ -121,20 +121,24 @@ export type File = {
   path: string;
   mime: string;
   integrity_hash: Uint8Array;
-  integrity_hash_algorithm: "SHA-256";
+  integrity_hash_algorithm: "SHA-256" | "SHA-512";
   size: number;
   id: string; // a id inside a bucket
 };
 
-export type DataFile = {
-  path: string;
-  mime: string;
-  integrity_hash: Uint8Array;
-  integrity_hash_algorithm: "SHA-256";
+export type UncommitedFile = Omit<File, "id"> & {
+  offset: number | null;
+};
+
+export type DataFile = Omit<File, "id"> & {
   data: Uint8Array;
 };
 
-export type BasicFile = Omit<DataFile, "integrity_hash" | "integrity_hash_algorithm">;
+export type BasicFile = {
+  path: string;
+  mime: string;
+  data: Uint8Array;
+};
 
 export type ContextualCapabilityGrant = {
   capability: ContextualCapability;
@@ -163,7 +167,7 @@ export type CartMeta = {
 };
 
 export type DataCart = CartMeta & {
-  files: DataFile[];
+  files: UncommitedFile[];
 };
 
 export type BucketCart = CartMeta & {

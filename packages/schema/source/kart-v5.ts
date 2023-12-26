@@ -12,6 +12,41 @@ import { concat_all } from "./util";
 
 const schema = LJT.parse(source);
 
+function size_of(id: number) {
+  const size = schema.max_size_of(id);
+  if (size == null) {
+    throw new Error(`Cannot compute a size for variable sized entity ${id}`);
+  }
+  return size;
+}
+
+// == Decoder from blob
+export async function decode_blob_header(blob: Blob): Promise<Cart.Header> {
+  const header_size = schema.magic.byteLength + 4 + size_of(Cart.Header.tag);
+  const buffer = await blob.slice(0, header_size).arrayBuffer();
+  return decode_header(new Uint8Array(buffer));
+}
+
+export async function decode_blob_metadata(
+  blob: Blob,
+  header: Cart.Header
+): Promise<Cart.Metadata> {
+  const loc = header["metadata-location"];
+  const buffer = await blob.slice(loc.offset, loc.offset + loc.size).arrayBuffer();
+  return decode_metadata_record(new Uint8Array(buffer));
+}
+
+export async function* decode_blob_files(
+  blob: Blob,
+  header: Cart.Header
+): AsyncGenerator<Cart.File, void, void> {
+  const loc = header["content-location"];
+  const files = blob.slice(loc.offset, loc.offset + loc.size);
+  const count_bytes = new Uint8Array(await files.slice(0, 4).arrayBuffer());
+
+  while (true) {}
+}
+
 // == Cartridge decoder
 export function decode_header(bytes: Uint8Array): Cart.Header {
   const decoder = LJT.SchemaDecoder.from_bytes(bytes, schema);
@@ -40,26 +75,15 @@ function decode_files_record(bytes: Uint8Array): Cart.File[] {
   return result;
 }
 
-export function decode_metadata(
-  bytes: Uint8Array,
-  header: Cart.Header
-): Cart.Metadata {
+export function decode_metadata(bytes: Uint8Array, header: Cart.Header): Cart.Metadata {
   const meta_loc = header["metadata-location"];
-  const metadata_bytes = bytes.slice(
-    meta_loc.offset,
-    meta_loc.offset + meta_loc.size
-  );
+  const metadata_bytes = bytes.slice(meta_loc.offset, meta_loc.offset + meta_loc.size);
   return decode_metadata_record(metadata_bytes);
 }
 
-export function decode_files(
-  bytes: Uint8Array,
-  header: Cart.Header
-): Cart.File[] {
+export function decode_files(bytes: Uint8Array, header: Cart.Header): Cart.File[] {
   const file_loc = header["content-location"];
-  return decode_files_record(
-    bytes.slice(file_loc.offset, file_loc.offset + file_loc.size)
-  );
+  return decode_files_record(bytes.slice(file_loc.offset, file_loc.offset + file_loc.size));
 }
 
 export function decode(bytes: Uint8Array): Cart.Cartridge {
@@ -76,15 +100,9 @@ type EncodeOptions = {
 };
 
 export function encode(options: EncodeOptions) {
-  const meta_bytes = LJT.encode_magicless(
-    options.metadata,
-    schema,
-    Cart.Metadata.tag
-  );
+  const meta_bytes = LJT.encode_magicless(options.metadata, schema, Cart.Metadata.tag);
 
-  const file_list = options.files.map((x) =>
-    LJT.encode_magicless(x, schema, Cart.File.tag)
-  );
+  const file_list = options.files.map((x) => LJT.encode_magicless(x, schema, Cart.File.tag));
   const file_size = new Uint8Array(4);
   new DataView(file_size.buffer).setUint32(0, file_list.length, true);
   const file_bytes = concat_all([file_size, ...file_list]);
@@ -108,10 +126,7 @@ export function encode(options: EncodeOptions) {
   return concat_all([header_bytes, meta_bytes, file_bytes]);
 }
 
-function slice_intersect(
-  a: { offset: number; size: number },
-  b: { offset: number; size: number }
-) {
+function slice_intersect(a: { offset: number; size: number }, b: { offset: number; size: number }) {
   if (a.offset + a.size <= b.offset) return false;
   if (a.offset >= b.offset + b.size) return false;
   return true;

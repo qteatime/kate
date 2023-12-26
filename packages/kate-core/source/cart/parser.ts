@@ -4,34 +4,106 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { DataCart, DataFile } from "./cart-type";
-import * as v4 from "./v4/v4";
-import * as v5 from "./v5/v5";
+import { ECartCorrupted, ECartFormatTooNew } from "../error";
+import { CartChangeReason } from "../os";
+import { SemVer } from "../utils";
+import { DataCart, DataFile, UncommitedFile } from "./cart-type";
+import * as v6 from "./v6/v6";
 
-const parsers = [
-  { detect: v4.detect, parse: v4.parse_v4 },
-  { detect: v5.detect, parse: v5.parse_v5 },
+export type YieldFile = {
+  index: number;
+  data: Uint8Array;
+};
+
+export type Parser<T> = {
+  detect(x: Blob): Promise<boolean>;
+  minimum_version(header: T): SemVer;
+  parse_header(x: Blob): Promise<T>;
+  parse_meta(x: Blob, header: T): Promise<DataCart>;
+  parse_files(x: Blob, header: T, metadata: DataCart): AsyncGenerator<YieldFile, void, void>;
+};
+
+const parsers: Parser<unknown>[] = [
+  {
+    detect: v6.detect,
+    minimum_version: v6.minimum_version,
+    parse_header: v6.decode_header,
+    parse_meta: v6.decode_metadata,
+    parse_files: v6.decode_files,
+  },
 ];
 
-export async function try_parse(data: Blob) {
+export async function choose_parser(data: Blob) {
   for (const parser of parsers) {
     if (await parser.detect(data)) {
-      return await parser.parse(data);
+      return parser;
     }
   }
 
   return null;
 }
 
-export async function parse(data: Blob) {
-  const cart = await try_parse(data);
-  if (cart == null) {
-    throw new Error(`No suitable parsers found`);
+export async function parse_metadata(data: Blob, kate_ver: SemVer) {
+  const parser = await choose_parser(data);
+  if (parser == null) {
+    throw new Error(`No suitable parser`);
   }
-  return cart;
+
+  const header = await parser.parse_header(data);
+  const required_ver = parser.minimum_version(header);
+  if (required_ver.gt(kate_ver)) {
+    throw new ECartFormatTooNew(required_ver, "cartridge");
+  }
+
+  const metadata = await parser.parse_meta(data, header);
+  const errors = await verify_pointers(metadata);
+  if (errors.length !== 0) {
+    console.error(`Missing cartridge files`, errors);
+    throw new ECartCorrupted(metadata.id);
+  }
+
+  return metadata;
 }
 
-export async function verify_integrity(cart: DataCart) {
+export async function parse_whole(data: Blob, kate_ver: SemVer) {
+  const parser = await choose_parser(data);
+  if (parser == null) {
+    throw new Error(`No suitable parser`);
+  }
+
+  const header = await parser.parse_header(data);
+  const required_ver = parser.minimum_version(header);
+  if (required_ver.gt(kate_ver)) {
+    throw new ECartFormatTooNew(required_ver, "cartridge");
+  }
+
+  const metadata = await parser.parse_meta(data, header);
+  const errors = await verify_pointers(metadata);
+  if (errors.length !== 0) {
+    console.error(`Missing cartridge files`, errors);
+    throw new ECartCorrupted(metadata.id);
+  }
+
+  const files = parser.parse_files(data, header, metadata);
+  const file_map = new Map<string, DataFile>();
+
+  for await (const entry of files) {
+    const node = metadata.files[entry.index];
+    if (node == null) {
+      console.error(`Unexpected cartridge file ${entry.index}`);
+      throw new ECartCorrupted(metadata.id);
+    }
+    if (!(await verify_file_integrity(node, entry.data))) {
+      console.error(`Integrity check failed for ${node.path}`, node);
+      throw new ECartCorrupted(metadata.id);
+    }
+    file_map.set(node.path, { ...node, data: entry.data });
+  }
+
+  return { metadata, file_map };
+}
+
+export async function verify_pointers(cart: DataCart) {
   const errors = [
     ...check_file_exists(cart.metadata.presentation.thumbnail_path, cart),
     ...check_file_exists(cart.metadata.presentation.banner_path, cart),
@@ -39,16 +111,11 @@ export async function verify_integrity(cart: DataCart) {
     ...check_file_exists(cart.metadata.legal.privacy_policy_path, cart),
     ...check_file_exists(cart.runtime.html_path, cart),
   ];
-  for (const file of cart.files) {
-    if (!(await check_file_integrity(file))) {
-      errors.push(`Corrupted file: ${file.path}`);
-    }
-  }
   return errors;
 }
 
-async function check_file_integrity(file: DataFile) {
-  const hash = await crypto.subtle.digest(file.integrity_hash_algorithm, file.data.buffer);
+export async function verify_file_integrity(file: UncommitedFile, data: Uint8Array) {
+  const hash = await crypto.subtle.digest(file.integrity_hash_algorithm, data.buffer);
   return byte_equals(new Uint8Array(hash), file.integrity_hash);
 }
 

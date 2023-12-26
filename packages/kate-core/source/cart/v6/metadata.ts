@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { Cart_v5 } from "./v5";
+import { Cart_v6 } from "./v6";
 import { unreachable } from "../../utils";
 import { str, list, chars_in_mb, regex } from "../parser-utils";
 import type {
@@ -18,7 +18,7 @@ import type {
   ReleaseType,
 } from "../cart-type";
 
-export function parse_metadata(meta: Cart_v5.Metadata): Metadata {
+export function parse_metadata(meta: Cart_v6.Metadata): Metadata {
   return {
     presentation: parse_presentation(meta.presentation),
     classification: parse_classification(meta.classification),
@@ -27,7 +27,7 @@ export function parse_metadata(meta: Cart_v5.Metadata): Metadata {
   };
 }
 
-function parse_presentation(block: Cart_v5.Meta_presentation): Metadata["presentation"] {
+function parse_presentation(block: Cart_v6.Meta_presentation): Metadata["presentation"] {
   return {
     title: str(block.title, 255),
     author: str(block.author, 255),
@@ -39,7 +39,7 @@ function parse_presentation(block: Cart_v5.Meta_presentation): Metadata["present
   };
 }
 
-function parse_classification(block: Cart_v5.Meta_classification): Metadata["classification"] {
+function parse_classification(block: Cart_v6.Meta_classification): Metadata["classification"] {
   return {
     genre: new Set(block.genre.map((x) => genre(x))),
     tags: new Set(
@@ -53,7 +53,7 @@ function parse_classification(block: Cart_v5.Meta_classification): Metadata["cla
   };
 }
 
-function parse_legal(block: Cart_v5.Meta_legal): Metadata["legal"] {
+function parse_legal(block: Cart_v6.Meta_legal): Metadata["legal"] {
   return {
     derivative_policy: derivative_policy(block["derivative-policy"]),
     licence_path: block["licence-path"] ? str(block["licence-path"], 1_024) : null,
@@ -63,7 +63,7 @@ function parse_legal(block: Cart_v5.Meta_legal): Metadata["legal"] {
   };
 }
 
-function parse_accessibility(block: Cart_v5.Meta_accessibility): Metadata["accessibility"] {
+function parse_accessibility(block: Cart_v6.Meta_accessibility): Metadata["accessibility"] {
   return {
     input_methods: new Set(block["input-methods"].map(input_method)),
     languages: list(block.languages.map(language), 255),
@@ -73,122 +73,122 @@ function parse_accessibility(block: Cart_v5.Meta_accessibility): Metadata["acces
   };
 }
 
-function release_kind(x: Cart_v5.Release_type): ReleaseType {
+function release_kind(x: Cart_v6.Release_type): ReleaseType {
   switch (x["@variant"]) {
-    case Cart_v5.Release_type.$Tags.Beta:
+    case Cart_v6.Release_type.$Tags.Beta:
       return "beta";
-    case Cart_v5.Release_type.$Tags.Demo:
+    case Cart_v6.Release_type.$Tags.Demo:
       return "demo";
-    case Cart_v5.Release_type.$Tags.Early_access:
+    case Cart_v6.Release_type.$Tags.Early_access:
       return "early-access";
-    case Cart_v5.Release_type.$Tags.Regular:
+    case Cart_v6.Release_type.$Tags.Regular:
       return "regular";
-    case Cart_v5.Release_type.$Tags.Prototype:
+    case Cart_v6.Release_type.$Tags.Prototype:
       return "prototype";
-    case Cart_v5.Release_type.$Tags.Unofficial:
+    case Cart_v6.Release_type.$Tags.Unofficial:
       return "unofficial";
     default:
       throw unreachable(x);
   }
 }
 
-function genre(x: Cart_v5.Genre): Genre {
+function genre(x: Cart_v6.Genre): Genre {
   switch (x["@variant"]) {
-    case Cart_v5.Genre.$Tags.Action:
+    case Cart_v6.Genre.$Tags.Action:
       return "action";
-    case Cart_v5.Genre.$Tags.Fighting:
+    case Cart_v6.Genre.$Tags.Fighting:
       return "fighting";
-    case Cart_v5.Genre.$Tags.Adventure:
+    case Cart_v6.Genre.$Tags.Adventure:
       return "adventure";
-    case Cart_v5.Genre.$Tags.Visual_novel:
+    case Cart_v6.Genre.$Tags.Visual_novel:
       return "visual-novel";
-    case Cart_v5.Genre.$Tags.Interactive_fiction:
+    case Cart_v6.Genre.$Tags.Interactive_fiction:
       return "interactive-fiction";
-    case Cart_v5.Genre.$Tags.Platformer:
+    case Cart_v6.Genre.$Tags.Platformer:
       return "platformer";
-    case Cart_v5.Genre.$Tags.Puzzle:
+    case Cart_v6.Genre.$Tags.Puzzle:
       return "puzzle";
-    case Cart_v5.Genre.$Tags.Racing:
+    case Cart_v6.Genre.$Tags.Racing:
       return "racing";
-    case Cart_v5.Genre.$Tags.Rhythm:
+    case Cart_v6.Genre.$Tags.Rhythm:
       return "rhythm";
-    case Cart_v5.Genre.$Tags.RPG:
+    case Cart_v6.Genre.$Tags.RPG:
       return "rpg";
-    case Cart_v5.Genre.$Tags.Simulation:
+    case Cart_v6.Genre.$Tags.Simulation:
       return "simulation";
-    case Cart_v5.Genre.$Tags.Shooter:
+    case Cart_v6.Genre.$Tags.Shooter:
       return "shooter";
-    case Cart_v5.Genre.$Tags.Sports:
+    case Cart_v6.Genre.$Tags.Sports:
       return "sports";
-    case Cart_v5.Genre.$Tags.Strategy:
+    case Cart_v6.Genre.$Tags.Strategy:
       return "strategy";
-    case Cart_v5.Genre.$Tags.Tool:
+    case Cart_v6.Genre.$Tags.Tool:
       return "tool";
-    case Cart_v5.Genre.$Tags.Other:
+    case Cart_v6.Genre.$Tags.Other:
       return "other";
-    case Cart_v5.Genre.$Tags.Not_specified:
+    case Cart_v6.Genre.$Tags.Not_specified:
       return "not-specified";
     default:
       throw unreachable(x, "genre");
   }
 }
 
-function content_rating(x: Cart_v5.Content_rating): ContentRating {
+function content_rating(x: Cart_v6.Content_rating): ContentRating {
   switch (x["@variant"]) {
-    case Cart_v5.Content_rating.$Tags.General:
+    case Cart_v6.Content_rating.$Tags.General:
       return "general";
-    case Cart_v5.Content_rating.$Tags.Teen_and_up:
+    case Cart_v6.Content_rating.$Tags.Teen_and_up:
       return "teen-and-up";
-    case Cart_v5.Content_rating.$Tags.Mature:
+    case Cart_v6.Content_rating.$Tags.Mature:
       return "mature";
-    case Cart_v5.Content_rating.$Tags.Explicit:
+    case Cart_v6.Content_rating.$Tags.Explicit:
       return "explicit";
-    case Cart_v5.Content_rating.$Tags.Unknown:
+    case Cart_v6.Content_rating.$Tags.Unknown:
       return "unknown";
     default:
       throw unreachable(x, "content rating");
   }
 }
 
-function derivative_policy(x: Cart_v5.Derivative_policy): DerivativePolicy {
+function derivative_policy(x: Cart_v6.Derivative_policy): DerivativePolicy {
   switch (x["@variant"]) {
-    case Cart_v5.Derivative_policy.$Tags.Not_allowed:
+    case Cart_v6.Derivative_policy.$Tags.Not_allowed:
       return "not-allowed";
-    case Cart_v5.Derivative_policy.$Tags.Personal_use:
+    case Cart_v6.Derivative_policy.$Tags.Personal_use:
       return "personal-use";
-    case Cart_v5.Derivative_policy.$Tags.Non_commercial_use:
+    case Cart_v6.Derivative_policy.$Tags.Non_commercial_use:
       return "non-commercial-use";
-    case Cart_v5.Derivative_policy.$Tags.Commercial_use:
+    case Cart_v6.Derivative_policy.$Tags.Commercial_use:
       return "commercial-use";
     default:
       throw unreachable(x, "derivative policy");
   }
 }
 
-function accessibility_provision(x: Cart_v5.Accessibility_provision): AccessibilityProvision {
+function accessibility_provision(x: Cart_v6.Accessibility_provision): AccessibilityProvision {
   switch (x["@variant"]) {
-    case Cart_v5.Accessibility_provision.$Tags.Configurable_difficulty:
+    case Cart_v6.Accessibility_provision.$Tags.Configurable_difficulty:
       return "configurable-difficulty";
-    case Cart_v5.Accessibility_provision.$Tags.High_contrast:
+    case Cart_v6.Accessibility_provision.$Tags.High_contrast:
       return "high-contrast";
-    case Cart_v5.Accessibility_provision.$Tags.Image_captions:
+    case Cart_v6.Accessibility_provision.$Tags.Image_captions:
       return "image-captions";
-    case Cart_v5.Accessibility_provision.$Tags.Skippable_content:
+    case Cart_v6.Accessibility_provision.$Tags.Skippable_content:
       return "skippable-content";
-    case Cart_v5.Accessibility_provision.$Tags.Subtitles:
+    case Cart_v6.Accessibility_provision.$Tags.Subtitles:
       return "subtitles";
-    case Cart_v5.Accessibility_provision.$Tags.Voiced_text:
+    case Cart_v6.Accessibility_provision.$Tags.Voiced_text:
       return "voiced-text";
     default:
       throw unreachable(x);
   }
 }
 
-function input_method(x: Cart_v5.Input_method): InputMethod {
+function input_method(x: Cart_v6.Input_method): InputMethod {
   switch (x["@variant"]) {
-    case Cart_v5.Input_method.$Tags.Buttons:
+    case Cart_v6.Input_method.$Tags.Buttons:
       return "buttons";
-    case Cart_v5.Input_method.$Tags.Pointer:
+    case Cart_v6.Input_method.$Tags.Pointer:
       return "pointer";
     default:
       throw unreachable(x);
@@ -197,7 +197,7 @@ function input_method(x: Cart_v5.Input_method): InputMethod {
 
 const valid_language = regex("language iso-code", /^[a-z]{2}(?:[\-_][a-zA-Z_]{2,})?$/);
 
-function language(x: Cart_v5.Language): Language {
+function language(x: Cart_v6.Language): Language {
   return {
     iso_code: valid_language(str(x["iso-code"], 255)),
     audio: x.audio,
