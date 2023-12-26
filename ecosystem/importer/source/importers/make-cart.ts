@@ -175,26 +175,26 @@ export async function make_file(path: Pathname, data: Uint8Array) {
 }
 
 export function encode_whole(cart: CartConfig) {
-  let offset = 0;
+  let offset = 0n;
   const bytes = [];
 
   const magic = kart_v6.encode_magic();
   bytes.push(magic);
-  offset += magic.byteLength;
+  offset += BigInt(magic.byteLength);
   const file_offset = offset;
   bytes.push(uint32(cart.files.length));
-  offset += 4;
+  offset += 4n;
   for (const file of cart.files) {
     bytes.push(uint32(file.byteLength));
-    offset += 4;
+    offset += 4n;
     bytes.push(file);
-    offset += file.byteLength;
+    offset += BigInt(file.byteLength);
   }
 
   const meta_offset = offset;
   const meta = kart_v6.encode_metadata(cart.metadata);
   bytes.push(meta);
-  offset += meta.byteLength;
+  offset += BigInt(meta.byteLength);
 
   const header_offset = offset;
   bytes.push(
