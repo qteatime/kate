@@ -62,7 +62,6 @@ export async function* decode_blob_files(
 // == Record decoding
 export function decode_header_record(bytes: Uint8Array): Cart.Header {
   const decoder = LJT.SchemaDecoder.from_bytes(bytes, schema);
-  decoder.assert_magic();
   const header = decoder.record(Cart.Header.tag) as Cart.Header;
   const meta_loc = header["metadata-location"];
   const file_loc = header["content-location"];
@@ -135,7 +134,7 @@ class BlobDecoder {
   }
 
   private assert_size(size: number) {
-    if (this.offset + size >= this.blob.size) {
+    if (this.offset + size > this.blob.size) {
       throw new Error(`Size out of bounds at offset 0x${this.offset.toString(16)}: ${size}`);
     }
   }

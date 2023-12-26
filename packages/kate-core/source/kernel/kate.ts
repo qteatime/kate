@@ -4,11 +4,16 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
+import { SemVer } from "../utils";
 import { ProcessManager } from "./process";
 import { ConsoleOptions, VirtualConsole } from "./virtual";
+const version = require("../../package.json").version;
+const semver = SemVer.try_parse(version)!;
 
 export class KateKernel {
   readonly processes;
+  readonly version = semver;
+
   private constructor(readonly console: VirtualConsole) {
     this.processes = new ProcessManager();
   }

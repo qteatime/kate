@@ -9,10 +9,10 @@ import * as FS from "fs";
 import * as Crypto from "crypto";
 import * as Stream from "stream";
 import { kart_v6 as Cart, kart_v6 } from "./deps/schema";
-import { enumerate, from_bytes, unreachable } from "./deps/util";
+import { Pathname, enumerate, from_bytes, unreachable } from "./deps/util";
 import * as Glob from "glob";
-import { Spec as T } from "./deps/util";
-import { Hash_algorithm } from "../../schema/source/kart-v6";
+import { Spec as T, bytes_to_hex } from "./deps/util";
+import { Hash_algorithm } from "../../schema/build/kart-v6";
 const keymap = require("../assets/keymap.json") as {
   [key: string]: {
     key: string;
@@ -44,8 +44,6 @@ class KartWriter {
 
   async close() {
     await this.writer.close();
-    this.writer.releaseLock();
-    await this.web_stream.close();
     this.stream.close();
   }
 
@@ -449,30 +447,11 @@ function load_file(path0: string, root: string, base_dir: string) {
   return new Uint8Array(FS.readFileSync(assert_base(path, root)));
 }
 
-function load_text_file(path0: string, root: string, base_dir: string) {
-  const path = Path.resolve(base_dir, path0);
-  return FS.readFileSync(assert_base(path, root), "utf-8");
-}
-
-function assert_file_exists(path0: string, root: string, base_dir: string) {
-  const path = Path.resolve(base_dir, path0);
-  if (!FS.existsSync(path)) {
-    throw new Error(`Missing file ${path0} in ${root}`);
-  }
-}
-
 function assert_file_in_archive(path: string, archive: Cart.Meta_file[]) {
-  const node = archive.find((x) => x.path === path);
+  const expected = Pathname.from_string(path).make_absolute().as_string();
+  const node = archive.find((x) => x.path === expected);
   if (node == null) {
     throw new Error(`Missing file ${path} in cartridge`);
-  }
-}
-
-function maybe_load_text_file(path: string | null, root: string, base_dir: string) {
-  if (path == null) {
-    return "";
-  } else {
-    return load_text_file(path, root, base_dir);
   }
 }
 
@@ -735,6 +714,7 @@ async function files(patterns: Kart["files"], root: string, base_dir: string, wr
       );
 
       await writer.write(encoder.encode_file(data));
+      console.log(`> Added ${make_absolute(path)} (${from_bytes(data.byteLength)})`);
     }
   }
 
@@ -1129,11 +1109,16 @@ export async function make_cartridge(path: string, output: string) {
     const total_size = writer.current_offset;
     await writer.close();
 
-    show_archive(archive);
     console.log(`> Total size ${from_bytes(total_size)}`);
   } catch (e: any) {
+    console.log(`> Packaging failed, removing corrupted file.`);
+    try {
+      await writer.close();
+    } catch (_) {}
+    if (FS.existsSync(output)) {
+      FS.unlinkSync(output);
+    }
     throw new Error(`Failed to generate cartridge: ${e?.stack ?? e}`);
-    // todo
   }
 }
 
@@ -1153,12 +1138,4 @@ function make_runtime(x: Kart["platform"]) {
 
 function show_details(json: unknown) {
   console.log(`> Cartridge build rules:\n${JSON.stringify(json, null, 2)}\n`);
-}
-
-function show_archive(archive: Cart.Meta_file[]) {
-  console.log(`> Cartridge contents:\n`);
-  for (const file of archive) {
-    console.log(`:: ${file.path} (${from_bytes(file.size)})`);
-  }
-  console.log("");
 }

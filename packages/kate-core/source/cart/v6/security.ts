@@ -6,15 +6,15 @@
 
 import { unreachable } from "../../utils";
 import { ContextualCapability, ContextualCapabilityGrant, Security } from "../cart-type";
-import { Cart_v4 } from "./v4";
+import { Cart_v6 } from "./v6";
 
-export function parse_security(cart: Cart_v4.Cartridge): Security {
+export function parse_security(metadata: Cart_v6.Metadata): Security {
   return {
-    contextual_capabilities: cart.security.capabilities.map(parse_capability),
+    contextual_capabilities: metadata.security.capabilities.map(parse_capability),
   };
 }
 
-function parse_capability(capability: Cart_v4.Capability.Contextual): ContextualCapabilityGrant {
+function parse_capability(capability: Cart_v6.Capability.Contextual): ContextualCapabilityGrant {
   return {
     reason: capability.reason,
     capability: parse_contextual_capability(capability.capability),
@@ -22,30 +22,30 @@ function parse_capability(capability: Cart_v4.Capability.Contextual): Contextual
 }
 
 function parse_contextual_capability(
-  capability: Cart_v4.Contextual_capability
+  capability: Cart_v6.Contextual_capability
 ): ContextualCapability {
   switch (capability["@variant"]) {
-    case Cart_v4.Contextual_capability.$Tags.Open_URLs: {
+    case Cart_v6.Contextual_capability.$Tags.Open_URLs: {
       return {
         type: "open-urls",
       };
     }
-    case Cart_v4.Contextual_capability.$Tags.Request_device_files: {
+    case Cart_v6.Contextual_capability.$Tags.Request_device_files: {
       return {
         type: "request-device-files",
       };
     }
-    case Cart_v4.Contextual_capability.$Tags.Install_cartridges: {
+    case Cart_v6.Contextual_capability.$Tags.Install_cartridges: {
       return {
         type: "install-cartridges",
       };
     }
-    case Cart_v4.Contextual_capability.$Tags.Download_files: {
+    case Cart_v6.Contextual_capability.$Tags.Download_files: {
       return {
         type: "download-files",
       };
     }
-    case Cart_v4.Contextual_capability.$Tags.Show_dialogs: {
+    case Cart_v6.Contextual_capability.$Tags.Show_dialogs: {
       return {
         type: "show-dialogs",
       };

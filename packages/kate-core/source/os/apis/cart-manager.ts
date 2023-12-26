@@ -18,9 +18,9 @@ import {
   zip,
 } from "../../utils";
 import { KateFileBucket } from "./file-store";
+import { ECartCorrupted, ECartFormatTooNew, ENoCartParser } from "../../error";
 
 export class CartManager {
-  readonly CARTRIDGE_SIZE_LIMIT = gb(1.4);
   readonly THUMBNAIL_WIDTH = 400;
   readonly THUMBNAIL_HEIGHT = 700;
   readonly BANNER_WIDTH = 1280;
@@ -111,18 +111,7 @@ export class CartManager {
   }
 
   // -- Installation
-  async install_from_file(file: File) {
-    if (file.size > this.CARTRIDGE_SIZE_LIMIT) {
-      this.os.notifications.push_transient(
-        "kate:cart-manager",
-        "Installation failed",
-        `${file.name} (${from_bytes(file.size)}) exceeds the ${from_bytes(
-          this.CARTRIDGE_SIZE_LIMIT
-        )} cartridge size limit.`
-      );
-      return;
-    }
-
+  async install_from_file(file: File | Blob) {
     const estimated_unpacked_size = file.size + this.os.object_store.default_quota.maximum_size * 2;
     if (!(await this.os.storage_manager.can_fit(estimated_unpacked_size))) {
       this.os.notifications.push_transient(
@@ -134,13 +123,20 @@ export class CartManager {
     }
 
     try {
-      const cart = await Cart.parse(file);
-      const errors = await Cart.verify_integrity(cart);
-      if (errors.length !== 0) {
-        console.error(`Corrupted cartridge ${cart.id}`, errors);
-        throw new Error(`Corrupted cartridge ${cart.id}`);
+      const parser = await Cart.choose_parser(file);
+      if (parser == null) {
+        throw new ENoCartParser(file.name);
       }
-      await this.install(cart, cart.files);
+      const header = await parser.parse_header(file);
+      await this.assert_minimum_version(file.name, header, parser);
+      const metadata = await parser.parse_meta(file, header);
+      const files = parser.parse_files(file, header);
+      const errors = await Cart.verify_pointers(metadata);
+      if (errors.length !== 0) {
+        console.error(`Corrupted cartridge ${metadata.id}`, errors);
+        throw new Error(`Corrupted cartridge ${metadata.id}`);
+      }
+      await this.install(metadata, files);
     } catch (error) {
       console.error(`Failed to install ${file.name}:`, error);
       await this.os.audit_supervisor.log("kate:cart-manager", {
@@ -158,7 +154,18 @@ export class CartManager {
     }
   }
 
-  async install(cart: Cart.DataCart, files: Iterable<{ path: string; data: Uint8Array }>) {
+  private async assert_minimum_version(
+    name: string,
+    header: unknown,
+    parser: Cart.Parser<unknown>
+  ) {
+    const required = parser.minimum_version(header);
+    if (this.os.kernel.version.lt(required)) {
+      throw new ECartFormatTooNew(required, name);
+    }
+  }
+
+  async install(cart: Cart.DataCart, files: AsyncIterable<{ index: number; data: Uint8Array }>) {
     if (this.os.kernel.console.options.mode === "single") {
       throw new Error(`Cartridge installation is not available in single mode.`);
     }
@@ -194,9 +201,20 @@ export class CartManager {
     }
 
     const cart_partition = await this.os.file_store.get_partition("cartridge");
-    const { bucket, mapping } = await cart_partition.from_stream(
-      readable_stream_from_iterable(files)
-    );
+    const bucket = await cart_partition.create(null);
+    const ids: string[] = [];
+    for await (const entry of files) {
+      const file_meta = cart.files[entry.index];
+      if (file_meta == null) {
+        throw new ECartCorrupted(cart.id);
+      }
+      if (!(await Cart.verify_file_integrity(file_meta, entry.data))) {
+        throw new ECartCorrupted(cart.id);
+      }
+      const file = await bucket.put(entry.data);
+      ids.push(file.id);
+    }
+
     let cart_meta: Cart.BucketCart;
     try {
       cart_meta = {
@@ -207,12 +225,10 @@ export class CartManager {
             id: cart.id,
             version: cart.version,
           }),
-          nodes: cart.files.map((node) => {
+          nodes: cart.files.map((node, i) => {
             return {
               ...node,
-              data: null,
-              size: node.data.byteLength,
-              id: mapping.get(node.path)!,
+              id: ids[i],
             };
           }),
         },

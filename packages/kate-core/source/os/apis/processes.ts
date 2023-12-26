@@ -41,8 +41,7 @@ export class KateProcesses {
     }
 
     const file = new Blob([bytes], { type: "application/octet-stream" });
-    const cart = await Cart.parse(file);
-    const file_map = new Map(cart.files.map((x) => [x.path, x] as const));
+    const { metadata: cart, file_map } = await Cart.parse_whole(file, this.os.kernel.version);
 
     const storage = await this.os.object_store.cartridge(cart, false).get_local_storage();
     const process = await this.os.kernel.processes.spawn({

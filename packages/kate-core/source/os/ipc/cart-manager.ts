@@ -21,11 +21,11 @@ export default [
         }
 
         const file = new Blob([cartridge]);
-        const cart = await Cart.parse(file);
-        const errors = await Cart.verify_integrity(cart);
-        if (errors.length !== 0) {
-          console.error(`Corrupted cartridge ${cart.id}`, errors);
-          throw new EMessageFailed("kate.cart-manager.corrupted", `Corrupted cartridge`);
+        let cart;
+        try {
+          cart = await Cart.parse_metadata(file, os.kernel.version);
+        } catch (e) {
+          throw new EMessageFailed("kate.cart-manager.corrupted", "Corrupted cartridge");
         }
 
         const should_install = await os.dialog.confirm("kate:cart-manager", {
@@ -41,7 +41,7 @@ export default [
         if (!should_install) {
           return null;
         }
-        await os.cart_manager.install(cart, cart.files);
+        await os.cart_manager.install_from_file(file);
         return null;
       });
     }
