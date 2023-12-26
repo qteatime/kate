@@ -179,11 +179,7 @@ export class Encoder {
     return this;
   }
 
-  map<K, V>(
-    x: Map<K, V>,
-    fk: (_: Encoder, k: K) => void,
-    fv: (_: Encoder, v: V) => void
-  ) {
+  map<K, V>(x: Map<K, V>, fk: (_: Encoder, k: K) => void, fv: (_: Encoder, v: V) => void) {
     this.uint32(x.size);
     for (const [k, v] of x.entries()) {
       fk(this, k);
@@ -218,34 +214,26 @@ export function magic_size(schema: Schema) {
   return schema.magic.length + 4; // magic + version
 }
 
+export function magic(schema: Schema) {
+  const encoder = new Encoder();
+  encoder.raw_bytes(schema.magic);
+  encoder.uint32(schema.version);
+  return encoder.to_bytes();
+}
+
 export function encode(value: unknown, schema: Schema, root: number) {
   const encoder = new Encoder();
   encoder.raw_bytes(schema.magic);
   encoder.uint32(schema.version);
-  return do_encode(
-    value,
-    { op: "record", id: root },
-    encoder,
-    schema
-  ).to_bytes();
+  return do_encode(value, { op: "record", id: root }, encoder, schema).to_bytes();
 }
 
 export function encode_magicless(value: unknown, schema: Schema, root: number) {
   const encoder = new Encoder();
-  return do_encode(
-    value,
-    { op: "record", id: root },
-    encoder,
-    schema
-  ).to_bytes();
+  return do_encode(value, { op: "record", id: root }, encoder, schema).to_bytes();
 }
 
-function do_encode(
-  value: unknown,
-  op: Op,
-  encoder: Encoder,
-  schema: Schema
-): Encoder {
+function do_encode(value: unknown, op: Op, encoder: Encoder, schema: Schema): Encoder {
   switch (op.op) {
     case "bool": {
       if (typeof value !== "boolean") {

@@ -1,0 +1,1182 @@
+{
+  "magic": [
+    75,
+    65,
+    82,
+    84
+  ],
+  "version": 6,
+  "entities": [
+    {
+      "type": "union",
+      "name": "Runtime",
+      "id": 8,
+      "versions": [
+        {
+          "variants": [
+            {
+              "name": "Web-archive",
+              "fields": [
+                {
+                  "name": "html-path",
+                  "type": {
+                    "op": "text"
+                  }
+                },
+                {
+                  "name": "bridges",
+                  "type": {
+                    "op": "array",
+                    "items": {
+                      "op": "union",
+                      "id": 23
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "record",
+      "name": "Header",
+      "id": 0,
+      "versions": [
+        {
+          "fields": [
+            {
+              "name": "minimum-kate-version",
+              "type": {
+                "op": "record",
+                "id": 13
+              }
+            },
+            {
+              "name": "metadata-location",
+              "type": {
+                "op": "record",
+                "id": 14
+              }
+            },
+            {
+              "name": "content-location",
+              "type": {
+                "op": "record",
+                "id": 14
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "record",
+      "name": "Metadata",
+      "id": 1,
+      "versions": [
+        {
+          "fields": [
+            {
+              "name": "identification",
+              "type": {
+                "op": "record",
+                "id": 2
+              }
+            },
+            {
+              "name": "presentation",
+              "type": {
+                "op": "record",
+                "id": 3
+              }
+            },
+            {
+              "name": "classification",
+              "type": {
+                "op": "record",
+                "id": 4
+              }
+            },
+            {
+              "name": "legal",
+              "type": {
+                "op": "record",
+                "id": 5
+              }
+            },
+            {
+              "name": "accessibility",
+              "type": {
+                "op": "record",
+                "id": 6
+              }
+            },
+            {
+              "name": "security",
+              "type": {
+                "op": "record",
+                "id": 7
+              }
+            },
+            {
+              "name": "runtime",
+              "type": {
+                "op": "union",
+                "id": 8
+              }
+            },
+            {
+              "name": "files",
+              "type": {
+                "op": "array",
+                "items": {
+                  "op": "record",
+                  "id": 9
+                }
+              }
+            },
+            {
+              "name": "signature",
+              "type": {
+                "op": "optional",
+                "value": {
+                  "op": "record",
+                  "id": 10
+                }
+              }
+            },
+            {
+              "name": "signed-by",
+              "type": {
+                "op": "array",
+                "items": {
+                  "op": "text"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "record",
+      "name": "Meta-identification",
+      "id": 2,
+      "versions": [
+        {
+          "fields": [
+            {
+              "name": "id",
+              "type": {
+                "op": "text"
+              }
+            },
+            {
+              "name": "version",
+              "type": {
+                "op": "record",
+                "id": 12
+              }
+            },
+            {
+              "name": "release-date",
+              "type": {
+                "op": "record",
+                "id": 15
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "record",
+      "name": "Meta-presentation",
+      "id": 3,
+      "versions": [
+        {
+          "fields": [
+            {
+              "name": "title",
+              "type": {
+                "op": "text"
+              }
+            },
+            {
+              "name": "author",
+              "type": {
+                "op": "text"
+              }
+            },
+            {
+              "name": "tagline",
+              "type": {
+                "op": "text"
+              }
+            },
+            {
+              "name": "description",
+              "type": {
+                "op": "text"
+              }
+            },
+            {
+              "name": "release-type",
+              "type": {
+                "op": "union",
+                "id": 18
+              }
+            },
+            {
+              "name": "thumbnail-path",
+              "type": {
+                "op": "optional",
+                "value": {
+                  "op": "text"
+                }
+              }
+            },
+            {
+              "name": "banner-path",
+              "type": {
+                "op": "optional",
+                "value": {
+                  "op": "text"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "record",
+      "name": "Meta-classification",
+      "id": 4,
+      "versions": [
+        {
+          "fields": [
+            {
+              "name": "genre",
+              "type": {
+                "op": "array",
+                "items": {
+                  "op": "union",
+                  "id": 16
+                }
+              }
+            },
+            {
+              "name": "tags",
+              "type": {
+                "op": "array",
+                "items": {
+                  "op": "text"
+                }
+              }
+            },
+            {
+              "name": "rating",
+              "type": {
+                "op": "union",
+                "id": 17
+              }
+            },
+            {
+              "name": "warnings",
+              "type": {
+                "op": "optional",
+                "value": {
+                  "op": "text"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "record",
+      "name": "Meta-legal",
+      "id": 5,
+      "versions": [
+        {
+          "fields": [
+            {
+              "name": "derivative-policy",
+              "type": {
+                "op": "union",
+                "id": 19
+              }
+            },
+            {
+              "name": "licence-path",
+              "type": {
+                "op": "optional",
+                "value": {
+                  "op": "text"
+                }
+              }
+            },
+            {
+              "name": "privacy-policy-path",
+              "type": {
+                "op": "optional",
+                "value": {
+                  "op": "text"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "record",
+      "name": "Meta-accessibility",
+      "id": 6,
+      "versions": [
+        {
+          "fields": [
+            {
+              "name": "input-methods",
+              "type": {
+                "op": "array",
+                "items": {
+                  "op": "union",
+                  "id": 20
+                }
+              }
+            },
+            {
+              "name": "languages",
+              "type": {
+                "op": "array",
+                "items": {
+                  "op": "record",
+                  "id": 21
+                }
+              }
+            },
+            {
+              "name": "provisions",
+              "type": {
+                "op": "array",
+                "items": {
+                  "op": "union",
+                  "id": 22
+                }
+              }
+            },
+            {
+              "name": "average-completion-seconds",
+              "type": {
+                "op": "optional",
+                "value": {
+                  "op": "uint32"
+                }
+              }
+            },
+            {
+              "name": "average-session-seconds",
+              "type": {
+                "op": "optional",
+                "value": {
+                  "op": "uint32"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "record",
+      "name": "Security",
+      "id": 7,
+      "versions": [
+        {
+          "fields": [
+            {
+              "name": "capabilities",
+              "type": {
+                "op": "array",
+                "items": {
+                  "op": "union",
+                  "id": 26
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "record",
+      "name": "Meta-file",
+      "id": 9,
+      "versions": [
+        {
+          "fields": [
+            {
+              "name": "path",
+              "type": {
+                "op": "text"
+              }
+            },
+            {
+              "name": "mime",
+              "type": {
+                "op": "text"
+              }
+            },
+            {
+              "name": "integrity",
+              "type": {
+                "op": "bytes"
+              }
+            },
+            {
+              "name": "hash-algorithm",
+              "type": {
+                "op": "union",
+                "id": 29
+              }
+            },
+            {
+              "name": "size",
+              "type": {
+                "op": "uint32"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "record",
+      "name": "Signature-block",
+      "id": 10,
+      "versions": [
+        {
+          "fields": [
+            {
+              "name": "purpose",
+              "type": {
+                "op": "text"
+              }
+            },
+            {
+              "name": "signatures",
+              "type": {
+                "op": "array",
+                "items": {
+                  "op": "record",
+                  "id": 11
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "record",
+      "name": "Signature",
+      "id": 11,
+      "versions": [
+        {
+          "fields": [
+            {
+              "name": "signed-by",
+              "type": {
+                "op": "text"
+              }
+            },
+            {
+              "name": "signature",
+              "type": {
+                "op": "bytes"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "record",
+      "name": "Version",
+      "id": 12,
+      "versions": [
+        {
+          "fields": [
+            {
+              "name": "major",
+              "type": {
+                "op": "uint32"
+              }
+            },
+            {
+              "name": "minor",
+              "type": {
+                "op": "uint32"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "record",
+      "name": "Kate-version",
+      "id": 13,
+      "versions": [
+        {
+          "fields": [
+            {
+              "name": "major",
+              "type": {
+                "op": "uint32"
+              }
+            },
+            {
+              "name": "minor",
+              "type": {
+                "op": "uint32"
+              }
+            },
+            {
+              "name": "patch",
+              "type": {
+                "op": "uint32"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "record",
+      "name": "Binary-location",
+      "id": 14,
+      "versions": [
+        {
+          "fields": [
+            {
+              "name": "offset",
+              "type": {
+                "op": "uint32"
+              }
+            },
+            {
+              "name": "size",
+              "type": {
+                "op": "uint32"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "record",
+      "name": "Date",
+      "id": 15,
+      "versions": [
+        {
+          "fields": [
+            {
+              "name": "year",
+              "type": {
+                "op": "uint32"
+              }
+            },
+            {
+              "name": "month",
+              "type": {
+                "op": "uint8"
+              }
+            },
+            {
+              "name": "day",
+              "type": {
+                "op": "uint8"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "union",
+      "name": "Genre",
+      "id": 16,
+      "versions": [
+        {
+          "variants": [
+            {
+              "name": "Not-specified",
+              "fields": []
+            },
+            {
+              "name": "Action",
+              "fields": []
+            },
+            {
+              "name": "Platformer",
+              "fields": []
+            },
+            {
+              "name": "Shooter",
+              "fields": []
+            },
+            {
+              "name": "Racing",
+              "fields": []
+            },
+            {
+              "name": "Fighting",
+              "fields": []
+            },
+            {
+              "name": "Rhythm",
+              "fields": []
+            },
+            {
+              "name": "Adventure",
+              "fields": []
+            },
+            {
+              "name": "Interactive-fiction",
+              "fields": []
+            },
+            {
+              "name": "Visual-novel",
+              "fields": []
+            },
+            {
+              "name": "Puzzle",
+              "fields": []
+            },
+            {
+              "name": "RPG",
+              "fields": []
+            },
+            {
+              "name": "Simulation",
+              "fields": []
+            },
+            {
+              "name": "Strategy",
+              "fields": []
+            },
+            {
+              "name": "Sports",
+              "fields": []
+            },
+            {
+              "name": "Tool",
+              "fields": []
+            },
+            {
+              "name": "Other",
+              "fields": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "union",
+      "name": "Content-rating",
+      "id": 17,
+      "versions": [
+        {
+          "variants": [
+            {
+              "name": "General",
+              "fields": []
+            },
+            {
+              "name": "Teen-and-up",
+              "fields": []
+            },
+            {
+              "name": "Mature",
+              "fields": []
+            },
+            {
+              "name": "Explicit",
+              "fields": []
+            },
+            {
+              "name": "Unknown",
+              "fields": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "union",
+      "name": "Release-type",
+      "id": 18,
+      "versions": [
+        {
+          "variants": [
+            {
+              "name": "Prototype",
+              "fields": []
+            },
+            {
+              "name": "Early-access",
+              "fields": []
+            },
+            {
+              "name": "Beta",
+              "fields": []
+            },
+            {
+              "name": "Demo",
+              "fields": []
+            },
+            {
+              "name": "Regular",
+              "fields": []
+            },
+            {
+              "name": "Unofficial",
+              "fields": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "union",
+      "name": "Derivative-policy",
+      "id": 19,
+      "versions": [
+        {
+          "variants": [
+            {
+              "name": "Not-allowed",
+              "fields": []
+            },
+            {
+              "name": "Personal-use",
+              "fields": []
+            },
+            {
+              "name": "Non-commercial-use",
+              "fields": []
+            },
+            {
+              "name": "Commercial-use",
+              "fields": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "union",
+      "name": "Input-method",
+      "id": 20,
+      "versions": [
+        {
+          "variants": [
+            {
+              "name": "Buttons",
+              "fields": []
+            },
+            {
+              "name": "Pointer",
+              "fields": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "record",
+      "name": "Language",
+      "id": 21,
+      "versions": [
+        {
+          "fields": [
+            {
+              "name": "iso-code",
+              "type": {
+                "op": "text"
+              }
+            },
+            {
+              "name": "interface",
+              "type": {
+                "op": "bool"
+              }
+            },
+            {
+              "name": "audio",
+              "type": {
+                "op": "bool"
+              }
+            },
+            {
+              "name": "text",
+              "type": {
+                "op": "bool"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "union",
+      "name": "Accessibility-provision",
+      "id": 22,
+      "versions": [
+        {
+          "variants": [
+            {
+              "name": "High-contrast",
+              "fields": []
+            },
+            {
+              "name": "Subtitles",
+              "fields": []
+            },
+            {
+              "name": "Image-captions",
+              "fields": []
+            },
+            {
+              "name": "Voiced-text",
+              "fields": []
+            },
+            {
+              "name": "Configurable-difficulty",
+              "fields": []
+            },
+            {
+              "name": "Skippable-content",
+              "fields": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "union",
+      "name": "Bridge",
+      "id": 23,
+      "versions": [
+        {
+          "variants": [
+            {
+              "name": "Network-proxy",
+              "fields": []
+            },
+            {
+              "name": "Local-storage-proxy",
+              "fields": []
+            },
+            {
+              "name": "Input-proxy",
+              "fields": [
+                {
+                  "name": "mapping",
+                  "type": {
+                    "op": "map",
+                    "keys": {
+                      "op": "union",
+                      "id": 24
+                    },
+                    "values": {
+                      "op": "record",
+                      "id": 25
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Preserve-WebGL-render",
+              "fields": []
+            },
+            {
+              "name": "Capture-canvas",
+              "fields": [
+                {
+                  "name": "selector",
+                  "type": {
+                    "op": "text"
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Pointer-input-proxy",
+              "fields": [
+                {
+                  "name": "selector",
+                  "type": {
+                    "op": "text"
+                  }
+                },
+                {
+                  "name": "hide-cursor",
+                  "type": {
+                    "op": "bool"
+                  }
+                }
+              ]
+            },
+            {
+              "name": "IndexedDB-proxy",
+              "fields": [
+                {
+                  "name": "versioned",
+                  "type": {
+                    "op": "bool"
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Renpy-web-tweaks",
+              "fields": [
+                {
+                  "name": "version",
+                  "type": {
+                    "op": "record",
+                    "id": 12
+                  }
+                }
+              ]
+            },
+            {
+              "name": "External-URL-handler",
+              "fields": []
+            },
+            {
+              "name": "Keyboard-input-proxy-v2",
+              "fields": [
+                {
+                  "name": "mapping",
+                  "type": {
+                    "op": "map",
+                    "keys": {
+                      "op": "union",
+                      "id": 24
+                    },
+                    "values": {
+                      "op": "record",
+                      "id": 25
+                    }
+                  }
+                },
+                {
+                  "name": "selector",
+                  "type": {
+                    "op": "union",
+                    "id": 28
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "union",
+      "name": "Virtual-key",
+      "id": 24,
+      "versions": [
+        {
+          "variants": [
+            {
+              "name": "Up",
+              "fields": []
+            },
+            {
+              "name": "Right",
+              "fields": []
+            },
+            {
+              "name": "Down",
+              "fields": []
+            },
+            {
+              "name": "Left",
+              "fields": []
+            },
+            {
+              "name": "Menu",
+              "fields": []
+            },
+            {
+              "name": "Capture",
+              "fields": []
+            },
+            {
+              "name": "X",
+              "fields": []
+            },
+            {
+              "name": "O",
+              "fields": []
+            },
+            {
+              "name": "L-trigger",
+              "fields": []
+            },
+            {
+              "name": "R-trigger",
+              "fields": []
+            },
+            {
+              "name": "Berry",
+              "fields": []
+            },
+            {
+              "name": "Sparkle",
+              "fields": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "record",
+      "name": "Keyboard-key",
+      "id": 25,
+      "versions": [
+        {
+          "fields": [
+            {
+              "name": "code",
+              "type": {
+                "op": "text"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "union",
+      "name": "Capability",
+      "id": 26,
+      "versions": [
+        {
+          "variants": [
+            {
+              "name": "Contextual",
+              "fields": [
+                {
+                  "name": "capability",
+                  "type": {
+                    "op": "union",
+                    "id": 27
+                  }
+                },
+                {
+                  "name": "reason",
+                  "type": {
+                    "op": "text"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "union",
+      "name": "Contextual-capability",
+      "id": 27,
+      "versions": [
+        {
+          "variants": [
+            {
+              "name": "Open-URLs",
+              "fields": []
+            },
+            {
+              "name": "Request-device-files",
+              "fields": []
+            },
+            {
+              "name": "Install-cartridges",
+              "fields": []
+            },
+            {
+              "name": "Download-files",
+              "fields": []
+            },
+            {
+              "name": "Show-dialogs",
+              "fields": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "union",
+      "name": "Keyboard-input-selector",
+      "id": 28,
+      "versions": [
+        {
+          "variants": [
+            {
+              "name": "Window",
+              "fields": []
+            },
+            {
+              "name": "Document",
+              "fields": []
+            },
+            {
+              "name": "Legacy",
+              "fields": []
+            },
+            {
+              "name": "CSS",
+              "fields": [
+                {
+                  "name": "selector",
+                  "type": {
+                    "op": "text"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "union",
+      "name": "Hash-algorithm",
+      "id": 29,
+      "versions": [
+        {
+          "variants": [
+            {
+              "name": "Sha-512",
+              "fields": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

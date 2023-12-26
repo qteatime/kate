@@ -5,6 +5,7 @@
  */
 
 import { Op } from "./ast";
+import { unreachable } from "./util";
 
 export class Schema {
   readonly entities = new Map<number, Entity>();
@@ -25,20 +26,28 @@ export class Schema {
     }
     return entity;
   }
+
+  max_size_of(id: number) {
+    const entity = this.resolve(id);
+    if (entity instanceof Union) {
+      return size_of_operation(this, { op: "union", id });
+    } else if (entity instanceof Record) {
+      return size_of_operation(this, { op: "record", id });
+    } else {
+      throw new Error(`Invalid entity id ${id}`);
+    }
+  }
 }
 
 export abstract class Entity {
   abstract id: number;
   abstract name: string;
   abstract find_version(data: unknown): unknown | null;
+  abstract max_byte_size(schema: Schema): number | null;
 }
 
 export class Union extends Entity {
-  constructor(
-    readonly id: number,
-    readonly name: string,
-    readonly versions: VersionedUnion[]
-  ) {
+  constructor(readonly id: number, readonly name: string, readonly versions: VersionedUnion[]) {
     super();
   }
 
@@ -57,6 +66,10 @@ export class Union extends Entity {
       }
     }
     throw new Error(`No version of ${this.name}(${this.id}) matched`);
+  }
+
+  max_byte_size(schema: Schema) {
+    return this.versions.map((x) => x.max_byte_size(schema)).reduce(max_size, 0);
   }
 }
 
@@ -90,14 +103,14 @@ export class VersionedUnion {
     const variant = this.variants[tag];
     return variant.accepts(data);
   }
+
+  max_byte_size(schema: Schema) {
+    return this.variants.map((x) => x.byte_size(schema)).reduce(max_size, 0);
+  }
 }
 
 export class Variant {
-  constructor(
-    readonly name: string,
-    readonly tag: number,
-    readonly fields: [string, Op][]
-  ) {}
+  constructor(readonly name: string, readonly tag: number, readonly fields: [string, Op][]) {}
 
   reify(value: { [key: string]: unknown }) {
     value["@variant"] = this.tag;
@@ -113,14 +126,14 @@ export class Variant {
     }
     return true;
   }
+
+  byte_size(schema: Schema) {
+    return this.fields.map(([_, op]) => size_of_operation(schema, op)).reduce(add_size, 0);
+  }
 }
 
 export class Record extends Entity {
-  constructor(
-    readonly id: number,
-    readonly name: string,
-    readonly versions: VersionedRecord[]
-  ) {
+  constructor(readonly id: number, readonly name: string, readonly versions: VersionedRecord[]) {
     super();
   }
 
@@ -139,6 +152,10 @@ export class Record extends Entity {
       }
     }
     throw new Error(`No version of ${this.name}(${this.id}) matched`);
+  }
+
+  max_byte_size(schema: Schema): number | null {
+    return this.versions.map((x) => x.byte_size(schema)).reduce(max_size, 0);
   }
 }
 
@@ -164,5 +181,70 @@ export class VersionedRecord {
       }
     }
     return true;
+  }
+
+  byte_size(schema: Schema) {
+    return this.fields.map(([_, op]) => size_of_operation(schema, op)).reduce(add_size, 0);
+  }
+}
+
+function size_of_operation(schema: Schema, op: Op): number | null {
+  switch (op.op) {
+    case "bool":
+      return 1;
+    case "int8":
+      return 1;
+    case "int16":
+      return 2;
+    case "int32":
+      return 4;
+    case "uint8":
+      return 1;
+    case "uint16":
+      return 2;
+    case "uint32":
+      return 4;
+    case "integer":
+      return null;
+    case "float32":
+      return 4;
+    case "float64":
+      return 4;
+    case "text":
+      return null;
+    case "bytes":
+      return null;
+    case "constant":
+      return op.value.byteLength;
+    case "array":
+      return null;
+    case "map":
+      return null;
+    case "optional":
+      return add_size(1, size_of_operation(schema, op.value));
+    case "record":
+      // tag + version + packed fields
+      return add_size(4 + 4, schema.resolve(op.id).max_byte_size(schema));
+    case "union":
+      // tag + version + variant + packed variant fields
+      return add_size(4 + 4 + 4, schema.resolve(op.id).max_byte_size(schema));
+    default:
+      throw unreachable(op);
+  }
+}
+
+function add_size(x: number | null, y: number | null) {
+  if (x == null || y == null) {
+    return null;
+  } else {
+    return x + y;
+  }
+}
+
+function max_size(x: number | null, y: number | null) {
+  if (x == null || y == null) {
+    return null;
+  } else {
+    return Math.max(x, y);
   }
 }
