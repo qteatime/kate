@@ -2,9 +2,11 @@
 export type Int8 = number;
 export type Int16 = number;
 export type Int32 = number;
+export type Int64 = bigint;
 export type UInt8 = number;
 export type UInt16 = number;
 export type UInt32 = number;
+export type UInt64 = bigint;
 export type Float32 = number;
 export type Float64 = number;
 
@@ -345,11 +347,11 @@ export interface Binary_location {
  readonly '@name': 'Binary-location';
  readonly '@tag': 14;
  readonly '@version': 0;
- readonly 'offset': UInt32;
+ readonly 'offset': UInt64;
   readonly 'size': UInt32
 }
 
-export function Binary_location(x: {readonly 'offset': UInt32,readonly 'size': UInt32}): Binary_location {
+export function Binary_location(x: {readonly 'offset': UInt64,readonly 'size': UInt32}): Binary_location {
  return {
    '@name': 'Binary-location',
    '@tag': 14,

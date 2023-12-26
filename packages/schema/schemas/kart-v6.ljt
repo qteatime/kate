@@ -116,7 +116,7 @@ type Kate-version {
 }
 
 type Binary-location {
-  field offset: Uint32;
+  field offset: Uint64;
   field size: Uint32;
 }
 

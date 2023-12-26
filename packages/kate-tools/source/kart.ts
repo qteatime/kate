@@ -28,7 +28,7 @@ const spec_version = Cart.Kate_version({
 });
 
 class KartWriter {
-  private offset = 0;
+  private offset = 0n;
   private web_stream: WritableStream<Uint8Array>;
   private writer;
 
@@ -39,7 +39,7 @@ class KartWriter {
 
   async write(bytes: Uint8Array) {
     await this.writer.write(bytes);
-    this.offset += bytes.byteLength;
+    this.offset += BigInt(bytes.byteLength);
   }
 
   async close() {
@@ -1105,11 +1105,11 @@ export async function make_cartridge(path: string, output: string) {
           "minimum-kate-version": spec_version,
           "content-location": Cart.Binary_location({
             offset: file_offset,
-            size: meta_offset - file_offset,
+            size: Number(meta_offset - file_offset),
           }),
           "metadata-location": Cart.Binary_location({
             offset: meta_offset,
-            size: header_offset - meta_offset,
+            size: Number(header_offset - meta_offset),
           }),
         })
       )

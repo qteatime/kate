@@ -567,7 +567,7 @@
             {
               "name": "offset",
               "type": {
-                "op": "uint32"
+                "op": "uint64"
               }
             },
             {
