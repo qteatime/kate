@@ -3,8 +3,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-import { kart_v5 as Cart } from "../deps/schema";
-import { Pathname, make_id, unreachable } from "../deps/utils";
+import { kart_v6 as Cart, kart_v6 } from "../deps/schema";
+import { Pathname, binary, make_id, unreachable } from "../deps/utils";
+import { CartConfig } from "./core";
 
 export function make_mapping(mapping: Record<KateTypes.InputKey, string | null>) {
   return new Map(
@@ -102,9 +103,9 @@ export function mime_type(path: Pathname) {
 }
 
 export async function maybe_add_thumbnail(
-  files: Cart.File[],
+  files: { meta: Cart.Meta_file; data: Uint8Array }[],
   thumbnail: Uint8Array | null
-): Promise<Cart.File[]> {
+): Promise<{ meta: Cart.Meta_file; data: Uint8Array }[]> {
   if (thumbnail == null) {
     return files;
   } else {
@@ -160,12 +161,63 @@ export function slug(title: string, max_length: number = 32) {
 }
 
 export async function make_file(path: Pathname, data: Uint8Array) {
-  const integrity = await crypto.subtle.digest("SHA-256", data.buffer);
-  return Cart.File({
-    path: path.make_absolute().as_string(),
-    mime: mime_type(path),
-    integrity: new Uint8Array(integrity),
-    data: data,
-    signature: null,
-  });
+  const integrity = await crypto.subtle.digest("SHA-512", data.buffer);
+  return {
+    meta: Cart.Meta_file({
+      path: path.make_absolute().as_string(),
+      mime: mime_type(path),
+      integrity: new Uint8Array(integrity),
+      "hash-algorithm": Cart.Hash_algorithm.Sha_512({}),
+      size: data.length,
+    }),
+    data,
+  };
+}
+
+export function encode_whole(cart: CartConfig) {
+  let offset = 0;
+  const bytes = [];
+
+  const magic = kart_v6.encode_magic();
+  bytes.push(magic);
+  offset += magic.byteLength;
+  const file_offset = offset;
+  bytes.push(uint32(cart.files.length));
+  offset += 4;
+  for (const file of cart.files) {
+    bytes.push(uint32(file.byteLength));
+    offset += 4;
+    bytes.push(file);
+    offset += file.byteLength;
+  }
+
+  const meta_offset = offset;
+  const meta = kart_v6.encode_metadata(cart.metadata);
+  bytes.push(meta);
+  offset += meta.byteLength;
+
+  const header_offset = offset;
+  bytes.push(
+    kart_v6.encode_header(
+      Cart.Header({
+        "minimum-kate-version": Cart.Kate_version({ major: 0, minor: 24, patch: 2 }),
+        "content-location": Cart.Binary_location({
+          offset: file_offset,
+          size: meta_offset - file_offset,
+        }),
+        "metadata-location": Cart.Binary_location({
+          offset: meta_offset,
+          size: header_offset - meta_offset,
+        }),
+      })
+    )
+  );
+
+  return binary.concat_all(bytes);
+}
+
+function uint32(x: number) {
+  const bytes = new Uint8Array(4);
+  new DataView(bytes.buffer).setUint32(0, x, true);
+  return bytes;
 }

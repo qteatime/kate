@@ -3,7 +3,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-import { kart_v5 as Cart } from "../deps/schema";
+import { kart_v6 as Cart } from "../deps/schema";
 import { GlobPattern, Pathname, make_id, unreachable } from "../deps/utils";
 import type { CartConfig, Importer } from "./core";
 import {
@@ -40,11 +40,12 @@ export class BitsyImporter implements Importer {
   async make_cartridge(): Promise<CartConfig> {
     const now = new Date();
 
-    const files = await Promise.all(
+    const files0 = await Promise.all(
       this.files.map(async (x) => {
         return make_file(x.relative_path, await x.read());
       })
     );
+    const files = await maybe_add_thumbnail(files0, this.thumbnail);
 
     const cartridge: CartConfig = {
       metadata: Cart.Metadata({
@@ -84,10 +85,11 @@ export class BitsyImporter implements Importer {
             Cart.Bridge.Capture_canvas({ selector: "#game" }),
           ],
         }),
+        files: files.map((x) => x.meta),
         signature: null,
         "signed-by": [],
       }),
-      files: await maybe_add_thumbnail(files, this.thumbnail),
+      files: files.map((x) => x.data),
     };
     return cartridge;
   }

@@ -4,13 +4,9 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 import { UI, UIScene, Widgetable } from "../deps/appui";
-import { kart_v5 as Cart } from "../deps/schema";
-import {
-  Observable,
-  load_image_from_bytes,
-  make_thumbnail_from_bytes,
-} from "../deps/utils";
+import { Observable, load_image_from_bytes, make_thumbnail_from_bytes } from "../deps/utils";
 import { Importer } from "../importers";
+import { encode_whole } from "../importers/make-cart";
 
 export class SceneReview extends UIScene {
   constructor(ui: UI, readonly candidates: Importer[]) {
@@ -89,9 +85,7 @@ export class SceneReview extends UIScene {
                         },
                         ["—"]
                       ),
-                      ui.class("imp-floating-edit-button", [
-                        ui.fa_icon("pencil"),
-                      ]),
+                      ui.class("imp-floating-edit-button", [ui.fa_icon("pencil")]),
                     ]),
                   ])
                   .interactive([
@@ -142,24 +136,15 @@ export class SceneReview extends UIScene {
   async select_thumbnail(current: Observable<number>, candidate: Importer) {
     const files = await KateAPI.device_files.request_file({
       strict: true,
-      types: [
-        { type: "image/*", extensions: [".jpg", ".jpeg", ".png", ".webp"] },
-      ],
+      types: [{ type: "image/*", extensions: [".jpg", ".jpeg", ".png", ".webp"] }],
     });
     if (files.length !== 1) {
       return;
     }
     const [file] = files;
     const image = await file.read();
-    const thumbnail_url = await make_thumbnail_from_bytes(
-      400,
-      700,
-      "image/png",
-      image
-    );
-    const bytes = new Uint8Array(
-      await (await fetch(thumbnail_url)).arrayBuffer()
-    );
+    const thumbnail_url = await make_thumbnail_from_bytes(400, 700, "image/png", image);
+    const bytes = new Uint8Array(await (await fetch(thumbnail_url)).arrayBuffer());
     candidate.thumbnail = bytes;
     current.value = current.value;
   }
@@ -178,11 +163,7 @@ export class SceneReview extends UIScene {
         process: async (progress) => {
           const cartridge = await candidate.make_cartridge();
           progress.set_message(["Packing cartridge..."]);
-          const bytes = Cart.encode({
-            kate_version: Cart.Kate_version({ major: 0, minor: 29, patch: 1 }),
-            metadata: cartridge.metadata,
-            files: cartridge.files,
-          });
+          const bytes = encode_whole(cartridge);
           progress.set_message(["Preparing to install..."]);
           await KateAPI.cart_manager.install(bytes);
         },
@@ -190,9 +171,7 @@ export class SceneReview extends UIScene {
     } catch (e) {
       console.error(`Failed to import:`, e);
       await this.ui.dialogs.message({
-        message: [
-          "Failed to prepare cartridge for installation: unknown internal error",
-        ],
+        message: ["Failed to prepare cartridge for installation: unknown internal error"],
       });
     }
   }

@@ -3,7 +3,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
-import { kart_v5 as Cart } from "../deps/schema";
+import { kart_v6 as Cart } from "../deps/schema";
 import { BitsyImporter } from "./bitsy";
 import { RenpyImporter } from "./renpy";
 
@@ -13,7 +13,7 @@ export interface Parser {
 
 export type CartConfig = {
   metadata: Cart.Metadata;
-  files: Cart.File[];
+  files: Uint8Array[];
 };
 
 export interface Importer {

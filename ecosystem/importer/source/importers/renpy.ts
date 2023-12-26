@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 import { JSZip } from "../deps/jszip";
-import { kart_v5 as Cart } from "../deps/schema";
+import { kart_v6 as Cart } from "../deps/schema";
 import { GlobPattern, GlobPatternList, Pathname, make_id } from "../deps/utils";
 import { rpa } from "../formats";
 import type { CartConfig, Importer } from "./core";
@@ -77,7 +77,7 @@ export class RenpyImporter implements Importer {
 
     const { zip, remote } = await make_game_zip(runtime_dir, this.files);
 
-    const files = await Promise.all([
+    const files0 = await Promise.all([
       ...runtime_files.map(async (x) => {
         return make_file(
           Pathname.from_string(x),
@@ -89,6 +89,7 @@ export class RenpyImporter implements Importer {
         return make_file(x.relative_path, await x.read());
       }),
     ]);
+    const files = await maybe_add_thumbnail(files0, this.thumbnail);
 
     const cartridge: CartConfig = {
       metadata: Cart.Metadata({
@@ -141,10 +142,11 @@ export class RenpyImporter implements Importer {
             }),
           ],
         }),
+        files: files.map((x) => x.meta),
         signature: null,
         "signed-by": [],
       }),
-      files: await maybe_add_thumbnail(files, this.thumbnail),
+      files: files.map((x) => x.data),
     };
     return cartridge;
   }
@@ -217,7 +219,7 @@ async function make_game_zip(runtime_dir: Pathname, files0: KateTypes.DeviceFile
   const game_files = await get_remote_files(files0);
   zip.file("game/renpyweb_remote_files.txt", encoder.encode(game_files.remote_rules));
   for (const file of game_files.placeholders) {
-    zip.file(Pathname.from_string(file.path).make_relative().as_string(), file.data);
+    zip.file(Pathname.from_string(file.meta.path).make_relative().as_string(), file.data);
   }
   for (const file of game_files.zipped) {
     zip.file(file.relative_path.make_relative().as_string(), await file.read());
