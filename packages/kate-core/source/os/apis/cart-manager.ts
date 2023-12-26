@@ -130,7 +130,7 @@ export class CartManager {
       const header = await parser.parse_header(file);
       await this.assert_minimum_version(file.name, header, parser);
       const metadata = await parser.parse_meta(file, header);
-      const files = parser.parse_files(file, header);
+      const files = parser.parse_files(file, header, metadata);
       const errors = await Cart.verify_pointers(metadata);
       if (errors.length !== 0) {
         console.error(`Corrupted cartridge ${metadata.id}`, errors);

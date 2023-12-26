@@ -67,8 +67,8 @@ export async function decode_metadata(file: Blob, header: Cart_v6.Header): Promi
   };
 }
 
-export async function* decode_files(file: Blob, header: Cart_v6.Header) {
-  yield* Cart_v6.decode_blob_files(file, header);
+export async function* decode_files(file: Blob, header: Cart_v6.Header, metadata: DataCart) {
+  yield* Cart_v6.decode_blob_files(file, header, metadata.files);
 }
 
 function check_header(x: Uint8Array): boolean {

@@ -691,32 +691,40 @@ function make_absolute(path: string) {
 }
 
 async function files(patterns: Kart["files"], root: string, base_dir: string, writer: KartWriter) {
-  const paths = [...new Set(patterns.flatMap((x) => Glob.sync(x, { cwd: base_dir })))];
+  const paths: string[] = [];
+  const candidates = new Set(patterns.flatMap((x) => Glob.sync(x, { cwd: base_dir })));
+  for (const candidate of candidates) {
+    if (FS.statSync(Path.resolve(base_dir, candidate)).isFile()) {
+      paths.push(candidate);
+    }
+  }
+
   const encoder = kart_v6.encode_files(paths.length);
   await writer.write(encoder.size);
 
+  console.log(`:: Adding ${paths.length} files to the cartridge`);
   const result: Cart.Meta_file[] = [];
   for (const path of paths) {
-    if (FS.statSync(Path.resolve(base_dir, path)).isFile()) {
-      const ext = Path.extname(path);
-      const mime = mime_table[ext] ?? "application/octet-stream";
-      const data = load_file(path, root, base_dir);
-      const integrity = await Crypto.subtle.digest("SHA-512", data.buffer);
+    const ext = Path.extname(path);
+    const mime = mime_table[ext] ?? "application/octet-stream";
+    const data = load_file(path, root, base_dir);
+    const integrity = await Crypto.subtle.digest("SHA-512", data.buffer);
 
-      result.push(
-        Cart.Meta_file({
-          path: make_absolute(path),
-          mime: mime,
-          integrity: new Uint8Array(integrity),
-          "hash-algorithm": Hash_algorithm.Sha_512({}),
-          size: data.byteLength,
-        })
-      );
+    result.push(
+      Cart.Meta_file({
+        path: make_absolute(path),
+        mime: mime,
+        integrity: new Uint8Array(integrity),
+        "hash-algorithm": Hash_algorithm.Sha_512({}),
+        size: data.byteLength,
+      })
+    );
 
-      await writer.write(encoder.encode_file(data));
-      console.log(`> Added ${make_absolute(path)} (${from_bytes(data.byteLength)})`);
-    }
+    await writer.write(encoder.encode_file(data));
+    console.log(`> Added ${make_absolute(path)} (${from_bytes(data.byteLength)})`);
   }
+
+  encoder.close();
 
   return result;
 }

@@ -45,12 +45,16 @@ export async function decode_blob_metadata(
 
 export async function* decode_blob_files(
   blob: Blob,
-  header: Cart.Header
+  header: Cart.Header,
+  nodes: { path: string; mime: string; size: number }[]
 ): AsyncGenerator<File, void, void> {
   const loc = header["content-location"];
   const files = blob.slice(loc.offset, loc.offset + loc.size);
   const decoder = new BlobDecoder(0, files);
   const count = await decoder.uint32();
+  if (count !== nodes.length) {
+    throw new Error(`Invalid file section size ${count} (expected ${nodes.length})`);
+  }
 
   for (let i = 0; i < count; ++i) {
     const size = await decoder.uint32();
@@ -104,8 +108,14 @@ export function encode_files(size: number) {
       if (count <= 0) {
         throw new Error(`Trying to encode more files than size allows`);
       }
-      size -= 1;
+      count -= 1;
       return encode_file_data(data);
+    },
+    close() {
+      if (count !== 0) {
+        throw new Error(`Extraneous files ${count}`);
+      }
+      count = 0;
     },
   };
 }

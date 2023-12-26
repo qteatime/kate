@@ -5,6 +5,7 @@
  */
 
 import { ECartCorrupted, ECartFormatTooNew } from "../error";
+import { CartChangeReason } from "../os";
 import { SemVer } from "../utils";
 import { DataCart, DataFile, UncommitedFile } from "./cart-type";
 import * as v6 from "./v6/v6";
@@ -19,7 +20,7 @@ export type Parser<T> = {
   minimum_version(header: T): SemVer;
   parse_header(x: Blob): Promise<T>;
   parse_meta(x: Blob, header: T): Promise<DataCart>;
-  parse_files(x: Blob, header: T): AsyncGenerator<YieldFile, void, void>;
+  parse_files(x: Blob, header: T, metadata: DataCart): AsyncGenerator<YieldFile, void, void>;
 };
 
 const parsers: Parser<unknown>[] = [
@@ -83,7 +84,7 @@ export async function parse_whole(data: Blob, kate_ver: SemVer) {
     throw new ECartCorrupted(metadata.id);
   }
 
-  const files = parser.parse_files(data, header);
+  const files = parser.parse_files(data, header, metadata);
   const file_map = new Map<string, DataFile>();
 
   for await (const entry of files) {
