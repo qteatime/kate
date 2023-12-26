@@ -1105,11 +1105,11 @@ export async function make_cartridge(path: string, output: string) {
           "minimum-kate-version": spec_version,
           "content-location": Cart.Binary_location({
             offset: file_offset,
-            size: Number(meta_offset - file_offset),
+            size: meta_offset - file_offset,
           }),
           "metadata-location": Cart.Binary_location({
             offset: meta_offset,
-            size: Number(header_offset - meta_offset),
+            size: header_offset - meta_offset,
           }),
         })
       )

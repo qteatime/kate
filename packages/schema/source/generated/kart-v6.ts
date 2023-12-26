@@ -348,10 +348,10 @@ export interface Binary_location {
  readonly '@tag': 14;
  readonly '@version': 0;
  readonly 'offset': UInt64;
-  readonly 'size': UInt32
+  readonly 'size': UInt64
 }
 
-export function Binary_location(x: {readonly 'offset': UInt64,readonly 'size': UInt32}): Binary_location {
+export function Binary_location(x: {readonly 'offset': UInt64,readonly 'size': UInt64}): Binary_location {
  return {
    '@name': 'Binary-location',
    '@tag': 14,

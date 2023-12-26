@@ -41,7 +41,7 @@ export async function decode_blob_metadata(
   header: Cart.Header
 ): Promise<Cart.Metadata> {
   const loc = header["metadata-location"];
-  const buffer = await blob.slice(Number(loc.offset), Number(loc.offset) + loc.size).arrayBuffer();
+  const buffer = await blob.slice(Number(loc.offset), Number(loc.offset + loc.size)).arrayBuffer();
   return decode_metadata_record(new Uint8Array(buffer));
 }
 
@@ -51,7 +51,7 @@ export async function* decode_blob_files(
   nodes: { path: string; mime: string; size: number }[]
 ): AsyncGenerator<File, void, void> {
   const loc = header["content-location"];
-  const files = blob.slice(Number(loc.offset), Number(loc.offset) + loc.size);
+  const files = blob.slice(Number(loc.offset), Number(loc.offset + loc.size));
   const decoder = new BlobDecoder(0, files);
   const count = await decoder.uint32();
   if (count !== nodes.length) {
@@ -82,9 +82,9 @@ function decode_metadata_record(bytes: Uint8Array): Cart.Metadata {
   return decoder.record(Cart.Metadata.tag) as Cart.Metadata;
 }
 
-function slice_intersect(a: { offset: bigint; size: number }, b: { offset: bigint; size: number }) {
-  if (Number(a.offset) + a.size <= b.offset) return false;
-  if (a.offset >= Number(b.offset) + b.size) return false;
+function slice_intersect(a: { offset: bigint; size: bigint }, b: { offset: bigint; size: bigint }) {
+  if (a.offset + a.size <= b.offset) return false;
+  if (a.offset >= b.offset + b.size) return false;
   return true;
 }
 
@@ -161,5 +161,13 @@ function assert_safe_location(loc: Cart.Binary_location) {
   const offset = loc.offset;
   if (offset < 0n || offset >= BigInt(Number.MAX_SAFE_INTEGER)) {
     throw new Error(`Unsafe 64-bit offset ${offset}`);
+  }
+  const size = loc.size;
+  if (size < 0n || size >= BigInt(Number.MAX_SAFE_INTEGER)) {
+    throw new Error(`Unsafe 64-bit size ${size}`);
+  }
+  const total = offset + size;
+  if (total < 0n || total >= BigInt(Number.MAX_SAFE_INTEGER)) {
+    throw new Error(`Unsafe 64-bit location ${offset},${size}`);
   }
 }

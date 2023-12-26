@@ -573,7 +573,7 @@
             {
               "name": "size",
               "type": {
-                "op": "uint32"
+                "op": "uint64"
               }
             }
           ]

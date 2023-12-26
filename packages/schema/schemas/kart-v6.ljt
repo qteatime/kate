@@ -117,7 +117,7 @@ type Kate-version {
 
 type Binary-location {
   field offset: Uint64;
-  field size: Uint32;
+  field size: Uint64;
 }
 
 type Date {
