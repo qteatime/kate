@@ -89,6 +89,90 @@ Note the lack of explicit deletion for buckets: they're garbage collected
 automatically once there are no more references to it!
 
 
+Ephemeral and persistent buckets
+--------------------------------
+
+All buckets start their life as ephemeral ones --- they're kept alive for as
+long as there are in-memory references to them, and they're garbage collected
+as soon as no in-memory references to them remain. Like with regular
+programming language garbage collection, bucket garbage collection is not
+*observable* by the code, since as far as code is concerned there's no way
+of getting to the bucket anymore. Kate also does not expose storage space
+metrics to regular code, which must assume the user has "an unlimited supply
+of storage space".
+
+Buckets can however be *promoted* to a persistent bucket. Persistent buckets
+are "ephemeral" buckets that have long-lived in-storage references. For example,
+buckets backing cartridge data start as ephemeral ones during installation,
+and progress to persistent just before the cartridge is reified in the
+database. From that point on, the bucket is only garbage collected if
+no in-memory **and** in-storage references to it remain.
+
+For tracking in-storage references Kate does a best-effort of managing the
+reference counter manually from the reference holders --- e.g.: during
+cartridge installation the cartridge manager service will manually release
+the persistent reference it holds in storage. But the garbage collection
+process will also ocasionally scan its persistent buckets and check if
+the persistent references it knows about are still pointing back to the
+bucket. This means that even if the reference is not manually released,
+e.g.: if an installation process fails between persisting the bucket and
+persisting the cartridge in the database, the next time the garbage collector
+runs it'll notice that there's no database recording pointing back, and it'll
+adjust the reference counter accordingly, most likely resulting in the bucket
+being collected.
+
+
+Persistent references
+"""""""""""""""""""""
+
+A ``PersistentKey`` or persistent reference is a reference stored on both the
+bucket side and the persistent storage side. This includes details on the
+process or service that holds the persistent reference, and allows the garbage
+collector to verify if that reference is still valid, thus getting around
+issues with unreliable reference counting, and also helping in detecting
+storage leaks.
+
+It's defined as a sum type of with a unique tag for each service, plus the
+details the service needs to verify if the reference is still valid. For
+example, cartridge data buckets are persisted with the cartridge identifier
+and version, which means that the garbage collector can point to the cartridge
+manager where it should look for the reference. It also includes the
+partition id and bucket id, which allows the garbage collector to know if the
+holder of that reference is pointing back to the exact bucket that the
+garbage collector is looking at.
+
+The bucket back-references are important because not all storage processes
+are immutable. For example, it *is* possible to overwrite a cartridge with
+another of the same id/version in some circumstances, but because Kate cannot
+guarantee that they'll have the same content it has to use a different bucket
+for the new installation. This can result in a case where the bucket X points
+to cartridge A@v1, but cartridge A@v1 points back to a different bucket Y,
+allowing the bucket X to be safely garbage collected.
+
+
+Ephemeral buckets from cartridges
+"""""""""""""""""""""""""""""""""
+
+Cartridges are also able to spawn new ephemeral buckets into existence for
+their own storage needs. For example, a cartridge that needs to work with
+large archive files might choose to unpack those files to a bucket to keep
+memory usage bounded at reasonable levels, rather than increasing linearly
+with the archive size.
+
+With this usage of ephemeral buckets our in-memory approach does not hold
+as well, since the Kernel and the cartridge processes run in different,
+isolated memory spaces. This is solved by putting a service between the
+file storage and the cartridge that manages buckets for that cartridge
+process specifically, and keeps them alive for as long as the process
+needs it to be alive --- which in worst cases is until the process dies.
+
+Further, we need to have bounds on the storage usage to prevent malicious
+or misbehaving cartridges from unfairly degrading the underlying storage.
+There's no real one-size-fits-all here, as cartridges that a user run
+may have wildly different requirements, so this limit must be configurable
+by the user, though it should never exceed 60% of the Kate storage quota.
+
+
 Formal semantics
 ----------------
 
