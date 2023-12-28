@@ -43,9 +43,8 @@ export class KateProcesses {
     const cart = await Cart.parse_metadata(blob, this.os.kernel.version);
     const has_proper_offset = cart.files.every((x) => x.offset !== null);
     const file_map = new Map(cart.files.map((x) => [x.path, x]));
-    let data_map: Map<string, Cart.DataFile> | null = null;
     if (!has_proper_offset) {
-      data_map = (await Cart.parse_whole(blob, this.os.kernel.version)).file_map;
+      throw new Error(`Running this cartridge is not supported without installation.`);
     }
 
     const storage = await this.os.object_store.cartridge(cart, false).get_local_storage();
@@ -56,28 +55,17 @@ export class KateProcesses {
       filesystem: {
         read: async (path) => {
           const node = file_map.get(path);
-          if (node == null) {
+          if (node == null || node.offset == null) {
             throw new Error(`File not found in ${cart.id}: ${path}`);
           }
-          if (data_map != null) {
-            const data = data_map.get(path)!.data;
-            return {
-              path: node.path,
-              mime: node.mime,
-              data,
-            };
-          } else if (node.offset != null) {
-            const data = new Uint8Array(
-              await blob.slice(node.offset, node.offset + node.size).arrayBuffer()
-            );
-            return {
-              path: node.path,
-              mime: node.mime,
-              data,
-            };
-          } else {
-            throw new Error(`Cannot read file ${path} in ${cart.id}`);
-          }
+          const data = new Uint8Array(
+            await blob.slice(node.offset, node.offset + node.size).arrayBuffer()
+          );
+          return {
+            path: node.path,
+            mime: node.mime,
+            data,
+          };
         },
       },
     });

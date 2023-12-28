@@ -36,6 +36,10 @@ export class EMessageFailed extends Error {
   }
 }
 
+export class WithTransfer {
+  constructor(readonly value: unknown, readonly transfer: Transferable[]) {}
+}
+
 export function handler<A, B>(
   type: string,
   parser: Handler<A, B>["parser"],

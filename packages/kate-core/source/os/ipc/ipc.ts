@@ -5,7 +5,7 @@
  */
 
 import type { KateOS } from "../os";
-import { EMessageFailed, type Handler } from "./handlers";
+import { EMessageFailed, WithTransfer, type Handler } from "./handlers";
 import { TC, make_id } from "../../utils";
 import CaptureMessages from "./capture";
 import CartFSMessages from "./cart_fs";
@@ -110,12 +110,16 @@ export class KateIPCServer {
               value: result,
             });
           }
-          process.send({
-            type: "kate:reply",
-            id: payload.id,
-            ok: true,
-            value: result,
-          });
+          const [value, transfer] = this.unpack_transfers(result);
+          process.send(
+            {
+              type: "kate:reply",
+              id: payload.id,
+              ok: true,
+              value: value,
+            },
+            transfer
+          );
         } catch (error: unknown) {
           console.error(
             `[kate:ipc] Error handling ${payload.type} from ${process.id}`,
@@ -136,6 +140,14 @@ export class KateIPCServer {
       }
     }
   };
+
+  private unpack_transfers(x: unknown): [unknown, Transferable[]] {
+    if (x instanceof WithTransfer) {
+      return [x.value, x.transfer];
+    } else {
+      return [x, []];
+    }
+  }
 
   private async mark_suspicious_activity(ev: Message, process: Process) {
     console.debug(`[Kate] suspicious IPC activity from ${process.id}`, ev);

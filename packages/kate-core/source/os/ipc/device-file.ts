@@ -6,7 +6,7 @@
 
 import type { KateOS } from "../os";
 import { TC, make_id } from "../../utils";
-import { EMessageFailed, auth_handler, handler } from "./handlers";
+import { EMessageFailed, WithTransfer, auth_handler, handler } from "./handlers";
 import { DeviceFileHandle } from "../apis";
 import * as UI from "../ui";
 import { Process } from "../../kernel";
@@ -122,7 +122,7 @@ export default [
     async (os, env, ipc, { id }) => {
       const file = (await device_ipc.resolve(os, env, id)).handle;
       const data = await file.arrayBuffer();
-      return new Uint8Array(data);
+      return new WithTransfer(new Uint8Array(data), [data]);
     }
   ),
 ];
