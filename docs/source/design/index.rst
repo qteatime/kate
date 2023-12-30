@@ -8,6 +8,16 @@ and developers making Kate games who wish to have a deeper understanding
 of the platform they're developing for.
 
 
+Language and format design
+==========================
+
+.. toctree::
+  :maxdepth: 1
+
+  formats/F0001-ljt
+  formats/F0002-kart
+
+
 Kernel design
 =============
 
