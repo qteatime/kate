@@ -86,8 +86,7 @@ export class BitsyImporter implements Importer {
           ],
         }),
         files: files.map((x) => x.meta),
-        signature: null,
-        "signed-by": [],
+        signature: [],
       }),
       files: files.map((x) => x.data),
     };
