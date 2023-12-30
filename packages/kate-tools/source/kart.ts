@@ -527,8 +527,7 @@ function metadata(json: Kart, archive: Cart.Meta_file[]) {
     runtime,
     security,
     files: archive,
-    "signed-by": [],
-    signature: null,
+    signature: [],
   });
 }
 
