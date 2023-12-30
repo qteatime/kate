@@ -5,6 +5,7 @@
   "main": "build/index.js",
   "bin": {
     "kart": "./cli/kart.js",
+    "kart-show": "./cli/kart-show.js",
     "kate-dist": "./cli/kate-dist.js"
   },
   "repository": {

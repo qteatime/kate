@@ -10,11 +10,11 @@ import * as Cart from "./generated/kart-v6";
 import { concat_all } from "./util";
 export * from "./generated/kart-v6";
 
-const schema = LJT.parse(source);
+export const schema = LJT.parse(source);
 
 export type File = { index: number; data: Uint8Array };
 
-function size_of(id: number) {
+export function size_of(id: number) {
   const size = schema.max_size_of(id);
   if (size == null) {
     throw new Error(`Cannot compute a size for variable sized entity ${id}`);
@@ -77,7 +77,7 @@ export function decode_header_record(bytes: Uint8Array): Cart.Header {
   return header;
 }
 
-function decode_metadata_record(bytes: Uint8Array): Cart.Metadata {
+export function decode_metadata_record(bytes: Uint8Array): Cart.Metadata {
   const decoder = LJT.SchemaDecoder.from_bytes(bytes, schema);
   return decoder.record(Cart.Metadata.tag) as Cart.Metadata;
 }

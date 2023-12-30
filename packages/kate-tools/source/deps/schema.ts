@@ -5,3 +5,4 @@
  */
 
 export * from "../../../schema/build";
+export * from "../../../schema/build/kart-v6-node";
