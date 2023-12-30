@@ -15,7 +15,7 @@ only supports mapping one Kate button press to one keyboard key press.
 Using in Kart
 -------------
 
-.. since:: 0.24.2
+.. versionadded:: 0.24.2
 
   ``input-proxy`` is deprecated in favour of ``keyboard-input-proxy-v2``.
   The configuration is the same, but the latter accepts a new ``selector``
