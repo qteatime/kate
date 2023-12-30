@@ -29,8 +29,7 @@ type Metadata {
   field security: Security;
   field runtime: Runtime;
   field files: Meta-file[];
-  field signature: Signature-block?;
-  field signed-by: Text[];
+  field signature: Signature[];
 }
 
 type Meta-identification {
@@ -94,13 +93,9 @@ type Meta-file {
 }
 
 // == Signature blocks
-type Signature-block {
-  field purpose: Text;
-  field signatures: Signature[];
-}
-
 type Signature {
   field signed-by: Text;
+  field key-id: Text;
   field signature: Raw-bytes;
 }
 

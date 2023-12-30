@@ -29,7 +29,7 @@
                     "op": "array",
                     "items": {
                       "op": "union",
-                      "id": 23
+                      "id": 22
                     }
                   }
                 }
@@ -50,21 +50,21 @@
               "name": "minimum-kate-version",
               "type": {
                 "op": "record",
-                "id": 13
+                "id": 12
               }
             },
             {
               "name": "metadata-location",
               "type": {
                 "op": "record",
-                "id": 14
+                "id": 13
               }
             },
             {
               "name": "content-location",
               "type": {
                 "op": "record",
-                "id": 14
+                "id": 13
               }
             }
           ]
@@ -140,19 +140,10 @@
             {
               "name": "signature",
               "type": {
-                "op": "optional",
-                "value": {
-                  "op": "record",
-                  "id": 10
-                }
-              }
-            },
-            {
-              "name": "signed-by",
-              "type": {
                 "op": "array",
                 "items": {
-                  "op": "text"
+                  "op": "record",
+                  "id": 10
                 }
               }
             }
@@ -177,14 +168,14 @@
               "name": "version",
               "type": {
                 "op": "record",
-                "id": 12
+                "id": 11
               }
             },
             {
               "name": "release-date",
               "type": {
                 "op": "record",
-                "id": 15
+                "id": 14
               }
             }
           ]
@@ -226,7 +217,7 @@
               "name": "release-type",
               "type": {
                 "op": "union",
-                "id": 18
+                "id": 17
               }
             },
             {
@@ -264,7 +255,7 @@
                 "op": "array",
                 "items": {
                   "op": "union",
-                  "id": 16
+                  "id": 15
                 }
               }
             },
@@ -281,7 +272,7 @@
               "name": "rating",
               "type": {
                 "op": "union",
-                "id": 17
+                "id": 16
               }
             },
             {
@@ -308,7 +299,7 @@
               "name": "derivative-policy",
               "type": {
                 "op": "union",
-                "id": 19
+                "id": 18
               }
             },
             {
@@ -346,7 +337,7 @@
                 "op": "array",
                 "items": {
                   "op": "union",
-                  "id": 20
+                  "id": 19
                 }
               }
             },
@@ -356,7 +347,7 @@
                 "op": "array",
                 "items": {
                   "op": "record",
-                  "id": 21
+                  "id": 20
                 }
               }
             },
@@ -366,7 +357,7 @@
                 "op": "array",
                 "items": {
                   "op": "union",
-                  "id": 22
+                  "id": 21
                 }
               }
             },
@@ -405,7 +396,7 @@
                 "op": "array",
                 "items": {
                   "op": "union",
-                  "id": 26
+                  "id": 25
                 }
               }
             }
@@ -442,7 +433,7 @@
               "name": "hash-algorithm",
               "type": {
                 "op": "union",
-                "id": 29
+                "id": 28
               }
             },
             {
@@ -463,40 +454,19 @@
     },
     {
       "type": "record",
-      "name": "Signature-block",
+      "name": "Signature",
       "id": 10,
       "versions": [
         {
           "fields": [
             {
-              "name": "purpose",
+              "name": "signed-by",
               "type": {
                 "op": "text"
               }
             },
             {
-              "name": "signatures",
-              "type": {
-                "op": "array",
-                "items": {
-                  "op": "record",
-                  "id": 11
-                }
-              }
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "type": "record",
-      "name": "Signature",
-      "id": 11,
-      "versions": [
-        {
-          "fields": [
-            {
-              "name": "signed-by",
+              "name": "key-id",
               "type": {
                 "op": "text"
               }
@@ -514,7 +484,7 @@
     {
       "type": "record",
       "name": "Version",
-      "id": 12,
+      "id": 11,
       "versions": [
         {
           "fields": [
@@ -537,7 +507,7 @@
     {
       "type": "record",
       "name": "Kate-version",
-      "id": 13,
+      "id": 12,
       "versions": [
         {
           "fields": [
@@ -566,7 +536,7 @@
     {
       "type": "record",
       "name": "Binary-location",
-      "id": 14,
+      "id": 13,
       "versions": [
         {
           "fields": [
@@ -589,7 +559,7 @@
     {
       "type": "record",
       "name": "Date",
-      "id": 15,
+      "id": 14,
       "versions": [
         {
           "fields": [
@@ -618,7 +588,7 @@
     {
       "type": "union",
       "name": "Genre",
-      "id": 16,
+      "id": 15,
       "versions": [
         {
           "variants": [
@@ -697,7 +667,7 @@
     {
       "type": "union",
       "name": "Content-rating",
-      "id": 17,
+      "id": 16,
       "versions": [
         {
           "variants": [
@@ -728,7 +698,7 @@
     {
       "type": "union",
       "name": "Release-type",
-      "id": 18,
+      "id": 17,
       "versions": [
         {
           "variants": [
@@ -763,7 +733,7 @@
     {
       "type": "union",
       "name": "Derivative-policy",
-      "id": 19,
+      "id": 18,
       "versions": [
         {
           "variants": [
@@ -790,7 +760,7 @@
     {
       "type": "union",
       "name": "Input-method",
-      "id": 20,
+      "id": 19,
       "versions": [
         {
           "variants": [
@@ -809,7 +779,7 @@
     {
       "type": "record",
       "name": "Language",
-      "id": 21,
+      "id": 20,
       "versions": [
         {
           "fields": [
@@ -844,7 +814,7 @@
     {
       "type": "union",
       "name": "Accessibility-provision",
-      "id": 22,
+      "id": 21,
       "versions": [
         {
           "variants": [
@@ -879,7 +849,7 @@
     {
       "type": "union",
       "name": "Bridge",
-      "id": 23,
+      "id": 22,
       "versions": [
         {
           "variants": [
@@ -900,11 +870,11 @@
                     "op": "map",
                     "keys": {
                       "op": "union",
-                      "id": 24
+                      "id": 23
                     },
                     "values": {
                       "op": "record",
-                      "id": 25
+                      "id": 24
                     }
                   }
                 }
@@ -960,7 +930,7 @@
                   "name": "version",
                   "type": {
                     "op": "record",
-                    "id": 12
+                    "id": 11
                   }
                 }
               ]
@@ -978,11 +948,11 @@
                     "op": "map",
                     "keys": {
                       "op": "union",
-                      "id": 24
+                      "id": 23
                     },
                     "values": {
                       "op": "record",
-                      "id": 25
+                      "id": 24
                     }
                   }
                 },
@@ -990,7 +960,7 @@
                   "name": "selector",
                   "type": {
                     "op": "union",
-                    "id": 28
+                    "id": 27
                   }
                 }
               ]
@@ -1002,7 +972,7 @@
     {
       "type": "union",
       "name": "Virtual-key",
-      "id": 24,
+      "id": 23,
       "versions": [
         {
           "variants": [
@@ -1061,7 +1031,7 @@
     {
       "type": "record",
       "name": "Keyboard-key",
-      "id": 25,
+      "id": 24,
       "versions": [
         {
           "fields": [
@@ -1078,7 +1048,7 @@
     {
       "type": "union",
       "name": "Capability",
-      "id": 26,
+      "id": 25,
       "versions": [
         {
           "variants": [
@@ -1089,7 +1059,7 @@
                   "name": "capability",
                   "type": {
                     "op": "union",
-                    "id": 27
+                    "id": 26
                   }
                 },
                 {
@@ -1107,7 +1077,7 @@
     {
       "type": "union",
       "name": "Contextual-capability",
-      "id": 27,
+      "id": 26,
       "versions": [
         {
           "variants": [
@@ -1138,7 +1108,7 @@
     {
       "type": "union",
       "name": "Keyboard-input-selector",
-      "id": 28,
+      "id": 27,
       "versions": [
         {
           "variants": [
@@ -1172,7 +1142,7 @@
     {
       "type": "union",
       "name": "Hash-algorithm",
-      "id": 29,
+      "id": 28,
       "versions": [
         {
           "variants": [
