@@ -22,9 +22,12 @@ Summary
 
 LJT is a programming language for specifying binary codecs. It's used
 extensively in both Kate and Crochet for all binary data needs, and designed
-for rich data encoding (with sum types), packed binaries, and schema evolution.
-However, it's *not* designed for random access, and as such many of the types
-in LJT do not have a fixed size.
+for rich data encoding (with sum types), packed binaries, integrity and
+safety contracts, and schema evolution.
+
+Unlike many other binary exchange formats, LJT is **intentionally** not
+designed for random access and structures have neither a fixed size nor
+fixed *version*.
 
 
 Codec formal language
@@ -42,6 +45,7 @@ described as follows:
 
   expr e :: array(e)
           | map(e, e)
+          | optional(e)
           | record(id, v)
           | variant(id, v, tag)
           | bool
@@ -114,10 +118,16 @@ Encoding proceeds in the following operational semantics:
   e(x: raw-bytes, E) =
     [e(x.length as uint32, E), ...x];
 
+  e(x: optional.some(v), E) =
+    [e(true, E), ...e(v, E)];
+
+  e(x: optional.none, E) =
+    [e(false, E)];
+
   e(x: array(t1, ..., tN), E) =
     [e(x.length as uint32, E), e(t1, E), ..., e(tN, E)];
 
-  e(x: map(k1, v1, ..., kN, vN), E) =
+  e(x: map(k1: v1, ..., kN: vN), E) =
     [e(x.length as uint32, E), e(k1, E), e(v1, E), ..., e(kN, E), e(vN, E)];
 
   e(x: record(id, v), E) when (f1, ..., fN) <- E[id, v] =
@@ -148,6 +158,9 @@ Broadly:
 
 * Likewise, raw-bytes are encoded as is, but preceded by the number of bytes
   as a uint32LE number.
+
+* Optionals are encoded with a boolean representing the presence or absence
+  of the value, followed by the packed encoding of the value if it's present.
 
 * Arrays start with the number of elements as a uint32LE number, and are
   followed by the packed encoding of each of its values. There's no padding
@@ -210,6 +223,9 @@ following operational semantics:
   d(raw-bytes, [N, b1, ..._, bN, ...]) =
     ([b1, ..., bN], [...]);
 
+  d(optional(t), [t, ...]) =
+    if t then optional.just(d(t, ...)) else optional.none;
+
   d(array(t), [N, b1, ..._, bN, ...]) =
     (g(N, [b1, ..._, bN]), [...])
     where g(0, []) = [];
@@ -217,10 +233,10 @@ following operational semantics:
 
   d(map(k, v), [N, b1, ..._, bN, ...]) =
     (g(N, [b1, ..._, bN]), [...])
-    where g(0, []) = [];
+    where g(0, []) = [:];
           g(N, bs) = let (K, R1) = d(k, bs) in
                      let (V, R2) = d(v, R1) in
-                     [<K, V>, ...g(N - 1, R2)];
+                     [K: V, ...g(N - 1, R2)];
 
   d(<record(id, v :: (f1, ..., fN)>, [v<uint32>, ...R0]) =
     let (F1, R1) = d(f1, R0) in
@@ -325,3 +341,117 @@ Decoding peeks at the magic header and picks the record type with the specified
 id and version to know which specific target type is to be used when decoding.
 This frees the user from worrying about how to figure out the version; that's
 handled automatically from the LJT side.
+
+
+Schema evolution
+----------------
+
+To support schema evolution LJT subscribes to the idea of versioned objects
+with patching semantics---similar to how database migrations work. Patches
+can specify upgrade semantics such that it's possible to decode
+older versions of data *and* treat them as the latest version anyway, avoiding
+complex and error-prone versioning in the actual program code.
+
+Patches are applied after decoding, so there are no changes needed to the
+decoding process itself---decoding already takes versioning into account,
+and properly decodes multiple versions of the same type. Again, patches are
+only meant to reduce the complexity of programs working with versioned data.
+
+
+Formal semantics
+""""""""""""""""
+
+Patching semantics are captured by the following formal language:
+
+.. code-block:: haskell
+
+  l in labels
+  x in variables
+  f in functions
+  b in booleans
+  i in integer
+  t in text
+  rb in raw-bytes
+
+  PatchExpr pe :: old                 -- the old object
+                | pe.l                -- projection
+                | [pe...]             -- arrays
+                | [pe: pe, ...]       -- maps
+                | f(pe...)            -- primitive/foreign call
+                | x                   -- variable dereference
+                | let x = pe in pe    -- local bindings
+                | b | i | t | rb      -- constants
+
+  Patch p :: upgrade-record(id@v, (pe1, ..., peN))
+           | upgrade-variant(id@v@tag, new-tag (pe1, ..., peN))
+
+  Patches = [p1, ..., pN]
+
+In essence, the decoded tree is passed to the patching function, which
+recurses down the tree and applies upgrade patches one-by-one to all
+records that can be upgraded. An upgrade is guaranteed to succeed,
+and guaranteed to yield a value of the same type with the complete
+shape defined --- this is captured by ``Patch`` instructions specifying
+the whole shape of the object. Patches **must** be type-checked.
+
+Execution of patches is captured by the following operational semantics:
+
+.. code-block:: haskell
+
+  patch(x: any, E) = x;
+
+  patch(x: optional.just(v), E) =
+    optional.just(patch(v, E));
+
+  patch(x: array(a1, ..., aN), E) =
+    array(patch(a1, E), ..., patch(aN, E));
+
+  patch(x: map(k1: v1, ..., kN: vN])) =
+    map(patch(k1, E): patch(v1, E), ..., patch(kN, E): patch(vN, E));
+
+  patch(x: record(<id, v>, (f1, ..., fN)), E) =
+    let (f1, ..., fN) = (patch(f1, E), ..., patch(fN, E)) in
+    let old = (f1, ..., fN) in
+    let (pe1, ..., peN) = E.patches[id][v+1] in
+    if patch exists => patch(record(<id, v+1>, (eval(pe1, old, E), ..., eval(peN, old, E))), E)
+    else => record(<id, v>, (f1, ..., fN));
+  
+  patch(x: variant(<id, v, tag>, (f1, ..., fN)), E) =
+    let (f1, ..., fN) = (patch(f1, E), ..., patch(fN, E)) in
+    let old = (f1, ..., fN) in
+    let new-tag(pe1, ..., peN) = E.patches[id][v+1] in
+    if patch exists => patch(variant(<id, v+1, new-tag>, (eval(pe1, old, E), ..., eval(peN, old, E))), E)
+    else => variant(<id, v, tag>, (f1, ..., fN));
+
+Where evaluation of the patch expressions themselves follows what you'd expect
+of a pure call-by-value expression language:
+
+.. code-block:: haskell
+  
+  eval(old, X, E) = X;
+
+  eval(e.l, X, E) =
+    eval(e, X, E).l;
+
+  eval([e1, ..., eN], X, E) =
+    [eval(e1, X, E), ..., eval(eN, X, E)];
+
+  eval([k1: e1, ..., kN: eN], X, E) =
+    [eval(k1, X, E): eval(e1, X, E), ..., eval(kN, X, E): eval(eN, X, E)];
+
+  eval(f(e1, ..., eN), X, E) =
+    E.funs[f](eval(e1, X, E), ..., eval(eN, X, E));
+
+  eval(x, X, E) =
+    E.vars[x];
+
+  eval(let x = e1 in e2, X, E) =
+    eval(e2, X, E{vars: [x: eval(e1, X, E), ...E.vars]});
+
+  eval(b | i | t | rb, X, E) = b | i | t | rb;
+
+.. todo::
+  Add type inference rules.
+
+.. todo::
+  Add contract language.
