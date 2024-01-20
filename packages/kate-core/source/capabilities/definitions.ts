@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { ContextualCapability } from "../cart";
+import { ContextualCapability, PassiveCapability } from "../cart";
 import type {
   CapabilityGrant,
   CapabilityType,
@@ -241,6 +241,48 @@ export class ShowDialogs extends SwitchCapability<"show-dialogs"> {
       throw new Error(`Unexpected capability: ${capability.type}`);
     }
     return new ShowDialogs(cart_id, true);
+  }
+
+  update(grant: boolean): void {
+    this._grant_configuration = grant;
+  }
+
+  risk_category(): RiskCategory {
+    return this.grant_configuration ? "low" : "none";
+  }
+}
+
+export class StoreTemporaryFiles extends SwitchCapability<"store-temporary-files"> {
+  readonly type = "store-temporary-files";
+  readonly title = "Store temporary files";
+  readonly description = `
+    Allow the cartridge to save temporary files in your device's file system.
+    The files will be deleted once the cartridge is closed.
+  `;
+
+  get grant_configuration() {
+    return this._grant_configuration;
+  }
+
+  constructor(readonly cart_id: string, private _grant_configuration: boolean) {
+    super();
+  }
+
+  static parse(grant: CapabilityGrant<StoreTemporaryFiles["type"]>) {
+    if (grant.name !== "store-temporary-files" || grant.granted.type !== "switch") {
+      throw new Error(`Unexpected capability: ${grant.name}`);
+    }
+    return new StoreTemporaryFiles(grant.cart_id, grant.granted.value);
+  }
+
+  static from_metadata(
+    cart_id: string,
+    capability: PassiveCapability & { type: StoreTemporaryFiles["type"] }
+  ) {
+    if (capability.type !== "store-temporary-files") {
+      throw new Error(`Unexpected capability: ${capability.type}`);
+    }
+    return new StoreTemporaryFiles(cart_id, true);
   }
 
   update(grant: boolean): void {

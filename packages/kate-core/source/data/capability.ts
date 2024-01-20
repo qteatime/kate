@@ -7,7 +7,7 @@
 import { Database, Transaction } from "../db-schema";
 import { kate } from "./db";
 import * as Capability from "../capabilities";
-import { ContextualCapability } from "../cart";
+import { ContextualCapability, PassiveCapability } from "../cart";
 
 export type GrantType = { type: "switch"; value: boolean };
 
@@ -19,9 +19,12 @@ export type GrantConfiguration = ValidateGrantConfig<{
   "install-cartridges": {};
   "download-files": {};
   "show-dialogs": {};
+  "store-temporary-files": {
+    max_size_mb: number;
+  };
 }>;
 
-export type CapabilityType = ContextualCapability["type"];
+export type CapabilityType = ContextualCapability["type"] | PassiveCapability["type"];
 
 export type SerialisedCapability = Pick<AnyCapabilityGrant, "cart_id" | "name" | "granted">;
 

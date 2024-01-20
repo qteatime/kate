@@ -271,6 +271,15 @@ function show_capability(x: Cart.Capability) {
       console.log(`    > Reason: ${x.reason}\n`);
       break;
     }
+
+    case t.$Tags.Passive: {
+      show_passive_capability(x.capability, x.optional);
+      console.log(`    > Reason: ${x.reason}\n`);
+      break;
+    }
+
+    default:
+      throw unreachable(x);
   }
 }
 
@@ -304,6 +313,19 @@ function show_contextual_capability(x: Cart.Contextual_capability) {
 
     default:
       throw unreachable(x);
+  }
+}
+
+function show_passive_capability(x: Cart.Passive_capability, optional: boolean) {
+  const t = Cart.Passive_capability;
+  switch (x["@variant"]) {
+    case t.$Tags.Store_temporary_files: {
+      console.log(`  * Store temporary files (max ${from_bytes(x["max-size-mb"] * 1024 * 1024)})`);
+      break;
+    }
+
+    // default:
+    //   throw unreachable(x);
   }
 }
 

@@ -433,7 +433,7 @@
               "name": "hash-algorithm",
               "type": {
                 "op": "union",
-                "id": 28
+                "id": 29
               }
             },
             {
@@ -960,7 +960,7 @@
                   "name": "selector",
                   "type": {
                     "op": "union",
-                    "id": 27
+                    "id": 28
                   }
                 }
               ]
@@ -1069,6 +1069,30 @@
                   }
                 }
               ]
+            },
+            {
+              "name": "Passive",
+              "fields": [
+                {
+                  "name": "capability",
+                  "type": {
+                    "op": "union",
+                    "id": 27
+                  }
+                },
+                {
+                  "name": "optional",
+                  "type": {
+                    "op": "bool"
+                  }
+                },
+                {
+                  "name": "reason",
+                  "type": {
+                    "op": "text"
+                  }
+                }
+              ]
             }
           ]
         }
@@ -1107,8 +1131,30 @@
     },
     {
       "type": "union",
-      "name": "Keyboard-input-selector",
+      "name": "Passive-capability",
       "id": 27,
+      "versions": [
+        {
+          "variants": [
+            {
+              "name": "Store-temporary-files",
+              "fields": [
+                {
+                  "name": "max-size-mb",
+                  "type": {
+                    "op": "uint32"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "union",
+      "name": "Keyboard-input-selector",
+      "id": 28,
       "versions": [
         {
           "variants": [
@@ -1142,7 +1188,7 @@
     {
       "type": "union",
       "name": "Hash-algorithm",
-      "id": 28,
+      "id": 29,
       "versions": [
         {
           "variants": [

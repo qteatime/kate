@@ -1925,13 +1925,14 @@ Keyboard_key.tag = 24;
 
 
 
-export type Capability = Capability.Contextual;
+export type Capability = Capability.Contextual | Capability.Passive;
 
 export namespace Capability {
  export const tag = 25;
 
  export const enum $Tags {
-   Contextual = 0
+   Contextual = 0,
+    Passive = 1
  }
 
  
@@ -1953,6 +1954,30 @@ export namespace Capability {
    readonly '@variant': $Tags.Contextual;
    readonly '@variant-name': 'Contextual';
    readonly 'capability': Contextual_capability
+    readonly 'reason': string
+ }
+
+
+  
+ export function Passive(x: {readonly 'capability': Passive_capability,readonly 'optional': boolean,readonly 'reason': string}): Capability {
+   return {
+     '@name': 'Capability',
+     '@tag': 25,
+     '@version': 0,
+     '@variant': $Tags.Passive,
+     '@variant-name': 'Passive',
+     ...x
+   }
+ }
+
+ export interface Passive {
+   readonly '@name': 'Capability';
+   readonly '@tag': 25;
+   readonly '@version': 0;
+   readonly '@variant': $Tags.Passive;
+   readonly '@variant-name': 'Passive';
+   readonly 'capability': Passive_capability
+    readonly 'optional': boolean
     readonly 'reason': string
  }
 
@@ -2086,10 +2111,44 @@ export namespace Contextual_capability {
 
 
 
+export type Passive_capability = Passive_capability.Store_temporary_files;
+
+export namespace Passive_capability {
+ export const tag = 27;
+
+ export const enum $Tags {
+   Store_temporary_files = 0
+ }
+
+ 
+ export function Store_temporary_files(x: {readonly 'max-size-mb': UInt32}): Passive_capability {
+   return {
+     '@name': 'Passive-capability',
+     '@tag': 27,
+     '@version': 0,
+     '@variant': $Tags.Store_temporary_files,
+     '@variant-name': 'Store-temporary-files',
+     ...x
+   }
+ }
+
+ export interface Store_temporary_files {
+   readonly '@name': 'Passive-capability';
+   readonly '@tag': 27;
+   readonly '@version': 0;
+   readonly '@variant': $Tags.Store_temporary_files;
+   readonly '@variant-name': 'Store-temporary-files';
+   readonly 'max-size-mb': UInt32
+ }
+
+}
+
+
+
 export type Keyboard_input_selector = Keyboard_input_selector.Window | Keyboard_input_selector.Document | Keyboard_input_selector.Legacy | Keyboard_input_selector.CSS;
 
 export namespace Keyboard_input_selector {
- export const tag = 27;
+ export const tag = 28;
 
  export const enum $Tags {
    Window = 0,
@@ -2102,7 +2161,7 @@ export namespace Keyboard_input_selector {
  export function Window(x: {}): Keyboard_input_selector {
    return {
      '@name': 'Keyboard-input-selector',
-     '@tag': 27,
+     '@tag': 28,
      '@version': 0,
      '@variant': $Tags.Window,
      '@variant-name': 'Window',
@@ -2112,7 +2171,7 @@ export namespace Keyboard_input_selector {
 
  export interface Window {
    readonly '@name': 'Keyboard-input-selector';
-   readonly '@tag': 27;
+   readonly '@tag': 28;
    readonly '@version': 0;
    readonly '@variant': $Tags.Window;
    readonly '@variant-name': 'Window';
@@ -2124,7 +2183,7 @@ export namespace Keyboard_input_selector {
  export function Document(x: {}): Keyboard_input_selector {
    return {
      '@name': 'Keyboard-input-selector',
-     '@tag': 27,
+     '@tag': 28,
      '@version': 0,
      '@variant': $Tags.Document,
      '@variant-name': 'Document',
@@ -2134,7 +2193,7 @@ export namespace Keyboard_input_selector {
 
  export interface Document {
    readonly '@name': 'Keyboard-input-selector';
-   readonly '@tag': 27;
+   readonly '@tag': 28;
    readonly '@version': 0;
    readonly '@variant': $Tags.Document;
    readonly '@variant-name': 'Document';
@@ -2146,7 +2205,7 @@ export namespace Keyboard_input_selector {
  export function Legacy(x: {}): Keyboard_input_selector {
    return {
      '@name': 'Keyboard-input-selector',
-     '@tag': 27,
+     '@tag': 28,
      '@version': 0,
      '@variant': $Tags.Legacy,
      '@variant-name': 'Legacy',
@@ -2156,7 +2215,7 @@ export namespace Keyboard_input_selector {
 
  export interface Legacy {
    readonly '@name': 'Keyboard-input-selector';
-   readonly '@tag': 27;
+   readonly '@tag': 28;
    readonly '@version': 0;
    readonly '@variant': $Tags.Legacy;
    readonly '@variant-name': 'Legacy';
@@ -2168,7 +2227,7 @@ export namespace Keyboard_input_selector {
  export function CSS(x: {readonly 'selector': string}): Keyboard_input_selector {
    return {
      '@name': 'Keyboard-input-selector',
-     '@tag': 27,
+     '@tag': 28,
      '@version': 0,
      '@variant': $Tags.CSS,
      '@variant-name': 'CSS',
@@ -2178,7 +2237,7 @@ export namespace Keyboard_input_selector {
 
  export interface CSS {
    readonly '@name': 'Keyboard-input-selector';
-   readonly '@tag': 27;
+   readonly '@tag': 28;
    readonly '@version': 0;
    readonly '@variant': $Tags.CSS;
    readonly '@variant-name': 'CSS';
@@ -2192,7 +2251,7 @@ export namespace Keyboard_input_selector {
 export type Hash_algorithm = Hash_algorithm.Sha_512;
 
 export namespace Hash_algorithm {
- export const tag = 28;
+ export const tag = 29;
 
  export const enum $Tags {
    Sha_512 = 0
@@ -2202,7 +2261,7 @@ export namespace Hash_algorithm {
  export function Sha_512(x: {}): Hash_algorithm {
    return {
      '@name': 'Hash-algorithm',
-     '@tag': 28,
+     '@tag': 29,
      '@version': 0,
      '@variant': $Tags.Sha_512,
      '@variant-name': 'Sha-512',
@@ -2212,7 +2271,7 @@ export namespace Hash_algorithm {
 
  export interface Sha_512 {
    readonly '@name': 'Hash-algorithm';
-   readonly '@tag': 28;
+   readonly '@tag': 29;
    readonly '@version': 0;
    readonly '@variant': $Tags.Sha_512;
    readonly '@variant-name': 'Sha-512';
