@@ -35,6 +35,7 @@ import { KateAuditSupervisor } from "./services/audit-supervisor";
 import { KateDeviceFile } from "./apis/device-file";
 import { KateFairnessSupervisor } from "./services/fairness-supervisor";
 import { ButtonChangeEvent } from "../kernel";
+import { KateProcessFileSupervisor } from "./services/process-file-supervisor";
 
 export type CartChangeReason = "installed" | "removed" | "archived" | "save-data-changed";
 
@@ -65,6 +66,7 @@ export class KateOS {
   readonly capability_supervisor: KateCapabilitySupervisor;
   readonly audit_supervisor: KateAuditSupervisor;
   readonly fairness_supervisor: KateFairnessSupervisor;
+  readonly process_file_supervisor: KateProcessFileSupervisor;
   readonly TRACE_ENABLED = trace_messages;
 
   readonly events = {
@@ -111,6 +113,8 @@ export class KateOS {
     this.audit_supervisor = new KateAuditSupervisor(this);
     this.fairness_supervisor = new KateFairnessSupervisor(this);
     this.file_store = new KateFileStore(this);
+    this.process_file_supervisor = new KateProcessFileSupervisor(this);
+    this.process_file_supervisor.setup();
   }
 
   get display() {

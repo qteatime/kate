@@ -11,6 +11,7 @@ import { KateCartManager } from "./cart-manager";
 import { KateIPC } from "./channel";
 import { DeviceFileHandle, KateDeviceFileAccess } from "./device-file";
 import { KateDialogs } from "./dialog";
+import { KateFileStore } from "./file-store";
 import { InputKey, KateInput } from "./input";
 import { KateObjectStore } from "./object-store";
 import { KatePointerInput, PointerClick, PointerLocation } from "./pointer-input";
@@ -26,6 +27,8 @@ export const events = channel.events;
 export const cart_fs = new KateCartFS(channel);
 
 export const store = new KateObjectStore(channel);
+
+export const file_store = new KateFileStore(channel);
 
 export const timer = new KateTimer();
 timer.setup();
