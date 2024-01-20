@@ -8,6 +8,16 @@ and developers making Kate games who wish to have a deeper understanding
 of the platform they're developing for.
 
 
+Language and format design
+==========================
+
+.. toctree::
+  :maxdepth: 1
+
+  formats/F0001-ljt
+  formats/F0002-kart
+
+
 Kernel design
 =============
 
@@ -19,6 +29,7 @@ Kernel design
   kernel/K0003-resource-band
   kernel/K0004-processes
   kernel/K0005-partitioned-file-storage
+  kernel/K0006-cartridge-signatures
 
 
 API design

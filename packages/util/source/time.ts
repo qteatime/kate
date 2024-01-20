@@ -4,6 +4,25 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
+export function fine_grained_time_seconds(x: number) {
+  const units = [
+    { unit: "minute", limit: 60 },
+    { unit: "hour", limit: 60 },
+  ];
+  let current = "second";
+  let value = x;
+  for (const { unit, limit } of units) {
+    if (value >= limit) {
+      value = value / limit;
+      current = unit;
+    } else {
+      break;
+    }
+  }
+  const suffix = Math.round(value) === 1 ? current : current + "s";
+  return `${Math.round(value)} ${suffix}`;
+}
+
 export function coarse_time_from_minutes(x: number) {
   const minute_threshold = 15;
   const hour_threshold = 60;
@@ -31,15 +50,13 @@ export function days_diff(x: Date, y: Date) {
 }
 
 export function date_time_string(x: Date) {
-  return `${x.getFullYear()}-${(x.getMonth() + 1)
+  return `${x.getFullYear()}-${(x.getMonth() + 1).toString().padStart(2, "0")}-${x
+    .getDate()
     .toString()
-    .padStart(2, "0")}-${x.getDate().toString().padStart(2, "0")} ${x
-    .getHours()
+    .padStart(2, "0")} ${x.getHours().toString().padStart(2, "0")}:${x
+    .getMinutes()
     .toString()
-    .padStart(2, "0")}:${x.getMinutes().toString().padStart(2, "0")}:${x
-    .getSeconds()
-    .toString()
-    .padStart(2, "0")}`;
+    .padStart(2, "0")}:${x.getSeconds().toString().padStart(2, "0")}`;
 }
 
 export function relative_time(x: Date) {
@@ -96,11 +113,7 @@ export function relative_date(x: Date | null) {
         (_) => "last month",
         (n) => `${n} months ago`
       );
-    } else if (
-      year === now.getFullYear() &&
-      month === now.getMonth() &&
-      date <= now.getDate()
-    ) {
+    } else if (year === now.getFullYear() && month === now.getMonth() && date <= now.getDate()) {
       const d = now.getDate() - date;
       switch (d) {
         case 0:
@@ -115,11 +128,7 @@ export function relative_date(x: Date | null) {
   }
 }
 
-function plural(
-  n: number,
-  single: (_: string) => string,
-  plural: (_: string) => string
-) {
+function plural(n: number, single: (_: string) => string, plural: (_: string) => string) {
   if (n === 1) {
     return single(String(n));
   } else {

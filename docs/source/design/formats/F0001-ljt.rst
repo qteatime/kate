@@ -1,0 +1,457 @@
+#F0001 — The LJT language
+=========================
+
+:Author: Niini
+:Started: 2023-12-30
+:Last updated: 2023-12-30
+:Status: Design in progress
+
+
+Timeline
+--------
+
+=========== ================ =====================
+First draft Proof of Concept Stable implementation
+=========== ================ =====================
+2023-12-30  —                —
+=========== ================ =====================
+
+
+Summary
+-------
+
+LJT is a programming language for specifying binary codecs. It's used
+extensively in both Kate and Crochet for all binary data needs, and designed
+for rich data encoding (with sum types), packed binaries, integrity and
+safety contracts, and schema evolution.
+
+Unlike many other binary exchange formats, LJT is **intentionally** not
+designed for random access and structures have neither a fixed size nor
+fixed *version*.
+
+
+Codec formal language
+---------------------
+
+LJT codecs uses a small language for encoding data, with types reminiscent of
+Standard ML, with the small addition that they're versioned. It can be
+described as follows:
+
+.. code-block:: haskell
+
+  id in identifiers;
+  v in versions;
+  tag in tags;
+
+  expr e :: array(e)
+          | map(e, e)
+          | optional(e)
+          | record(id, v)
+          | variant(id, v, tag)
+          | bool
+          | int8 | int16 | int32 | int64
+          | uint8 | uint16 | uint32 | uint64
+          | float32 | float64
+          | bigint | text | raw-bytes  // non-fixed size
+          ;
+
+  declaration d :: record id@v (e1, ..., eN)
+                 | union id@v { 0: (e1, ..., eN), ..., N: (e1, ..., eN) }
+                 invariant ``id@v`` is unique;
+
+  schema s :: {magic, v, (d1, ..., dN)};
+
+So we can declare record types, which hold a tuple of basic type expressions,
+and union types, which hold a variant that is also a tuple of basic type
+expressions. Both of these are versioned, so ``point2d@1`` and ``point2d@2``
+can hold entirely different type tuples or have entirely different tuple
+sizes.
+
+In the type expressions, in addition to the scalar types we also have
+``array`` of types and ``map`` of types, as well as pointers to defined
+records and variants at a specific version. Arrays and maps are packed ---
+that is, they include the size and then pack all of their contents up to
+that size. There's no padding to allow for random access.
+
+A schema specifies its magic (an arbitrary sequence of *bytes*), its version,
+and a sequence of all top-level types declared in it. Schemas with the same
+magic and version are also expected to match exactly in their declaration
+list.
+
+When executing a schema we have two execution goals: **encoding** and 
+**decoding**. Both are described below:
+
+
+Encoding
+""""""""
+
+Encoding proceeds in the following operational semantics:
+
+.. code-block:: haskell
+
+  -- that is, the slice of the number using little-endian encoding
+  s(a..0, n) = [];
+  s(a..b, n) = [(n >> (a*8)) & 0xff, ...s(a+1..b-1, n)];
+
+  -- encoding takes a typed value and an environment mapping `[id, v] -> d`
+  e(x: bool, E) = [if x then 0x01 else 0x00];
+
+  e(x: int8, E) = [x];
+  e(x: int16, E) = s(0..1, x);
+  e(x: int32, E) = s(0..4, x);
+  e(x: int64, E) = s(0..8, x);
+
+  e(x: uint8, E) = [x];
+  e(x: uint16, E) = s(0..1, x);
+  e(x: uint32, E) = s(0..4, x);
+  e(x: uint64, E) = s(0..8, x);
+
+  e(x: float32, E) = to-ieee754-binary(x, 32);
+  e(x: float64, E) = to-ieee754-binary(x, 64);
+
+  e(x: bigint, E) =
+    [e(x < 0, E), e(ceil(x/256) as uint32, E), ...s(0..ceil(x/256), x)];
+
+  e(x: text, E) =
+    [e(x.length as uint32, E), ...utf8(x)];
+
+  e(x: raw-bytes, E) =
+    [e(x.length as uint32, E), ...x];
+
+  e(x: optional.some(v), E) =
+    [e(true, E), ...e(v, E)];
+
+  e(x: optional.none, E) =
+    [e(false, E)];
+
+  e(x: array(t1, ..., tN), E) =
+    [e(x.length as uint32, E), e(t1, E), ..., e(tN, E)];
+
+  e(x: map(k1: v1, ..., kN: vN), E) =
+    [e(x.length as uint32, E), e(k1, E), e(v1, E), ..., e(kN, E), e(vN, E)];
+
+  e(x: record(id, v), E) when (f1, ..., fN) <- E[id, v] =
+    [e(v as uint32), e(f1, E), ..., e(fN, E)];
+
+  e(x: variant(id, v, tag), E) when (f1, ..., fN) <- E[id, v][tag] =
+    [e(v as uint32), e(tag as uint32), e(f1, E), ..., e(fN, E)];
+
+Broadly:
+
+* Booleans are encoded in a single **byte**. ``0`` denotes false, all other
+  values denote true (though conventionally ``1`` is used).
+
+* Numbers are encoded in a fixed number of bytes using little-endian encoding.
+
+* Floating points are taken to follow the IEEE-754 encoding for 32 and 64 bit
+  binary representations, and are not defined here. Please
+  `refer to the IEEE-754 specification for details instead
+  <https://ieeexplore.ieee.org/document/8766229>`_.
+
+* Arbitrary-precision integers are encoded just as their sign, followed
+  by the number of required bytes, followed by all bytes that make up the number,
+  in little-endian encoding. Note that the sign takes one whole byte --- it's
+  encoded in the same manner as ``boolean``.
+
+* Text is encoded as raw UTF-8 bytes, preceded by the number of bytes that it
+  requires as a uint32LE number.
+
+* Likewise, raw-bytes are encoded as is, but preceded by the number of bytes
+  as a uint32LE number.
+
+* Optionals are encoded with a boolean representing the presence or absence
+  of the value, followed by the packed encoding of the value if it's present.
+
+* Arrays start with the number of elements as a uint32LE number, and are
+  followed by the packed encoding of each of its values. There's no padding
+  added, so items cannot be accessed by byte offsets in this format.
+
+* Maps, like arrays, start with the number of elements as a uint32LE number,
+  and are followed by the packed encoding of the key, and the packed encoding
+  of that key's value. There's no padding added, so again items cannot be
+  accessed by byte offsets in this format.
+
+* Records are encoded **by their version**, as a uint32LE number, followed
+  by the packed encoding of their fields in order. Note that there's no
+  identifier specifying what the record is because LJT **requires** a schema
+  for both encoding and decoding.
+
+* Unions are encoded **by the version and variant tag**, as two uint32LE numbers,
+  followed by the packed encoding of that variant's fields in order. This is
+  because only the union is versioned, not individual variants, and unions
+  may remove or add variants in different versions. Again, no identifier for
+  the union is provided, so a schema is required for decoding.
+
+
+Decoding
+""""""""
+
+Decoding follows the reverse process of encoding, and is captured in the
+following operational semantics:
+
+.. code-block:: haskell
+
+  -- that is, putting together the number from little-endian bytes
+  s([], n) = 0
+  s([a, ...b], n) = (a << (n*8)) | s(b, n + 1);
+
+  -- decoding does not require an environment, but it requires a target type
+  d(bool, [a, ...]) = (a !== 0x00, [...]);
+
+  d(int8, [a, ...]) = (a as int8, [...]);
+  d(int16, [a, b, ...]) = (s([a, b]) as int16, [...]);
+  d(int32, [a, b, c, d, ...]) = (s([a, b, c, d]) as int32, [...]);
+  d(int64, [a, b, c, d, e, f, g, h, ...]) = (s([a, b, c, d, e, f, g, h]) as int64, [...]);
+
+  d(uint8, [a, ...]) = (a, [...]);
+  d(uint16, [a, b, ...]) = (s([a, b]), [...]);
+  d(uint32, [a, b, c, d, ...]) = (s([a, b, c, d]), [...]);
+  d(uint64, [a, b, c, d, e, f, g, h, ...]) = (s([a, b, c, d, e, f, g, h]), [...]);
+
+  d(float32, [a, b, c, d, ...]) =
+    (from-iee754-binary([a, b, c, d], 32), [...]);
+  d(float64, [a, b, c, d, e, f, g, h, ...]) =
+    (from-iee754-binary([a, b, c, d, e, f, g, h], 64), [...]);
+
+  d(bigint, [negative, N, b1, ..._, bN, ...]) =
+    ( ((b1 << 0) + ..._ + (bN << ((N - 1) * 8))) * (d(bool, negative) ? -1 : 1)
+    , [...]);
+
+  d(text, [N, b1, ..._, bN, ...]) =
+    (from-utf8([b1, ..._, bN]), [...]);
+
+  d(raw-bytes, [N, b1, ..._, bN, ...]) =
+    ([b1, ..., bN], [...]);
+
+  d(optional(t), [t, ...]) =
+    if t then optional.just(d(t, ...)) else optional.none;
+
+  d(array(t), [N, b1, ..._, bN, ...]) =
+    (g(N, [b1, ..._, bN]), [...])
+    where g(0, []) = [];
+          g(N, bs) = let (V, R) = d(t, bs) in [V, ...g(N - 1, R)];
+
+  d(map(k, v), [N, b1, ..._, bN, ...]) =
+    (g(N, [b1, ..._, bN]), [...])
+    where g(0, []) = [:];
+          g(N, bs) = let (K, R1) = d(k, bs) in
+                     let (V, R2) = d(v, R1) in
+                     [K: V, ...g(N - 1, R2)];
+
+  d(<record(id, v :: (f1, ..., fN)>, [v<uint32>, ...R0]) =
+    let (F1, R1) = d(f1, R0) in
+    ...
+    let (FN, RN) = d(fN, R{N-1})) in
+    (<id, v, (F1, ..., FN)>, RN);
+
+  d(<union(id) :: (v, tag) :: (f1, ..., fN)>, [v<uint32>, tag<uint32>, ...R0]) =
+    let (F1, R1) = d(f1, R0) in
+    ...
+    let (FN, RN) = d(fN, R{N-1}) in
+    (<id, v, tag, (F1, ..., FN)>, RN);
+
+So decoding is mostly straightforward: take the target type, decode the first
+bytes according to that type's specification, then return the decoded value
+along with the remaining bytes.
+
+Where it requires a bit more of attention is in decoding records and variants.
+The schema only specifies the id of the record or union that can be encoded
+at a specific point, so the decoder must first decode the version (and tag,
+in case of a union) to find the specific type that is to be used when decoding
+the following bytes.
+
+For example, consider:
+
+.. code-block:: typescript
+
+  type Point@0 { field x: Uint32; field y: Uint32 }                   // id: 0
+  type Point@1 { field x: Uint32; field y: Uint32; field z: Uint32 }  // id: 0
+
+  type Player@0 { field position: Point }                             // id: 1
+
+If we encode the player value ``Player({ x: 0, y: 0 })``, that will have
+a distinct binary representation from encoding ``Player({ x: 0, y: 0, z: 0 })``,
+but the schema only says "use ``Point`` to decode this".
+
+Putting it in more concrete terms::
+
+  encode(Player({x: 0, y: 0 }))
+  = [1<u32>, 0<u32>, 0<u32>, 0<u32>, 0<u32>]
+     |       |       |       `-------------> Point fields
+     |       |       `--> Point version
+     |       `--> Player version
+     `--> Player id
+
+  encode(Player({ x: 0, y: 0, z: 0 ))
+  = [1<u32>, 0<u32>, 1<u32>, 0<u32>, 0<u32>, 0<u32>]
+
+  decode([1<u32>, 0<u32>, 0<u32>, 0<u32>, 0<u32>])
+  = Player@0(Point@0(x: 0, y: 0))
+
+  decode([1<u32>, 0<u32>, 1<u32>, 0<u32>, 0<u32>, 0<u32>])
+  = Player@0(Point@1(x: 0, y: 0, z: 0))
+
+
+
+Codec invariants
+""""""""""""""""
+
+The algorithm specified enjoys the property that ``d(e(v, E), T) = v`` always
+holds given the correct environment and target type.
+
+Likewise, ``e(d(bytes, T), E) = bytes`` always holds given the correct
+environment and target type.
+
+
+Top-level encoding and decoding
+"""""""""""""""""""""""""""""""
+
+The encoding and decoding algorithms specified in the sections above refer
+only to individual expressions. There is additional data and operations
+involved when we encode or decode from the top-level. This is because a
+LJT schema does not prescribe any canonical type to start encoding/decoding
+from, and thus it can start from any given **record** type.
+
+This is captured in the following operational semantics:
+
+.. code-block:: haskell
+
+  top-encode(value, id, version, {magic, v, (record id@version = T, ...) = E}) =
+    [
+      ...magic,
+      e(v as uint32, E),
+      e(id as uint32, E),
+      e(value as T, E)
+    ];
+
+  top-decode(
+    [...magic, v<uint32>, id<uint32>, version<uint32>, ...data],
+    id,
+    {magic, v, (record id@version = T, ...)}
+  ) =
+    d(<record(id, version), T>, [...version, data]);
+
+Which is to say, a top-level encoding includes the magic and version header
+for the schema as well, and the identifier for the record that should be used
+when decoding it. The *version* of that record is included by the regular
+encoder, because individual values in the encoded blob can be at different
+versions of the same record type.
+
+Decoding peeks at the magic header and picks the record type with the specified
+id and version to know which specific target type is to be used when decoding.
+This frees the user from worrying about how to figure out the version; that's
+handled automatically from the LJT side.
+
+
+Schema evolution
+----------------
+
+To support schema evolution LJT subscribes to the idea of versioned objects
+with patching semantics---similar to how database migrations work. Patches
+can specify upgrade semantics such that it's possible to decode
+older versions of data *and* treat them as the latest version anyway, avoiding
+complex and error-prone versioning in the actual program code.
+
+Patches are applied after decoding, so there are no changes needed to the
+decoding process itself---decoding already takes versioning into account,
+and properly decodes multiple versions of the same type. Again, patches are
+only meant to reduce the complexity of programs working with versioned data.
+
+
+Formal semantics
+""""""""""""""""
+
+Patching semantics are captured by the following formal language:
+
+.. code-block:: haskell
+
+  l in labels
+  x in variables
+  f in functions
+  b in booleans
+  i in integer
+  t in text
+  rb in raw-bytes
+
+  PatchExpr pe :: old                 -- the old object
+                | pe.l                -- projection
+                | [pe...]             -- arrays
+                | [pe: pe, ...]       -- maps
+                | f(pe...)            -- primitive/foreign call
+                | x                   -- variable dereference
+                | let x = pe in pe    -- local bindings
+                | b | i | t | rb      -- constants
+
+  Patch p :: upgrade-record(id@v, (pe1, ..., peN))
+           | upgrade-variant(id@v@tag, new-tag (pe1, ..., peN))
+
+  Patches = [p1, ..., pN]
+
+In essence, the decoded tree is passed to the patching function, which
+recurses down the tree and applies upgrade patches one-by-one to all
+records that can be upgraded. An upgrade is guaranteed to succeed,
+and guaranteed to yield a value of the same type with the complete
+shape defined --- this is captured by ``Patch`` instructions specifying
+the whole shape of the object. Patches **must** be type-checked.
+
+Execution of patches is captured by the following operational semantics:
+
+.. code-block:: haskell
+
+  patch(x: any, E) = x;
+
+  patch(x: optional.just(v), E) =
+    optional.just(patch(v, E));
+
+  patch(x: array(a1, ..., aN), E) =
+    array(patch(a1, E), ..., patch(aN, E));
+
+  patch(x: map(k1: v1, ..., kN: vN])) =
+    map(patch(k1, E): patch(v1, E), ..., patch(kN, E): patch(vN, E));
+
+  patch(x: record(<id, v>, (f1, ..., fN)), E) =
+    let (f1, ..., fN) = (patch(f1, E), ..., patch(fN, E)) in
+    let old = (f1, ..., fN) in
+    let (pe1, ..., peN) = E.patches[id][v+1] in
+    if patch exists => patch(record(<id, v+1>, (eval(pe1, old, E), ..., eval(peN, old, E))), E)
+    else => record(<id, v>, (f1, ..., fN));
+  
+  patch(x: variant(<id, v, tag>, (f1, ..., fN)), E) =
+    let (f1, ..., fN) = (patch(f1, E), ..., patch(fN, E)) in
+    let old = (f1, ..., fN) in
+    let new-tag(pe1, ..., peN) = E.patches[id][v+1] in
+    if patch exists => patch(variant(<id, v+1, new-tag>, (eval(pe1, old, E), ..., eval(peN, old, E))), E)
+    else => variant(<id, v, tag>, (f1, ..., fN));
+
+Where evaluation of the patch expressions themselves follows what you'd expect
+of a pure call-by-value expression language:
+
+.. code-block:: haskell
+  
+  eval(old, X, E) = X;
+
+  eval(e.l, X, E) =
+    eval(e, X, E).l;
+
+  eval([e1, ..., eN], X, E) =
+    [eval(e1, X, E), ..., eval(eN, X, E)];
+
+  eval([k1: e1, ..., kN: eN], X, E) =
+    [eval(k1, X, E): eval(e1, X, E), ..., eval(kN, X, E): eval(eN, X, E)];
+
+  eval(f(e1, ..., eN), X, E) =
+    E.funs[f](eval(e1, X, E), ..., eval(eN, X, E));
+
+  eval(x, X, E) =
+    E.vars[x];
+
+  eval(let x = e1 in e2, X, E) =
+    eval(e2, X, E{vars: [x: eval(e1, X, E), ...E.vars]});
+
+  eval(b | i | t | rb, X, E) = b | i | t | rb;
+
+.. todo::
+  Add type inference rules.
+
+.. todo::
+  Add contract language.

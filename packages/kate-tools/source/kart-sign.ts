@@ -4,5 +4,4 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-export * from "../../../schema/build";
-export * from "../../../schema/build/kart-v6-node";
+// Manages signing a cartridge.
