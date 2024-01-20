@@ -209,7 +209,7 @@ registered keys for that domain.
 
 
 Key registry
-------------
+""""""""""""
 
 The key registry is a repository of all keys used to sign Kate cartridges that
 is available for the public domain and signed with the trusted key for the
@@ -230,8 +230,9 @@ The following format is used:
       hash: SHA-512 signature of the previous chunk file
       hash-algorithm: "SHA-512"
     }
+    last-update: ISO-8601 date/time string
     entries: Entry[]
-    signature: sign({previous, entries}) with registry key
+    signature: sign({previous, last-update, entries}) with registry key
   }
 
   type Entry =
@@ -242,9 +243,8 @@ The following format is used:
     type: "key-added"
     key: JWK public key
     domain: domain part string
-    registered_at: UTC timestamp
-    previous: null | sha256 hash
-    hash: sha256-hash({type, key, domain, registered_at, previous})
+    registered_at: ISO-8601 UTC date/time string
+    hash: sha256-hash({type, key, domain, registered_at})
   }
 
   type Key-invalidated = {
@@ -252,10 +252,9 @@ The following format is used:
     reason: "compromised-key" | "compromised-domain"
     key: JWK public key
     domain: domain part string
-    invalidated_at: UTC timestamp
+    invalidated_at: ISO-8601 UTC date/time string
     proof: sign({key, domain, reason, invalidated_at}) with publisher key
-    previous: null | sha256 hash
-    hash: sha256-hash({type, reason, key, domain, invalidated_at, proof, previous})
+    hash: sha256-hash({type, reason, key, domain, invalidated_at, proof})
   }
 
 Wherever ``sign`` is specified here, we assume the signature of those fields
@@ -266,13 +265,249 @@ invalidated in the registry come from legit requests from publishers, and that
 the correct validation has been performed on the registry side when associating
 a key with a domain (i.e.: to ensure the owner of the key also owns the domain).
 
-Like version control systems, each "commit" or addition in this registry
-includes a reference to the previous state of the registry. This means that
-it's not possible to reorder entries in the registry without invalidating
-the whole state of the registry, but it does not provide any assurance that
-the additions are valid.
+Entries in the registry have **set** semantics. That is, their particular
+ordering is irrelevant. A client consuming the registry will know they have
+the latest state when they've applied the whole set of entry hashes, in any
+order. The addition and invalidation work in a similar way to a
+`2P-Set CRDT <https://en.wikipedia.org/wiki/Conflict-free_replicated_data_type#2P-Set_(Two-Phase_Set)>`_,
+so additions and invalidations are tracked as separate sets you can only
+add data to, but never remove.
 
-To address the addition concern, the public registry *must* have an open
-source implementation and have all changes to the registry committed to
-a public git repository. This makes it possible for third parties to
-independently audit changes to the registry.
+Since, unlike in signed chain registries, the Kate key registry does not
+have a total order or signatures on this total order, entries can be
+added or removed anywhere, at any point in time, as long as they're
+signed with the registry's key. To address the auditing concerns,
+the public registry *must* have an open source implementation and have
+all changes to the registry committed to a public git repository.
+This makes it possible for third parties to independently audit changes
+to the registry.
+
+
+The registry server
+"""""""""""""""""""
+
+A registry server is any service that allows publishers to register their
+public keys and verify that those public keys do indeed belong to the
+publisher, so that they can add or invalidate the keys in the registry
+records.
+
+In essence, a registry server can be thought of as follows:
+
+.. code-block:: haskell
+
+  Server s :: { signing-key
+              , work-queue
+              , registry
+              }
+
+  Operation op ::
+    | register-domain(domain)
+    | invalidate-key(request)
+    | commit()
+    | all-keys()
+    | all-keys-for(domain)
+
+And the operations can be defined as follows:
+
+``s.register-domain(d)``
+''''''''''''''''''''''''
+
+.. code-block:: haskell
+
+  s.register-domain(d) when d is not in s.work-queue =
+    add d to s.work-queue
+
+When someone registers a domain update, we simply add it to the server's
+work queue. We'll get to that domain eventually once the server's
+``commit`` operation runs.
+
+
+``s.commit()``
+''''''''''''''
+
+.. code-block:: haskell
+
+  s{work-queue = []}.commit() =
+    nothing
+
+  s{work-queue = [d, ...]}.commit() =
+    let page = first-of (fetch(d / kate.txt) | fetch(d))
+    let key = extract public key in PEM format from page's text
+    ensure the key is unique within the registry
+      -- if the key belongs to another domain, this is an error
+      -- if the key is already associated with the domain, do nothing
+    add key to the registry, associating it with d
+    s{work-queue = [...]}.commit()
+
+That is, within a commit loop we'll process the work-queue and fetch the
+public key either from a dedicated place in the remote server, or by parsing
+the HTML response from the server and looking for a public key in PEM format.
+
+In case this key is an actual addition to the registry, we'll add a new
+signed entry to the registry for that key, and continue processing the queue.
+
+
+``s.invalidate-key(r)``
+'''''''''''''''''''''''
+
+.. code-block:: haskell
+
+  s.invalidate-key({key, domain, time, reason, proof}) =
+    ensure key has not yet been invalidated and exists in the registry
+    verify the proof signature against our known key for that domain
+    add an invalidated entry for the key to the registry
+
+That is, in a key invalidation request we just make sure that the proof
+provided is valid and actually refers to a key/domain entry that we have
+in the registry. If that's the case, the entry is added to the registry
+mostly as-is.
+
+
+``s.all-keys()`` and ``s.all-keys-for(domain)``
+'''''''''''''''''''''''''''''''''''''''''''''''
+
+.. code-block:: haskell
+  
+  s.all-keys() =
+    registry paginated in 1024 entries chunks
+
+  s.all-keys-for(domain) =
+    (registry filtered by domain) in 1024 entries chunks
+
+Both ``all-keys`` and ``all-keys-for`` return a complete registry in the
+format specified above. The only difference is that ``all-keys-for`` only
+returns entries that are associated with the provided domain.
+
+
+How is this feature dangerous?
+------------------------------
+
+Kate relies on signatures to tell users about provenance and allow them to
+tie their risk assessment decisions to a known entity. Therefore it's
+important that these signatures *can* be used to provide that kind of link
+between the cartridge and the publisher. Here we consider risks from users',
+publishers, the registry, and Kate's perspectives.
+
+
+**Signatures only prove domain ownership**:
+  When a user makes a risk assessment for granting capabilities to a
+  cartridge, they need to know who they're trusting, but signatures in
+  Kate only prove domain ownership, which is not sufficient for this
+  assessment.
+
+  Kate communicates what is verified (the domain) by showing the whole
+  domain on the capability grant screen. Capability risks are described
+  independently. This doesn't provide an actual entity for trust, but
+  it helps users focus on the capability risks rather than the
+  domain itself.
+
+  Because indie games are generally self-published by smaller developers
+  attaching a person or studio's name would not improve much over the
+  domain verification, but would significantly raise the bar for anyone
+  wanting to publish to Kate.
+
+**Compromised publisher keys**:
+  If the private key of a publisher is compromised, then we cannot attest
+  that cartridges signed with it must come from that publisher anymore.
+  Users installing such cartridges risk being tricked into giving
+  stronger capabilities to attackers based on previous good experiences
+  with the publisher.
+
+  The registry allows for key invalidation. A publisher may notify the registry
+  that their key was compromised by signing an invalidation request, which is
+  then propagated to all Kate devices. When a cartridge signed with an
+  invalidated key is installed, the user will be notified that the cartridge
+  cannot be verified and specify the invalidation reason, which the user
+  can then rely on for risk assessment.
+
+**Compromised publisher domain**:
+  Because Kate associates keys with domains, and because domain ownership is
+  ephemeral, a publisher's verified domain may be compromised for several
+  different reasons. For each of these reasons we risk a third party
+  registering keys that are otuside of the publisher's control. These can
+  then be used to publish cartridges that abuse the publisher's reputation
+  for privilege escalation, tricking the user into granting more capabilities
+  than the attacker would generally enjoy.
+
+  The registry allows for domain invalidation. A publisher may notify the
+  registry that their domain was compromised by signing an invalidation
+  request, which is then propagated to all Kate devices. When a cartridge
+  with an invalidated domain is installed, regardless of being signed,
+  the user will be notified that the cartridge cannot be verified because
+  the domain has been compromised; the user can then rely on that additional
+  information when making their own risk assessment.
+
+**Complicated publisher onboarding**:
+  In order to publish cartridges for Kate, a publisher needs to:
+
+  * Own an internet domain;
+  * Generate a cryptographic private/public signing key pair;
+  * Upload the public signing key to their internet domain;
+  * Sign all cartridges with their private key;
+  * Keep their private key safe and backed up.
+
+  Given Kate's developer audience are neither cryptographers nor computer
+  science students, this is a very involved process which makes it hard for
+  regular people to publish their small games.
+
+  To mitigate this there will be a separate onboarding effort where most of
+  the steps here can be automated. To make it more financially accessible,
+  we also allow people to use their existing online accounts in publishing
+  platforms as an "internet domain they own", so long as they can provide
+  their public key there.
+
+**Unavailability of the registry**:
+  Because the registry is an online service, it's possible that it becomes
+  unreachable by Kate clients for a host of reasons (including the client
+  itself not having public internet connection).
+
+  All clients synchronise data from the registry to their own local database,
+  so signature verifications happens entirely locally. A client will always
+  be able to verify a signature without having a connection to the registry,
+  however it might not have the latest state at that point in time and
+  report that the signature cannot be verified if its key addition has not
+  yet been sync'd. This is an acceptable risk in a decentralised system.
+
+**Unbounded registry growth**:
+  Because the registry accepts an association of any domain with any number
+  of keys, it can grow to unbounded lengths and is particularly susceptible
+  to attacks that aim to make it unusable by overloading the registry with
+  junk data.
+
+  Since the only entry-point for new data in the registry is the
+  ``register-domain`` operation, we can control which entries we allow
+  by either manual (e.g.: through an invite queue system) or automatic veto
+  (e.g.: by checking that the domain is "reasonably publisher-ish"). These
+  must be considered if domain registration is open to anyone.
+
+**Malicious key invalidation/addition requests**:
+  If a key or domain is compromised, then the attacker may register or
+  invalidate keys in the registry as if they were the publisher who previously
+  owned that domain.
+
+  Kate errs on the side of being cautious here and therefore cannot mitigate
+  this issue. This means that once a publisher's key/domain has been
+  compromised, there's no way to mark it as "un-compromised", and the
+  publisher must choose a new key/domain.
+
+**Registry compromised**:
+  The registry is signed with the registry server's key, which is trusted
+  by all Kate clients by default. If this key or ther registry are compromised,
+  then an attacker would be able to fabricate publisher key entries that would
+  be then trusted by the Kate clients.
+
+  There's no provision in the registry or Kate to handle this. Rather, the
+  registry's key must be rotated, a new Kate client must be published trusting
+  the new public key, and the existing publisher keys in the key store must be
+  flushed in favour of re-sync'ing them from the registry.
+
+**Unreasonable registry sizes for sync'ing**:
+  Even if the registry grows in a manageable pace, it may still become too
+  big for Kate clients to hold the state locally. A registry taking gigabytes
+  of storage space is unreasonable if most users will only need a few keys
+  from it.
+
+  Clients should allow users to switch from locally-stored complete registries
+  to on-demand sync'ing. In this sense the client queries the registry for
+  keys of a specific domain upon cartridge installation, rather than before.
+  This means  that verification requires users to be online.
