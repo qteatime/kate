@@ -3,7 +3,7 @@
 
 :Author: Niini
 :Started: 2023-12-31
-:Last updated: 2023-12-31
+:Last updated: 2023-01-20
 :Status: Design in progress
 
 
@@ -32,6 +32,29 @@ A centrally veto-ed and publicly available repository of public signatures
 then handles the additional tying of a public key to a verified identity,
 so the information can be provided to players when making risk decisions
 about what capabilities to grant and which cartridges to trust.
+
+The lifecycle of a cartridge goes roughly as follows:
+
+1. The publisher registers their ownership of a domain by uploading their public
+   key;
+2. The Kate Signature Repository service downloads the public key from the
+   publisher's domain and signs it into the set of publicly known publisher
+   keys, as ownership of the domain has been proven.
+3. The publisher creates a cartridge and signs it with their private key. This
+   provides to the players a way of assuring that the cartridge comes from the
+   domain it specifies;
+4. The player installs the cartridge. Kate verifies the signature in the
+   cartridge using the public key associated with that domain.
+
+   a. If there's no signature in the cartridge, the player is notified that
+      the cartridge is not signed, and higher-risk capabilities cannot be
+      granted without additional confirmation.
+   b. If the public key that verifies the signature has been invalidated,
+      the player is notified that the cartridge might have been compromised,
+      and any capability cannot be granted without additional confirmation.
+
+5. If the domain or private key are compromised, the publisher signs a key
+   invalidation request so players are aware of the issue.
 
 
 Technical details
@@ -167,6 +190,89 @@ the list to be signed by a trusted key allows it to not be maintained
 centrally, while also allowing for revocations to be issued.
 
 
+Invalidated keys
+''''''''''''''''
+
+Invalidated keys are used to notify the player that a cartridge cannot be
+proven to have been produced by the expected owner, even though its signature
+can be verified with the public key we know, because we no longer believe
+that the private key is exclusively known by the expected owner.
+
+Publishers can invalidate keys by submitting an invalidation request by signing
+the message with their private key. The invalidation request includes a
+signature of the public key, the domain, and the reason for the invalidation
+as an enumeration (``compromised-key`` or ``compromised-domain``).
+
+In case of a compromised domain, the domain itself is invalidated and no new
+keys are allowed to be registered for it, as well as invalidating all
+registered keys for that domain.
 
 
+Key registry
+------------
 
+The key registry is a repository of all keys used to sign Kate cartridges that
+is available for the public domain and signed with the trusted key for the
+registry (whose public key is statically known to all Kate instances).
+
+The registry is made out of JSON files in chunks of 1024 keys, stored as
+a signed linked list. A client can replay the registry by taking the latest
+chunk, following all links until it finds one it has already consumed or
+reach the root of the set. Then replaying all entries in sequence.
+
+The following format is used:
+
+.. code-block:: typescript
+
+  type Chunk = {
+    previous: null | {
+      file: path,
+      hash: SHA-512 signature of the previous chunk file
+      hash-algorithm: "SHA-512"
+    }
+    entries: Entry[]
+    signature: sign({previous, entries}) with registry key
+  }
+
+  type Entry =
+    | Key-added
+    | Key-invalidated
+
+  type Key-added = {
+    type: "key-added"
+    key: JWK public key
+    domain: domain part string
+    registered_at: UTC timestamp
+    previous: null | sha256 hash
+    hash: sha256-hash({type, key, domain, registered_at, previous})
+  }
+
+  type Key-invalidated = {
+    type: "key-invalidated"
+    reason: "compromised-key" | "compromised-domain"
+    key: JWK public key
+    domain: domain part string
+    invalidated_at: UTC timestamp
+    proof: sign({key, domain, reason, invalidated_at}) with publisher key
+    previous: null | sha256 hash
+    hash: sha256-hash({type, reason, key, domain, invalidated_at, proof, previous})
+  }
+
+Wherever ``sign`` is specified here, we assume the signature of those fields
+encoded as JSON with no spaces or indentation.
+
+The registry is a *trusted* service. One must trust that the keys added or
+invalidated in the registry come from legit requests from publishers, and that
+the correct validation has been performed on the registry side when associating
+a key with a domain (i.e.: to ensure the owner of the key also owns the domain).
+
+Like version control systems, each "commit" or addition in this registry
+includes a reference to the previous state of the registry. This means that
+it's not possible to reorder entries in the registry without invalidating
+the whole state of the registry, but it does not provide any assurance that
+the additions are valid.
+
+To address the addition concern, the public registry *must* have an open
+source implementation and have all changes to the registry committed to
+a public git repository. This makes it possible for third parties to
+independently audit changes to the registry.
