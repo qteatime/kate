@@ -12,10 +12,12 @@ import type {
   GrantType,
   SerialisedCapability,
 } from "../data/capability";
+import { from_bytes, gb, mb } from "../utils";
 import type { RiskCategory } from "./risk";
 
 export type AnyCapability = Capability<CapabilityType>;
 export type AnySwitchCapability = SwitchCapability<CapabilityType>;
+export type AnyStorageSpaceCapability = StorageSpaceCapability<CapabilityType>;
 
 export abstract class Capability<T extends CapabilityType> {
   abstract type: T;
@@ -43,6 +45,25 @@ export abstract class SwitchCapability<T extends CapabilityType> extends Capabil
       name: this.type,
       cart_id: this.cart_id,
       granted: { type: "switch", value: this.grant_configuration },
+    };
+  }
+}
+
+export abstract class StorageSpaceCapability<T extends CapabilityType> extends Capability<T> {
+  readonly grant_type = "storage-space";
+  abstract grant_configuration: { max_size_bytes: number };
+  abstract update(grant: { max_size_bytes: number }): void;
+  abstract options: { label: string; bytes: number }[];
+
+  is_allowed(configuration: { max_size_bytes: number }): boolean {
+    return this.grant_configuration.max_size_bytes >= configuration.max_size_bytes;
+  }
+
+  serialise(): SerialisedCapability {
+    return {
+      name: this.type,
+      cart_id: this.cart_id,
+      granted: { type: "storage-space", value: this.grant_configuration },
     };
   }
 }
@@ -252,24 +273,32 @@ export class ShowDialogs extends SwitchCapability<"show-dialogs"> {
   }
 }
 
-export class StoreTemporaryFiles extends SwitchCapability<"store-temporary-files"> {
+export class StoreTemporaryFiles extends StorageSpaceCapability<"store-temporary-files"> {
   readonly type = "store-temporary-files";
   readonly title = "Store temporary files";
   readonly description = `
     Allow the cartridge to save temporary files in your device's file system.
     The files will be deleted once the cartridge is closed.
   `;
+  readonly options = [
+    {
+      label: "Disabled",
+      bytes: 0,
+    },
+  ].concat(
+    [gb(1), gb(4), gb(8), gb(32), gb(256)].map((x) => ({ label: from_bytes(x, 0), bytes: x }))
+  );
 
   get grant_configuration() {
-    return this._grant_configuration;
+    return { max_size_bytes: this._grant_configuration.max_size_bytes };
   }
 
-  constructor(readonly cart_id: string, private _grant_configuration: boolean) {
+  constructor(readonly cart_id: string, private _grant_configuration: { max_size_bytes: number }) {
     super();
   }
 
   static parse(grant: CapabilityGrant<StoreTemporaryFiles["type"]>) {
-    if (grant.name !== "store-temporary-files" || grant.granted.type !== "switch") {
+    if (grant.name !== "store-temporary-files" || grant.granted.type !== "storage-space") {
       throw new Error(`Unexpected capability: ${grant.name}`);
     }
     return new StoreTemporaryFiles(grant.cart_id, grant.granted.value);
@@ -282,10 +311,12 @@ export class StoreTemporaryFiles extends SwitchCapability<"store-temporary-files
     if (capability.type !== "store-temporary-files") {
       throw new Error(`Unexpected capability: ${capability.type}`);
     }
-    return new StoreTemporaryFiles(cart_id, true);
+    return new StoreTemporaryFiles(cart_id, {
+      max_size_bytes: mb(capability.max_size_mb),
+    });
   }
 
-  update(grant: boolean): void {
+  update(grant: { max_size_bytes: number }): void {
     this._grant_configuration = grant;
   }
 

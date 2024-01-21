@@ -17,6 +17,17 @@ export class KateCapabilitySupervisor {
     );
   }
 
+  async try_get_grant<K extends CapabilityType>(cart_id: string, capability: K) {
+    return await CapabilityStore.transaction(
+      this.os.db,
+      "capability",
+      "readonly",
+      async (store) => {
+        return store.read_grant(cart_id, capability);
+      }
+    );
+  }
+
   async update_grant(cart_id: string, grant: AnyCapability) {
     return await CapabilityStore.transaction(
       this.os.db,
@@ -38,13 +49,13 @@ export class KateCapabilitySupervisor {
       "capability",
       "readonly",
       async (store) => {
-        return store.read_grant(cart_id, capability);
+        return store.read_grant<T>(cart_id, capability);
       }
     );
     if (grant == null) {
       return false;
     } else {
-      return grant.is_allowed(configuration);
+      return grant.is_allowed(configuration as any);
     }
   }
 }

@@ -9,7 +9,9 @@ import { kate } from "./db";
 import * as Capability from "../capabilities";
 import { ContextualCapability, PassiveCapability } from "../cart";
 
-export type GrantType = { type: "switch"; value: boolean };
+export type GrantType =
+  | { type: "switch"; value: boolean }
+  | { type: "storage-space"; value: { max_size_bytes: number } };
 
 type ValidateGrantConfig<T extends Record<CapabilityType, {}>> = T;
 
@@ -20,7 +22,7 @@ export type GrantConfiguration = ValidateGrantConfig<{
   "download-files": {};
   "show-dialogs": {};
   "store-temporary-files": {
-    max_size_mb: number;
+    max_size_bytes: number;
   };
 }>;
 
@@ -91,12 +93,12 @@ export class CapabilityStore {
     return grants.map(Capability.parse);
   }
 
-  async read_grant(cart_id: string, name: CapabilityType) {
+  async read_grant<K extends CapabilityType>(cart_id: string, name: K) {
     const grant = await this.grants.try_get([cart_id, name]);
     if (grant == null) {
       return null;
     } else {
-      return Capability.parse(grant);
+      return Capability.parse<K>(grant);
     }
   }
 

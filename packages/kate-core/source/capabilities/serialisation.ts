@@ -18,7 +18,15 @@ import {
   StoreTemporaryFiles,
 } from "./definitions";
 
-export function parse(grant: AnyCapabilityGrant) {
+export type ParsedCapability = ReturnType<typeof do_parse>;
+
+export function parse<K extends CapabilityType>(
+  grant: AnyCapabilityGrant
+): Extract<ParsedCapability, { type: K }> {
+  return do_parse(grant) as any;
+}
+
+function do_parse(grant: AnyCapabilityGrant) {
   switch (grant.name) {
     case "open-urls": {
       return OpenURLs.parse(grant as CapabilityGrant<"open-urls">);

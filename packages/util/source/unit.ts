@@ -8,7 +8,7 @@ export function mhz_to_ghz(n: number) {
   return `${(n / 1000).toFixed(3)} GHz`;
 }
 
-export function from_bytes(n0: number | bigint) {
+export function from_bytes(n0: number | bigint, decimals: number = 2) {
   const units = [
     ["KB", 1024],
     ["MB", 1024],
@@ -19,7 +19,7 @@ export function from_bytes(n0: number | bigint) {
   let n = Number(n0);
   let use_unit = "B";
   for (const [unit, bucket] of units) {
-    if (n > bucket) {
+    if (n >= bucket) {
       n /= bucket;
       use_unit = unit;
     } else {
@@ -27,7 +27,7 @@ export function from_bytes(n0: number | bigint) {
     }
   }
 
-  return `${n.toFixed(2)} ${use_unit}`;
+  return `${n.toFixed(decimals)} ${use_unit}`;
 }
 
 export function bytes(n: number) {

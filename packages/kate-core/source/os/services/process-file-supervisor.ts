@@ -5,7 +5,7 @@
  */
 
 import type { ProcessId, SystemEvent } from "../../kernel";
-import { from_bytes, make_id } from "../../utils";
+import { from_bytes, gb, make_id } from "../../utils";
 import { BucketId, KateFileBucket, PartitionId } from "../apis";
 import type { KateOS } from "../os";
 
@@ -17,7 +17,7 @@ type Bucket = {
 };
 
 export class KateProcessFileSupervisor {
-  readonly PROCESS_MAX = 8 * 1024 * 1024 * 1024; // 8gb
+  readonly PROCESS_MAX = gb(32);
   private _started = false;
   private _in_use = false;
   private resources = new Map<ProcessId, Map<string, Bucket>>();
@@ -39,6 +39,28 @@ export class KateProcessFileSupervisor {
       }
     }
   };
+
+  async available_max() {
+    const storage_size = await this.os.storage_manager.storage_summary();
+    if (storage_size.quota == null || storage_size.usage == null) {
+      return this.PROCESS_MAX;
+    } else {
+      return Math.min((storage_size.quota - storage_size.usage) * 0.6, this.PROCESS_MAX);
+    }
+  }
+
+  async available_max_for_process(process: ProcessId) {
+    const grant = await this.os.capability_supervisor.try_get_grant(
+      process,
+      "store-temporary-files"
+    );
+    const available = await this.available_max();
+    if (grant == null) {
+      return 0;
+    } else {
+      return Math.min(available, grant.grant_configuration.max_size_bytes);
+    }
+  }
 
   get_refs(process: ProcessId) {
     return this.resources.get(process) ?? new Map<string, Bucket>();
@@ -65,7 +87,8 @@ export class KateProcessFileSupervisor {
   }
 
   async make_temporary(process: ProcessId, size: number) {
-    if (this.current_size(process) + size > this.PROCESS_MAX) {
+    const max_storage = await this.available_max_for_process(process);
+    if (this.current_size(process) + size > max_storage) {
       throw new Error(
         `[kate:process-file-supervisor] ${process} buckets would use more space than allowed.`
       );
