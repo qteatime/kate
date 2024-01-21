@@ -5,7 +5,7 @@
  */
 
 import { TC } from "../../utils";
-import { auth_handler } from "./handlers";
+import { WithTransfer, auth_handler } from "./handlers";
 
 export default [
   auth_handler(
@@ -67,9 +67,10 @@ export default [
     { capabilities: [{ type: "store-temporary-files" }] },
     async (os, process, ipc, { bucket_id, file_id, offset, size }) => {
       const file = await os.process_file_supervisor.read_file(process.id, bucket_id, file_id);
-      return new Uint8Array(
-        await file.slice(offset, size == null ? undefined : offset + size).arrayBuffer()
-      );
+      const buffer = await file
+        .slice(offset, size == null ? undefined : offset + size)
+        .arrayBuffer();
+      return new WithTransfer(new Uint8Array(buffer), [buffer]);
     }
   ),
 
