@@ -5,55 +5,60 @@
  */
 
 import { TC } from "../../utils";
-import { handler } from "./handlers";
+import { auth_handler, handler } from "./handlers";
 
 export const public_repr = {};
 
 export default [
-  handler(
+  auth_handler(
     "kate:file-store.make-temporary-bucket",
     TC.spec({ size: TC.int }),
+    { capabilities: [{ type: "store-temporary-files" }] },
     async (os, process, ipc, { size }) => {
       return await os.process_file_supervisor.make_temporary(process.id, size);
     }
   ),
 
-  handler(
+  auth_handler(
     "kate.file-store.delete-bucket",
     TC.spec({ bucket_id: TC.str }),
+    { capabilities: [{ type: "store-temporary-files" }] },
     async (os, process, ipc, { bucket_id }) => {
       await os.process_file_supervisor.release(process.id, bucket_id);
       return null;
     }
   ),
 
-  handler(
+  auth_handler(
     "kate:file-store.put-file",
     TC.spec({ bucket_id: TC.str, data: TC.bytearray }),
+    { capabilities: [{ type: "store-temporary-files" }] },
     async (os, process, ipc, { bucket_id, data }) => {
       return await os.process_file_supervisor.put_file(process.id, bucket_id, data);
     }
   ),
 
-  handler(
+  auth_handler(
     "kate:file-store.append-file",
     TC.spec({ bucket_id: TC.str, file_id: TC.str, data: TC.bytearray }),
+    { capabilities: [{ type: "store-temporary-files" }] },
     async (os, process, ipc, { bucket_id, file_id, data }) => {
       await os.process_file_supervisor.append_file(process.id, bucket_id, file_id, data);
       return null;
     }
   ),
 
-  handler(
+  auth_handler(
     "kate:file-store.file-size",
     TC.spec({ bucket_id: TC.str, file_id: TC.str }),
+    { capabilities: [{ type: "store-temporary-files" }] },
     async (os, process, ipc, { bucket_id, file_id }) => {
       const file = await os.process_file_supervisor.read_file(process.id, bucket_id, file_id);
       return file.size;
     }
   ),
 
-  handler(
+  auth_handler(
     "kate:file-store.read-file",
     TC.spec({
       bucket_id: TC.str,
@@ -61,6 +66,7 @@ export default [
       offset: TC.int,
       size: TC.optional(null, TC.int),
     }),
+    { capabilities: [{ type: "store-temporary-files" }] },
     async (os, process, ipc, { bucket_id, file_id, offset, size }) => {
       const file = await os.process_file_supervisor.read_file(process.id, bucket_id, file_id);
       return new Uint8Array(
@@ -69,9 +75,10 @@ export default [
     }
   ),
 
-  handler(
+  auth_handler(
     "kate:file-store.delete-file",
     TC.spec({ bucket_id: TC.str, file_id: TC.str }),
+    { capabilities: [{ type: "store-temporary-files" }] },
     async (os, process, ipc, { bucket_id, file_id }) => {
       await os.process_file_supervisor.delete_file(process.id, bucket_id, file_id);
       return null;

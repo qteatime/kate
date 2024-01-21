@@ -19,6 +19,7 @@ type Bucket = {
 export class KateProcessFileSupervisor {
   readonly PROCESS_MAX = 8 * 1024 * 1024 * 1024; // 8gb
   private _started = false;
+  private _in_use = false;
   private resources = new Map<ProcessId, Map<string, Bucket>>();
   constructor(readonly os: KateOS) {}
 
@@ -69,6 +70,10 @@ export class KateProcessFileSupervisor {
         `[kate:process-file-supervisor] ${process} buckets would use more space than allowed.`
       );
     }
+    if (!this._in_use) {
+      this.os.kernel.console.resources.take("temporary-file");
+      this._in_use = true;
+    }
 
     const partition = await this.os.file_store.get_partition("temporary");
     const bucket = await partition.create(null);
@@ -86,7 +91,15 @@ export class KateProcessFileSupervisor {
     } else {
       console.warn(`[kate:process-file-supervisor] ${process} released unknown bucket ${id}.`);
     }
-    this.resources.set(process, refs);
+    if (refs.size === 0) {
+      this.resources.delete(process);
+    } else {
+      this.resources.set(process, refs);
+    }
+    if (this._in_use && this.resources.size === 0) {
+      this.os.kernel.console.resources.release("temporary-file");
+      this._in_use = false;
+    }
   }
 
   async put_file(process: ProcessId, id: string, data: Uint8Array) {

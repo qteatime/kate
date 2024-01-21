@@ -51,6 +51,12 @@
       {
         "type": "show-dialogs",
         "reason": "For text input and error feedback"
+      },
+      {
+        "type": "store-temporary-files",
+        "reason": "Unpacking zip files and generating cartridges",
+        "max_size_mb": 8192,
+        "optional": false
       }
     ]
   },

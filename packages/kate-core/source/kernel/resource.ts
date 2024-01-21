@@ -4,7 +4,13 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-export type Resource = "screen-recording" | "transient-storage" | "low-storage" | "gc";
+export type Resource =
+  | "screen-recording"
+  | "transient-storage"
+  | "low-storage"
+  | "gc"
+  | "temporary-file";
+
 export type RunningProcessMeta = {
   application_id: string;
   trusted: boolean;
