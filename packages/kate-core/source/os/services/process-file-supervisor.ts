@@ -38,15 +38,26 @@ export class KateProcessFileSupervisor {
     this.os.kernel.processes.on_system_event.listen(this.handle_process_event);
   }
 
-  handle_process_event = (ev: SystemEvent) => {
+  private handle_process_event = (ev: SystemEvent) => {
     if (ev.type === "killed") {
       const refs = this.get_refs(ev.process.id);
       if (refs.size > 0) {
         console.debug(`[kate:process-file-supervisor] Releasing buckets held by ${ev.process.id}`);
         this.resources.delete(ev.process.id);
+        this.update_resource_band();
       }
     }
   };
+
+  private update_resource_band() {
+    if (this.resources.size > 0 && !this._in_use) {
+      this.os.kernel.console.resources.take("temporary-file");
+      this._in_use = true;
+    } else if (this.resources.size === 0 && this._in_use) {
+      this.os.kernel.console.resources.release("temporary-file");
+      this._in_use = false;
+    }
+  }
 
   async available_max() {
     const storage_size = await this.os.storage_manager.storage_summary();
@@ -116,11 +127,6 @@ export class KateProcessFileSupervisor {
         `[kate:process-file-supervisor] ${process} buckets would use more space than allowed.`
       );
     }
-    if (!this._in_use) {
-      this.os.kernel.console.resources.take("temporary-file");
-      this._in_use = true;
-    }
-
     const partition = await this.os.file_store.get_partition("temporary");
     const bucket = await partition.create(null);
     const id = make_id();
@@ -132,6 +138,7 @@ export class KateProcessFileSupervisor {
         bucket.id
       } (ref: ${id}, max size: ${from_bytes(size)}) for ${process}`
     );
+    this.update_resource_band();
     return id;
   }
 
@@ -147,11 +154,8 @@ export class KateProcessFileSupervisor {
     } else {
       this.resources.set(process, refs);
     }
-    if (this._in_use && this.resources.size === 0) {
-      this.os.kernel.console.resources.release("temporary-file");
-      this._in_use = false;
-    }
     console.debug(`[kate:process-file-supervisor] Released bucket ${id} for ${process}`);
+    this.update_resource_band();
   }
 
   async put_file(process: ProcessId, id: string, data: Uint8Array) {
