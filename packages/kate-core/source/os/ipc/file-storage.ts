@@ -5,9 +5,7 @@
  */
 
 import { TC } from "../../utils";
-import { auth_handler, handler } from "./handlers";
-
-export const public_repr = {};
+import { auth_handler } from "./handlers";
 
 export default [
   auth_handler(
@@ -82,6 +80,45 @@ export default [
     async (os, process, ipc, { bucket_id, file_id }) => {
       await os.process_file_supervisor.delete_file(process.id, bucket_id, file_id);
       return null;
+    }
+  ),
+
+  auth_handler(
+    "kate:file-store.create-write-stream",
+    TC.spec({
+      bucket_id: TC.str,
+      file_id: TC.str,
+      expected_size: TC.optional(undefined, TC.int),
+      keep_existing_data: TC.bool,
+    }),
+    { capabilities: [{ type: "store-temporary-files" }] },
+    async (os, process, ipc, { bucket_id, file_id, keep_existing_data, expected_size }) => {
+      const id = await os.process_file_supervisor.create_write_stream(
+        process.id,
+        bucket_id,
+        file_id,
+        keep_existing_data,
+        expected_size
+      );
+      return id;
+    }
+  ),
+
+  auth_handler(
+    "kate:file-store.write-chunk",
+    TC.spec({ writer_id: TC.str, chunk: TC.bytearray }),
+    { capabilities: [{ type: "store-temporary-files" }] },
+    async (os, process, ipc, { writer_id, chunk }) => {
+      await os.process_file_supervisor.write_chunk(process.id, writer_id, chunk);
+    }
+  ),
+
+  auth_handler(
+    "kate:file-store.close-write-stream",
+    TC.spec({ writer_id: TC.str }),
+    { capabilities: [{ type: "store-temporary-files" }] },
+    async (os, process, ipc, { writer_id }) => {
+      await os.process_file_supervisor.close_write_stream(process.id, writer_id);
     }
   ),
 ];

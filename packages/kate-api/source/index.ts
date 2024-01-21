@@ -11,7 +11,7 @@ import { KateCartManager } from "./cart-manager";
 import { KateIPC } from "./channel";
 import { DeviceFileHandle, KateDeviceFileAccess } from "./device-file";
 import { KateDialogs } from "./dialog";
-import { KateFileStore } from "./file-store";
+import { FileBucket, KateFile, KateFileStore } from "./file-store";
 import { InputKey, KateInput } from "./input";
 import { KateObjectStore } from "./object-store";
 import { KatePointerInput, PointerClick, PointerLocation } from "./pointer-input";
@@ -79,6 +79,7 @@ export type KateAPI = {
   events: typeof events;
   cart_fs: typeof cart_fs;
   store: typeof store;
+  file_store: typeof file_store;
   input: typeof input;
   pointer_input: typeof pointer_input;
   timer: typeof timer;
@@ -102,6 +103,8 @@ declare global {
       PointerLocation,
       PointerClick,
       DeviceFileHandle,
+      FileBucket,
+      KateFile,
     };
   }
 }

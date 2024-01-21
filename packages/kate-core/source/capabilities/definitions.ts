@@ -55,8 +55,10 @@ export abstract class StorageSpaceCapability<T extends CapabilityType> extends C
   abstract update(grant: { max_size_bytes: number }): void;
   abstract options: { label: string; bytes: number }[];
 
-  is_allowed(configuration: { max_size_bytes: number }): boolean {
-    return this.grant_configuration.max_size_bytes >= configuration.max_size_bytes;
+  is_allowed(configuration: { max_size_bytes?: number }): boolean {
+    return configuration.max_size_bytes == null
+      ? this.grant_configuration.max_size_bytes > 0
+      : this.grant_configuration.max_size_bytes >= configuration.max_size_bytes;
   }
 
   serialise(): SerialisedCapability {

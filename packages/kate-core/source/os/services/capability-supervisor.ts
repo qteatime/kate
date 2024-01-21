@@ -6,6 +6,7 @@
 
 import { AnyCapability, Capability } from "../../capabilities";
 import { CapabilityStore, CapabilityType, GrantConfiguration } from "../../data/capability";
+import { OptionalRec } from "../../utils";
 import type { KateOS } from "../os";
 
 export class KateCapabilitySupervisor {
@@ -42,7 +43,7 @@ export class KateCapabilitySupervisor {
   async is_allowed<T extends CapabilityType>(
     cart_id: string,
     capability: T,
-    configuration: GrantConfiguration[T]
+    configuration: OptionalRec<GrantConfiguration[T]>
   ) {
     const grant = await CapabilityStore.transaction(
       this.os.db,
@@ -55,7 +56,7 @@ export class KateCapabilitySupervisor {
     if (grant == null) {
       return false;
     } else {
-      return grant.is_allowed(configuration as any);
+      return grant.is_allowed(configuration);
     }
   }
 }

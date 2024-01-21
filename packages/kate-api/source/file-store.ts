@@ -6,6 +6,7 @@
 import type { KateIPC } from "./channel";
 
 export type FileId = string & { __file_id: true };
+export type PartitionId = "temporary";
 
 export class KateFileStore {
   #channel: KateIPC;
@@ -17,7 +18,7 @@ export class KateFileStore {
     const id = (await this.#channel.call("kate:file-store.make-temporary-bucket", {
       size,
     })) as string;
-    return new FileBucket(this.#channel, id);
+    return new FileBucket(this.#channel, "temporary", id);
   }
 }
 
@@ -25,7 +26,7 @@ export class FileBucket {
   #channel: KateIPC;
   private inodes = new Map<string, FileId>();
 
-  constructor(channel: KateIPC, readonly id: string) {
+  constructor(channel: KateIPC, readonly partition: PartitionId, readonly id: string) {
     this.#channel = channel;
   }
 
@@ -83,11 +84,66 @@ export class KateFile {
     })) as number;
   }
 
-  async read_all() {
-    return this.read(0);
+  async create_read_stream(
+    chunk_size: number = 1024 * 1024 * 8
+  ): Promise<ReadableStream<Uint8Array>> {
+    let offset = 0;
+    let size = 0;
+
+    return new ReadableStream(
+      {
+        start: async (controller) => {
+          size = await this.size();
+          offset = 0;
+          if (size === 0) {
+            controller.close();
+          }
+        },
+        pull: async (controller) => {
+          const chunk = await this.read_slice(offset, chunk_size);
+          offset += chunk.byteLength;
+          controller.enqueue(chunk);
+          if (offset >= size) {
+            controller.close();
+            return;
+          }
+        },
+      },
+      new CountQueuingStrategy({ highWaterMark: 1 })
+    );
   }
 
-  async read(offset: number, size?: number) {
+  async create_write_stream(options: {
+    keep_existing_data: boolean;
+    expected_size?: number;
+  }): Promise<WritableStream<Uint8Array>> {
+    return new WritableStream(
+      {
+        start: async (controller) => {
+          await this.#channel.call("kate:file-store.create-write-stream", {
+            bucket_id: this.bucket.id,
+            file_id: this.id,
+            keep_existing_data: options.keep_existing_data,
+            expected_size: options.expected_size,
+          });
+        },
+        write: async (chunk: Uint8Array, controller) => {
+          await this.#channel.call("kate:file-store.write-chunk", {
+            writer_id: this.id,
+            chunk,
+          });
+        },
+        close: async () => {
+          await this.#channel.call("kate:file-store.close-write-stream", {
+            writer_id: this.id,
+          });
+        },
+      },
+      new CountQueuingStrategy({ highWaterMark: 1 })
+    );
+  }
+
+  async read_slice(offset: number, size?: number) {
     return (await this.#channel.call("kate:file-store.read-file", {
       bucket_id: this.bucket.id,
       file_id: this.id,

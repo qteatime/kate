@@ -342,6 +342,10 @@ export class KateFile {
     return await handle.getFile();
   }
 
+  async get_handle() {
+    return await this.bucket.handle.getFileHandle(this.id, { create: false });
+  }
+
   async delete() {
     await this.bucket.handle.removeEntry(this.id);
     console.debug(`[kate:file-store] Deleted ${this.id}`);
