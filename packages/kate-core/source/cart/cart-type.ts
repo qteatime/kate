@@ -145,6 +145,12 @@ export type ContextualCapabilityGrant = {
   reason: string;
 };
 
+export type PassiveCapabilityGrant = {
+  capability: PassiveCapability;
+  reason: string;
+  optional: boolean;
+};
+
 export type ContextualCapability =
   | { type: "open-urls" }
   | { type: "request-device-files" }
@@ -152,8 +158,11 @@ export type ContextualCapability =
   | { type: "download-files" }
   | { type: "show-dialogs" };
 
+export type PassiveCapability = { type: "store-temporary-files"; max_size_mb: number };
+
 export type Security = {
   contextual_capabilities: ContextualCapabilityGrant[];
+  passive_capabilities: PassiveCapabilityGrant[];
 };
 
 export type CartMeta = {

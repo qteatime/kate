@@ -5,6 +5,7 @@
  */
 
 import type { KateIPC } from "./channel";
+import type { KateFile } from "./file-store";
 
 export class KateCartManager {
   #channel: KateIPC;
@@ -13,9 +14,16 @@ export class KateCartManager {
     this.#channel = channel;
   }
 
-  async install(cartridge: Uint8Array) {
-    await this.#channel.call("kate:cart-manager.install", { cartridge }, [
+  async install_from_bytes(cartridge: Uint8Array) {
+    await this.#channel.call("kate:cart-manager.install-from-bytes", { cartridge }, [
       cartridge.buffer,
     ]);
+  }
+
+  async install_from_file(file: KateFile) {
+    await this.#channel.call("kate:cart-manager.install-from-file", {
+      bucket_id: file.bucket.id,
+      file_id: file.id,
+    });
   }
 }

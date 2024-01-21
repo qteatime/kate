@@ -11,8 +11,8 @@
 import { iterate_stream, lock, make_id, sleep, unreachable } from "../../utils";
 import type { KateOS } from "../os";
 
-type PartitionId = "temporary" | "cartridge" | "kernel";
-type BucketId = string & { __bucket_id: true };
+export type PartitionId = "temporary" | "cartridge" | "kernel";
+export type BucketId = string & { __bucket_id: true };
 type BucketRefs = Map<BucketId, Set<WeakRef<KateFileBucket>>>;
 type KernelResource = "media";
 
@@ -330,9 +330,20 @@ export class KateFile {
     return `${this.bucket.path}/${this.id}`;
   }
 
+  async append(data: Uint8Array) {
+    const handle = await this.bucket.handle.getFileHandle(this.id);
+    const writer = await handle.createWritable({ keepExistingData: true });
+    await writer.write(data);
+    await writer.close();
+  }
+
   async read() {
     const handle = await this.bucket.handle.getFileHandle(this.id);
     return await handle.getFile();
+  }
+
+  async get_handle() {
+    return await this.bucket.handle.getFileHandle(this.id, { create: false });
   }
 
   async delete() {

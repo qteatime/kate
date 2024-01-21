@@ -163,9 +163,9 @@ export class SceneReview extends UIScene {
         process: async (progress) => {
           const cartridge = await candidate.make_cartridge();
           progress.set_message(["Packing cartridge..."]);
-          const bytes = encode_whole(cartridge);
+          const file = await encode_whole(cartridge);
           progress.set_message(["Preparing to install..."]);
-          await KateAPI.cart_manager.install(bytes);
+          await KateAPI.cart_manager.install_from_file(file);
         },
       });
     } catch (e) {

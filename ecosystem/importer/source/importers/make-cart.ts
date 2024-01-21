@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 import { kart_v6 as Cart, kart_v6 } from "../deps/schema";
-import { Pathname, binary, make_id, unreachable } from "../deps/utils";
+import { Pathname, binary, gb, make_id, unreachable } from "../deps/utils";
 import { CartConfig } from "./core";
 
 export function make_mapping(mapping: Record<KateTypes.InputKey, string | null>) {
@@ -175,30 +175,35 @@ export async function make_file(path: Pathname, data: Uint8Array) {
   };
 }
 
-export function encode_whole(cart: CartConfig) {
-  let offset = 0n;
-  const bytes = [];
+export async function encode_whole(cart: CartConfig) {
+  const bucket = await KateAPI.file_store.make_temporary(gb(8));
+  const file = await bucket.create_file(cart.metadata.presentation.title, new Uint8Array([]));
+  const write_stream = await file.create_write_stream({ keep_existing_data: false });
+  const writer = write_stream.getWriter();
 
+  let offset = 0n;
   const magic = kart_v6.encode_magic();
-  bytes.push(magic);
+  await writer.write(magic);
   offset += BigInt(magic.byteLength);
+
   const file_offset = offset;
-  bytes.push(uint32(cart.files.length));
+  await writer.write(uint32(cart.files.length));
   offset += 4n;
+
   for (const file of cart.files) {
-    bytes.push(uint32(file.byteLength));
+    await writer.write(uint32(file.byteLength));
     offset += 4n;
-    bytes.push(file);
+    await writer.write(file);
     offset += BigInt(file.byteLength);
   }
 
   const meta_offset = offset;
   const meta = kart_v6.encode_metadata(cart.metadata);
-  bytes.push(meta);
+  await writer.write(meta);
   offset += BigInt(meta.byteLength);
 
   const header_offset = offset;
-  bytes.push(
+  await writer.write(
     kart_v6.encode_header(
       Cart.Header({
         "minimum-kate-version": Cart.Kate_version({ major: 0, minor: 24, patch: 2 }),
@@ -214,7 +219,8 @@ export function encode_whole(cart: CartConfig) {
     )
   );
 
-  return binary.concat_all(bytes);
+  await writer.close();
+  return file;
 }
 
 function uint32(x: number) {

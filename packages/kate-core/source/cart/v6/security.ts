@@ -5,23 +5,78 @@
  */
 
 import { unreachable } from "../../utils";
-import { ContextualCapability, ContextualCapabilityGrant, Security } from "../cart-type";
+import {
+  ContextualCapability,
+  ContextualCapabilityGrant,
+  PassiveCapability,
+  PassiveCapabilityGrant,
+  Security,
+} from "../cart-type";
 import { Cart_v6 } from "./v6";
 
 export function parse_security(metadata: Cart_v6.Metadata): Security {
+  const { contextual, passive } = metadata.security.capabilities.reduce(parse_capability, {
+    contextual: [],
+    passive: [],
+  });
   return {
-    contextual_capabilities: metadata.security.capabilities.map(parse_capability),
+    contextual_capabilities: contextual,
+    passive_capabilities: passive,
   };
 }
 
-function parse_capability(capability: Cart_v6.Capability.Contextual): ContextualCapabilityGrant {
+function parse_capability(
+  acc: { contextual: ContextualCapabilityGrant[]; passive: PassiveCapabilityGrant[] },
+  x: Cart_v6.Capability
+) {
+  const t = Cart_v6.Capability;
+  switch (x["@variant"]) {
+    case t.$Tags.Contextual:
+      acc.contextual.push(parse_contextual_capability(x));
+      return acc;
+
+    case t.$Tags.Passive:
+      acc.passive.push(parse_passive_capability(x));
+      return acc;
+
+    default:
+      throw unreachable(x);
+  }
+}
+
+function parse_passive_capability(capability: Cart_v6.Capability.Passive): PassiveCapabilityGrant {
   return {
     reason: capability.reason,
-    capability: parse_contextual_capability(capability.capability),
+    capability: do_parse_passive_capability(capability.capability),
+    optional: capability.optional,
   };
+}
+
+function do_parse_passive_capability(capability: Cart_v6.Passive_capability): PassiveCapability {
+  const t = Cart_v6.Passive_capability;
+  switch (capability["@variant"]) {
+    case t.$Tags.Store_temporary_files: {
+      return {
+        type: "store-temporary-files",
+        max_size_mb: capability["max-size-mb"],
+      };
+    }
+
+    // default:
+    //   throw unreachable(capability);
+  }
 }
 
 function parse_contextual_capability(
+  capability: Cart_v6.Capability.Contextual
+): ContextualCapabilityGrant {
+  return {
+    reason: capability.reason,
+    capability: do_parse_contextual_capability(capability.capability),
+  };
+}
+
+function do_parse_contextual_capability(
   capability: Cart_v6.Contextual_capability
 ): ContextualCapability {
   switch (capability["@variant"]) {

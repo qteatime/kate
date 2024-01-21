@@ -6,7 +6,7 @@
 
 import * as Db from "../../../data";
 import * as Cart from "../../../cart";
-import { Observable } from "../../../utils";
+import { Observable, from_bytes } from "../../../utils";
 import { Security } from "../../apis";
 import { CartChangeReason, KateOS } from "../../os";
 import * as Capability from "../../../capabilities";
@@ -161,21 +161,50 @@ export class SceneCartridgePermissions extends UI.SimpleScene {
   }
 
   render_grant(x: Capability.AnyCapability) {
-    if (x instanceof Capability.SwitchCapability) {
-      return UI.toggle_cell(this.os, {
-        title: x.title,
-        description: x.description,
-        value: x.grant_configuration,
-        on_changed: (new_value) => {
-          this.grant_switch(x, new_value);
-        },
-      });
-    } else {
-      throw new Error(`Invalid capability: ${x.type}`);
+    switch (true) {
+      case x instanceof Capability.SwitchCapability: {
+        return UI.toggle_cell(this.os, {
+          title: x.title,
+          description: x.description,
+          value: x.grant_configuration,
+          on_changed: (new_value) => {
+            this.grant_switch(x, new_value);
+          },
+        });
+      }
+
+      case x instanceof Capability.StorageSpaceCapability: {
+        return UI.select_panel(this.os, {
+          process_id: "kate:settings",
+          title: x.title,
+          description: x.description,
+          choices: x.options.map((x) => ({ label: x.label, value: x.bytes })),
+          initial_value: x.grant_configuration.max_size_bytes,
+          render_value: (x) => (x === 0 ? "Disabled" : from_bytes(x, 0)),
+          on_changed: async (value) => {
+            this.grant_storage(x, { max_size_bytes: value });
+          },
+        });
+      }
+
+      default:
+        throw new Error(`Invalid capability: ${x.type}`);
     }
   }
 
   async grant_switch(x: Capability.AnySwitchCapability, value: boolean) {
+    x.update(value);
+    await this.os.capability_supervisor.update_grant(this.cart.id, x);
+    await this.os.audit_supervisor.log("kate:settings", {
+      resources: ["kate:permissions"],
+      risk: x.risk_category(),
+      type: "kate.security.permissions.updated",
+      message: `Updated security permissions for ${this.cart.id}`,
+      extra: { cartridge: this.cart.id, permission: x.type, granted: value },
+    });
+  }
+
+  async grant_storage(x: Capability.AnyStorageSpaceCapability, value: { max_size_bytes: number }) {
     x.update(value);
     await this.os.capability_supervisor.update_grant(this.cart.id, x);
     await this.os.audit_supervisor.log("kate:settings", {

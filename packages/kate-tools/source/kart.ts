@@ -254,6 +254,12 @@ const capability = T.tagged_choice<Capability, Capability["type"]>("type", {
     type: T.constant("show-dialogs" as const),
     reason: T.short_str(255),
   }),
+  "store-temporary-files": T.spec({
+    type: T.constant("store-temporary-files" as const),
+    reason: T.short_str(255),
+    max_size_mb: T.int,
+    optional: T.bool,
+  }),
 });
 
 const security = T.spec({
@@ -362,7 +368,8 @@ type ContextualCapability =
   | { type: "request-device-files" }
   | { type: "install-cartridges" }
   | { type: "download-files" }
-  | { type: "show-dialogs" };
+  | { type: "show-dialogs" }
+  | { type: "store-temporary-files"; max_size_mb: number; optional: boolean };
 
 type Bridge =
   | { type: "network-proxy" }
@@ -769,6 +776,16 @@ function make_capability(json: Capability) {
     case "show-dialogs": {
       return Cart.Capability.Contextual({
         capability: Cart.Contextual_capability.Show_dialogs({}),
+        reason: json.reason,
+      });
+    }
+
+    case "store-temporary-files": {
+      return Cart.Capability.Passive({
+        capability: Cart.Passive_capability.Store_temporary_files({
+          "max-size-mb": json.max_size_mb,
+        }),
+        optional: json.optional,
         reason: json.reason,
       });
     }

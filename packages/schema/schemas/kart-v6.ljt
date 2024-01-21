@@ -248,6 +248,11 @@ union Capability {
     field capability: Contextual-capability;
     field reason: Text;
   }
+  type Passive {
+    field capability: Passive-capability;
+    field optional: Boolean;
+    field reason: Text;
+  }
 }
 
 union Contextual-capability {
@@ -265,6 +270,13 @@ union Contextual-capability {
 
   // low risk: annoyance, denial-of-service
   type Show-dialogs {}
+}
+
+union Passive-capability {
+  // low risk: storage degradation
+  type Store-temporary-files {
+    field max-size-mb: Uint32;
+  }
 }
 
 union Keyboard-input-selector {

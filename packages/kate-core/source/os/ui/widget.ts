@@ -968,3 +968,49 @@ export function line_field(title: Widgetable, value: Widgetable) {
 export function text_ellipsis(text: Widgetable[]) {
   return klass("kate-ui-text-ellipsis", text);
 }
+
+export function select_panel<A>(
+  os: KateOS,
+  options: {
+    click_label?: string;
+    arrow?: string;
+    process_id: string;
+    title: string;
+    description?: string;
+    initial_value: A;
+    choices: { label: string; value: A }[];
+    render_value?: (_: A) => Widgetable;
+    on_changed?: (_: A) => void;
+  }
+) {
+  const value = Observable.from(options.initial_value);
+  const cancelled = { __cancelled: true };
+  return add_class(
+    link_card(os, {
+      arrow: options.arrow ?? "pencil",
+      click_label: options.click_label ?? "Change",
+      title: options.title,
+      description: options.description ?? "",
+      value: dynamic(value.map<Widgetable>((x) => options.render_value?.(x) ?? String(x))),
+      on_click: async () => {
+        const result = await os.dialog.pop_menu(
+          options.process_id,
+          options.title,
+          options.choices,
+          cancelled as any
+        );
+        if (result == cancelled) {
+          return;
+        }
+        value.value = result;
+        options.on_changed?.(result);
+      },
+    }),
+    ["kate-ui-select-panel"]
+  );
+}
+
+function add_class(x: HTMLElement, classes: string[]) {
+  x.classList.add(...classes);
+  return x;
+}

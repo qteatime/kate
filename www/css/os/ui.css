@@ -86,6 +86,7 @@
 
 .kate-ui-info-line-label {
   font-weight: 500;
+  margin-right: 2rem;
 }
 
 .kate-ui-info-line-data {
@@ -155,6 +156,10 @@
   gap: 0.3rem;
 }
 
+.kate-ui-select-panel .kate-ui-link-card-text {
+  margin-right: 2rem;
+}
+
 .kate-ui-link-card-title,
 .kate-ui-text-panel-title {
   font-weight: 500;
@@ -174,6 +179,7 @@
 
 .kate-ui-link-card-value {
   color: var(--color-text-very-muted);
+  white-space: nowrap;
 }
 
 /* #Toggle */

@@ -26,3 +26,5 @@ export * from "../../util/build/semver";
 export function lock<T>(name: string, fn: () => Promise<T>): Promise<T> {
   return navigator.locks.request(name, fn);
 }
+
+export type OptionalRec<T> = T extends {} ? { [k in keyof T]?: OptionalRec<T[k]> } : T;
