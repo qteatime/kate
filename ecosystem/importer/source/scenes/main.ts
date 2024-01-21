@@ -4,8 +4,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 import { UIScene, Widgetable } from "../deps/appui";
-import { JSZip, _JSZip } from "../deps/jszip";
-import { Pathname } from "../deps/utils";
+import { JSZip, ZipObject, _JSZip } from "../deps/jszip";
+import { Pathname, gb } from "../deps/utils";
 import * as Importers from "../importers";
 import { SceneReview } from "./review";
 
@@ -120,27 +120,28 @@ async function unpack_zip(file: KateTypes.DeviceFileHandle) {
 }
 
 async function zip_to_files(zip: _JSZip) {
-  const files: Promise<KateTypes.DeviceFileHandle>[] = [];
+  const bucket = await KateAPI.file_store.make_temporary(gb(8));
+  const file_list: { path: string; file: ZipObject }[] = [];
   zip.forEach((path, file) => {
     if (file.dir) {
       return;
+    } else {
+      file_list.push({ path, file });
     }
-
-    files.push(
-      (async () => {
-        const data = await file.async("uint8array");
-        return {
-          relative_path: Pathname.from_string(path),
-          read: () => Promise.resolve(data),
-          __fake: true,
-        } as any as KateTypes.DeviceFileHandle;
-      })()
-    );
   });
 
-  const real_files: KateTypes.DeviceFileHandle[] = [];
-  for (const file of files) {
-    real_files.push(await file);
+  const files: KateTypes.DeviceFileHandle[] = [];
+  for (const { path, file } of file_list) {
+    const data = await file.async("uint8array");
+    const file_handle = await bucket.create_file(path, data);
+    files.push({
+      relative_path: Pathname.from_string(path),
+      read: async () => {
+        return file_handle.read_slice(0);
+      },
+      __fake: true,
+    } as any as KateTypes.DeviceFileHandle);
   }
-  return real_files;
+
+  return files;
 }
