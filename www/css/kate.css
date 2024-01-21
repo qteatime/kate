@@ -163,6 +163,15 @@ body {
   display: block;
 }
 
+.kate-resource-temporary-file {
+  font-family: "Font Awesome 6 Free";
+}
+
+.kate-resource-temporary-file::before {
+  content: "\f15b";
+  display: block;
+}
+
 .kate-resource-transient-storage {
   font-family: "Font Awesome 6 Free";
 }
