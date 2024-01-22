@@ -13,7 +13,6 @@ type Bucket = {
   bucket: KateFileBucket;
   id: string;
   size: number;
-  max_size: number;
 };
 
 type Writer = {
@@ -38,12 +37,17 @@ export class KateProcessFileSupervisor {
     this.os.kernel.processes.on_system_event.listen(this.handle_process_event);
   }
 
-  private handle_process_event = (ev: SystemEvent) => {
+  private handle_process_event = async (ev: SystemEvent) => {
     if (ev.type === "killed") {
       const refs = this.get_refs(ev.process.id);
       if (refs.size > 0) {
         console.debug(`[kate:process-file-supervisor] Releasing buckets held by ${ev.process.id}`);
+        const partition = await this.os.file_store.get_partition("temporary");
+        for (const ref of refs.values()) {
+          partition.release(ref.bucket);
+        }
         this.resources.delete(ev.process.id);
+        this.writers.delete(ev.process.id);
         this.update_resource_band();
       }
     }
@@ -93,7 +97,7 @@ export class KateProcessFileSupervisor {
     const refs = this.get_refs(process);
     let result = 0;
     for (const ref of refs.values()) {
-      result += ref.max_size;
+      result += ref.size;
     }
     return result;
   }
@@ -120,23 +124,24 @@ export class KateProcessFileSupervisor {
     return ref;
   }
 
-  async make_temporary(process: ProcessId, size: number) {
+  async assert_fits(process: ProcessId, size: number) {
     const max_storage = await this.available_max_for_process(process);
     if (this.current_size(process) + size > max_storage) {
       throw new Error(
         `[kate:process-file-supervisor] ${process} buckets would use more space than allowed.`
       );
     }
+  }
+
+  async make_temporary(process: ProcessId) {
     const partition = await this.os.file_store.get_partition("temporary");
     const bucket = await partition.create(null);
     const id = make_id();
     const refs = this.get_refs(process);
-    refs.set(id, { bucket: bucket, id, size: 0, max_size: size });
+    refs.set(id, { bucket: bucket, id, size: 0 });
     this.resources.set(process, refs);
     console.debug(
-      `[kate:process-file-supervisor] Allocated bucket ${
-        bucket.id
-      } (ref: ${id}, max size: ${from_bytes(size)}) for ${process}`
+      `[kate:process-file-supervisor] Allocated bucket ${bucket.id} (ref: ${id}) for ${process}`
     );
     this.update_resource_band();
     return id;
@@ -160,13 +165,7 @@ export class KateProcessFileSupervisor {
 
   async put_file(process: ProcessId, id: string, data: Uint8Array) {
     const ref = this.get_ref(process, id);
-    if (ref.size + data.byteLength > ref.max_size) {
-      throw new Error(
-        `[kate:process-file-supervisor] ${process} failed to store file in ${id}: max size (${from_bytes(
-          ref.max_size
-        )}) for the bucket exceeded`
-      );
-    }
+    await this.assert_fits(process, data.byteLength);
     const file = await ref.bucket.put(data);
     ref.size += data.byteLength;
     console.debug(
@@ -186,18 +185,8 @@ export class KateProcessFileSupervisor {
   ) {
     const ref = this.get_ref(process, id);
     const handle = await ref.bucket.file(file_id).get_handle();
-    const added_size =
-      expected_size == null
-        ? null
-        : keep_existing_data
-        ? expected_size
-        : expected_size - (await handle.getFile()).size;
-    if (added_size != null && ref.size + added_size > ref.max_size) {
-      throw new Error(
-        `[kate:process-file-supervisor] ${process} cannot fully commit ${from_bytes(
-          added_size
-        )} as there's not enough available space (max size: ${from_bytes(ref.max_size)})`
-      );
+    if (expected_size != null) {
+      await this.assert_fits(process, expected_size);
     }
     const writer = await handle.createWritable({ keepExistingData: keep_existing_data });
     const writers = this.get_writers(process);
@@ -224,13 +213,7 @@ export class KateProcessFileSupervisor {
   async write_chunk(process: ProcessId, writer_id: string, chunk: Uint8Array) {
     const writer = this.get_writer(process, writer_id);
     const ref = this.get_ref(process, writer.bucket_id);
-    if (ref.size + chunk.byteLength > ref.max_size) {
-      throw new Error(
-        `[kate:process-file-supervisor] ${process} failed to write to stream in ${
-          writer.bucket_id
-        }: max size (${from_bytes(ref.max_size)}) for the bucket exceeded`
-      );
-    }
+    await this.assert_fits(process, chunk.byteLength);
     if (
       writer.expected_size != null &&
       writer.written_size + chunk.byteLength > writer.expected_size
@@ -260,13 +243,7 @@ export class KateProcessFileSupervisor {
 
   async append_file(process: ProcessId, id: string, file_id: string, data: Uint8Array) {
     const ref = this.get_ref(process, id);
-    if (ref.size + data.byteLength > ref.max_size) {
-      throw new Error(
-        `[kate:process-file-supervisor] ${process} failed to store file in ${id}: max size (${from_bytes(
-          ref.max_size
-        )}) for the bucket exceeded`
-      );
-    }
+    this.assert_fits(process, data.byteLength);
     await ref.bucket.file(file_id).append(data);
     ref.size += data.byteLength;
     console.debug(

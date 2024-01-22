@@ -10,10 +10,10 @@ import { WithTransfer, auth_handler } from "./handlers";
 export default [
   auth_handler(
     "kate:file-store.make-temporary-bucket",
-    TC.spec({ size: TC.int }),
+    TC.spec({}),
     { capabilities: [{ type: "store-temporary-files" }] },
-    async (os, process, ipc, { size }) => {
-      return await os.process_file_supervisor.make_temporary(process.id, size);
+    async (os, process, ipc, {}) => {
+      return await os.process_file_supervisor.make_temporary(process.id);
     }
   ),
 

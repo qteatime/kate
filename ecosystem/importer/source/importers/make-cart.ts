@@ -170,14 +170,14 @@ export async function make_file(path: Pathname, data: () => Promise<Uint8Array>)
       integrity: new Uint8Array(integrity),
       "hash-algorithm": Cart.Hash_algorithm.Sha_512({}),
       offset: 0n,
-      size: data.length,
+      size: buffer.byteLength,
     }),
     data,
   };
 }
 
 export async function encode_whole(cart: CartConfig) {
-  const bucket = await KateAPI.file_store.make_temporary(gb(8));
+  const bucket = await KateAPI.file_store.make_temporary();
   const file = await bucket.create_file(cart.metadata.presentation.title, new Uint8Array([]));
   const write_stream = await file.create_write_stream({ keep_existing_data: false });
   const writer = write_stream.getWriter();

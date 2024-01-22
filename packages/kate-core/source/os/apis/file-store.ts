@@ -143,7 +143,7 @@ export class KateFilePartition {
           break;
         }
       }
-      if (this.has_memory_refs(bucket.id)) {
+      if (!this.has_memory_refs(bucket.id)) {
         console.debug(
           `[kate:file-store:gc] scheduling ${this.id}/${bucket.id} for deletion (reason: no more memory-refs)`
         );

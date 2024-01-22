@@ -120,7 +120,7 @@ async function unpack_zip(file: KateTypes.DeviceFileHandle) {
 }
 
 async function zip_to_files(zip: _JSZip) {
-  const bucket = await KateAPI.file_store.make_temporary(gb(8));
+  const bucket = await KateAPI.file_store.make_temporary();
   const file_list: { path: string; file: ZipObject }[] = [];
   zip.forEach((path, file) => {
     if (file.dir) {

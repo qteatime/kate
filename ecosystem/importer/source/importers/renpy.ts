@@ -222,7 +222,7 @@ async function make_game_zip(runtime_dir: Pathname, files0: KateTypes.DeviceFile
   for (const file of game_files.zipped) {
     zip.file(file.relative_path.make_relative().as_string(), await file.read());
   }
-  const bucket = await KateAPI.file_store.make_temporary(gb(8));
+  const bucket = await KateAPI.file_store.make_temporary();
   const zip_file = await bucket.create_file(
     "game.zip",
     await zip.generateAsync({ type: "uint8array" })

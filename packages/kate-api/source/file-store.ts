@@ -14,10 +14,8 @@ export class KateFileStore {
     this.#channel = channel;
   }
 
-  async make_temporary(size: number) {
-    const id = (await this.#channel.call("kate:file-store.make-temporary-bucket", {
-      size,
-    })) as string;
+  async make_temporary() {
+    const id = (await this.#channel.call("kate:file-store.make-temporary-bucket", {})) as string;
     return new FileBucket(this.#channel, "temporary", id);
   }
 }
