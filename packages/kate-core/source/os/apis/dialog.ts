@@ -5,7 +5,7 @@
  */
 
 import { KateButton } from "../../kernel";
-import { Deferred, defer } from "../../utils";
+import { Deferred, Observable, defer } from "../../utils";
 import type { KateOS } from "../os";
 import { wait } from "../time";
 import * as UI from "../ui";
@@ -76,22 +76,42 @@ export class KateDialog {
     id: string,
     message: string,
     options: {
+      min_length?: number;
       max_length?: number;
       initial_value?: string;
       type: "text" | "password";
       placeholder?: string;
+      autocomplete?: UI.AutoComplete[];
     }
   ) {
+    const value = new Observable(options.initial_value ?? "");
+    const valid = value.map((x) => {
+      if (options.min_length && x.length < options.min_length) {
+        return `Must have at least ${options.min_length} character(s)`;
+      }
+      if (options.max_length && x.length > options.max_length) {
+        return `Must have at most ${options.max_length} characters(s)`;
+      }
+      return null;
+    });
     const input = UI.h(
       "input",
       {
         type: options.type,
         value: options.initial_value ?? "",
         placeholder: options.placeholder ?? "",
+        autocomplete: options.autocomplete == null ? "" : options.autocomplete.join(" "),
         class: "kate-ui-text-input-input",
       },
       []
     ) as HTMLInputElement;
+    const update = () => {
+      if (value.value !== input.value) {
+        value.value = input.value;
+      }
+    };
+    input.addEventListener("keyup", update);
+    input.addEventListener("change", update);
     input.addEventListener("keydown", (ev) => {
       if (ev.code === "ArrowUp" || ev.code === "ArrowDown") {
         ev.preventDefault();
@@ -114,7 +134,20 @@ export class KateDialog {
         UI.h("div", { class: "kate-ui-text-input-control" }, [
           UI.interactive(
             this.os,
-            input,
+            UI.h("form", {}, [
+              input,
+              UI.vspace(0.3),
+              UI.klass("kate-ui-text-input-error", [
+                UI.hbox(0.5, [
+                  UI.meta_text([
+                    UI.dynamic(value.map<UI.Widgetable>((x) => `${x.length} character(s)`)),
+                  ]),
+                  UI.dynamic(
+                    valid.map((x) => (x == null ? null : ` | ${x}`)) as Observable<UI.Widgetable>
+                  ),
+                ]),
+              ]),
+            ]),
             [
               {
                 key: ["o"],

@@ -21,6 +21,8 @@ export type AuditResource =
   | "kate:cartridge"
   | "kate:ui"
   | "kate:audit"
+  | "kate:key-store"
+  | "kate:profile"
   | "error";
 
 export type AuditMessage = {

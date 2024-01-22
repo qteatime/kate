@@ -6,9 +6,9 @@
 
 import { capabilities } from "../..";
 import * as Cart from "../../cart";
-import { KateButton } from "../../kernel";
+import type { KateButton } from "../../kernel";
 import { EventStream, Observable, load_image_from_bytes } from "../../utils";
-import { InteractionHandler } from "../apis";
+import type { InteractionHandler } from "../apis";
 import type { KateOS } from "../os";
 
 export abstract class Widget {
@@ -489,6 +489,10 @@ export function info_line(label: Widgetable, data: Widgetable[], x?: { interacti
 
 export function info_cell(label: Widgetable, data: Widgetable[]) {
   return info_line(label, data, { interactive: true });
+}
+
+export function inline(x: Widgetable) {
+  return klass("kate-ui-inline", [x]);
 }
 
 export function button_panel(
@@ -1008,6 +1012,223 @@ export function select_panel<A>(
     }),
     ["kate-ui-select-panel"]
   );
+}
+
+type Form = {
+  observe_value(name: string): Observable<string | null>;
+};
+export function form(fn: (form: Form) => Widgetable[]) {
+  const form: Form = {
+    observe_value(name: string) {
+      let field: HTMLInputElement | null = null;
+      const result = Observable.from<string | null>(null, () => {
+        field?.removeEventListener("change", update);
+        field?.removeEventListener("keyup", update);
+      });
+      const update = () => {
+        if (result.value !== field!.value) {
+          result.value = field!.value;
+        }
+      };
+      const listen = () => {
+        field = form_element.querySelector(
+          `input[name=${JSON.stringify(name)}]`
+        ) as HTMLInputElement;
+        if (field == null) {
+          setTimeout(listen, 1000);
+        } else {
+          result.value = field.value;
+          field.addEventListener("change", update);
+          field.addEventListener("keyup", update);
+          result;
+        }
+      };
+      setTimeout(listen);
+      return result;
+    },
+  };
+  const form_element = h("form", {}, []);
+  const children = fn(form);
+  for (const child of children) {
+    append(child, form_element);
+  }
+  return form_element;
+}
+
+export type AutoComplete = "username" | "new-password" | "current-password" | "one-time-code";
+
+export function text_input(
+  os: KateOS,
+  x: {
+    initial_value?: string;
+    name?: string;
+    type: "text" | "password";
+    placeholder?: string;
+    autocomplete?: AutoComplete[];
+    write_to?: Observable<string>;
+  }
+) {
+  const input = h(
+    "input",
+    {
+      type: x.type,
+      name: x.name ?? "",
+      value: x.initial_value ?? "",
+      placeholder: x.placeholder ?? "",
+      autocomplete: x.autocomplete == null ? "" : x.autocomplete.join(" "),
+      class: "kate-ui-text-input-input",
+    },
+    []
+  ) as HTMLInputElement;
+  if (x.write_to != null) {
+    const output = x.write_to;
+    const update = () => {
+      if (output.value !== input.value) {
+        output.value = input.value;
+      }
+    };
+    input.addEventListener("change", update);
+    input.addEventListener("keyup", update);
+  }
+  input.addEventListener("keydown", (ev) => {
+    if (ev.code === "ArrowUp" || ev.code === "ArrowDown") {
+      input.blur();
+      ev.preventDefault();
+      return;
+    }
+    ev.stopPropagation();
+    if (ev.code === "Escape") {
+      input.blur();
+      ev.preventDefault();
+      return;
+    }
+  });
+  const validation = Observable.from<Widgetable>(null);
+  return h("div", { class: "kate-ui-text-input-control" }, [
+    interactive(
+      os,
+      input,
+      [
+        {
+          key: ["o"],
+          label: "Edit",
+          on_click: true,
+          handler: () => {
+            input.focus();
+          },
+        },
+      ],
+      {
+        replace: true,
+        default_focus_indicator: false,
+      }
+    ),
+    dynamic(validation),
+  ]);
+}
+
+export function field(title: string, children: Widgetable[]) {
+  return klass("kate-ui-form-field", [
+    h("label", { class: "kate-ui-form-field-label" }, [title]),
+    ...children,
+  ]);
+}
+
+export function lazy(x: Promise<Widgetable>) {
+  const element = klass("kate-ui-lazy", []);
+  x.then(
+    (value) => {
+      append(value, element);
+    },
+    (error) => {
+      console.error(`Failed to resolve lazy element`, error);
+      append(klass("kate-ui-lazy-error", [String(error)]), element);
+    }
+  );
+  return element;
+}
+
+export function multistep(
+  os: KateOS,
+  steps: {
+    content: Widgetable;
+    next_label?: string;
+    previous_label?: string;
+    valid?: Observable<boolean>;
+    on_next?: () => Promise<void>;
+    on_previous?: () => Promise<void>;
+  }[]
+) {
+  const current = new Observable<number>(0);
+  const content = current.map<Widgetable>((x) => steps[x].content);
+  const actions = current.map<Widgetable>((x) => {
+    const step = steps[x];
+
+    return klass("kate-ui-step-actions", [
+      klass("kate-ui-step-previous", [
+        when(x > 0, [
+          text_button(os, step.previous_label ?? "Back", {
+            on_click: async () => {
+              if (step.on_previous) await step.on_previous();
+              current.value = Math.max(0, x - 1);
+            },
+          }),
+        ]),
+      ]),
+      klass("kate-ui-step-view", [
+        ...steps.map((_, i) => {
+          return klass(`kate-ui-step-icon ${i === x ? "active" : ""}`, []);
+        }),
+      ]),
+      klass("kate-ui-step-next", [
+        when(x < steps.length - 1, [
+          text_button(os, step.next_label ?? "Continue", {
+            enabled: step.valid,
+            on_click: async () => {
+              if (step.on_next) await step.on_next();
+              current.value = Math.min(steps.length - 1, x + 1);
+            },
+          }),
+        ]),
+      ]),
+    ]);
+  });
+
+  return klass("kate-ui-steps", [
+    klass("kate-ui-steps-content", [dynamic(content)]),
+    dynamic(actions),
+  ]);
+}
+
+export function tabs<A>(
+  os: KateOS,
+  x: {
+    selected?: A;
+    out?: Observable<A>;
+    choices: { icon?: Widgetable; title: Widgetable; value: A }[];
+  }
+) {
+  const current = new Observable<A | null>(x.selected ?? null);
+  return klass("kate-ui-tab-bar", [
+    hchoices(2, [
+      ...x.choices.map((c) => {
+        return choice_button(
+          os,
+          klass("kate-ui-tab-button", [
+            klass("kate-ui-tab-button-icon", [c.icon ?? null]),
+            klass("kate-ui-tab-button-title", [c.title]),
+          ]),
+          {
+            selected: current.map((x) => x === c.value),
+            on_select: () => {
+              current.value = c.value;
+              if (x.out != null) x.out.value = c.value;
+            },
+          }
+        );
+      }),
+    ]),
+  ]);
 }
 
 function add_class(x: HTMLElement, classes: string[]) {

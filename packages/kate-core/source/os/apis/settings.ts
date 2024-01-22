@@ -43,8 +43,26 @@ export type Audit = {
   log_retention_days: number;
 };
 
+export type DeveloperProfile = {
+  name: string;
+  domain: string;
+  icon: Uint8Array | null;
+  created_at: Date;
+  key_id: string;
+  fingerprint: string;
+};
+
 export type Developer = {
   allow_version_overwrite: boolean;
+  profiles: DeveloperProfile[];
+};
+
+export type KeyStore = {
+  master_key: null | {
+    salt: Uint8Array;
+    key_check: Uint8Array;
+    key_derive_iterations: number;
+  };
 };
 
 export type SettingsData = {
@@ -54,6 +72,7 @@ export type SettingsData = {
   security: Security;
   audit: Audit;
   developer: Developer;
+  key_store: KeyStore;
 };
 
 export type AnySetting = SettingsData[keyof SettingsData];
@@ -210,6 +229,10 @@ const defaults: SettingsData = {
   },
   developer: {
     allow_version_overwrite: false,
+    profiles: [],
+  },
+  key_store: {
+    master_key: null,
   },
 };
 

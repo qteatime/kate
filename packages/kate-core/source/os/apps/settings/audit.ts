@@ -289,6 +289,10 @@ function render_resource(x: AuditResource) {
       return UI.fa_icon("globe");
     case "device-fs":
       return UI.fa_icon("laptop-file");
+    case "kate:key-store":
+      return UI.fa_icon("vault");
+    case "kate:profile":
+      return UI.fa_icon("user");
     default:
       throw unreachable(x, "audit resource");
   }

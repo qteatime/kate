@@ -4,8 +4,14 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
+import { base64_to_bytes } from "./binary";
+
 export abstract class EParse {
   abstract message: string;
+
+  toString() {
+    return `Parsing failed: ${this.message}`;
+  }
 }
 
 export class EType extends EParse {
@@ -59,11 +65,7 @@ export class EMinLength extends EParse {
 }
 
 export class ERegExp extends EParse {
-  constructor(
-    readonly reason: string,
-    readonly regex: RegExp,
-    readonly actual: string
-  ) {
+  constructor(readonly reason: string, readonly regex: RegExp, readonly actual: string) {
     super();
   }
 
@@ -109,11 +111,7 @@ export class EAt extends EParse {
 }
 
 export class EOr extends EParse {
-  constructor(
-    readonly left: EParse,
-    readonly right: EParse,
-    readonly value: any
-  ) {
+  constructor(readonly left: EParse, readonly right: EParse, readonly value: any) {
     super();
   }
 
@@ -221,6 +219,17 @@ export function byte(x: any): number {
   })(x);
 }
 
+export function date(x: any): Date {
+  return seq2(str, (x) => {
+    const v = new Date(x);
+    if (isNaN(v.getTime())) {
+      throw new EType("date", x);
+    } else {
+      return v;
+    }
+  })(x);
+}
+
 export function max_length(size: number) {
   return (x: string) => {
     if (x.length < size) {
@@ -319,10 +328,7 @@ export function one_of<K>(xs: readonly K[]) {
   };
 }
 
-export function instance_of<A>(
-  type: { new (...args: any[]): A },
-  name?: string
-) {
+export function instance_of<A>(type: { new (...args: any[]): A }, name?: string) {
   return (x: unknown) => {
     if (x instanceof type) {
       return x;
@@ -338,6 +344,12 @@ export function bytearray(x: any): Uint8Array {
   } else {
     throw new EInstance("Uint8Array", x);
   }
+}
+
+export function base64_bytes(x: any): Uint8Array {
+  return seq2(str, (x) => {
+    return base64_to_bytes(x);
+  })(x);
 }
 
 export function spec<T extends { [key: string]: (_: any) => any }>(
@@ -378,11 +390,7 @@ export function seq2<A, B, C>(a: (_: A) => B, b: (_: B) => C) {
 
 export const map = seq2;
 
-export function seq3<A, B, C, D>(
-  a: (_: A) => B,
-  b: (_: B) => C,
-  c: (_: C) => D
-) {
+export function seq3<A, B, C, D>(a: (_: A) => B, b: (_: B) => C, c: (_: C) => D) {
   return (x: any) => {
     return c(b(a(x)));
   };
@@ -432,24 +440,21 @@ export function or3<A, B, C>(a: P<A>, b: P<B>, c: P<C>) {
 export function or4<A, B, C, D>(a: P<A>, b: P<B>, c: P<C>, d: P<D>) {
   return or(a, or(b, or(c, d)));
 }
-export function or5<A, B, C, D, E>(
-  a: P<A>,
-  b: P<B>,
-  c: P<C>,
-  d: P<D>,
-  e: P<E>
-) {
+export function or5<A, B, C, D, E>(a: P<A>, b: P<B>, c: P<C>, d: P<D>, e: P<E>) {
   return or(a, or(b, or(c, or(d, e))));
 }
-export function or6<A, B, C, D, E, F>(
-  a: P<A>,
-  b: P<B>,
-  c: P<C>,
-  d: P<D>,
-  e: P<E>,
-  f: P<F>
-) {
+export function or6<A, B, C, D, E, F>(a: P<A>, b: P<B>, c: P<C>, d: P<D>, e: P<E>, f: P<F>) {
   return or(a, or(b, or(c, or(d, or(e, f)))));
+}
+
+export function bracket<A>(spec: (_: any) => A, handler: (_: unknown) => A) {
+  return (value: any) => {
+    try {
+      return spec(value);
+    } catch (e) {
+      return handler(e);
+    }
+  };
 }
 
 export function parse<A>(spec: (_: any) => A, value: any) {

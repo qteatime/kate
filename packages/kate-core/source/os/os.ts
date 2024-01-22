@@ -10,7 +10,7 @@ import * as Cart from "../cart";
 import type { KateKernel } from "../kernel/kate";
 import { EventStream } from "../utils";
 import { wait } from "./time";
-import { Scene } from "./ui/scenes";
+import { Scene, SimpleScene } from "./ui/scenes";
 import { SceneBoot } from "./apps/boot";
 import { SceneHome } from "./apps/home";
 import { CartManager } from "./apis/cart-manager";
@@ -36,6 +36,8 @@ import { KateDeviceFile } from "./apis/device-file";
 import { KateFairnessSupervisor } from "./services/fairness-supervisor";
 import { ButtonChangeEvent } from "../kernel";
 import { KateProcessFileSupervisor } from "./services/process-file-supervisor";
+import { KateKeyManager } from "./services/key-manager";
+import { KateDeveloperProfile } from "./apis/developer-profile";
 
 export type CartChangeReason = "installed" | "removed" | "archived" | "save-data-changed";
 
@@ -62,11 +64,13 @@ export class KateOS {
   readonly browser: KateBrowser;
   readonly device_file: KateDeviceFile;
   readonly file_store: KateFileStore;
+  readonly developer_profile: KateDeveloperProfile;
   // Services
   readonly capability_supervisor: KateCapabilitySupervisor;
   readonly audit_supervisor: KateAuditSupervisor;
   readonly fairness_supervisor: KateFairnessSupervisor;
   readonly process_file_supervisor: KateProcessFileSupervisor;
+  readonly key_manager: KateKeyManager;
   readonly TRACE_ENABLED = trace_messages;
 
   readonly events = {
@@ -115,6 +119,8 @@ export class KateOS {
     this.file_store = new KateFileStore(this);
     this.process_file_supervisor = new KateProcessFileSupervisor(this);
     this.process_file_supervisor.setup();
+    this.key_manager = new KateKeyManager(this);
+    this.developer_profile = new KateDeveloperProfile(this);
   }
 
   get display() {
@@ -129,10 +135,13 @@ export class KateOS {
     return this._current_scene;
   }
 
-  push_scene(scene: Scene) {
+  push_scene(scene: Scene, on_close?: () => void) {
     console.debug(`[kate:os] Entering ${scene.application_id}`);
     if (this._current_scene != null) {
       this._scene_stack.push(this._current_scene);
+    }
+    if (on_close != null && scene instanceof SimpleScene) {
+      scene.on_close.listen(on_close);
     }
     this._current_scene = scene;
     scene.attach(this.display);

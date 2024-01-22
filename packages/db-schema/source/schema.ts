@@ -208,6 +208,30 @@ export abstract class TableSchema<S> {
     this.indexes.push(id);
     return id;
   }
+
+  index3<K1 extends keyof S, K2 extends keyof S, K3 extends keyof S>(x: {
+    since: number;
+    name: string;
+    path: [K1, K2, K3];
+    unique?: boolean;
+    multi_entry?: boolean;
+    deprecated_since?: number;
+    deleted_since?: number;
+  }) {
+    const id = new IndexSchema3<S, K1, K2, K3>(
+      this as any,
+      x.since,
+      x.name,
+      x.path,
+      {
+        unique: x.unique ?? true,
+        multi_entry: x.multi_entry ?? false,
+      },
+      x.deleted_since
+    );
+    this.indexes.push(id);
+    return id;
+  }
 }
 
 export class TableSchema1<Schema, Id extends keyof Schema> extends TableSchema<Schema> {
@@ -326,6 +350,32 @@ export class IndexSchema2<S, K1 extends keyof S, K2 extends keyof S> extends Ind
     version: number,
     name: string,
     key: [K1, K2],
+    options: { unique: boolean; multi_entry: boolean },
+    deleted_since?: number
+  ) {
+    super(table, version, name, key, options, deleted_since);
+  }
+}
+
+export class IndexSchema3<
+  S,
+  K1 extends keyof S,
+  K2 extends keyof S,
+  K3 extends keyof S
+> extends IndexSchema {
+  readonly __schema3!: S;
+  readonly __k1!: K1;
+  readonly __kt1!: S[K1];
+  readonly __k2!: K2;
+  readonly __kt2!: S[K2];
+  readonly __k3!: K3;
+  readonly __kt3!: S[K3];
+
+  constructor(
+    table: TableSchema3<S, K1, K2, K3>,
+    version: number,
+    name: string,
+    key: [K1, K2, K3],
     options: { unique: boolean; multi_entry: boolean },
     deleted_since?: number
   ) {

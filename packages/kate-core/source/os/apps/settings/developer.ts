@@ -4,23 +4,88 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { SettingsData } from "../../apis";
+import { KeyStore_v1 } from "../../../data";
+import { Observable, relative_date, unreachable } from "../../../utils";
+import { DeveloperProfile, DeviceFileHandle, SettingsData } from "../../apis";
+import type { KateOS } from "../../os";
 import * as UI from "../../ui";
+import { SceneCreateMasterPassword } from "./key-store";
 
 export class SceneDeveloperSettings extends UI.SimpleScene {
   readonly application_id = "kate:settings:developer";
   icon = "code";
   title = ["Developer settings"];
 
-  body() {
+  async missing_actions() {
+    const profiles = await this.os.developer_profile.list();
+    const key_store = this.os.settings.get("key_store");
+
+    return [
+      {
+        type: "protect-store",
+        missing: key_store.master_key == null,
+      },
+      {
+        type: "make-profile",
+        missing: profiles.length === 0,
+      },
+    ];
+  }
+
+  async body() {
+    const actions = await this.missing_actions();
+    const is_developer = actions.every((x) => !x.missing);
+
+    return [
+      UI.when(!is_developer, [
+        UI.p([
+          `Your console is not yet configured for publishing cartridges.
+          If you want to create your own Kate cartridges, the configuration
+          wizard will guide you through the necessary steps.
+          `,
+        ]),
+        UI.p([
+          `You'll need to create a developer profile and generate signing
+          keys for your cartridges. The process will take a few minutes.`,
+        ]),
+        UI.text_button(this.os, "I want to make games for Kate!", {
+          on_click: () => {
+            this.os.push_scene(new SceneNewDeveloper(this.os), () => {
+              this.refresh();
+            });
+          },
+        }),
+        UI.vspace(16),
+        UI.h("h3", {}, ["I already have a profile!"]),
+        UI.p([
+          `If you have a backup file for a developer profile, you can also import `,
+          `that backup file instead.`,
+        ]),
+        UI.text_button(this.os, "Import my profile backup file", {
+          on_click: () => {
+            this.import_backup();
+          },
+        }),
+      ]),
+
+      UI.when(is_developer, [...this.developer_settings()]),
+    ];
+  }
+
+  developer_settings() {
     const data = this.os.settings.get("developer");
 
     return [
-      UI.p([
-        `These settings are intended for users making cartridges for Kate.
-        Updating these settings may impact Kate's stability, security, and privacy.`,
-      ]),
+      UI.link_card(this.os, {
+        icon: "user",
+        title: "Developer profiles",
+        description: "View and manager your developer profiles",
+        on_click: () => {
+          this.os.push_scene(new SceneDeveloperProfiles(this.os));
+        },
+      }),
 
+      UI.h("h3", {}, ["Testing your Kate cartridges"]),
       UI.toggle_cell(this.os, {
         value: data.allow_version_overwrite,
         title: "Allow overwriting a cartridge",
@@ -50,4 +115,592 @@ export class SceneDeveloperSettings extends UI.SimpleScene {
       extra: { [key]: value },
     });
   }
+
+  async import_backup() {
+    const config = this.os.settings.get("key_store");
+    if (config.master_key == null) {
+      await this.os.dialog.message(this.application_id, {
+        title: "Key store is not protected",
+        message: `
+          Before you can import your profile backup, you'll need to 
+          configure a master password for your key store. That way
+          your private key can be stored securely.
+        `,
+      });
+      this.os.push_scene(new SceneCreateMasterPassword(this.os), async () => {
+        const config = this.os.settings.get("key_store");
+        if (config == null) {
+          return;
+        }
+        await import_from_file(this.os).catch((x) =>
+          UI.show_error(this.os, "Failed to import backup", x)
+        );
+        this.refresh();
+      });
+    } else {
+      await import_from_file(this.os).catch((x) =>
+        UI.show_error(this.os, "Failed to import backup", x)
+      );
+      this.refresh();
+    }
+  }
+}
+
+export class SceneNewDeveloper extends UI.SimpleScene {
+  readonly application_id = "kate:settings:developer:new";
+  icon = "code";
+  title = ["Create a developer profile"];
+  data = {
+    name: new Observable(""),
+    domain: new Observable(""),
+    has_master_key: new Observable(false),
+    key_ids: new Observable<null | { private_key: KeyStore_v1; public_key: KeyStore_v1 }>(null),
+  };
+  non_empty_name = this.data.name.map((x) =>
+    x.length > 0 ? null : `Publisher name cannot be empty`
+  );
+  valid_domain = this.data.domain.map((x) => {
+    if (this.os.developer_profile.is_valid_domain(x)) {
+      return null;
+    } else {
+      return `
+        A publisher domain must be in the form 'domain.tld' (e.g.: 'qteati.me').
+        It must have at least one part separated by '.', each part must have at least 2 characters,
+        and the only allowed characters are letters, numbers, underscores ('_'), and hyphens ('-').
+      `;
+    }
+  });
+
+  body() {
+    this.data.has_master_key.value = this.os.settings.get("key_store").master_key != null;
+
+    return [
+      UI.multistep(this.os, [
+        {
+          content: this.choose_profile(),
+          valid: this.non_empty_name.zip_with(this.valid_domain, (name, domain) => {
+            return name === null && domain === null;
+          }),
+        },
+        {
+          content: this.protect_key_store(),
+          valid: this.data.has_master_key,
+        },
+        {
+          content: this.generate_key_pair(),
+          valid: this.data.key_ids.map((x) => x != null),
+        },
+        {
+          content: this.publish_public_key(),
+        },
+        {
+          content: this.confirm(),
+        },
+      ]),
+    ];
+  }
+
+  choose_profile() {
+    return UI.section({
+      title: "Your publisher profile",
+      contents: [
+        UI.p([
+          `You'll need a developer profile to publish Kate cartridges. This
+        profile exists only locally in your Kate device---think of it as
+        accounts in your computer. You pick one of them when publishing.`,
+        ]),
+        UI.vspace(16),
+
+        UI.form((form) => {
+          return [
+            UI.field("Publisher name", [
+              UI.text_input(this.os, {
+                name: "publisher-name",
+                type: "text",
+                initial_value: this.data.name.value,
+                write_to: this.data.name,
+                placeholder: "Cute Games Studio",
+              }),
+              UI.klass("kate-ui-text-input-error", [
+                UI.dynamic(this.non_empty_name as Observable<UI.Widgetable>),
+              ]),
+              UI.meta_text([`The name stamped as "developed by" in the cartridge.`]),
+            ]),
+            UI.vspace(16),
+            UI.field("Publisher internet domain", [
+              UI.text_input(this.os, {
+                name: "publisher-domain",
+                type: "text",
+                initial_value: this.data.domain.value,
+                write_to: this.data.domain,
+                placeholder: "cute-games-studio.com",
+              }),
+              UI.klass("kate-ui-text-input-error", [
+                UI.dynamic(this.valid_domain as Observable<UI.Widgetable>),
+              ]),
+              UI.meta_text([
+                `Cartridges in Kate are associated with an internet domain, like
+              'qteati.me'. You need to provide an internet domain or subdomain
+              that you own in some capacity. If you publish your games on
+              Itch.io, your profile's domain works (e.g.: 'my-name.itch.io')`,
+              ]),
+            ]),
+          ];
+        }),
+      ],
+    });
+  }
+
+  protect_key_store() {
+    return UI.stack([
+      UI.section({
+        title: "Protecting your key store",
+        contents: [
+          UI.p([
+            `When you publish a Kate cartridge you'll need to sign it digitally,
+            so players know the cartridge file they downloaded truly came from
+            you.`,
+          ]),
+
+          UI.dynamic(
+            this.data.has_master_key.map<UI.Widgetable>((has_key) => {
+              if (has_key) {
+                return UI.stack([
+                  UI.p([
+                    `Your key store is already protected with a master password.
+                  You're all set!`,
+                  ]),
+                ]);
+              } else {
+                return UI.stack([
+                  UI.p([
+                    `You sign cartridges with a Cryptographic Signing Key. We'll generate
+                one for you, and keep it secure in your device, but you'll need to
+                provide a password to encrypt this key and store it securely. This
+                password will protect your entire Key Store.`,
+                  ]),
+                  UI.text_button(this.os, "Secure my key store with a password", {
+                    on_click: async () => {
+                      const config = this.os.settings.get("key_store");
+                      if (config.master_key != null) {
+                        this.data.has_master_key.value = true;
+                        return;
+                      } else {
+                        this.os.push_scene(new SceneCreateMasterPassword(this.os), () => {
+                          const config = this.os.settings.get("key_store");
+                          this.data.has_master_key.value = config.master_key != null;
+                        });
+                      }
+                    },
+                  }),
+                ]);
+              }
+            })
+          ),
+        ],
+      }),
+    ]);
+  }
+
+  generate_key_pair() {
+    return UI.section({
+      title: "Your signing keys",
+      contents: [
+        UI.p([
+          `To sign cartridges you'll need a Cryptographic Signing Key. Signature keys
+        used by Kate come in a pair: you use a private key to sign your cartridges,
+        and your players use the public part of this key to verify your signature`,
+        ]),
+        UI.dynamic(
+          this.data.key_ids.map<UI.Widgetable>((x) => {
+            if (x == null) {
+              return UI.stack([
+                UI.p([
+                  `We'll generate this pair of keys and store it securely in your key store,
+              so it's ready any time you wish to sign cartridges. Your private key is like
+              a password, and you should never share your it with anyone.
+              Anyone with the private key could use it to sign cartridges as if they were you!`,
+                ]),
+                UI.text_button(this.os, "Generate my cartridge signing keys", {
+                  on_click: async () => {
+                    const keys = await this.os.key_manager.generate_key(
+                      this.application_id,
+                      this.data.domain.value,
+                      `Kate signing keys for ${this.data.name.value}`
+                    );
+                    if (keys == null) {
+                      await this.os.dialog.message(this.application_id, {
+                        title: "Failed to generate keys",
+                        message: `Something went wrong while generating your signing keys.`,
+                      });
+                    } else {
+                      this.data.key_ids.value = {
+                        private_key: keys.private_key,
+                        public_key: keys.public_key,
+                      };
+                    }
+                  },
+                }),
+              ]);
+            } else {
+              return UI.p([`Your signing keys are all set!`]);
+            }
+          })
+        ),
+      ],
+    });
+  }
+
+  publish_public_key() {
+    const method = new Observable<null | "file" | "text">(null);
+    const keys = this.data.key_ids;
+
+    return UI.section({
+      title: "Publishing your public key",
+      contents: [
+        UI.p([
+          `Players will use your public key to verify that your cartridges are truly
+        coming from you---and not someone pretending to be you. But for that to
+        work you need to prove you own the domain you provided: `,
+          UI.inline(UI.mono_text([UI.dynamic(this.data.domain as Observable<UI.Widgetable>)])),
+        ]),
+        UI.p([
+          `To do this you need to make your public key available through that domain.
+        If you host files in that domain, you can upload your public key as a file.
+        If you use a platform like Itch.io, which gives you a user profile, you can
+        publish your public key in your profile's text.`,
+        ]),
+        UI.tabs(this.os, {
+          selected: method.value,
+          out: method,
+          choices: [
+            { icon: UI.fa_icon("file"), title: "Upload a file", value: "file" as const },
+            { icon: UI.fa_icon("comment-dots"), title: "Publish as text", value: "text" as const },
+          ],
+        }),
+        UI.klass("kate-ui-section-instruction", [
+          UI.dynamic(
+            method.map<UI.Widgetable>((x) => {
+              switch (x) {
+                case null: {
+                  return "Select a way of publishing your public key above for more detailed instructions.";
+                }
+
+                case "file": {
+                  return UI.stack([
+                    UI.p([
+                      `You'll need to make your public key file available at: `,
+                      UI.inline(
+                        UI.mono_text([
+                          UI.dynamic(
+                            this.data.domain.map<UI.Widgetable>(
+                              (x) => `https://${x}/kate-public-key.txt`
+                            )
+                          ),
+                        ])
+                      ),
+                    ]),
+                    UI.text_button(this.os, "Download public key file", {
+                      on_click: async () => {
+                        const pem_key = this.os.key_manager.export_public_key(
+                          keys.value!.public_key.key
+                        );
+                        const blob = new Blob([new TextEncoder().encode(pem_key)]);
+                        download_blob(blob, `kate-public-key.txt`);
+                      },
+                    }),
+                  ]);
+                }
+
+                case "text": {
+                  return UI.stack([
+                    UI.p([
+                      `You'll need to include the private key in your page's text.
+                    For example, if you're using a Itch.io domain, this would go
+                    somewhere in your profile page's text.`,
+                    ]),
+                    UI.p([
+                      `It must be accessible by a computer program accessing `,
+                      UI.inline(
+                        UI.mono_text([
+                          UI.dynamic(this.data.domain.map<UI.Widgetable>((x) => `https://${x}/`)),
+                        ])
+                      ),
+                      ` but it doesn't need to be visible to humans---that is, including
+                    it in an HTML comment or a hidden section is fine.`,
+                    ]),
+                    UI.klass("kate-ui-mono-block", [
+                      this.os.key_manager.export_public_key(keys.value!.public_key.key),
+                      UI.fa_icon_button("copy", "").on_clicked(async () => {
+                        const pem_key = this.os.key_manager.export_public_key(
+                          keys.value!.public_key.key
+                        );
+                        try {
+                          await navigator.clipboard?.writeText(pem_key);
+                          await this.os.dialog.message(this.application_id, {
+                            title: "Key copied",
+                            message: "Your public key has been copied to the clipboard.",
+                          });
+                        } catch (e) {
+                          console.error(`Failed to copy key to the clipboard`, e);
+                          await this.os.dialog.message(this.application_id, {
+                            title: "Failed to copy key to clipboard",
+                            message:
+                              "An error occurred when trying to copy the key to the clipboard.",
+                          });
+                        }
+                      }),
+                    ]),
+                  ]);
+                }
+
+                default:
+                  throw unreachable(x);
+              }
+            })
+          ),
+        ]),
+      ],
+    });
+  }
+
+  confirm() {
+    return UI.section({
+      title: "Confirm your details",
+      contents: [
+        UI.p([
+          `Almost there! Once you confirm the details below we'll save your
+        developer profile and you'll be ready to start publishing Kate cartridges!`,
+        ]),
+        UI.vspace(16),
+        UI.info_line("Publisher name", [UI.dynamic(this.data.name as Observable<UI.Widgetable>)]),
+        UI.info_line("Publisher domain", [
+          UI.dynamic(this.data.domain as Observable<UI.Widgetable>),
+        ]),
+        UI.text_button(this.os, "Save my developer profile", {
+          on_click: async () => {
+            const keys = this.data.key_ids.value!;
+            const profile = {
+              name: this.data.name.value,
+              domain: this.data.domain.value,
+              icon: null,
+              created_at: new Date(),
+              key_id: keys.private_key.id,
+              fingerprint: keys.public_key.fingerprint,
+            };
+            await this.os.key_manager
+              .save_keys([keys.private_key, keys.public_key])
+              .catch((x) => UI.show_error(this.os, "Failed to save keys", x));
+            await this.os.developer_profile
+              .add(profile)
+              .catch((x) => UI.show_error(this.os, "Failed to add profile", x));
+            await this.os.dialog.message(this.application_id, {
+              title: "Developer profile created",
+              message: `Your new developer profile is saved and ready to use!`,
+            });
+            this.close();
+          },
+        }),
+      ],
+    });
+  }
+}
+
+export class SceneDeveloperProfiles extends UI.SimpleScene {
+  readonly application_id = "kate:settings:developer:profiles";
+  icon = "user";
+  title = ["Developer profiles"];
+
+  actions: UI.Action[] = [
+    {
+      key: ["x"],
+      label: "Return",
+      handler: () => {
+        this.on_return();
+      },
+    },
+    {
+      key: ["menu"],
+      label: "Actions",
+      handler: () => {
+        this.handle_actions();
+      },
+    },
+  ];
+
+  async body() {
+    const profiles = await this.os.developer_profile.list();
+    return profiles.map((x) =>
+      UI.link_card(this.os, {
+        icon: "user",
+        title: x.name,
+        description: `${x.domain} | Created ${relative_date(x.created_at)}`,
+        on_click: () => {
+          this.os.push_scene(new SceneDeveloperViewProfile(this.os, x), () => {
+            this.refresh();
+          });
+        },
+      })
+    );
+  }
+
+  async handle_actions() {
+    const action = await this.os.dialog.pop_menu(
+      this.application_id,
+      `Actions on developer profiles`,
+      [
+        { label: "Import profile backup", value: "import-backup" as const },
+        { label: "Create new profile", value: "new" as const },
+      ],
+      null
+    );
+
+    switch (action) {
+      case null: {
+        return;
+      }
+
+      case "new": {
+        this.os.push_scene(new SceneNewDeveloper(this.os), () => {
+          this.refresh();
+        });
+        return;
+      }
+
+      case "import-backup": {
+        await import_from_file(this.os).catch((x) =>
+          UI.show_error(this.os, "Failed to import backup", x)
+        );
+        this.refresh();
+        return;
+      }
+
+      default:
+        throw unreachable(action);
+    }
+  }
+}
+
+export class SceneDeveloperViewProfile extends UI.SimpleScene {
+  readonly application_id = "kate:settings:developer:view-profile";
+  icon = "user";
+  get title() {
+    return [`Profile for ${this.profile.name}`];
+  }
+
+  actions: UI.Action[] = [
+    {
+      key: ["x"],
+      label: "Return",
+      handler: () => {
+        this.on_return();
+      },
+    },
+    {
+      key: ["menu"],
+      label: "Actions",
+      handler: () => {
+        this.handle_actions();
+      },
+    },
+  ];
+
+  constructor(os: KateOS, readonly profile: DeveloperProfile) {
+    super(os);
+  }
+
+  async body() {
+    const { private_key, public_key } = await this.os.developer_profile.get_keys(
+      this.profile.domain
+    );
+
+    return [
+      UI.info_line("Publisher name", [this.profile.name]),
+      UI.info_line("Publisher domain", [this.profile.domain]),
+      UI.info_line("Created at", [this.profile.created_at.toISOString()]),
+
+      UI.section({
+        title: "Signing keys",
+        contents: [
+          UI.info_line("Private key", [private_key.fingerprint]),
+          UI.info_line("Public key", [public_key.fingerprint]),
+        ],
+      }),
+    ];
+  }
+
+  async handle_actions() {
+    const action = await this.os.dialog.pop_menu(
+      this.application_id,
+      `Actions on ${this.profile.name}`,
+      [
+        { label: "Export public key", value: "export-public-key" as const },
+        { label: "Export profile backup", value: "backup" as const },
+        { label: "Delete profile", value: "delete" as const },
+      ],
+      null
+    );
+    switch (action) {
+      case null:
+        return;
+
+      case "export-public-key": {
+        const { public_key } = await this.os.developer_profile.get_keys(this.profile.domain);
+        const pem = this.os.key_manager.export_public_key(public_key.key);
+        download_blob(new Blob([pem]), `${this.profile.domain}-public-key.pem`);
+        return;
+      }
+
+      case "backup": {
+        const bkp = await this.os.developer_profile.export_backup(this.profile.domain);
+        const source = JSON.stringify(bkp, null, 2);
+        const blob = new Blob([new TextEncoder().encode(source)]);
+        download_blob(blob, `${this.profile.domain}-backup.json`);
+        return;
+      }
+
+      case "delete": {
+        const ok = await this.os.dialog.confirm(this.application_id, {
+          title: `Delete profile ${this.profile.name}`,
+          message: `Are you sure you want to delete the profile ${this.profile.name} (${this.profile.domain})?
+            This operation is irreversible.
+            `,
+          dangerous: true,
+          ok: "Delete profile",
+        });
+        if (ok) {
+          await this.os.developer_profile.delete(this.profile.domain);
+          this.close();
+        }
+        return;
+      }
+
+      default:
+        throw unreachable(action);
+    }
+  }
+}
+
+function download_blob(blob: Blob, name: string) {
+  const a = document.createElement("a");
+  document.body.appendChild(a);
+  a.style.display = "none";
+  const url = URL.createObjectURL(blob);
+  a.href = url;
+  a.download = name;
+  a.click();
+  URL.revokeObjectURL(url);
+  a.remove();
+}
+
+async function import_from_file(os: KateOS) {
+  const [file] = await os.device_file.open_file("kate:settings:developer-profile", {
+    types: [{ description: "JSON profile backups", accept: { "application/json": [".json"] } }],
+  });
+  if (file == null) {
+    return;
+  }
+  const data = new Uint8Array(await file.handle.arrayBuffer());
+  const json = JSON.parse(new TextDecoder().decode(data));
+  await os.developer_profile.import_backup(json, false);
 }

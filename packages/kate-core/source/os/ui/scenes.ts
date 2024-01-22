@@ -4,6 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
+import { EUserError } from "../../error";
 import { KateButton } from "../../kernel";
 import { EventStream, Sets, serialise_error } from "../../utils";
 import { FocusInteraction } from "../apis";
@@ -18,6 +19,8 @@ import {
   stringify,
   to_node,
   fa_icon,
+  klass,
+  p,
 } from "./widget";
 
 export abstract class Scene {
@@ -217,4 +220,32 @@ export abstract class SimpleScene extends Scene {
     }
     return false;
   };
+}
+
+export async function show_error(os: KateOS, title: string, error: unknown) {
+  if (error instanceof EUserError) {
+    if (error.handled) {
+      return;
+    }
+    error.handled = true;
+  }
+
+  if (error instanceof EUserError && error.warning) {
+    console.warn(error.formatted_error_message, error);
+    throw error;
+  }
+
+  const message =
+    error instanceof EUserError ? error.formatted_error_message : `Unknown internal error`;
+
+  console.error(`Unhandled error (${title})`, error);
+  await os.dialog.message("kate:error", {
+    title,
+    message: klass("kate-ui-error-dialog", [
+      p([`An error occurred while executing the operation:`]),
+      klass("kate-ui-error-message", [message]),
+    ]),
+  });
+
+  throw error;
 }
