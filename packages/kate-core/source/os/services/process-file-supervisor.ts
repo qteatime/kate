@@ -149,7 +149,9 @@ export class KateProcessFileSupervisor {
 
   async release(process: ProcessId, id: string) {
     const refs = this.get_refs(process);
-    if (refs.has(id)) {
+    const ref = refs.get(id);
+    if (ref != null) {
+      ref.bucket.partition.release(ref.bucket);
       refs.delete(id);
     } else {
       console.warn(`[kate:process-file-supervisor] ${process} released unknown bucket ${id}.`);

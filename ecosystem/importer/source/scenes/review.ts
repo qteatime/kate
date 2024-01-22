@@ -13,6 +13,10 @@ export class SceneReview extends UIScene {
     super(ui);
   }
 
+  on_detached(): void {
+    KateAPI.file_store.release_all_temporary_buckets();
+  }
+
   render(): Widgetable {
     const ui = this.ui.dsl;
     const current_index = new Observable(0);

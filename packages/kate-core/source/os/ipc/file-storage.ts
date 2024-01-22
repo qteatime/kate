@@ -18,7 +18,7 @@ export default [
   ),
 
   auth_handler(
-    "kate.file-store.delete-bucket",
+    "kate:file-store.delete-bucket",
     TC.spec({ bucket_id: TC.str }),
     { capabilities: [{ type: "store-temporary-files" }] },
     async (os, process, ipc, { bucket_id }) => {

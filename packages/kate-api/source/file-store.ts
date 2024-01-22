@@ -10,13 +10,26 @@ export type PartitionId = "temporary";
 
 export class KateFileStore {
   #channel: KateIPC;
+
+  private _temporary: FileBucket[] = [];
+
   constructor(channel: KateIPC) {
     this.#channel = channel;
   }
 
   async make_temporary() {
     const id = (await this.#channel.call("kate:file-store.make-temporary-bucket", {})) as string;
-    return new FileBucket(this.#channel, "temporary", id);
+    const bucket = new FileBucket(this.#channel, "temporary", id);
+    this._temporary.push(bucket);
+    return bucket;
+  }
+
+  async release_all_temporary_buckets() {
+    const buckets = this._temporary.slice();
+    this._temporary = [];
+    for (const bucket of buckets) {
+      await bucket.delete();
+    }
   }
 }
 
