@@ -343,6 +343,10 @@ export class CartManager {
         await new Db.PlayHabitsStore(txn).remove(cart_id);
       }
     );
+    if (meta.bucket_key != null) {
+      const partition = await this.os.file_store.get_partition(meta.bucket_key.partition);
+      partition.release_persistent(meta.bucket_key);
+    }
     this.os.events.on_cart_removed.emit({
       id: cart_id,
       title: meta.metadata.presentation.title,
