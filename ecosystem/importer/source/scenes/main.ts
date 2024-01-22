@@ -136,9 +136,7 @@ async function zip_to_files(zip: _JSZip) {
     const file_handle = await bucket.create_file(path, data);
     files.push({
       relative_path: Pathname.from_string(path),
-      read: async () => {
-        return file_handle.read_slice(0);
-      },
+      read: file_handle.read_slice.bind(file_handle, 0),
       __fake: true,
     } as any as KateTypes.DeviceFileHandle);
   }

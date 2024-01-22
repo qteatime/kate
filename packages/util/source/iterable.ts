@@ -30,6 +30,14 @@ export function* map<A, B>(a: Iterable<A>, f: (_: A) => B): Iterable<B> {
   }
 }
 
+export async function map_async<A, B>(a: Iterable<A>, fn: (_: A) => Promise<B>): Promise<B[]> {
+  const result: B[] = [];
+  for (const x of a) {
+    result.push(await fn(x));
+  }
+  return result;
+}
+
 export function* zip<A, B>(a0: Iterable<A>, b0: Iterable<B>) {
   const a = iterator(a0);
   const b = iterator(b0);

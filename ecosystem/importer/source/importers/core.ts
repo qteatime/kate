@@ -13,7 +13,7 @@ export interface Parser {
 
 export type CartConfig = {
   metadata: Cart.Metadata;
-  files: Uint8Array[];
+  files: (() => Promise<Uint8Array>)[];
 };
 
 export interface Importer {

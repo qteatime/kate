@@ -10,4 +10,5 @@ export * from "../../../../packages/util/build/pathname";
 export * from "../../../../packages/util/build/assert";
 export * from "../../../../packages/util/build/observable";
 export * from "../../../../packages/util/build/unit";
+export * from "../../../../packages/util/build/iterable";
 export * as binary from "../../../../packages/util/build/binary";

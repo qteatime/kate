@@ -5,7 +5,7 @@
  */
 import { JSZip } from "../deps/jszip";
 import { kart_v6 as Cart } from "../deps/schema";
-import { GlobPattern, GlobPatternList, Pathname, make_id } from "../deps/utils";
+import { GlobPattern, GlobPatternList, Pathname, gb, make_id, map_async } from "../deps/utils";
 import { rpa } from "../formats";
 import type { CartConfig, Importer } from "./core";
 import {
@@ -77,18 +77,17 @@ export class RenpyImporter implements Importer {
 
     const { zip, remote } = await make_game_zip(runtime_dir, this.files);
 
-    const files0 = await Promise.all([
-      ...runtime_files.map(async (x) => {
-        return make_file(
-          Pathname.from_string(x),
-          (await KateAPI.cart_fs.read_file(runtime_dir.to(x).as_string())).bytes
-        );
-      }),
-      zip,
-      ...remote.map(async (x) => {
-        return make_file(x.relative_path, await x.read());
-      }),
-    ]);
+    const files0 = [
+      ...(await map_async(runtime_files, async (x) => {
+        return make_file(Pathname.from_string(x), async () => {
+          return (await KateAPI.cart_fs.read_file(runtime_dir.to(x).as_string())).bytes;
+        });
+      })),
+      await zip,
+      ...(await map_async(remote, async (x) => {
+        return make_file(x.relative_path, () => x.read());
+      })),
+    ];
     const files = await maybe_add_thumbnail(files0, this.thumbnail);
 
     const cartridge: CartConfig = {
@@ -218,17 +217,19 @@ async function make_game_zip(runtime_dir: Pathname, files0: KateTypes.DeviceFile
   const game_files = await get_remote_files(files0);
   zip.file("game/renpyweb_remote_files.txt", encoder.encode(game_files.remote_rules));
   for (const file of game_files.placeholders) {
-    zip.file(Pathname.from_string(file.meta.path).make_relative().as_string(), file.data);
+    zip.file(Pathname.from_string(file.meta.path).make_relative().as_string(), await file.data());
   }
   for (const file of game_files.zipped) {
     zip.file(file.relative_path.make_relative().as_string(), await file.read());
   }
+  const bucket = await KateAPI.file_store.make_temporary(gb(8));
+  const zip_file = await bucket.create_file(
+    "game.zip",
+    await zip.generateAsync({ type: "uint8array" })
+  );
   return {
     remote: game_files.remotes,
-    zip: make_file(
-      Pathname.from_string("/game.zip"),
-      await zip.generateAsync({ type: "uint8array" })
-    ),
+    zip: make_file(Pathname.from_string("/game.zip"), zip_file.read_slice.bind(zip_file, 0)),
   };
 }
 
@@ -349,7 +350,7 @@ async function get_remote_files(files: KateTypes.DeviceFileHandle[]) {
       .map((x) =>
         make_file(
           Pathname.from_string("_placeholders").join(x.file.relative_path.drop_prefix(["game"])),
-          placeholder_img
+          async () => placeholder_img
         )
       )
   );

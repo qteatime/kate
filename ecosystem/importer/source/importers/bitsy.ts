@@ -42,7 +42,7 @@ export class BitsyImporter implements Importer {
 
     const files0 = await Promise.all(
       this.files.map(async (x) => {
-        return make_file(x.relative_path, await x.read());
+        return make_file(x.relative_path, () => x.read());
       })
     );
     const files = await maybe_add_thumbnail(files0, this.thumbnail);

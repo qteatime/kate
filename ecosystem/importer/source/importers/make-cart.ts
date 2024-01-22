@@ -103,13 +103,13 @@ export function mime_type(path: Pathname) {
 }
 
 export async function maybe_add_thumbnail(
-  files: { meta: Cart.Meta_file; data: Uint8Array }[],
+  files: { meta: Cart.Meta_file; data: () => Promise<Uint8Array> }[],
   thumbnail: Uint8Array | null
-): Promise<{ meta: Cart.Meta_file; data: Uint8Array }[]> {
+): Promise<{ meta: Cart.Meta_file; data: () => Promise<Uint8Array> }[]> {
   if (thumbnail == null) {
     return files;
   } else {
-    const file = await make_file(Pathname.from_string("kate-thumbnail.png"), thumbnail);
+    const file = await make_file(Pathname.from_string("kate-thumbnail.png"), async () => thumbnail);
     return [...files, file];
   }
 }
@@ -160,8 +160,9 @@ export function slug(title: string, max_length: number = 32) {
     .slice(0, max_length);
 }
 
-export async function make_file(path: Pathname, data: Uint8Array) {
-  const integrity = await crypto.subtle.digest("SHA-512", data.buffer);
+export async function make_file(path: Pathname, data: () => Promise<Uint8Array>) {
+  const buffer = (await data()).buffer;
+  const integrity = await crypto.subtle.digest("SHA-512", buffer);
   return {
     meta: Cart.Meta_file({
       path: path.make_absolute().as_string(),
@@ -191,10 +192,11 @@ export async function encode_whole(cart: CartConfig) {
   offset += 4n;
 
   for (const file of cart.files) {
-    await writer.write(uint32(file.byteLength));
+    const data = await file();
+    await writer.write(uint32(data.byteLength));
     offset += 4n;
-    await writer.write(file);
-    offset += BigInt(file.byteLength);
+    await writer.write(data);
+    offset += BigInt(data.byteLength);
   }
 
   const meta_offset = offset;
