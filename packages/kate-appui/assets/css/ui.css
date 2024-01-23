@@ -31,7 +31,8 @@
   font-weight: 500;
 }
 
-.kate-ui-focus-target[disabled] {
+.kate-ui-focus-target[disabled],
+.kate-ui-focus-target.disabled {
   opacity: 0.5;
 }
 

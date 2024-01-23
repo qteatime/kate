@@ -530,7 +530,36 @@ w.task(
   }
 );
 
-w.task("ecosystem:all", ["ecosystem:importer"], () => {});
+w.task("ecosystem:publisher:pack", [], () => {
+  tsc("ecosystem/publisher");
+  remove("ecosystem/publisher/www", { recursive: true, force: true });
+  copy_tree("ecosystem/publisher/assets", "ecosystem/publisher/www");
+  glomp({
+    entry: "ecosystem/publisher/build/index.js",
+    out: "ecosystem/publisher/www/js/publisher.js",
+    name: "KatePublisher",
+  });
+  copy("packages/kate-appui/www/kate-appui.css", "ecosystem/publisher/www/css/kate-appui.css");
+  kart({
+    config: "ecosystem/publisher/kate.json",
+    output: kart_name("ecosystem/publisher", "kate-publisher"),
+  });
+});
+
+w.task(
+  "ecosystem:publisher",
+  [
+    "licences:generate",
+    "util:build",
+    "tools:build",
+    "appui:build",
+    "glomp:build",
+    "ecosystem:publisher:pack",
+  ],
+  () => {}
+);
+
+w.task("ecosystem:all", ["ecosystem:importer", "ecosystem:publisher"], () => {});
 
 // -- Desktop app
 w.task("desktop:compile", [], () => {

@@ -1,0 +1,74 @@
+{
+  "id": "qteati.me/kate-publisher",
+  "version": {
+    "major": 0,
+    "minor": 1
+  },
+  "release": {
+    "year": 2024,
+    "month": 1,
+    "day": 22
+  },
+  "metadata": {
+    "presentation": {
+      "author": "Niini",
+      "title": "Kate Publisher",
+      "tagline": "Publish your own Kate cartridges!",
+      "release_type": "prototype"
+    },
+    "classification": {
+      "genre": ["tool"],
+      "tags": [],
+      "rating": "general"
+    },
+    "legal": {
+      "licence_path": "LICENCE.txt",
+      "derivative_policy": "commercial-use"
+    },
+    "accessibility": {
+      "input_methods": ["buttons"],
+      "languages": [
+        {
+          "iso_code": "en",
+          "interface": true,
+          "audio": false,
+          "text": true
+        }
+      ]
+    }
+  },
+  "security": {
+    "capabilities": [
+      {
+        "type": "request-device-files",
+        "reason": "Import games from your device's storage"
+      },
+      {
+        "type": "show-dialogs",
+        "reason": "For text input and error feedback"
+      },
+      {
+        "type": "store-temporary-files",
+        "reason": "Unpacking zip files and generating cartridges",
+        "max_size_mb": 8192,
+        "optional": false
+      }
+    ]
+  },
+  "files": [
+    "www/**/*.html",
+    "www/**/*.css",
+    "www/**/*.js",
+    "www/**/*.txt",
+    "www/**/*.md",
+    "www/**/*.ttf",
+    "www/**/*.png",
+    "thumbnail.png",
+    "LICENCE.txt"
+  ],
+  "platform": {
+    "type": "web-archive",
+    "html": "www/index.html",
+    "bridges": []
+  }
+}

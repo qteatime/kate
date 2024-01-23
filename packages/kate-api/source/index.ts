@@ -13,7 +13,7 @@ import { DeviceFileHandle, KateDeviceFileAccess } from "./device-file";
 import { KateDialogs } from "./dialog";
 import { FileBucket, KateFile, KateFileStore } from "./file-store";
 import { InputKey, KateInput } from "./input";
-import { KateObjectStore } from "./object-store";
+import { KateObjectStore, ObjectMetadata, Object, Usage } from "./object-store";
 import { KatePointerInput, PointerClick, PointerLocation } from "./pointer-input";
 import { KateTimer } from "./timer";
 
@@ -106,6 +106,10 @@ declare global {
       FileBucket,
       KateFile,
     };
+
+    export namespace object_store {
+      export { ObjectMetadata, Object, Usage };
+    }
   }
 }
 

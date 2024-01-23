@@ -6,7 +6,7 @@
 
 import type { KateIPC } from "./channel";
 
-type ObjectMetadata = {
+export type ObjectMetadata = {
   key: string;
   created_at: Date;
   updated_at: Date;
@@ -15,9 +15,9 @@ type ObjectMetadata = {
   metadata: { [key: string]: unknown };
 };
 
-type Object = ObjectMetadata & { data: unknown };
+export type Object<T = unknown> = ObjectMetadata & { data: T };
 
-type Usage = {
+export type Usage = {
   limits: {
     size_in_bytes: number;
     buckets: number;
@@ -61,9 +61,7 @@ class OSCartridge {
       versioned: this.versioned,
       count: count,
     })) as { name: string; created_at: Date }[];
-    return buckets.map(
-      (x) => new OSBucket(this.#channel, this.versioned, x.name)
-    );
+    return buckets.map((x) => new OSBucket(this.#channel, this.versioned, x.name));
   }
 
   async add_bucket(name: string) {
@@ -92,9 +90,7 @@ class OSCartridge {
 
   async get_local_storage(): Promise<{ [key: string]: string }> {
     const bucket = await this.get_special_bucket();
-    return (
-      (bucket.try_read("kate:local-storage") as any) ?? Object.create(null)
-    );
+    return (bucket.try_read("kate:local-storage") as any) ?? Object.create(null);
   }
 
   async update_local_storage(data: { [key: string]: string }) {
@@ -122,11 +118,7 @@ class OSCartridge {
 
 class OSBucket {
   #channel: KateIPC;
-  constructor(
-    channel: KateIPC,
-    readonly versioned: boolean,
-    readonly name: string
-  ) {
+  constructor(channel: KateIPC, readonly versioned: boolean, readonly name: string) {
     this.#channel = channel;
   }
 
@@ -145,7 +137,7 @@ class OSBucket {
     });
   }
 
-  async read(key: string): Promise<Object> {
+  async read<T>(key: string): Promise<Object<T>> {
     return this.#channel.call("kate:store.read", {
       versioned: this.versioned,
       bucket_name: this.name,
@@ -153,11 +145,11 @@ class OSBucket {
     });
   }
 
-  async read_data(key: string) {
-    return (await this.read(key)).data;
+  async read_data<T>(key: string) {
+    return (await this.read<T>(key)).data;
   }
 
-  async try_read(key: string): Promise<Object | null> {
+  async try_read<T>(key: string): Promise<Object<T> | null> {
     return this.#channel.call("kate:store.try-read", {
       versioned: this.versioned,
       bucket_name: this.name,
@@ -165,13 +157,13 @@ class OSBucket {
     });
   }
 
-  async try_read_data(key: string): Promise<unknown | null> {
-    return (await this.try_read(key))?.data ?? null;
+  async try_read_data<T>(key: string): Promise<T | null> {
+    return (await this.try_read<T>(key))?.data ?? null;
   }
 
-  async write(
+  async write<T>(
     key: string,
-    entry: { type: string; metadata: { [key: string]: unknown }; data: unknown }
+    entry: { type: string; metadata: { [key: string]: unknown }; data: T }
   ) {
     return this.#channel.call("kate:store.write", {
       versioned: this.versioned,
@@ -183,17 +175,13 @@ class OSBucket {
     });
   }
 
-  async write_structured(
-    key: string,
-    data: unknown,
-    metadata: { [key: string]: unknown } = {}
-  ) {
+  async write_structured<T>(key: string, data: T, metadata: { [key: string]: unknown } = {}) {
     await this.write(key, { type: "kate::structured", metadata, data });
   }
 
-  async create(
+  async create<T>(
     key: string,
-    entry: { type: string; metadata: { [key: string]: unknown }; data: unknown }
+    entry: { type: string; metadata: { [key: string]: unknown }; data: T }
   ): Promise<Object> {
     return this.#channel.call("kate:store.create", {
       versioned: this.versioned,
@@ -205,11 +193,7 @@ class OSBucket {
     });
   }
 
-  async create_structured(
-    key: string,
-    data: unknown,
-    metadata: { [key: string]: unknown } = {}
-  ) {
+  async create_structured<T>(key: string, data: T, metadata: { [key: string]: unknown } = {}) {
     return await this.create(key, { type: "kate::structured", metadata, data });
   }
 

@@ -35,6 +35,13 @@ export type SelectionOption<A> = {
   is_visible?: () => boolean;
 };
 
+export type ActionSelection<A> = {
+  title: Widgetable;
+  description?: Widgetable;
+  value: A;
+  is_visible?: Observable<boolean>;
+};
+
 export type HorizontalSelection<A> = {
   title: Widgetable;
   description?: Widgetable;
@@ -266,7 +273,10 @@ export class Widget {
     );
   }
 
-  interactive(interactions: InteractionHandler[], x?: { custom_focus?: boolean }) {
+  interactive(
+    interactions: InteractionHandler[],
+    x?: { custom_focus?: boolean; enabled?: Observable<boolean> }
+  ) {
     this.ui.focus.register_interactions(this.canvas, interactions);
     this.canvas.classList.add("kate-ui-focus-target");
     if (x?.custom_focus === true) {
@@ -285,6 +295,20 @@ export class Widget {
         ev.preventDefault();
         menu_handler.handler(menu_handler.key[0], false);
       });
+    }
+    if (x?.enabled != null) {
+      const enabled = x.enabled;
+      const update = (v: boolean) => {
+        if (v) {
+          this.canvas.classList.remove("disabled");
+          this.ui.focus.register_interactions(this.canvas, interactions);
+        } else {
+          this.canvas.classList.add("disabled");
+          this.ui.focus.register_interactions(this.canvas, []);
+        }
+      };
+      enabled.stream.listen((v) => update(v));
+      update(enabled.value);
     }
     return this;
   }
@@ -427,18 +451,21 @@ export class WidgetDSL {
     ]);
   }
 
-  text_button(label: string, on_click?: () => void) {
-    return this.h("button", { class: "kate-ui-text-button" }, [label]).interactive([
-      {
-        key: ["o"],
-        label: "Ok",
-        allow_repeat: false,
-        on_click: true,
-        handler: async () => {
-          on_click?.();
+  text_button(label: string, on_click?: () => void, enabled?: Observable<boolean>) {
+    return this.h("button", { class: "kate-ui-text-button" }, [label]).interactive(
+      [
+        {
+          key: ["o"],
+          label: "Ok",
+          allow_repeat: false,
+          on_click: true,
+          handler: async () => {
+            on_click?.();
+          },
         },
-      },
-    ]);
+      ],
+      { enabled }
+    );
   }
 
   page_bullet(current: Observable<number>, x: { total: number; max_size?: number }) {
@@ -586,6 +613,32 @@ export class WidgetDSL {
     ]);
   }
 
+  action_selection<A>(x: {
+    value: A;
+    options: ActionSelection<A>[];
+    on_change?: (value: A) => void;
+  }) {
+    const selected = new Observable(x.value);
+    return this.dynamic(
+      selected.map((value) => {
+        return this.action_list(
+          x.options.map((opt) => {
+            return {
+              title: opt.title,
+              description: opt.description,
+              icon: opt.value === value ? this.fa_icon("circle-check") : undefined,
+              is_visible: opt.is_visible?.value,
+              on_select: () => {
+                selected.value = opt.value;
+                x.on_change?.(opt.value);
+              },
+            };
+          })
+        ).add_classes(["kate-ui-action-selection"]);
+      })
+    );
+  }
+
   horizontal_selection<A>(x: HorizontalSelection<A>) {
     const current = new Observable(x.value);
 
@@ -713,17 +766,43 @@ export class WidgetDSL {
     });
   }
 
+  slot(name: string) {
+    return this.h("kate-slot", { name }, []);
+  }
+
+  private get_slot(parent: Widgetable, name: string): Element | null {
+    const query = `kate-slot[name=${JSON.stringify(name)}]`;
+    if (parent instanceof HTMLElement) {
+      return parent.querySelector(query) ?? null;
+    } else if (parent instanceof Widget) {
+      return this.get_slot(parent.canvas, name);
+    } else {
+      return null;
+    }
+  }
+
+  private fill_slot(parent: Widgetable, name: string, value: Widgetable) {
+    const slot = this.get_slot(parent, name);
+    if (slot != null) {
+      append(slot, value);
+    }
+    return parent;
+  }
+
   multistep(
     steps: {
       content: Widgetable;
       next_label?: string;
       previous_label?: string;
+      is_valid?: Observable<boolean>;
       on_next?: () => Promise<void>;
       on_previous?: () => Promise<void>;
-    }[]
+    }[],
+    options?: {
+      slot_for_actions?: string;
+    }
   ) {
     const current = new Observable<number>(0);
-    const content = current.map<Widgetable>((x) => steps[x].content);
     const actions = current.map<Widgetable>((x) => {
       const step = steps[x];
 
@@ -742,18 +821,32 @@ export class WidgetDSL {
           }),
         ]),
         this.class("kate-ui-step-next", [
-          this.text_button(step.next_label ?? "Continue", async () => {
-            if (step.on_next) await step.on_next();
-            current.value = Math.min(steps.length - 1, x + 1);
-          }),
+          this.when(x < steps.length - 1, [
+            this.text_button(
+              step.next_label ?? "Continue",
+              async () => {
+                if (step.on_next) await step.on_next();
+                current.value = Math.min(steps.length - 1, x + 1);
+              },
+              step.is_valid
+            ),
+          ]),
         ]),
       ]);
+    });
+    const action_widget = this.dynamic(actions);
+    const content = current.map<Widgetable>((x) => {
+      if (options?.slot_for_actions != null) {
+        return this.fill_slot(steps[x].content, options.slot_for_actions, action_widget);
+      } else {
+        return steps[x].content;
+      }
     });
 
     return this.class("kate-ui-steps", [
       this.class("kate-ui-steps-content", [this.dynamic(content)]),
-      this.dynamic(actions),
-    ]);
+      options?.slot_for_actions == null ? action_widget : null,
+    ]).add_classes(options?.slot_for_actions == null ? [] : ["with-action-slot"]);
   }
 
   meta_text(children: Widgetable[]) {

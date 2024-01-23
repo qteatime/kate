@@ -204,6 +204,7 @@ export abstract class UIScene {
       replace(this.canvas, body);
       this.ui.focus.ensure_focus();
     } catch (e) {
+      console.error(`Failed to render screen`, e);
       replace(this.canvas, this.ui.dsl.class("kate-ui-error", ["Failed to render the screen"]));
     }
   }

@@ -1,0 +1,16 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
+#canvas {
+  transform-origin: 0 0;
+  transform: scale(var(--kate-screen-scale));
+  position: fixed;
+  overflow: hidden;
+  top: 0px;
+  left: 0px;
+  width: 800px;
+  height: 480px;
+}
