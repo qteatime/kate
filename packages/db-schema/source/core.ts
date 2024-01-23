@@ -11,6 +11,7 @@ import type {
   IndexSchema1,
   IndexSchema2,
   TableSchema3,
+  IndexSchema3,
 } from "./schema";
 
 function lift_request<A>(req: IDBRequest<A>): Promise<A> {
@@ -142,6 +143,15 @@ export class Transaction {
     return new Index<I["__schema2"], [I["__kt1"], I["__kt2"]], [I["__k1"], I["__k2"]]>(
       store.index(index.name)
     );
+  }
+
+  get_index3<I extends IndexSchema3<any, any, any, any>>(index: I) {
+    const store = this.trans.objectStore(index.table.name);
+    return new Index<
+      I["__schema3"],
+      [I["__kt1"], I["__kt2"], I["__kt3"]],
+      [I["__k1"], I["__k2"], I["__k3"]]
+    >(store.index(index.name));
   }
 }
 

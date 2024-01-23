@@ -8,6 +8,7 @@ import * as UI from "../../ui";
 import { SceneAudit, SceneAuditLog } from "./audit";
 import { SceneDeveloperSettings } from "./developer";
 import { SceneInputSettings } from "./input";
+import { SceneKeyStoreSettings } from "./key-store";
 import { ScenePermissions } from "./permissions";
 import { ScenePlayHabitsSettings } from "./play-habits";
 import { SceneRecovery } from "./recovery";
@@ -87,6 +88,15 @@ export class SceneSettings extends UI.SimpleScene {
         description: "See what your console and cartridges have been doing behind the scenes",
         on_click: () => {
           this.os.push_scene(new SceneAudit(this.os));
+        },
+      }),
+
+      UI.link_card(this.os, {
+        icon: "vault",
+        title: "Secure key store",
+        description: "See and manage your digital signing and verification keys",
+        on_click: () => {
+          this.os.push_scene(new SceneKeyStoreSettings(this.os));
         },
       }),
 

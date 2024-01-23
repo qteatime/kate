@@ -13,11 +13,11 @@ export class Observable<A> {
 
   constructor(private _value: A, private _on_disponse: () => void = () => {}) {}
 
-  static from<T>(value: T) {
+  static from<T>(value: T, _on_dispose?: () => void) {
     if (value instanceof Observable) {
       return value;
     } else {
-      return new Observable(value);
+      return new Observable(value, _on_dispose);
     }
   }
 
@@ -92,10 +92,7 @@ export class Observable<A> {
     return result;
   }
 
-  zip_with<B, C>(
-    that: Observable<B>,
-    combine: (left: A, right: B) => C
-  ): Observable<C> {
+  zip_with<B, C>(that: Observable<B>, combine: (left: A, right: B) => C): Observable<C> {
     const result = new Observable<C>(combine(this.value, that.value));
     const update = () => {
       result.value = combine(this.value, that.value);
@@ -111,11 +108,7 @@ export class Observable<A> {
     return result;
   }
 
-  zip_with2<B, C, D>(
-    b: Observable<B>,
-    c: Observable<C>,
-    combine: (a: A, b: B, c: C) => D
-  ) {
+  zip_with2<B, C, D>(b: Observable<B>, c: Observable<C>, combine: (a: A, b: B, c: C) => D) {
     return this.zip_with(b, (va, vb) => c.map((vc) => combine(va, vb, vc)));
   }
 
@@ -125,9 +118,7 @@ export class Observable<A> {
     d: Observable<D>,
     combine: (a: A, b: B, c: C, d: D) => E
   ) {
-    return this.zip_with2(b, c, (va, vb, vc) =>
-      d.map((vd) => combine(va, vb, vc, vd))
-    );
+    return this.zip_with2(b, c, (va, vb, vc) => d.map((vd) => combine(va, vb, vc, vd)));
   }
 
   static zip_with<R, T extends { [key: string]: Observable<any> }>(

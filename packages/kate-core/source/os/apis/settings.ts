@@ -47,6 +47,14 @@ export type Developer = {
   allow_version_overwrite: boolean;
 };
 
+export type KeyStore = {
+  master_key: null | {
+    salt: Uint8Array;
+    key_check: Uint8Array;
+    key_derive_iterations: number;
+  };
+};
+
 export type SettingsData = {
   play_habits: PlayHabits;
   input: Input;
@@ -54,6 +62,7 @@ export type SettingsData = {
   security: Security;
   audit: Audit;
   developer: Developer;
+  key_store: KeyStore;
 };
 
 export type AnySetting = SettingsData[keyof SettingsData];
@@ -210,6 +219,9 @@ const defaults: SettingsData = {
   },
   developer: {
     allow_version_overwrite: false,
+  },
+  key_store: {
+    master_key: null,
   },
 };
 

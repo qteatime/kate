@@ -36,3 +36,19 @@ export function bytes_to_hex(x: Uint8Array) {
     .map((x) => x.toString(16).padStart(2, "0"))
     .join(" ");
 }
+
+export function bytes_to_base64(x: Uint8Array) {
+  return btoa(
+    Array.from(x)
+      .map((x) => String.fromCharCode(x))
+      .join("")
+  );
+}
+
+export function base64_to_bytes(x: string) {
+  return new Uint8Array(
+    atob(x)
+      .split("")
+      .map((x) => x.charCodeAt(0))
+  );
+}
