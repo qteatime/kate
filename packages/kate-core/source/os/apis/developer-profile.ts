@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { KeyStore_v1 } from "../../data";
+import { DeveloperProfile, DeveloperProfileStore, KeyStore, KeyStore_v1 } from "../../data";
 import {
   EDeveloperBackupConflict,
   EDeveloperBackupHashMismatch,
@@ -16,7 +16,6 @@ import {
 } from "../../error";
 import { TC, byte_equals, bytes_to_base64 } from "../../utils";
 import type { KateOS } from "../os";
-import type { DeveloperProfile } from "./settings";
 
 type ProfileBackupEnvelope = {
   version: 1;
@@ -93,12 +92,11 @@ export class KateDeveloperProfile {
   }
 
   async list(): Promise<DeveloperProfile[]> {
-    return this.os.settings.get("developer").profiles;
+    return await this.rt((s) => s.list());
   }
 
   async try_get(domain: string): Promise<DeveloperProfile | null> {
-    const profiles = await this.list();
-    return profiles.find((x) => x.domain === domain) ?? null;
+    return await this.rt((s) => s.try_get_by_domain(domain));
   }
 
   async get(domain: string) {
@@ -116,11 +114,8 @@ export class KateDeveloperProfile {
       throw new EDeveloperProfileExists(profile.domain, profile);
     }
 
-    await this.os.settings.update("developer", (x) => {
-      return {
-        ...x,
-        profiles: [profile, ...x.profiles],
-      };
+    await DeveloperProfileStore.transaction(this.os.db, "readwrite", async (s) => {
+      await s.add(profile);
     });
     await this.os.audit_supervisor.log("kate:developer-profile", {
       risk: "low",
@@ -141,13 +136,17 @@ export class KateDeveloperProfile {
       return;
     }
     const keys = await this.get_keys(domain);
-    await this.os.key_manager.delete_keys([keys.private_key, keys.public_key]);
-    await this.os.settings.update("developer", (x) => {
-      return {
-        ...x,
-        profiles: x.profiles.filter((x) => x.domain !== domain),
-      };
-    });
+    await this.os.db.transaction(
+      [...DeveloperProfileStore.tables, ...KeyStore.tables],
+      "readwrite",
+      async (txn) => {
+        const key_store = new KeyStore(txn);
+        const dev_store = new DeveloperProfileStore(txn);
+        await key_store.delete_key(keys.private_key);
+        await key_store.delete_key(keys.public_key);
+        await dev_store.delete(profile);
+      }
+    );
     await this.os.audit_supervisor.log("kate:developer-profile", {
       risk: "low",
       type: "kate.developer-profile.added",
@@ -180,9 +179,6 @@ export class KateDeveloperProfile {
     const profile = await this.get(domain);
     const keys = await this.get_keys(domain);
     const bkp_key = await this.os.key_manager.export_private_key_for_backup(keys.private_key);
-    if (bkp_key == null) {
-      throw new Error("TODO");
-    }
 
     const json: ProfileBackup = {
       profile: {
@@ -266,27 +262,16 @@ export class KateDeveloperProfile {
         pair_id: public_key,
       }
     );
-    if (private_key == null) {
-      throw new Error("TODO");
-    }
-
-    await this.os.settings.update("developer", (x) => {
-      return {
-        ...x,
-        profiles: [
-          {
-            name: bkp.profile.name,
-            domain: bkp.profile.domain,
-            icon: null,
-            key_id: private_key,
-            created_at: bkp.profile.created_at,
-            fingerprint: bkp.public_key.fingerprint,
-          },
-          ...x.profiles.filter((x) => x.domain !== bkp.profile.domain),
-        ],
-      };
+    await DeveloperProfileStore.transaction(this.os.db, "readwrite", async (store) => {
+      store.add({
+        name: bkp.profile.name,
+        domain: bkp.profile.domain,
+        icon: null,
+        key_id: private_key,
+        created_at: bkp.profile.created_at,
+        fingerprint: bkp.public_key.fingerprint,
+      });
     });
-
     await this.os.audit_supervisor.log("kate:developer-profile", {
       risk: "medium",
       resources: ["kate:profile"],
@@ -298,5 +283,9 @@ export class KateDeveloperProfile {
         fingerprint: bkp.public_key.fingerprint,
       },
     });
+  }
+
+  async rt<A>(fn: (_: DeveloperProfileStore) => Promise<A>) {
+    return DeveloperProfileStore.transaction(this.os.db, "readonly", (s) => fn(s));
   }
 }

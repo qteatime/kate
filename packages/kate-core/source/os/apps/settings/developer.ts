@@ -4,9 +4,9 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { KeyStore_v1 } from "../../../data";
+import { DeveloperProfile, KeyStore_v1 } from "../../../data";
 import { Observable, relative_date, unreachable } from "../../../utils";
-import { DeveloperProfile, DeviceFileHandle, SettingsData } from "../../apis";
+import { SettingsData } from "../../apis";
 import type { KateOS } from "../../os";
 import * as UI from "../../ui";
 import { SceneCreateMasterPassword } from "./key-store";

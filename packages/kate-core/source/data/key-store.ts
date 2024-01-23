@@ -91,6 +91,10 @@ export class KeyStore {
 
   static tables = [key_store_v1];
 
+  get store() {
+    return this.transaction.get_table1(key_store_v1);
+  }
+
   async public_keys_for_domain(domain: string) {
     const by_domain = this.transaction.get_index2(idx_key_by_domain);
     return by_domain.get_all([domain, "public"]);

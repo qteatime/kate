@@ -14,5 +14,6 @@ export * from "./object-storage";
 export * from "./capability";
 export * from "./audit";
 export * from "./key-store";
+export * from "./developer-profile";
 
 import "./migrations";

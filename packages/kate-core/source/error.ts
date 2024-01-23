@@ -4,8 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import type { KateVersion } from "./cart";
-import type { DeveloperProfile, KateOS } from "./os";
+import type { DeveloperProfile } from "./data";
 import { SemVer } from "./utils";
 
 export abstract class EUserError extends Error {
