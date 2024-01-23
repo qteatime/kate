@@ -4,4 +4,12 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-export class App {}
+.kate-ui-mono-block {
+  overflow: auto;
+  padding: 0.5rem;
+  background: var(--color-cream-c);
+  border: 5px;
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  white-space: pre;
+}

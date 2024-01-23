@@ -14,7 +14,8 @@
       "author": "Niini",
       "title": "Kate Publisher",
       "tagline": "Publish your own Kate cartridges!",
-      "release_type": "prototype"
+      "release_type": "early-access",
+      "thumbnail_path": "/kate-publisher-thumbnail.png"
     },
     "classification": {
       "genre": ["tool"],
@@ -52,6 +53,18 @@
         "reason": "Unpacking zip files and generating cartridges",
         "max_size_mb": 8192,
         "optional": false
+      },
+      {
+        "type": "view-developer-profile",
+        "reason": "Associating cartridges with your developer account"
+      },
+      {
+        "type": "sign-digitally",
+        "reason": "Signing your cartridges"
+      },
+      {
+        "type": "download-files",
+        "reason": "Save the generated cartridge to your device's storage"
       }
     ]
   },
@@ -63,7 +76,7 @@
     "www/**/*.md",
     "www/**/*.ttf",
     "www/**/*.png",
-    "thumbnail.png",
+    "kate-publisher-thumbnail.png",
     "LICENCE.txt"
   ],
   "platform": {

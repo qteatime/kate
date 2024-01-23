@@ -29,7 +29,7 @@ export default [
   ),
 
   auth_handler(
-    "kate:browser.download",
+    "kate:browser.download-from-bytes",
     TC.spec({ filename: TC.short_str(255), data: TC.bytearray }),
     {
       fail_silently: true,
@@ -38,7 +38,7 @@ export default [
     async (os, process, ipc, { filename, data }) => {
       try {
         await os.fairness_supervisor.with_resource(process, "modal-dialog", async () => {
-          await os.browser.download(process.cartridge.id, filename, data);
+          await os.browser.download_from_bytes(process.cartridge.id, filename, data);
         });
       } catch (error) {
         console.error(
@@ -47,6 +47,28 @@ export default [
         );
       }
 
+      return null;
+    }
+  ),
+
+  auth_handler(
+    "kate:browser.download-from-file",
+    TC.spec({ filename: TC.str, bucket_id: TC.str, file_id: TC.str }),
+    { fail_silently: true, capabilities: [{ type: "download-files" }] },
+    async (os, process, ipc, { filename, bucket_id, file_id }) => {
+      const bucket_ref = await os.process_file_supervisor.get_ref(process.id, bucket_id);
+      const kate_file = bucket_ref.bucket.file(file_id);
+      const file = await kate_file.read();
+      try {
+        await os.fairness_supervisor.with_resource(process, "modal-dialog", async () => {
+          await os.browser.download_from_blob(process.cartridge.id, filename, file);
+        });
+      } catch (error) {
+        console.error(
+          `Failed to download ${filename} at the request of ${process.cartridge.id}:`,
+          error
+        );
+      }
       return null;
     }
   ),

@@ -4,4 +4,15 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-export class App {}
+.kate-ui-cartridge-thumbnail {
+  border: 1px solid #ececea;
+  padding: 1px;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.kate-ui-cartridge-thumbnail img {
+  display: block;
+  width: 100%;
+  height: auto;
+}

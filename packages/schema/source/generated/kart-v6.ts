@@ -2008,7 +2008,7 @@ export namespace Capability {
 
 
 
-export type Contextual_capability = Contextual_capability.Open_URLs | Contextual_capability.Request_device_files | Contextual_capability.Install_cartridges | Contextual_capability.Download_files | Contextual_capability.Show_dialogs;
+export type Contextual_capability = Contextual_capability.Open_URLs | Contextual_capability.Request_device_files | Contextual_capability.Install_cartridges | Contextual_capability.Download_files | Contextual_capability.Show_dialogs | Contextual_capability.View_developer_profile | Contextual_capability.Sign_digitally;
 
 export namespace Contextual_capability {
  export const tag = 26;
@@ -2018,7 +2018,9 @@ export namespace Contextual_capability {
     Request_device_files = 1,
     Install_cartridges = 2,
     Download_files = 3,
-    Show_dialogs = 4
+    Show_dialogs = 4,
+    View_developer_profile = 5,
+    Sign_digitally = 6
  }
 
  
@@ -2127,6 +2129,50 @@ export namespace Contextual_capability {
    readonly '@version': 0;
    readonly '@variant': $Tags.Show_dialogs;
    readonly '@variant-name': 'Show-dialogs';
+   
+ }
+
+
+  
+ export function View_developer_profile(x: {}): Contextual_capability {
+   return {
+     '@name': 'Contextual-capability',
+     '@tag': 26,
+     '@version': 0,
+     '@variant': $Tags.View_developer_profile,
+     '@variant-name': 'View-developer-profile',
+     ...x
+   }
+ }
+
+ export interface View_developer_profile {
+   readonly '@name': 'Contextual-capability';
+   readonly '@tag': 26;
+   readonly '@version': 0;
+   readonly '@variant': $Tags.View_developer_profile;
+   readonly '@variant-name': 'View-developer-profile';
+   
+ }
+
+
+  
+ export function Sign_digitally(x: {}): Contextual_capability {
+   return {
+     '@name': 'Contextual-capability',
+     '@tag': 26,
+     '@version': 0,
+     '@variant': $Tags.Sign_digitally,
+     '@variant-name': 'Sign-digitally',
+     ...x
+   }
+ }
+
+ export interface Sign_digitally {
+   readonly '@name': 'Contextual-capability';
+   readonly '@tag': 26;
+   readonly '@version': 0;
+   readonly '@variant': $Tags.Sign_digitally;
+   readonly '@variant-name': 'Sign-digitally';
    
  }
 

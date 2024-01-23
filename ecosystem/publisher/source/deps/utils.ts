@@ -13,3 +13,4 @@ export * from "../../../../packages/util/build/unit";
 export * from "../../../../packages/util/build/iterable";
 export * as binary from "../../../../packages/util/build/binary";
 export * from "../../../../packages/util/build/time";
+export * as Spec from "../../../../packages/util/build/object-spec";

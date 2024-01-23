@@ -317,6 +317,16 @@ function show_contextual_capability(x: Cart.Contextual_capability) {
       break;
     }
 
+    case t.$Tags.Sign_digitally: {
+      console.log(`  * Sign data digitally`);
+      break;
+    }
+
+    case t.$Tags.View_developer_profile: {
+      console.log(`  * Ask for developer profile information`);
+      break;
+    }
+
     default:
       throw unreachable(x);
   }

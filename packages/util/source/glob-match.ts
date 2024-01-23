@@ -9,13 +9,17 @@ import { Pathname } from "./pathname";
 function compile(pattern: string) {
   const path = Pathname.from_string(pattern);
   return new RegExp(
-    "^\\/?" + path.segments.map(compile_segment).join("\\/") + "$"
+    "^\\/?" + handle_greedy_match(path.segments.map(compile_segment).join("\\/")) + "$"
   );
+}
+
+function handle_greedy_match(pattern: string) {
+  return pattern.replace(/\.\*\?\\\//g, ".*?\\/?");
 }
 
 function compile_segment(segment: string) {
   return segment
-    .replace(/[^\*\w\d]/, (x) => `\\${x}`)
+    .replace(/[^\*\w\d]/g, (x) => `\\${x}`)
     .replace(/\*\*?/g, (m) => {
       switch (m) {
         case "**":
@@ -48,9 +52,7 @@ export class GlobPatternList {
   private constructor(private _patterns: GlobPattern[]) {}
 
   static from_patterns(patterns: string[]) {
-    return new GlobPatternList(
-      patterns.map((x) => GlobPattern.from_pattern(x))
-    );
+    return new GlobPatternList(patterns.map((x) => GlobPattern.from_pattern(x)));
   }
 
   test(path: Pathname | string) {

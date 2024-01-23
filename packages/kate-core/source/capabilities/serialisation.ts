@@ -15,7 +15,9 @@ import {
   OpenURLs,
   RequestDeviceFiles,
   ShowDialogs,
+  SignDigitally,
   StoreTemporaryFiles,
+  ViewDeveloperProfile,
 } from "./definitions";
 
 export type ParsedCapability = ReturnType<typeof do_parse>;
@@ -46,6 +48,12 @@ function do_parse(grant: AnyCapabilityGrant) {
     case "store-temporary-files": {
       return StoreTemporaryFiles.parse(grant as CapabilityGrant<"store-temporary-files">);
     }
+    case "sign-digitally": {
+      return SignDigitally.parse(grant as CapabilityGrant<"sign-digitally">);
+    }
+    case "view-developer-profile": {
+      return ViewDeveloperProfile.parse(grant as CapabilityGrant<"view-developer-profile">);
+    }
     default:
       throw unreachable(grant.name, "grant");
   }
@@ -73,6 +81,12 @@ export function from_metadata(
     }
     case "store-temporary-files": {
       return StoreTemporaryFiles.from_metadata(cart_id, capability);
+    }
+    case "sign-digitally": {
+      return SignDigitally.from_metadata(cart_id, capability);
+    }
+    case "view-developer-profile": {
+      return ViewDeveloperProfile.from_metadata(cart_id, capability);
     }
     default:
       throw unreachable(capability, "capability");

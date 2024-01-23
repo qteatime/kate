@@ -326,3 +326,87 @@ export class StoreTemporaryFiles extends StorageSpaceCapability<"store-temporary
     return this.grant_configuration ? "low" : "none";
   }
 }
+
+export class SignDigitally extends SwitchCapability<"sign-digitally"> {
+  readonly type = "sign-digitally";
+  readonly title = "Ask to sign data";
+  readonly description = `
+    Allow the cartridge to ask to use your digital signing keys to sign
+    any piece of data.
+  `;
+
+  get grant_configuration() {
+    return this._grant_configuration;
+  }
+
+  constructor(readonly cart_id: string, private _grant_configuration: boolean) {
+    super();
+  }
+
+  static parse(grant: CapabilityGrant<SignDigitally["type"]>) {
+    if (grant.name !== "sign-digitally" || grant.granted.type !== "switch") {
+      throw new Error(`Unexpected capability: ${grant.name}`);
+    }
+    return new SignDigitally(grant.cart_id, grant.granted.value);
+  }
+
+  static from_metadata(
+    cart_id: string,
+    capability: ContextualCapability & { type: SignDigitally["type"] }
+  ) {
+    if (capability.type !== "sign-digitally") {
+      throw new Error(`Unexpected capability: ${capability.type}`);
+    }
+    return new SignDigitally(cart_id, true);
+  }
+
+  update(grant: boolean): void {
+    this._grant_configuration = grant;
+  }
+
+  risk_category(): RiskCategory {
+    return this.grant_configuration ? "medium" : "none";
+  }
+}
+
+export class ViewDeveloperProfile extends SwitchCapability<"view-developer-profile"> {
+  readonly type = "view-developer-profile";
+  readonly title = "Ask for your developer profile";
+  readonly description = `
+    Allows the cartridge to read non-sensitive data in your developer profile
+    (e.g.: name, domain, and public key fingerprint).
+  `;
+
+  get grant_configuration() {
+    return this._grant_configuration;
+  }
+
+  constructor(readonly cart_id: string, private _grant_configuration: boolean) {
+    super();
+  }
+
+  static parse(grant: CapabilityGrant<ViewDeveloperProfile["type"]>) {
+    if (grant.name !== "view-developer-profile" || grant.granted.type !== "switch") {
+      throw new Error(`Unexpected capability: ${grant.name}`);
+    }
+    return new ViewDeveloperProfile(grant.cart_id, grant.granted.value);
+  }
+
+  static from_metadata(
+    cart_id: string,
+    capability: ContextualCapability & { type: ViewDeveloperProfile["type"] }
+  ) {
+    if (capability.type !== "view-developer-profile") {
+      throw new Error(`Unexpected capability: ${capability.type}`);
+    }
+    return new ViewDeveloperProfile(cart_id, true);
+  }
+
+  update(grant: boolean): void {
+    this._grant_configuration = grant;
+  }
+
+  risk_category(): RiskCategory {
+    return this.grant_configuration ? "medium" : "none";
+  }
+}

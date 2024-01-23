@@ -92,3 +92,18 @@
   position: relative;
   z-index: 1;
 }
+
+.kate-hud-dialog-action-menu-frame .kate-hud-dialog-text {
+  padding: 0 1rem;
+}
+
+.kate-hud-dialog-action-menu-options {
+  max-height: 250px;
+  overflow-y: scroll;
+  scrollbar-width: none;
+  padding: 1rem 0;
+}
+
+.kate-hud-dialog-action-menu-options::-webkit-scrollbar {
+  display: none;
+}

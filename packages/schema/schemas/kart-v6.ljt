@@ -274,6 +274,12 @@ union Contextual-capability {
 
   // low risk: annoyance, denial-of-service
   type Show-dialogs {}
+
+  // medium risk: leaking developer identities
+  type View-developer-profile {}
+
+  // medium-risk: leaking developer identities
+  type Sign-digitally {}
 }
 
 union Passive-capability {

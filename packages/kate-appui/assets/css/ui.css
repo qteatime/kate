@@ -158,3 +158,7 @@
   text-transform: uppercase;
   font-weight: 500;
 }
+
+.kate-ui-grid {
+  display: grid;
+}

@@ -14,7 +14,8 @@
     { "path": "../../packages/kate-api" },
     { "path": "../../packages/kate-appui" },
     { "path": "../../packages/util" },
-    { "path": "../../packages/schema" }
+    { "path": "../../packages/schema" },
+    { "path": "../../packages/kate-tools" }
   ],
   "include": ["source", "../../packages/kate-api/build/index.d.ts"]
 }

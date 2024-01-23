@@ -6,6 +6,7 @@
 
 import { capabilities } from "../..";
 import * as Cart from "../../cart";
+import type { DeveloperProfile } from "../../data";
 import type { KateButton } from "../../kernel";
 import { EventStream, Observable, load_image_from_bytes } from "../../utils";
 import type { InteractionHandler } from "../apis";
@@ -1234,4 +1235,12 @@ export function tabs<A>(
 function add_class(x: HTMLElement, classes: string[]) {
   x.classList.add(...classes);
   return x;
+}
+
+export function developer_profile_chip(profile: DeveloperProfile) {
+  return klass("kate-ui-developer-profile-chip", [
+    klass("kate-ui-developer-profile-name", [profile.name]),
+    klass("kate-ui-developer-profile-domain", [profile.domain]),
+    klass("kate-ui-developer-profile-fingerprint", [profile.fingerprint]),
+  ]);
 }

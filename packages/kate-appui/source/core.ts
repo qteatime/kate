@@ -38,7 +38,7 @@ export class UI {
     return this._stack.length === 0;
   }
 
-  push_scene(scene: UIScene) {
+  push_scene(scene: UIScene, on_close?: () => void) {
     if (this._current != null) {
       const current = this._current;
       current.on_deactivated();
@@ -49,6 +49,9 @@ export class UI {
     scene.on_attached();
     scene.on_activated();
     this.on_scene_changed.emit(scene);
+    if (on_close != null) {
+      scene.on_close.once(on_close);
+    }
   }
 
   pop_scene(scene: UIScene) {
@@ -189,6 +192,7 @@ export type PopMenuItem<A> = {
 
 export abstract class UIScene {
   readonly canvas: HTMLElement;
+  readonly on_close = new EventStream<void>();
 
   constructor(readonly ui: UI) {
     this.canvas = document.createElement("div");
@@ -212,7 +216,9 @@ export abstract class UIScene {
   on_attached(): void {
     this.refresh();
   }
-  on_detached(): void {}
+  on_detached(): void {
+    this.on_close.emit();
+  }
   on_activated(): void {}
   on_deactivated(): void {}
 }
@@ -371,9 +377,16 @@ export class UIFocus {
   };
 
   handle_pointer_click = (ev: PointerClickEvent) => {
-    const [target] = Array.from(document.elementsFromPoint(ev.location.x, ev.location.y)).filter(
-      (x) => x.classList.contains("kate-ui-focus-target")
+    const current_screen = this.root;
+    if (current_screen == null) {
+      return;
+    }
+
+    const [candidate] = Array.from(document.elementsFromPoint(ev.location.x, ev.location.y)).filter(
+      (x) => current_screen.contains(x)
     );
+    const target = select_interactive_root(candidate);
+
     if (target != null) {
       switch (ev.button) {
         case "primary": {
@@ -714,4 +727,16 @@ export class PopMenuDialog extends BaseDialog {
       }),
     ]);
   }
+}
+
+function select_interactive_root(x: Element | null) {
+  if (x == null) {
+    return null;
+  }
+
+  if (x.classList.contains("kate-ui-focus-target")) {
+    return x;
+  }
+
+  return select_interactive_root(x.parentElement);
 }

@@ -105,6 +105,16 @@ function do_parse_contextual_capability(
         type: "show-dialogs",
       };
     }
+    case Cart_v6.Contextual_capability.$Tags.Sign_digitally: {
+      return {
+        type: "sign-digitally",
+      };
+    }
+    case Cart_v6.Contextual_capability.$Tags.View_developer_profile: {
+      return {
+        type: "view-developer-profile",
+      };
+    }
     default:
       throw unreachable(capability, "capability");
   }

@@ -285,6 +285,16 @@ export class KateDeveloperProfile {
     });
   }
 
+  async sign(requestee: string, profile: DeveloperProfile, data: Uint8Array) {
+    const keys = await this.os.key_manager.signing_keys_for_domain(profile.domain);
+    const key = keys.find((x) => x.id === profile.key_id && x.kind === "private");
+    if (key == null) {
+      return null;
+    } else {
+      return await this.os.key_manager.sign_with_key(requestee, key, data);
+    }
+  }
+
   async rt<A>(fn: (_: DeveloperProfileStore) => Promise<A>) {
     return DeveloperProfileStore.transaction(this.os.db, "readonly", (s) => fn(s));
   }

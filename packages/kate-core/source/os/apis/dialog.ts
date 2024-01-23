@@ -204,6 +204,48 @@ export class KateDialog {
     return deferred;
   }
 
+  async action_menu<A>(
+    id: string,
+    options: {
+      title: UI.Widgetable;
+      description: UI.Widgetable;
+      options: {
+        title: UI.Widgetable;
+        description?: UI.Widgetable;
+        icon?: UI.Widgetable;
+        value: A;
+      }[];
+      cancel_value: A;
+    }
+  ) {
+    const container = UI.klass("kate-hud-dialog-action-menu-container", []);
+    const result = this.custom(
+      id,
+      "kate-hud-dialog-action-menu",
+      [container],
+      options.cancel_value,
+      "action-menu"
+    );
+    const choices = UI.klass("kate-hud-dialog-action-menu-frame", [
+      UI.klass("kate-hud-dialog-title", [options.title]),
+      UI.klass("kate-hud-dialog-text", [options.description ?? null]),
+      UI.klass("kate-hud-dialog-action-menu-options", [
+        ...options.options.map((x) => {
+          return UI.link_card(this.os, {
+            icon: x.icon,
+            description: x.description,
+            title: x.title,
+            on_click: () => {
+              result.resolve(x.value);
+            },
+          });
+        }),
+      ]),
+    ]);
+    UI.append(choices, container);
+    return result.promise;
+  }
+
   async pop_menu<A>(
     id: string,
     heading: string,

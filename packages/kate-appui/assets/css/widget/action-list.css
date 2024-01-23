@@ -18,6 +18,10 @@
   position: relative;
 }
 
+.kate-ui-action-list.with-no-icons .kate-ui-action-list-item {
+  grid-template-columns: 0px 1fr min-content min-content;
+}
+
 .kate-ui-action-list-item:not(:last-child) {
   border-bottom: 1px solid var(--color-border);
 }

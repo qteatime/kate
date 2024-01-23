@@ -5,6 +5,7 @@
  */
 
 import type { KateIPC } from "./channel";
+import type { KateFile } from "./file-store";
 
 export class KateBrowser {
   #channel: KateIPC;
@@ -17,7 +18,15 @@ export class KateBrowser {
     this.#channel.call("kate:browser.open", { url: url.toString() });
   }
 
-  download(filename: string, data: Uint8Array) {
-    this.#channel.call("kate:browser.download", { filename, data });
+  download_from_bytes(filename: string, data: Uint8Array) {
+    this.#channel.call("kate:browser.download-from-bytes", { filename, data });
+  }
+
+  download_from_file(filename: string, file: KateFile) {
+    this.#channel.call("kate:browser.download-from-file", {
+      filename,
+      bucket_id: file.bucket.id,
+      file_id: file.id,
+    });
   }
 }

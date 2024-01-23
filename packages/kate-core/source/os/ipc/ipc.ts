@@ -17,7 +17,8 @@ import DeviceFileMessages from "./device-file";
 import CartManagerMessages from "./cart-manager";
 import DialogMessages from "./dialog";
 import FileStorage from "./file-storage";
-import { Process, SystemEvent } from "../../kernel";
+import DeveloperProfile from "./developer";
+import { Process, ProcessId, SystemEvent } from "../../kernel";
 
 type Message = {
   type: string;
@@ -42,6 +43,7 @@ export class KateIPCServer {
     this.add_handlers(CartManagerMessages);
     this.add_handlers(DialogMessages);
     this.add_handlers(FileStorage);
+    this.add_handlers(DeveloperProfile);
   }
 
   private add_handlers(handlers: Handler<any, any>[]) {

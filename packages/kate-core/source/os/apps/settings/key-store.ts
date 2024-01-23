@@ -34,6 +34,14 @@ export class SceneKeyStoreSettings extends UI.SimpleScene {
             this.os.push_scene(new SceneChangeMasterPassword(this.os));
           },
         }),
+        UI.button_panel(this.os, {
+          title: "Reset your key store",
+          description: `This will DELETE all data in your key store so you can start from a clean state.`,
+          dangerous: true,
+          on_click: () => {
+            this.reset_key_store();
+          },
+        }),
       ]),
       UI.when(config.master_key == null, [
         UI.link_card(this.os, {
@@ -77,6 +85,30 @@ export class SceneKeyStoreSettings extends UI.SimpleScene {
         },
       }),
     ];
+  }
+
+  async reset_key_store() {
+    const proceed = await this.os.dialog.confirm("kate:key-store", {
+      title: "Delete all data from key store?",
+      message: `This will delete all data in your key-store, including your
+        private keys, developer profiles, and master password. All data will
+        be lost if you don't have backups. If you want to reset your password,
+        keeping your data, use the 'Change master password' option.
+      `,
+      dangerous: true,
+      cancel: "Keep my data",
+      ok: "Delete everything in my key store",
+    });
+
+    if (!proceed) {
+      return;
+    }
+
+    await this.os.dialog.progress("kate:key-store:settings", "Resetting key store", async () => {
+      await this.os.key_manager.reset_store("kate:key-store:settings");
+    });
+
+    this.refresh();
   }
 }
 
