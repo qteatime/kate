@@ -23,19 +23,18 @@ void (function () {
     if (is_data_url(url0)) {
       return url0;
     }
-    if (SYNC_ACCESS[url0]) {
-      const data = SYNC_ACCESS[url0];
-      const bytes = new TextEncoder().encode(data);
-      const byte_string = Array.from(bytes, (x) => String.fromCodePoint(x)).join("");
-      return `data:text/plain;base64,${window.btoa(byte_string)}`;
-    }
 
     const url = new URL(url0, "https://cartridge.kate.qteati.me");
     if (url.hostname !== "cartridge.kate.qteati.me") {
       console.warn(`[Kate] Non-proxyable URL:`, url0);
       return url0;
     } else {
-      return decodeURIComponent(url.pathname);
+      const decoded_url = decodeURIComponent(url.pathname);
+      if (SYNC_ACCESS[decoded_url]) {
+        return SYNC_ACCESS[decoded_url];
+      } else {
+        return decoded_url;
+      }
     }
   }
 
@@ -128,9 +127,13 @@ void (function () {
       return this.__src ?? old_img_src.get!.call(this);
     },
     set(url0) {
-      const url = fix_url(url0);
+      if (url0 === "") {
+        old_img_src.set!.call(this, "");
+        return;
+      }
 
-      this.__src = url;
+      this.__src = url0;
+      const url = fix_url(url0);
       if (is_data_url(url)) {
         old_img_src.set!.call(this, url);
         return;
@@ -157,8 +160,8 @@ void (function () {
       return this.__src ?? old_script_src.get!.call(this);
     },
     set(url0) {
+      this.__src = url0;
       const url = fix_url(url0);
-      this.__src = url;
       if (is_data_url(url)) {
         old_script_src.set!.call(this, url);
         return;
@@ -185,9 +188,9 @@ void (function () {
       return this.__src ?? old_media_src.get!.call(this);
     },
     set(url0) {
-      const url = fix_url(url0);
+      this.__src = url0;
 
-      this.__src = url;
+      const url = fix_url(url0);
       if (is_data_url(url)) {
         old_media_src.set!.call(this, url);
         return;

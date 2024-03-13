@@ -149,7 +149,7 @@ async function apply_bridge(
       const code = bridges["standard-network.js"];
       const files = files_matching(context.file_paths, bridge.allow_sync_access);
       const data = await Promise.all(
-        files.map((x) => ({ path: x, data: get_text_file(x, context) }))
+        files.map(async (x) => ({ path: x, data: await get_data_url(x, context) }))
       );
       const sync_access = JSON.stringify(Object.fromEntries(data.map((x) => [x.path, x.data])));
       const full_source = `
