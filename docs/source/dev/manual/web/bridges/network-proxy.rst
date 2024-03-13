@@ -17,10 +17,16 @@ To add this bridge to your cartridge, you specify the following in your
   {
     "bridges": [
       {
-        "type": "network-proxy"
+        "type": "network-proxy",
+        "sync_access": []
       }
     ]
   }
+
+The `sync_access` list is a series of
+`Glob patterns <https://en.wikipedia.org/wiki/Glob_(programming)>`_ for
+files that should be loaded synchronously, which is required by some
+game engines.
 
 
 Requests handled
@@ -101,3 +107,47 @@ Potentially more if ``game.css`` references external resources.
 The bridge does not yet handle these cases, and this causes things like
 Twine games to not work properly. This will be fixed in a future version,
 no changes will be needed in cartridges created before the fix.
+
+
+"Synchronous" requests
+----------------------
+
+Some engines, such as RPG Maker MV, require certain assets to be loaded
+synchronously. Most other engines are generally fully asynchronous and
+need no special handling for asset loading, but they might use
+`WebWorkers <https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API>`_
+for performance, and that might need some JavaScript to be loaded synchronously.
+
+Because all cartridge data lives outside of the cartridge process, loading
+this data synchronously is not really possible. As a middle ground, the
+network proxy bridge lets you pre-load a set of files at the time the
+cartridge is being loaded in the console; this allows us to mimic synchronous
+requests for these files, satisfying the needs of these game engines without
+needing to change any code in them.
+
+You specify which assets will be pre-loaded by providing a list of Glob
+patterns in the network proxy configuration. For example, RPG Maker MV
+expects both tilesets and plugins to be loaded synchronously, so a
+configuration like the following would make everything work as expected:
+
+.. code-block:: json
+
+  {
+    "type": "network-proxy",
+    "sync_access": [
+      "js/plugins/*.js",
+      "img/tilesets/*.png"
+    ]
+  }
+
+.. important::
+   Note that this should only be used for the cases where there's no other
+   way of loading these resources. **All** assets matching the patterns you
+   specify here will be loaded immediately when you open the cartridge, and
+   they will be stored passed to the cartridge process in a less performant
+   format.
+
+   This means that if you specify a lot of big files in the patterns, your
+   game will need a large amount of memory just to start itself (this
+   memory requirement will never go down), and it'll take considerably
+   longer for your game to start.
