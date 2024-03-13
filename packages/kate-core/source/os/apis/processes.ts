@@ -52,6 +52,7 @@ export class KateProcesses {
       console: this.os.kernel.console,
       cart: cart,
       local_storage: storage,
+      file_paths: cart.files.map((x) => x.path),
       filesystem: {
         read: async (path) => {
           const node = file_map.get(path);
@@ -134,6 +135,7 @@ export class KateProcesses {
         console: this.os.kernel.console,
         cart: cart,
         local_storage: storage,
+        file_paths: cart.files.map((x) => x.path),
         filesystem: {
           read: async (path) => {
             const file_id = file_map.get(path);

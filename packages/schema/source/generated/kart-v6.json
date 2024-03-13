@@ -964,6 +964,20 @@
                   }
                 }
               ]
+            },
+            {
+              "name": "Network-proxy-v2",
+              "fields": [
+                {
+                  "name": "allow-sync-access",
+                  "type": {
+                    "op": "array",
+                    "items": {
+                      "op": "text"
+                    }
+                  }
+                }
+              ]
             }
           ]
         }

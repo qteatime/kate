@@ -222,6 +222,10 @@ union Bridge {
     field mapping: Virtual-key -> Keyboard-key;
     field selector: Keyboard-input-selector;
   }
+
+  type Network-proxy-v2 {
+    field allow-sync-access: Text[];
+  }
 }
 
 union Virtual-key {

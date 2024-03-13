@@ -1375,7 +1375,7 @@ export namespace Accessibility_provision {
 
 
 
-export type Bridge = Bridge.Network_proxy | Bridge.Local_storage_proxy | Bridge.Input_proxy | Bridge.Preserve_WebGL_render | Bridge.Capture_canvas | Bridge.Pointer_input_proxy | Bridge.IndexedDB_proxy | Bridge.Renpy_web_tweaks | Bridge.External_URL_handler | Bridge.Keyboard_input_proxy_v2;
+export type Bridge = Bridge.Network_proxy | Bridge.Local_storage_proxy | Bridge.Input_proxy | Bridge.Preserve_WebGL_render | Bridge.Capture_canvas | Bridge.Pointer_input_proxy | Bridge.IndexedDB_proxy | Bridge.Renpy_web_tweaks | Bridge.External_URL_handler | Bridge.Keyboard_input_proxy_v2 | Bridge.Network_proxy_v2;
 
 export namespace Bridge {
  export const tag = 22;
@@ -1390,7 +1390,8 @@ export namespace Bridge {
     IndexedDB_proxy = 6,
     Renpy_web_tweaks = 7,
     External_URL_handler = 8,
-    Keyboard_input_proxy_v2 = 9
+    Keyboard_input_proxy_v2 = 9,
+    Network_proxy_v2 = 10
  }
 
  
@@ -1612,6 +1613,28 @@ export namespace Bridge {
    readonly '@variant-name': 'Keyboard-input-proxy-v2';
    readonly 'mapping': Map<Virtual_key, Keyboard_key>
     readonly 'selector': Keyboard_input_selector
+ }
+
+
+  
+ export function Network_proxy_v2(x: {readonly 'allow-sync-access': (string)[]}): Bridge {
+   return {
+     '@name': 'Bridge',
+     '@tag': 22,
+     '@version': 0,
+     '@variant': $Tags.Network_proxy_v2,
+     '@variant-name': 'Network-proxy-v2',
+     ...x
+   }
+ }
+
+ export interface Network_proxy_v2 {
+   readonly '@name': 'Bridge';
+   readonly '@tag': 22;
+   readonly '@version': 0;
+   readonly '@variant': $Tags.Network_proxy_v2;
+   readonly '@variant-name': 'Network-proxy-v2';
+   readonly 'allow-sync-access': (string)[]
  }
 
 }

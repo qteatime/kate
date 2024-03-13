@@ -160,6 +160,7 @@ const meta = T.spec({
 const bridges = T.tagged_choice<Bridge, Bridge["type"]>("type", {
   "network-proxy": T.spec({
     type: T.constant("network-proxy" as const),
+    sync_access: T.list_of(T.short_str(255)),
   }),
   "local-storage-proxy": T.spec({
     type: T.constant("local-storage-proxy" as const),
@@ -173,7 +174,7 @@ const bridges = T.tagged_choice<Bridge, Bridge["type"]>("type", {
     ),
   }),
   "keyboard-input-proxy-v2": T.spec({
-    type: T.constant("input-proxy" as const),
+    type: T.constant("keyboard-input-proxy-v2" as const),
     mapping: T.or3(
       T.constant("defaults" as const),
       T.constant("kate" as const),
@@ -372,7 +373,7 @@ type ContextualCapability =
   | { type: "store-temporary-files"; max_size_mb: number; optional: boolean };
 
 type Bridge =
-  | { type: "network-proxy" }
+  | { type: "network-proxy"; sync_access?: string[] }
   | { type: "local-storage-proxy" }
   | { type: "input-proxy"; mapping: KeyMapping }
   | {
@@ -798,7 +799,11 @@ function make_capability(json: Capability) {
 function make_bridge(x: Bridge): Cart.Bridge[] {
   switch (x.type) {
     case "network-proxy": {
-      return [Cart.Bridge.Network_proxy({})];
+      return [
+        Cart.Bridge.Network_proxy_v2({
+          "allow-sync-access": x.sync_access ?? [],
+        }),
+      ];
     }
 
     case "local-storage-proxy": {

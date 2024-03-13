@@ -191,6 +191,12 @@ function bridge(x: Cart.Bridge) {
       return `network-proxy`;
     }
 
+    case t.$Tags.Network_proxy_v2: {
+      return `network-proxy-v2 {
+  allow_sync_access: ${JSON.stringify(x["allow-sync-access"])}
+}`;
+    }
+
     case t.$Tags.Pointer_input_proxy: {
       return `pointer-input-proxy {
   CSS selector: ${JSON.stringify(x.selector)}
