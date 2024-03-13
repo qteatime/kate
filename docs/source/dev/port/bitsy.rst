@@ -1,7 +1,7 @@
 Bitsy
 =====
 
-Games made with `Bitsy <https://bitsy.org/>` can run on Kate with little
+Games made with `Bitsy <https://bitsy.org/>`_ can run on Kate with little
 configuration. Games using bitsy hacks might not be supported.
 
 

@@ -13,3 +13,5 @@ Porting recipes are currently available for the following engines:
 
   bitsy
   renpy
+  godot
+  rpg-maker
