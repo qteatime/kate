@@ -108,3 +108,5 @@ declare global {
     };
   }
 }
+
+import "./lockdown";
