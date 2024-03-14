@@ -6,7 +6,7 @@
 
 import { bridges } from "../../bridges";
 import * as Cart from "../../cart";
-import { make_id, unreachable, file_to_dataurl, Pathname } from "../../utils";
+import { make_id, unreachable, file_to_dataurl, Pathname, GlobPattern } from "../../utils";
 import { RuntimeEnvConfig } from "./runtimes";
 import { KateButton } from "./../input";
 
@@ -15,7 +15,7 @@ type RuntimeEnv = RuntimeEnvConfig & { secret: string; trace: boolean };
 export async function sandbox_html(html: string, context: RuntimeEnv) {
   const dom = new DOMParser().parseFromString(html, "text/html");
   const preamble = add_preamble(dom, context);
-  add_bridges(preamble, dom, context);
+  await add_bridges(preamble, dom, context);
   await inline_all_scripts(dom, context);
   await inline_all_links(dom, context);
   await load_all_media(dom, context);
@@ -67,7 +67,6 @@ async function load_all_media(dom: Document, context: RuntimeEnv) {
 
 function add_preamble(dom: Document, context: RuntimeEnv) {
   const script = dom.createElement("script");
-  const user_agent = "Kate";
   const id = `preamble_${make_id()}`;
   script.id = id;
   script.textContent = `
@@ -79,12 +78,6 @@ function add_preamble(dom: Document, context: RuntimeEnv) {
     script = null;
 
     ${bridges["kate-api.js"]};
-
-    Object.defineProperty(navigator, "userAgent", {
-      value: ${JSON.stringify(user_agent)},
-      enumerable: true,
-      configurable: true
-    });
   }();
   `;
   dom.head.insertBefore(script, dom.head.firstChild);
@@ -109,18 +102,18 @@ function add_preamble(dom: Document, context: RuntimeEnv) {
   return script;
 }
 
-function add_bridges(reference: Element, dom: Document, context: RuntimeEnv) {
+async function add_bridges(reference: Element, dom: Document, context: RuntimeEnv) {
   for (const bridge of context.cart.runtime.bridges) {
-    apply_bridge(bridge, reference, dom, context);
+    await apply_bridge(bridge, reference, dom, context);
   }
 }
 
-function apply_bridge(
+async function apply_bridge(
   bridge: Cart.Bridge,
   reference: Element,
   dom: Document,
   context: RuntimeEnv
-): void {
+): Promise<void> {
   const wrap = (source: string) => {
     return `void function(exports) {
       "use strict";
@@ -142,6 +135,21 @@ function apply_bridge(
   switch (bridge.type) {
     case "network-proxy": {
       append_proxy(bridges["standard-network.js"]);
+      break;
+    }
+
+    case "network-proxy-v2": {
+      const code = bridges["standard-network.js"];
+      const files = files_matching(context.file_paths, bridge.allow_sync_access);
+      const data = await Promise.all(
+        files.map(async (x) => ({ path: x, data: await get_data_url(x, context) }))
+      );
+      const sync_access = JSON.stringify(Object.fromEntries(data.map((x) => [x.path, x.data])));
+      const full_source = `
+        const SYNC_ACCESS = ${sync_access};
+        ${code};
+      `;
+      append_proxy(full_source);
       break;
     }
 
@@ -380,4 +388,9 @@ function is_non_local(url: string) {
   } catch (_) {
     return false;
   }
+}
+
+function files_matching(files: string[], patterns: string[]) {
+  const globs = patterns.map((x) => GlobPattern.from_pattern(x));
+  return files.filter((x) => globs.some((g) => g.test(x)));
 }

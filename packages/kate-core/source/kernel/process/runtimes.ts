@@ -13,6 +13,7 @@ import { sandbox_html } from "./sandbox-html";
 export type RuntimeEnvConfig = {
   console: VirtualConsole;
   cart: Cart.CartMeta;
+  file_paths: string[];
   filesystem: IFileSystem;
   local_storage: unknown;
 };

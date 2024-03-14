@@ -121,10 +121,11 @@ We aim to support all reasonable web-exports of common game engines. The list be
 - ✔️ **Ren'Py** (full support for Ren'Py web export 7.5 and 8.1 as of Kate v0.23.6);
 - ✔️ **GB Studio** (web emulators work with existing bridges, but no recipe provided yet);
 - ✔️ **Pico-8** (web export works with existing bridges, but no recipe provided yet);
-- ➖ RPG Maker MV (requires minor code changes in the game);
+- ✔️ **Godot 3** (web exports should be fully functional as of Kate v0.25.x);
+- ✔️ **RPG Maker MV** (web exports should be functional as of Kate v0.25.x --- plugin support depends on what APIs the plugin requires);
 - ➖ Unity (requires minor code changes in the game);
 - ✖️ Twine (requires changes to Kate's sandboxing);
-- ✖️ Godot (requires changes to Kate's sandboxing);
+- ✖️ Godot 4 (requires changes to Kate's sandboxing);
 - ✖️ Construct 3 (requires changes to Kate's sandboxing);
 - ✖️ TyranoBuilder (requires changes to Kate's sandboxing);
 

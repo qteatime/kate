@@ -4,6 +4,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
+declare var SYNC_ACCESS: { [path: string]: string };
+
 // Resolve GETs on the same domain to reads from the cartridge files.
 // This handles fetch, XMLHttpRequest, IMG, Audio, and Video.
 void (function () {
@@ -27,7 +29,12 @@ void (function () {
       console.warn(`[Kate] Non-proxyable URL:`, url0);
       return url0;
     } else {
-      return decodeURIComponent(url.pathname);
+      const decoded_url = decodeURIComponent(url.pathname);
+      if (SYNC_ACCESS[decoded_url]) {
+        return SYNC_ACCESS[decoded_url];
+      } else {
+        return decoded_url;
+      }
     }
   }
 
@@ -46,9 +53,7 @@ void (function () {
     }
 
     if (method !== "GET") {
-      return new Promise((_, reject) =>
-        reject(new Error(`Non-GET requests are not supported.`))
-      );
+      return new Promise((_, reject) => reject(new Error(`Non-GET requests are not supported.`)));
     }
     if (is_data_url(url)) {
       return old_fetch(url);
@@ -73,11 +78,7 @@ void (function () {
   };
   const old_xhr_open = XMLHttpRequest.prototype.open;
   const old_xhr_send = XMLHttpRequest.prototype.send;
-  XMLHttpRequest.prototype.open = function (
-    this: XMLHttpRequestE,
-    method,
-    url
-  ) {
+  XMLHttpRequest.prototype.open = function (this: XMLHttpRequestE, method, url) {
     if (method !== "GET") {
       throw new Error(`Non-GET requests are not supported.`);
     }
@@ -104,10 +105,7 @@ void (function () {
     }
   };
 
-  XMLHttpRequest.prototype.setRequestHeader = function (
-    name: string,
-    value: string
-  ) {
+  XMLHttpRequest.prototype.setRequestHeader = function (name: string, value: string) {
     // Do nothing, there's no HTTP server handling these.
   };
 
@@ -121,10 +119,7 @@ void (function () {
   };
 
   // -- Image loading
-  const old_img_src = Object.getOwnPropertyDescriptor(
-    HTMLImageElement.prototype,
-    "src"
-  )!;
+  const old_img_src = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, "src")!;
   Object.defineProperty(HTMLImageElement.prototype, "src", {
     enumerable: old_img_src.enumerable,
     configurable: old_img_src.configurable,
@@ -132,9 +127,13 @@ void (function () {
       return this.__src ?? old_img_src.get!.call(this);
     },
     set(url0) {
-      const url = fix_url(url0);
+      if (url0 === "") {
+        old_img_src.set!.call(this, "");
+        return;
+      }
 
-      this.__src = url;
+      this.__src = url0;
+      const url = fix_url(url0);
       if (is_data_url(url)) {
         old_img_src.set!.call(this, url);
         return;
@@ -153,10 +152,7 @@ void (function () {
   });
 
   // -- Script loading
-  const old_script_src = Object.getOwnPropertyDescriptor(
-    HTMLScriptElement.prototype,
-    "src"
-  )!;
+  const old_script_src = Object.getOwnPropertyDescriptor(HTMLScriptElement.prototype, "src")!;
   Object.defineProperty(HTMLScriptElement.prototype, "src", {
     enumerable: old_script_src.enumerable,
     configurable: old_script_src.configurable,
@@ -164,8 +160,8 @@ void (function () {
       return this.__src ?? old_script_src.get!.call(this);
     },
     set(url0) {
+      this.__src = url0;
       const url = fix_url(url0);
-      this.__src = url;
       if (is_data_url(url)) {
         old_script_src.set!.call(this, url);
         return;
@@ -184,10 +180,7 @@ void (function () {
   });
 
   // -- Media loading
-  const old_media_src = Object.getOwnPropertyDescriptor(
-    HTMLMediaElement.prototype,
-    "src"
-  )!;
+  const old_media_src = Object.getOwnPropertyDescriptor(HTMLMediaElement.prototype, "src")!;
   Object.defineProperty(HTMLMediaElement.prototype, "src", {
     enumerable: old_media_src.enumerable,
     configurable: old_media_src.configurable,
@@ -195,9 +188,9 @@ void (function () {
       return this.__src ?? old_media_src.get!.call(this);
     },
     set(url0) {
-      const url = fix_url(url0);
+      this.__src = url0;
 
-      this.__src = url;
+      const url = fix_url(url0);
       if (is_data_url(url)) {
         old_media_src.set!.call(this, url);
         return;
@@ -213,5 +206,24 @@ void (function () {
         }
       })();
     },
+  });
+
+  // -- Web workers
+  const original_web_worker = Worker;
+  function ProxyWorker(url0: string, options: any) {
+    const url = fix_url(String(url0));
+    if (is_data_url(url)) {
+      return new original_web_worker(url, options);
+    } else {
+      throw new Error(
+        `Cannot spawn Worker with url ${JSON.stringify(
+          url0
+        )} because it's not specified for sync access.`
+      );
+    }
+  }
+  Object.defineProperty(globalThis, "Worker", {
+    value: ProxyWorker,
+    configurable: true,
   });
 })();

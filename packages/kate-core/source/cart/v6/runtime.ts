@@ -68,6 +68,15 @@ function bridge(x: Cart_v6.Bridge): Bridge {
         selector: keyboard_selector(x.selector),
       };
     }
+    case Cart_v6.Bridge.$Tags.Network_proxy_v2: {
+      return {
+        type: "network-proxy-v2",
+        allow_sync_access: list(
+          x["allow-sync-access"].map((x) => str(x, 255)),
+          255
+        ),
+      };
+    }
     default:
       throw unreachable(x);
   }
@@ -144,4 +153,11 @@ function str(x: unknown, size: number = Infinity): string {
     throw new Error(`String is too long (maximum: ${size})`);
   }
   return x;
+}
+
+function list<A>(xs: A[], size: number) {
+  if (xs.length > size) {
+    throw new Error(`List is too long (maximum: ${size})`);
+  }
+  return xs;
 }

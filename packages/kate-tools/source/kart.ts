@@ -160,6 +160,7 @@ const meta = T.spec({
 const bridges = T.tagged_choice<Bridge, Bridge["type"]>("type", {
   "network-proxy": T.spec({
     type: T.constant("network-proxy" as const),
+    sync_access: T.list_of(T.short_str(255)),
   }),
   "local-storage-proxy": T.spec({
     type: T.constant("local-storage-proxy" as const),
@@ -173,7 +174,7 @@ const bridges = T.tagged_choice<Bridge, Bridge["type"]>("type", {
     ),
   }),
   "keyboard-input-proxy-v2": T.spec({
-    type: T.constant("input-proxy" as const),
+    type: T.constant("keyboard-input-proxy-v2" as const),
     mapping: T.or3(
       T.constant("defaults" as const),
       T.constant("kate" as const),
@@ -223,6 +224,17 @@ const recipe = T.tagged_choice<Recipe, Recipe["type"]>("type", {
     renpy_version: T.regex("version in the form MM.NN (e.g.: 7.5, 8.1)", /^\d+\.\d+$/),
     hide_cursor: T.optional(false, T.bool),
     open_urls_reason: T.optional(null, T.short_str(255)),
+  }),
+  godot: T.spec({
+    type: T.constant("godot" as const),
+    version: T.constant("3" as const),
+    pointer_support: T.optional(true, T.bool),
+    hide_cursor: T.optional(false, T.bool),
+  }),
+  "rpg-maker-mv": T.spec({
+    type: T.constant("rpg-maker-mv" as const),
+    pointer_support: T.optional(true, T.bool),
+    hide_cursor: T.optional(false, T.bool),
   }),
 });
 
@@ -372,7 +384,7 @@ type ContextualCapability =
   | { type: "store-temporary-files"; max_size_mb: number; optional: boolean };
 
 type Bridge =
-  | { type: "network-proxy" }
+  | { type: "network-proxy"; sync_access?: string[] }
   | { type: "local-storage-proxy" }
   | { type: "input-proxy"; mapping: KeyMapping }
   | {
@@ -397,7 +409,9 @@ type Recipe =
       open_urls_reason: string | null;
       renpy_version: string;
     }
-  | { type: "bitsy" };
+  | { type: "bitsy" }
+  | { type: "godot"; version: "3"; pointer_support: boolean; hide_cursor: boolean }
+  | { type: "rpg-maker-mv"; pointer_support: boolean; hide_cursor: boolean };
 
 const mime_table = Object.assign(Object.create(null), {
   // Text/code
@@ -798,7 +812,11 @@ function make_capability(json: Capability) {
 function make_bridge(x: Bridge): Cart.Bridge[] {
   switch (x.type) {
     case "network-proxy": {
-      return [Cart.Bridge.Network_proxy({})];
+      return [
+        Cart.Bridge.Network_proxy_v2({
+          "allow-sync-access": x.sync_access ?? [],
+        }),
+      ];
     }
 
     case "local-storage-proxy": {
@@ -1068,6 +1086,73 @@ function apply_recipe(json: ReturnType<typeof config>): ReturnType<typeof config
         },
       };
     }
+
+    case "godot": {
+      return {
+        ...json,
+        files: ["**/*.html", "**/*.png", "**/*.js", "**/*.pck", "**/*.wasm"],
+        platform: {
+          recipe,
+          type: "web-archive",
+          html: json.platform.html,
+          bridges: select_bridges([
+            { type: "network-proxy", sync_access: ["*.js"] },
+            { type: "keyboard-input-proxy-v2", mapping: "defaults", selector: "#canvas" },
+            ...(recipe.pointer_support
+              ? [
+                  {
+                    type: "pointer-input-proxy" as const,
+                    selector: "#canvas",
+                    hide_cursor: recipe.hide_cursor,
+                  },
+                ]
+              : []),
+            { type: "capture-canvas", selector: "#canvas" },
+            { type: "preserve-webgl-render" },
+            ...json.platform.bridges,
+          ]),
+        },
+      };
+    }
+
+    case "rpg-maker-mv": {
+      return {
+        ...json,
+        files: [
+          "**/*.html",
+          "**/*.json",
+          "**/*.ogg",
+          "**/*.css",
+          "**/*.ttf",
+          "**/*.png",
+          "**/*.txt",
+          "**/*.js",
+        ],
+        platform: {
+          recipe,
+          type: "web-archive",
+          html: json.platform.html,
+          bridges: select_bridges([
+            { type: "network-proxy", sync_access: ["js/plugins/*.js", "img/tilesets/*.png"] },
+            { type: "keyboard-input-proxy-v2", mapping: "defaults", selector: "document" },
+            ...(recipe.pointer_support
+              ? [
+                  {
+                    type: "pointer-input-proxy" as const,
+                    selector: "#GameCanvas",
+                    hide_cursor: recipe.hide_cursor,
+                  },
+                ]
+              : []),
+            { type: "capture-canvas", selector: "#GameCanvas" },
+            { type: "preserve-webgl-render" },
+            { type: "local-storage-proxy" },
+            ...json.platform.bridges,
+          ]),
+        },
+      };
+    }
+
     default:
       throw unreachable(recipe, "Recipe");
   }
