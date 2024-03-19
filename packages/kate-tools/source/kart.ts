@@ -23,8 +23,8 @@ const keymap = require("../assets/keymap.json") as {
 
 const spec_version = Cart.Kate_version({
   major: 0,
-  minor: 24,
-  patch: 2,
+  minor: 25,
+  patch: 0,
 });
 
 class KartWriter {
@@ -231,6 +231,11 @@ const recipe = T.tagged_choice<Recipe, Recipe["type"]>("type", {
     pointer_support: T.optional(true, T.bool),
     hide_cursor: T.optional(false, T.bool),
   }),
+  gamemaker: T.spec({
+    type: T.constant("gamemaker" as const),
+    pointer_support: T.optional(true, T.bool),
+    hide_cursor: T.optional(false, T.bool),
+  }),
   "rpg-maker-mv": T.spec({
     type: T.constant("rpg-maker-mv" as const),
     pointer_support: T.optional(true, T.bool),
@@ -411,6 +416,7 @@ type Recipe =
     }
   | { type: "bitsy" }
   | { type: "godot"; version: "3"; pointer_support: boolean; hide_cursor: boolean }
+  | { type: "gamemaker"; pointer_support: boolean; hide_cursor: boolean }
   | { type: "rpg-maker-mv"; pointer_support: boolean; hide_cursor: boolean };
 
 const mime_table = Object.assign(Object.create(null), {
@@ -1147,6 +1153,34 @@ function apply_recipe(json: ReturnType<typeof config>): ReturnType<typeof config
             { type: "capture-canvas", selector: "#GameCanvas" },
             { type: "preserve-webgl-render" },
             { type: "local-storage-proxy" },
+            ...json.platform.bridges,
+          ]),
+        },
+      };
+    }
+
+    case "gamemaker": {
+      return {
+        ...json,
+        files: ["**/*.html", "**/*.ico", "**/*.ini", "**/*.js", "**/*.png", "**/*.ogg", "**/*.yy"],
+        platform: {
+          recipe,
+          type: "web-archive",
+          html: json.platform.html,
+          bridges: select_bridges([
+            { type: "network-proxy", sync_access: ["*.js"] },
+            { type: "keyboard-input-proxy-v2", mapping: "defaults", selector: "#canvas" },
+            ...(recipe.pointer_support
+              ? [
+                  {
+                    type: "pointer-input-proxy" as const,
+                    selector: "#canvas",
+                    hide_cursor: recipe.hide_cursor,
+                  },
+                ]
+              : []),
+            { type: "capture-canvas", selector: "#canvas" },
+            { type: "preserve-webgl-render" },
             ...json.platform.bridges,
           ]),
         },

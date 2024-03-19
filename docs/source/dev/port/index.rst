@@ -15,3 +15,4 @@ Porting recipes are currently available for the following engines:
   renpy
   godot
   rpg-maker
+  gamemaker
