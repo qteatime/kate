@@ -1,3 +1,5 @@
+.. _play habits:
+
 Play habits
 ===========
 

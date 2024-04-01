@@ -146,7 +146,7 @@ and password salt so it the encryption key can be re-derived from the storage.
 
 
 ``s.sign(key, m)``
-""""""""""""""""
+""""""""""""""""""
 
 .. code-block:: haskell
 
