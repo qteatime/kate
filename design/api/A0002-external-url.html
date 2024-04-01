@@ -1,0 +1,941 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" /><link rel="next" title="#A0003 — Device file access" href="A0003-device-file-access.html" /><link rel="prev" title="#A0001 — Object Store API" href="A0001-object-storage.html" />
+
+    <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
+        <title>#A0002 — External URL navigation - Kate 0.23.10 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=82a976d7" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=135e06be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=36a5483c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=d1035e3f" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #ffffff;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+<div class="announcement">
+  <aside class="announcement-content">
+     Both Kate and this documentation are a work in progress and may change at any time. 
+  </aside>
+</div>
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../index.html"><div class="brand">Kate 0.23.10 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
+  
+  
+  <span class="sidebar-brand-text">Kate 0.23.10 documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">End-user books</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../user/manual/index.html">The Kate User Manual</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of The Kate User Manual</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../user/manual/intro/index.html">Getting started</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of Getting started</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../user/manual/intro/hardware.html">Tech specs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../user/manual/intro/emulator.html">Emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../user/manual/intro/install.html">Installing</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../user/manual/gaming/index.html">Playing games</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of Playing games</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../user/manual/gaming/cartridges.html">ROM Cartridges</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../user/manual/gaming/captures.html">Screen recording</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../user/manual/gaming/save-data.html">Save data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../user/manual/gaming/play-habits.html">Play habits</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../user/manual/gaming/storage.html">Stored data</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../user/manual/security/index.html">Security and privacy</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of Security and privacy</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../user/manual/security/philosophy.html">Safety philosophy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../user/manual/security/sandboxing.html">Sandboxing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../user/manual/security/privacy.html">Privacy policy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../user/manual/security/trust.html">Trust and consent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../user/manual/security/audit.html">Audit logs</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../user/importer/index.html">The Kate Importer Manual</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle navigation of The Kate Importer Manual</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../user/importer/renpy.html">Ren’Py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../user/importer/bitsy.html">Bitsy</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../user/diy/index.html">Build Your Own Console!</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle navigation of Build Your Own Console!</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../user/diy/overview/index.html">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../user/diy/hardware/index.html">The hardware</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Game developer books</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../dev/manual/index.html">Making games for Kate!</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><div class="visually-hidden">Toggle navigation of Making games for Kate!</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../dev/manual/intro/index.html">Getting started</a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" role="switch" type="checkbox"/><label for="toctree-checkbox-8"><div class="visually-hidden">Toggle navigation of Getting started</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../dev/manual/intro/why.html">Why make games for Kate?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../dev/manual/intro/setup.html">What will you need?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../dev/manual/intro/hello-world.html">Hello, World</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../dev/manual/model/index.html">Programming model</a><input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" role="switch" type="checkbox"/><label for="toctree-checkbox-9"><div class="visually-hidden">Toggle navigation of Programming model</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../dev/manual/model/overview.html">Overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../dev/manual/model/cartridges.html">Cartridges</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../dev/manual/model/sandboxing.html">Sandboxing and APIs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../dev/manual/model/capabilities.html">Capabilities</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../dev/manual/api/index.html">Kate API</a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" role="switch" type="checkbox"/><label for="toctree-checkbox-10"><div class="visually-hidden">Toggle navigation of Kate API</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../dev/manual/api/events.html"><code class="docutils literal notranslate"><span class="pre">events</span></code> — Event handling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../dev/manual/api/cart-fs.html"><code class="docutils literal notranslate"><span class="pre">cart_fs</span></code> — Reading files</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../dev/manual/api/input.html"><code class="docutils literal notranslate"><span class="pre">*_input</span></code> — Reacting to player input</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../dev/manual/api/timer.html"><code class="docutils literal notranslate"><span class="pre">timer</span></code> — Scheduling updates</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../dev/manual/api/capture.html"><code class="docutils literal notranslate"><span class="pre">capture</span></code> — Screenshots and video recording</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../dev/manual/api/store.html"><code class="docutils literal notranslate"><span class="pre">store</span></code> — Saving state</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../dev/manual/api/browser.html"><code class="docutils literal notranslate"><span class="pre">browser</span></code> — Navigating to URLs</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../dev/manual/web/index.html">Web game support</a><input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" role="switch" type="checkbox"/><label for="toctree-checkbox-11"><div class="visually-hidden">Toggle navigation of Web game support</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../dev/manual/web/basics.html">Basics of porting</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../dev/manual/web/bridges/index.html">Bridges</a><input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" role="switch" type="checkbox"/><label for="toctree-checkbox-12"><div class="visually-hidden">Toggle navigation of Bridges</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../dev/manual/web/bridges/network-proxy.html">Network proxy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../dev/manual/web/bridges/input-proxy.html">Button input proxy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../dev/manual/web/bridges/pointer-input-proxy.html">Pointer input proxy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../dev/manual/web/bridges/local-storage-proxy.html">Local storage proxy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../dev/manual/web/bridges/indexeddb-proxy.html">IndexedDB proxy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../dev/manual/web/bridges/external-url-handler.html">External URL handler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../dev/manual/web/bridges/preserve-webgl-render.html">Preserve WebGL Render</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../dev/manual/web/bridges/capture-canvas.html">Capture canvas</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../dev/manual/web/bridges/renpy-tweaks.html">Ren’Py tweaks</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../dev/manual/kart/index.html">Kart — Packing cartridges</a><input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" role="switch" type="checkbox"/><label for="toctree-checkbox-13"><div class="visually-hidden">Toggle navigation of Kart — Packing cartridges</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../dev/manual/kart/getting-started.html">Getting started</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../dev/manual/kart/configuration.html">Configuration files</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../dev/port/index.html">Kate Porting Recipes</a><input class="toctree-checkbox" id="toctree-checkbox-14" name="toctree-checkbox-14" role="switch" type="checkbox"/><label for="toctree-checkbox-14"><div class="visually-hidden">Toggle navigation of Kate Porting Recipes</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../dev/port/bitsy.html">Bitsy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../dev/port/renpy.html">Ren’Py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../dev/port/godot.html">Godot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../dev/port/rpg-maker.html">RPG Maker MV</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../dev/port/gamemaker.html">GameMaker</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Design and implementation</span></p>
+<ul class="current">
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../index.html">Kate’s Design Documents</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-15" name="toctree-checkbox-15" role="switch" type="checkbox"/><label for="toctree-checkbox-15"><div class="visually-hidden">Toggle navigation of Kate’s Design Documents</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../formats/F0001-ljt.html">#F0001 — The LJT language</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../formats/F0002-kart.html">#F0002 — KART cartridges</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../kernel/K0001-capabilities.html">#K0001 — Capabilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../kernel/K0002-live-audit.html">#K0002 — Live auditing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../kernel/K0003-resource-band.html">#K0003 — Resource band</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../kernel/K0004-processes.html">#K0004 — Processes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../kernel/K0005-partitioned-file-storage.html">#K0005 — Partitioned File Storage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../kernel/K0006-cartridge-signatures.html">#K0006 — Cartridge signatures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../kernel/K0007-key-store.html">#K0006 — Cartridge signatures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="A0001-object-storage.html">#A0001 — Object Store API</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">#A0002 — External URL navigation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="A0003-device-file-access.html">#A0003 — Device file access</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Changes, Terms, and Credits</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../etc/releases/index.html">Release notes</a><input class="toctree-checkbox" id="toctree-checkbox-16" name="toctree-checkbox-16" role="switch" type="checkbox"/><label for="toctree-checkbox-16"><div class="visually-hidden">Toggle navigation of Release notes</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../etc/releases/0.23.10.html">Kate v0.23.10  (October 2023)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../etc/releases/0.23.8.html">Kate v0.23.8  (August 2023)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../etc/releases/0.23.6.html">Kate v0.23.6  (June 2023)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../etc/releases/0.23.5.html">Kate v0.23.5  (May 2023)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../etc/releases/0.23.4.html">Kate v0.23.4  (April 2023)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../etc/licence.html">Terms of use</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Indices and Tables</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../genindex.html">Index</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../py-modindex.html">Module Index</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/qteatime/kate/edit/main/docs/source/design/api/A0002-external-url.rst" title="Edit this page">
+    <svg aria-hidden="true" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <path d="M4 20h4l10.5 -10.5a1.5 1.5 0 0 0 -4 -4l-10.5 10.5v4" />
+      <line x1="13.5" y1="6.5" x2="17.5" y2="10.5" />
+    </svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          <section id="a0002-external-url-navigation">
+<h1>#A0002 — External URL navigation<a class="headerlink" href="#a0002-external-url-navigation" title="Link to this heading">#</a></h1>
+<dl class="field-list simple">
+<dt class="field-odd">Author<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Niini</p>
+</dd>
+<dt class="field-even">Started<span class="colon">:</span></dt>
+<dd class="field-even"><p>2023-06-25</p>
+</dd>
+<dt class="field-odd">Last updated<span class="colon">:</span></dt>
+<dd class="field-odd"><p>2023-07-23</p>
+</dd>
+<dt class="field-even">Status<span class="colon">:</span></dt>
+<dd class="field-even"><p>PoC in progress</p>
+</dd>
+</dl>
+<section id="timeline">
+<h2>Timeline<a class="headerlink" href="#timeline" title="Link to this heading">#</a></h2>
+<div class="table-wrapper docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>First draft</p></th>
+<th class="head"><p>Proof of Concept</p></th>
+<th class="head"><p>Stable implementation</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>2023-07-15</p></td>
+<td><p>—</p></td>
+<td><p>—</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Link to this heading">#</a></h2>
+<p>Kate’s cartridges are sandboxed and have no internet connection. This is
+done to protect players’ privacy and allow them to run unvetted cartridges
+with little risk—there are few attacks that are truly interesting when
+the cartridge cannot do anything other than pure computation.</p>
+<p>However, to be useful for the player, cartridges may contain links to
+external websites. For example, a cartridge might want to link to its
+developers’ profile in a credits screen, or provide a help page online.</p>
+<p>In these cases Kate should support cartridges to open external URLs while
+maintaining a baseline of privacy and security guarantees for the player.</p>
+</section>
+<section id="technical-implementation">
+<h2>Technical implementation<a class="headerlink" href="#technical-implementation" title="Link to this heading">#</a></h2>
+<p>Here we want to introduce a new API, <code class="docutils literal notranslate"><span class="pre">Browser</span></code>, which provides a function
+to load an external URL. This URL is always opened in the user’s default
+browser window, with enough security and trust indicators to allow them
+to make an informed choice about what page they’re navigating through. It
+must also make it clear that the user has left Kate’s own security boundaries
+and guarantees.</p>
+<p>The API definition is as follows:</p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span class="kd">interface</span><span class="w"> </span><span class="nx">Browser</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">async</span><span class="w"> </span><span class="nx">open_url</span><span class="p">(</span><span class="nx">url</span><span class="o">:</span><span class="w"> </span><span class="kt">URL</span><span class="p">)</span><span class="o">:</span><span class="w"> </span><span class="nb">Promise</span><span class="o">&lt;</span><span class="ow">void</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>And its semantics are as follows:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>Check if we’re allowed to ask the user to open a URL;</p>
+<ol class="loweralpha simple">
+<li><p>If the cartridge does not have a <code class="docutils literal notranslate"><span class="pre">Open</span> <span class="pre">URLs</span></code> capability: reject the request;</p></li>
+<li><p>If the cartridge has a pending <code class="docutils literal notranslate"><span class="pre">Open</span> <span class="pre">URL</span></code> request: reject the new request;</p></li>
+<li><p>If the cartridge is not active and in the foreground: reject the request;</p></li>
+</ol>
+</li>
+<li><p>The URL must have a known trusted protocol. We support HTTP and HTTPS;</p></li>
+<li><p>The URL must not have inline authentication details;</p></li>
+<li><p>Let the <strong>Display URL</strong> be a <a class="reference external" href="url-shortening">shorter version of the URL</a>
+that fits in under 100 characters, and uses punycode and URL encoded notation
+for non ASCII parts;</p></li>
+<li><p><a class="reference external" href="dialog-behaviour">Ask the user confirmation</a> for opening the URL by
+showing the cartridge making the request and the <strong>Display URL</strong>;</p>
+<ol class="loweralpha simple">
+<li><p>If the user consents, open the URL in a new browser window, in a new
+browsing context, with no referrer.</p></li>
+</ol>
+</li>
+<li><p>Store the request and its outcome in the audit log;</p>
+<ol class="loweralpha simple">
+<li><p>If the request is rejected, store at most 5 URLs during a session,
+and combine all requests within a time window.</p></li>
+</ol>
+</li>
+<li><p>Whether the request completes or is rejected, the promise should always
+be fulfilled with no value; the user’s decision of following the URL or
+not should not be leaked to the cartridge.</p></li>
+</ol>
+</div></blockquote>
+<p>Note that this whole process is just about informing the user what URL is
+going to be opened, because cartridges are not forced to display this to
+the user before calling the API with an arbitrary URL. For actual security
+we still rely on the browsers’ sandbox and OS defence mechanisms (e.g.:
+tainting downloaded streams).</p>
+</section>
+<section id="issues-with-url-navigation">
+<h2>Issues with URL navigation<a class="headerlink" href="#issues-with-url-navigation" title="Link to this heading">#</a></h2>
+<p>Kate blocks all internet connections from a cartridge by default, and
+also any navigation (even internal). This ensures that once a cartridge
+is loaded, it is unable to exfiltrate data, modify its content in ways
+that cannot be vetted, or perform attacks that consist of tricking users
+into navigating to a malicious website which poses as a known one.</p>
+<p>However there are valid use cases where a cartridge (or Kate itself)
+might want to let the user open a different page. For example, the
+cartridge might have links in its help or about page that point
+to a documentation page, or to a developer’s profile. There might be
+requirements on this for asset usage.</p>
+<p>Allowing these URLs to be open makes Kate less safe in the following ways:</p>
+<section id="blurred-security-boundaries">
+<h3>Blurred security boundaries<a class="headerlink" href="#blurred-security-boundaries" title="Link to this heading">#</a></h3>
+<p>Kate itself is a web application. It should never load external
+URLs within its own web view. Doing so blurs the clear boundaries it
+traces between verifiable content and unverifiable content.</p>
+<p>A different approach is to always open the links in a separate browser
+window. This signals to the user that such URL is entirely unrelated to
+Kate, and regains the clear distinction between what constitutes the
+Kate OS and its contents; and what’s external to it and thus not subject
+to the same security and privacy guarantees.</p>
+</section>
+<section id="social-attacks-on-url-rendering">
+<h3>Social attacks on URL rendering<a class="headerlink" href="#social-attacks-on-url-rendering" title="Link to this heading">#</a></h3>
+<p>The second problem is more complicated and refers to the social idea
+of when and by whom a URL can be trusted. This, of course, extends to
+attacks where malicious cartridges craft a URL that looks like a
+legit website and try to convince the user to perform some
+operation there.</p>
+<p>For example <code class="docutils literal notranslate"><span class="pre">google.com</span></code> and <code class="docutils literal notranslate"><span class="pre">9oogle.com</span></code> might
+be read as the same website by some people, especially if it’s
+rendered with a font where the lowercase “G” and the arabic digit “9”
+are less distinct, which might work for phishing attacks.
+<a class="reference external" href="https://en.wikipedia.org/wiki/Domain_name#Domain_name_spoofing">Domain name spoofing attacks</a>
+go further beyond the use of homoglyphs, and there isn’t really much
+that technology can do to prevent them, in the general sense.</p>
+<p>Even if we ask the user for consent before opening the URL, it’s
+hard for the user to actually <em>do</em> any kind of risk assessment.
+What <em>should</em> the user be looking for here? Can looking at a URL
+really give you much of a warning about what kind of page you’re
+about to land on? Outside of the most well-known domains and websites,
+not really. Showing the user a URL only tells them “you’re going to
+this place you’ve never heard about before”.</p>
+<p>And if we <em>do</em> show the URL to the user before sending them there, how do
+we handle the general case? For example, someone might use a URL shortener,
+such as the one provided by social networks for tracking clickthroughs, in which
+case telling them “You’re about to open <code class="docutils literal notranslate"><span class="pre">https://go.to/SomeRandomLetters</span></code>”
+doesn’t even tell them anything about where they will <em>land</em>. The
+reputable URL shortner domain is just an intermediary that will immediately
+redirect to some random URL it has no control over.</p>
+<p>Further, some URLs might be too long to display. For example, if we’re
+given <code class="docutils literal notranslate"><span class="pre">https://trusted.site/&lt;3000</span> <span class="pre">characters</span> <span class="pre">follow</span> <span class="pre">here&gt;</span></code> what do
+we display? Do we show just the beginning of the URL? Parts of the
+beginning and parts of the end? Sometimes browsers might show just
+the domain name to the user which can be very misleading if the
+path and query parts of the URL include some kind of command
+that’s about to take place on the user’s behalf, but there’s no
+realistic way of presenting this to the user in a way they <em>could</em>
+have some sort of informed consent.</p>
+</section>
+<section id="state-and-browser-issues">
+<h3>State and browser issues<a class="headerlink" href="#state-and-browser-issues" title="Link to this heading">#</a></h3>
+<p>Besides not having enough information for informed consent, users also
+have no control over what information they will share with the target
+page.</p>
+<p>For example, a cartridge that collects user data might include that
+data in the URL to send it to some external website, even when that
+wasn’t what the user expected when clicking a link.</p>
+<p>Or, if we open a page in a domain the user trusts, but the
+page is not controlled by the same trusted entity, an attacker might be able
+to escalate their privileges. The same goes for malicious pages that
+might exploit browser bugs to gain more information than the browser
+intended to provide. Browsers have very complex machinery, particularly
+when running JavaScript, and are frequent sources of bugs such as
+<a class="reference external" href="https://bugzilla.mozilla.org/show_bug.cgi?id=1538006">JIT Type Confusion</a>
+which allows web sites to escape the sandbox they’re placed into and run
+arbitrary code with more privileges.</p>
+<p>Or a cartridge may link to a domain that, at the time it was published,
+belonged to a trustworthy entity. But as time went on the domain
+expired and was purchased by someone with less-than-charitable intentions;
+resulting in the cartridge now linking to an actively harmful website.</p>
+<p>All these issues are outside of Kate’s control, but we should consider
+ways of mitigating the damage they may cause nonetheless.</p>
+</section>
+</section>
+<section id="how-is-this-feature-dangerous">
+<h2>How is this feature dangerous?<a class="headerlink" href="#how-is-this-feature-dangerous" title="Link to this heading">#</a></h2>
+<p>Though the previous section provides an informal write-up of the many threats
+one may encounter with external URLs, this section is more technical and
+follows the general format of Kate’s threat documentation.</p>
+<dl>
+<dt><strong>Blurred Kate/External boundary:</strong></dt><dd><p>Because Kate is itself a web application, there’s a risk that opening
+an external URL will provide little guidance to the users in that
+such content <em>is not part of Kate</em>, and the user must reassess the
+risk of using it independently.</p>
+<p>We mitigate this by not allowing external URLs to open in the same
+window Kate uses. All external URLs are opened in a new window or
+in a new tab, using the user’s current or default web browser.</p>
+</dd>
+<dt><strong>Lack of feedback about navigation:</strong></dt><dd><p>Kate is primarily a gaming console, and most games are not written using
+web technologies. For example, a game engine like Ren’Py directly uses
+<a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/API/Window/open">Window.open</a>
+to be able to navigate to links. A user is, then, not informed that they’re
+about to navigate to an external resource, like they would be hovering
+a link in a regular webpage.</p>
+<p>We mitigate this by showing users a message indicating that they are
+about to navigate to an external resource. This is similar to the
+approach other platforms with significant risk of phishing attacks take.</p>
+</dd>
+<dt><strong>Security scare fatigue:</strong></dt><dd><p>Because Kate shows a message indicating that the user is navigating
+to an external resource, there’s a risk, based on the frequency
+of these alerts and the pay-off perceived, that users will treat
+these as useless security scares and end up trained to click
+“Take me to the malicious website” without reading or performing
+any needed risk assessment.</p>
+<p>Due to the risk of data exfiltration, and the requirement of a
+transient action from the browser side, Kate chooses to not mitigate this.</p>
+</dd>
+<dt><strong>Navigating to a malicious website:</strong></dt><dd><p>Because neither Kate nor the user can realistically know if the
+target website contains malicious code or not, there’s a risk that
+by following a link the user has their digital accounts or device
+compromised.</p>
+<p>We don’t mitigate this in Kate, but rather rely on the user’s
+browser and OS to perform the active mitigation of known malicious
+targets (e.g.: by keeping a deny-list or tainting downloaded executables),
+and sandboxing malicious content to mitigate the potential damage.</p>
+</dd>
+<dt><strong>Homoglyph attacks:</strong></dt><dd><p>Because Kate tells users what website they’re about to visit,
+it’s possible that a malicious cartridge may try to trick users
+into believing they’re visiting a trusted website when in reality
+they’re visiting a malicious one.</p>
+<p>We partly mitigate this by showing domains using only ASCII characters
+in a font that is known to have distinctive glyphs for all characters
+(e.g.: “O” (the uppercase letter O) and “0” (the digit zero) have distinct symbols,
+as do “I” (the uppercase vowel I) and “l” (the lowercase consonant L)).
+And we rely on the browser to provide further mitigation in the address
+bar and with filters to warn users of known phishing attacks.</p>
+</dd>
+<dt><strong>Redirection attacks:</strong></dt><dd><p>Because Kate may receive any URL to open, a malicious cartridge might
+hide a malicious URL under a more trusted redirect (e.g.: the URL shortener
+many social network websites use), in which case the user may end up
+opening a webpage that’s not what they expected.</p>
+<p>We cannot mitigate this. Because Kate generally runs as a regular webpage,
+it has no way of connecting to the server at the other end to figure out
+where it redirects to — and even if it did, the server might behave differently
+regarding redirections if it’s reached by a Browser agent,
+depending on the cookies it’s given, etc.</p>
+<p>Instead, we rely on the trusted redirect service and the browsers’ own
+defenses against malicious URLs to provide at least some protection against
+well-known forms and targets of this attack.</p>
+</dd>
+<dt><strong>Long domain attacks:</strong></dt><dd><p>Because Kate has limited physical screen space to tell the user about what
+website they’re navigating to, a malicious cartridge may choose an
+intentionally long domain or pathname in the hopes that what the user sees
+misleads them into thinking they’re visiting a trusted domain.
+E.g.: <code class="docutils literal notranslate"><span class="pre">https://accounts.google.com.definitely-absolutely-not-at-all-malicious-domain.invalid/login</span></code> could
+risk displaying only <code class="docutils literal notranslate"><span class="pre">https://accounts.google.com...</span></code> because the name
+is otherwise too long to fit in the screen.</p>
+<p>Kate mitigates this by always attempting to show the entire domain, if
+it can fit the screen, and otherwise indicating that it’s not showing
+the entire domain. In this case the link could be shown as:
+<code class="docutils literal notranslate"><span class="pre">https://accounts.[44</span> <span class="pre">characters</span> <span class="pre">omitted]malicious-domain.invalid/login</span></code>.
+The <code class="docutils literal notranslate"><span class="pre">44</span> <span class="pre">characters</span> <span class="pre">omitted</span></code> part <strong>must</strong> be shown in a different font,
+which indicates that it’s not part of the actual domain name, but Kate’s
+own URL shortening, to mitigate further attacks. Hovering the URL should
+always display the complete domain.</p>
+</dd>
+<dt><strong>Unicode control character attacks</strong></dt><dd><p>Because Unicode contains control characters, which have no display but
+<em>change how text is rendered</em>, it’s possible for an attacker to trick
+users into believing they’re visiting a trusted site by carefully manipulating
+how the actual URL is rendered.</p>
+<p>For example:
+<code class="docutils literal notranslate"><span class="pre">https://kate.qteati.me/‮resu_detsurt‬</span></code> is rendered as
+<code class="docutils literal notranslate"><span class="pre">https://kate.qteati.me/trusted_user</span></code>, but in reality contains the URL
+<code class="docutils literal notranslate"><span class="pre">https://kate.qteati.me/[U+202E]resu_detsurt[U+202C]</span></code> with a clever use of
+“render this portion of the text right-to-left”.</p>
+<p>Kate will never show non-ASCII characters when presenting the URL. Unicode
+characters should either be converted to their punicode format or be
+percent-encoded. That is, when asking the user for consent, the user
+should be seeing this URL as <code class="docutils literal notranslate"><span class="pre">https://kate.qteati.me/%E2%80%AEresu_detsurt%E2%80%AC</span></code>.</p>
+</dd>
+<dt><strong>Data exfiltration:</strong></dt><dd><p>Cartridges generally do not have access to any sensitive data, however
+they might collect data from the user or be endowed with additional
+permissions. In these cases there’s a risk that, to circumvent not having
+direct network access, a cartridge might craft a URL that contains sensitive
+information and exfiltrate it by having the user follow the URL.</p>
+<p>Since Kate cannot do proper provenance tracking in cartridges (Browsers’
+execution models make this intractable), there’s no realistic mitigation
+for this scenario. We display parts of the URL to the user in the hopes
+it contains enough information for them to make an informed risk decision,
+but that’s, of course, fallible.</p>
+</dd>
+<dt><strong>Link rotting:</strong></dt><dd><p>Because cartridges are static snapshots that work entirely offline, it’s
+possible that a player gets to run a cartridge many years after the author
+has published it, and in that period the URLs included in cartridge have
+ceased to be published online, have changed, or contain malicious content
+unintended by the author of the cartridge.</p>
+<p>Although this document does not prescribe any mitigation for link rotting,
+in the future Kate could look into using the date of publication of the
+cartridge to warn the user of the possibility of the link having changed.</p>
+</dd>
+<dt><strong>Unreliable or uncommon protocols:</strong></dt><dd><p>Cartridges may redirect users to URLs that use insecure protocols,
+such as plain HTTP, or that are uncommonly used and might result in
+native applications being open without the user’s expectation.
+While some of these might not be malicious, there’s still an issue
+with expectations and the inherent safety guarantees of the protocol.</p>
+<p>Kate should only support opening URLs in known safe protocols. It
+should still support unsafe but common protocols, such as plain HTTP,
+as long as the user can be informed about the privacy and security
+risks associated with it.</p>
+</dd>
+<dt><strong>Denial of service attacks:</strong></dt><dd><p>Because Kate exposes URL opening as an API, similar to Browsers’
+<code class="docutils literal notranslate"><span class="pre">window.open</span></code> API, it’s possible for a malicious cartridge to
+abuse this power, leading to a similar situation as old popup
+flooding attacks, where a cartridge could issue so many requests
+that users would not be able to handle them all, rendering the
+whole device unusable.</p>
+<p>Modern browsers mitigate this by both restricting the number of
+popups that can be shown subsequently and by tying them to a
+transient user action (e.g.: the user needs to click or press a
+key for the page to be allowed to show a popup).</p>
+<p>Kate does not use transient activation directly, but mitigates this instead
+by giving cartridges a quota of dialogue requests that can be issued,
+with only one request active at any given time, as well as allowing
+users to suppress requests from cartridges that abuse it.</p>
+</dd>
+<dt><strong>Storage filling attacks:</strong></dt><dd><p>Kate aims to provide an auditable environment, so all sensitive
+actions have both immediate and persistent feedback. External URL
+requests are always logged to persistent storage, but this means
+there’s a risk that a malicious cartridge may issue several blocked
+requests in the hopes of filling the storage.</p>
+<p>Kate mitigates this by using a supervisor which takes logging
+requests for these actions and can both apply restrictive quotas
+to ensure storage doesn’t fill up, merge cancelled requests when logging
+to the audit log, or one-sidedly terminate particularly misbehaving
+cartridges to guarantee fair resource usage.</p>
+</dd>
+</dl>
+</section>
+<section id="comparison-to-prior-art">
+<h2>Comparison to prior art<a class="headerlink" href="#comparison-to-prior-art" title="Link to this heading">#</a></h2>
+<p>Though Kate is in a bit of a niche position given its philosophy on security
+and privacy, it’s not alone in feeling a need to signal to users changes in
+trust boundaries and privacy guarantees.</p>
+<p>When it comes to warning users of this, the most common approaches are:</p>
+<ul class="simple">
+<li><p><strong>Active confirmation</strong>: before the user can navigate to the external
+resource, the user is presented with some kind of confirmation dialog
+that seeks active confirmation from the user. This can be seen in
+applications like Discord, websites like Pixiv, and libraries like
+Iframely.</p></li>
+<li><p><strong>Enriching the link</strong>: links that load external resources are rendered
+in differently from links to internal resources. The difference is usually
+a small icon suffixed to the link. This can be seen on Wikipedia and other
+documentation websites.</p></li>
+<li><p><strong>Showing the destination in a secondary channel</strong>: users are able to
+ask for details about the destination of a link before following it.
+Browsers generally do this by having the user hover the link with a pointing
+device, or long-press the link on a touch-enabled device, and then showing
+the destination on a status bar or popup menu.</p></li>
+</ul>
+<p>Kate has no control over the contents of the cartridge, and games are not
+webpages (the concept of a “link” does not exist), thus the only realistic
+approach for us is to seek active confirmation from the user.</p>
+</section>
+<section id="seeking-active-user-consent">
+<h2>Seeking active user consent<a class="headerlink" href="#seeking-active-user-consent" title="Link to this heading">#</a></h2>
+<p>Kate chooses popups for checking the users’ consent as opposed to Browsers’
+use of transient activation, particularly because it’s hard for Kate to
+communicate enough to the user about the URL before navigation takes place,
+as cartridges are not webpages.</p>
+<section id="dialog-behaviour">
+<span id="id1"></span><h3>Dialog behaviour<a class="headerlink" href="#dialog-behaviour" title="Link to this heading">#</a></h3>
+<p>We have two scenarios for these popups:</p>
+<ul>
+<li><p>The cartridge has a “Open URLs” capability and the URL uses a secure
+protocol: here we want to give people an indication of where they’re
+going so they can do some risk assessment.</p>
+<img alt="../../_images/external-url-dialog.png" src="../../_images/external-url-dialog.png" />
+</li>
+<li><p>The URL uses an insecure protocol: this is the case where the URL is using
+plain HTTP. We want to make sure the user understands that their connection
+can be spied upon and tampered with, but we won’t block the request.</p>
+<img alt="../../_images/external-url-insecure.png" src="../../_images/external-url-insecure.png" />
+</li>
+</ul>
+<p>The only difference between the two dialogs is that insecure protocols include
+an additional warning about the privacy and security implications of navigating
+to a URL using an unencrypted protocol.</p>
+<p>The user can perform three actions here:</p>
+<ul class="simple">
+<li><p><strong>Continue to website</strong>: this will open the target URL in a separate
+browser window, with all of the security/privacy indicators the browser
+regularly uses, and without leaking the emulator’s location as the referrer,
+or connecting both navigation contexts.</p></li>
+<li><p><strong>Suppress future requests</strong>: this will cancel the dialog and remove the
+capability grant for navigating to external URLs.</p></li>
+<li><p><strong>Cancel</strong>: this will cancel the dialog but allow the cartridge to issue
+new requests in the future.</p></li>
+</ul>
+</section>
+<section id="url-presentation">
+<span id="url-shortening"></span><h3>URL presentation<a class="headerlink" href="#url-presentation" title="Link to this heading">#</a></h3>
+<p>Because we need to present the URL to the user, we need a strategy for dealing
+with longer URLs.</p>
+<section id="http-urls">
+<h4>HTTP URLs<a class="headerlink" href="#http-urls" title="Link to this heading">#</a></h4>
+<p>To avoid the cases where cartridges may maliciously abuse our URL shortening
+at presentation to trick users into believing they’re navigating to a trusted
+domain, we shorten the URL in the following way:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">Insecure</span> <span class="n">Protocol</span><span class="p">]</span>
+<span class="p">[</span><span class="n">MaxMid</span><span class="p">(</span><span class="mi">70</span><span class="p">,</span> <span class="n">Domain</span><span class="p">)]</span>
+<span class="p">[</span><span class="n">Port</span><span class="p">]</span>
+<span class="p">[</span><span class="n">MaxEnd</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="n">Path</span><span class="p">)]</span>
+<span class="p">[</span><span class="n">MaxEnd</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">Query</span><span class="p">)]</span>
+<span class="p">[</span><span class="n">MaxEnd</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">Hash</span><span class="p">)]</span>
+</pre></div>
+</div>
+<p>Note that we give ample space to fit most reasonable domains by compromising
+on the path/query/hash parts instead. Protocol and port are never shortened,
+however we only show the protocol if the connection would be unencrypted.
+This is to make HTTPS connections look more desirable, and help users pay
+attention to insecure connections instead.</p>
+<p>If the URL contains inline authentication, we should reject opening these
+URLs at all and do a separate risk assessment for them. URLs containing
+authentication are rare enough (and enough of a bad idea) to skip supporting
+them for now.</p>
+</section>
+<section id="shortening-algorithms">
+<h4>Shortening algorithms<a class="headerlink" href="#shortening-algorithms" title="Link to this heading">#</a></h4>
+<p>The actual shortening is handled by two functions <code class="docutils literal notranslate"><span class="pre">MaxMid(length,</span> <span class="pre">text)</span></code> and
+<code class="docutils literal notranslate"><span class="pre">MaxEnd(length,</span> <span class="pre">text)</span></code>. The first keeps parts of the beginning and parts of
+the ending of the URL, and omits parts in the middle. The second keeps
+the beginning and omits parts of the ending.</p>
+<p>The omitted bits are replaced by a message that can be distinctively
+presented to the user and immediately recognisable as not part of the URL.
+This means that it <em>cannot</em> be just text, but has to be text aided by
+different presentation and rendering (e.g.: a different background).</p>
+<p>Both functions are more formally specified as follows:</p>
+<div class="highlight-haskell notranslate"><div class="highlight"><pre><span></span><span class="kt">MaxEnd</span><span class="p">(</span><span class="n">length</span><span class="w"> </span><span class="ow">::</span><span class="w"> </span><span class="kt">Int</span><span class="p">,</span><span class="w"> </span><span class="n">text</span><span class="w"> </span><span class="ow">::</span><span class="w"> </span><span class="kt">Text</span><span class="p">)</span><span class="w"> </span><span class="ow">=</span>
+<span class="w">  </span><span class="n">when</span><span class="w"> </span><span class="n">codepoints</span><span class="p">(</span><span class="n">text</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">length</span><span class="w"> </span><span class="ow">-&gt;</span>
+<span class="w">    </span><span class="n">slice</span><span class="p">(</span><span class="n">text</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">length</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">[</span><span class="o">...</span><span class="p">`</span><span class="n">codepoints</span><span class="p">(</span><span class="n">text</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">length</span><span class="p">`</span><span class="w"> </span><span class="n">characters</span><span class="p">]</span>
+
+<span class="w">  </span><span class="n">otherwise</span><span class="w"> </span><span class="ow">-&gt;</span>
+<span class="w">    </span><span class="n">text</span>
+
+
+<span class="kt">MaxMid</span><span class="p">(</span><span class="n">length</span><span class="w"> </span><span class="ow">::</span><span class="w"> </span><span class="kt">Int</span><span class="p">,</span><span class="w"> </span><span class="n">text</span><span class="w"> </span><span class="ow">::</span><span class="w"> </span><span class="kt">Text</span><span class="p">)</span><span class="w"> </span><span class="ow">=</span>
+<span class="w">  </span><span class="n">when</span><span class="w"> </span><span class="n">codepoints</span><span class="p">(</span><span class="n">text</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">length</span><span class="w"> </span><span class="ow">-&gt;</span>
+<span class="w">    </span><span class="kr">let</span><span class="w"> </span><span class="n">omitted</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="n">codepoints</span><span class="p">(</span><span class="n">text</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">length</span><span class="p">;</span>
+<span class="w">    </span><span class="kr">let</span><span class="w"> </span><span class="n">mid_start</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="n">floor</span><span class="p">(</span><span class="n">length</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">2</span><span class="p">);</span>
+<span class="w">    </span><span class="kr">let</span><span class="w"> </span><span class="n">mid_stop</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="n">mid_start</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">omitted</span><span class="p">;</span>
+<span class="w">    </span><span class="n">slice</span><span class="p">(</span><span class="n">text</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">mid_start</span><span class="p">)</span>
+<span class="w">      </span><span class="o">+</span><span class="w"> </span><span class="p">[</span><span class="o">...</span><span class="p">`</span><span class="n">omitted</span><span class="p">`</span><span class="w"> </span><span class="n">characters</span><span class="o">...</span><span class="p">]</span>
+<span class="w">      </span><span class="o">+</span><span class="w"> </span><span class="n">slice</span><span class="p">(</span><span class="n">text</span><span class="p">,</span><span class="w"> </span><span class="n">mid_stop</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">codepoints</span><span class="p">(</span><span class="n">text</span><span class="p">))</span>
+
+<span class="w">  </span><span class="n">otherwise</span><span class="w"> </span><span class="ow">-&gt;</span>
+<span class="w">    </span><span class="n">text</span>
+
+<span class="nf">slice</span><span class="p">(</span><span class="n">text</span><span class="w"> </span><span class="ow">::</span><span class="w"> </span><span class="kt">Text</span><span class="p">,</span><span class="w"> </span><span class="n">start</span><span class="w"> </span><span class="ow">::</span><span class="w"> </span><span class="kt">Int</span><span class="p">,</span><span class="w"> </span><span class="n">stop</span><span class="w"> </span><span class="ow">::</span><span class="w"> </span><span class="kt">Int</span><span class="p">)</span><span class="w"> </span><span class="ow">=</span>
+<span class="w">  </span><span class="c1">-- all text codepoints from `start` to `stop`, inclusive on both ends,</span>
+<span class="w">  </span><span class="c1">-- 1-indexed</span>
+<span class="w">  </span><span class="c1">--</span>
+<span class="w">  </span><span class="c1">-- E.g.: slice(&quot;abcdef&quot;, 3, 4) = &quot;cd&quot;</span>
+</pre></div>
+</div>
+<p>It’s important to note here that we slice at codepoint boundaries, rather
+than at grapheme boundaries. This is okay, but only because the displayed URL
+will never have unicode characters, given that we translate it into a
+canonically encoded form before displaying.</p>
+</section>
+</section>
+</section>
+<section id="capabilities-and-privacy">
+<h2>Capabilities and privacy<a class="headerlink" href="#capabilities-and-privacy" title="Link to this heading">#</a></h2>
+<p>Cartridge requests to open a URL always trigger a dialog to get active
+confirmation from the user. In that sense they are already a contextual
+capability. However, we still want cartridges to indicate that they <em>will</em>
+rely on this during runtime for two reasons:</p>
+<ul class="simple">
+<li><p>Users can remove the grant of this capability if they feel the cartridge
+has been abusing it; and</p></li>
+<li><p>We can request that cartridges using the capability provide a privacy
+policy and disclose the intended uses of linking to external content.</p></li>
+</ul>
+<p>In this way we want to have a new capability, <code class="docutils literal notranslate"><span class="pre">Open</span> <span class="pre">URLs</span></code>, which
+cartridges <em>must</em> include in their capability list metadata in order
+to be able to use this API. Users will not be prompted for a grant
+because the capability is contextual, but they will be informed that
+the cartridge can request opening external URLs.</p>
+</section>
+<section id="references-and-additional-material">
+<h2>References and additional material<a class="headerlink" href="#references-and-additional-material" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://dl.acm.org/doi/10.1145/268998.266669">A decentralized model for information flow control</a>
+— academic paper on information flow by Andrew C. Myers and Barbara Liskov;</p></li>
+<li><p><a class="reference external" href="https://robotlolita.me/talks/konferense/">Securing Your Systems by Befriending Ghosts</a>
+— technical talk on information flow;</p></li>
+<li><p><a class="reference external" href="https://url.spec.whatwg.org/">URL living standard</a>
+— specification by WhatWG;</p></li>
+<li><p><a class="reference external" href="https://www.rfc-editor.org/rfc/rfc3492.txt">Punycode RFC</a>
+— RFC by IETC;</p></li>
+<li><p><a class="reference external" href="https://en.wikipedia.org/wiki/IDN_homograph_attack">IDN homograph attack</a>
+— Wikipedia;</p></li>
+<li><p><a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/API/Window/open">Window.open()</a>
+— Documentation on MDN;</p></li>
+</ul>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="A0003-device-file-access.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">#A0003 — Device file access</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="A0001-object-storage.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">#A0001 — Object Store API</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2023, Niini
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">#A0002 — External URL navigation</a><ul>
+<li><a class="reference internal" href="#timeline">Timeline</a></li>
+<li><a class="reference internal" href="#summary">Summary</a></li>
+<li><a class="reference internal" href="#technical-implementation">Technical implementation</a></li>
+<li><a class="reference internal" href="#issues-with-url-navigation">Issues with URL navigation</a><ul>
+<li><a class="reference internal" href="#blurred-security-boundaries">Blurred security boundaries</a></li>
+<li><a class="reference internal" href="#social-attacks-on-url-rendering">Social attacks on URL rendering</a></li>
+<li><a class="reference internal" href="#state-and-browser-issues">State and browser issues</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-is-this-feature-dangerous">How is this feature dangerous?</a></li>
+<li><a class="reference internal" href="#comparison-to-prior-art">Comparison to prior art</a></li>
+<li><a class="reference internal" href="#seeking-active-user-consent">Seeking active user consent</a><ul>
+<li><a class="reference internal" href="#dialog-behaviour">Dialog behaviour</a></li>
+<li><a class="reference internal" href="#url-presentation">URL presentation</a><ul>
+<li><a class="reference internal" href="#http-urls">HTTP URLs</a></li>
+<li><a class="reference internal" href="#shortening-algorithms">Shortening algorithms</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#capabilities-and-privacy">Capabilities and privacy</a></li>
+<li><a class="reference internal" href="#references-and-additional-material">References and additional material</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../../_static/documentation_options.js?v=1b0dedb3"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/scripts/furo.js?v=32e29ea5"></script>
+    </body>
+</html>

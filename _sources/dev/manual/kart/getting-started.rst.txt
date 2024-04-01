@@ -21,7 +21,7 @@ the following:
     "version": {"major": 1, "minor": 0},
     "metadata": {
       "presentation": {
-        "author": "Q.",
+        "author": "Niini",
         "title": "Kat'chu",
         "tagline": "Collect consoles and rack up scores",
         "thumbnail_path": "thumbnail.png"

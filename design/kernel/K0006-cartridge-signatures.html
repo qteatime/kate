@@ -1,0 +1,886 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" /><link rel="next" title="#K0006 — Cartridge signatures" href="K0007-key-store.html" /><link rel="prev" title="#K0005 — Partitioned File Storage" href="K0005-partitioned-file-storage.html" />
+
+    <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
+        <title>#K0006 — Cartridge signatures - Kate 0.23.10 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=82a976d7" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=135e06be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=36a5483c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=d1035e3f" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #ffffff;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+<div class="announcement">
+  <aside class="announcement-content">
+     Both Kate and this documentation are a work in progress and may change at any time. 
+  </aside>
+</div>
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../index.html"><div class="brand">Kate 0.23.10 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
+  
+  
+  <span class="sidebar-brand-text">Kate 0.23.10 documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">End-user books</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../user/manual/index.html">The Kate User Manual</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of The Kate User Manual</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../user/manual/intro/index.html">Getting started</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of Getting started</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../user/manual/intro/hardware.html">Tech specs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../user/manual/intro/emulator.html">Emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../user/manual/intro/install.html">Installing</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../user/manual/gaming/index.html">Playing games</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of Playing games</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../user/manual/gaming/cartridges.html">ROM Cartridges</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../user/manual/gaming/captures.html">Screen recording</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../user/manual/gaming/save-data.html">Save data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../user/manual/gaming/play-habits.html">Play habits</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../user/manual/gaming/storage.html">Stored data</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../user/manual/security/index.html">Security and privacy</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of Security and privacy</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../user/manual/security/philosophy.html">Safety philosophy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../user/manual/security/sandboxing.html">Sandboxing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../user/manual/security/privacy.html">Privacy policy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../user/manual/security/trust.html">Trust and consent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../user/manual/security/audit.html">Audit logs</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../user/importer/index.html">The Kate Importer Manual</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle navigation of The Kate Importer Manual</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../user/importer/renpy.html">Ren’Py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../user/importer/bitsy.html">Bitsy</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../user/diy/index.html">Build Your Own Console!</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle navigation of Build Your Own Console!</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../user/diy/overview/index.html">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../user/diy/hardware/index.html">The hardware</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Game developer books</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../dev/manual/index.html">Making games for Kate!</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><div class="visually-hidden">Toggle navigation of Making games for Kate!</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../dev/manual/intro/index.html">Getting started</a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" role="switch" type="checkbox"/><label for="toctree-checkbox-8"><div class="visually-hidden">Toggle navigation of Getting started</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../dev/manual/intro/why.html">Why make games for Kate?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../dev/manual/intro/setup.html">What will you need?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../dev/manual/intro/hello-world.html">Hello, World</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../dev/manual/model/index.html">Programming model</a><input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" role="switch" type="checkbox"/><label for="toctree-checkbox-9"><div class="visually-hidden">Toggle navigation of Programming model</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../dev/manual/model/overview.html">Overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../dev/manual/model/cartridges.html">Cartridges</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../dev/manual/model/sandboxing.html">Sandboxing and APIs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../dev/manual/model/capabilities.html">Capabilities</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../dev/manual/api/index.html">Kate API</a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" role="switch" type="checkbox"/><label for="toctree-checkbox-10"><div class="visually-hidden">Toggle navigation of Kate API</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../dev/manual/api/events.html"><code class="docutils literal notranslate"><span class="pre">events</span></code> — Event handling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../dev/manual/api/cart-fs.html"><code class="docutils literal notranslate"><span class="pre">cart_fs</span></code> — Reading files</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../dev/manual/api/input.html"><code class="docutils literal notranslate"><span class="pre">*_input</span></code> — Reacting to player input</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../dev/manual/api/timer.html"><code class="docutils literal notranslate"><span class="pre">timer</span></code> — Scheduling updates</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../dev/manual/api/capture.html"><code class="docutils literal notranslate"><span class="pre">capture</span></code> — Screenshots and video recording</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../dev/manual/api/store.html"><code class="docutils literal notranslate"><span class="pre">store</span></code> — Saving state</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../dev/manual/api/browser.html"><code class="docutils literal notranslate"><span class="pre">browser</span></code> — Navigating to URLs</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../dev/manual/web/index.html">Web game support</a><input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" role="switch" type="checkbox"/><label for="toctree-checkbox-11"><div class="visually-hidden">Toggle navigation of Web game support</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../dev/manual/web/basics.html">Basics of porting</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../dev/manual/web/bridges/index.html">Bridges</a><input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" role="switch" type="checkbox"/><label for="toctree-checkbox-12"><div class="visually-hidden">Toggle navigation of Bridges</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../dev/manual/web/bridges/network-proxy.html">Network proxy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../dev/manual/web/bridges/input-proxy.html">Button input proxy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../dev/manual/web/bridges/pointer-input-proxy.html">Pointer input proxy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../dev/manual/web/bridges/local-storage-proxy.html">Local storage proxy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../dev/manual/web/bridges/indexeddb-proxy.html">IndexedDB proxy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../dev/manual/web/bridges/external-url-handler.html">External URL handler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../dev/manual/web/bridges/preserve-webgl-render.html">Preserve WebGL Render</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../dev/manual/web/bridges/capture-canvas.html">Capture canvas</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../dev/manual/web/bridges/renpy-tweaks.html">Ren’Py tweaks</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../dev/manual/kart/index.html">Kart — Packing cartridges</a><input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" role="switch" type="checkbox"/><label for="toctree-checkbox-13"><div class="visually-hidden">Toggle navigation of Kart — Packing cartridges</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../dev/manual/kart/getting-started.html">Getting started</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../dev/manual/kart/configuration.html">Configuration files</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../dev/port/index.html">Kate Porting Recipes</a><input class="toctree-checkbox" id="toctree-checkbox-14" name="toctree-checkbox-14" role="switch" type="checkbox"/><label for="toctree-checkbox-14"><div class="visually-hidden">Toggle navigation of Kate Porting Recipes</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../dev/port/bitsy.html">Bitsy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../dev/port/renpy.html">Ren’Py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../dev/port/godot.html">Godot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../dev/port/rpg-maker.html">RPG Maker MV</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../dev/port/gamemaker.html">GameMaker</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Design and implementation</span></p>
+<ul class="current">
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../index.html">Kate’s Design Documents</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-15" name="toctree-checkbox-15" role="switch" type="checkbox"/><label for="toctree-checkbox-15"><div class="visually-hidden">Toggle navigation of Kate’s Design Documents</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../formats/F0001-ljt.html">#F0001 — The LJT language</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../formats/F0002-kart.html">#F0002 — KART cartridges</a></li>
+<li class="toctree-l2"><a class="reference internal" href="K0001-capabilities.html">#K0001 — Capabilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="K0002-live-audit.html">#K0002 — Live auditing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="K0003-resource-band.html">#K0003 — Resource band</a></li>
+<li class="toctree-l2"><a class="reference internal" href="K0004-processes.html">#K0004 — Processes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="K0005-partitioned-file-storage.html">#K0005 — Partitioned File Storage</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">#K0006 — Cartridge signatures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="K0007-key-store.html">#K0006 — Cartridge signatures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/A0001-object-storage.html">#A0001 — Object Store API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/A0002-external-url.html">#A0002 — External URL navigation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/A0003-device-file-access.html">#A0003 — Device file access</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Changes, Terms, and Credits</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../etc/releases/index.html">Release notes</a><input class="toctree-checkbox" id="toctree-checkbox-16" name="toctree-checkbox-16" role="switch" type="checkbox"/><label for="toctree-checkbox-16"><div class="visually-hidden">Toggle navigation of Release notes</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../etc/releases/0.23.10.html">Kate v0.23.10  (October 2023)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../etc/releases/0.23.8.html">Kate v0.23.8  (August 2023)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../etc/releases/0.23.6.html">Kate v0.23.6  (June 2023)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../etc/releases/0.23.5.html">Kate v0.23.5  (May 2023)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../etc/releases/0.23.4.html">Kate v0.23.4  (April 2023)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../etc/licence.html">Terms of use</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Indices and Tables</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../genindex.html">Index</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../py-modindex.html">Module Index</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/qteatime/kate/edit/main/docs/source/design/kernel/K0006-cartridge-signatures.rst" title="Edit this page">
+    <svg aria-hidden="true" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <path d="M4 20h4l10.5 -10.5a1.5 1.5 0 0 0 -4 -4l-10.5 10.5v4" />
+      <line x1="13.5" y1="6.5" x2="17.5" y2="10.5" />
+    </svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          <section id="k0006-cartridge-signatures">
+<h1>#K0006 — Cartridge signatures<a class="headerlink" href="#k0006-cartridge-signatures" title="Link to this heading">#</a></h1>
+<dl class="field-list simple">
+<dt class="field-odd">Author<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Niini</p>
+</dd>
+<dt class="field-even">Started<span class="colon">:</span></dt>
+<dd class="field-even"><p>2023-12-31</p>
+</dd>
+<dt class="field-odd">Last updated<span class="colon">:</span></dt>
+<dd class="field-odd"><p>2024-01-20</p>
+</dd>
+<dt class="field-even">Status<span class="colon">:</span></dt>
+<dd class="field-even"><p>Design in progress</p>
+</dd>
+</dl>
+<section id="timeline">
+<h2>Timeline<a class="headerlink" href="#timeline" title="Link to this heading">#</a></h2>
+<div class="table-wrapper docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>First draft</p></th>
+<th class="head"><p>Proof of Concept</p></th>
+<th class="head"><p>Stable implementation</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>2023-12-31</p></td>
+<td><p>—</p></td>
+<td><p>—</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Link to this heading">#</a></h2>
+<p>Kate cartridges are not distributed via a centrally veto-ed place, but rather
+can be distributed through any medium, by any party. That said, security
+properties in Kate directly depend on asking the player to make a risk and
+trust assessment of the developer of the cartridge, and thus we need to be
+able to provide enough assurance on the provenance of the cartridge.</p>
+<p>To this end Kate relies on digital signatures. Cartridges are signed by
+at least the developer, and may be further vouched for by other parties.
+A centrally veto-ed and publicly available repository of public signatures
+then handles the additional tying of a public key to a verified identity,
+so the information can be provided to players when making risk decisions
+about what capabilities to grant and which cartridges to trust.</p>
+<p>The lifecycle of a cartridge goes roughly as follows:</p>
+<ol class="arabic simple">
+<li><p>The publisher registers their ownership of a domain by uploading their public
+key;</p></li>
+<li><p>The Kate Signature Repository service downloads the public key from the
+publisher’s domain and signs it into the set of publicly known publisher
+keys, as ownership of the domain has been proven.</p></li>
+<li><p>The publisher creates a cartridge and signs it with their private key. This
+provides to the players a way of assuring that the cartridge comes from the
+domain it specifies;</p></li>
+<li><p>The player installs the cartridge. Kate verifies the signature in the
+cartridge using the public key associated with that domain.</p>
+<ol class="loweralpha simple">
+<li><p>If there’s no signature in the cartridge, the player is notified that
+the cartridge is not signed, and higher-risk capabilities cannot be
+granted without additional confirmation.</p></li>
+<li><p>If the public key that verifies the signature has been invalidated,
+the player is notified that the cartridge might have been compromised,
+and any capability cannot be granted without additional confirmation.</p></li>
+</ol>
+</li>
+<li><p>If the domain or private key are compromised, the publisher signs a key
+invalidation request so players are aware of the issue.</p></li>
+</ol>
+</section>
+<section id="technical-details">
+<h2>Technical details<a class="headerlink" href="#technical-details" title="Link to this heading">#</a></h2>
+<p>Kate uses a binary cartridge format (documented in <a class="reference internal" href="../formats/F0002-kart.html"><span class="doc">#F0002 — KART cartridges</span></a>),
+and this format allows embedding multiple signatures by specifying the signee
+and the public key identifier of that signee. When accepting cartridges
+(e.g.: installing in the console, submitting to the store), they <strong>must</strong> be
+verified against the public repository of digital signatures for the validity
+of the stated identities vouching for the cartridge.</p>
+<p>Cartridges are signed with ECDSA keys (using a P-384 curve and SHA-512 hashing).
+When signing and verifying a cartridge, we consider only the Metadata binary
+blob, as encoded from LJT, without taking into account any signatures. That is
+the metadata is considered with its <code class="docutils literal notranslate"><span class="pre">signature</span></code> field set to the empty list.
+That means that all signees would sign the same binary representation. Note
+that it’s important that the binary encoding of the metadata is not changed,
+and thus for signing and verification LJT’s automatic patches <strong>must</strong> be
+disabled.</p>
+<p>Kate requires at least the developer of the cartridge to vouch for it. This
+is done by considering the namespace part of the cartridge identifier, which
+points to a domain name. A separate service <strong>must</strong> keep track of public keys
+made available in the known domain names used to publish Kate cartridges, and
+it <strong>must</strong> make those public keys available in a centrally veto-ed and
+publicly available repository. This repository must be accessible via CORS, as
+it needs to be accessible in the web version of Kate as well. Notwithstanding,
+<strong>critical keys</strong> (i.e.: those used to sign cartridges using critical-risk
+capabilities and Kernel resources) must be distributed within the console’s
+trusted code and not depend on external network connections.</p>
+<p>Key management is partially out of scope of this document. However, since keys
+are associated with domain names, and domain names are ephemeral markers of
+identity (e.g.: they might cease to be associated with the previous owner in
+case they don’t renew the domain), we must offer a way of marking a domain as
+invalid for ownership verification purposes — we do so by asking the previous
+owner to sign a message to terminate the domain tracking after a specific date.
+In this case all public keys registered after the cutoff date are invalidated,
+and the domain is no longer tracked for new public keys.</p>
+<p>Because private keys may also be compromised, we need a way of invalidating
+previously published public keys when this happens. To do so a special
+invalidation key <strong>should</strong> be generated when generating the private key and
+its public key registered as the invalidation key. A message can then be
+signed with this invalidation key to invalidate the pair of public keys.</p>
+<p>Finally, cartridges may be partially verified (i.e.: not all signees could be
+verified). In this case it is up to the verifying process to decide how to
+communicate this failure mode to the player. Players <strong>should</strong> be able to
+run a cartridge that has only been partially verified, but they must
+acknowledge the risks first. This is necessary for video game preservation,
+as keys might have been invalidated at future dates.</p>
+<section id="key-generation-and-distribution">
+<h3>Key generation and distribution<a class="headerlink" href="#key-generation-and-distribution" title="Link to this heading">#</a></h3>
+<p>Cartridges are signed with ECDSA keys (using the P-384 curve). However these
+are generated is out of scope for this document, but there are three ways in
+which public keys used to verify the signatures are to be distributed.</p>
+<p>First, keys for critical capability accesses are to be handled by a manual
+review process and included directly in Kate’s distribution. This means that
+these keys will have a hard-coded identity and invalidation key in Kate, thus
+the identity verification process is up to maintainers; this is only meant
+to cover public keys maintainers themselves use to sign core Kate components,
+such as core tooling applications and Kernel components.</p>
+<p>Second, for game/application developer keys, they are to be distributed
+through the domain that is associated with the game. Kate cartridge
+identifiers are comprised of a <code class="docutils literal notranslate"><span class="pre">&lt;domain-name&gt;/&lt;unique-name&gt;</span></code> pair, so
+by distributing the key through the given domain name we can verify
+ownership of that namespace, which here is a weaker form of identity
+verification — we don’t need to associate the cartridge with a physical
+entity, we just need to inform the player if the cartridge truly comes
+from the source it specifies in its identifier.</p>
+<p>There’s a risk that domain names change hands, or that keys are compromised,
+so in this case too we need to be able to invalidate the domain part or the
+key part of that identity.</p>
+<section id="kate-key-store">
+<h4>Kate key-store<a class="headerlink" href="#kate-key-store" title="Link to this heading">#</a></h4>
+<p>Kate maintains an internal key-store that contains private and public keys
+needed by the user. Private keys are stored encrypted with a user-provided
+password, whereas public keys are stored in plain form.</p>
+<p>Keys can be retrieved from the store only by the Kernel, for a subset of
+components. It is the responsibility of those components to make sure a
+private key doesn’t linger in memory for longer than it needs to be.</p>
+<p>The store is divided into different <em>purposes</em>:</p>
+<ul class="simple">
+<li><p><strong>Trusted keys</strong>: static set of keys shipped with Kate.</p></li>
+<li><p><strong>Publisher keys</strong>: dynamic set of keys associated with domain names.</p></li>
+<li><p><strong>Invalidated keys</strong>: dynamic set of keys built when any key is invalidated,
+for auditing and warning purposes.</p></li>
+</ul>
+</section>
+<section id="trusted-keys">
+<h4>Trusted keys<a class="headerlink" href="#trusted-keys" title="Link to this heading">#</a></h4>
+<p>Trusted keys are keys used to sign trusted components (e.g.: Kernel components,
+applications that require critical capability access). These keys are used
+for <em>vouching</em> for a cartridge or component, so they are not associated
+with a domain name.</p>
+<p>These are listed in a <code class="docutils literal notranslate"><span class="pre">trusted-keys.json</span></code> file along with an identification
+of who the signees of that key are. We assume Kate files live in a secure
+and isolated file system environment, where other applications cannot modify
+its contents.</p>
+</section>
+<section id="publisher-keys">
+<h4>Publisher keys<a class="headerlink" href="#publisher-keys" title="Link to this heading">#</a></h4>
+<p>Publisher keys are used to verify that the source of the cartridge can be
+fully traced back to its domain name counter-part. We verify these keys
+by asking owners to upload the keys to their domain and expose it under a
+well-known endpoint. Once verified, they are added to a list of known
+public keys that the console uses, and this list is signed with one of
+the console’s trusted keys.</p>
+<p>This gives publishers freedom to maintain their online identity and associate
+it with cartridges, while also giving Kate something useful to work with when
+presenting publisher information to the player for risk assessments. Allowing
+the list to be signed by a trusted key allows it to not be maintained
+centrally, while also allowing for revocations to be issued.</p>
+</section>
+<section id="invalidated-keys">
+<h4>Invalidated keys<a class="headerlink" href="#invalidated-keys" title="Link to this heading">#</a></h4>
+<p>Invalidated keys are used to notify the player that a cartridge cannot be
+proven to have been produced by the expected owner, even though its signature
+can be verified with the public key we know, because we no longer believe
+that the private key is exclusively known by the expected owner.</p>
+<p>Publishers can invalidate keys by submitting an invalidation request by signing
+the message with their private key. The invalidation request includes a
+signature of the public key, the domain, and the reason for the invalidation
+as an enumeration (<code class="docutils literal notranslate"><span class="pre">compromised-key</span></code> or <code class="docutils literal notranslate"><span class="pre">compromised-domain</span></code>).</p>
+<p>In case of a compromised domain, the domain itself is invalidated and no new
+keys are allowed to be registered for it, as well as invalidating all
+registered keys for that domain.</p>
+</section>
+</section>
+<section id="key-registry">
+<h3>Key registry<a class="headerlink" href="#key-registry" title="Link to this heading">#</a></h3>
+<p>The key registry is a repository of all keys used to sign Kate cartridges that
+is available for the public domain and signed with the trusted key for the
+registry (whose public key is statically known to all Kate instances).</p>
+<p>The registry is made out of JSON files in chunks of 1024 keys, stored as
+a signed linked list. A client can replay the registry by taking the latest
+chunk, following all links until it finds one it has already consumed or
+reach the root of the set. Then replaying all entries in sequence.</p>
+<p>The following format is used:</p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span class="kr">type</span><span class="w"> </span><span class="nx">Chunk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">previous</span><span class="o">:</span><span class="w"> </span><span class="kt">null</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">file</span><span class="o">:</span><span class="w"> </span><span class="kt">path</span><span class="p">,</span>
+<span class="w">    </span><span class="nx">hash</span><span class="o">:</span><span class="w"> </span><span class="kt">SHA</span><span class="o">-</span><span class="mf">512</span><span class="w"> </span><span class="nx">signature</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nx">the</span><span class="w"> </span><span class="nx">previous</span><span class="w"> </span><span class="nx">chunk</span><span class="w"> </span><span class="nx">file</span>
+<span class="w">    </span><span class="nx">hash</span><span class="o">-</span><span class="nx">algorithm</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;SHA-512&quot;</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="w">  </span><span class="nx">last</span><span class="o">-</span><span class="nx">update</span><span class="o">:</span><span class="w"> </span><span class="kt">ISO</span><span class="o">-</span><span class="mf">8601</span><span class="w"> </span><span class="nx">date</span><span class="o">/</span><span class="nx">time</span><span class="w"> </span><span class="kt">string</span>
+<span class="w">  </span><span class="nx">entries</span><span class="o">:</span><span class="w"> </span><span class="kt">Entry</span><span class="p">[]</span>
+<span class="w">  </span><span class="nx">signature</span><span class="o">:</span><span class="w"> </span><span class="kt">sign</span><span class="p">({</span><span class="nx">previous</span><span class="p">,</span><span class="w"> </span><span class="nx">last</span><span class="o">-</span><span class="nx">update</span><span class="p">,</span><span class="w"> </span><span class="nx">entries</span><span class="p">})</span><span class="w"> </span><span class="kd">with</span><span class="w"> </span><span class="nx">registry</span><span class="w"> </span><span class="nx">key</span>
+<span class="p">}</span>
+
+<span class="kr">type</span><span class="w"> </span><span class="nx">Entry</span><span class="w"> </span><span class="o">=</span>
+<span class="w">  </span><span class="o">|</span><span class="w"> </span><span class="nx">Key</span><span class="o">-</span><span class="nx">added</span>
+<span class="w">  </span><span class="o">|</span><span class="w"> </span><span class="nx">Key</span><span class="o">-</span><span class="nx">invalidated</span>
+
+<span class="kr">type</span><span class="w"> </span><span class="nx">Key</span><span class="o">-</span><span class="nx">added</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="kr">type</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;key-added&quot;</span>
+<span class="w">  </span><span class="nx">key</span><span class="o">:</span><span class="w"> </span><span class="kt">JWK</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="nx">key</span>
+<span class="w">  </span><span class="nx">domain</span><span class="o">:</span><span class="w"> </span><span class="kt">domain</span><span class="w"> </span><span class="nx">part</span><span class="w"> </span><span class="kt">string</span>
+<span class="w">  </span><span class="nx">registered_at</span><span class="o">:</span><span class="w"> </span><span class="kt">ISO</span><span class="o">-</span><span class="mf">8601</span><span class="w"> </span><span class="nx">UTC</span><span class="w"> </span><span class="nx">date</span><span class="o">/</span><span class="nx">time</span><span class="w"> </span><span class="kt">string</span>
+<span class="w">  </span><span class="nx">hash</span><span class="o">:</span><span class="w"> </span><span class="kt">sha256</span><span class="o">-</span><span class="nx">hash</span><span class="p">({</span><span class="kr">type</span><span class="p">,</span><span class="w"> </span><span class="nx">key</span><span class="p">,</span><span class="w"> </span><span class="nx">domain</span><span class="p">,</span><span class="w"> </span><span class="nx">registered_at</span><span class="p">})</span>
+<span class="p">}</span>
+
+<span class="kr">type</span><span class="w"> </span><span class="nx">Key</span><span class="o">-</span><span class="nx">invalidated</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="kr">type</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;key-invalidated&quot;</span>
+<span class="w">  </span><span class="nx">reason</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;compromised-key&quot;</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="s2">&quot;compromised-domain&quot;</span>
+<span class="w">  </span><span class="nx">key</span><span class="o">:</span><span class="w"> </span><span class="kt">JWK</span><span class="w"> </span><span class="k">public</span><span class="w"> </span><span class="nx">key</span>
+<span class="w">  </span><span class="nx">domain</span><span class="o">:</span><span class="w"> </span><span class="kt">domain</span><span class="w"> </span><span class="nx">part</span><span class="w"> </span><span class="kt">string</span>
+<span class="w">  </span><span class="nx">invalidated_at</span><span class="o">:</span><span class="w"> </span><span class="kt">ISO</span><span class="o">-</span><span class="mf">8601</span><span class="w"> </span><span class="nx">UTC</span><span class="w"> </span><span class="nx">date</span><span class="o">/</span><span class="nx">time</span><span class="w"> </span><span class="kt">string</span>
+<span class="w">  </span><span class="nx">proof</span><span class="o">:</span><span class="w"> </span><span class="kt">sign</span><span class="p">({</span><span class="nx">key</span><span class="p">,</span><span class="w"> </span><span class="nx">domain</span><span class="p">,</span><span class="w"> </span><span class="nx">reason</span><span class="p">,</span><span class="w"> </span><span class="nx">invalidated_at</span><span class="p">})</span><span class="w"> </span><span class="kd">with</span><span class="w"> </span><span class="nx">publisher</span><span class="w"> </span><span class="nx">key</span>
+<span class="w">  </span><span class="nx">hash</span><span class="o">:</span><span class="w"> </span><span class="kt">sha256</span><span class="o">-</span><span class="nx">hash</span><span class="p">({</span><span class="kr">type</span><span class="p">,</span><span class="w"> </span><span class="nx">reason</span><span class="p">,</span><span class="w"> </span><span class="nx">key</span><span class="p">,</span><span class="w"> </span><span class="nx">domain</span><span class="p">,</span><span class="w"> </span><span class="nx">invalidated_at</span><span class="p">,</span><span class="w"> </span><span class="nx">proof</span><span class="p">})</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Wherever <code class="docutils literal notranslate"><span class="pre">sign</span></code> is specified here, we assume the signature of those fields
+encoded as JSON with no spaces or indentation.</p>
+<p>The registry is a <em>trusted</em> service. One must trust that the keys added or
+invalidated in the registry come from legit requests from publishers, and that
+the correct validation has been performed on the registry side when associating
+a key with a domain (i.e.: to ensure the owner of the key also owns the domain).</p>
+<p>Entries in the registry have <strong>set</strong> semantics. That is, their particular
+ordering is irrelevant. A client consuming the registry will know they have
+the latest state when they’ve applied the whole set of entry hashes, in any
+order. The addition and invalidation work in a similar way to a
+<a class="reference external" href="https://en.wikipedia.org/wiki/Conflict-free_replicated_data_type#2P-Set_(Two-Phase_Set)">2P-Set CRDT</a>,
+so additions and invalidations are tracked as separate sets you can only
+add data to, but never remove.</p>
+<p>Since, unlike in signed chain registries, the Kate key registry does not
+have a total order or signatures on this total order, entries can be
+added or removed anywhere, at any point in time, as long as they’re
+signed with the registry’s key. To address the auditing concerns,
+the public registry <em>must</em> have an open source implementation and have
+all changes to the registry committed to a public git repository.
+This makes it possible for third parties to independently audit changes
+to the registry.</p>
+</section>
+<section id="the-registry-server">
+<h3>The registry server<a class="headerlink" href="#the-registry-server" title="Link to this heading">#</a></h3>
+<p>A registry server is any service that allows publishers to register their
+public keys and verify that those public keys do indeed belong to the
+publisher, so that they can add or invalidate the keys in the registry
+records.</p>
+<p>In essence, a registry server can be thought of as follows:</p>
+<div class="highlight-haskell notranslate"><div class="highlight"><pre><span></span><span class="kt">Server</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="ow">::</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">signing</span><span class="o">-</span><span class="n">key</span>
+<span class="w">            </span><span class="p">,</span><span class="w"> </span><span class="n">work</span><span class="o">-</span><span class="n">queue</span>
+<span class="w">            </span><span class="p">,</span><span class="w"> </span><span class="n">registry</span>
+<span class="w">            </span><span class="p">}</span>
+
+<span class="kt">Operation</span><span class="w"> </span><span class="n">op</span><span class="w"> </span><span class="ow">::</span>
+<span class="w">  </span><span class="o">|</span><span class="w"> </span><span class="n">register</span><span class="o">-</span><span class="n">domain</span><span class="p">(</span><span class="n">domain</span><span class="p">)</span>
+<span class="w">  </span><span class="o">|</span><span class="w"> </span><span class="n">invalidate</span><span class="o">-</span><span class="n">key</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+<span class="w">  </span><span class="o">|</span><span class="w"> </span><span class="n">commit</span><span class="nb">()</span>
+<span class="w">  </span><span class="o">|</span><span class="w"> </span><span class="n">all</span><span class="o">-</span><span class="n">keys</span><span class="nb">()</span>
+<span class="w">  </span><span class="o">|</span><span class="w"> </span><span class="n">all</span><span class="o">-</span><span class="n">keys</span><span class="o">-</span><span class="n">for</span><span class="p">(</span><span class="n">domain</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>And the operations can be defined as follows:</p>
+<section id="s-register-domain-d">
+<h4><code class="docutils literal notranslate"><span class="pre">s.register-domain(d)</span></code><a class="headerlink" href="#s-register-domain-d" title="Link to this heading">#</a></h4>
+<div class="highlight-haskell notranslate"><div class="highlight"><pre><span></span><span class="nf">s</span><span class="o">.</span><span class="n">register</span><span class="o">-</span><span class="n">domain</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="w"> </span><span class="n">when</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="n">is</span><span class="w"> </span><span class="n">not</span><span class="w"> </span><span class="kr">in</span><span class="w"> </span><span class="n">s</span><span class="o">.</span><span class="n">work</span><span class="o">-</span><span class="n">queue</span><span class="w"> </span><span class="ow">=</span>
+<span class="w">  </span><span class="n">add</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="n">s</span><span class="o">.</span><span class="n">work</span><span class="o">-</span><span class="n">queue</span>
+</pre></div>
+</div>
+<p>When someone registers a domain update, we simply add it to the server’s
+work queue. We’ll get to that domain eventually once the server’s
+<code class="docutils literal notranslate"><span class="pre">commit</span></code> operation runs.</p>
+</section>
+<section id="s-commit">
+<h4><code class="docutils literal notranslate"><span class="pre">s.commit()</span></code><a class="headerlink" href="#s-commit" title="Link to this heading">#</a></h4>
+<div class="highlight-haskell notranslate"><div class="highlight"><pre><span></span><span class="nf">s</span><span class="p">{</span><span class="n">work</span><span class="o">-</span><span class="n">queue</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="kt">[]</span><span class="p">}</span><span class="o">.</span><span class="n">commit</span><span class="nb">()</span><span class="w"> </span><span class="ow">=</span>
+<span class="w">  </span><span class="n">nothing</span>
+
+<span class="nf">s</span><span class="p">{</span><span class="n">work</span><span class="o">-</span><span class="n">queue</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="p">[</span><span class="n">d</span><span class="p">,</span><span class="w"> </span><span class="o">...</span><span class="p">]}</span><span class="o">.</span><span class="n">commit</span><span class="nb">()</span><span class="w"> </span><span class="ow">=</span>
+<span class="w">  </span><span class="kr">let</span><span class="w"> </span><span class="n">page</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="n">first</span><span class="o">-</span><span class="kr">of</span><span class="w"> </span><span class="p">(</span><span class="n">fetch</span><span class="p">(</span><span class="n">d</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">kate</span><span class="o">.</span><span class="n">txt</span><span class="p">)</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">fetch</span><span class="p">(</span><span class="n">d</span><span class="p">))</span>
+<span class="w">  </span><span class="kr">let</span><span class="w"> </span><span class="n">key</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="n">extract</span><span class="w"> </span><span class="n">public</span><span class="w"> </span><span class="n">key</span><span class="w"> </span><span class="kr">in</span><span class="w"> </span><span class="kt">PEM</span><span class="w"> </span><span class="n">format</span><span class="w"> </span><span class="n">from</span><span class="w"> </span><span class="n">page&#39;s</span><span class="w"> </span><span class="n">text</span>
+<span class="w">  </span><span class="n">ensure</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">key</span><span class="w"> </span><span class="n">is</span><span class="w"> </span><span class="n">unique</span><span class="w"> </span><span class="n">within</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">registry</span>
+<span class="w">    </span><span class="c1">-- if the key belongs to another domain, this is an error</span>
+<span class="w">    </span><span class="c1">-- if the key is already associated with the domain, do nothing</span>
+<span class="w">  </span><span class="n">add</span><span class="w"> </span><span class="n">key</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">registry</span><span class="p">,</span><span class="w"> </span><span class="n">associating</span><span class="w"> </span><span class="n">it</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="n">d</span>
+<span class="w">  </span><span class="n">s</span><span class="p">{</span><span class="n">work</span><span class="o">-</span><span class="n">queue</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="p">[</span><span class="o">...</span><span class="p">]}</span><span class="o">.</span><span class="n">commit</span><span class="nb">()</span>
+</pre></div>
+</div>
+<p>That is, within a commit loop we’ll process the work-queue and fetch the
+public key either from a dedicated place in the remote server, or by parsing
+the HTML response from the server and looking for a public key in PEM format.</p>
+<p>In case this key is an actual addition to the registry, we’ll add a new
+signed entry to the registry for that key, and continue processing the queue.</p>
+</section>
+<section id="s-invalidate-key-r">
+<h4><code class="docutils literal notranslate"><span class="pre">s.invalidate-key(r)</span></code><a class="headerlink" href="#s-invalidate-key-r" title="Link to this heading">#</a></h4>
+<div class="highlight-haskell notranslate"><div class="highlight"><pre><span></span><span class="nf">s</span><span class="o">.</span><span class="n">invalidate</span><span class="o">-</span><span class="n">key</span><span class="p">({</span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="n">domain</span><span class="p">,</span><span class="w"> </span><span class="n">time</span><span class="p">,</span><span class="w"> </span><span class="n">reason</span><span class="p">,</span><span class="w"> </span><span class="n">proof</span><span class="p">})</span><span class="w"> </span><span class="ow">=</span>
+<span class="w">  </span><span class="n">ensure</span><span class="w"> </span><span class="n">key</span><span class="w"> </span><span class="n">has</span><span class="w"> </span><span class="n">not</span><span class="w"> </span><span class="n">yet</span><span class="w"> </span><span class="n">been</span><span class="w"> </span><span class="n">invalidated</span><span class="w"> </span><span class="n">and</span><span class="w"> </span><span class="n">exists</span><span class="w"> </span><span class="kr">in</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">registry</span>
+<span class="w">  </span><span class="n">verify</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">proof</span><span class="w"> </span><span class="n">signature</span><span class="w"> </span><span class="n">against</span><span class="w"> </span><span class="n">our</span><span class="w"> </span><span class="n">known</span><span class="w"> </span><span class="n">key</span><span class="w"> </span><span class="n">for</span><span class="w"> </span><span class="n">that</span><span class="w"> </span><span class="n">domain</span>
+<span class="w">  </span><span class="n">add</span><span class="w"> </span><span class="n">an</span><span class="w"> </span><span class="n">invalidated</span><span class="w"> </span><span class="n">entry</span><span class="w"> </span><span class="n">for</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">key</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">registry</span>
+</pre></div>
+</div>
+<p>That is, in a key invalidation request we just make sure that the proof
+provided is valid and actually refers to a key/domain entry that we have
+in the registry. If that’s the case, the entry is added to the registry
+mostly as-is.</p>
+</section>
+<section id="s-all-keys-and-s-all-keys-for-domain">
+<h4><code class="docutils literal notranslate"><span class="pre">s.all-keys()</span></code> and <code class="docutils literal notranslate"><span class="pre">s.all-keys-for(domain)</span></code><a class="headerlink" href="#s-all-keys-and-s-all-keys-for-domain" title="Link to this heading">#</a></h4>
+<div class="highlight-haskell notranslate"><div class="highlight"><pre><span></span><span class="nf">s</span><span class="o">.</span><span class="n">all</span><span class="o">-</span><span class="n">keys</span><span class="nb">()</span><span class="w"> </span><span class="ow">=</span>
+<span class="w">  </span><span class="n">registry</span><span class="w"> </span><span class="n">paginated</span><span class="w"> </span><span class="kr">in</span><span class="w"> </span><span class="mi">1024</span><span class="w"> </span><span class="n">entries</span><span class="w"> </span><span class="n">chunks</span>
+
+<span class="nf">s</span><span class="o">.</span><span class="n">all</span><span class="o">-</span><span class="n">keys</span><span class="o">-</span><span class="n">for</span><span class="p">(</span><span class="n">domain</span><span class="p">)</span><span class="w"> </span><span class="ow">=</span>
+<span class="w">  </span><span class="p">(</span><span class="n">registry</span><span class="w"> </span><span class="n">filtered</span><span class="w"> </span><span class="n">by</span><span class="w"> </span><span class="n">domain</span><span class="p">)</span><span class="w"> </span><span class="kr">in</span><span class="w"> </span><span class="mi">1024</span><span class="w"> </span><span class="n">entries</span><span class="w"> </span><span class="n">chunks</span>
+</pre></div>
+</div>
+<p>Both <code class="docutils literal notranslate"><span class="pre">all-keys</span></code> and <code class="docutils literal notranslate"><span class="pre">all-keys-for</span></code> return a complete registry in the
+format specified above. The only difference is that <code class="docutils literal notranslate"><span class="pre">all-keys-for</span></code> only
+returns entries that are associated with the provided domain.</p>
+</section>
+</section>
+</section>
+<section id="how-is-this-feature-dangerous">
+<h2>How is this feature dangerous?<a class="headerlink" href="#how-is-this-feature-dangerous" title="Link to this heading">#</a></h2>
+<p>Kate relies on signatures to tell users about provenance and allow them to
+tie their risk assessment decisions to a known entity. Therefore it’s
+important that these signatures <em>can</em> be used to provide that kind of link
+between the cartridge and the publisher. Here we consider risks from users’,
+publishers, the registry, and Kate’s perspectives.</p>
+<dl>
+<dt><strong>Signatures only prove domain ownership</strong>:</dt><dd><p>When a user makes a risk assessment for granting capabilities to a
+cartridge, they need to know who they’re trusting, but signatures in
+Kate only prove domain ownership, which is not sufficient for this
+assessment.</p>
+<p>Kate communicates what is verified (the domain) by showing the whole
+domain on the capability grant screen. Capability risks are described
+independently. This doesn’t provide an actual entity for trust, but
+it helps users focus on the capability risks rather than the
+domain itself.</p>
+<p>Because indie games are generally self-published by smaller developers
+attaching a person or studio’s name would not improve much over the
+domain verification, but would significantly raise the bar for anyone
+wanting to publish to Kate.</p>
+</dd>
+<dt><strong>Compromised publisher keys</strong>:</dt><dd><p>If the private key of a publisher is compromised, then we cannot attest
+that cartridges signed with it must come from that publisher anymore.
+Users installing such cartridges risk being tricked into giving
+stronger capabilities to attackers based on previous good experiences
+with the publisher.</p>
+<p>The registry allows for key invalidation. A publisher may notify the registry
+that their key was compromised by signing an invalidation request, which is
+then propagated to all Kate devices. When a cartridge signed with an
+invalidated key is installed, the user will be notified that the cartridge
+cannot be verified and specify the invalidation reason, which the user
+can then rely on for risk assessment.</p>
+</dd>
+<dt><strong>Compromised publisher domain</strong>:</dt><dd><p>Because Kate associates keys with domains, and because domain ownership is
+ephemeral, a publisher’s verified domain may be compromised for several
+different reasons. For each of these reasons we risk a third party
+registering keys that are otuside of the publisher’s control. These can
+then be used to publish cartridges that abuse the publisher’s reputation
+for privilege escalation, tricking the user into granting more capabilities
+than the attacker would generally enjoy.</p>
+<p>The registry allows for domain invalidation. A publisher may notify the
+registry that their domain was compromised by signing an invalidation
+request, which is then propagated to all Kate devices. When a cartridge
+with an invalidated domain is installed, regardless of being signed,
+the user will be notified that the cartridge cannot be verified because
+the domain has been compromised; the user can then rely on that additional
+information when making their own risk assessment.</p>
+</dd>
+<dt><strong>Complicated publisher onboarding</strong>:</dt><dd><p>In order to publish cartridges for Kate, a publisher needs to:</p>
+<ul class="simple">
+<li><p>Own an internet domain;</p></li>
+<li><p>Generate a cryptographic private/public signing key pair;</p></li>
+<li><p>Upload the public signing key to their internet domain;</p></li>
+<li><p>Sign all cartridges with their private key;</p></li>
+<li><p>Keep their private key safe and backed up.</p></li>
+</ul>
+<p>Given Kate’s developer audience are neither cryptographers nor computer
+science students, this is a very involved process which makes it hard for
+regular people to publish their small games.</p>
+<p>To mitigate this there will be a separate onboarding effort where most of
+the steps here can be automated. To make it more financially accessible,
+we also allow people to use their existing online accounts in publishing
+platforms as an “internet domain they own”, so long as they can provide
+their public key there.</p>
+</dd>
+<dt><strong>Unavailability of the registry</strong>:</dt><dd><p>Because the registry is an online service, it’s possible that it becomes
+unreachable by Kate clients for a host of reasons (including the client
+itself not having public internet connection).</p>
+<p>All clients synchronise data from the registry to their own local database,
+so signature verifications happens entirely locally. A client will always
+be able to verify a signature without having a connection to the registry,
+however it might not have the latest state at that point in time and
+report that the signature cannot be verified if its key addition has not
+yet been sync’d. This is an acceptable risk in a decentralised system.</p>
+</dd>
+<dt><strong>Unbounded registry growth</strong>:</dt><dd><p>Because the registry accepts an association of any domain with any number
+of keys, it can grow to unbounded lengths and is particularly susceptible
+to attacks that aim to make it unusable by overloading the registry with
+junk data.</p>
+<p>Since the only entry-point for new data in the registry is the
+<code class="docutils literal notranslate"><span class="pre">register-domain</span></code> operation, we can control which entries we allow
+by either manual (e.g.: through an invite queue system) or automatic veto
+(e.g.: by checking that the domain is “reasonably publisher-ish”). These
+must be considered if domain registration is open to anyone.</p>
+</dd>
+<dt><strong>Malicious key invalidation/addition requests</strong>:</dt><dd><p>If a key or domain is compromised, then the attacker may register or
+invalidate keys in the registry as if they were the publisher who previously
+owned that domain.</p>
+<p>Kate errs on the side of being cautious here and therefore cannot mitigate
+this issue. This means that once a publisher’s key/domain has been
+compromised, there’s no way to mark it as “un-compromised”, and the
+publisher must choose a new key/domain.</p>
+</dd>
+<dt><strong>Registry compromised</strong>:</dt><dd><p>The registry is signed with the registry server’s key, which is trusted
+by all Kate clients by default. If this key or ther registry are compromised,
+then an attacker would be able to fabricate publisher key entries that would
+be then trusted by the Kate clients.</p>
+<p>There’s no provision in the registry or Kate to handle this. Rather, the
+registry’s key must be rotated, a new Kate client must be published trusting
+the new public key, and the existing publisher keys in the key store must be
+flushed in favour of re-sync’ing them from the registry.</p>
+</dd>
+<dt><strong>Unreasonable registry sizes for sync’ing</strong>:</dt><dd><p>Even if the registry grows in a manageable pace, it may still become too
+big for Kate clients to hold the state locally. A registry taking gigabytes
+of storage space is unreasonable if most users will only need a few keys
+from it.</p>
+<p>Clients should allow users to switch from locally-stored complete registries
+to on-demand sync’ing. In this sense the client queries the registry for
+keys of a specific domain upon cartridge installation, rather than before.
+This means  that verification requires users to be online.</p>
+</dd>
+</dl>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="K0007-key-store.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">#K0006 — Cartridge signatures</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="K0005-partitioned-file-storage.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">#K0005 — Partitioned File Storage</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2023, Niini
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">#K0006 — Cartridge signatures</a><ul>
+<li><a class="reference internal" href="#timeline">Timeline</a></li>
+<li><a class="reference internal" href="#summary">Summary</a></li>
+<li><a class="reference internal" href="#technical-details">Technical details</a><ul>
+<li><a class="reference internal" href="#key-generation-and-distribution">Key generation and distribution</a><ul>
+<li><a class="reference internal" href="#kate-key-store">Kate key-store</a></li>
+<li><a class="reference internal" href="#trusted-keys">Trusted keys</a></li>
+<li><a class="reference internal" href="#publisher-keys">Publisher keys</a></li>
+<li><a class="reference internal" href="#invalidated-keys">Invalidated keys</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#key-registry">Key registry</a></li>
+<li><a class="reference internal" href="#the-registry-server">The registry server</a><ul>
+<li><a class="reference internal" href="#s-register-domain-d"><code class="docutils literal notranslate"><span class="pre">s.register-domain(d)</span></code></a></li>
+<li><a class="reference internal" href="#s-commit"><code class="docutils literal notranslate"><span class="pre">s.commit()</span></code></a></li>
+<li><a class="reference internal" href="#s-invalidate-key-r"><code class="docutils literal notranslate"><span class="pre">s.invalidate-key(r)</span></code></a></li>
+<li><a class="reference internal" href="#s-all-keys-and-s-all-keys-for-domain"><code class="docutils literal notranslate"><span class="pre">s.all-keys()</span></code> and <code class="docutils literal notranslate"><span class="pre">s.all-keys-for(domain)</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-is-this-feature-dangerous">How is this feature dangerous?</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../../_static/documentation_options.js?v=1b0dedb3"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/scripts/furo.js?v=32e29ea5"></script>
+    </body>
+</html>

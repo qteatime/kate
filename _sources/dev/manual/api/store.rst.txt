@@ -15,7 +15,7 @@ Unlike most file systems, the Object Store API uses a design that's more
 similar to recent object stores offered in the cloud. That is, a flat
 set of objects can be divided into buckets. Kate has a few other partitions
 that have a special role in its security-oriented design, these are further
-described in the :doc:`Object Storage API design document </design/0101-object-storage>`.
+described in the :doc:`Object Storage API design document </design/api/A0001-object-storage>`.
 
 
 Partitions, buckets, and objects
@@ -237,7 +237,7 @@ The types supported are:
 * Plain objects (i.e.: no functions, no prototype chains);
 
 To know how sizes for each of these are computed, see the
-:doc:`Object Storage API design document </design/0101-object-storage>`.
+:doc:`Object Storage API design document </design/api/A0001-object-storage>`.
 
 
 .. py:class:: ObjectMetadata

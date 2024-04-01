@@ -84,7 +84,7 @@ This recipe will include the following bridges:
   {
     "bridges": [
       {"type": "network-proxy"},
-      {"type": "input-proxy", "mapping": "defaults"},
+      {"type": "keyboard-input-proxy-v2", "mapping": "defaults", "selector": "window"},
       {"type": "pointer-input-proxy", "selector": "#canvas", "hide_cursor": false},
       {"type": "preserve-webgl-render"},
       {"type": "capture-canvas", "selector": "#canvas"},

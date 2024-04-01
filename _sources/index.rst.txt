@@ -27,6 +27,12 @@ cover aspects from how to use Kate to its philosophy and security guarantees.
    platforms in Kate. This manual explains what's supported, how it
    works, and what the limitations are.
 
+:doc:`Build Your Own Game Console <user/diy/index>`
+   Ever wanted to build your own video game console? The Kate project
+   was designed exactly for that. This manual will guide you step-by-step,
+   from assembling the pieces of hardware, to getting your own customised
+   cases, to setting up the Kate operating system.
+
 
 Game developer books
 ====================
@@ -91,6 +97,7 @@ Indices and tables
 
   user/manual/index
   user/importer/index
+  user/diy/index
 
 .. toctree::
   :caption: Game developer books
