@@ -134,7 +134,11 @@ async function apply_bridge(
   console.debug(`[kate:sandbox] Applied ${bridge.type} bridge in ${context.cart.id}`);
   switch (bridge.type) {
     case "network-proxy": {
-      append_proxy(bridges["standard-network.js"]);
+      const full_source = `
+        const SYNC_ACCESS = {};
+        ${bridges["standard-network.js"]};
+      `;
+      append_proxy(full_source);
       break;
     }
 
