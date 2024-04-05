@@ -208,7 +208,7 @@ export async function encode_whole(cart: CartConfig) {
   await writer.write(
     kart_v6.encode_header(
       Cart.Header({
-        "minimum-kate-version": Cart.Kate_version({ major: 0, minor: 24, patch: 2 }),
+        "minimum-kate-version": Cart.Kate_version({ major: 0, minor: 25, patch: 0 }),
         "content-location": Cart.Binary_location({
           offset: file_offset,
           size: meta_offset - file_offset,
