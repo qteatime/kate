@@ -51,7 +51,7 @@ export async function parse_metadata(data: Blob, kate_ver: SemVer) {
 
   const header = await parser.parse_header(data);
   const required_ver = parser.minimum_version(header);
-  if (required_ver.gt(kate_ver)) {
+  if (kate_ver.lt(required_ver)) {
     throw new ECartFormatTooNew(required_ver, "cartridge");
   }
 
