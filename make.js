@@ -174,6 +174,9 @@ function playwright(args) {
 function clean_build(root) {
   remove(Path.join(root, "build"), { recursive: true, force: true });
   remove(Path.join(root, "tsconfig.tsbuildinfo"), { force: true });
+  for (const cart of glob("*.kart", { cwd: root })) {
+    remove(Path.join(root, cart), { force: true });
+  }
 }
 
 function remove(path, { recursive, force } = { recursive: false, force: false }) {
@@ -677,6 +680,7 @@ w.task("release:cartridges", ["example:all", "ecosystem:all"], () => {
   }
 
   // Copy all cartridges
+  remove("dist/cartridges", { recursive: true, force: true });
   copy_all("examples");
   copy_all("ecosystem");
 
