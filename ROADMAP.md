@@ -261,7 +261,7 @@ called Meow, which defines a [CEK machine][cek] in [ANF][anf] as its IR, and
 a multi-language system that works on top of this same IR. The machine is
 64-bit based and can be efficiently compiled to both JavaScript and WASM
 (all continuations are single-shot, which aligns with both [JavaScript's][jsk]
-and [WASM's delimited continuations][wasm-k] --- though WASM's isn't live yet,
+and [WASM's delimited continuations][wasmk] --- though WASM's isn't live yet,
 but most continuations can be eliminated during compilation with the aid of
 an effect system, along with the simplified model that Meow uses for its
 effect handlers).
