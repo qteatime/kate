@@ -122,7 +122,7 @@ export class SceneDeveloperSettings extends UI.SimpleScene {
       await this.os.dialog.message(this.application_id, {
         title: "Key store is not protected",
         message: `
-          Before you can import your profile backup, you'll need to 
+          Before you can import your profile backup you'll need to 
           configure a master password for your key store. That way
           your private key can be stored securely.
         `,
@@ -206,7 +206,7 @@ export class SceneNewDeveloper extends UI.SimpleScene {
       contents: [
         UI.p([
           `You'll need a developer profile to publish Kate cartridges. This
-        profile exists only locally in your Kate device---think of it as
+        profile exists only locally in your Kate device—think of it as
         accounts in your computer. You pick one of them when publishing.`,
         ]),
         UI.vspace(16),
@@ -257,7 +257,7 @@ export class SceneNewDeveloper extends UI.SimpleScene {
         title: "Protecting your key store",
         contents: [
           UI.p([
-            `When you publish a Kate cartridge you'll need to sign it digitally,
+            `When you publish a Kate cartridge you'll need to sign it digitally
             so players know the cartridge file they downloaded truly came from
             you.`,
           ]),
@@ -275,9 +275,9 @@ export class SceneNewDeveloper extends UI.SimpleScene {
                 return UI.stack([
                   UI.p([
                     `You sign cartridges with a Cryptographic Signing Key. We'll generate
-                one for you, and keep it secure in your device, but you'll need to
-                provide a password to encrypt this key and store it securely. This
-                password will protect your entire Key Store.`,
+                one for you, and keep it secure in your device. You need to provide a
+                password to encrypt this key and ensure that it can only be accessed
+                by you.`,
                   ]),
                   UI.text_button(this.os, "Secure my key store with a password", {
                     on_click: async () => {
@@ -307,7 +307,7 @@ export class SceneNewDeveloper extends UI.SimpleScene {
       title: "Your signing keys",
       contents: [
         UI.p([
-          `To sign cartridges you'll need a Cryptographic Signing Key. Signature keys
+          `To sign cartridges you'll need a Cryptographic Signing Key. Signing keys
         used by Kate come in a pair: you use a private key to sign your cartridges,
         and your players use the public part of this key to verify your signature`,
         ]),
@@ -316,9 +316,9 @@ export class SceneNewDeveloper extends UI.SimpleScene {
             if (x == null) {
               return UI.stack([
                 UI.p([
-                  `We'll generate this pair of keys and store it securely in your key store,
+                  `We'll generate this pair of keys and store it securely in your key store
               so it's ready any time you wish to sign cartridges. Your private key is like
-              a password, and you should never share your it with anyone.
+              a password, and you should never share it.
               Anyone with the private key could use it to sign cartridges as if they were you!`,
                 ]),
                 UI.text_button(this.os, "Generate my cartridge signing keys", {
@@ -360,7 +360,7 @@ export class SceneNewDeveloper extends UI.SimpleScene {
       contents: [
         UI.p([
           `Players will use your public key to verify that your cartridges are truly
-        coming from you---and not someone pretending to be you. But for that to
+        coming from you—and not someone pretending to be you. But for that to
         work you need to prove you own the domain you provided: `,
           UI.inline(UI.mono_text([UI.dynamic(this.data.domain as Observable<UI.Widgetable>)])),
         ]),
@@ -415,7 +415,7 @@ export class SceneNewDeveloper extends UI.SimpleScene {
                 case "text": {
                   return UI.stack([
                     UI.p([
-                      `You'll need to include the private key in your page's text.
+                      `You'll need to include the public key in your page's text.
                     For example, if you're using a Itch.io domain, this would go
                     somewhere in your profile page's text.`,
                     ]),
@@ -426,7 +426,7 @@ export class SceneNewDeveloper extends UI.SimpleScene {
                           UI.dynamic(this.data.domain.map<UI.Widgetable>((x) => `https://${x}/`)),
                         ])
                       ),
-                      ` but it doesn't need to be visible to humans---that is, including
+                      ` but it doesn't need to be visible to humans—that is, including
                     it in an HTML comment or a hidden section is fine.`,
                     ]),
                     UI.klass("kate-ui-mono-block", [
