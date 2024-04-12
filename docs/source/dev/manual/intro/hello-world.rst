@@ -44,6 +44,8 @@ web-browser you should see something similar to the image below:
 .. image:: img/demo1.png
 
 
+.. _kart cartridge configuration:
+
 Cartridge metadata
 ------------------
 
@@ -95,6 +97,8 @@ Kate will treat it as if it was a web page of sorts. This ``web-archive``
 platform requires us to specify which web page Kate should load first;
 we only have one, so ``index.html`` is is.
 
+
+.. _package your game:
 
 Packaging your game
 -------------------

@@ -12,6 +12,39 @@ what a Ren'Py game published for Kate can look like, and the necessary
 configuration.
 
 
+Preparation
+-----------
+
+You'll first need to generate a web build of your game, which you can do
+from the Ren'Py launcher by using the ``Web (Beta)`` option in ``Actions``,
+then clicking ``Build Web Application``.
+
+.. image:: image/renpy-1.png
+
+.. image:: image/renpy-2.png
+
+You can use the ``Open build directory`` option in this same screen to navigate
+to the folder where your game's web build was stored. From there you should
+have a :ref:`Kart cartridge configuration` and run the ``kart`` application
+to :ref:`package your game`. You can find an example configuration using the
+Ren'Py recipe below, which should work with most Ren'Py games.
+
+
+Tips
+''''
+
+**Improve startup performance**
+  Ren'Py web builds are optimised for streaming the game, but Kate cartridges
+  already have the data fully locally. See the `Startup performance`_ section
+  on how to take advantage of that for making the game load faster.
+
+**Pre-loading screen**
+  Just like regular web builds, Kate cartridges will use the
+  ``web-presplash.png`` file at the root of your web build folder to show
+  the initial loading screen background; you can change that for something
+  that matches your game better.
+
+
 Kart configuration
 ------------------
 
