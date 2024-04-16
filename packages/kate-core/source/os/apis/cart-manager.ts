@@ -286,6 +286,12 @@ export class CartManager {
       }
     );
 
+    if (old_meta != null && old_meta.bucket_key != null) {
+      const key = old_meta.bucket_key;
+      const partition = await this.os.file_store.get_partition(key.partition);
+      await partition.release_persistent(key);
+    }
+
     await this.os.audit_supervisor.log("kate:cart-manager", {
       resources: ["kate:storage"],
       risk: "low",
