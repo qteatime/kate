@@ -3,8 +3,8 @@ ROM Cartridges
 
 Kate games are distributed as a special file called a "ROM cartridge", with a
 ``.kart`` extension. This file includes all data for the game, and some special
-meta-data that Kate uses to present the game in the console and allow it to
-be organised and searched for in your library.
+meta-data that tells Kate how to run and present the game in the console
+(and which can be used to search and organise games in your library).
 
 Kate doesn't run cartridges directly from this ROM file. Instead, it installs
 the contents of the file locally in the console in a more efficient format to
@@ -59,7 +59,7 @@ consider :term:`archiving the cartridge <archiving>`. You can do
 so from the cartridge's storage page (from the home screen, press |btn_menu_text|
 and select ``Manage data``).
 
-When archiving a cartridge, the cartridge data is removed from your local
+When archiving a cartridge its data is removed from your local
 device, but metadata (which Kate uses to display the cartridge), save data,
 and media captures are kept around. This means that you can re-install the
 cartridge at a later point in time and continue from where you left off.
@@ -72,7 +72,7 @@ Privacy & safety
 
 Kate cartridges are fully :term:`sandboxed <sandboxing>`. This means that a cartridge
 cannot access data on your device or use the internet in any way. By
-sandboxing all cartridges Kate greatly limits the possible impacts to
+sandboxing all cartridges Kate greatly limits the possible risks to
 your device or data, even if you end up running a malicious cartridge.
 
 Cartridges that need more privileges can request special permissions
@@ -93,6 +93,6 @@ You can read the licence text by pressing |btn_menu_text| in the library and
 choosing ``Legal notices``. Or pressing |btn_berry_text| while running a
 cartridge and selecting ``Legal notices``.
 
-Cartridges that have use the internet or link to an internet location in
+Cartridges that use the internet or link to an internet location in
 any way also include a privacy policy, which you can find in the same menu
 the legal notices are available.

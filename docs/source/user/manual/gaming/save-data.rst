@@ -22,7 +22,7 @@ Managing stored data
 --------------------
 
 Save data is associated with a specific cartridge, so you can manage it
-from the cartridge's storage screen. You can get to this screen by either
+from the cartridge's storage screen. You can get to this screen by
 pressing |btn_berry_text| to bring up the context menu, selecting
 ``Settings -> Storage``, and then the cartridge you want. Or by using the
 ``Manage Data`` option for a cartridge in the library. When you're running

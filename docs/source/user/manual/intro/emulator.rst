@@ -41,7 +41,7 @@ Handheld Mode
 
 This is the default case mode for the Kate emulator, but it's optimised for
 smartphones (and marginally for tablet devices). It includes virtual
-buttons on the sides and on the top, which can be pressed on a touch-capable
+buttons on the sides which can be pressed on a touch-capable
 device instead of requiring a physical gamepad or keyboard, and it tries to
 maximise the area used for the screen as much as possible. This is also why
 it uses a thumbstick instead of the usual D-Pad (you can hold the thumbstick
@@ -64,8 +64,9 @@ The TV case mode is optimised for devices that have a fairly big screen
 resolution (e.g.: 1600x900 pixels) but also have some sort of physical
 input device connected, such as a keyboard or a gamepad.
 
-In TV mode you can choose between 800x480 and 1200x720 as the emulator
-screen resolution. Your device's screen resolution will need to be at
+In TV mode you can choose between native 800x480 or upscaled
+1200x720 (1.5x) and 1600x960 (2x) as the emulator screen resolution.
+Your device's screen resolution will need to be at
 least 60 pixels larger than that horizontally and vertically in order
 to fit the emulator UI comfortably.
 
@@ -77,7 +78,7 @@ Fullscreen Mode
 
 In fullscreen mode the screen takes the whole space available for the
 emulator. It has the same resolution options as the TV mode:
-800x480 and 1200x720 pixels.
+native 800x480, or upscaled to 1200x720 and 1600x960 pixels.
 
 .. note::
 
@@ -106,7 +107,8 @@ able to control games that offer pointer input options.
 Kate buttons
 ''''''''''''
 
-Kate has 12 digital input buttons which are used to control most games.
+Kate has 10 digital input buttons which are used to control most games
+(plus 2 digital input buttons that are special for the OS).
 In the emulator you can:
 
 **Use the virtual buttons**
@@ -116,7 +118,7 @@ In the emulator you can:
    ``Settings -> User Interface``.
 
 **Use your keyboard**
-   You can configure the how the keyboard keys map to
+   You can configure how the keyboard keys map to
    Kate buttons from ``Settings -> Controllers & Sensors -> Control Kate
    with a keyboard``. The default is arrow keys for the |btn_dpad_text|;
    ``Left Shift``, ``Z``, ``X``, and ``C`` for |btn_menu|, |btn_ok|,

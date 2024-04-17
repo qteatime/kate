@@ -18,7 +18,7 @@ even if your screen is configured for 1200x720.
 
 Screenshots are stored in Kate as a loss-less PNG; compression is managed
 by the browser engine you're using, so some browsers may not apply any
-compression to it. There's a limit of 2 MB to each individual screenshot.
+compression to it. There's a limit of 10 MB to each individual screenshot.
 
 
 Video recording
@@ -27,7 +27,7 @@ Video recording
 Hold |btn_capture_text| for one second to start recording the cartridge's
 screen. Hold it again for another second to stop recording and save the
 video. Kate can record up to one minute of gameplay in this manner (and
-up to 64 MB for a single video), and recording is done in the cartridge's
+up to 128 MB for a single video). Recording is done in the cartridge's
 original resolution, regardless of what resolution you're using for Kate.
 
 Video captures are done in `WebM`_ using Google's `VP9`_ codec and the
