@@ -117,6 +117,16 @@ cartridge with no code changes required!
 PRs: #41, c843f95
 
 
+Friendlier creation of cartridges
+---------------------------------
+
+This release includes the new Kate Publisher cartridge, a GUI Kate
+application that can generate and sign cartridges right from the
+console. It uses the same inputs as its command-line cousin Kart for now.
+
+PRs: #42
+
+
 Minor fixes and improvements
 ----------------------------
 
@@ -128,3 +138,8 @@ Minor fixes and improvements
 
 * Small performance improvements to loading and sending data in the
   cartridge's process by avoiding copying when possible (f8eb02d);
+
+* Fixed an issue where overwriting a cartridge with the same version would
+  not remove the previous cartridge's files (fb030e8);
+
+* Many tweaks to the text and feel in some parts of the UI;
