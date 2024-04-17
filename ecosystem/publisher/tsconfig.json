@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "rootDir": "source",
+    "outDir": "build",
+    "module": "commonjs",
+    "target": "ESNext",
+    "lib": ["ESNext", "DOM", "ESNext.Intl"],
+    "experimentalDecorators": true,
+    "incremental": true,
+    "jsx": "react"
+  },
+  "references": [
+    { "path": "../../packages/kate-api" },
+    { "path": "../../packages/kate-appui" },
+    { "path": "../../packages/util" },
+    { "path": "../../packages/schema" },
+    { "path": "../../packages/kate-tools" }
+  ],
+  "include": ["source", "../../packages/kate-api/build/index.d.ts"]
+}

@@ -1,0 +1,81 @@
+Copyright (c) 2024 Niini
+
+The Kate Publisher is released under the terms of the Mozilla Public Licence,
+v. 2.0. A copy of the MPL is included in this file, but you can also obtain
+one at https://mozilla.org/MPL/2.0/.
+
+You may get a copy of the source code at https://github.com/qteatime/kate.
+Information on how to build the Kate Publisher from the source code is also
+included there. Official releases will always be distributed at
+https://github.com/qteatime/kate, and you're encouraged to audit any
+modifications if you've got your copy of the Kate Publisher cartridge elsewhere.
+
+There are other components that make up the Kate Publisher project and which
+are available under different terms. Full text for all relevant licences is
+included here, after attributions, in the goal of making them offline-friendly.
+
+This software contains portions of code, fonts, images, and sounds by
+third-parties, specified below.
+
+-------------------------------------------------------------------------------
+
+## Fonts:
+
+Font Awesome 6 Free (c) 2023 Fonticons, Inc. (https://fontawesome.com)
+Licensed under the SIL Open Font License (font files),
+Creative Commons 4.0 Attribution International license (icons), and
+MIT (CSS source code).
+
+---
+
+Poppins (c) 2020 The Poppins Project Authors
+(https://github.com/itfoundry/Poppins)
+Licensed under the SIL Open Font License.
+
+---
+
+Roboto and Roboto Mono (c) Google
+(https://fonts.google.com/specimen/Roboto/about)
+Licensed under the Apache License 2.0.
+
+_______________________________________________________________________________
+
+## Themes
+
+The Candy Pop colour theme for Kate is based on a the Pollen8 palette
+by Conker (https://lospec.com/palette-list/pollen8)
+
+_______________________________________________________________________________
+
+
+Full licence terms are provided below.
+
+-------------------------------------------------------------------------------
+
+## MIT licence
+
+{{support/licences/MIT.txt}}
+
+_______________________________________________________________________________
+
+## Apache 2.0 licence
+
+{{support/licences/Apache2.txt}}
+
+_______________________________________________________________________________
+
+## Mozilla Public Licence 2.0
+
+{{support/licences/MPL2.txt}}
+
+_______________________________________________________________________________
+
+## SIL Open Font Licence
+
+{{support/licences/SIL.txt}}
+
+_______________________________________________________________________________
+
+## Creative Commons 4.0 Attribution International licence
+
+{{support/licences/CC4-BY.txt}}

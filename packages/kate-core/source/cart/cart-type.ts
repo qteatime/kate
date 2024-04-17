@@ -157,7 +157,9 @@ export type ContextualCapability =
   | { type: "request-device-files" }
   | { type: "install-cartridges" }
   | { type: "download-files" }
-  | { type: "show-dialogs" };
+  | { type: "show-dialogs" }
+  | { type: "sign-digitally" }
+  | { type: "view-developer-profile" };
 
 export type PassiveCapability = { type: "store-temporary-files"; max_size_mb: number };
 

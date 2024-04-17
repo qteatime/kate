@@ -35,6 +35,13 @@ export type SelectionOption<A> = {
   is_visible?: () => boolean;
 };
 
+export type ActionSelection<A> = {
+  title: Widgetable;
+  description?: Widgetable;
+  value: A;
+  is_visible?: Observable<boolean>;
+};
+
 export type HorizontalSelection<A> = {
   title: Widgetable;
   description?: Widgetable;
@@ -99,10 +106,10 @@ export type Size =
   | "6x"
   | "7x"
   | "8x";
-export type IconStyle = "solid";
+export type IconStyle = "solid" | "regular";
 export type IconAnimation = "spin" | "spin-pulse" | "bounce" | "beat";
-export type BoxJustify = "";
-export type BoxAlign = "";
+export type BoxJustify = "center" | "flex-start";
+export type BoxAlign = "center" | "flex-start";
 
 export function set_attribute(element: HTMLElement, key: string, value: string | boolean) {
   if (typeof value === "string") {
@@ -246,6 +253,32 @@ export class Widget {
     return this;
   }
 
+  fill() {
+    return this.style({
+      width: "100%",
+      height: "100%",
+      "box-sizing": "border-box",
+      "flex-grow": "1",
+      overflow: "hidden",
+    });
+  }
+
+  hfill() {
+    return this.style({
+      width: "100%",
+      height: "100%",
+      overflow: "hidden",
+    });
+  }
+
+  vfill() {
+    return this.style({
+      width: "100%",
+      height: "100%",
+      overflow: "hidden",
+    });
+  }
+
   replace(content: Widgetable) {
     replace(this.canvas, content);
     return this;
@@ -266,7 +299,10 @@ export class Widget {
     );
   }
 
-  interactive(interactions: InteractionHandler[], x?: { custom_focus?: boolean }) {
+  interactive(
+    interactions: InteractionHandler[],
+    x?: { custom_focus?: boolean; enabled?: Observable<boolean> }
+  ) {
     this.ui.focus.register_interactions(this.canvas, interactions);
     this.canvas.classList.add("kate-ui-focus-target");
     if (x?.custom_focus === true) {
@@ -285,6 +321,20 @@ export class Widget {
         ev.preventDefault();
         menu_handler.handler(menu_handler.key[0], false);
       });
+    }
+    if (x?.enabled != null) {
+      const enabled = x.enabled;
+      const update = (v: boolean) => {
+        if (v) {
+          this.canvas.classList.remove("disabled");
+          this.ui.focus.register_interactions(this.canvas, interactions);
+        } else {
+          this.canvas.classList.add("disabled");
+          this.ui.focus.register_interactions(this.canvas, []);
+        }
+      };
+      enabled.stream.listen((v) => update(v));
+      update(enabled.value);
     }
     return this;
   }
@@ -313,7 +363,7 @@ export class WidgetDSL {
       on_detached?: (canvas: HTMLElement) => void;
     }
   ) {
-    return from_observable(observable, x);
+    return new Widget(this.ui, from_observable(observable, x));
   }
 
   subscription_manager(
@@ -330,16 +380,19 @@ export class WidgetDSL {
       });
     };
 
-    return dynamic({
-      on_attached: (canvas) => {
-        replace(canvas, fn(subscribe));
-      },
-      on_detached: (canvas) => {
-        for (const { stream, subscription } of subscriptions) {
-          stream.remove(subscription);
-        }
-      },
-    });
+    return new Widget(
+      this.ui,
+      dynamic({
+        on_attached: (canvas) => {
+          replace(canvas, fn(subscribe));
+        },
+        on_detached: (canvas) => {
+          for (const { stream, subscription } of subscriptions) {
+            stream.remove(subscription);
+          }
+        },
+      })
+    );
   }
 
   title_bar(x: { left?: Widgetable; middle?: Widgetable; right?: Widgetable }) {
@@ -355,7 +408,7 @@ export class WidgetDSL {
   }
 
   button_icon(x: ButtonIcon) {
-    return h("div", { class: "kate-ui-button-icon", "data-icon": x }, []);
+    return this.h("div", { class: "kate-ui-button-icon", "data-icon": x }, []);
   }
 
   key_icon(x: KateTypes.InputKey) {
@@ -402,6 +455,28 @@ export class WidgetDSL {
     ]);
   }
 
+  grid(x: {
+    layout: string[];
+    column_sizes?: string[];
+    row_sizes?: string[];
+    gap?: string;
+    content: { [key: string]: Widgetable };
+  }) {
+    return this.class("kate-ui-grid", [
+      ...Object.entries(x.content).map(([area, widget]) => {
+        return this.class("kate-ui-grid-cell", [widget]).style({
+          "grid-area": area,
+          overflow: "hidden",
+        });
+      }),
+    ]).style({
+      "grid-template-areas": x.layout.map((l) => JSON.stringify(l)).join(" "),
+      "grid-template-columns": x.column_sizes?.join(" "),
+      "grid-template-rows": x.row_sizes?.join(" "),
+      gap: x.gap,
+    });
+  }
+
   hero(x: { title?: Widgetable; subtitle?: Widgetable; content?: Widgetable }) {
     return this.class("kate-ui-hero", [
       this.class("kate-ui-hero-title", [x.title ?? null]),
@@ -410,35 +485,46 @@ export class WidgetDSL {
     ]);
   }
 
-  floating_button(x: { label?: Widgetable; icon?: Widgetable; on_click?: () => void }) {
+  floating_button(x: {
+    label?: Widgetable;
+    icon?: Widgetable;
+    on_click?: () => void;
+    enabled?: Observable<boolean>;
+  }) {
     return this.h("button", { class: "kate-ui-floating-button kate-ui-text-button" }, [
       this.class("kate-ui-floating-button-icon", [x.icon ?? null]),
       this.class("kate-ui-floating-button-label", [x.label ?? null]),
-    ]).interactive([
-      {
-        key: ["o"],
-        label: "Ok",
-        allow_repeat: false,
-        on_click: true,
-        handler: async () => {
-          x.on_click?.();
+    ]).interactive(
+      [
+        {
+          key: ["o"],
+          label: "Ok",
+          allow_repeat: false,
+          on_click: true,
+          handler: async () => {
+            x.on_click?.();
+          },
         },
-      },
-    ]);
+      ],
+      { enabled: x.enabled }
+    );
   }
 
-  text_button(label: string, on_click?: () => void) {
-    return this.h("button", { class: "kate-ui-text-button" }, [label]).interactive([
-      {
-        key: ["o"],
-        label: "Ok",
-        allow_repeat: false,
-        on_click: true,
-        handler: async () => {
-          on_click?.();
+  text_button(label: string, on_click?: () => void, enabled?: Observable<boolean>) {
+    return this.h("button", { class: "kate-ui-text-button" }, [label]).interactive(
+      [
+        {
+          key: ["o"],
+          label: "Ok",
+          allow_repeat: false,
+          on_click: true,
+          handler: async () => {
+            on_click?.();
+          },
         },
-      },
-    ]);
+      ],
+      { enabled }
+    );
   }
 
   page_bullet(current: Observable<number>, x: { total: number; max_size?: number }) {
@@ -503,6 +589,7 @@ export class WidgetDSL {
   }
 
   action_list(items: ActionItem[]) {
+    const has_icon = items.some((x) => x.icon != null);
     return this.class("kate-ui-action-list", [
       ...items
         .filter((x) => x.is_visible !== false)
@@ -526,7 +613,7 @@ export class WidgetDSL {
               },
             ])
         ),
-    ]);
+    ]).add_classes(has_icon ? [] : ["with-no-icons"]);
   }
 
   select_panel<A>(x: SelectionItem<A>) {
@@ -584,6 +671,35 @@ export class WidgetDSL {
           ])
         ),
     ]);
+  }
+
+  action_selection<A>(x: {
+    value: A;
+    options: ActionSelection<A>[];
+    on_change?: (value: A) => void;
+  }) {
+    const selected = new Observable(x.value);
+    return this.dynamic(
+      selected.map((value) => {
+        return this.action_list(
+          x.options.map((opt) => {
+            return {
+              title: opt.title,
+              description: opt.description,
+              icon:
+                opt.value === value
+                  ? this.fa_icon("circle-check")
+                  : this.fa_icon("circle", "1x", "regular"),
+              is_visible: opt.is_visible?.value,
+              on_select: () => {
+                selected.value = opt.value;
+                x.on_change?.(opt.value);
+              },
+            };
+          })
+        ).add_classes(["kate-ui-action-selection"]);
+      })
+    );
   }
 
   horizontal_selection<A>(x: HorizontalSelection<A>) {
@@ -703,14 +819,40 @@ export class WidgetDSL {
       handler: async () => handler.action(),
       enabled: handler.enabled,
     }));
-    return dynamic({
-      on_attached: (canvas) => {
-        this.ui.focus.register_scene_handlers(scene, handlers);
-      },
-      on_detached: (canvas) => {
-        this.ui.focus.deregister_scene_handlers(scene, handlers);
-      },
-    });
+    return new Widget(
+      this.ui,
+      dynamic({
+        on_attached: (canvas) => {
+          this.ui.focus.register_scene_handlers(scene, handlers);
+        },
+        on_detached: (canvas) => {
+          this.ui.focus.deregister_scene_handlers(scene, handlers);
+        },
+      })
+    );
+  }
+
+  slot(name: string) {
+    return this.h("kate-slot", { name }, []);
+  }
+
+  private get_slot(parent: Widgetable, name: string): Element | null {
+    const query = `kate-slot[name=${JSON.stringify(name)}]`;
+    if (parent instanceof HTMLElement) {
+      return parent.querySelector(query) ?? null;
+    } else if (parent instanceof Widget) {
+      return this.get_slot(parent.canvas, name);
+    } else {
+      return null;
+    }
+  }
+
+  private fill_slot(parent: Widgetable, name: string, value: Widgetable) {
+    const slot = this.get_slot(parent, name);
+    if (slot != null) {
+      append(slot, value);
+    }
+    return parent;
   }
 
   multistep(
@@ -718,12 +860,15 @@ export class WidgetDSL {
       content: Widgetable;
       next_label?: string;
       previous_label?: string;
+      is_valid?: Observable<boolean>;
       on_next?: () => Promise<void>;
       on_previous?: () => Promise<void>;
-    }[]
+    }[],
+    options?: {
+      slot_for_actions?: string;
+    }
   ) {
     const current = new Observable<number>(0);
-    const content = current.map<Widgetable>((x) => steps[x].content);
     const actions = current.map<Widgetable>((x) => {
       const step = steps[x];
 
@@ -742,18 +887,32 @@ export class WidgetDSL {
           }),
         ]),
         this.class("kate-ui-step-next", [
-          this.text_button(step.next_label ?? "Continue", async () => {
-            if (step.on_next) await step.on_next();
-            current.value = Math.min(steps.length - 1, x + 1);
-          }),
+          this.when(x < steps.length - 1, [
+            this.text_button(
+              step.next_label ?? "Continue",
+              async () => {
+                if (step.on_next) await step.on_next();
+                current.value = Math.min(steps.length - 1, x + 1);
+              },
+              step.is_valid
+            ),
+          ]),
         ]),
       ]);
+    });
+    const action_widget = this.dynamic(actions);
+    const content = current.map<Widgetable>((x) => {
+      if (options?.slot_for_actions != null) {
+        return this.fill_slot(steps[x].content, options.slot_for_actions, action_widget);
+      } else {
+        return steps[x].content;
+      }
     });
 
     return this.class("kate-ui-steps", [
       this.class("kate-ui-steps-content", [this.dynamic(content)]),
-      this.dynamic(actions),
-    ]);
+      options?.slot_for_actions == null ? action_widget : null,
+    ]).add_classes(options?.slot_for_actions == null ? [] : ["with-action-slot"]);
   }
 
   meta_text(children: Widgetable[]) {
@@ -762,6 +921,10 @@ export class WidgetDSL {
 
   mono_text(children: Widgetable[]) {
     return this.h("span", { class: "kate-ui-mono-text" }, children);
+  }
+
+  mono_block(children: Widgetable[]) {
+    return this.class("kate-ui-mono-block", children);
   }
 
   hspace(size: number) {
@@ -883,6 +1046,21 @@ export class WidgetDSL {
     return this.class("kate-ui-no-thumbnail", [this.class("kate-ui-no-thumbnail-title", [text])]);
   }
 
+  cartridge_thumbnail(x: { url: string | null; title: string }) {
+    return this.class("kate-ui-cartridge-thumbnail", [
+      x.url == null
+        ? this.no_thumbnail()
+        : this.h(
+            "img",
+            {
+              src: x.url,
+              class: "kate-ui-cartridge-image-thumb",
+            },
+            []
+          ),
+    ]);
+  }
+
   cartridge_chip(x: {
     thumbnail_dataurl?: string | null;
     title: string;
@@ -1000,6 +1178,30 @@ export class WidgetDSL {
     });
   }
 
+  update_panel(x: {
+    content: Widgetable;
+    icon?: Widgetable;
+    enabled?: Observable<boolean>;
+    on_click?: () => void;
+  }) {
+    return this.class("kate-ui-update-panel", [
+      this.class("kate-ui-update-panel-content", [x.content]),
+      this.class("kate-ui-update-panel-icon", [x.icon ?? this.fa_icon("chevron-right")]),
+    ]).interactive(
+      [
+        {
+          key: ["o"],
+          label: "Update",
+          on_click: true,
+          handler: async () => {
+            x.on_click?.();
+          },
+        },
+      ],
+      { enabled: x.enabled }
+    );
+  }
+
   toggle_panel(x: {
     value: boolean | Observable<boolean>;
     title: Widgetable;
@@ -1032,6 +1234,19 @@ export class WidgetDSL {
         },
       },
     ]);
+  }
+
+  alert(x: { kind: "warning" | "error" | "info"; content: Widgetable; icon?: Widgetable }) {
+    const default_icons = {
+      warning: this.fa_icon("triangle-exclamation"),
+      info: this.fa_icon("circle-info"),
+      error: this.fa_icon("circle-xmark"),
+    };
+
+    return this.class("kate-ui-alert", [
+      this.class("kate-ui-alert-icon", [x.icon ?? default_icons[x.kind]]),
+      this.class("kate-ui-alert-content", [x.content]),
+    ]).attr({ "data-kind": x.kind });
   }
 }
 

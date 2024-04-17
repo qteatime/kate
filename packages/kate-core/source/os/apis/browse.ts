@@ -49,7 +49,7 @@ export class KateBrowser {
     window.open(url, "_blank", "noopener,noreferrer");
   }
 
-  async download(requestee: string, filename: string, data: Uint8Array) {
+  async download_from_blob(requestee: string, filename: string, blob: Blob) {
     const ok = await this.os.dialog.confirm("kate:browser", {
       title: "Save file to your device?",
       message: UI.stack([
@@ -60,7 +60,7 @@ export class KateBrowser {
         UI.h("div", { class: "kate-ui-browse-save-chip" }, [
           UI.stack([
             UI.line_field("Suggested name:", filename),
-            UI.line_field("File size:", from_bytes(data.length)),
+            UI.line_field("File size:", from_bytes(blob.size)),
           ]),
         ]),
       ]),
@@ -77,13 +77,16 @@ export class KateBrowser {
       risk: "high",
       type: "kate.browse.download",
       message: `Saved a file to the user's device.`,
-      extra: { filename, size: data.length },
+      extra: { filename, size: blob.size },
     });
 
-    const blob = new Blob([data.buffer]);
     const url = URL.createObjectURL(blob);
     const link = UI.h("a", { download: filename, href: url }, []);
     link.click();
+  }
+
+  async download_from_bytes(requestee: string, filename: string, data: Uint8Array) {
+    return this.download_from_blob(requestee, filename, new Blob([data.buffer]));
   }
 }
 

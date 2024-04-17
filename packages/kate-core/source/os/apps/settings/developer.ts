@@ -619,11 +619,12 @@ export class SceneDeveloperViewProfile extends UI.SimpleScene {
       UI.info_line("Publisher domain", [this.profile.domain]),
       UI.info_line("Created at", [this.profile.created_at.toISOString()]),
 
+      UI.vspace(16),
       UI.section({
-        title: "Signing keys",
+        title: "Signing key fingerprints",
         contents: [
-          UI.info_line("Private key", [private_key.fingerprint]),
-          UI.info_line("Public key", [public_key.fingerprint]),
+          UI.info_line("Private key", [UI.mono_text([private_key.fingerprint])]),
+          UI.info_line("Public key", [UI.mono_text([public_key.fingerprint])]),
         ],
       }),
     ];

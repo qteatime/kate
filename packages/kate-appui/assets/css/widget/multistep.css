@@ -11,6 +11,10 @@
   gap: 1rem;
 }
 
+.kate-ui-steps.with-action-slot {
+  padding: 0;
+}
+
 .kate-ui-steps-content {
   flex-grow: 1;
 }

@@ -38,6 +38,7 @@ import { ButtonChangeEvent } from "../kernel";
 import { KateProcessFileSupervisor } from "./services/process-file-supervisor";
 import { KateKeyManager } from "./services/key-manager";
 import { KateDeveloperProfile } from "./apis/developer-profile";
+import { KateProcessDataSupervisor } from "./services/process-data-supervisor";
 
 export type CartChangeReason = "installed" | "removed" | "archived" | "save-data-changed";
 
@@ -70,6 +71,7 @@ export class KateOS {
   readonly audit_supervisor: KateAuditSupervisor;
   readonly fairness_supervisor: KateFairnessSupervisor;
   readonly process_file_supervisor: KateProcessFileSupervisor;
+  readonly process_data_supervisor: KateProcessDataSupervisor;
   readonly key_manager: KateKeyManager;
   readonly TRACE_ENABLED = trace_messages;
 
@@ -119,6 +121,8 @@ export class KateOS {
     this.file_store = new KateFileStore(this);
     this.process_file_supervisor = new KateProcessFileSupervisor(this);
     this.process_file_supervisor.setup();
+    this.process_data_supervisor = new KateProcessDataSupervisor(this);
+    this.process_data_supervisor.setup();
     this.key_manager = new KateKeyManager(this);
     this.developer_profile = new KateDeveloperProfile(this);
   }

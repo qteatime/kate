@@ -31,7 +31,8 @@
   font-weight: 500;
 }
 
-.kate-ui-focus-target[disabled] {
+.kate-ui-focus-target[disabled],
+.kate-ui-focus-target.disabled {
   opacity: 0.5;
 }
 
@@ -156,4 +157,8 @@
   border-radius: 4px;
   text-transform: uppercase;
   font-weight: 500;
+}
+
+.kate-ui-grid {
+  display: grid;
 }

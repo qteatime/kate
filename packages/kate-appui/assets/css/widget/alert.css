@@ -1,0 +1,26 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
+.kate-ui-alert {
+  display: grid;
+  grid-template-areas: "icon content";
+  gap: 1rem;
+  padding: 0.5rem;
+  border-radius: 5px;
+  border: 1px solid var(--color-border);
+  grid-template-columns: 1.5em 1fr;
+  align-items: center;
+}
+
+.kate-ui-alert-icon {
+  grid-area: icon;
+  justify-self: center;
+}
+
+.kate-ui-alert-content {
+  grid-area: content;
+  font-size: 0.8em;
+}

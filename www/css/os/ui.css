@@ -572,7 +572,7 @@
 .kate-ui-key-entry-title {
   font-weight: 500;
   grid-area: title;
-  padding-=bottom: 0;
+  padding-bottom: 0;
 }
 
 .kate-ui-key-entry-domain,
@@ -594,4 +594,34 @@
 .kate-ui-key-entry-fp {
   grid-area: fp;
   justify-self: self-end;
+}
+
+.kate-ui-developer-profile-chip {
+  padding: 0.5rem;
+  margin: 0.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.kate-ui-developer-profile-name {
+  font-weight: bold;
+}
+
+.kate-ui-developer-profile-domain {
+  font-size: 0.9em;
+  font-family: var(--font-family-mono);
+}
+
+.kate-ui-developer-profile-fingerprint {
+  padding: 0.5rem;
+  background: var(--color-border);
+  border-radius: 5px;
+  font-family: var(--font-family-mono);
+  margin-top: 0.5rem;
+  white-space: pre-wrap;
+  word-break: break-all;
+  font-size: 0.8em;
 }

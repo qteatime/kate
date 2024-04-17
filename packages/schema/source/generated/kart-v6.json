@@ -1138,6 +1138,14 @@
             {
               "name": "Show-dialogs",
               "fields": []
+            },
+            {
+              "name": "View-developer-profile",
+              "fields": []
+            },
+            {
+              "name": "Sign-digitally",
+              "fields": []
             }
           ]
         }

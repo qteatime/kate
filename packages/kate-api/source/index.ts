@@ -9,11 +9,12 @@ import { KateCapture } from "./capture";
 import { KateCartFS } from "./cart-fs";
 import { KateCartManager } from "./cart-manager";
 import { KateIPC } from "./channel";
+import { DeveloperProfile, KateDeveloper } from "./developer";
 import { DeviceFileHandle, KateDeviceFileAccess } from "./device-file";
 import { KateDialogs } from "./dialog";
 import { FileBucket, KateFile, KateFileStore } from "./file-store";
 import { InputKey, KateInput } from "./input";
-import { KateObjectStore } from "./object-store";
+import { KateObjectStore, ObjectMetadata, Object, Usage } from "./object-store";
 import { KatePointerInput, PointerClick, PointerLocation } from "./pointer-input";
 import { KateTimer } from "./timer";
 
@@ -48,6 +49,8 @@ export const device_files = new KateDeviceFileAccess(channel);
 export const cart_manager = new KateCartManager(channel);
 
 export const dialogs = new KateDialogs(channel);
+
+export const developer = new KateDeveloper(channel);
 
 window.addEventListener("focus", () => {
   channel.send_and_ignore_result("kate:special.focus", {});
@@ -88,6 +91,7 @@ export type KateAPI = {
   device_files: typeof device_files;
   cart_manager: typeof cart_manager;
   dialogs: typeof dialogs;
+  developer: typeof developer;
 };
 
 declare global {
@@ -106,6 +110,14 @@ declare global {
       FileBucket,
       KateFile,
     };
+
+    export namespace object_store {
+      export { ObjectMetadata, Object, Usage };
+    }
+
+    export namespace developer {
+      export { DeveloperProfile };
+    }
   }
 }
 

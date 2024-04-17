@@ -24,6 +24,8 @@ export type GrantConfiguration = ValidateGrantConfig<{
   "store-temporary-files": {
     max_size_bytes: number;
   };
+  "sign-digitally": {};
+  "view-developer-profile": {};
 }>;
 
 export type CapabilityType = ContextualCapability["type"] | PassiveCapability["type"];

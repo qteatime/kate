@@ -7,7 +7,7 @@
 // The KeyManager takes care of handling all usage of private keys and
 // making sure that they don't live decrypted outside of the kernel.
 
-import { KeyStore, KeyStore_v1, TrustStore } from "../../data";
+import { DeveloperProfileStore, KeyStore, KeyStore_v1, TrustStore } from "../../data";
 import {
   EKeyIncorrectPassword,
   EKeyMissing,
@@ -91,7 +91,7 @@ export class KateKeyManager {
     }
 
     const secret = await this.ask_password(
-      `${requestee} wants access to your secure key store. Enter your password to unlock it.`,
+      `Enter your password to unlock your key store (prompted by ${requestee}'s request).`,
       "current-password"
     );
 
@@ -248,6 +248,32 @@ export class KateKeyManager {
   }
 
   // == Key management lifecycle
+  async reset_store(requestee: string): Promise<void> {
+    await this.os.db.transaction(
+      [...KeyStore.tables, ...DeveloperProfileStore.tables],
+      "readwrite",
+      async (txn) => {
+        const key_store = new KeyStore(txn);
+        const dev_store = new DeveloperProfileStore(txn);
+        const keys = await key_store.all_private_keys();
+        for (const key of keys) {
+          await key_store.delete_key(key);
+        }
+        const profiles = await dev_store.list();
+        for (const profile of profiles) {
+          await dev_store.delete(profile);
+        }
+      }
+    );
+    await this.os.settings.update("key_store", (store) => ({ ...store, master_key: null }));
+    await this.os.audit_supervisor.log(requestee, {
+      risk: "critical",
+      type: "kate.key-manager.store-reset",
+      resources: ["kate:key-store"],
+      message: `Store has been reset.`,
+    });
+  }
+
   async rotate_master_key(requestee: string, old_pass: string, new_pass: string): Promise<void> {
     const config = this.os.settings.get("key_store").master_key;
     if (config == null) {
