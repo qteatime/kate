@@ -1,0 +1,17 @@
+{
+  "id": "my.domain/my-first-cartridge",
+  "version": { "major": 1, "minor": 0 },
+  "metadata": {
+    "presentation": {
+      "author": "Your Name",
+      "title": "My First Cartridge",
+      "tagline": "My first cartridge",
+      "thumbnail_path": "thumbnail.png"
+    }
+  },
+  "files": ["index.html", "thumbnail.png"],
+  "platform": {
+    "type": "web-archive",
+    "html": "index.html"
+  }
+}

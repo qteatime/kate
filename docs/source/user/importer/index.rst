@@ -35,7 +35,7 @@ Getting the Importer
 The Kate Importer is released as a standard cartridge. Download the
 ``standard-cartridges.zip`` file from either the
 `GitHub releases page <https://github.com/qteatime/kate/releases>`_ or the
-`Itch.io stable mirror <https://qteatime.itch.io/kate-importer>`_. You'll
+`Itch.io stable mirror <https://cute-the-niini.itch.io/kate-importer>`_. You'll
 find the importer cartridge inside this ZIP file.
 
 To install, you can drag-and-drop the ``kate-importer.kart`` file on a Kate

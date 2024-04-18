@@ -5,7 +5,7 @@ Kate is a :term:`fantasy console`. This essentially means that while the
 hardware specifications are real, there is no off-the-shelf device that
 users can buy from a store (although they could build one themselves).
 Rather, users will mostly be running an emulator of the real Kate device
-on their computer (or phone/smartdevice). Think of how people can run
+on their computer or phone/smartdevice. Think of how people can run
 games made for 90s and 00s era consoles in their desktop nowadays;
 Kate is similar.
 
@@ -22,9 +22,10 @@ As a developer, by making a game for Kate you get to:
   and have players install and run it offline in any device the Kate
   emulator runs on, with a predictable experience.
 
-* Avoid the tension of players being overly cautious of downloading
-  small native applications because they're worried it could be
-  malware.
+* Avoid scary security warnings when the player launches your game
+  on Windows or MacOS
+  (Kate prevents malicious applications from damaging the player's
+  device and data :doc:`in a different way </user/manual/security/sandboxing>`).
 
 * Have the option of packaging the emulator and your game as a webpage,
   which you can then upload to platforms like Itch.io as a web game.
@@ -35,7 +36,7 @@ As a developer, by making a game for Kate you get to:
 * Avoid having to optimise your asset sizes for streaming on the web,
   like you would with a regular web-based game. This means you can
   have games with gigabytes in size that still start up instantly,
-  as all download is done upfront and the files are installed locally.
+  there's no download happening while the player is running the game.
 
 On top of the APIs that are provided in the web platform Kate adds its
 own game-specific APIs that have a baseline expectation among players.
