@@ -12,7 +12,7 @@ The web-based emulator
 
 When using the web emulator through the public instance,
 at https://kate.qteati.me, the server at the end of that address will
-receive your computer's IP address. (since it
+receive your computer's IP address (since it
 has to know where to send a reply back to—this happens for any website).
 An IP address may provide to the server a rough estimate of your physical
 location (e.g.: the country you're accessing the website from). The browser
@@ -76,6 +76,18 @@ Information stored locally includes:
    This includes things like what cartridges were installed, what permissions
    were granted, and similar changes to Kate's database. Logs are subject to
    the retention you specify in ``Settings -> Audit log``.
+
+**Developer profiles**
+  If you've created a developer profile in the console to publish your own
+  Kate cartridges, then the developer data is stored only locally in your
+  device. You can manage it in ``Settings -> For developers``.
+
+**Public and private keys**
+  Kate stores public keys of developers whose cartridges you've trusted before,
+  and it can store your own public and private keys if you've created a
+  developer profile. Private keys are always stored encrypted with your
+  store's password and never leave your device. You can manage your keys
+  in ``Settings -> Secure key store``.
 
 You can erase all data Kate has stored locally and reset the console by going
 to ``Settings -> Diagnostics & Recovery`` and using the ``Delete all data``

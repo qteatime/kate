@@ -94,7 +94,7 @@ to protect your device from these processes, and each process from each
 other. `Firefox has its own sandbox <https://wiki.mozilla.org/Security/Sandbox>`_.
 Safari, likewise, has a process sandbox.
 
-Not all process sandbox are equal—there are different kinds of attacks
+Not all process sandboxes are equal—there are different kinds of attacks
 these sandbox designs for different browsers can protect you against. But
 they all share the goal of limiting the damage that any real attack can do
 to your device.
@@ -125,7 +125,7 @@ OS sandboxing
 -------------
 
 Phone OSs make heavy use of sandboxing to contain damage from applications
-with less-than-graceful intentions (or with just unfortunate bugs). Modern
+with less-than-graceful intentions (or just unfortunate bugs). Modern
 OSs do less well here as sandboxing is often not backwards compatible with
 legacy applications.
 
