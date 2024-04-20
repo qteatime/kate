@@ -34,7 +34,7 @@ web-browser you should see something similar to the image below:
 .. image:: img/demo-goal.png
 
 
-.. _kart cartridge configuration:
+.. _cartridge build configuration:
 
 Cartridge metadata
 ------------------

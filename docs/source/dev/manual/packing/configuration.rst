@@ -408,7 +408,7 @@ average_session *(recommended)*
   
 .. rubric:: Footnotes
 
-.. [#f2] Kart counts the UTF-16 codepoints. So one character might
+.. [#f2] Packaging tools count the UTF-16 codepoints. So one character might
   count as multiple ones (e.g.: Japanese characters and emojis often count
   as two or more characters).
 
@@ -472,8 +472,8 @@ bridges *(optional)*
 
 recipe *(optional)*
   | ``Recipe``
-  | If given, this should be a porting recipe that Kart knows about. Recipes
-    can do the heavy lifting of configuring Kart for games made with common
+  | If given, this should be a porting recipe that the packaging tool knows about. Recipes
+    can do the heavy lifting of configuring packaging for games made with common
     engines. You should look at the :doc:`Kate Porting Recipes book </dev/port/index>`
     for details.
 

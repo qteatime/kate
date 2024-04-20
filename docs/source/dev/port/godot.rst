@@ -10,8 +10,8 @@ using the HTML5 export option.
   `outstanding security issues can be addressed <https://github.com/orgs/qteatime/discussions/1>`_.
 
 
-Kart configuration
-------------------
+Build configuration
+-------------------
 
 The minimal configuration for a Godot game looks like this:
 

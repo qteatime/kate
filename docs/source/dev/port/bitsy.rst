@@ -5,8 +5,8 @@ Games made with `Bitsy <https://bitsy.org/>`_ can run on Kate with little
 configuration. Games using bitsy hacks might not be supported.
 
 
-Kart configuration
-------------------
+Build configuration
+-------------------
 
 The minimal configuration for a Bitsy game looks like this:
 
@@ -58,7 +58,7 @@ precedence over the configuration above.
 Included files
 --------------
 
-By default Kart will only include HTML files. If your Bitsy game is not
+By default the build configuration will only include HTML files. If your Bitsy game is not
 self-contained and has additional files referenced from the HTML, you'll
 need to manually include those on the cartridge configuration as well.
 

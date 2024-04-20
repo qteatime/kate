@@ -10,8 +10,8 @@ can run on Kate when using the web export option.
   require manually.
 
 
-Kart configuration
-------------------
+Build configuration
+-------------------
 
 The minimal configuration for a RPG Maker MV game looks like this:
 

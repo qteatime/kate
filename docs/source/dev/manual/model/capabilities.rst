@@ -83,7 +83,7 @@ Open URLs
 :Risk: Medium
 :Main concerns: Data exfiltration, privacy
 :Gates access to: :meth:`KateAPI.browser.open`
-:Kart type: ``open-urls``
+:Build configuration type: ``open-urls``
 
 Kate blocks any sort of internet access and URL navigation in a cartridge
 for security and privacy reasons. However, some times it's useful for a
@@ -104,7 +104,7 @@ Download files
 :Risk: Critical
 :Main concerns: Escalation, unsandboxed code execution
 :Gates access to: :meth:`KateAPI.browser.download`
-:Kart type: ``download-files``
+:Build configuration type: ``download-files``
 
 Allows a cartridge to ask the user to get a file saved to their device's
 regular file system. The file is treated in the same way any other
@@ -117,7 +117,7 @@ Show dialogs
 :Risk: low
 :Main concerns: Denial of service, bad user experience
 :Gates access to: :mod:`KateAPI.dialogs`
-:Kart type: ``show-dialogs``
+:Build configuration type: ``show-dialogs``
 
 Allows a cartridge to show Kate OS-like modal dialogs to the user, such
 as message alerts or requests for text input.
@@ -129,7 +129,7 @@ Request device files
 :Risk: High
 :Main concerns: Privacy, general security, privilege escalation
 :Gates access to: :mod:`KateAPI.device_file`
-:Kart type: ``request-device-files``
+:Build configuration type: ``request-device-files``
 
 Allows a cartridge to ask the user for read-only access to a single file
 or a single directory.
@@ -141,7 +141,7 @@ Install cartridges
 :Risk: Critical
 :Main concerns: Escalation, code execution, general security
 :Gates access to: :mod:`KateAPI.cart_manager`
-:Kart type: ``install-cartridges``
+:Build configuration type: ``install-cartridges``
 
 Allows a cartridge to ask the user to install a cartridge by providing
 the cartridge's binary data.
