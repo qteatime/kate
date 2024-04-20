@@ -115,7 +115,7 @@ async function write_files(
 }
 
 export async function generate(
-  developer: KateTypes.developer.DeveloperProfile,
+  developer: KateTypes.developer.DeveloperProfile | null,
   build: BuildConfig,
   files: KateTypes.DeviceFileHandle[],
   progress: (_: string) => void
@@ -138,18 +138,26 @@ export async function generate(
     const meta_offset = writer.current_offset;
     const meta = metadata(build, archive);
     const unsigned_meta_bytes = kart_v6.encode_metadata(meta);
-    const signature = await KateAPI.developer.sign(developer, unsigned_meta_bytes);
-    if (signature == null) {
-      throw new Error(`Could not sign the cartridge. Aborting.`);
+    let signature: null | Uint8Array = null;
+    if (developer != null) {
+      const signature = await KateAPI.developer.sign(developer, unsigned_meta_bytes);
+      if (signature == null) {
+        throw new Error(`Could not sign the cartridge. Aborting.`);
+      }
     }
+
     const signed_meta = Cart.Metadata({
       ...meta,
       signature: [
-        Cart.Signature({
-          "signed-by": developer.domain,
-          "key-id": developer.fingerprint,
-          signature: signature,
-        }),
+        ...(signature == null || developer == null
+          ? []
+          : [
+              Cart.Signature({
+                "signed-by": developer.domain,
+                "key-id": developer.fingerprint,
+                signature: signature,
+              }),
+            ]),
       ],
     });
     await writer.write(kart_v6.encode_metadata(signed_meta));

@@ -69,7 +69,10 @@ export class SceneMain extends UIScene {
                           content: ui.dynamic(
                             this.state.map((x) => {
                               if (x.developer == null) {
-                                return ui.meta_text(["(Not selected)"]);
+                                return ui.alert({
+                                  kind: "warning",
+                                  content: "No profile selected, cartridge won't be signed.",
+                                });
                               } else {
                                 return ui.stack([
                                   ui.strong([x.developer.name]),
@@ -80,7 +83,7 @@ export class SceneMain extends UIScene {
                                     [
                                       ui.alert({
                                         kind: "error",
-                                        content: `Developer domain doesn't match the work's domain`,
+                                        content: `Developer domain doesn't match the work's domain.`,
                                       }),
                                     ]
                                   ),
@@ -128,7 +131,12 @@ export class SceneMain extends UIScene {
               on_click: () => {
                 this.generate_cartridge();
               },
-              enabled: this.state.map((x) => x.developer != null && x.project != null),
+              enabled: this.state.map(
+                (x) =>
+                  x.project != null &&
+                  (x.developer == null ||
+                    x.project.metadata.id.startsWith(x.developer.domain + "/"))
+              ),
             }),
           ])
           .style({ height: "100%" }),
@@ -144,7 +152,7 @@ export class SceneMain extends UIScene {
 
   async generate_cartridge() {
     const { developer, project } = this.state.value;
-    if (developer == null || project == null) {
+    if (project == null) {
       return;
     }
 
