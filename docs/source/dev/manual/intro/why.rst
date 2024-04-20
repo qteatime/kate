@@ -9,34 +9,30 @@ on their computer or phone/smartdevice. Think of how people can run
 games made for 90s and 00s era consoles in their desktop nowadays;
 Kate is similar.
 
-Unlike most commercial consoles, however, Kate is first and foremost
-a platform *for players*. This means that we want to respect their
-safety, privacy, and agency as much as possible. We want players to
-be able to download any random game they find on the internet and
-run it, without having to think about whether that game will try
-to do weird things to their computer or data.
+Unlike most commercial consoles, Kate is free to use, free to develop
+for, and entirely open source. As a developer, by making a game for
+Kate you get to:
 
-As a developer, by making a game for Kate you get to:
-
-* Program for a single platform, distribute your game as a single file,
+* **Program for a single platform**, distribute your game as a single file,
   and have players install and run it offline in any device the Kate
-  emulator runs on, with a predictable experience.
+  emulator runs on, with a predictable experience;
 
-* Avoid scary security warnings when the player launches your game
+* **Avoid scary security warnings** when the player launches your game
   on Windows or MacOS
   (Kate prevents malicious applications from damaging the player's
-  device and data :doc:`in a different way </user/manual/security/sandboxing>`).
+  device and data :doc:`in a different way </user/manual/security/sandboxing>`);
 
-* Have the option of packaging the emulator and your game as a webpage,
-  which you can then upload to platforms like Itch.io as a web game.
+* **Use the same tools you're already familiar with**, as long as they at
+  least offer an option to make a web export [#f1]_;
 
-* Use the same tools you're already familiar with, as long as they at
-  least offer an option to make a web export [#f1]_; and
+* **Make gigabyte-sized games that still start instantly in any browser**,
+  since players fully download your game's cartridge file and install it
+  only once, just like any other native game. There's nothing to download
+  during gameplay, so no lag or long loading screens there—internet connection
+  isn't even required;
 
-* Avoid having to optimise your asset sizes for streaming on the web,
-  like you would with a regular web-based game. This means you can
-  have games with gigabytes in size that still start up instantly,
-  there's no download happening while the player is running the game.
+* **Optionally, package your game as a web page** so it can be uploaded to
+  platforms like Itch.io and played directly in the browser;
 
 On top of the APIs that are provided in the web platform Kate adds its
 own game-specific APIs that have a baseline expectation among players.

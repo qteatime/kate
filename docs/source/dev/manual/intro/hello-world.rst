@@ -142,3 +142,15 @@ engines, meaning you might be able to get your game to work even with very
 little knowledge of web development. Check out the
 :doc:`Kate Porting Recipes </dev/port/index>` book for configuration examples
 and tips on how to create cartridges for games made in Ren'Py, Godot, Bitsy, and more.
+
+
+Configuration files
+-------------------
+
+The Publisher uses special JSON configuration files to describe how the
+cartridge should be built. These configuration files contain other
+meta-data used to present and search for the cartridge, as well as
+some information on how the cartridge should be executed.
+
+Detailed information about these configuration files is available
+in the :doc:`Packaging cartridges </dev/manual/packing/index>` section.

@@ -75,6 +75,7 @@ device). During these steps you will:
   a new password to protect your backup, so you can safely store it anywhere
   without giving other people access to your private key.
 
+.. _installing the kate publisher:
 
 Installing the Publisher
 ------------------------

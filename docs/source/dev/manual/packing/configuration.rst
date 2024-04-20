@@ -1,8 +1,9 @@
 Configuration files
 ===================
 
-Kart relies on a JSON configuration file (commonly named ``kate.json``)
-to describe how to create the cartridge and what to include in it.
+Kate cartridge packaging tools rely on a JSON configuration file
+(commonly named ``kate.json``) to describe how to create the cartridge
+and what to include in it.
 
 This configuration is made out of the following sections:
 
@@ -37,7 +38,7 @@ your game directory—that is, at the same level as your HTML entrypoint:
 
 But sometimes it makes sense to place the configuration file outside of
 your game's root directory. For example, Ren'Py web distributions modify
-the contents of the whole game directory, so you'll want to have the Kate
+the contents of the whole build directory, so you'll want to have the Kate
 files somewhere Ren'Py won't touch:
 
 .. code-block:: text
@@ -68,12 +69,12 @@ When using this option, a configuration file looks like this:
     ...
   }
 
-.. [#f1] Kart does not allow the ``root`` option to point to a directory
-  that's unrelated to the ``kate.json`` directory for security reasons.
-  If you were to run Kart on a configuration file you didn't write, that
-  configuration would be able to instruct Kart to read and include in the
-  cartridge sensitive files from your computer, which the cartridge could
-  then access when you run it.
+.. [#f1] It's not possible to use the ``root`` option to point to a directory
+  that's outside of the directory containing your ``kate.json`` file
+  for security reasons. If we allowed that, then a configuration file
+  would be able to instruct the packaging tool to read and include in the
+  cartridge any file in your computer, including sensitive ones like private
+  keys, stored passwords, or personal photos!
 
 
 Identification
@@ -85,7 +86,7 @@ contains:
 release *(optional)*
   | ``{year: integer, month: integer, day: integer}``
   | The date in which the cartridge was released. Defaults to the current
-    date. This helps players sort store entries and their library by
+    date. This helps players sort catalog entries and their library by
     recency, or look for releases in a particular time-frame.
 
   E.g.: ``{year: 2023, month: 6, day: 10}``
@@ -107,10 +108,10 @@ Metadata
 The metadata section is further divided into several subsections:
 
 * ``presentation`` — provides information about how to display the game
-  throughout Kate (e.g.: in the library or in the store);
+  throughout Kate (e.g.: in the library or in the catalog);
 
 * ``classification`` — provides information for categorising and filtering
-  the game in the store and library, this includes things like the genre
+  the game in the catalog and library, this includes things like the genre
   of the game, but also things like age rating;
 
 * ``legal`` — provides information about the usage terms of the cartridge
@@ -129,7 +130,7 @@ Presentation
 
 author
   | ``string``
-  | A descriptive name identifying who made the game. Will show up on stores
+  | A descriptive name identifying who made the game. Will show up on the catalog
     and in the detailed cartridge information screen. Up to 255 characters [#f2]_.
 
 title
@@ -140,19 +141,19 @@ title
 
 tagline
   | ``string``
-  | A very short description of the game. This will show up on the store and
+  | A very short description of the game. This will show up on the catalog and
     in the game information screen. Up to 255 characters [#f2]_.
 
 description *(optional)*
   | ``string``
   | A free-text description of the game. Might include a summary, features
     players might expect, and similar text to what is generally found in
-    game stores. Up to 10,000 (ten thousand) characters [#f2]_.
+    the catalog. Up to 10,000 (ten thousand) characters [#f2]_.
 
 release_type *(recommended)*
   | ``string``
   | Tells players what kind of stability and polish they should expect from
-    the cartridge. The default is ``regular``, which means a proper, stable and
+    the cartridge. The default is ``regular``, which means a proper, stable, and
     polished release.
 
   Can be one of:
@@ -186,10 +187,10 @@ thumbnail_path *(recommended)*
 
 banner_path *(recommended)*
   | ``string``
-  | A path to a PNG image to use as a banner in the top of the game information
-    screen, and also in the game's store page.
+  | A path to a PNG image to use as a banner at the top of the game information
+    screen, and also in the game's catalog page.
 
-  The image should have 1280x200 pixels.
+  The image should have 1200x200 pixels.
 
 
 Classification
@@ -236,16 +237,16 @@ tag *(optional)*
 rating *(recommended)*
   | ``string``
   | The age-appropriateness rating of the cartridge, based on the author's
-    perspective. You should provide this, the default is ``unknown``, which
+    perspective. You should provide this as the default is ``unknown``, which
     is treated in the same manner as ``explicit``, and therefore considered
-    adult-only content regardless of what the actual cartridge is.
+    adult-only content regardless of what the actual cartridge content is.
 
   Can be one of:
 
-  * ``general`` — for everyone;
-  * ``teen-and-up`` — 13+;
-  * ``mature`` — 17+;
-  * ``explicit`` — 18+;
+  * ``general`` — no age restrictions deemed necessary by the author;
+  * ``teen-and-up`` — 13+-ish;
+  * ``mature`` — 17+-ish;
+  * ``explicit`` — 18+-ish;
   * ``unknown`` — not rated, but same as ``explicit``.
 
   See :ref:`Cartridge Content Rating <cartridge rating>` for details.
@@ -255,7 +256,7 @@ warnings *(recommended)*
   | This is a free text (up to 1,000 characters [#f2]_) where you can provide
     any warnings to the player about the content so they can make a more
     informed choice about playing it and avoid dangerous situations. The text
-    will be shown as-is to players on the store and on the cartridge details
+    will be shown as-is to players on the catalog and on the cartridge details
     page, as well as before installing or playing it for the first time.
   
   We expect at least warnings for common triggers, as these can start a
@@ -284,12 +285,12 @@ privacy_policy_path *(recommended)*
 
   Privacy policy files should be written in a clear, direct, and informative
   style. They're primarily meant to provide users with enough information to make
-  an informed consent about using the cartridge or not based on their own
+  an informed decision about using the cartridge or not based on their own
   personal risks, not to be a legal document to protect the author of the
   cartridge of any claimed damages — keep that in the legal notices file.
 
   Kate will allow players to read through this file from the cartridge's
-  context menu, and also from the store. See :ref:`Cartridge Usage Terms`
+  context menu, and also from the catalog. See :ref:`Cartridge Usage Terms`
   for details.
 
 derivative_policy *(recommended)*
@@ -310,7 +311,7 @@ derivative_policy *(recommended)*
     even for personal use. This is the common case for more restrictive
     proprietary licences for games.
 
-  * ``personal-use`` — The users are allowd to modify the cartridge for their
+  * ``personal-use`` — The users are allowed to modify the cartridge for their
     own use, but they are not allowed to share any modification they make.
 
   * ``non-commercial-use`` — The users are allowed to modify the cartridge,
@@ -367,7 +368,7 @@ provisions *(recommended)*
   | A list of accessibility provisions that the game offers to allow more
     players to play the game. We always encourage developers to look into
     ways of making their games more accessible. This setting helps players
-    who need accessibility options to filter items in the store to those
+    who need accessibility options to filter items in the catalog to those
     they can play. The `Xbox Acessibility Guidelines <https://learn.microsoft.com/en-us/gaming/accessibility/guidelines>`_
     are a good resource to get more familiar with accessibility in
     video games.
@@ -416,10 +417,10 @@ Security
 --------
 
 capabilities *(required)*
-  | list of capability
+  | ``list of capability``
   | The list of capabilities that your cartridge needs to work, and the
     reason why you need them. The reason is not shown to the user in any
-    kind of risk assessment, but it's used for store reviews.
+    kind of risk assessment, but it's used for catalog reviews.
 
   A basic capability has the following shape:
 

@@ -34,7 +34,7 @@ we are interested in for such format:
 
 - **Rich metadata**: It should be possible to encode rich metadata about the
   application, as Kate uses this to enable displaying and searching for
-  cartridges in the console and the store.
+  cartridges in the console and the catalog.
 
 - **Multiparty whole-cartridge signatures**: It should be possible to sign
   the whole cartridge by multiple signees. We expect authors to sign their

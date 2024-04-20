@@ -69,13 +69,13 @@ Meta-data
 
 The cartridge meta-data includes information that Kate uses to display the
 cartridge in the library and allow players to filter or create dynamic
-collections. It will also be used by other tools (such as the store feed
+collections. It will also be used by other tools (such as the catalog feed
 ones) to extract information necessary to present a cartridge.
 
 The meta-data is itself divided into further sections:
 
 * **Presentation**: This provides information about how Kate should present
-  your cartridge to users across the console and in the store. It includes
+  your cartridge to users across the console and in the catalog. It includes
   the game's title, author, thumbnails, etc.
 
 * **Classification**: This provides information about the content of the

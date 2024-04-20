@@ -63,7 +63,7 @@ Technical details
 Kate uses a binary cartridge format (documented in :doc:`../formats/F0002-kart`),
 and this format allows embedding multiple signatures by specifying the signee
 and the public key identifier of that signee. When accepting cartridges
-(e.g.: installing in the console, submitting to the store), they **must** be
+(e.g.: installing in the console, submitting to the catalog), they **must** be
 verified against the public repository of digital signatures for the validity
 of the stated identities vouching for the cartridge.
 
