@@ -25,7 +25,7 @@ Capabilities in Kate are divided in two categories:
   with the possibility of selecting a file to grant your cartridge access to,
   that's a contextual capability — the actual grant of the access happens
   in a specific context, so the user is aware of the cause/effect, and must
-  agree to the permission request every time they click that button.
+  agree to the request every time they click that button.
 
 * **Passive** capabilities are the ones your cartridge asks for when the user
   is installing your cartridge. For example, a multiplayer game needs to send

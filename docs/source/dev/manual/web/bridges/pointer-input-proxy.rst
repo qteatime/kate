@@ -13,8 +13,8 @@ the browser should be hidden or not (e.g.: if you're using a
 custom cursor in your game).
 
 
-Using in Kart
--------------
+Using in your build configuration
+---------------------------------
 
 To add this bridge to your cartridge, you specify the following in your
 ``kate.json`` configuration:

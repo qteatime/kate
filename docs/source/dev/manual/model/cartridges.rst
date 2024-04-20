@@ -33,8 +33,8 @@ Each cartridge has a unique identifier, which is written in the form:
 ``namespace/name``. Here ``namespace`` is a domain name that you own,
 whereas ``name`` is a name that must be unique in that namespace.
 
-For example, the author's game is identified by ``qteati.me/the-sound-of-rain``.
-This means that they have a game named ``the-sound-of-rain``, and this
+For example, given a cartridge identified by ``qteati.me/the-sound-of-rain``,
+this means that the author has a game named ``the-sound-of-rain``, and this
 is published by someone who owns the domain ``qteati.me``. Having domains be
 something authors own makes it easier for Kate to do automatic verifications
 about the origin of a cartridge, improving users' trust.
@@ -164,23 +164,23 @@ necessary content warnings. Failing to do so might cause the cartridge to
 be hidden from the official channels, or require the player to agree to
 possibly explicit content before they can install and play.
 
-Rating is made out of an age-appropriateness rating, from the author's
-perspective and not governed by any regulatory body, which can be one of:
+Rating is made out of an age-appropriateness rating from the author's
+perspective and not governed by any regulatory body. It can be one of:
 
 * **General** — the author sees it as appropriate for any audience;
 * **Teen-and-up** — the author thinks the game is not appropriate for
-  kids aged 12 and younger;
+  younger kids (generally aged 12 and younger);
 * **Mature** — the author thinks the game is only appropriate for adult
   audiences. It may include depictions of violence, sex, abuse, and other
-  heavy topics, but there's nothing very graphic;
-* **Explicit** — like mature, except things can get graphic.
+  heavy topics, but there's nothing very explicit;
+* **Explicit** — like mature, except things can get explicit or overt.
 * **Unknown** — the author has chosen to not give the game an age
   appropriateness rating.
 
 The default age-appropriateness rating is "Unknown", which for all practical
 purposes has the same meaning as "Explicit". It will be treated as a game
-for adults regardless of its actual content, so players can give their
-informed consent.
+for adults regardless of its actual content since we can't tell the player
+what to expect.
 
 The other part of rating is the content warning. This is a free-text field
 that includes any warnings the author wishes players to be aware before they

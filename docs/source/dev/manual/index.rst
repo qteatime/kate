@@ -28,4 +28,4 @@ providing details on its approach to security and privacy.
    model/index
    api/index
    web/index
-   kart/index
+   packing/index

@@ -6,7 +6,7 @@ privacy, it makes heavy use of :term:`capabilities` and :term:`sandboxing`,
 as well as isolating components to prevent a faulty component from compromising
 the entire system.
 
-On top of that, Kate runs on top of a web browser. This means that
+On top of that, Kate runs in a web browser. This means that
 Kate runs in any platform that has a web browser, often with similar
 behaviour, but it also means Kate does not have access to any of the
 device's native functionality directly. Likewise, nor does your cartridge.

@@ -201,7 +201,7 @@ to use the same archive format).
 Because these only have their semantic defined by the interpreter of the
 cartridge, we don't discuss them in this document. How Kate interprets
 these fields is described in :doc:`/dev/manual/model/cartridges` and
-:doc:`/dev/manual/kart/configuration`.
+:doc:`/dev/manual/packing/configuration`.
 
 
 Multi-party, whole cartridge signatures

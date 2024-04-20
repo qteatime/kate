@@ -6,8 +6,8 @@ into read calls to the :py:mod:`Cartridge File System API <KateAPI.cart_fs>`.
 There is no configuration for this bridge.
 
 
-Using in Kart
--------------
+Using in your build configuration
+---------------------------------
 
 To add this bridge to your cartridge, you specify the following in your
 ``kate.json`` configuration:

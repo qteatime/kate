@@ -10,8 +10,8 @@ opened in a regular browser's window or tab.
   :ref:`Open URLs <open urls capability>` capability.
 
 
-Using in Kart
--------------
+Using in your build configuration
+---------------------------------
 
 To add this bridge to your cartridge you specify the following in your
 ``kate.json`` configuration:
