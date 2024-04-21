@@ -3,11 +3,16 @@
 > **NOTE:**  
 > Kate is an experimental proof-of-concept currently, its security properties are not proven, and it may break randomly. Cartridge format is not final, you might need to re-package your game for newer versions.
 
-Kate is a fantasy handheld console designed for simpler story-rich games, like Visual Novels and 2d RPGs. It looks like an old handheld, but runs on Windows, Mac, Linux, or in your browser.
-
-It's built to be secure, respect your privacy, and give you agency on how you play your games. Developers can package their existing games for Kate and distribute it as a single cartridge file, playable on any platform the Kate emulator runs on. All sandboxed so players don't have to worry about malicious applications masquerading as games.
+Kate is a small fantasy console for small 2d games, particularly story-rich ones, like visual novels and RPGs. It looks like a handheld from the 2000s, but runs right in your browser (or natively on a Raspberry Pi).
 
 ![](./docs/kate.png)
+
+Kate is built to be secure, respect your privacy, and give you agency on how you play your games. It has a [modern take on application security][sandboxing] which keeps your device and data safe even if you happen to run a buggy or malicious cartridge!
+
+What's more? The console specifications are based on real, reasonably-priced, off-the-shelf hardware so if you like tinkering with crafts and electronics you can actually [put together your very own physical console][diy]. The "Build Your Own Console" guide is still a work in progress, though. You can expect more news on this, along with open-source models for 3d printing, in the later part of 2024.
+
+[sandboxing]: https://docs.kate.qteati.me/user/manual/security/sandboxing.html
+[diy]: https://docs.kate.qteati.me/user/diy/index.html
 
 ## Documentation
 
@@ -89,7 +94,7 @@ See the [complete, detailed roadmap here](ROADMAP.md).
 - Exporting and synchronising data across devices;
 - Decentralised stores (a community-driven form of curation);
 - Game collections and library filtering;
-- Native app support (Android, ChromeOS, SteamOS, Linux, Windows);
+- Native Kate support (on the Raspberry Pi);
 - Accessibility options (TTS, contrast, sizes, etc);
 - Stabilise cartridge format;
 - Digital OSTs and artbooks as cartridges;
@@ -101,12 +106,17 @@ See the [complete, detailed roadmap here](ROADMAP.md).
   - Gyroscope input support;
   - Kate's own virtual keyboard (for devices like the Raspberry Pi);
   - Multi-touch and stylus input support;
+  - Multiple gamepad support;
   - Haptic feedback (device and gamepad vibration);
   - Badges/Achievements API;
   - Networking API (HTTP and P2P for online multi-player games);
   - Audio support in video recording;
 - **OS**
   - Custom theming support;
+  - Tag-based file system;
+  - Multi-process support;
+  - Typed and capability-secure inter-process communication;
+  - DLC/Patch/Extension cartridge support;
   - OS mods (for cases where changing OS behaviour is desired);
 - **Tooling**
   - Kate SDK (low-level API for making Kate games);
