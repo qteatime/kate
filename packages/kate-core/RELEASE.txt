@@ -1,8 +1,8 @@
 =======================================================================
-Kate v0.25.1  (April 2024)
+Kate v0.25  (April 2024)
 =======================================================================
 
-The v0.25.1 is the Spring experimental release of Kate. This release
+The v0.25 is the Spring experimental release of Kate. This release
 focuses on improving Kate's stability, making it easier for players
 to play a game across multiple devices, and making it easier for
 developers to publish games for Kate.
@@ -143,3 +143,5 @@ Minor fixes and improvements
   not remove the previous cartridge's files (fb030e8);
 
 * Many tweaks to the text and feel in some parts of the UI;
+
+* Support 1600x960 as a console resolution (808c3e7);
