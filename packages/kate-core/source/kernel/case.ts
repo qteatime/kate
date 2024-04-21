@@ -8,7 +8,7 @@ import { unreachable } from "../utils";
 
 export type ConsoleCaseConfig = {
   type: "handheld" | "tv" | "fullscreen";
-  resolution: 480 | 720;
+  resolution: 480 | 720 | 960;
   scale_to_fit: boolean;
 };
 

@@ -36,7 +36,7 @@ export const KateNative = {
     return ipcRenderer.invoke("kate:is-fullscreen");
   },
 
-  async screen_resolution(): Promise<480 | 720> {
+  async screen_resolution(): Promise<480 | 720 | 960> {
     return ipcRenderer.invoke("kate:screen-resolution");
   },
 };

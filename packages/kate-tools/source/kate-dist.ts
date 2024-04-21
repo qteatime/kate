@@ -45,7 +45,7 @@ export async function generate(
   config: {
     case_mode: {
       type: "handheld" | "tv" | "fullscreen";
-      resolution: 480 | 720;
+      resolution: 480 | 720 | 960;
       scale_to_fit: boolean;
     };
   }

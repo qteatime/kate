@@ -19,7 +19,7 @@ const args = parseArgs({
 });
 
 const is_fullscreen = args.values.fullscreen ?? false;
-const resolution = ["480", "720"].includes(args.values.resolution ?? "720")
+const resolution = ["480", "720", "960"].includes(args.values.resolution ?? "720")
   ? Number(args.values.resolution ?? "720")
   : 720;
 
