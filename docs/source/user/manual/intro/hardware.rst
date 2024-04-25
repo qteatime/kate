@@ -44,7 +44,7 @@ needed to play the game, as well as the recommended version.
 \             Crystal (Casual)         Paper Lantern (Regular)  Phantom (Powerful)
 ============= ======================== ======================== ========================
 **CPU**       1.8GHz (4 cores)         1.8GHz (4 cores)         2.4GHz (4 cores)
-**RAM**       1 GB                     2 GB                     4 GB
+**RAM**       2 GB                     4 GB                     4 GB
 **Storage**   32 GB                    64 GB                    128 GB
 **SoC**       Raspberry Pi 4\*         Raspberry Pi 4\*         Raspberry Pi 5\*
 ============= ======================== ======================== ========================
