@@ -191,9 +191,6 @@ export class SceneNewDeveloper extends UI.SimpleScene {
           valid: this.data.key_ids.map((x) => x != null),
         },
         {
-          content: this.publish_public_key(),
-        },
-        {
           content: this.confirm(),
         },
       ]),
@@ -351,119 +348,6 @@ export class SceneNewDeveloper extends UI.SimpleScene {
     });
   }
 
-  publish_public_key() {
-    const method = new Observable<null | "file" | "text">(null);
-    const keys = this.data.key_ids;
-
-    return UI.section({
-      title: "Publishing your public key",
-      contents: [
-        UI.p([
-          `Players will use your public key to verify that your cartridges are truly
-        coming from you—and not someone pretending to be you. But for that to
-        work you need to prove you own the domain you provided: `,
-          UI.inline(UI.mono_text([UI.dynamic(this.data.domain as Observable<UI.Widgetable>)])),
-        ]),
-        UI.p([
-          `To do this you need to make your public key available through that domain.
-        If you host files in that domain, you can upload your public key as a file.
-        If you use a platform like Itch.io, which gives you a user profile, you can
-        publish your public key in your profile's text.`,
-        ]),
-        UI.tabs(this.os, {
-          selected: method.value,
-          out: method,
-          choices: [
-            { icon: UI.fa_icon("file"), title: "Upload a file", value: "file" as const },
-            { icon: UI.fa_icon("comment-dots"), title: "Publish as text", value: "text" as const },
-          ],
-        }),
-        UI.klass("kate-ui-section-instruction", [
-          UI.dynamic(
-            method.map<UI.Widgetable>((x) => {
-              switch (x) {
-                case null: {
-                  return "Select a way of publishing your public key above for more detailed instructions.";
-                }
-
-                case "file": {
-                  return UI.stack([
-                    UI.p([
-                      `You'll need to make your public key file available at: `,
-                      UI.inline(
-                        UI.mono_text([
-                          UI.dynamic(
-                            this.data.domain.map<UI.Widgetable>(
-                              (x) => `https://${x}/kate-public-key.txt`
-                            )
-                          ),
-                        ])
-                      ),
-                    ]),
-                    UI.text_button(this.os, "Download public key file", {
-                      on_click: async () => {
-                        const pem_key = this.os.key_manager.export_public_key(
-                          keys.value!.public_key.key
-                        );
-                        const blob = new Blob([new TextEncoder().encode(pem_key)]);
-                        download_blob(blob, `kate-public-key.txt`);
-                      },
-                    }),
-                  ]);
-                }
-
-                case "text": {
-                  return UI.stack([
-                    UI.p([
-                      `You'll need to include the public key in your page's text.
-                    For example, if you're using a Itch.io domain, this would go
-                    somewhere in your profile page's text.`,
-                    ]),
-                    UI.p([
-                      `It must be accessible by a computer program accessing `,
-                      UI.inline(
-                        UI.mono_text([
-                          UI.dynamic(this.data.domain.map<UI.Widgetable>((x) => `https://${x}/`)),
-                        ])
-                      ),
-                      ` but it doesn't need to be visible to humans—that is, including
-                    it in an HTML comment or a hidden section is fine.`,
-                    ]),
-                    UI.klass("kate-ui-mono-block", [
-                      this.os.key_manager.export_public_key(keys.value!.public_key.key),
-                      UI.fa_icon_button("copy", "").on_clicked(async () => {
-                        const pem_key = this.os.key_manager.export_public_key(
-                          keys.value!.public_key.key
-                        );
-                        try {
-                          await navigator.clipboard?.writeText(pem_key);
-                          await this.os.dialog.message(this.application_id, {
-                            title: "Key copied",
-                            message: "Your public key has been copied to the clipboard.",
-                          });
-                        } catch (e) {
-                          console.error(`Failed to copy key to the clipboard`, e);
-                          await this.os.dialog.message(this.application_id, {
-                            title: "Failed to copy key to clipboard",
-                            message:
-                              "An error occurred when trying to copy the key to the clipboard.",
-                          });
-                        }
-                      }),
-                    ]),
-                  ]);
-                }
-
-                default:
-                  throw unreachable(x);
-              }
-            })
-          ),
-        ]),
-      ],
-    });
-  }
-
   confirm() {
     return UI.section({
       title: "Confirm your details",
@@ -499,6 +383,7 @@ export class SceneNewDeveloper extends UI.SimpleScene {
               message: `Your new developer profile is saved and ready to use!`,
             });
             this.close();
+            this.os.push_scene(new SceneDeveloperViewProfile(this.os, profile));
           },
         }),
       ],

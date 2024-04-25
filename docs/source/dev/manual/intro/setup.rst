@@ -53,11 +53,6 @@ device). During these steps you will:
   equivalent public key which Kate will use to verify your cartridge
   signature whenever someone installs it.
 
-* Publish your public key so it's accessible to other Kate devices and proves
-  that you're truly the person who controls the domain provided for your
-  developer profile. For example, if you're using your itch.io domain, you'd
-  copy the text in this step and paste it somewhere in your profile's page.
-
 * And, finally, save your profile so it can be used by the Kate development
   tools.
   
@@ -137,3 +132,12 @@ in the command line:
 
 * **kart-show** is used for verifying that a cartridge contains the expected
   configuration and is not corrupted.
+
+
+Getting your profile verified
+-----------------------------
+
+In order for players to be sure of who published the cartridge, you need to
+get your developer profile verified --- otherwise there's nothing that ties
+you to your cartridge signature. Profile verification is still a work in
+progress and is coming later in 2024.
