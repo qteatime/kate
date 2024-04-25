@@ -364,6 +364,11 @@ export class SceneNewDeveloper extends UI.SimpleScene {
         UI.text_button(this.os, "Save my developer profile", {
           on_click: async () => {
             const keys = this.data.key_ids.value!;
+            // Users can go back and update the domain, but the domain is stored
+            // in the key records already when they're generated so we need to
+            // make sure they match here.
+            keys.private_key.domain = this.data.domain.value;
+            keys.public_key.domain = this.data.domain.value;
             const profile = {
               name: this.data.name.value,
               domain: this.data.domain.value,
