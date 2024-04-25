@@ -15,6 +15,13 @@ emulation and translation techniques to make this possible.
 
 .. important::
 
+  The importer works by creating a cartridge from the game's contents and
+  copying this cartridge into your console's storage. Some games' licence
+  terms have provisions against copying their data to other locations than
+  e.g.: the disc or media they were published in. You're still responsible
+  for making sure your usage of the importer aligns with the EULA and
+  other licences of the games you're importing.
+
   Cartridges installed by the Importer are explicitly marked ``unofficial``.
   As long as the original developers have not officially released the game
   for Kate, you should treat all issues you see in an imported games as

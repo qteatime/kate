@@ -14,6 +14,10 @@ There are other components that make up the Kate Importer project and which
 are available under different terms. Full text for all relevant licences is
 included here, after attributions, in the goal of making them offline-friendly.
 
+Note that the importer's implementation of emulation copies data into your
+console's storage. You're responsible in making sure this is in line with
+the EULA and licence of games you wish to play using the importer.
+
 This software contains portions of code, fonts, images, and sounds by
 third-parties, specified below.
 
