@@ -21,7 +21,15 @@ export class SceneHome extends SimpleScene {
   title = ["Start"];
   subtitle = "Recently played and favourites";
 
-  readonly actions: Action[] = [];
+  readonly actions: Action[] = [
+    {
+      key: ["berry"],
+      label: "System menu",
+      handler: (key, is_repeat, is_long_press) => {
+        this.os.context_menu.show_context_menu();
+      },
+    },
+  ];
 
   private cart_map = new Map<Element, Db.CartMeta_v3>();
 
