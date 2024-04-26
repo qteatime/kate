@@ -62,6 +62,12 @@ function make_electron_name(platform = electron_platform(), arch = electron_arch
   return `electron-${version}-${platform}-${arch}.zip`;
 }
 
+async function fetch_checksum() {
+  const remote_url = `https://github.com/electron/electron/releases/download/${version}/SHASUMS256.txt`;
+  const res = await globalThis.fetch(remote_url);
+  return await res.text();
+}
+
 async function download_electron(filename, force = false) {
   const remote_url = `https://github.com/electron/electron/releases/download/${version}/${filename}`;
   const dest_path = Path.join(__dirname, "..", ".cache", filename);
@@ -117,4 +123,5 @@ module.exports = {
   make_name: make_electron_name,
   download: download_electron,
   unzip: unzip_electron,
+  fetch_checksum,
 };

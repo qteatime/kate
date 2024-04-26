@@ -13,6 +13,7 @@ const glob = require("glob").sync;
 const crypto = require("crypto");
 const { copy, copy_tree, assert_root, zip } = require("./support/utils");
 const gen_build = require("./support/generate-builds");
+const electron = require("./support/electron.js");
 
 class World {
   constructor() {
@@ -604,6 +605,19 @@ w.task("chore:clean-tsc-cache", [], () => {
       FS.rmSync(file);
     }
   }
+});
+
+w.task("chore:update-electron", [], async () => {
+  console.log(`-> Updating checksums`);
+  const checksums = await electron.fetch_checksum();
+  FS.writeFileSync(Path.join(__dirname, "support/electron-shasum.txt"), checksums);
+  exec_file(`node`, [
+    `support/bootstrap.js`,
+    `--npm-install`,
+    `--download-electron`,
+    `--unzip-electron`,
+    `--build`,
+  ]);
 });
 
 w.task("chore:clean-artifacts", [], () => {
