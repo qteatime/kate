@@ -24,6 +24,7 @@ export * from "../../util/build/serialise";
 export * from "../../util/build/semver";
 export * from "../../util/build/binary";
 export * from "../../util/build/glob-match";
+export * from "../../util/build/log-serialise";
 
 export function lock<T>(name: string, fn: () => Promise<T>): Promise<T> {
   return navigator.locks.request(name, fn);

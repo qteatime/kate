@@ -4,8 +4,14 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { AuditMessage, AuditResource } from "../../../data";
-import { Observable, fine_grained_relative_date, unreachable } from "../../../utils";
+import { AuditMessage, AuditResource, ProcessLogEntry } from "../../../data";
+import {
+  Observable,
+  fine_grained_relative_date,
+  from_bytes,
+  relative_time,
+  unreachable,
+} from "../../../utils";
 import { Audit } from "../../apis";
 import type { KateOS } from "../../os";
 import * as UI from "../../ui";
@@ -51,6 +57,15 @@ export class SceneAudit extends UI.SimpleScene {
         description: "See all actions taken on your behalf and any errors that happened.",
         on_click: () => {
           this.os.push_scene(new SceneAuditLog(this.os));
+        },
+      }),
+
+      UI.link_card(this.os, {
+        icon: "file",
+        title: "Process runtime log",
+        description: `See internal log messages from each process (useful for debugging).`,
+        on_click: () => {
+          this.os.push_scene(new SceneProcessLog(this.os));
         },
       }),
     ];
@@ -260,6 +275,80 @@ export class SceneAuditEntry extends UI.SimpleScene {
       default:
         throw unreachable(result);
     }
+  }
+}
+
+export class SceneProcessLog extends UI.SimpleScene {
+  readonly application_id = "kate:settings:process-log";
+  icon = "file";
+  title = ["Process runtime log"];
+  actions: UI.Action[] = [
+    {
+      key: ["x"],
+      label: "Return",
+      handler: () => {
+        this.on_return();
+      },
+    },
+  ];
+
+  async body() {
+    const processes = await this.os.process_log.list_processes();
+    return [
+      UI.klass("kate-ui-process-logview", [
+        ...processes.map((x) =>
+          UI.link_card(this.os, {
+            title: x.process_id,
+            description: `${from_bytes(x.size)} | last updated ${fine_grained_relative_date(
+              x.last_update
+            )}`,
+            on_click: () => {
+              this.os.push_scene(new SceneProcessLogView(this.os, x.process_id));
+            },
+          })
+        ),
+      ]),
+    ];
+  }
+}
+
+export class SceneProcessLogView extends UI.SimpleScene {
+  readonly application_id = "kate:settings:process-log:view";
+  icon = "file";
+  title = ["Process log"];
+
+  constructor(os: KateOS, readonly process_id: string) {
+    super(os);
+    this.subtitle = process_id;
+  }
+
+  async body() {
+    const logs = await this.os.process_log.open(this.process_id);
+    return [
+      UI.klass("kate-ui-logview", [
+        UI.klass("kate-ui-logview-data", [
+          ...logs.entries
+            .slice()
+            .reverse()
+            .map((x) => this.render_entry(x)),
+        ]),
+      ]),
+    ];
+  }
+
+  render_entry(x: ProcessLogEntry) {
+    return UI.interactive(
+      this.os,
+      UI.klass("kate-ui-logview-entry", [
+        UI.klass("kate-ui-logview-entry-heading", [
+          UI.h("div", { class: "kate-ui-logview-pdate", title: x.time.toISOString() }, [
+            fine_grained_relative_date(x.time),
+          ]),
+        ]),
+        UI.h("div", { class: "kate-ui-logview-entry-message" }, [x.message]),
+      ]),
+      []
+    );
   }
 }
 

@@ -17,6 +17,7 @@ import { InputKey, KateInput } from "./input";
 import { KateObjectStore, ObjectMetadata, Object, Usage } from "./object-store";
 import { KatePointerInput, PointerClick, PointerLocation } from "./pointer-input";
 import { KateTimer } from "./timer";
+import { serialise } from "./util";
 
 declare var KATE_SECRET: string;
 
@@ -74,6 +75,40 @@ window.addEventListener("load", () => {
   setInterval(() => {
     cover.style.zIndex = highest_zindex;
   }, 1_000);
+});
+
+// Forward log messages to Kate kernel
+const levels = {
+  log: "info",
+  debug: "debug",
+  info: "info",
+  warn: "warn",
+  trace: "trace",
+  error: "error",
+};
+for (const [fn, level] of Object.entries(levels)) {
+  const bare_fn = (console as any)[fn] as (...args: any[]) => void;
+  (console as any)[fn] = (...args: any[]) => {
+    channel.send_and_ignore_result("kate:special.log", { level, message: serialise(args) });
+    bare_fn.call(console, ...args);
+  };
+}
+
+window.addEventListener("error", (ev) => {
+  channel.send_and_ignore_result("kate:special.log", {
+    level: "error",
+    message: serialise([
+      `Unhandled error at ${ev.filename}:${ev.lineno}:${ev.colno}:\n\n${ev.message}`,
+      ev.error,
+    ]),
+  });
+});
+
+window.addEventListener("unhandledrejection", (ev) => {
+  channel.send_and_ignore_result("kate:special.log", {
+    level: "error",
+    message: serialise([`Unhandled promise rejection:`, ev.reason]),
+  });
 });
 
 pointer_input.monitor(cover);

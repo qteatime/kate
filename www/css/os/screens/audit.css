@@ -36,6 +36,7 @@
 
 .kate-ui-logview-entry-message {
   padding: 0.5em;
+  white-space: pre-wrap;
 }
 
 .kate-ui-logview-extra:not(:empty) {
