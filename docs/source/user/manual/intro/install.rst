@@ -7,7 +7,7 @@ Windows and Linux (including Steam OS and Chrome OS). MacOS support will
 come soon.
 
 The Web version can be installed as a Web Application on supported
-browsers: Chrome (desktop and Android), Safari (iOS), and Edge (Windows 10+).
+browsers: Chrome (desktop and Android), Safari (iOS*), and Edge (Windows 10+).
 Installing the web application will allow you to run Kate offline, but you'll
 have less integration with the underlying device.
 
@@ -429,12 +429,18 @@ web version of Kate has been tested and runs on the following browsers:
 +--------------------+-------------------+----------------------------------+
 | Chrome for Android | 108+              | Android 9, Android 13            |
 +--------------------+-------------------+----------------------------------+
-| Safari             | 16+ [#]_          | iPhone 11, iPad Pro 9th Gen      |
-+--------------------+-------------------+----------------------------------+
 
-.. [#] Safari on iOS is only partly supported, and Safari on MacOS is not
-       currently tested. There are missing features in Safari that Apple needs
-       to implement before full support can be added.
+.. important::
+
+  Safari on iOS is currently unsupported as `Apple does not implement the
+  file system standard <https://bugs.webkit.org/show_bug.cgi?id=231706>`_.
+  Kate's cartridge installation depends on this API to have reasonable
+  memory usage and proper storage isolation. A work-around for this
+  (with higher memory usage on iOS) should happen before the stable release
+  if Apple doesn't fix their implementation first.
+
+  Video capture on iOS is also currently unsupported due to Apple not
+  implementing support for webm.
 
 Installing the web app works in the following device/OSs:
 
