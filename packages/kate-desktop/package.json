@@ -1,6 +1,6 @@
 {
   "name": "@qteatime/kate-desktop",
-  "version": "0.25.3",
+  "version": "0.25.240427-r1",
   "description": "A fantasy handheld console for small visual novels, 2d RPGs, and other story-rich games!",
   "author": "Niini",
   "main": "app/index.js",
