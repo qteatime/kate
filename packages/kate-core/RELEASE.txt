@@ -145,3 +145,6 @@ Minor fixes and improvements
 * Many tweaks to the text and feel in some parts of the UI;
 
 * Support 1600x960 as a console resolution (808c3e7);
+
+* Added a "process log" which shows messages output by each process to
+  standard outputs (#43);
