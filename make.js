@@ -511,27 +511,39 @@ w.task(
 );
 
 // -- Ecosystem
+w.task("ecosystem:importer:build", [], () => {
+  tsc("ecosystem/importer");
+  remove("ecosystem/importer/www", { recursive: true, force: true });
+  copy_tree("ecosystem/importer/assets", "ecosystem/importer/www");
+  glomp({
+    entry: "ecosystem/importer/build/index.js",
+    out: "ecosystem/importer/www/js/importer.js",
+    name: "KateImporter",
+  });
+  copy("packages/kate-appui/www/kate-appui.css", "ecosystem/importer/www/css/kate-appui.css");
+});
+
+w.task("ecosystem:importer:pack", ["ecosystem:publisher:build"], () => {
+  kart({
+    config: "ecosystem/importer/kate.json",
+    output: kart_name("ecosystem/importer", "kate-importer"),
+  });
+});
+
 w.task(
   "ecosystem:importer",
-  ["licences:generate", "util:build", "tools:build", "appui:build", "glomp:build"],
-  () => {
-    tsc("ecosystem/importer");
-    remove("ecosystem/importer/www", { recursive: true, force: true });
-    copy_tree("ecosystem/importer/assets", "ecosystem/importer/www");
-    glomp({
-      entry: "ecosystem/importer/build/index.js",
-      out: "ecosystem/importer/www/js/importer.js",
-      name: "KateImporter",
-    });
-    copy("packages/kate-appui/www/kate-appui.css", "ecosystem/importer/www/css/kate-appui.css");
-    kart({
-      config: "ecosystem/importer/kate.json",
-      output: kart_name("ecosystem/importer", "kate-importer"),
-    });
-  }
+  [
+    "licences:generate",
+    "util:build",
+    "tools:build",
+    "appui:build",
+    "glomp:build",
+    "ecosystem:publisher:build",
+  ],
+  () => {}
 );
 
-w.task("ecosystem:publisher:pack", [], () => {
+w.task("ecosystem:publisher:build", [], () => {
   tsc("ecosystem/publisher");
   remove("ecosystem/publisher/www", { recursive: true, force: true });
   copy_tree("ecosystem/publisher/assets", "ecosystem/publisher/www");
@@ -541,6 +553,9 @@ w.task("ecosystem:publisher:pack", [], () => {
     name: "KatePublisher",
   });
   copy("packages/kate-appui/www/kate-appui.css", "ecosystem/publisher/www/css/kate-appui.css");
+});
+
+w.task("ecosystem:publisher:pack", ["ecosystem:publisher:build"], () => {
   kart({
     config: "ecosystem/publisher/kate.json",
     output: kart_name("ecosystem/publisher", "kate-publisher"),
@@ -555,7 +570,7 @@ w.task(
     "tools:build",
     "appui:build",
     "glomp:build",
-    "ecosystem:publisher:pack",
+    "ecosystem:publisher:build",
   ],
   () => {}
 );
@@ -725,7 +740,6 @@ w.task("release:cartridges", ["example:all", "ecosystem:all"], () => {
   // Copy all cartridges
   remove("dist/cartridges", { recursive: true, force: true });
   copy_all("examples");
-  copy_all("ecosystem");
 
   // Generate integrity hashes
   const files = glob("dist/cartridges/**/*.kart");
@@ -744,7 +758,7 @@ w.task("release:www", ["www:release", "release:cartridges", "tools:make-npm-pack
   }
   copy_tree("www", "dist/www");
   exec(`zip -r ../kate-www-v${version}.zip *`, { cwd: "dist/www" });
-  exec(`zip -r ../standard-cartridges-v${version}.zip *`, { cwd: "dist/cartridges" });
+  exec(`zip -r ../sample-cartridges-v${version}.zip *`, { cwd: "dist/cartridges" });
 });
 
 w.task("release:preview", ["www:release", "release:cartridges", "tools:make-npm-package"], () => {
