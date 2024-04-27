@@ -39,6 +39,7 @@ import { KateProcessFileSupervisor } from "./services/process-file-supervisor";
 import { KateKeyManager } from "./services/key-manager";
 import { KateDeveloperProfile } from "./apis/developer-profile";
 import { KateProcessDataSupervisor } from "./services/process-data-supervisor";
+import { KateProcessLogService } from "./services/process-log-service";
 
 export type CartChangeReason = "installed" | "removed" | "archived" | "save-data-changed";
 
@@ -86,6 +87,7 @@ export class KateOS {
   };
 
   private constructor(
+    readonly process_log: KateProcessLogService,
     readonly kernel: KateKernel,
     readonly db: Database,
     readonly sfx: KateSfx,
@@ -229,13 +231,17 @@ export class KateOS {
 
   static async boot(kernel: KateKernel, x: { database?: string; set_case_mode?: boolean } = {}) {
     // Setup OS
+    const logger = new KateProcessLogService();
+    logger.setup();
     console.debug(`[kate:os] Starting OS boot sequence`);
     const sfx = await KateSfx.make(kernel);
     console.debug(`[kate:os] Opening the Kate database`);
     const { db, old_version } = await KateDb.kate.open(x.database);
+    console.debug(`[kate:os] Setting up logger storage`);
+    logger.set_database(db);
     console.debug(`[kate:os] Loading player settings`);
     const settings = await KateSettings.load(db);
-    const os = new KateOS(kernel, db, sfx, settings);
+    const os = new KateOS(logger, kernel, db, sfx, settings);
     console.debug(`[kate:os] Initialising and configuring OS services`);
     kernel.console.button_input.virtual_source.on_button_changed.listen(
       os.handle_virtual_button_feedback

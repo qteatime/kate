@@ -15,5 +15,6 @@ export * from "./capability";
 export * from "./audit";
 export * from "./key-store";
 export * from "./developer-profile";
+export * from "./process-log";
 
 import "./migrations";
