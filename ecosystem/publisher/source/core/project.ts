@@ -140,7 +140,7 @@ export async function generate(
     const unsigned_meta_bytes = kart_v6.encode_metadata(meta);
     let signature: null | Uint8Array = null;
     if (developer != null) {
-      const signature = await KateAPI.developer.sign(developer, unsigned_meta_bytes);
+      signature = await KateAPI.developer.sign(developer, unsigned_meta_bytes);
       if (signature == null) {
         throw new Error(`Could not sign the cartridge. Aborting.`);
       }
