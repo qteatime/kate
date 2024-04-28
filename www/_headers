@@ -31,7 +31,7 @@
   Content-Type: audio/wav
 
 /*.svg
-  Content-Type: image/svg
+  Content-Type: image/svg+xml
 
 /*.ttf
   Content-Type: font/ttf
