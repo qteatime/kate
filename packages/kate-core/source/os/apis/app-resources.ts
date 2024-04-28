@@ -87,7 +87,7 @@ export class KateAppResources {
     const refresh = this.send({
       type: "refresh-cache",
     });
-    const timeout = sleep(5000).then((x) => Promise.reject(new Error("timeout")));
+    const timeout = sleep(60000).then((x) => Promise.reject(new Error("timeout")));
     await Promise.race([refresh, timeout]);
   }
 
