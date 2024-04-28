@@ -772,7 +772,7 @@ w.task("release:preview", ["www:release", "release:cartridges", "tools:make-npm-
   const index2 = index1.replace(/manifest\.json/, "nightly-manifest.json");
   FS.writeFileSync("dist/www/index.html", index2);
   exec(`zip -r ../kate-www-v${version}.zip *`, { cwd: "dist/www" });
-  exec(`zip -r ../standard-cartridges-v${version}.zip *`, { cwd: "dist/cartridges" });
+  exec(`zip -r ../sample-cartridges-v${version}.zip *`, { cwd: "dist/cartridges" });
 });
 
 // -- Testing
