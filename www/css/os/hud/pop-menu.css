@@ -89,8 +89,6 @@
 .kate-hud-dialog-pop-menu-action .kate-ui-button.focus {
   background: var(--focus-background);
   color: var(--color-text-inverted);
-  position: relative;
-  z-index: 1;
 }
 
 .kate-hud-dialog-action-menu-frame .kate-hud-dialog-text {
