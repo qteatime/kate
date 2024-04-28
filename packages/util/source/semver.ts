@@ -1,14 +1,24 @@
 export class SemVer {
-  constructor(readonly major: number, readonly minor: number, readonly patch: number) {}
+  constructor(
+    readonly major: number,
+    readonly minor: number,
+    readonly patch: number,
+    readonly build: string | null
+  ) {}
 
-  static try_parse(version: string): SemVer | null {
-    const re = /^(\d+)\.(\d+)\.(\d+)/;
+  static try_parse(version: string, default_build: string | null): SemVer | null {
+    const re = /^(\d+)\.(\d+)\.(\d+)(?:\-(.*))?/;
     const matches = version.match(re);
     if (matches == null) {
       return null;
     } else {
-      const [_, major, minor, patch] = matches;
-      return new SemVer(Number(major), Number(minor), Number(patch));
+      const [_, major, minor, patch, build] = matches;
+      return new SemVer(
+        Number(major),
+        Number(minor),
+        Number(patch),
+        build?.trim() || default_build
+      );
     }
   }
 
@@ -37,6 +47,7 @@ export class SemVer {
   }
 
   toString() {
-    return `v${this.major}.${this.minor}.${this.patch}`;
+    const suffix = this.build ? `-${this.build}` : "";
+    return `v${this.major}.${this.minor}.${this.patch}${suffix}`;
   }
 }

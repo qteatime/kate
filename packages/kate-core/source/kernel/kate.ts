@@ -8,7 +8,8 @@ import { SemVer } from "../utils";
 import { ProcessManager } from "./process";
 import { ConsoleOptions, VirtualConsole } from "./virtual";
 const version = require("../../package.json").version;
-const semver = SemVer.try_parse(version)!;
+const build = require("../../../../kate-buildinfo.json").build;
+const semver = SemVer.try_parse(version, build)!;
 
 export class KateKernel {
   readonly processes;

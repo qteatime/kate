@@ -39,7 +39,7 @@ export async function detect(x: Blob): Promise<boolean> {
 
 export function minimum_version(x: Cart_v6.Header) {
   const kate_ver = x["minimum-kate-version"];
-  return new SemVer(kate_ver.major, kate_ver.minor, kate_ver.patch);
+  return new SemVer(kate_ver.major, kate_ver.minor, kate_ver.patch, null);
 }
 
 export async function decode_header(file: Blob): Promise<Cart_v6.Header> {

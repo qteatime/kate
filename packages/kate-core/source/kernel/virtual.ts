@@ -10,6 +10,7 @@ import { KateConsoleClock } from "./clock";
 import { KateButtonInputAggregator } from "./input/button-input";
 import { KateResources } from "./resource";
 const pkg = require("../../package.json");
+const build = require("../../../../kate-buildinfo.json").build;
 
 export type ConsoleOptions = {
   mode: "native" | "web" | "single";
@@ -31,7 +32,7 @@ export class VirtualConsole {
   readonly hud: HTMLElement;
   readonly os_root: HTMLElement;
   readonly version_container: HTMLElement | null = null;
-  readonly version = pkg?.version == null ? null : `v${pkg.version}`;
+  readonly version = pkg?.version == null ? null : `v${pkg.version}${build ? "-" + build : ""}`;
 
   constructor(readonly root: HTMLElement, readonly options: ConsoleOptions) {
     this.case = new KateConsoleCase(options.case);

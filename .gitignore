@@ -40,3 +40,4 @@ examples/**/LICENCE.txt
 packages/**/LICENCE.txt
 docs/source/etc/licences
 packages/kate-desktop/source/electron.d.ts
+/kate-buildinfo.json

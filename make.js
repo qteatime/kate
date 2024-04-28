@@ -439,6 +439,11 @@ w.task("tools:make-npm-package", ["licences:generate", "tools:build"], () => {
 
 // -- WWW
 w.task("www:bundle", ["licences:generate", "core:build", "glomp:build"], () => {
+  const date = new Date();
+  const yy = String(date.getUTCFullYear()).slice(-2);
+  const mm = String(date.getUTCMonth() + 1).padStart(2, "0");
+  const dd = String(date.getUTCDate()).padStart(2, "0");
+  FS.writeFileSync("kate-buildinfo.json", JSON.stringify({ build: `r${yy}${mm}${dd}` }));
   glomp({
     entry: "packages/kate-core/build/index.js",
     out: `www/kate/kate-latest.js`,
@@ -451,7 +456,7 @@ w.task("www:bundle", ["licences:generate", "core:build", "glomp:build"], () => {
   });
   const version = require("./package.json").version;
   const worker0 = FS.readFileSync("packages/kate-core/build/worker.js", "utf-8");
-  const worker = worker0.replace(/{{VERSION}}/, version);
+  const worker = worker0.replace(/{{VERSION}}/, `${version}-r${yy}${mm}${dd}`);
   FS.writeFileSync("www/worker.js", worker);
   console.log("-> Wrote versioned www/worker.js");
   copy("packages/kate-core/RELEASE.txt", `www/kate/RELEASE-latest.txt`);
@@ -771,8 +776,7 @@ w.task("release:preview", ["www:release", "release:cartridges", "tools:make-npm-
   const index1 = index0.replace(/<title>Kate<\/title>/, "<title>Kate (Nightly)</title>");
   const index2 = index1.replace(/manifest\.json/, "nightly-manifest.json");
   FS.writeFileSync("dist/www/index.html", index2);
-  exec(`zip -r ../kate-www-v${version}.zip *`, { cwd: "dist/www" });
-  exec(`zip -r ../sample-cartridges-v${version}.zip *`, { cwd: "dist/cartridges" });
+  exec(`zip -r ../kate-www-preview-v${version}.zip *`, { cwd: "dist/www" });
 });
 
 // -- Testing
