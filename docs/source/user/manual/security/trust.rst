@@ -120,14 +120,9 @@ Resource icons
 |                       |    process might slow down with more intensive      |
 |                       |    applications while it's running.                 |
 +-----------------------+-----------------------------------------------------+
-| |icon_temp_file|      | **Reading/Writing temporary files**                 |
+| |icon_file|           | **Reading/Writing files**                           |
 |                       |    When cartridges are reading or writing           |
-|                       |    temporary files, this icon will be shown.        |
-|                       |    These files pose no privacy or security risk,    |
-|                       |    but if an application is using too much of your  |
-|                       |    storage space for temporary files, you can       |
-|                       |    change its limit for temporary file storage      |
-|                       |    in the cartridge's permissions screen.           |
+|                       |    files on your console, this icon will be shown.  |
 +-----------------------+-----------------------------------------------------+
 
 .. |icon_tmp_storage| image:: img/icons/temporary-storage.png
@@ -142,7 +137,7 @@ Resource icons
 .. |icon_gc| image:: img/icons/gc.png
   :width: 32px
 
-.. |icon_temp_file| image:: img/icons/temp-file.png
+.. |icon_file| image:: img/icons/file.png
   :width: 32px
 
 .. _Best-Effort storage mode: https://developer.mozilla.org/en-US/docs/Web/API/Storage_API#bucket_modes

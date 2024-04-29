@@ -1,0 +1,159 @@
+Kate v0.25  (Spring 2024)
+=========================
+
+The v0.25 is the spring experimental release of Kate. This release
+focuses on improving Kate's stability, making it easier for players
+to play a game across multiple devices, and making it easier for
+developers to publish games for Kate.
+
+
+New input proxy bridge
+----------------------
+
+This release includes a new input proxy bridge that allows one to
+specify a CSS selector for dispatching the events to, or keep dispatching
+them on the document/window. This is necessary because every engine out
+there decides to listen to events in a different place, so Ren'Py
+listens to window events, Bitsy to document events, and Godot to canvas
+events.
+
+PRs: `#33 <https://github.com/qteatime/kate/pull/33>`_
+
+
+New network proxy bridge
+------------------------
+
+The network proxy bridge was extended to allow specifying files that need to
+be loaded "synchronously" (which we do by pre-loading them at the time we
+create the process sandbox). This allows games that use workers and other
+features that require seemingly synchronous access to work in Kate without
+any changes to the source code, and expands Kate's emulation support to
+engines like Godot and similar.
+
+PRs: `#41 <https://github.com/qteatime/kate/pull/41>`_
+
+
+Memory-friendly cartridge format
+--------------------------------
+
+Previously a Kate cartridge had to be fully loaded in memory in order to
+install it, which meant that some devices (e.g.: the Raspberry Pi 4) were
+limited to installing only cartridges smaller than 300 MB. This release
+introduces a new (not-backwards compatible) cartridge format that can be
+processed without loading it fully in memory, thus getting rid of the
+cartridge size restrictions for all devices.
+
+PRs: `#37 <https://github.com/qteatime/kate/pull/37>`_,
+     `e150378..08c1b22 <https://github.com/qteatime/kate/compare/e150378..08c1b22>`_
+
+
+New file storage service
+------------------------
+
+Previous versions of Kate stored files (such as those extracted from cartridges)
+in its main database. This caused the database load to increase unreasonably,
+preventing the installation of large collections of games.
+
+The new version has replaced this with an entirely new file storage service that
+leaves the database alone and is not subject to the same scalability concerns.
+The file storage service is also partitioned, meaning that cartridge files and
+other system files remain fully isolated --- i.e.: cartridge A can *never*
+access files from cartridge B, or even from a different version of cartridge A.
+
+The use of the file storage service gives us better stability, and helps us
+scale to large game collections, but it operates more sequentially and as such
+has lower raw write performance. This means that installing games with large
+amounts of files takes longer than before --- optimisations here are possible,
+and will be looked at in future versions!
+
+PRs: `#35 <https://github.com/qteatime/kate/pull/35>`_,
+     `#36 <https://github.com/qteatime/kate/pull/36>`_
+
+
+More stable process handling
+----------------------------
+
+.. important::
+  
+  **SECURITY-SENSITIVE CHANGE**: This patch fixes an issue with the previous
+  cartridge sandboxing code that, with user cooperation, could lead to
+  increased privileges for the cartridge.
+
+The previous code for handling sandboxed processes in Kate was still in
+its proof-of-concept stage. This release includes a rewrite of the process
+handling to make it more stable and prepare for a future multi-process Kate.
+
+Along with the changes, sandboxed processes are no longer using a Blob URL,
+and rather pass the HTML directly into the frame. This removes one avenue
+of privilege escalation where attackers could trick users to cooperate in
+opening the blob URL outside of the frame, and then having their code execute
+with the same privileges as Kate.
+
+Note that this change does not yet address the issues with speculative
+side-channel attacks (Spectre, etc.), as Browsers do not offer any
+guarantee that a frame will be rendered in a separate process. The issue
+is however mitigated in Kate as sandboxed processes do not have network
+or navigation access.
+
+PRs: `#34 <https://github.com/qteatime/kate/pull/34>`_,
+     `c5ab0f1..94efd01 <https://github.com/qteatime/kate/compare/c5ab0f1..94efd01>`_
+
+
+Cartridge signatures and key stores
+-----------------------------------
+
+While not fully ready yet, this release prepares the ground-work for Kate's
+decentralised game catalog by adding support for signed cartridges, as well
+as managing signing keys and verifying signatures. This comes with an early
+introduction of "Developer Profiles", which will be the basis of Kate's
+future developer tools.
+
+PRs: `#38 <https://github.com/qteatime/kate/pull/38>`_,
+     `#40 <https://github.com/qteatime/kate/pull/40>`_
+
+
+New game engine recipes
+-----------------------
+
+This release extends Kart (Kate's official tool for creating game cartridges)
+with built-in recipe support for Godot (only version 3 for now), GameMaker,
+and RPG Maker MV. There's a little bit of additional work to support other
+engines that will be done in the next iteration, but the changes introduced
+in this release should allow a fair amount of games to be loaded from a Kate
+cartridge with no code changes required!
+
+PRs: `#41 <https://github.com/qteatime/kate/pull/41>`_,
+     `c843f95 <https://github.com/qteatime/kate/commit/c843f95>`_
+
+
+Friendlier creation of cartridges
+---------------------------------
+
+This release includes the new Kate Publisher cartridge, a GUI Kate
+application that can generate and sign cartridges right from the
+console. It uses the same inputs as its command-line cousin Kart for now.
+
+PRs: `#42 <https://github.com/qteatime/kate/pull/42>`_
+
+
+Minor fixes and improvements
+----------------------------
+
+* The drop-installer indicator now shows up more reliably when dragging
+  files over the console (`b76b0ce <https://github.com/qteatime/kate/commit/b76b0ce>`_);
+
+* Plugins are now fully disabled in sandboxed processes, which makes it harder
+  for cartridges to escape their sandboxes (`c070957 <https://github.com/qteatime/kate/commit/c070957>`_);
+
+* Small performance improvements to loading and sending data in the
+  cartridge's process by avoiding copying when possible (`f8eb02d <https://github.com/qteatime/kate/commit/f8eb02d>`_);
+
+* Fixed an issue where overwriting a cartridge with the same version would
+  not remove the previous cartridge's files (`fb030e8 <https://github.com/qteatime/kate/commit/fb030e8>`_);
+
+* Many tweaks to the text and feel in some parts of the UI;
+
+* Support 1600x960 as a console resolution (`808c3e7 <https://github.com/qteatime/kate/commit/808c3e7>`_);
+
+* Added a "process log" which shows messages output by each process to
+  standard outputs (`#43 <https://github.com/qteatime/kate/pull/43>`_);
