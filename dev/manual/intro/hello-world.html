@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Programming model" href="../model/index.html" /><link rel="prev" title="What will you need?" href="setup.html" />
 
     <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
-        <title>Hello, World - Kate 0.23.10 documentation</title>
+        <title>Hello, World - Kate 0.25 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=82a976d7" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=135e06be" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo-extensions.css?v=36a5483c" />
@@ -128,7 +128,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../../index.html"><div class="brand">Kate 0.23.10 documentation</div></a>
+      <a href="../../../index.html"><div class="brand">Kate 0.25 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -151,7 +151,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../index.html">
   
   
-  <span class="sidebar-brand-text">Kate 0.23.10 documentation</span>
+  <span class="sidebar-brand-text">Kate 0.25 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -239,9 +239,9 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../kart/index.html">Kart — Packing cartridges</a><input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" role="switch" type="checkbox"/><label for="toctree-checkbox-13"><div class="visually-hidden">Toggle navigation of Kart — Packing cartridges</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../kart/getting-started.html">Getting started</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../kart/configuration.html">Configuration files</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../packing/index.html">Packaging cartridges</a><input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" role="switch" type="checkbox"/><label for="toctree-checkbox-13"><div class="visually-hidden">Toggle navigation of Packaging cartridges</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../packing/getting-started.html">Getting started</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../packing/configuration.html">Configuration files</a></li>
 </ul>
 </li>
 </ul>
@@ -266,7 +266,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../design/kernel/K0004-processes.html">#K0004 — Processes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../design/kernel/K0005-partitioned-file-storage.html">#K0005 — Partitioned File Storage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../design/kernel/K0006-cartridge-signatures.html">#K0006 — Cartridge signatures</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../design/kernel/K0007-key-store.html">#K0006 — Cartridge signatures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../design/kernel/K0007-key-store.html">#K0007 — Secure key store</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../design/api/A0001-object-storage.html">#A0001 — Object Store API</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../design/api/A0002-external-url.html">#A0002 — External URL navigation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../design/api/A0003-device-file-access.html">#A0003 — Device file access</a></li>
@@ -276,6 +276,7 @@
 <p class="caption" role="heading"><span class="caption-text">Changes, Terms, and Credits</span></p>
 <ul>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../../etc/releases/index.html">Release notes</a><input class="toctree-checkbox" id="toctree-checkbox-16" name="toctree-checkbox-16" role="switch" type="checkbox"/><label for="toctree-checkbox-16"><div class="visually-hidden">Toggle navigation of Release notes</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../etc/releases/0.25.html">Kate v0.25  (Spring 2024)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../etc/releases/0.23.10.html">Kate v0.23.10  (October 2023)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../etc/releases/0.23.8.html">Kate v0.23.8  (August 2023)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../etc/releases/0.23.6.html">Kate v0.23.6  (June 2023)</a></li>
@@ -336,77 +337,95 @@
 <h1>Hello, World<a class="headerlink" href="#hello-world" title="Link to this heading">#</a></h1>
 <section id="creating-a-start-page">
 <h2>Creating a start page<a class="headerlink" href="#creating-a-start-page" title="Link to this heading">#</a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To make games for Kate, it’s recommended that you first take some
+time to learn the <a class="reference external" href="https://developer.mozilla.org/en-US/docs/Learn">basics of web development</a>.
+This section will assume you know what web pages are, and how to
+make one using the basic features of HTML, CSS, and JavaScript.</p>
+<p>While you can publish Kate cartridges without knowledge of web development,
+it’ll greatly aid debugging any issues that may arise.</p>
+</div>
 <p>Let’s start by trying to get something to show up on the screen, to make
 sure everything is set up correctly and your Kate emulator can play games.</p>
 <p>To begin with we’ll create a HTML page. Kate cartridges distributed with
 the web runtime all start with one HTML page.</p>
-<p>Create a file called <code class="docutils literal notranslate"><span class="pre">index.html</span></code> in your text editor with the following
+<p>Create a file called <a class="reference download internal" download="" href="../../../_downloads/5b0c21aaa154454de853dc3e27c51c59/index.html"><code class="xref download docutils literal notranslate"><span class="pre">index.html</span></code></a> in your text editor with the following
 contents:</p>
-<div class="highlight-html notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;!DOCTYPE html&gt;</span>
-<span class="p">&lt;</span><span class="nt">html</span><span class="p">&gt;</span>
-  <span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
-    <span class="p">&lt;</span><span class="nt">style</span><span class="p">&gt;</span>
-<span class="w">      </span><span class="nt">body</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="k">margin</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
-<span class="w">        </span><span class="k">padding</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
-<span class="w">        </span><span class="k">width</span><span class="p">:</span><span class="w"> </span><span class="mi">100</span><span class="kt">vw</span><span class="p">;</span>
-<span class="w">        </span><span class="k">height</span><span class="p">:</span><span class="w"> </span><span class="mi">100</span><span class="kt">vh</span><span class="p">;</span>
-<span class="w">        </span><span class="k">display</span><span class="p">:</span><span class="w"> </span><span class="kc">flex</span><span class="p">;</span>
-<span class="w">        </span><span class="k">align-items</span><span class="p">:</span><span class="w"> </span><span class="kc">center</span><span class="p">;</span>
-<span class="w">        </span><span class="k">justify-content</span><span class="p">:</span><span class="w"> </span><span class="kc">center</span><span class="p">;</span>
-<span class="w">        </span><span class="k">background</span><span class="p">:</span><span class="w"> </span><span class="kc">white</span><span class="p">;</span>
-<span class="w">        </span><span class="k">color</span><span class="p">:</span><span class="w"> </span><span class="kc">black</span><span class="p">;</span>
-<span class="w">      </span><span class="p">}</span>
-<span class="w">    </span><span class="p">&lt;/</span><span class="nt">style</span><span class="p">&gt;</span>
-  <span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
-  <span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
-    <span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>Hello, from Kate!<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
-  <span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
-<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span>&lt;!DOCTYPE html&gt;
+<span class="linenos"> 2</span>&lt;html&gt;
+<span class="linenos"> 3</span>  &lt;head&gt;
+<span class="linenos"> 4</span>    &lt;style&gt;
+<span class="linenos"> 5</span>      body {
+<span class="linenos"> 6</span>        margin: 0;
+<span class="linenos"> 7</span>        padding: 0;
+<span class="linenos"> 8</span>        width: 100vw;
+<span class="linenos"> 9</span>        height: 100vh;
+<span class="linenos">10</span>        display: flex;
+<span class="linenos">11</span>        align-items: center;
+<span class="linenos">12</span>        justify-content: center;
+<span class="linenos">13</span>        background: white;
+<span class="linenos">14</span>        color: black;
+<span class="linenos">15</span>      }
+<span class="linenos">16</span>    &lt;/style&gt;
+<span class="linenos">17</span>  &lt;/head&gt;
+<span class="linenos">18</span>  &lt;body&gt;
+<span class="linenos">19</span>    &lt;h1&gt;Hello, from Kate!&lt;/h1&gt;
+<span class="linenos">20</span>  &lt;/body&gt;
+<span class="linenos">21</span>&lt;/html&gt;
 </pre></div>
 </div>
 <p>Here we have a page with the text “Hello, from Kate!”, and some <a class="reference internal" href="../../../glossary.html#term-CSS"><span class="xref std std-term">CSS</span></a>
 to put it in the centre of the screen. If you open <code class="docutils literal notranslate"><span class="pre">index.html</span></code> on a
 web-browser you should see something similar to the image below:</p>
-<img alt="../../../_images/demo1.png" src="../../../_images/demo1.png" />
+<img alt="../../../_images/demo-goal.png" src="../../../_images/demo-goal.png" />
 </section>
 <section id="cartridge-metadata">
-<h2>Cartridge metadata<a class="headerlink" href="#cartridge-metadata" title="Link to this heading">#</a></h2>
+<span id="cartridge-build-configuration"></span><h2>Cartridge metadata<a class="headerlink" href="#cartridge-metadata" title="Link to this heading">#</a></h2>
 <p>Not very exciting, but hey, baby steps!</p>
 <p>Now, we want to turn this into a Kate cartridge, which we can then install
 in a Kate emulator to play. To do so we’ll need to create a file describing
-the cartridge, that’s then used by the <code class="docutils literal notranslate"><span class="pre">kart</span></code> tool to build the actual
+the cartridge, that’s then used by the Publisher tool to build the actual
 cartridge.</p>
-<p>Create a file called <code class="docutils literal notranslate"><span class="pre">kate.json</span></code> in the same folder as your <code class="docutils literal notranslate"><span class="pre">index.html</span></code>,
-and give it the following contents:</p>
-<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;my-namespace/my-first-cartridge&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;major&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;minor&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">},</span>
-<span class="w">  </span><span class="nt">&quot;metadata&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;presentation&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">      </span><span class="nt">&quot;author&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Your Name&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;My First Cartridge&quot;</span><span class="p">,</span>
-<span class="w">      </span><span class="nt">&quot;tagline&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;My first cartridge&quot;</span>
-<span class="w">    </span><span class="p">}</span>
-<span class="w">  </span><span class="p">},</span>
-<span class="w">  </span><span class="nt">&quot;files&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;index.html&quot;</span><span class="p">],</span>
-<span class="w">  </span><span class="nt">&quot;platform&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;web-archive&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;html&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;index.html&quot;</span>
-<span class="w">  </span><span class="p">}</span>
-<span class="p">}</span>
+<p>Create a file called <a class="reference download internal" download="" href="../../../_downloads/011ec96f003cbe90cdc22750619241a4/kate.json"><code class="xref download docutils literal notranslate"><span class="pre">kate.json</span></code></a> in the same
+folder as your <code class="docutils literal notranslate"><span class="pre">index.html</span></code>, and give it the following contents:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="p">{</span>
+<span class="linenos"> 2</span>  <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;my.domain/my-first-cartridge&quot;</span><span class="p">,</span>
+<span class="linenos"> 3</span>  <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="p">{</span> <span class="s2">&quot;major&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;minor&quot;</span><span class="p">:</span> <span class="mi">0</span> <span class="p">},</span>
+<span class="linenos"> 4</span>  <span class="s2">&quot;metadata&quot;</span><span class="p">:</span> <span class="p">{</span>
+<span class="linenos"> 5</span>    <span class="s2">&quot;presentation&quot;</span><span class="p">:</span> <span class="p">{</span>
+<span class="linenos"> 6</span>      <span class="s2">&quot;author&quot;</span><span class="p">:</span> <span class="s2">&quot;Your Name&quot;</span><span class="p">,</span>
+<span class="linenos"> 7</span>      <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;My First Cartridge&quot;</span><span class="p">,</span>
+<span class="linenos"> 8</span>      <span class="s2">&quot;tagline&quot;</span><span class="p">:</span> <span class="s2">&quot;My first cartridge&quot;</span><span class="p">,</span>
+<span class="linenos"> 9</span>      <span class="s2">&quot;thumbnail_path&quot;</span><span class="p">:</span> <span class="s2">&quot;thumbnail.png&quot;</span>
+<span class="linenos">10</span>    <span class="p">}</span>
+<span class="linenos">11</span>  <span class="p">},</span>
+<span class="linenos">12</span>  <span class="s2">&quot;files&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;index.html&quot;</span><span class="p">,</span> <span class="s2">&quot;thumbnail.png&quot;</span><span class="p">],</span>
+<span class="linenos">13</span>  <span class="s2">&quot;platform&quot;</span><span class="p">:</span> <span class="p">{</span>
+<span class="linenos">14</span>    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;web-archive&quot;</span><span class="p">,</span>
+<span class="linenos">15</span>    <span class="s2">&quot;html&quot;</span><span class="p">:</span> <span class="s2">&quot;index.html&quot;</span>
+<span class="linenos">16</span>  <span class="p">}</span>
+<span class="linenos">17</span><span class="p">}</span>
 </pre></div>
 </div>
-<p>This file tells the <code class="docutils literal notranslate"><span class="pre">kart</span></code> tool that there’s a game identified by
-<code class="docutils literal notranslate"><span class="pre">my-namespace/my-first-cartridge</span></code>. This identification <strong>must</strong> be
-unique, and we’ll get into what that means later. A version must also
-be provided, here the version is “1.0”.</p>
+<p>This file tells the Publisher tool that there’s a game identified by
+<code class="docutils literal notranslate"><span class="pre">my.domain/my-first-cartridge</span></code>. The <code class="docutils literal notranslate"><span class="pre">my.domain</span></code> part should match
+what your developer profile uses, otherwise you won’t be able to sign
+the cartridge. The <code class="docutils literal notranslate"><span class="pre">my-first-cartridge</span></code> part can be anything (using
+only letters and hyphens), but it must be unique among your games.</p>
+<p>A version is also required, and every time you publish a new cartridge
+release, you should update the version number. Here we start with
+version “1.0”.</p>
 <p>We also provide a more readable title, <code class="docutils literal notranslate"><span class="pre">My</span> <span class="pre">First</span> <span class="pre">Cartridge</span></code>. This is
-what players will see in the cartridge selection screen.</p>
+what players will see in the cartridge selection screen. And we tell
+Kate which file will serve as the thumbnail image for the cartridge—the
+thumbnail is optional, but highly recommended, and should be 400x700 pixels.
+For this you can use the <a class="reference download internal" download="" href="../../../_downloads/7c2999ae1ff11510a4b747dc8a1bae26/thumbnail.png"><code class="xref download docutils literal notranslate"><span class="pre">thumbnail.png</span></code></a> image below:</p>
+<img alt="../../../_images/thumbnail.png" src="../../../_images/thumbnail.png" />
 <p>Next we tell Kate what files are actually in the cartridge. Our cartridge
-so far is made up of a single file, <code class="docutils literal notranslate"><span class="pre">index.html</span></code>. All files we declare
-in this <code class="docutils literal notranslate"><span class="pre">files</span></code> section will have their contents included a special
-<a class="reference internal" href="../../../glossary.html#term-File-system"><span class="xref std std-term">file system</span></a> in the cartridge file.</p>
+so far is made up of a two file, <code class="docutils literal notranslate"><span class="pre">index.html</span></code> and our <code class="docutils literal notranslate"><span class="pre">thumbnail.png</span></code>.
+All files we declare in this <code class="docutils literal notranslate"><span class="pre">files</span></code> section will have their contents
+included directly in the cartridge file (using a special <a class="reference internal" href="../../../glossary.html#term-File-system"><span class="xref std std-term">file system</span></a>).</p>
 <p>Finally, in order to play this cartridge, we tell Kate to use the
 <code class="docutils literal notranslate"><span class="pre">web-archive</span></code> platform. This means that
 Kate will treat it as if it was a web page of sorts. This <code class="docutils literal notranslate"><span class="pre">web-archive</span></code>
@@ -414,49 +433,59 @@ platform requires us to specify which web page Kate should load first;
 we only have one, so <code class="docutils literal notranslate"><span class="pre">index.html</span></code> is is.</p>
 </section>
 <section id="packaging-your-game">
-<h2>Packaging your game<a class="headerlink" href="#packaging-your-game" title="Link to this heading">#</a></h2>
-<p>With all the incantations in place, what’s left is asking the <code class="docutils literal notranslate"><span class="pre">kart</span></code> tool
-to turn this configuration into an actual cartridge file. You do so by
-running the following command from the same directory your <code class="docutils literal notranslate"><span class="pre">kate.json</span></code>
-and <code class="docutils literal notranslate"><span class="pre">index.html</span></code> files are:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>kart<span class="w"> </span>kate.json<span class="w"> </span>--output<span class="w"> </span>my-first-cartridge.kart
-</pre></div>
+<span id="package-your-game"></span><h2>Packaging your game<a class="headerlink" href="#packaging-your-game" title="Link to this heading">#</a></h2>
+<p>Having your files in place, it’s time to open the Publisher application
+and select both your developer profile and the project folder. You should
+see something like the following:</p>
+<img alt="../../../_images/demo0.png" src="../../../_images/demo0.png" />
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you get a warning saying “Developer domain doesn’t match the work’s domain”,
+it means your <code class="docutils literal notranslate"><span class="pre">kate.json</span></code> configuration has a cartridge <code class="docutils literal notranslate"><span class="pre">id</span></code> that is
+different from your developer profile’s domain. You need to update it so
+it matches.</p>
 </div>
-<p>This should create a <code class="docutils literal notranslate"><span class="pre">my-first-cartridge.kart</span></code> file in the same folder
-you have <code class="docutils literal notranslate"><span class="pre">kate.json</span></code> and <code class="docutils literal notranslate"><span class="pre">index.html</span></code>. The screen should include a
-summary of all the things that were packaged in the cartridge file.</p>
-<p>To <a class="reference internal" href="../../../user/manual/gaming/cartridges.html#installing-cartridges"><span class="std std-ref">install this cartridge</span></a>, you can drag-and-drop
-it on your Kate emulator. Or use the <code class="docutils literal notranslate"><span class="pre">Install</span> <span class="pre">cartridge...</span></code> option in the
-context menu.</p>
-<p>After installing, your emulator should look like this:</p>
+<p>When you click <code class="docutils literal notranslate"><span class="pre">Create</span> <span class="pre">cartridge</span></code>, the Publisher will generate a cartridge
+for you and use your developer’s key to sign it. You might need to use your
+password to unlock your signing key if you haven’t unlocked it recently.</p>
+<p>Once the cartridge is ready to be saved, you’ll see a review screen that
+includes a summary of the cartridge. Clicking the <code class="docutils literal notranslate"><span class="pre">Save</span> <span class="pre">cartridge</span></code> button
+will let you save the <code class="docutils literal notranslate"><span class="pre">.kart</span></code> file to your device to distribute it:</p>
+<img alt="../../../_images/demo1.png" src="../../../_images/demo1.png" />
+</section>
+<section id="testing-your-game">
+<h2>Testing your game<a class="headerlink" href="#testing-your-game" title="Link to this heading">#</a></h2>
+<p>With a <code class="docutils literal notranslate"><span class="pre">.kart</span></code> file in hand, you should try out your cartridge. First
+close the Publisher application (press <a class="reference internal" href="../../../_images/berry_32.png"><img alt="Berry button" class="align-middle" src="../../../_images/berry_32.png" style="height: 1em;" /></a>, then <code class="docutils literal notranslate"><span class="pre">Close</span> <span class="pre">game</span></code>), then
+install the new cartridge file you just saved. Your home screen should
+show your cartridge, with the title and thumbnail you chose:</p>
 <img alt="../../../_images/demo2.png" src="../../../_images/demo2.png" />
-<p>And if you click on the cartridge (or press <a class="reference internal" href="../../../_images/ok_32.png"><img alt="Ok button (a.k.a. O)" class="align-middle" src="../../../_images/ok_32.png" style="height: 1em;" /></a>) to play it, your
-emulator should look like this:</p>
+<p>When you open the cartridge, you should see the same screen we look at
+in the beginning of this page:</p>
 <img alt="../../../_images/demo3.png" src="../../../_images/demo3.png" />
-<div class="admonition important">
-<p class="admonition-title">Important</p>
-<p>If you’re using PowerShell on Windows 10+, depending on your security
-settings, you might see a message like the following:</p>
-<blockquote>
-<div><p>kart : File <code class="docutils literal notranslate"><span class="pre">C:\&lt;...&gt;\kart.ps1</span></code> cannot be loaded because running
-scripts is disabled on this system. For more information, see
-about_Execution_Policies at <code class="docutils literal notranslate"><span class="pre">https://...</span></code></p>
-</div></blockquote>
-<p>PowerShell has more restricted rules on script execution, and the Kate
-tools are not signed. You are encouraged to
-<a class="reference external" href="https://github.com/qteatime/kate/tree/main/packages/kate-tools">review the code on GitHub</a>
-and at the location Windows is pointing you to, if you’ve installed it
-through <a class="reference external" href="https://www.npmjs.com/">npm</a>.</p>
-<p>Rather than disabling PowerShell’s security rules, you <em>may</em> choose
-to run <code class="docutils literal notranslate"><span class="pre">kart.cmd</span></code> instead of <code class="docutils literal notranslate"><span class="pre">kart</span></code> as a work-around. CMD files
-are not covered by the same security rules.</p>
-<p>Once again, <strong>you are encouraged to review your tools’ code</strong>. These
-security rules exist for a reason, and arbitrarily running applications
-in an unsandboxed system, like Windows, can easily get your computer
-compromised or damaged (or risk your reputation by shipping malware
-to your players). Kate is a secure platform, but part of that security
-comes from knowing what your applications are doing.</p>
-</div>
+</section>
+<section id="special-game-engine-support">
+<h2>Special game engine support<a class="headerlink" href="#special-game-engine-support" title="Link to this heading">#</a></h2>
+<p>Kate aims to support a majority of game engines that can export your project
+as a web game, and allow players to run those games in a web browser without
+the size and lag limitations typical of a browser-based game. The process described here
+is very similar to what you’d follow to get a Kate cartridge for a Ren’Py
+visual novel, a Godot RPG, or a Bitsy adventure, except you don’t need to
+write your own HTML page and CSS files.</p>
+<p>There’s special support built in the Publisher application for many of these
+engines, meaning you might be able to get your game to work even with very
+little knowledge of web development. Check out the
+<a class="reference internal" href="../../port/index.html"><span class="doc">Kate Porting Recipes</span></a> book for configuration examples
+and tips on how to create cartridges for games made in Ren’Py, Godot, Bitsy, and more.</p>
+</section>
+<section id="configuration-files">
+<h2>Configuration files<a class="headerlink" href="#configuration-files" title="Link to this heading">#</a></h2>
+<p>The Publisher uses special JSON configuration files to describe how the
+cartridge should be built. These configuration files contain other
+meta-data used to present and search for the cartridge, as well as
+some information on how the cartridge should be executed.</p>
+<p>Detailed information about these configuration files is available
+in the <a class="reference internal" href="../packing/index.html"><span class="doc">Packaging cartridges</span></a> section.</p>
 </section>
 </section>
 
@@ -489,7 +518,7 @@ comes from knowing what your applications are doing.</p>
         <div class="bottom-of-page">
           <div class="left-details">
             <div class="copyright">
-                Copyright &#169; 2023, Niini
+                Copyright &#169; 2023-2024, Niini
             </div>
             Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
             
@@ -519,6 +548,9 @@ comes from knowing what your applications are doing.</p>
 <li><a class="reference internal" href="#creating-a-start-page">Creating a start page</a></li>
 <li><a class="reference internal" href="#cartridge-metadata">Cartridge metadata</a></li>
 <li><a class="reference internal" href="#packaging-your-game">Packaging your game</a></li>
+<li><a class="reference internal" href="#testing-your-game">Testing your game</a></li>
+<li><a class="reference internal" href="#special-game-engine-support">Special game engine support</a></li>
+<li><a class="reference internal" href="#configuration-files">Configuration files</a></li>
 </ul>
 </li>
 </ul>
@@ -530,7 +562,7 @@ comes from knowing what your applications are doing.</p>
       
     </aside>
   </div>
-</div><script src="../../../_static/documentation_options.js?v=1b0dedb3"></script>
+</div><script src="../../../_static/documentation_options.js?v=594d7d3c"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/scripts/furo.js?v=32e29ea5"></script>

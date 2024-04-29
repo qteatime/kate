@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Screen recording" href="captures.html" /><link rel="prev" title="Playing games" href="index.html" />
 
     <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
-        <title>ROM Cartridges - Kate 0.23.10 documentation</title>
+        <title>ROM Cartridges - Kate 0.25 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=82a976d7" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=135e06be" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo-extensions.css?v=36a5483c" />
@@ -128,7 +128,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../../index.html"><div class="brand">Kate 0.23.10 documentation</div></a>
+      <a href="../../../index.html"><div class="brand">Kate 0.25 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -151,7 +151,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../index.html">
   
   
-  <span class="sidebar-brand-text">Kate 0.23.10 documentation</span>
+  <span class="sidebar-brand-text">Kate 0.25 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -239,9 +239,9 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../dev/manual/kart/index.html">Kart — Packing cartridges</a><input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" role="switch" type="checkbox"/><label for="toctree-checkbox-13"><div class="visually-hidden">Toggle navigation of Kart — Packing cartridges</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../dev/manual/kart/getting-started.html">Getting started</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../dev/manual/kart/configuration.html">Configuration files</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../dev/manual/packing/index.html">Packaging cartridges</a><input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" role="switch" type="checkbox"/><label for="toctree-checkbox-13"><div class="visually-hidden">Toggle navigation of Packaging cartridges</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../dev/manual/packing/getting-started.html">Getting started</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../dev/manual/packing/configuration.html">Configuration files</a></li>
 </ul>
 </li>
 </ul>
@@ -266,7 +266,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../design/kernel/K0004-processes.html">#K0004 — Processes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../design/kernel/K0005-partitioned-file-storage.html">#K0005 — Partitioned File Storage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../design/kernel/K0006-cartridge-signatures.html">#K0006 — Cartridge signatures</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../design/kernel/K0007-key-store.html">#K0006 — Cartridge signatures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../design/kernel/K0007-key-store.html">#K0007 — Secure key store</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../design/api/A0001-object-storage.html">#A0001 — Object Store API</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../design/api/A0002-external-url.html">#A0002 — External URL navigation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../design/api/A0003-device-file-access.html">#A0003 — Device file access</a></li>
@@ -276,6 +276,7 @@
 <p class="caption" role="heading"><span class="caption-text">Changes, Terms, and Credits</span></p>
 <ul>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../../etc/releases/index.html">Release notes</a><input class="toctree-checkbox" id="toctree-checkbox-16" name="toctree-checkbox-16" role="switch" type="checkbox"/><label for="toctree-checkbox-16"><div class="visually-hidden">Toggle navigation of Release notes</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../etc/releases/0.25.html">Kate v0.25  (Spring 2024)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../etc/releases/0.23.10.html">Kate v0.23.10  (October 2023)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../etc/releases/0.23.8.html">Kate v0.23.8  (August 2023)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../etc/releases/0.23.6.html">Kate v0.23.6  (June 2023)</a></li>
@@ -336,8 +337,8 @@
 <h1>ROM Cartridges<a class="headerlink" href="#rom-cartridges" title="Link to this heading">#</a></h1>
 <p>Kate games are distributed as a special file called a “ROM cartridge”, with a
 <code class="docutils literal notranslate"><span class="pre">.kart</span></code> extension. This file includes all data for the game, and some special
-meta-data that Kate uses to present the game in the console and allow it to
-be organised and searched for in your library.</p>
+meta-data that tells Kate how to run and present the game in the console
+(and which can be used to search and organise games in your library).</p>
 <p>Kate doesn’t run cartridges directly from this ROM file. Instead, it installs
 the contents of the file locally in the console in a more efficient format to
 be able to start up games faster and using less memory. This means that,
@@ -377,7 +378,7 @@ cartridge file at any time.</p>
 consider <a class="reference internal" href="../../../glossary.html#term-Archiving"><span class="xref std std-term">archiving the cartridge</span></a>. You can do
 so from the cartridge’s storage page (from the home screen, press <a class="reference internal" href="../../../_images/menu_32.png"><img alt="Menu button" class="align-middle" src="../../../_images/menu_32.png" style="height: 1em;" /></a> <em>(Menu button)</em>
 and select <code class="docutils literal notranslate"><span class="pre">Manage</span> <span class="pre">data</span></code>).</p>
-<p>When archiving a cartridge, the cartridge data is removed from your local
+<p>When archiving a cartridge its data is removed from your local
 device, but metadata (which Kate uses to display the cartridge), save data,
 and media captures are kept around. This means that you can re-install the
 cartridge at a later point in time and continue from where you left off.</p>
@@ -387,7 +388,7 @@ cartridge at a later point in time and continue from where you left off.</p>
 <h2>Privacy &amp; safety<a class="headerlink" href="#privacy-safety" title="Link to this heading">#</a></h2>
 <p>Kate cartridges are fully <a class="reference internal" href="../../../glossary.html#term-Sandboxing"><span class="xref std std-term">sandboxed</span></a>. This means that a cartridge
 cannot access data on your device or use the internet in any way. By
-sandboxing all cartridges Kate greatly limits the possible impacts to
+sandboxing all cartridges Kate greatly limits the possible risks to
 your device or data, even if you end up running a malicious cartridge.</p>
 <p>Cartridges that need more privileges can request special permissions
 to do things with your device or data. This puts you in control of what
@@ -403,7 +404,7 @@ is licensed to you—how the developers expect you to use the cartridge.
 You can read the licence text by pressing <a class="reference internal" href="../../../_images/menu_32.png"><img alt="Menu button" class="align-middle" src="../../../_images/menu_32.png" style="height: 1em;" /></a> <em>(Menu button)</em> in the library and
 choosing <code class="docutils literal notranslate"><span class="pre">Legal</span> <span class="pre">notices</span></code>. Or pressing <a class="reference internal" href="../../../_images/berry_32.png"><img alt="Berry button" class="align-middle" src="../../../_images/berry_32.png" style="height: 1em;" /></a> <em>(Berry button)</em> while running a
 cartridge and selecting <code class="docutils literal notranslate"><span class="pre">Legal</span> <span class="pre">notices</span></code>.</p>
-<p>Cartridges that have use the internet or link to an internet location in
+<p>Cartridges that use the internet or link to an internet location in
 any way also include a privacy policy, which you can find in the same menu
 the legal notices are available.</p>
 </section>
@@ -438,7 +439,7 @@ the legal notices are available.</p>
         <div class="bottom-of-page">
           <div class="left-details">
             <div class="copyright">
-                Copyright &#169; 2023, Niini
+                Copyright &#169; 2023-2024, Niini
             </div>
             Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
             
@@ -481,7 +482,7 @@ the legal notices are available.</p>
       
     </aside>
   </div>
-</div><script src="../../../_static/documentation_options.js?v=1b0dedb3"></script>
+</div><script src="../../../_static/documentation_options.js?v=594d7d3c"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/scripts/furo.js?v=32e29ea5"></script>

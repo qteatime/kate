@@ -12,3 +12,5 @@ tsconfig.tsbuildinfo
 build/
 /ecosystem/
 /tests/
+kate-buildinfo.json
+.buildinfo

@@ -7,7 +7,7 @@ Windows and Linux (including Steam OS and Chrome OS). MacOS support will
 come soon.
 
 The Web version can be installed as a Web Application on supported
-browsers: Chrome (desktop and Android), Safari (iOS), and Edge (Windows 10+).
+browsers: Chrome (desktop and Android), Safari (iOS*), and Edge (Windows 10+).
 Installing the web application will allow you to run Kate offline, but you'll
 have less integration with the underlying device.
 
@@ -39,24 +39,24 @@ Running your own Kate instance
 """"""""""""""""""""""""""""""
 
 Rather than depending on the public instance, you can run your own private
-Kate instance on any server. To do so, please download the ``kate-www.zip``
-file from the
+Kate instance on any server. To do so, please download ``kate-www.zip``
+from the
 `Kate Releases page on GitHub <https://github.com/qteatime/kate/releases>`_,
-then put this file in your server.
+then put the contents of this archive in your server.
 
-If you don't know how to run a web server, or would rather not manage a
-server on your own, but still want the added control and privacy of having
-your own Kate instance, services like Netlify or Digital Ocean's App Platform
-will let you upload the zip file above and get a managed server. Be sure to
-check their usage prices and compare before you sign up for anything.
-Other similar managed services exist elsewhere.
+If you don't know how to run a web server (or would rather not manage a
+server on your own) but still want the added control and privacy of having
+your own Kate instance, services like Cloudflare's Pages, Netlify, or
+Digital Ocean's App Platform will let you upload the zip file above and
+get a managed server. Be sure to check their usage prices and compare
+before you sign up for anything. Other similar managed services exist elsewhere.
 
 .. important::
 
    Kate **must absolutely be served over HTTPS, with a valid SSL certificate**.
-   Again, managed services will handle this for you automatically,
+   Managed services will generally handle this for you automatically,
    but if you're running your own server you'll need to configure a proper
-   HTTPS connection, as most of the browser APIs that Kate relies are not
+   HTTPS connection yourself. Most of the browser APIs that Kate relies are not
    available over unencrypted HTTP.
 
 
@@ -77,9 +77,12 @@ browser and operating system, then:
 * On **Android**: open the page in Google Chrome, then choose ``Install app``
   from the menu;
 * On **Chrome for Windows/Linux**: you'll find the ``Install`` button in the
-  address bar.
+  address bar;
+* On **iOS**: you can use the ``Add to Home Screen`` under the "share" option
+  in the browser;
 
 You might also be prompted to install the page as an App when you first visit it.
+
 
 Web applications on Steam Deck
 """"""""""""""""""""""""""""""
@@ -90,7 +93,7 @@ you to access Kate directly from Steam's gaming mode, and consequently play
 any Kate game from there as well.
 
 However, Chrome runs using `Flatpak <https://flatpak.org/>`_ by default, and
-the default sandbox configuration is a bit too restrictive for running Kate
+the sandbox configuration is a bit too restrictive for installing Kate
 properly. Enabling Kate in Steam Deck's gaming mode thus takes a little bit
 of effort and some being comfortable with running commands in the command line.
 All of the configuration below has to be done in the Deck's desktop mode.
@@ -132,13 +135,15 @@ All of the configuration below has to be done in the Deck's desktop mode.
     TryExec=/var/lib/flatpak/exports/bin/com.google.Chrome
 
   The additional ``--start-fullscreen`` and ``--no-default-browser-check`` are
-  optional, but you'll usually want to run Kate in fullscreen on the Deck.
+  optional, but you'll usually want to run Kate in fullscreen on the Deck. The
+  ``--no-default-browser-check`` flag just suppresses Chrome asking you to make
+  it your default browser.
 
 **Allow Chrome to read the Steam gamepad input (and other devices):**
   By default Chrome will not have access to read gamepad input because it
   interacts with gamepads through `udev <https://en.wikipedia.org/wiki/Udev>`_
-  and the flatpak does not grant access to it on the basis that the API is
-  not stable.
+  and the flatpak does not grant access to it (on the basis of the API being
+  unstable).
 
   Since Steam Deck is a fairly specific device with a fairly specific OS,
   you can give Chrome read-only access to it to get the gamepad working.
@@ -149,12 +154,12 @@ All of the configuration below has to be done in the Deck's desktop mode.
 
 **Add Kate to your library as a non-Steam game:**
   To launch Kate from the Deck's gaming mode you'll need to add it to your
-  Steam library as a non-Steam game. To do so open the Steam client in
+  Steam library as a non-Steam game. To do so, open the Steam client in
   desktop mode, then in the bottom left click "Add a Game", and select
   "Add a Non-Steam Game".
 
   From the list that opens search for ``Kate`` (or the name you gave it if
-  you wrote your own ``.desktop`` file), check the checkbox beside the name,
+  you wrote your own ``.desktop`` file), mark the checkbox beside the name,
   and click "Add selected Programs".
 
   That's it, you can go back to gaming mode.
@@ -175,10 +180,11 @@ All of the configuration below has to be done in the Deck's desktop mode.
   (the menu button on the right of the Deck), then select
   ``Settings -> User Interface`` and switch to Fullscreen Mode.
 
-  You might also want to swap |btn_ok| and |btn_cancel| in
+  If you're used to Steam's gamepad layout you might also want to swap
+  |btn_ok| and |btn_cancel| in
   ``Settings -> Controller & Sensors -> Control Kate with a standard gamepad ->
   Configure standard mapping``. By default you confirm things in Kate with
-  the ``B`` button on the deck, and cancel with ``A``, but Steam OS uses the
+  the ``B`` button on the Deck, and cancel with ``A``, but Steam OS uses the
   opposite configuration out of the box.
 
 
@@ -186,7 +192,7 @@ Caveats
 """""""
 
 Using the public Kate instance is practical, but depends on a website that
-is external to your device. As such, it's not the recommended option for
+is external to your device. It's not the recommended option for
 video game archival.
 
 The security properties depend on the domain it uses (``kate.qteati.me``)
@@ -201,6 +207,10 @@ to a different computer) would allow the attacker to have access to all
 information locally stored in Kate in your device, and any additional
 permissions you've granted the domain; this poses a significant risk,
 but the risk applies to web sites in general.
+
+To avoid these issues you might consider `running your own Kate instance`_.
+You'd follow the same instructions to install it as a PWA, but with the
+domain pointing to your instance, of course.
 
 
 .. _Native application:
@@ -350,7 +360,7 @@ avoid any network requests.
 Building Kate
 '''''''''''''
 
-After setting up, you can run ``node make all`` to build all Kate components:
+After setting up you can run ``node make all`` to build all Kate components:
 
 .. code-block:: shell
 
@@ -358,7 +368,8 @@ After setting up, you can run ``node make all`` to build all Kate components:
 
 This will give you a working Kate emulator. You can try it by either running
 ``node make desktop:run`` (to run it as an Electron app), or starting a
-server on the ``www/`` folder and pointing a modern browser there.
+server on the ``www/`` folder (``node make server:start`` works) and pointing
+a modern browser there.
 
 You should see a screen similar to the screenshot below. Download the
 ``example-cartridges.zip`` file from the `Kate releases page`_, extract it,
@@ -419,15 +430,24 @@ web version of Kate has been tested and runs on the following browsers:
 | Chrome for Android | 108+              | Android 9, Android 13            |
 +--------------------+-------------------+----------------------------------+
 
-Safari on iOS is not currently supported, and Safari on MacOS is not currently
-tested. Once the missing features are implemented in Safari, these will be
-added to the table above as well.
+.. important::
+
+  Safari on iOS is currently unsupported as `Apple does not implement the
+  file system standard <https://bugs.webkit.org/show_bug.cgi?id=231706>`_.
+  Kate's cartridge installation depends on this API to have reasonable
+  memory usage and proper storage isolation. A work-around for this
+  (with higher memory usage on iOS) should happen before the stable release
+  if Apple doesn't fix their implementation first.
+
+  Video capture on iOS is also currently unsupported due to Apple not
+  implementing support for webm.
 
 Installing the web app works in the following device/OSs:
 
 * **Android**: only with Chrome for Android;
 * **Windows 10+**: only with Microsoft Edge;
 * **Chrome (Desktop)**: supported on Windows and Linux;
+* **iOS**: only with Safari;
 
 
 Native version

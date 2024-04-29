@@ -7,8 +7,8 @@ the Kate runtime environment to be more browser-like. You configure this
 bridge by specifying the version of Ren'Py that your cartridge uses.
 
 
-Using in Kart
--------------
+Using in your build configuration
+---------------------------------
 
 To add this bridge to your cartridge you specify the following in your
 ``kate.json`` configuration:

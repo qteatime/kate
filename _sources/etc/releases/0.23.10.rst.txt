@@ -70,7 +70,7 @@ Memory-friendly cartridge format
 
 A new cartridge format! Hopefully the last one this time. This new
 format adds support for signing cartridges (which is necessary for
-the upcoming store security features), and for memory-friendly
+the upcoming catalog security features), and for memory-friendly
 decoding.
 
 Today's Kate cartridge format needs to be fully loaded in memory

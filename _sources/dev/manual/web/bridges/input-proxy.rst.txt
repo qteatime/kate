@@ -12,8 +12,8 @@ You configure what keyboard keys each button maps to, however this bridge
 only supports mapping one Kate button press to one keyboard key press.
 
 
-Using in Kart
--------------
+Using in your build configuration
+---------------------------------
 
 .. versionadded:: 0.24.2
 

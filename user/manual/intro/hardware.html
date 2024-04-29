@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Emulator" href="emulator.html" /><link rel="prev" title="Getting started" href="index.html" />
 
     <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
-        <title>Tech specs - Kate 0.23.10 documentation</title>
+        <title>Tech specs - Kate 0.25 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=82a976d7" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=135e06be" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo-extensions.css?v=36a5483c" />
@@ -128,7 +128,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../../index.html"><div class="brand">Kate 0.23.10 documentation</div></a>
+      <a href="../../../index.html"><div class="brand">Kate 0.25 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -151,7 +151,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../index.html">
   
   
-  <span class="sidebar-brand-text">Kate 0.23.10 documentation</span>
+  <span class="sidebar-brand-text">Kate 0.25 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -239,9 +239,9 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../dev/manual/kart/index.html">Kart — Packing cartridges</a><input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" role="switch" type="checkbox"/><label for="toctree-checkbox-13"><div class="visually-hidden">Toggle navigation of Kart — Packing cartridges</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../dev/manual/kart/getting-started.html">Getting started</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../dev/manual/kart/configuration.html">Configuration files</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../dev/manual/packing/index.html">Packaging cartridges</a><input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" role="switch" type="checkbox"/><label for="toctree-checkbox-13"><div class="visually-hidden">Toggle navigation of Packaging cartridges</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../dev/manual/packing/getting-started.html">Getting started</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../dev/manual/packing/configuration.html">Configuration files</a></li>
 </ul>
 </li>
 </ul>
@@ -266,7 +266,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../design/kernel/K0004-processes.html">#K0004 — Processes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../design/kernel/K0005-partitioned-file-storage.html">#K0005 — Partitioned File Storage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../design/kernel/K0006-cartridge-signatures.html">#K0006 — Cartridge signatures</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../design/kernel/K0007-key-store.html">#K0006 — Cartridge signatures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../design/kernel/K0007-key-store.html">#K0007 — Secure key store</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../design/api/A0001-object-storage.html">#A0001 — Object Store API</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../design/api/A0002-external-url.html">#A0002 — External URL navigation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../design/api/A0003-device-file-access.html">#A0003 — Device file access</a></li>
@@ -276,6 +276,7 @@
 <p class="caption" role="heading"><span class="caption-text">Changes, Terms, and Credits</span></p>
 <ul>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../../etc/releases/index.html">Release notes</a><input class="toctree-checkbox" id="toctree-checkbox-16" name="toctree-checkbox-16" role="switch" type="checkbox"/><label for="toctree-checkbox-16"><div class="visually-hidden">Toggle navigation of Release notes</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../etc/releases/0.25.html">Kate v0.25  (Spring 2024)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../etc/releases/0.23.10.html">Kate v0.23.10  (October 2023)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../etc/releases/0.23.8.html">Kate v0.23.8  (August 2023)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../etc/releases/0.23.6.html">Kate v0.23.6  (June 2023)</a></li>
@@ -340,12 +341,11 @@
 of the feelings of early 2000s and 2010s technology and culture.
 It sports a cute strawberry cake × cats themed case,
 specific security feedback channels, and a proper cartridge slot.</p>
-<p>The hardware comes in two versions. The initial hand-held (Pancake) version:</p>
-<img alt="../../../_images/handheld.png" src="../../../_images/handheld.png" />
-<p>And the shiny new mini-Kate box (Cheesecake) version, which you can certainly
-hold in one hand but not really see much without plugging it to some external
-display through HDMI:</p>
-<img alt="../../../_images/box.png" src="../../../_images/box.png" />
+<p>The hardware comes in two versions. A handheld version, the Purr-fect Cookie:</p>
+<img alt="../../../_images/cookie.png" src="../../../_images/cookie.png" />
+<p>And a small box with a CD/DVD reader that you plug into your TV,
+the Cheesecake Vending Meow-chine:</p>
+<img alt="../../../_images/cheesecake.png" src="../../../_images/cheesecake.png" />
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>The hardware, 3d models for the case design, operating system, and all
@@ -354,8 +354,8 @@ you will be able to build your own physical Kate console from these parts.</p>
 <p>Right now only the <a class="reference internal" href="install.html"><span class="doc">Kate Emulator</span></a> is available
 as an early technology preview. The physical console will run the same
 software specification and thus be compatible with all Kate cartridges
-that run in the emulator, but with the hardware limitations specified
-below, unless you build your console using custom hardware.</p>
+that run in the emulator, only with the hardware limitations specified
+below unless you build your console using custom hardware.</p>
 </div>
 </section>
 <section id="computing-power">
@@ -379,8 +379,8 @@ needed to play the game, as well as the recommended version.</p>
 <td><p>2.4GHz (4 cores)</p></td>
 </tr>
 <tr class="row-odd"><td><p><strong>RAM</strong></p></td>
-<td><p>1 GB</p></td>
 <td><p>2 GB</p></td>
+<td><p>4 GB</p></td>
 <td><p>4 GB</p></td>
 </tr>
 <tr class="row-even"><td><p><strong>Storage</strong></p></td>
@@ -406,9 +406,9 @@ components if you’re using another Linux distribution.</p>
 </section>
 <section id="graphics">
 <span id="hardware-graphics"></span><h2>Graphics<a class="headerlink" href="#graphics" title="Link to this heading">#</a></h2>
-<p>Kate uses 4” capacitive multi-touch (10 points) display with a resolution
-of 800x480. When connecting to an external display, it can reach the maximum
-resolution of 1280x720. The screen aspect ratio is 5:3.</p>
+<p>Kate has a native display resolution of 800x480 pixels. It can be upscaled to
+1200x720 (1.5x) and 1600x960 (2x). The screen aspect ratio is 5:3. The handheld
+version sports a 5” screen with touch support (5 points).</p>
 <p>The GPU supports <a class="reference external" href="https://en.wikipedia.org/wiki/OpenGL_ES#OpenGL_ES_3.0_2">OpenGL ES 3.1</a>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -419,35 +419,38 @@ provide the needed functionality.</p>
 </section>
 <section id="input">
 <h2>Input<a class="headerlink" href="#input" title="Link to this heading">#</a></h2>
-<p>Kate has a total of 12 digital input buttons used for controlling games:</p>
+<p>Kate’s gamepad has a total of 10 digital input buttons used for controlling
+games, with two special digital buttons used by the OS:</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="../../../_images/ok_32.png"><img alt="Ok button (a.k.a. O)" class="align-middle" src="../../../_images/ok_32.png" style="height: 1em;" /></a> <em>(Ok)</em>, <a class="reference internal" href="../../../_images/sparkle_32.png"><img alt="Sparkle button" class="align-middle" src="../../../_images/sparkle_32.png" style="height: 1em;" /></a> <em>(Sparkle)</em>, <a class="reference internal" href="../../../_images/menu_32.png"><img alt="Menu button" class="align-middle" src="../../../_images/menu_32.png" style="height: 1em;" /></a> <em>(Menu)</em>, and <a class="reference internal" href="../../../_images/cancel_32.png"><img alt="Cancel button (a.k.a. X)" class="align-middle" src="../../../_images/cancel_32.png" style="height: 1em;" /></a> <em>(Cancel)</em> face buttons;</p></li>
 <li><p><a class="reference internal" href="../../../_images/dpad_32.png"><img alt="D-Pad" class="align-middle" src="../../../_images/dpad_32.png" style="height: 1em;" /></a> <em>(D-Pad)</em>;</p></li>
-<li><p><a class="reference internal" href="../../../_images/capture_32.png"><img alt="Capture button" class="align-middle" src="../../../_images/capture_32.png" style="height: 1em;" /></a> <em>(Capture button)</em> and <a class="reference internal" href="../../../_images/berry_32.png"><img alt="Berry button" class="align-middle" src="../../../_images/berry_32.png" style="height: 1em;" /></a> <em>(Berry button)</em>;</p></li>
 <li><p><a class="reference internal" href="../../../_images/l_32.png"><img alt="Left shoulder button" class="align-middle" src="../../../_images/l_32.png" style="height: 1em;" /></a> and <a class="reference internal" href="../../../_images/r_32.png"><img alt="Right shoulder button" class="align-middle" src="../../../_images/r_32.png" style="height: 1em;" /></a> shoulder buttons;</p></li>
+<li><p><a class="reference internal" href="../../../_images/capture_32.png"><img alt="Capture button" class="align-middle" src="../../../_images/capture_32.png" style="height: 1em;" /></a> <em>(Capture button)</em> and <a class="reference internal" href="../../../_images/berry_32.png"><img alt="Berry button" class="align-middle" src="../../../_images/berry_32.png" style="height: 1em;" /></a> <em>(Berry button)</em> (special, used by the OS);</p></li>
 </ul>
-<p>It also has a capacitive touch screen with support to 10 touch points,
-a haptics module for vibration, a 3-axis gyroscope sensor, and a 3-axis
-accelerometer sensor.</p>
 <p>Up to 4 gamepads can be connected to the console at a time, either through
 bluetooth or directly through USB.</p>
+<p>It also supports attached keyboards for text input, and styluses/touch for
+pointer inputs. A haptics module for vibration and a 6-axis DoF sensor module
+are planned.</p>
 </section>
 <section id="cartridges">
 <h2>Cartridges<a class="headerlink" href="#cartridges" title="Link to this heading">#</a></h2>
 <p>Games for Kate can be made with many different technologies, and are shared
-as ROM files, which Kate calls a “cartridge”. The ROM files incldue all the
-data needed to run the game. There are no limits for the ROM file size.</p>
+as ROM files (physically distributed in mini CD/DVD), which Kate calls
+a “cartridge”. The ROM files incldue all the data needed to run the game.
+There are no limits for the ROM file size.</p>
 <p>Kate never runs the ROM files directly; rather they’re copied into the
 console in a more efficient format upon installation. From that point on,
 as long as you don’t archive the game in Kate, it can be played without
-needing to keep the file around or insert the disc <a class="footnote-reference brackets" href="#f1" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>.</p>
+needing to keep the file around or inserting the disc <a class="footnote-reference brackets" href="#f1" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>.</p>
 <aside class="footnote-list brackets">
 <aside class="footnote brackets" id="f1" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
 <p>Kate cartridges contain no form of <a class="reference internal" href="../../../glossary.html#term-Copy-protection"><span class="xref std std-term">copy-protection</span></a>, and rather
 rely on players being respectful of game developers’ wishes regarding
 sharing and modifying the game—such wishes are included in the cartridge’s
-metadata.</p>
+metadata and the console uses it to decide what affordances to provide the
+player with.</p>
 </aside>
 </aside>
 </section>
@@ -482,7 +485,7 @@ metadata.</p>
         <div class="bottom-of-page">
           <div class="left-details">
             <div class="copyright">
-                Copyright &#169; 2023, Niini
+                Copyright &#169; 2023-2024, Niini
             </div>
             Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
             
@@ -525,7 +528,7 @@ metadata.</p>
       
     </aside>
   </div>
-</div><script src="../../../_static/documentation_options.js?v=1b0dedb3"></script>
+</div><script src="../../../_static/documentation_options.js?v=594d7d3c"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/scripts/furo.js?v=32e29ea5"></script>

@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Sandboxing and APIs" href="sandboxing.html" /><link rel="prev" title="Overview" href="overview.html" />
 
     <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
-        <title>Cartridges - Kate 0.23.10 documentation</title>
+        <title>Cartridges - Kate 0.25 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=82a976d7" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=135e06be" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo-extensions.css?v=36a5483c" />
@@ -128,7 +128,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../../index.html"><div class="brand">Kate 0.23.10 documentation</div></a>
+      <a href="../../../index.html"><div class="brand">Kate 0.25 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -151,7 +151,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../index.html">
   
   
-  <span class="sidebar-brand-text">Kate 0.23.10 documentation</span>
+  <span class="sidebar-brand-text">Kate 0.25 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -239,9 +239,9 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../kart/index.html">Kart — Packing cartridges</a><input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" role="switch" type="checkbox"/><label for="toctree-checkbox-13"><div class="visually-hidden">Toggle navigation of Kart — Packing cartridges</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../kart/getting-started.html">Getting started</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../kart/configuration.html">Configuration files</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../packing/index.html">Packaging cartridges</a><input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" role="switch" type="checkbox"/><label for="toctree-checkbox-13"><div class="visually-hidden">Toggle navigation of Packaging cartridges</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../packing/getting-started.html">Getting started</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../packing/configuration.html">Configuration files</a></li>
 </ul>
 </li>
 </ul>
@@ -266,7 +266,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../design/kernel/K0004-processes.html">#K0004 — Processes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../design/kernel/K0005-partitioned-file-storage.html">#K0005 — Partitioned File Storage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../design/kernel/K0006-cartridge-signatures.html">#K0006 — Cartridge signatures</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../design/kernel/K0007-key-store.html">#K0006 — Cartridge signatures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../design/kernel/K0007-key-store.html">#K0007 — Secure key store</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../design/api/A0001-object-storage.html">#A0001 — Object Store API</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../design/api/A0002-external-url.html">#A0002 — External URL navigation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../design/api/A0003-device-file-access.html">#A0003 — Device file access</a></li>
@@ -276,6 +276,7 @@
 <p class="caption" role="heading"><span class="caption-text">Changes, Terms, and Credits</span></p>
 <ul>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../../etc/releases/index.html">Release notes</a><input class="toctree-checkbox" id="toctree-checkbox-16" name="toctree-checkbox-16" role="switch" type="checkbox"/><label for="toctree-checkbox-16"><div class="visually-hidden">Toggle navigation of Release notes</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../etc/releases/0.25.html">Kate v0.25  (Spring 2024)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../etc/releases/0.23.10.html">Kate v0.23.10  (October 2023)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../etc/releases/0.23.8.html">Kate v0.23.8  (August 2023)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../etc/releases/0.23.6.html">Kate v0.23.6  (June 2023)</a></li>
@@ -357,8 +358,8 @@ cartridge.</p></li>
 <p>Each cartridge has a unique identifier, which is written in the form:
 <code class="docutils literal notranslate"><span class="pre">namespace/name</span></code>. Here <code class="docutils literal notranslate"><span class="pre">namespace</span></code> is a domain name that you own,
 whereas <code class="docutils literal notranslate"><span class="pre">name</span></code> is a name that must be unique in that namespace.</p>
-<p>For example, the author’s game is identified by <code class="docutils literal notranslate"><span class="pre">qteati.me/the-sound-of-rain</span></code>.
-This means that they have a game named <code class="docutils literal notranslate"><span class="pre">the-sound-of-rain</span></code>, and this
+<p>For example, given a cartridge identified by <code class="docutils literal notranslate"><span class="pre">qteati.me/the-sound-of-rain</span></code>,
+this means that the author has a game named <code class="docutils literal notranslate"><span class="pre">the-sound-of-rain</span></code>, and this
 is published by someone who owns the domain <code class="docutils literal notranslate"><span class="pre">qteati.me</span></code>. Having domains be
 something authors own makes it easier for Kate to do automatic verifications
 about the origin of a cartridge, improving users’ trust.</p>
@@ -388,12 +389,12 @@ issues for players relying on screen-readers.</p>
 <h2>Meta-data<a class="headerlink" href="#meta-data" title="Link to this heading">#</a></h2>
 <p>The cartridge meta-data includes information that Kate uses to display the
 cartridge in the library and allow players to filter or create dynamic
-collections. It will also be used by other tools (such as the store feed
+collections. It will also be used by other tools (such as the catalog feed
 ones) to extract information necessary to present a cartridge.</p>
 <p>The meta-data is itself divided into further sections:</p>
 <ul class="simple">
 <li><p><strong>Presentation</strong>: This provides information about how Kate should present
-your cartridge to users across the console and in the store. It includes
+your cartridge to users across the console and in the catalog. It includes
 the game’s title, author, thumbnails, etc.</p></li>
 <li><p><strong>Classification</strong>: This provides information about the content of the
 cartridge, such as genre, age appropriateness, and content warnings.</p></li>
@@ -458,23 +459,23 @@ accessibility needs is encouraged.</p>
 necessary content warnings. Failing to do so might cause the cartridge to
 be hidden from the official channels, or require the player to agree to
 possibly explicit content before they can install and play.</p>
-<p>Rating is made out of an age-appropriateness rating, from the author’s
-perspective and not governed by any regulatory body, which can be one of:</p>
+<p>Rating is made out of an age-appropriateness rating from the author’s
+perspective and not governed by any regulatory body. It can be one of:</p>
 <ul class="simple">
 <li><p><strong>General</strong> — the author sees it as appropriate for any audience;</p></li>
 <li><p><strong>Teen-and-up</strong> — the author thinks the game is not appropriate for
-kids aged 12 and younger;</p></li>
+younger kids (generally aged 12 and younger);</p></li>
 <li><p><strong>Mature</strong> — the author thinks the game is only appropriate for adult
 audiences. It may include depictions of violence, sex, abuse, and other
-heavy topics, but there’s nothing very graphic;</p></li>
-<li><p><strong>Explicit</strong> — like mature, except things can get graphic.</p></li>
+heavy topics, but there’s nothing very explicit;</p></li>
+<li><p><strong>Explicit</strong> — like mature, except things can get explicit or overt.</p></li>
 <li><p><strong>Unknown</strong> — the author has chosen to not give the game an age
 appropriateness rating.</p></li>
 </ul>
 <p>The default age-appropriateness rating is “Unknown”, which for all practical
 purposes has the same meaning as “Explicit”. It will be treated as a game
-for adults regardless of its actual content, so players can give their
-informed consent.</p>
+for adults regardless of its actual content since we can’t tell the player
+what to expect.</p>
 <p>The other part of rating is the content warning. This is a free-text field
 that includes any warnings the author wishes players to be aware before they
 install and play a cartridge, and it’s limited to up to 1,000 UTF-16
@@ -527,7 +528,7 @@ to emulate web APIs that the cartridge uses, using the Kate APIs.</p></li>
         <div class="bottom-of-page">
           <div class="left-details">
             <div class="copyright">
-                Copyright &#169; 2023, Niini
+                Copyright &#169; 2023-2024, Niini
             </div>
             Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
             
@@ -575,7 +576,7 @@ to emulate web APIs that the cartridge uses, using the Kate APIs.</p></li>
       
     </aside>
   </div>
-</div><script src="../../../_static/documentation_options.js?v=1b0dedb3"></script>
+</div><script src="../../../_static/documentation_options.js?v=594d7d3c"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/scripts/furo.js?v=32e29ea5"></script>

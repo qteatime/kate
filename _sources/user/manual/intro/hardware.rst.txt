@@ -9,16 +9,14 @@ of the feelings of early 2000s and 2010s technology and culture.
 It sports a cute strawberry cake × cats themed case,
 specific security feedback channels, and a proper cartridge slot.
 
-The hardware comes in two versions. The initial hand-held (Pancake) version:
+The hardware comes in two versions. A handheld version, the Purr-fect Cookie:
 
-.. image:: img/handheld.png
+.. image:: /user/diy/overview/img/cookie.png
 
-And the shiny new mini-Kate box (Cheesecake) version, which you can certainly
-hold in one hand but not really see much without plugging it to some external
-display through HDMI:
+And a small box with a CD/DVD reader that you plug into your TV,
+the Cheesecake Vending Meow-chine:
 
-.. image:: img/box.png
-
+.. image:: /user/diy/overview/img/cheesecake.png
 
 .. note::
 
@@ -29,8 +27,8 @@ display through HDMI:
    Right now only the :doc:`Kate Emulator <install>` is available
    as an early technology preview. The physical console will run the same
    software specification and thus be compatible with all Kate cartridges
-   that run in the emulator, but with the hardware limitations specified
-   below, unless you build your console using custom hardware.
+   that run in the emulator, only with the hardware limitations specified
+   below unless you build your console using custom hardware.
 
 
 .. _hardware computing power:
@@ -46,7 +44,7 @@ needed to play the game, as well as the recommended version.
 \             Crystal (Casual)         Paper Lantern (Regular)  Phantom (Powerful)
 ============= ======================== ======================== ========================
 **CPU**       1.8GHz (4 cores)         1.8GHz (4 cores)         2.4GHz (4 cores)
-**RAM**       1 GB                     2 GB                     4 GB
+**RAM**       2 GB                     4 GB                     4 GB
 **Storage**   32 GB                    64 GB                    128 GB
 **SoC**       Raspberry Pi 4\*         Raspberry Pi 4\*         Raspberry Pi 5\*
 ============= ======================== ======================== ========================
@@ -63,9 +61,9 @@ needed to play the game, as well as the recommended version.
 Graphics
 --------
 
-Kate uses 4" capacitive multi-touch (10 points) display with a resolution
-of 800x480. When connecting to an external display, it can reach the maximum
-resolution of 1280x720. The screen aspect ratio is 5:3.
+Kate has a native display resolution of 800x480 pixels. It can be upscaled to
+1200x720 (1.5x) and 1600x960 (2x). The screen aspect ratio is 5:3. The handheld
+version sports a 5" screen with touch support (5 points).
 
 The GPU supports `OpenGL ES 3.1`_.
 
@@ -81,35 +79,38 @@ The GPU supports `OpenGL ES 3.1`_.
 Input
 -----
 
-Kate has a total of 12 digital input buttons used for controlling games:
+Kate's gamepad has a total of 10 digital input buttons used for controlling
+games, with two special digital buttons used by the OS:
 
 * |btn_ok| *(Ok)*, |btn_sparkle| *(Sparkle)*, |btn_menu| *(Menu)*, and |btn_cancel| *(Cancel)* face buttons;
 * |btn_dpad| *(D-Pad)*;
-* |btn_capture_text| and |btn_berry_text|;
 * |btn_l| and |btn_r| shoulder buttons;
-
-It also has a capacitive touch screen with support to 10 touch points,
-a haptics module for vibration, a 3-axis gyroscope sensor, and a 3-axis
-accelerometer sensor.
+* |btn_capture_text| and |btn_berry_text| (special, used by the OS);
 
 Up to 4 gamepads can be connected to the console at a time, either through
 bluetooth or directly through USB.
+
+It also supports attached keyboards for text input, and styluses/touch for
+pointer inputs. A haptics module for vibration and a 6-axis DoF sensor module
+are planned.
+
 
 
 Cartridges
 ----------
 
 Games for Kate can be made with many different technologies, and are shared
-as ROM files, which Kate calls a "cartridge". The ROM files incldue all the
-data needed to run the game. There are no limits for the ROM file size.
+as ROM files (physically distributed in mini CD/DVD), which Kate calls
+a "cartridge". The ROM files incldue all the data needed to run the game.
+There are no limits for the ROM file size.
 
 Kate never runs the ROM files directly; rather they're copied into the
 console in a more efficient format upon installation. From that point on,
 as long as you don't archive the game in Kate, it can be played without
-needing to keep the file around or insert the disc [#f1]_.
+needing to keep the file around or inserting the disc [#f1]_.
 
 .. [#f1] Kate cartridges contain no form of :term:`copy-protection`, and rather
    rely on players being respectful of game developers' wishes regarding
    sharing and modifying the game—such wishes are included in the cartridge's
-   metadata.
-
+   metadata and the console uses it to decide what affordances to provide the
+   player with.

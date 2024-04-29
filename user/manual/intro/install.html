@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Playing games" href="../gaming/index.html" /><link rel="prev" title="Emulator" href="emulator.html" />
 
     <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
-        <title>Installing - Kate 0.23.10 documentation</title>
+        <title>Installing - Kate 0.25 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=82a976d7" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=135e06be" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo-extensions.css?v=36a5483c" />
@@ -128,7 +128,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../../index.html"><div class="brand">Kate 0.23.10 documentation</div></a>
+      <a href="../../../index.html"><div class="brand">Kate 0.25 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -151,7 +151,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../index.html">
   
   
-  <span class="sidebar-brand-text">Kate 0.23.10 documentation</span>
+  <span class="sidebar-brand-text">Kate 0.25 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -239,9 +239,9 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../dev/manual/kart/index.html">Kart — Packing cartridges</a><input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" role="switch" type="checkbox"/><label for="toctree-checkbox-13"><div class="visually-hidden">Toggle navigation of Kart — Packing cartridges</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../dev/manual/kart/getting-started.html">Getting started</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../dev/manual/kart/configuration.html">Configuration files</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../dev/manual/packing/index.html">Packaging cartridges</a><input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" role="switch" type="checkbox"/><label for="toctree-checkbox-13"><div class="visually-hidden">Toggle navigation of Packaging cartridges</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../dev/manual/packing/getting-started.html">Getting started</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../dev/manual/packing/configuration.html">Configuration files</a></li>
 </ul>
 </li>
 </ul>
@@ -266,7 +266,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../design/kernel/K0004-processes.html">#K0004 — Processes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../design/kernel/K0005-partitioned-file-storage.html">#K0005 — Partitioned File Storage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../design/kernel/K0006-cartridge-signatures.html">#K0006 — Cartridge signatures</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../design/kernel/K0007-key-store.html">#K0006 — Cartridge signatures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../design/kernel/K0007-key-store.html">#K0007 — Secure key store</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../design/api/A0001-object-storage.html">#A0001 — Object Store API</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../design/api/A0002-external-url.html">#A0002 — External URL navigation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../design/api/A0003-device-file-access.html">#A0003 — Device file access</a></li>
@@ -276,6 +276,7 @@
 <p class="caption" role="heading"><span class="caption-text">Changes, Terms, and Credits</span></p>
 <ul>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../../etc/releases/index.html">Release notes</a><input class="toctree-checkbox" id="toctree-checkbox-16" name="toctree-checkbox-16" role="switch" type="checkbox"/><label for="toctree-checkbox-16"><div class="visually-hidden">Toggle navigation of Release notes</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../etc/releases/0.25.html">Kate v0.25  (Spring 2024)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../etc/releases/0.23.10.html">Kate v0.23.10  (October 2023)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../etc/releases/0.23.8.html">Kate v0.23.8  (August 2023)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../etc/releases/0.23.6.html">Kate v0.23.6  (June 2023)</a></li>
@@ -339,7 +340,7 @@ a modern web browser. You can also install the Kate Emulator natively on
 Windows and Linux (including Steam OS and Chrome OS). MacOS support will
 come soon.</p>
 <p>The Web version can be installed as a Web Application on supported
-browsers: Chrome (desktop and Android), Safari (iOS), and Edge (Windows 10+).
+browsers: Chrome (desktop and Android), Safari (iOS*), and Edge (Windows 10+).
 Installing the web application will allow you to run Kate offline, but you’ll
 have less integration with the underlying device.</p>
 <p>The currently recommended installation options are, in order:</p>
@@ -360,22 +361,22 @@ for the time needed to address security and debugging issues.</p>
 <section id="running-your-own-kate-instance">
 <span id="id2"></span><h3>Running your own Kate instance<a class="headerlink" href="#running-your-own-kate-instance" title="Link to this heading">#</a></h3>
 <p>Rather than depending on the public instance, you can run your own private
-Kate instance on any server. To do so, please download the <code class="docutils literal notranslate"><span class="pre">kate-www.zip</span></code>
-file from the
+Kate instance on any server. To do so, please download <code class="docutils literal notranslate"><span class="pre">kate-www.zip</span></code>
+from the
 <a class="reference external" href="https://github.com/qteatime/kate/releases">Kate Releases page on GitHub</a>,
-then put this file in your server.</p>
-<p>If you don’t know how to run a web server, or would rather not manage a
-server on your own, but still want the added control and privacy of having
-your own Kate instance, services like Netlify or Digital Ocean’s App Platform
-will let you upload the zip file above and get a managed server. Be sure to
-check their usage prices and compare before you sign up for anything.
-Other similar managed services exist elsewhere.</p>
+then put the contents of this archive in your server.</p>
+<p>If you don’t know how to run a web server (or would rather not manage a
+server on your own) but still want the added control and privacy of having
+your own Kate instance, services like Cloudflare’s Pages, Netlify, or
+Digital Ocean’s App Platform will let you upload the zip file above and
+get a managed server. Be sure to check their usage prices and compare
+before you sign up for anything. Other similar managed services exist elsewhere.</p>
 <div class="admonition important">
 <p class="admonition-title">Important</p>
 <p>Kate <strong>must absolutely be served over HTTPS, with a valid SSL certificate</strong>.
-Again, managed services will handle this for you automatically,
+Managed services will generally handle this for you automatically,
 but if you’re running your own server you’ll need to configure a proper
-HTTPS connection, as most of the browser APIs that Kate relies are not
+HTTPS connection yourself. Most of the browser APIs that Kate relies are not
 available over unencrypted HTTP.</p>
 </div>
 </section>
@@ -394,7 +395,9 @@ browser and operating system, then:</p>
 <li><p>On <strong>Android</strong>: open the page in Google Chrome, then choose <code class="docutils literal notranslate"><span class="pre">Install</span> <span class="pre">app</span></code>
 from the menu;</p></li>
 <li><p>On <strong>Chrome for Windows/Linux</strong>: you’ll find the <code class="docutils literal notranslate"><span class="pre">Install</span></code> button in the
-address bar.</p></li>
+address bar;</p></li>
+<li><p>On <strong>iOS</strong>: you can use the <code class="docutils literal notranslate"><span class="pre">Add</span> <span class="pre">to</span> <span class="pre">Home</span> <span class="pre">Screen</span></code> under the “share” option
+in the browser;</p></li>
 </ul>
 <p>You might also be prompted to install the page as an App when you first visit it.</p>
 </section>
@@ -405,7 +408,7 @@ then have it added to your Steam library as a “non-steam game”. This allows
 you to access Kate directly from Steam’s gaming mode, and consequently play
 any Kate game from there as well.</p>
 <p>However, Chrome runs using <a class="reference external" href="https://flatpak.org/">Flatpak</a> by default, and
-the default sandbox configuration is a bit too restrictive for running Kate
+the sandbox configuration is a bit too restrictive for installing Kate
 properly. Enabling Kate in Steam Deck’s gaming mode thus takes a little bit
 of effort and some being comfortable with running commands in the command line.
 All of the configuration below has to be done in the Deck’s desktop mode.</p>
@@ -441,12 +444,14 @@ following:</p>
 </pre></div>
 </div>
 <p>The additional <code class="docutils literal notranslate"><span class="pre">--start-fullscreen</span></code> and <code class="docutils literal notranslate"><span class="pre">--no-default-browser-check</span></code> are
-optional, but you’ll usually want to run Kate in fullscreen on the Deck.</p>
+optional, but you’ll usually want to run Kate in fullscreen on the Deck. The
+<code class="docutils literal notranslate"><span class="pre">--no-default-browser-check</span></code> flag just suppresses Chrome asking you to make
+it your default browser.</p>
 </dd>
 <dt><strong>Allow Chrome to read the Steam gamepad input (and other devices):</strong></dt><dd><p>By default Chrome will not have access to read gamepad input because it
 interacts with gamepads through <a class="reference external" href="https://en.wikipedia.org/wiki/Udev">udev</a>
-and the flatpak does not grant access to it on the basis that the API is
-not stable.</p>
+and the flatpak does not grant access to it (on the basis of the API being
+unstable).</p>
 <p>Since Steam Deck is a fairly specific device with a fairly specific OS,
 you can give Chrome read-only access to it to get the gamepad working.</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>flatpak<span class="w"> </span>--override<span class="w"> </span>--user<span class="w"> </span>--filesystem<span class="o">=</span>/run/udev:ro<span class="w"> </span>com.google.Chrome
@@ -454,11 +459,11 @@ you can give Chrome read-only access to it to get the gamepad working.</p>
 </div>
 </dd>
 <dt><strong>Add Kate to your library as a non-Steam game:</strong></dt><dd><p>To launch Kate from the Deck’s gaming mode you’ll need to add it to your
-Steam library as a non-Steam game. To do so open the Steam client in
+Steam library as a non-Steam game. To do so, open the Steam client in
 desktop mode, then in the bottom left click “Add a Game”, and select
 “Add a Non-Steam Game”.</p>
 <p>From the list that opens search for <code class="docutils literal notranslate"><span class="pre">Kate</span></code> (or the name you gave it if
-you wrote your own <code class="docutils literal notranslate"><span class="pre">.desktop</span></code> file), check the checkbox beside the name,
+you wrote your own <code class="docutils literal notranslate"><span class="pre">.desktop</span></code> file), mark the checkbox beside the name,
 and click “Add selected Programs”.</p>
 <p>That’s it, you can go back to gaming mode.</p>
 </dd>
@@ -474,10 +479,11 @@ file picker is a bit annoying to use with the trackpad.</p>
 <p>Once you can control Kate with the Steam gamepad, press <a class="reference internal" href="../../../_images/berry_32.png"><img alt="Berry button" class="align-middle" src="../../../_images/berry_32.png" style="height: 1em;" /></a> <em>(Berry button)</em>
 (the menu button on the right of the Deck), then select
 <code class="docutils literal notranslate"><span class="pre">Settings</span> <span class="pre">-&gt;</span> <span class="pre">User</span> <span class="pre">Interface</span></code> and switch to Fullscreen Mode.</p>
-<p>You might also want to swap <a class="reference internal" href="../../../_images/ok_32.png"><img alt="Ok button (a.k.a. O)" class="align-middle" src="../../../_images/ok_32.png" style="height: 1em;" /></a> and <a class="reference internal" href="../../../_images/cancel_32.png"><img alt="Cancel button (a.k.a. X)" class="align-middle" src="../../../_images/cancel_32.png" style="height: 1em;" /></a> in
+<p>If you’re used to Steam’s gamepad layout you might also want to swap
+<a class="reference internal" href="../../../_images/ok_32.png"><img alt="Ok button (a.k.a. O)" class="align-middle" src="../../../_images/ok_32.png" style="height: 1em;" /></a> and <a class="reference internal" href="../../../_images/cancel_32.png"><img alt="Cancel button (a.k.a. X)" class="align-middle" src="../../../_images/cancel_32.png" style="height: 1em;" /></a> in
 <code class="docutils literal notranslate"><span class="pre">Settings</span> <span class="pre">-&gt;</span> <span class="pre">Controller</span> <span class="pre">&amp;</span> <span class="pre">Sensors</span> <span class="pre">-&gt;</span> <span class="pre">Control</span> <span class="pre">Kate</span> <span class="pre">with</span> <span class="pre">a</span> <span class="pre">standard</span> <span class="pre">gamepad</span> <span class="pre">-&gt;</span>
 <span class="pre">Configure</span> <span class="pre">standard</span> <span class="pre">mapping</span></code>. By default you confirm things in Kate with
-the <code class="docutils literal notranslate"><span class="pre">B</span></code> button on the deck, and cancel with <code class="docutils literal notranslate"><span class="pre">A</span></code>, but Steam OS uses the
+the <code class="docutils literal notranslate"><span class="pre">B</span></code> button on the Deck, and cancel with <code class="docutils literal notranslate"><span class="pre">A</span></code>, but Steam OS uses the
 opposite configuration out of the box.</p>
 </dd>
 </dl>
@@ -485,7 +491,7 @@ opposite configuration out of the box.</p>
 <section id="caveats">
 <h3>Caveats<a class="headerlink" href="#caveats" title="Link to this heading">#</a></h3>
 <p>Using the public Kate instance is practical, but depends on a website that
-is external to your device. As such, it’s not the recommended option for
+is external to your device. It’s not the recommended option for
 video game archival.</p>
 <p>The security properties depend on the domain it uses (<code class="docutils literal notranslate"><span class="pre">kate.qteati.me</span></code>)
 taking you to the same computer for ever. Since the authors of Kate are
@@ -498,6 +504,9 @@ to a different computer) would allow the attacker to have access to all
 information locally stored in Kate in your device, and any additional
 permissions you’ve granted the domain; this poses a significant risk,
 but the risk applies to web sites in general.</p>
+<p>To avoid these issues you might consider <a class="reference internal" href="#running-your-own-kate-instance">running your own Kate instance</a>.
+You’d follow the same instructions to install it as a PWA, but with the
+domain pointing to your instance, of course.</p>
 </section>
 </section>
 <section id="native-application">
@@ -609,13 +618,14 @@ avoid any network requests.</p>
 </section>
 <section id="building-kate">
 <h4>Building Kate<a class="headerlink" href="#building-kate" title="Link to this heading">#</a></h4>
-<p>After setting up, you can run <code class="docutils literal notranslate"><span class="pre">node</span> <span class="pre">make</span> <span class="pre">all</span></code> to build all Kate components:</p>
+<p>After setting up you can run <code class="docutils literal notranslate"><span class="pre">node</span> <span class="pre">make</span> <span class="pre">all</span></code> to build all Kate components:</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>node<span class="w"> </span>make<span class="w"> </span>all
 </pre></div>
 </div>
 <p>This will give you a working Kate emulator. You can try it by either running
 <code class="docutils literal notranslate"><span class="pre">node</span> <span class="pre">make</span> <span class="pre">desktop:run</span></code> (to run it as an Electron app), or starting a
-server on the <code class="docutils literal notranslate"><span class="pre">www/</span></code> folder and pointing a modern browser there.</p>
+server on the <code class="docutils literal notranslate"><span class="pre">www/</span></code> folder (<code class="docutils literal notranslate"><span class="pre">node</span> <span class="pre">make</span> <span class="pre">server:start</span></code> works) and pointing
+a modern browser there.</p>
 <p>You should see a screen similar to the screenshot below. Download the
 <code class="docutils literal notranslate"><span class="pre">example-cartridges.zip</span></code> file from the <a class="reference external" href="https://github.com/qteatime/kate/releases">Kate releases page</a>, extract it,
 then drag-and-drop any of the <code class="docutils literal notranslate"><span class="pre">.kart</span></code> files over the console to install.
@@ -682,14 +692,23 @@ web version of Kate has been tested and runs on the following browsers:</p>
 </tbody>
 </table>
 </div>
-<p>Safari on iOS is not currently supported, and Safari on MacOS is not currently
-tested. Once the missing features are implemented in Safari, these will be
-added to the table above as well.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Safari on iOS is currently unsupported as <a class="reference external" href="https://bugs.webkit.org/show_bug.cgi?id=231706">Apple does not implement the
+file system standard</a>.
+Kate’s cartridge installation depends on this API to have reasonable
+memory usage and proper storage isolation. A work-around for this
+(with higher memory usage on iOS) should happen before the stable release
+if Apple doesn’t fix their implementation first.</p>
+<p>Video capture on iOS is also currently unsupported due to Apple not
+implementing support for webm.</p>
+</div>
 <p>Installing the web app works in the following device/OSs:</p>
 <ul class="simple">
 <li><p><strong>Android</strong>: only with Chrome for Android;</p></li>
 <li><p><strong>Windows 10+</strong>: only with Microsoft Edge;</p></li>
 <li><p><strong>Chrome (Desktop)</strong>: supported on Windows and Linux;</p></li>
+<li><p><strong>iOS</strong>: only with Safari;</p></li>
 </ul>
 </section>
 <section id="native-version">
@@ -748,7 +767,7 @@ stopped supporting those versions in Chromium.</p>
         <div class="bottom-of-page">
           <div class="left-details">
             <div class="copyright">
-                Copyright &#169; 2023, Niini
+                Copyright &#169; 2023-2024, Niini
             </div>
             Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
             
@@ -812,7 +831,7 @@ stopped supporting those versions in Chromium.</p>
       
     </aside>
   </div>
-</div><script src="../../../_static/documentation_options.js?v=1b0dedb3"></script>
+</div><script src="../../../_static/documentation_options.js?v=594d7d3c"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/scripts/furo.js?v=32e29ea5"></script>

@@ -102,7 +102,7 @@ why the cartridge needs this capability.
 This reason is never shown to the user *for risk assessment decision*,
 because malicious cartridges could literally write anything there and
 mislead users regarding what risks they'd be taking. Rather, it's used
-for store reviews and additional clarification for the user *after being
+for catalog reviews and additional clarification for the user *after being
 informed of all risks*.
 
 Additionally, capabilities have an associated "risk category". This is
@@ -142,8 +142,8 @@ and in the process end up causing a lot more harm to users.
 
 Kate's approach to capability management is derived from the work in Crochet,
 but also inspired by capability management in mobile OSs and web browsers.
-We want to shif the burden, as much as possible, to cartridge authors and
-store administrators, rather than cartridge users. This way we can leave users
+We want to shift the burden, as much as possible, to cartridge authors and
+catalog administrators, rather than cartridge users. This way we can leave users
 in charge of deciding the amount of risk they're comfortable with taking.
 
 To that end Kate makes the following choices:

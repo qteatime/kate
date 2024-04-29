@@ -7,8 +7,8 @@ bridge you must also provide the canvas to be the target of screenshots and
 video captures.
 
 
-Using in Kart
--------------
+Using in your build configuration
+---------------------------------
 
 To add this bridge to your cartridge you specify the following in your
 ``kate.json`` configuration:

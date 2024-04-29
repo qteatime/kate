@@ -15,6 +15,13 @@ emulation and translation techniques to make this possible.
 
 .. important::
 
+  The importer works by creating a cartridge from the game's contents and
+  copying this cartridge into your console's storage. Some games' licence
+  terms have provisions against copying their data to other locations than
+  e.g.: the disc or media they were published in. You're still responsible
+  for making sure your usage of the importer aligns with the EULA and
+  other licences of the games you're importing.
+
   Cartridges installed by the Importer are explicitly marked ``unofficial``.
   As long as the original developers have not officially released the game
   for Kate, you should treat all issues you see in an imported games as
@@ -33,13 +40,12 @@ Getting the Importer
 --------------------
 
 The Kate Importer is released as a standard cartridge. Download the
-``standard-cartridges.zip`` file from either the
+``kate-importer.kart`` file from either the
 `GitHub releases page <https://github.com/qteatime/kate/releases>`_ or the
-`Itch.io stable mirror <https://qteatime.itch.io/kate-importer>`_. You'll
-find the importer cartridge inside this ZIP file.
+`Itch.io stable mirror <https://cute-the-niini.itch.io/kate-importer>`_.
 
-To install, you can drag-and-drop the ``kate-importer.kart`` file on a Kate
-emulator, or use |btn_berry_text| to bring the context menu and select
+To install, you can drag-and-drop the cartridge file on a Kate
+emulator window, or use |btn_berry_text| to bring the context menu and select
 ``Install cartridge...``.
 
 

@@ -1,5 +1,5 @@
-#K0006 — Cartridge signatures
-=============================
+#K0007 — Secure key store
+=========================
 
 :Author: Niini
 :Started: 2024-01-23

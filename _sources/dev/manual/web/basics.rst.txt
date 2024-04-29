@@ -174,7 +174,7 @@ These code snippets are called :doc:`Bridges </dev/manual/web/bridges/index>`, a
 for them, since they impact performance in general.
 
 For example, if a cartridge opts in for the :doc:`Network Proxy </dev/manual/web/bridges/network-proxy>` bridge,
-Kate will inject code that allows APIs such as `fetch <https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API>`, or dynamically
+Kate will inject code that allows APIs such as `fetch <https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API>`_, or dynamically
 setting the ``src`` property of an image, to read data from the cartridge
 file system instead of making a network request.
 
@@ -189,7 +189,7 @@ That is, when the following code is run:
   document.querySelector("#game").append(bg);
 
 It will have equivalent behaviour to the following code, but without any
-code changes being needed:
+code changes by the cartridge author:
 
 .. code-block:: javascript
   :emphasize-lines: 1,2,3,5

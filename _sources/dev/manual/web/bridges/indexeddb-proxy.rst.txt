@@ -7,8 +7,8 @@ will allow it to work in Kate by converting IndexedDB operations to work on the
 use the versioned or unversioned partition when instantiating this bridge.
 
 
-Using in Kart
--------------
+Using in your build configuration
+---------------------------------
 
 To add this bridge to your cartridge you specify the following in your
 ``kate.json`` configuration:

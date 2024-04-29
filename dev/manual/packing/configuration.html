@@ -1,0 +1,892 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../../">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Kate Porting Recipes" href="../../port/index.html" /><link rel="prev" title="Getting started" href="getting-started.html" />
+
+    <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
+        <title>Configuration files - Kate 0.25 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=82a976d7" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=135e06be" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo-extensions.css?v=36a5483c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css?v=d1035e3f" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #ffffff;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+<div class="announcement">
+  <aside class="announcement-content">
+     Both Kate and this documentation are a work in progress and may change at any time. 
+  </aside>
+</div>
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../../index.html"><div class="brand">Kate 0.25 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../index.html">
+  
+  
+  <span class="sidebar-brand-text">Kate 0.25 documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">End-user books</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../user/manual/index.html">The Kate User Manual</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of The Kate User Manual</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../user/manual/intro/index.html">Getting started</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of Getting started</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../user/manual/intro/hardware.html">Tech specs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../user/manual/intro/emulator.html">Emulator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../user/manual/intro/install.html">Installing</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../user/manual/gaming/index.html">Playing games</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of Playing games</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../user/manual/gaming/cartridges.html">ROM Cartridges</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../user/manual/gaming/captures.html">Screen recording</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../user/manual/gaming/save-data.html">Save data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../user/manual/gaming/play-habits.html">Play habits</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../user/manual/gaming/storage.html">Stored data</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../user/manual/security/index.html">Security and privacy</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of Security and privacy</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../user/manual/security/philosophy.html">Safety philosophy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../user/manual/security/sandboxing.html">Sandboxing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../user/manual/security/privacy.html">Privacy policy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../user/manual/security/trust.html">Trust and consent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../user/manual/security/audit.html">Audit logs</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../user/importer/index.html">The Kate Importer Manual</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle navigation of The Kate Importer Manual</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../user/importer/renpy.html">Ren’Py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user/importer/bitsy.html">Bitsy</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../user/diy/index.html">Build Your Own Console!</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle navigation of Build Your Own Console!</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../user/diy/overview/index.html">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../user/diy/hardware/index.html">The hardware</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Game developer books</span></p>
+<ul class="current">
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../index.html">Making games for Kate!</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><div class="visually-hidden">Toggle navigation of Making games for Kate!</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2 has-children"><a class="reference internal" href="../intro/index.html">Getting started</a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" role="switch" type="checkbox"/><label for="toctree-checkbox-8"><div class="visually-hidden">Toggle navigation of Getting started</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../intro/why.html">Why make games for Kate?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../intro/setup.html">What will you need?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../intro/hello-world.html">Hello, World</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../model/index.html">Programming model</a><input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" role="switch" type="checkbox"/><label for="toctree-checkbox-9"><div class="visually-hidden">Toggle navigation of Programming model</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../model/overview.html">Overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../model/cartridges.html">Cartridges</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../model/sandboxing.html">Sandboxing and APIs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../model/capabilities.html">Capabilities</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../api/index.html">Kate API</a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" role="switch" type="checkbox"/><label for="toctree-checkbox-10"><div class="visually-hidden">Toggle navigation of Kate API</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../api/events.html"><code class="docutils literal notranslate"><span class="pre">events</span></code> — Event handling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/cart-fs.html"><code class="docutils literal notranslate"><span class="pre">cart_fs</span></code> — Reading files</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/input.html"><code class="docutils literal notranslate"><span class="pre">*_input</span></code> — Reacting to player input</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/timer.html"><code class="docutils literal notranslate"><span class="pre">timer</span></code> — Scheduling updates</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/capture.html"><code class="docutils literal notranslate"><span class="pre">capture</span></code> — Screenshots and video recording</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/store.html"><code class="docutils literal notranslate"><span class="pre">store</span></code> — Saving state</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/browser.html"><code class="docutils literal notranslate"><span class="pre">browser</span></code> — Navigating to URLs</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../web/index.html">Web game support</a><input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" role="switch" type="checkbox"/><label for="toctree-checkbox-11"><div class="visually-hidden">Toggle navigation of Web game support</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../web/basics.html">Basics of porting</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../web/bridges/index.html">Bridges</a><input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" role="switch" type="checkbox"/><label for="toctree-checkbox-12"><div class="visually-hidden">Toggle navigation of Bridges</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../web/bridges/network-proxy.html">Network proxy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../web/bridges/input-proxy.html">Button input proxy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../web/bridges/pointer-input-proxy.html">Pointer input proxy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../web/bridges/local-storage-proxy.html">Local storage proxy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../web/bridges/indexeddb-proxy.html">IndexedDB proxy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../web/bridges/external-url-handler.html">External URL handler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../web/bridges/preserve-webgl-render.html">Preserve WebGL Render</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../web/bridges/capture-canvas.html">Capture canvas</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../web/bridges/renpy-tweaks.html">Ren’Py tweaks</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2 current has-children"><a class="reference internal" href="index.html">Packaging cartridges</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" role="switch" type="checkbox"/><label for="toctree-checkbox-13"><div class="visually-hidden">Toggle navigation of Packaging cartridges</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="getting-started.html">Getting started</a></li>
+<li class="toctree-l3 current current-page"><a class="current reference internal" href="#">Configuration files</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../port/index.html">Kate Porting Recipes</a><input class="toctree-checkbox" id="toctree-checkbox-14" name="toctree-checkbox-14" role="switch" type="checkbox"/><label for="toctree-checkbox-14"><div class="visually-hidden">Toggle navigation of Kate Porting Recipes</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../port/bitsy.html">Bitsy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../port/renpy.html">Ren’Py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../port/godot.html">Godot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../port/rpg-maker.html">RPG Maker MV</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../port/gamemaker.html">GameMaker</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Design and implementation</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../design/index.html">Kate’s Design Documents</a><input class="toctree-checkbox" id="toctree-checkbox-15" name="toctree-checkbox-15" role="switch" type="checkbox"/><label for="toctree-checkbox-15"><div class="visually-hidden">Toggle navigation of Kate’s Design Documents</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../design/formats/F0001-ljt.html">#F0001 — The LJT language</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../design/formats/F0002-kart.html">#F0002 — KART cartridges</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../design/kernel/K0001-capabilities.html">#K0001 — Capabilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../design/kernel/K0002-live-audit.html">#K0002 — Live auditing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../design/kernel/K0003-resource-band.html">#K0003 — Resource band</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../design/kernel/K0004-processes.html">#K0004 — Processes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../design/kernel/K0005-partitioned-file-storage.html">#K0005 — Partitioned File Storage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../design/kernel/K0006-cartridge-signatures.html">#K0006 — Cartridge signatures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../design/kernel/K0007-key-store.html">#K0007 — Secure key store</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../design/api/A0001-object-storage.html">#A0001 — Object Store API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../design/api/A0002-external-url.html">#A0002 — External URL navigation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../design/api/A0003-device-file-access.html">#A0003 — Device file access</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Changes, Terms, and Credits</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../etc/releases/index.html">Release notes</a><input class="toctree-checkbox" id="toctree-checkbox-16" name="toctree-checkbox-16" role="switch" type="checkbox"/><label for="toctree-checkbox-16"><div class="visually-hidden">Toggle navigation of Release notes</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../etc/releases/0.25.html">Kate v0.25  (Spring 2024)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../etc/releases/0.23.10.html">Kate v0.23.10  (October 2023)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../etc/releases/0.23.8.html">Kate v0.23.8  (August 2023)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../etc/releases/0.23.6.html">Kate v0.23.6  (June 2023)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../etc/releases/0.23.5.html">Kate v0.23.5  (May 2023)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../etc/releases/0.23.4.html">Kate v0.23.4  (April 2023)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../etc/licence.html">Terms of use</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Indices and Tables</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../genindex.html">Index</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../py-modindex.html">Module Index</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/qteatime/kate/edit/main/docs/source/dev/manual/packing/configuration.rst" title="Edit this page">
+    <svg aria-hidden="true" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <path d="M4 20h4l10.5 -10.5a1.5 1.5 0 0 0 -4 -4l-10.5 10.5v4" />
+      <line x1="13.5" y1="6.5" x2="17.5" y2="10.5" />
+    </svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          <section id="configuration-files">
+<h1>Configuration files<a class="headerlink" href="#configuration-files" title="Link to this heading">#</a></h1>
+<p>Kate cartridge packaging tools rely on a JSON configuration file
+(commonly named <code class="docutils literal notranslate"><span class="pre">kate.json</span></code>) to describe how to create the cartridge
+and what to include in it.</p>
+<p>This configuration is made out of the following sections:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code> — a string with the cartridge identifier. Follows rules specified
+in <a class="reference internal" href="../model/cartridges.html#cartridge-identification"><span class="std std-ref">Identification</span></a>;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">version</span></code> — a unique identification for the specific cartridge release;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">release</span></code> — the date of release for the cartridge. May be used to warn
+users about link rotting and other time-sensitive issues;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">metadata</span></code> — information used to display and filter the cartridge in the
+Kate library;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">files</span></code> — describes which files to include in the cartridge file;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">security</span></code> — describes additional capabilities for the cartridge which
+require user consent or that might cause harm when misused/abused;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">platform</span></code> — describes how to run the cartridge;</p></li>
+</ul>
+<section id="file-location">
+<h2>File location<a class="headerlink" href="#file-location" title="Link to this heading">#</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">kate.json</span></code> configuration file is generally placed in the root of
+your game directory—that is, at the same level as your HTML entrypoint:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>+--.
+   |
+   |---o kate.json
+   |---o kate-thumbnail.png
+   |---o index.html
+   |---+ images/
+   `---+ audio/
+</pre></div>
+</div>
+<p>But sometimes it makes sense to place the configuration file outside of
+your game’s root directory. For example, Ren’Py web distributions modify
+the contents of the whole build directory, so you’ll want to have the Kate
+files somewhere Ren’Py won’t touch:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>+--.
+   |
+   |---o kate.json
+   |---o kate-thumbnail.png
+   `---+ renpy-game-1.0-web
+       |
+       |--o index.html
+       |--o game.zip
+       |--+ game/
+       (...)
+</pre></div>
+</div>
+<p>To accomodate these cases, the configuration file accepts a <code class="docutils literal notranslate"><span class="pre">root</span></code> option,
+which changes the root directory of the game to a different folder contained
+in the directory holding the <code class="docutils literal notranslate"><span class="pre">kate.json</span></code> file <a class="footnote-reference brackets" href="#f1" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>.</p>
+<p>When using this option, a configuration file looks like this:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;namespace/game&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;root&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;renpy-game-1.0-web&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="err">...</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="f1" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>It’s not possible to use the <code class="docutils literal notranslate"><span class="pre">root</span></code> option to point to a directory
+that’s outside of the directory containing your <code class="docutils literal notranslate"><span class="pre">kate.json</span></code> file
+for security reasons. If we allowed that, then a configuration file
+would be able to instruct the packaging tool to read and include in the
+cartridge any file in your computer, including sensitive ones like private
+keys, stored passwords, or personal photos!</p>
+</aside>
+</aside>
+</section>
+<section id="identification">
+<h2>Identification<a class="headerlink" href="#identification" title="Link to this heading">#</a></h2>
+<p>Besides the <code class="docutils literal notranslate"><span class="pre">id</span></code> field, the top-level part of the cartridge also
+contains:</p>
+<dl>
+<dt>release <em>(optional)</em></dt><dd><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">{year:</span> <span class="pre">integer,</span> <span class="pre">month:</span> <span class="pre">integer,</span> <span class="pre">day:</span> <span class="pre">integer}</span></code></div>
+<div class="line">The date in which the cartridge was released. Defaults to the current
+date. This helps players sort catalog entries and their library by
+recency, or look for releases in a particular time-frame.</div>
+</div>
+<p>E.g.: <code class="docutils literal notranslate"><span class="pre">{year:</span> <span class="pre">2023,</span> <span class="pre">month:</span> <span class="pre">6,</span> <span class="pre">day:</span> <span class="pre">10}</span></code></p>
+</dd>
+<dt>version</dt><dd><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">{major:</span> <span class="pre">integer,</span> <span class="pre">minor:</span> <span class="pre">integer}</span></code></div>
+<div class="line">The version of the cartridge. Must be unique per release, since Kate will
+do nothing if a player tries to install a cartridge when there’s something
+with the same id and version already installed
+(even if the contents differ). See <a class="reference internal" href="../model/cartridges.html#cartridge-versioning"><span class="std std-ref">Versioning</span></a> for details.</div>
+</div>
+<p>E.g.: <code class="docutils literal notranslate"><span class="pre">{major:</span> <span class="pre">1,</span> <span class="pre">minor:</span> <span class="pre">13}</span></code></p>
+</dd>
+</dl>
+</section>
+<section id="metadata">
+<h2>Metadata<a class="headerlink" href="#metadata" title="Link to this heading">#</a></h2>
+<p>The metadata section is further divided into several subsections:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">presentation</span></code> — provides information about how to display the game
+throughout Kate (e.g.: in the library or in the catalog);</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">classification</span></code> — provides information for categorising and filtering
+the game in the catalog and library, this includes things like the genre
+of the game, but also things like age rating;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">legal</span></code> — provides information about the usage terms of the cartridge
+and the users’ rights. This includes things like licence information,
+third party IP notices, but also things like privacy policy;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">accessibility</span></code> — provides information about how the game is played. This
+of course includes things like what accessibility provisions the game offers,
+such as high-contrast or voiced text, but also things like what input methods
+are supported, which languages the game offers, how long it takes to complete
+the game, etc.</p></li>
+</ul>
+<section id="presentation">
+<h3>Presentation<a class="headerlink" href="#presentation" title="Link to this heading">#</a></h3>
+<dl>
+<dt>author</dt><dd><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">string</span></code></div>
+<div class="line">A descriptive name identifying who made the game. Will show up on the catalog
+and in the detailed cartridge information screen. Up to 255 characters <a class="footnote-reference brackets" href="#f2" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.</div>
+</div>
+</dd>
+<dt>title</dt><dd><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">string</span></code></div>
+<div class="line">A descriptive name identifying the game itself. Will show up under the
+cartridge’s thumbnail in the library, and everywhere else the cartridge
+is displayed. Up to 255 characters <a class="footnote-reference brackets" href="#f2" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.</div>
+</div>
+</dd>
+<dt>tagline</dt><dd><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">string</span></code></div>
+<div class="line">A very short description of the game. This will show up on the catalog and
+in the game information screen. Up to 255 characters <a class="footnote-reference brackets" href="#f2" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.</div>
+</div>
+</dd>
+<dt>description <em>(optional)</em></dt><dd><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">string</span></code></div>
+<div class="line">A free-text description of the game. Might include a summary, features
+players might expect, and similar text to what is generally found in
+the catalog. Up to 10,000 (ten thousand) characters <a class="footnote-reference brackets" href="#f2" id="id5" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.</div>
+</div>
+</dd>
+<dt>release_type <em>(recommended)</em></dt><dd><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">string</span></code></div>
+<div class="line">Tells players what kind of stability and polish they should expect from
+the cartridge. The default is <code class="docutils literal notranslate"><span class="pre">regular</span></code>, which means a proper, stable, and
+polished release.</div>
+</div>
+<p>Can be one of:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">prototype</span></code> — the game is more of a proof-of-concept than an actual game.
+Players shouldn’t expect polish, stability, or completeness of the contents.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">early-access</span></code> — the game is being released to gather early feedback.
+Players should expect a less polished, less stable, and incomplete
+experience.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">beta</span></code> — the game is complete, but looking for more feedback and testing.
+Players should expect a more polished and complete experience, but they
+should expect there to be bugs.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">demo</span></code> — the game is a portion of a bigger vision, but this portion is
+complete in this release. Players should still expect a polished and stable
+experience.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">regular</span></code> — this is for proper stable releases. Players should expect regular
+releases to be polished, complete, and stable.</p></li>
+</ul>
+</dd>
+<dt>thumbnail_path <em>(recommended)</em></dt><dd><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">string</span></code></div>
+<div class="line">A path to a PNG image to use as the cartridge cover when displaying
+the cartridge across Kate (e.g.: in the start screen and in the library).
+The path is relative to the root defined in the configuration file.</div>
+</div>
+<p>The image should have a 4:7 aspect ratio, and the recommended resolution
+is 400x700 pixels.</p>
+</dd>
+<dt>banner_path <em>(recommended)</em></dt><dd><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">string</span></code></div>
+<div class="line">A path to a PNG image to use as a banner at the top of the game information
+screen, and also in the game’s catalog page.</div>
+</div>
+<p>The image should have 1200x200 pixels.</p>
+</dd>
+</dl>
+</section>
+<section id="classification">
+<h3>Classification<a class="headerlink" href="#classification" title="Link to this heading">#</a></h3>
+<dl>
+<dt>genre <em>(recommended)</em></dt><dd><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">array</span> <span class="pre">of</span> <span class="pre">string</span></code></div>
+<div class="line">A list of genres that the game might be classified as, with a maximum of
+10 items. This is used for organising the cartridge library and allow
+players to search for things they want to play.</div>
+</div>
+<p>The list of genres is pre-defined and can be one of the following:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">action</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">fighting</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">adventure</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">interactive-fiction</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">platformer</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">puzzle</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">racing</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rhythm</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rpg</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">simulation</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">shooter</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sports</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">strategy</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tool</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">visual-novel</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">other</span></code></p></li>
+</ul>
+<p>The default is <code class="docutils literal notranslate"><span class="pre">other</span></code>, if no list of genres is provided.</p>
+</dd>
+<dt>tag <em>(optional)</em></dt><dd><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">array</span> <span class="pre">of</span> <span class="pre">string</span></code></div>
+<div class="line">A list of additional tags that help players search for cartridges and
+organise their library. You can specify up to 10 tags, so you shouldn’t
+use them to repeat things already conveyed by your set of genres.</div>
+</div>
+<p>Each tag can have up to 255 characters <a class="footnote-reference brackets" href="#f2" id="id6" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>, and must consist entirely
+of lower-case latin letters and hyphens. E.g.: <code class="docutils literal notranslate"><span class="pre">visual-novel</span></code> is a
+valid tag, but <code class="docutils literal notranslate"><span class="pre">visual</span> <span class="pre">novel</span></code> is not, because of the white space.
+Neither is <code class="docutils literal notranslate"><span class="pre">café-simulator</span></code>, because of the accent on <code class="docutils literal notranslate"><span class="pre">e</span></code>.</p>
+</dd>
+<dt>rating <em>(recommended)</em></dt><dd><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">string</span></code></div>
+<div class="line">The age-appropriateness rating of the cartridge, based on the author’s
+perspective. You should provide this as the default is <code class="docutils literal notranslate"><span class="pre">unknown</span></code>, which
+is treated in the same manner as <code class="docutils literal notranslate"><span class="pre">explicit</span></code>, and therefore considered
+adult-only content regardless of what the actual cartridge content is.</div>
+</div>
+<p>Can be one of:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">general</span></code> — no age restrictions deemed necessary by the author;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">teen-and-up</span></code> — 13+-ish;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mature</span></code> — 17+-ish;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">explicit</span></code> — 18+-ish;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">unknown</span></code> — not rated, but same as <code class="docutils literal notranslate"><span class="pre">explicit</span></code>.</p></li>
+</ul>
+<p>See <a class="reference internal" href="../model/cartridges.html#cartridge-rating"><span class="std std-ref">Cartridge Content Rating</span></a> for details.</p>
+</dd>
+<dt>warnings <em>(recommended)</em></dt><dd><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">string</span></code></div>
+<div class="line">This is a free text (up to 1,000 characters <a class="footnote-reference brackets" href="#f2" id="id7" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>) where you can provide
+any warnings to the player about the content so they can make a more
+informed choice about playing it and avoid dangerous situations. The text
+will be shown as-is to players on the catalog and on the cartridge details
+page, as well as before installing or playing it for the first time.</div>
+</div>
+<p>We expect at least warnings for common triggers, as these can start a
+panic attack episode on players suffering from some form of trauma, or lead
+to other medical emergencies such as epileptic seizures.</p>
+</dd>
+</dl>
+</section>
+<section id="legal">
+<h3>Legal<a class="headerlink" href="#legal" title="Link to this heading">#</a></h3>
+<dl>
+<dt>licence_path <em>(recommended)</em></dt><dd><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">string</span></code></div>
+<div class="line">A path to a text file describing the terms of use of the cartridge and
+any additional credits or licences for data that the cartridge uses.
+This is the place where you should e.g.: put licences from assets and
+code that you use in your game, but which was not made by you.</div>
+</div>
+<p>Kate will allow players to read through this file from the cartridge’s
+context menu. See <a class="reference internal" href="../model/cartridges.html#cartridge-usage-terms"><span class="std std-ref">Usage terms</span></a> for details.</p>
+</dd>
+<dt>privacy_policy_path <em>(recommended)</em></dt><dd><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">string</span></code></div>
+<div class="line">A path to a text file describing what privacy guarantees the cartridge
+provides. This <strong>must</strong> be provided if the cartridge requires access
+to the internet or provides links to pages on the internet.</div>
+</div>
+<p>Privacy policy files should be written in a clear, direct, and informative
+style. They’re primarily meant to provide users with enough information to make
+an informed decision about using the cartridge or not based on their own
+personal risks, not to be a legal document to protect the author of the
+cartridge of any claimed damages — keep that in the legal notices file.</p>
+<p>Kate will allow players to read through this file from the cartridge’s
+context menu, and also from the catalog. See <a class="reference internal" href="../model/cartridges.html#cartridge-usage-terms"><span class="std std-ref">Usage terms</span></a>
+for details.</p>
+</dd>
+<dt>derivative_policy <em>(recommended)</em></dt><dd><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">string</span></code></div>
+<div class="line">Whether the author allows derivative works (e.g.: mods) to be made of
+the cartridge; and if so what limitations are in place for derivative
+works.</div>
+</div>
+<p>The default is <code class="docutils literal notranslate"><span class="pre">personal-use</span></code>, which allows players to modify the
+cartridge <em>strictly</em> for their own personal use, but not share any
+modifications. These provisions exist so players with special accessibility
+needs can use a cartridge even if the cartridge was not made with them
+in mind.</p>
+<p>Can be one of:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">not-allowed</span></code> — No derivative works or modifications are allowed, not
+even for personal use. This is the common case for more restrictive
+proprietary licences for games.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">personal-use</span></code> — The users are allowed to modify the cartridge for their
+own use, but they are not allowed to share any modification they make.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">non-commercial-use</span></code> — The users are allowed to modify the cartridge,
+and are allowed to share modified cartridges as long as there’s no
+commercial usage of the modified cartridge.</p>
+<p>This is not limited to selling the cartridge directly. For example, using
+a modified cartridge in a café or business, even if patrons are not paying
+to play the cartridge directly, is still considered commercial use.</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">commercial-use</span></code> — The users are allowed to modify the cartridge, there
+are no restrictions in the distribution of derivative works regarding
+commercial use.</p></li>
+</ul>
+<p>Note that regardless of how permissive a cartridge is regarding this policy,
+derivative works are still <em>required</em> to make it clear that they are
+unofficial works, not endorsed by the original author.</p>
+</dd>
+</dl>
+</section>
+<section id="accessibility">
+<h3>Accessibility<a class="headerlink" href="#accessibility" title="Link to this heading">#</a></h3>
+<dl>
+<dt>input_methods <em>(recommended)</em></dt><dd><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">array</span> <span class="pre">of</span> <span class="pre">string</span></code></div>
+<div class="line">A list of methods that players can use to control the game. This allows
+players to decide if they can play your game or not, e.g.: because they
+lack a device you require, or because they have specific accessibility
+needs.</div>
+</div>
+<p>We encourage developers to provide fallback methods where reasonable and
+possible. For example, in a game that uses a mouse/pointing device, you
+can provide support for using the d-pad to approximate that experience
+for players who can’t use precise pointing devices.</p>
+<p>Can be one of:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">kate-buttons</span></code> — the game can be played using the Kate gamepad;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pointer</span></code> — the game can be played using a pointing device, such as mouse;</p></li>
+</ul>
+</dd>
+<dt>languages <em>(recommended)</em></dt><dd><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">array</span> <span class="pre">of</span> <span class="pre">{iso_code:</span> <span class="pre">string,</span> <span class="pre">interface:</span> <span class="pre">boolean,</span> <span class="pre">audio:</span> <span class="pre">boolean,</span> <span class="pre">text:</span> <span class="pre">boolean}</span></code></div>
+<div class="line">A list of languages that the game offers support for, as well as what
+is supported in that language.</div>
+</div>
+<p>The language is described by its
+<a class="reference external" href="https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes">ISO 639-1 code</a>,
+and the additional booleans specify what is supported in that language.
+<code class="docutils literal notranslate"><span class="pre">interface</span></code> means that the GUI is translated, <code class="docutils literal notranslate"><span class="pre">audio</span></code> means that
+voices are translated, and <code class="docutils literal notranslate"><span class="pre">text</span></code> means that the game offers subtitles
+and other text in the language.</p>
+</dd>
+<dt>provisions <em>(recommended)</em></dt><dd><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">array</span> <span class="pre">of</span> <span class="pre">string</span></code></div>
+<div class="line">A list of accessibility provisions that the game offers to allow more
+players to play the game. We always encourage developers to look into
+ways of making their games more accessible. This setting helps players
+who need accessibility options to filter items in the catalog to those
+they can play. The <a class="reference external" href="https://learn.microsoft.com/en-us/gaming/accessibility/guidelines">Xbox Acessibility Guidelines</a>
+are a good resource to get more familiar with accessibility in
+video games.</div>
+</div>
+<p>Can be one of:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">high-contrast</span></code> — helps players with low vision.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">subtitles</span></code> — helps players who can’t rely on audio or have problems understanding the language.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">image-captions</span></code> — helps players who rely on a screen reader.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">voiced-text</span></code> — helps players who rely on a screen reader or have trouble reading text.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">configurable-difficulty</span></code> — helps players who wish to complete the game
+but find themselves unable to cross the game’s difficult barrier.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">skippable-content</span></code> — helps players who may have little time to play or
+different interests in what they want out of the game.</p></li>
+</ul>
+</dd>
+<dt>average_completion <em>(recommended)</em></dt><dd><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">{unit:</span> <span class="pre">&quot;seconds&quot;</span> <span class="pre">|</span> <span class="pre">&quot;minutes&quot;</span> <span class="pre">|</span> <span class="pre">&quot;hours&quot;,</span> <span class="pre">value:</span> <span class="pre">integer}</span></code></div>
+<div class="line">An estimation of the amount of time that it takes to complete one run of
+the game, but not necessarily doing all of the things the game offers.
+This helps players looking for something to play to consider what
+their options are for the free time they have at the moment.</div>
+</div>
+<p>For example, <code class="docutils literal notranslate"><span class="pre">{&quot;unit&quot;:</span> <span class="pre">&quot;seconds&quot;,</span> <span class="pre">&quot;value&quot;:</span> <span class="pre">30}</span></code> and
+<code class="docutils literal notranslate"><span class="pre">{&quot;unit&quot;:</span> <span class="pre">&quot;hours&quot;,</span> <span class="pre">&quot;value&quot;:</span> <span class="pre">20}</span></code> are valid expressions of
+“roughly a few seconds” and “roughly 20 hours”.</p>
+</dd>
+<dt>average_session <em>(recommended)</em></dt><dd><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">{unit:</span> <span class="pre">&quot;seconds&quot;</span> <span class="pre">|</span> <span class="pre">&quot;minutes&quot;</span> <span class="pre">|</span> <span class="pre">&quot;hours&quot;,</span> <span class="pre">value:</span> <span class="pre">integer}</span></code></div>
+<div class="line">An estimation of the amount of time that it takes to complete one
+portion of the game. What a “session” means varies greatly from
+game to game—it could be a level, a chapter, a match, etc.</div>
+</div>
+<p>The format is the same as <code class="docutils literal notranslate"><span class="pre">average_completion</span></code>.</p>
+</dd>
+</dl>
+<p class="rubric">Footnotes</p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="f2" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id2">1</a>,<a role="doc-backlink" href="#id3">2</a>,<a role="doc-backlink" href="#id4">3</a>,<a role="doc-backlink" href="#id5">4</a>,<a role="doc-backlink" href="#id6">5</a>,<a role="doc-backlink" href="#id7">6</a>)</span>
+<p>Packaging tools count the UTF-16 codepoints. So one character might
+count as multiple ones (e.g.: Japanese characters and emojis often count
+as two or more characters).</p>
+</aside>
+</aside>
+</section>
+</section>
+<section id="security">
+<h2>Security<a class="headerlink" href="#security" title="Link to this heading">#</a></h2>
+<dl>
+<dt>capabilities <em>(required)</em></dt><dd><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">list</span> <span class="pre">of</span> <span class="pre">capability</span></code></div>
+<div class="line">The list of capabilities that your cartridge needs to work, and the
+reason why you need them. The reason is not shown to the user in any
+kind of risk assessment, but it’s used for catalog reviews.</div>
+</div>
+<p>A basic capability has the following shape:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;open-urls&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;reason&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Open links to developers&#39; pages in credits&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>You can see all available capabilities in the <a class="reference internal" href="../model/capabilities.html"><span class="doc">Capabilities</span></a>
+section.</p>
+</dd>
+</dl>
+</section>
+<section id="files">
+<h2>Files<a class="headerlink" href="#files" title="Link to this heading">#</a></h2>
+<p>The files section is a list of <a class="reference internal" href="../../../glossary.html#term-Glob-pattern"><span class="xref std std-term">glob patterns</span></a> that define which
+files should be included in the cartridge. The root directory for searching
+these files is the one specified for the cartridge configuration.</p>
+</section>
+<section id="platform">
+<h2>Platform<a class="headerlink" href="#platform" title="Link to this heading">#</a></h2>
+<p>The platform section defines how to run the cartridge. Currently it only
+supports the <code class="docutils literal notranslate"><span class="pre">web-archive</span></code> platform, which runs games from an HTML web
+page. The <a class="reference internal" href="../web/index.html"><span class="doc">Web game support section</span></a> describes
+this in detail.</p>
+<section id="web-archive">
+<h3>Web Archive<a class="headerlink" href="#web-archive" title="Link to this heading">#</a></h3>
+<dl>
+<dt>html</dt><dd><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">string</span></code></div>
+<div class="line">A path to the HTML page that should be loaded when the cartridge is ran.
+This is relative to the root directory speficied in the cartridge
+configuration.</div>
+</div>
+</dd>
+<dt>bridges <em>(optional)</em></dt><dd><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">array</span> <span class="pre">of</span> <span class="pre">Bridge</span></code></div>
+<div class="line">A list of bridges that should be injected in the cartridge process when
+it’s executed to make it work in the Kate platform. For the available
+bridges and how to configure them, see the
+<a class="reference internal" href="../web/bridges/index.html"><span class="doc">Bridges section</span></a>.</div>
+</div>
+<p>By default no bridge is included.</p>
+</dd>
+<dt>recipe <em>(optional)</em></dt><dd><div class="line-block">
+<div class="line"><code class="docutils literal notranslate"><span class="pre">Recipe</span></code></div>
+<div class="line">If given, this should be a porting recipe that the packaging tool knows about. Recipes
+can do the heavy lifting of configuring packaging for games made with common
+engines. You should look at the <a class="reference internal" href="../../port/index.html"><span class="doc">Kate Porting Recipes book</span></a>
+for details.</div>
+</div>
+</dd>
+</dl>
+</section>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="../../port/index.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Kate Porting Recipes</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="getting-started.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Getting started</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2023-2024, Niini
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Configuration files</a><ul>
+<li><a class="reference internal" href="#file-location">File location</a></li>
+<li><a class="reference internal" href="#identification">Identification</a></li>
+<li><a class="reference internal" href="#metadata">Metadata</a><ul>
+<li><a class="reference internal" href="#presentation">Presentation</a></li>
+<li><a class="reference internal" href="#classification">Classification</a></li>
+<li><a class="reference internal" href="#legal">Legal</a></li>
+<li><a class="reference internal" href="#accessibility">Accessibility</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#security">Security</a></li>
+<li><a class="reference internal" href="#files">Files</a></li>
+<li><a class="reference internal" href="#platform">Platform</a><ul>
+<li><a class="reference internal" href="#web-archive">Web Archive</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../../../_static/documentation_options.js?v=594d7d3c"></script>
+    <script src="../../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/scripts/furo.js?v=32e29ea5"></script>
+    </body>
+</html>

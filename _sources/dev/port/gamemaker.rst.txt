@@ -5,8 +5,8 @@ Games made with `GameMaker <https://gamemaker.io/en>`_ can run on Kate when
 using the HTML5 export option.
 
 
-Kart configuration
-------------------
+Build configuration
+-------------------
 
 The minimal configuration for a GameMaker game looks like this:
 

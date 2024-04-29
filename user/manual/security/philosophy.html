@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Sandboxing" href="sandboxing.html" /><link rel="prev" title="Security and privacy" href="index.html" />
 
     <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
-        <title>Safety philosophy - Kate 0.23.10 documentation</title>
+        <title>Safety philosophy - Kate 0.25 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=82a976d7" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=135e06be" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo-extensions.css?v=36a5483c" />
@@ -128,7 +128,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../../index.html"><div class="brand">Kate 0.23.10 documentation</div></a>
+      <a href="../../../index.html"><div class="brand">Kate 0.25 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -151,7 +151,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../index.html">
   
   
-  <span class="sidebar-brand-text">Kate 0.23.10 documentation</span>
+  <span class="sidebar-brand-text">Kate 0.25 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -239,9 +239,9 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../dev/manual/kart/index.html">Kart — Packing cartridges</a><input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" role="switch" type="checkbox"/><label for="toctree-checkbox-13"><div class="visually-hidden">Toggle navigation of Kart — Packing cartridges</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../dev/manual/kart/getting-started.html">Getting started</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../dev/manual/kart/configuration.html">Configuration files</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../dev/manual/packing/index.html">Packaging cartridges</a><input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" role="switch" type="checkbox"/><label for="toctree-checkbox-13"><div class="visually-hidden">Toggle navigation of Packaging cartridges</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../dev/manual/packing/getting-started.html">Getting started</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../dev/manual/packing/configuration.html">Configuration files</a></li>
 </ul>
 </li>
 </ul>
@@ -266,7 +266,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../design/kernel/K0004-processes.html">#K0004 — Processes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../design/kernel/K0005-partitioned-file-storage.html">#K0005 — Partitioned File Storage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../design/kernel/K0006-cartridge-signatures.html">#K0006 — Cartridge signatures</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../design/kernel/K0007-key-store.html">#K0006 — Cartridge signatures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../design/kernel/K0007-key-store.html">#K0007 — Secure key store</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../design/api/A0001-object-storage.html">#A0001 — Object Store API</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../design/api/A0002-external-url.html">#A0002 — External URL navigation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../design/api/A0003-device-file-access.html">#A0003 — Device file access</a></li>
@@ -276,6 +276,7 @@
 <p class="caption" role="heading"><span class="caption-text">Changes, Terms, and Credits</span></p>
 <ul>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../../etc/releases/index.html">Release notes</a><input class="toctree-checkbox" id="toctree-checkbox-16" name="toctree-checkbox-16" role="switch" type="checkbox"/><label for="toctree-checkbox-16"><div class="visually-hidden">Toggle navigation of Release notes</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../etc/releases/0.25.html">Kate v0.25  (Spring 2024)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../etc/releases/0.23.10.html">Kate v0.23.10  (October 2023)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../etc/releases/0.23.8.html">Kate v0.23.8  (August 2023)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../etc/releases/0.23.6.html">Kate v0.23.6  (June 2023)</a></li>
@@ -344,7 +345,7 @@ And even when you do, it’s not something you can do free of cost. Or for
 any small game you wish to publish. In that sense gaming on a computer is
 much better.</p>
 <p>But gaming on a computer is less than ideal. You start by browing the catalog
-of games and choosing the ones you like, as usual, but now, rather than rushing
+of games and choosing the ones you like, as usual. Except that now, rather than rushing
 to play it, you’re forced to ask yourself a lot of questions:</p>
 <ul class="simple">
 <li><p>Does this run on my OS?</p></li>
@@ -352,10 +353,11 @@ to play it, you’re forced to ask yourself a lot of questions:</p>
 <li><p>Is this compatible with my graphics card?</p></li>
 <li><p>How do I run this on my computer?</p></li>
 <li><p>Do I trust the person who made this game?</p></li>
-<li><p>Oh, no, when I try to run it it shows me a scary security dialogue…</p></li>
-<li><p>It runs… and then crashes 2 minutes later but I have no idea why…</p></li>
-<li><p>It runs now, but the gamepad I’m using is not the one they use in the screen
-so I never know which buttons to press.</p></li>
+<li><p>Is the person who made this game truly the person I think they are?</p></li>
+<li><p>Has the person who made the game had the gamepad/input devices I’m using in mind?</p></li>
+<li><p>Will this game damage my computer?</p></li>
+<li><p>Will this game try to steal my data?</p></li>
+<li><p>Will…</p></li>
 </ul>
 <p>And so on, and so forth. Every time you run a video game on your computer,
 on top of all this additional effort from non-standard hardware, there’s this
@@ -363,15 +365,14 @@ ever looming shadow of “what if this is actually a virus and it does bad thing
 on my computer?” It’s always there, in a way that isn’t really a concern in
 console gaming.</p>
 <p>Kate’s safety philosophy is that gaming on a computer should be like gaming
-on consoles: pain-free and with no risks attached. But it should maintain
+on consoles: pain-free and with very few risks attached. But it should maintain
 the same democratic “everyone can publish a video game” aspect computer
 games have.</p>
 <section id="installing-games-safely">
 <h2>Installing games, safely<a class="headerlink" href="#installing-games-safely" title="Link to this heading">#</a></h2>
 <p>Installing computer games is tricky. Some games are distributed as a ZIP
 archive. Some games are distributed as an installer application. Some
-games are distributed as a collection of files, or as a single file,
-that you need to arrange and run.</p>
+games are distributed as a collection of files that you need to arrange and run.</p>
 <p>But running it is also not consistent. Each OS has its own ways of running
 a video game. And each game might have different ways of running itself,
 even in the same OS.</p>
@@ -388,7 +389,7 @@ the installer that make <em>your entire computer</em> incompatible with a new
 installation!</p>
 <p>Kate aims to do away with any lack of safety during installation: you get
 exactly one cartridge file, and there’s exactly one way of installing and
-uninstalling it, regardless of which device or operating system you use.
+uninstalling it, regardless of which device or host operating system you use.
 Once you install, there are no ways of corrupting the installed game files
 by just using your device. Even if you delete data the game has saved after
 installation.</p>
@@ -444,11 +445,11 @@ the console you have—after all, there’s only one hardware the developers
 need to test on. Console game bugs are generally of the “if you press X
 when standing near a cliff and holding a meelee weapon while wearing
 a winter outfit during the night in summer, the character animation looks
-funky” variety. Which is understandable, games are very complex nowadays,
+funky” variety. Which is understandable, as games are very complex nowadays
 and it’s impossible to test <em>all</em> possible things that can happen in it.</p>
 <p>Computer games, on the other hand, have the less fun kinds of bugs. A
 game may run, but freeze constantly because it doesn’t like your specific
-graphics card. It might run but immediately crash during cut scenes because
+graphics card. It might run but immediately crash during cut-scenes because
 your monitor just happens to have a higher refresh rate than what the game
 supports. It might not recognise your gamepad. It might recognise your
 special accessibility device, but only map two of the 5 buttons in it.</p>
@@ -475,7 +476,7 @@ expect when publishing their games because every user may have modified
 core aspects of their computers.</p>
 <p>Going further, Kate also attempts to address problems that are not
 technical in nature. Cartridges’ metadata can contain information on
-content warnings, age rating, supported interaction and language,
+content warnings, age rating, supported interaction modes and language,
 provided accessibility features, and more. These are used by Kate to
 help you find games that you can enjoy given your own personal
 context at the moment.</p>
@@ -489,18 +490,18 @@ accessibility support guidelines are still not implemented.</p>
 <p>When you run a video game, or any other application, it’s very hard to know
 what data it can access. This is true even for phone apps, which are
 <a class="reference internal" href="../../../glossary.html#term-Sandboxing"><span class="xref std std-term">sandboxed</span></a>, and thus limited in what they can do.</p>
-<p>This is made worse when a video game (or app) has internet access. Now,
+<p>The issue is worse when a video game (or app) has internet access. Now,
 whatever information it has managed to access can travel outside of
 your computer and to someone else, without your consent, or, really, even
 without your knowledge. Given that people have more of their lives stored
-in their computers nowadays privacy is a much bigger concern now.</p>
+in their computers nowadays, privacy is a much bigger concern now.</p>
 <p>There are a few different ways of addressing this problem, but Kate just
 picks the simplest one to explain: no cartridge in Kate has access to
 the internet, and no cartridge in Kate has access to your device’s storage.
 In essence, what this means is that the only data a cartridge can read
 is what you provide them with, and the only thing they can do with this
-data is process locally—they can never make any piece of data leave your device,
-unless you specifically give the cartridge more permissions.</p>
+data is process locally—they can never make any piece of data leave your device
+by themselves—you, specifically, have to give the cartridge more permissions.</p>
 </section>
 <section id="feeling-safe-by-knowing-what-s-happening">
 <h2>Feeling safe by knowing what’s happening<a class="headerlink" href="#feeling-safe-by-knowing-what-s-happening" title="Link to this heading">#</a></h2>
@@ -515,8 +516,8 @@ example, the battery indicator in a phone will let you know when it’s safe
 to use your phone, and when you should be rushing to find a power outlet
 to avoid losing your past 2 hours of work.</p>
 <p>Kate takes a very principled approach to these sorts of indicators. In Kate
-an indicator should exist to communicate everything potentially unsafe (or
-that requires more of your attention), and all such indicators should be
+an indicator should exist to communicate everything potentially unsafe or
+that requires more of your attention, and all such indicators should be
 impossible to mimic by any cartridge. You should be able to look at the
 indicator and immediately know that it’s a Kate indicator, and not, possibly,
 an application trying to trick you with a very elaborate copy of what your
@@ -602,7 +603,7 @@ can cause wider damage.</p></li>
         <div class="bottom-of-page">
           <div class="left-details">
             <div class="copyright">
-                Copyright &#169; 2023, Niini
+                Copyright &#169; 2023-2024, Niini
             </div>
             Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
             
@@ -646,7 +647,7 @@ can cause wider damage.</p></li>
       
     </aside>
   </div>
-</div><script src="../../../_static/documentation_options.js?v=1b0dedb3"></script>
+</div><script src="../../../_static/documentation_options.js?v=594d7d3c"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/scripts/furo.js?v=32e29ea5"></script>

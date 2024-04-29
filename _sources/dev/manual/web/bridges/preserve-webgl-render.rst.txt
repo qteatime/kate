@@ -7,8 +7,8 @@ screenshot feature. There's no configuration for this bridge, it'll
 affect all canvases.
 
 
-Using in Kart
--------------
+Using in your build configuration
+---------------------------------
 
 To add this bridge to your cartridge, you specify the following in your
 ``kate.json`` configuration:

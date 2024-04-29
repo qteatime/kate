@@ -23,7 +23,7 @@ are not informed if the user opened the URL or not.
     the cartridge will not be notified if opening the URL succeeded or not.
 
 
-.. py:function:: download(filename: string, data: Uint8Array)
+.. py:function:: download_from_bytes(filename: string, data: Uint8Array)
 
   :param filename: A suggestion for the name of the file;
   :param data: A byte array containing the data of the file.

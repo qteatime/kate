@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Installing" href="install.html" /><link rel="prev" title="Tech specs" href="hardware.html" />
 
     <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
-        <title>Emulator - Kate 0.23.10 documentation</title>
+        <title>Emulator - Kate 0.25 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=82a976d7" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=135e06be" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo-extensions.css?v=36a5483c" />
@@ -128,7 +128,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../../index.html"><div class="brand">Kate 0.23.10 documentation</div></a>
+      <a href="../../../index.html"><div class="brand">Kate 0.25 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -151,7 +151,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../index.html">
   
   
-  <span class="sidebar-brand-text">Kate 0.23.10 documentation</span>
+  <span class="sidebar-brand-text">Kate 0.25 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -239,9 +239,9 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../dev/manual/kart/index.html">Kart — Packing cartridges</a><input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" role="switch" type="checkbox"/><label for="toctree-checkbox-13"><div class="visually-hidden">Toggle navigation of Kart — Packing cartridges</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../dev/manual/kart/getting-started.html">Getting started</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../dev/manual/kart/configuration.html">Configuration files</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../dev/manual/packing/index.html">Packaging cartridges</a><input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" role="switch" type="checkbox"/><label for="toctree-checkbox-13"><div class="visually-hidden">Toggle navigation of Packaging cartridges</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../dev/manual/packing/getting-started.html">Getting started</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../dev/manual/packing/configuration.html">Configuration files</a></li>
 </ul>
 </li>
 </ul>
@@ -266,7 +266,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../design/kernel/K0004-processes.html">#K0004 — Processes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../design/kernel/K0005-partitioned-file-storage.html">#K0005 — Partitioned File Storage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../design/kernel/K0006-cartridge-signatures.html">#K0006 — Cartridge signatures</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../design/kernel/K0007-key-store.html">#K0006 — Cartridge signatures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../design/kernel/K0007-key-store.html">#K0007 — Secure key store</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../design/api/A0001-object-storage.html">#A0001 — Object Store API</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../design/api/A0002-external-url.html">#A0002 — External URL navigation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../design/api/A0003-device-file-access.html">#A0003 — Device file access</a></li>
@@ -276,6 +276,7 @@
 <p class="caption" role="heading"><span class="caption-text">Changes, Terms, and Credits</span></p>
 <ul>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../../etc/releases/index.html">Release notes</a><input class="toctree-checkbox" id="toctree-checkbox-16" name="toctree-checkbox-16" role="switch" type="checkbox"/><label for="toctree-checkbox-16"><div class="visually-hidden">Toggle navigation of Release notes</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../etc/releases/0.25.html">Kate v0.25  (Spring 2024)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../etc/releases/0.23.10.html">Kate v0.23.10  (October 2023)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../etc/releases/0.23.8.html">Kate v0.23.8  (August 2023)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../etc/releases/0.23.6.html">Kate v0.23.6  (June 2023)</a></li>
@@ -363,7 +364,7 @@ available modes.</p>
 <img alt="../../../_images/handheld-mode.png" src="../../../_images/handheld-mode.png" />
 <p>This is the default case mode for the Kate emulator, but it’s optimised for
 smartphones (and marginally for tablet devices). It includes virtual
-buttons on the sides and on the top, which can be pressed on a touch-capable
+buttons on the sides which can be pressed on a touch-capable
 device instead of requiring a physical gamepad or keyboard, and it tries to
 maximise the area used for the screen as much as possible. This is also why
 it uses a thumbstick instead of the usual D-Pad (you can hold the thumbstick
@@ -381,8 +382,9 @@ lower image quality.</p>
 <p>The TV case mode is optimised for devices that have a fairly big screen
 resolution (e.g.: 1600x900 pixels) but also have some sort of physical
 input device connected, such as a keyboard or a gamepad.</p>
-<p>In TV mode you can choose between 800x480 and 1200x720 as the emulator
-screen resolution. Your device’s screen resolution will need to be at
+<p>In TV mode you can choose between native 800x480 or upscaled
+1200x720 (1.5x) and 1600x960 (2x) as the emulator screen resolution.
+Your device’s screen resolution will need to be at
 least 60 pixels larger than that horizontally and vertically in order
 to fit the emulator UI comfortably.</p>
 </section>
@@ -391,7 +393,7 @@ to fit the emulator UI comfortably.</p>
 <img alt="../../../_images/fullscreen-mode.png" src="../../../_images/fullscreen-mode.png" />
 <p>In fullscreen mode the screen takes the whole space available for the
 emulator. It has the same resolution options as the TV mode:
-800x480 and 1200x720 pixels.</p>
+native 800x480, or upscaled to 1200x720 and 1600x960 pixels.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>When running Kate’s native mode distribution it’s not possible to
@@ -414,7 +416,8 @@ able to control games that offer pointer input options.</p>
 </section>
 <section id="kate-buttons">
 <h3>Kate buttons<a class="headerlink" href="#kate-buttons" title="Link to this heading">#</a></h3>
-<p>Kate has 12 digital input buttons which are used to control most games.
+<p>Kate has 10 digital input buttons which are used to control most games
+(plus 2 digital input buttons that are special for the OS).
 In the emulator you can:</p>
 <dl>
 <dt><strong>Use the virtual buttons</strong></dt><dd><p>In hand-held mode, if you have a device with
@@ -422,7 +425,7 @@ a touch screen, like a smartphone or tablet, you can touch the virtual
 buttons to control Kate. You’ll need to select hand-held mode from
 <code class="docutils literal notranslate"><span class="pre">Settings</span> <span class="pre">-&gt;</span> <span class="pre">User</span> <span class="pre">Interface</span></code>.</p>
 </dd>
-<dt><strong>Use your keyboard</strong></dt><dd><p>You can configure the how the keyboard keys map to
+<dt><strong>Use your keyboard</strong></dt><dd><p>You can configure how the keyboard keys map to
 Kate buttons from <code class="docutils literal notranslate"><span class="pre">Settings</span> <span class="pre">-&gt;</span> <span class="pre">Controllers</span> <span class="pre">&amp;</span> <span class="pre">Sensors</span> <span class="pre">-&gt;</span> <span class="pre">Control</span> <span class="pre">Kate</span>
 <span class="pre">with</span> <span class="pre">a</span> <span class="pre">keyboard</span></code>. The default is arrow keys for the <a class="reference internal" href="../../../_images/dpad_32.png"><img alt="D-Pad" class="align-middle" src="../../../_images/dpad_32.png" style="height: 1em;" /></a> <em>(D-Pad)</em>;
 <code class="docutils literal notranslate"><span class="pre">Left</span> <span class="pre">Shift</span></code>, <code class="docutils literal notranslate"><span class="pre">Z</span></code>, <code class="docutils literal notranslate"><span class="pre">X</span></code>, and <code class="docutils literal notranslate"><span class="pre">C</span></code> for <a class="reference internal" href="../../../_images/menu_32.png"><img alt="Menu button" class="align-middle" src="../../../_images/menu_32.png" style="height: 1em;" /></a>, <a class="reference internal" href="../../../_images/ok_32.png"><img alt="Ok button (a.k.a. O)" class="align-middle" src="../../../_images/ok_32.png" style="height: 1em;" /></a>,
@@ -471,7 +474,7 @@ as a D-Pad.</p>
         <div class="bottom-of-page">
           <div class="left-details">
             <div class="copyright">
-                Copyright &#169; 2023, Niini
+                Copyright &#169; 2023-2024, Niini
             </div>
             Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
             
@@ -520,7 +523,7 @@ as a D-Pad.</p>
       
     </aside>
   </div>
-</div><script src="../../../_static/documentation_options.js?v=1b0dedb3"></script>
+</div><script src="../../../_static/documentation_options.js?v=594d7d3c"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/scripts/furo.js?v=32e29ea5"></script>

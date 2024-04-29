@@ -8,8 +8,8 @@ The local storage proxy provides the same API as the browser's storage API
 There's no configuration for this bridge. It has only one behaviour.
 
 
-Using in Kart
--------------
+Using in your build configuration
+---------------------------------
 
 To add this bridge to your cartridge, you specify the following in your
 ``kate.json`` configuration:

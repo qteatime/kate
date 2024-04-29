@@ -4,7 +4,7 @@ Welcome to Kate's Library!
 .. warning::
   
    These books are still being written, and should currently be considered
-   unedited drafts. Kate has not stabilised yet, so any concept covered
+   unedited drafts. Kate has not stabilised yet, any concept covered
    here might change in future versions. Sections that are particularly
    in-flux will be marked with an admnotion like this one.
 
@@ -20,7 +20,7 @@ cover aspects from how to use Kate to its philosophy and security guarantees.
 
 :doc:`Kate's User Manual <user/manual/index>`
    New to Kate? Confused about how Kate works? This explains how to
-   install it and all features in the console.
+   install the emulator, as well as the features in the console.
 
 :doc:`Kate's Importer Manual <user/importer/index>`
    The Kate Importer lets you install and play games made for other

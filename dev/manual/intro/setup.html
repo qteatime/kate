@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Hello, World" href="hello-world.html" /><link rel="prev" title="Why make games for Kate?" href="why.html" />
 
     <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
-        <title>What will you need? - Kate 0.23.10 documentation</title>
+        <title>What will you need? - Kate 0.25 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=82a976d7" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=135e06be" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo-extensions.css?v=36a5483c" />
@@ -128,7 +128,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../../index.html"><div class="brand">Kate 0.23.10 documentation</div></a>
+      <a href="../../../index.html"><div class="brand">Kate 0.25 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -151,7 +151,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../index.html">
   
   
-  <span class="sidebar-brand-text">Kate 0.23.10 documentation</span>
+  <span class="sidebar-brand-text">Kate 0.25 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -239,9 +239,9 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../kart/index.html">Kart — Packing cartridges</a><input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" role="switch" type="checkbox"/><label for="toctree-checkbox-13"><div class="visually-hidden">Toggle navigation of Kart — Packing cartridges</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../kart/getting-started.html">Getting started</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../kart/configuration.html">Configuration files</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../packing/index.html">Packaging cartridges</a><input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" role="switch" type="checkbox"/><label for="toctree-checkbox-13"><div class="visually-hidden">Toggle navigation of Packaging cartridges</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../packing/getting-started.html">Getting started</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../packing/configuration.html">Configuration files</a></li>
 </ul>
 </li>
 </ul>
@@ -266,7 +266,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../design/kernel/K0004-processes.html">#K0004 — Processes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../design/kernel/K0005-partitioned-file-storage.html">#K0005 — Partitioned File Storage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../design/kernel/K0006-cartridge-signatures.html">#K0006 — Cartridge signatures</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../design/kernel/K0007-key-store.html">#K0006 — Cartridge signatures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../design/kernel/K0007-key-store.html">#K0007 — Secure key store</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../design/api/A0001-object-storage.html">#A0001 — Object Store API</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../design/api/A0002-external-url.html">#A0002 — External URL navigation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../design/api/A0003-device-file-access.html">#A0003 — Device file access</a></li>
@@ -276,6 +276,7 @@
 <p class="caption" role="heading"><span class="caption-text">Changes, Terms, and Credits</span></p>
 <ul>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../../etc/releases/index.html">Release notes</a><input class="toctree-checkbox" id="toctree-checkbox-16" name="toctree-checkbox-16" role="switch" type="checkbox"/><label for="toctree-checkbox-16"><div class="visually-hidden">Toggle navigation of Release notes</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../etc/releases/0.25.html">Kate v0.25  (Spring 2024)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../etc/releases/0.23.10.html">Kate v0.23.10  (October 2023)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../etc/releases/0.23.8.html">Kate v0.23.8  (August 2023)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../etc/releases/0.23.6.html">Kate v0.23.6  (June 2023)</a></li>
@@ -339,21 +340,82 @@
 <p>To run games in Kate you’ll need an emulator. The recommended way of testing
 the games is to use the web-based emulator. The Kate developers maintain a
 public instance of Kate on the internet, which you can open in a modern
-browser by accessing <a class="reference external" href="https://kate.qteati.me">https://kate.qteati.me</a></p>
+browser by accessing <a class="reference external" href="https://kate.qteati.me">https://kate.qteati.me</a>. You should install this as a
+web application as otherwise the browser might decide to randomly delete all
+data you stored in Kate (it’s only stored locally in your device).</p>
 <p>The <a class="reference internal" href="../../../user/manual/intro/install.html"><span class="doc">intallation instructions section</span></a> goes
 into more details about what browsers are supported, specific instructions
 for platforms like Steam Deck, and alternative installation options, including
 running your own Kate web emulator instance.</p>
 </section>
-<section id="installing-the-developer-tools">
-<h2>Installing the developer tools<a class="headerlink" href="#installing-the-developer-tools" title="Link to this heading">#</a></h2>
-<p>The tools used for developing Kate games require <a class="reference external" href="https://nodejs.org/en">Node.js</a> <a class="footnote-reference brackets" href="#f1" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>
+<section id="creating-a-developer-account">
+<h2>Creating a developer account<a class="headerlink" href="#creating-a-developer-account" title="Link to this heading">#</a></h2>
+<p>Kate requires all cartridges to be digitally signed by its developers. A
+digital signature proves to players that the one who published the cartridge
+was really you.</p>
+<p>This additional step is needed since Kate does not require
+cartridges to be distributed through a single store—you can distribute your
+cartridge wherever you like, however you like. Thus players need some additional
+guarantees to know that the cartridge they’re trusting is indeed made
+by the person they’re trusting.</p>
+<p>The console will help you set up all the necessary things to digitally sign
+your cartridges. By accessing <code class="docutils literal notranslate"><span class="pre">Settings</span> <span class="pre">-&gt;</span> <span class="pre">For</span> <span class="pre">developers</span></code> you’ll be
+presented with a “developer onboarding” setup that looks like this:</p>
+<img alt="../../../_images/dev1.png" src="../../../_images/dev1.png" />
+<p>Here you choose “I want to make games for Kate” and complete the steps for
+setting up a new developer account (which is only stored locally on your
+device). During these steps you will:</p>
+<ul class="simple">
+<li><p>Choose a name for your developer profile, and a domain
+(e.g.: <code class="docutils literal notranslate"><span class="pre">cute-the-niini.itch.io</span></code>) which you have control over and
+uniquely identifies you to your players;</p></li>
+<li><p>Secure your key store with a password. This key store holds all of the
+necessary data to sign cartridges digitally with the developer information
+you chose, and it’s kept safe (encrypted) with the password you provide.
+This is the only password you’ll have to remember for all Kate usage.</p></li>
+<li><p>Generate a private key that will be used to sign your cartridges, and an
+equivalent public key which Kate will use to verify your cartridge
+signature whenever someone installs it.</p></li>
+<li><p>And, finally, save your profile so it can be used by the Kate development
+tools.</p></li>
+</ul>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>It’s strongly recommended that you export your profile and
+store it safely along with your other backups—this way, if you change
+devices or lose access to your data, you can always import it back in
+and use the same profile again. Otherwise you’ll need to generate a new
+profile, with a new pair of keys.</p>
+<p>You can export your profile by going to <code class="docutils literal notranslate"><span class="pre">Settings</span> <span class="pre">-&gt;</span> <span class="pre">For</span> <span class="pre">developers</span> <span class="pre">-&gt;</span>
+<span class="pre">Developer</span> <span class="pre">profiles</span> <span class="pre">-&gt;</span> <span class="pre">&lt;Your</span> <span class="pre">profile&gt;</span></code>, pressing <a class="reference internal" href="../../../_images/menu_32.png"><img alt="Menu button" class="align-middle" src="../../../_images/menu_32.png" style="height: 1em;" /></a> <em>(Menu button)</em> for
+actions, and choosing <code class="docutils literal notranslate"><span class="pre">Export</span> <span class="pre">profile</span> <span class="pre">backup</span></code>. Kate will ask you for
+a new password to protect your backup, so you can safely store it anywhere
+without giving other people access to your private key.</p>
+</div>
+</section>
+<section id="installing-the-publisher">
+<span id="installing-the-kate-publisher"></span><h2>Installing the Publisher<a class="headerlink" href="#installing-the-publisher" title="Link to this heading">#</a></h2>
+<p>The recommended way of creating Kate cartridges is to use the
+Kate Publisher application, which you can download either from the
+<a class="reference external" href="https://github.com/qteatime/kate/releases">Github releases page</a> or the
+<a class="reference external" href="https://cute-the-niini.itch.io/kate-publisher">Itch.io stable mirror</a>.</p>
+<p>To install it, you can drag-and-drop the <code class="docutils literal notranslate"><span class="pre">kate-publisher.kart</span></code> file to
+your Kate emulator, or use <a class="reference internal" href="../../../_images/berry_32.png"><img alt="Berry button" class="align-middle" src="../../../_images/berry_32.png" style="height: 1em;" /></a> <em>(Berry button)</em> to bring the context menu and
+select <code class="docutils literal notranslate"><span class="pre">Install</span> <span class="pre">cartridge...</span></code>.</p>
+<p>After installing, you should see the Publisher in your home screen:</p>
+<img alt="../../../_images/publisher.png" src="../../../_images/publisher.png" />
+</section>
+<section id="advanced-installing-the-command-line-tools">
+<h2>(Advanced) Installing the command-line tools<a class="headerlink" href="#advanced-installing-the-command-line-tools" title="Link to this heading">#</a></h2>
+<p>Instead of using the Publisher application, you can use command-line tools
+to create Kate cartridges. You might use these tools when setting up
+automations for your cartridge publishing.</p>
+<p>The command-line tools for Kate require <a class="reference external" href="https://nodejs.org/en">Node.js</a>
 to be installed, so you’ll need a device capable of installing it. Node.js
 supports Windows, MacOS, and Linux.</p>
-<p>You’ll also need to be familiar with the <a class="reference internal" href="../../../glossary.html#term-Command-line"><span class="xref std std-term">command line</span></a>, and with the
-<a class="reference external" href="https://developer.mozilla.org/en-US/docs/Learn">basics of web development</a>.</p>
-<p>Once you have Node.js installed, you can install all tools necessary for
-building Kate games from the command line:</p>
+<p>You’ll also need to be familiar with the <a class="reference internal" href="../../../glossary.html#term-Command-line"><span class="xref std std-term">command line</span></a>.
+Once you have Node.js installed, you can install all command-line tools for
+Kate using:</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>npm<span class="w"> </span>install<span class="w"> </span>-g<span class="w"> </span>@qteatime/kate-tools
 </pre></div>
 </div>
@@ -366,7 +428,7 @@ the <code class="docutils literal notranslate"><span class="pre">$</span></code>
 Kate (and its tools) requires administrator privileges, and
 they never will.</p>
 </div>
-<p>After running this command you should have two new applications available
+<p>After running this command you should have three new applications available
 in the command line:</p>
 <ul class="simple">
 <li><p><strong>kart</strong> is used for packaging your games into a single <code class="docutils literal notranslate"><span class="pre">.kart</span></code> file,
@@ -375,16 +437,16 @@ which you can distribute for your players to install.</p></li>
 into a web page, which you can then upload to a platform like Itch.io
 as a web game. You’ll need to zip the contents of the generated folder
 yourself.</p></li>
+<li><p><strong>kart-show</strong> is used for verifying that a cartridge contains the expected
+configuration and is not corrupted.</p></li>
 </ul>
-<aside class="footnote-list brackets">
-<aside class="footnote brackets" id="f1" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
-<p>There’s a planned tool, called Kate Studio, which will allow you
-to build games right from inside Kate, and thus avoid the need to install
-any of these command line tools. But that will only happen after the
-stable release.</p>
-</aside>
-</aside>
+</section>
+<section id="getting-your-profile-verified">
+<h2>Getting your profile verified<a class="headerlink" href="#getting-your-profile-verified" title="Link to this heading">#</a></h2>
+<p>In order for players to be sure of who published the cartridge, you need to
+get your developer profile verified — otherwise there’s nothing that ties
+you to your cartridge signature. Profile verification is still a work in
+progress and is coming later in 2024.</p>
 </section>
 </section>
 
@@ -417,7 +479,7 @@ stable release.</p>
         <div class="bottom-of-page">
           <div class="left-details">
             <div class="copyright">
-                Copyright &#169; 2023, Niini
+                Copyright &#169; 2023-2024, Niini
             </div>
             Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
             
@@ -445,7 +507,10 @@ stable release.</p>
             <ul>
 <li><a class="reference internal" href="#">What will you need?</a><ul>
 <li><a class="reference internal" href="#installing-the-emulator">Installing the emulator</a></li>
-<li><a class="reference internal" href="#installing-the-developer-tools">Installing the developer tools</a></li>
+<li><a class="reference internal" href="#creating-a-developer-account">Creating a developer account</a></li>
+<li><a class="reference internal" href="#installing-the-publisher">Installing the Publisher</a></li>
+<li><a class="reference internal" href="#advanced-installing-the-command-line-tools">(Advanced) Installing the command-line tools</a></li>
+<li><a class="reference internal" href="#getting-your-profile-verified">Getting your profile verified</a></li>
 </ul>
 </li>
 </ul>
@@ -457,7 +522,7 @@ stable release.</p>
       
     </aside>
   </div>
-</div><script src="../../../_static/documentation_options.js?v=1b0dedb3"></script>
+</div><script src="../../../_static/documentation_options.js?v=594d7d3c"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/scripts/furo.js?v=32e29ea5"></script>

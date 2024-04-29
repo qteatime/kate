@@ -13,7 +13,7 @@ any small game you wish to publish. In that sense gaming on a computer is
 much better.
 
 But gaming on a computer is less than ideal. You start by browing the catalog
-of games and choosing the ones you like, as usual, but now, rather than rushing
+of games and choosing the ones you like, as usual. Except that now, rather than rushing
 to play it, you're forced to ask yourself a lot of questions:
 
 * Does this run on my OS?
@@ -21,10 +21,11 @@ to play it, you're forced to ask yourself a lot of questions:
 * Is this compatible with my graphics card?
 * How do I run this on my computer?
 * Do I trust the person who made this game?
-* Oh, no, when I try to run it it shows me a scary security dialogue...
-* It runs... and then crashes 2 minutes later but I have no idea why...
-* It runs now, but the gamepad I'm using is not the one they use in the screen
-  so I never know which buttons to press.
+* Is the person who made this game truly the person I think they are?
+* Has the person who made the game had the gamepad/input devices I'm using in mind?
+* Will this game damage my computer?
+* Will this game try to steal my data?
+* Will...
 
 And so on, and so forth. Every time you run a video game on your computer,
 on top of all this additional effort from non-standard hardware, there's this
@@ -33,7 +34,7 @@ on my computer?" It's always there, in a way that isn't really a concern in
 console gaming.
 
 Kate's safety philosophy is that gaming on a computer should be like gaming
-on consoles: pain-free and with no risks attached. But it should maintain
+on consoles: pain-free and with very few risks attached. But it should maintain
 the same democratic "everyone can publish a video game" aspect computer
 games have.
 
@@ -43,8 +44,7 @@ Installing games, safely
 
 Installing computer games is tricky. Some games are distributed as a ZIP
 archive. Some games are distributed as an installer application. Some 
-games are distributed as a collection of files, or as a single file,
-that you need to arrange and run.
+games are distributed as a collection of files that you need to arrange and run.
 
 But running it is also not consistent. Each OS has its own ways of running
 a video game. And each game might have different ways of running itself,
@@ -65,7 +65,7 @@ installation!
 
 Kate aims to do away with any lack of safety during installation: you get
 exactly one cartridge file, and there's exactly one way of installing and
-uninstalling it, regardless of which device or operating system you use.
+uninstalling it, regardless of which device or host operating system you use.
 Once you install, there are no ways of corrupting the installed game files
 by just using your device. Even if you delete data the game has saved after
 installation.
@@ -134,12 +134,12 @@ the console you have—after all, there's only one hardware the developers
 need to test on. Console game bugs are generally of the "if you press X
 when standing near a cliff and holding a meelee weapon while wearing
 a winter outfit during the night in summer, the character animation looks
-funky" variety. Which is understandable, games are very complex nowadays,
+funky" variety. Which is understandable, as games are very complex nowadays
 and it's impossible to test *all* possible things that can happen in it.
 
 Computer games, on the other hand, have the less fun kinds of bugs. A
 game may run, but freeze constantly because it doesn't like your specific
-graphics card. It might run but immediately crash during cut scenes because
+graphics card. It might run but immediately crash during cut-scenes because
 your monitor just happens to have a higher refresh rate than what the game
 supports. It might not recognise your gamepad. It might recognise your
 special accessibility device, but only map two of the 5 buttons in it.
@@ -171,7 +171,7 @@ core aspects of their computers.
 
 Going further, Kate also attempts to address problems that are not
 technical in nature. Cartridges' metadata can contain information on
-content warnings, age rating, supported interaction and language,
+content warnings, age rating, supported interaction modes and language,
 provided accessibility features, and more. These are used by Kate to
 help you find games that you can enjoy given your own personal
 context at the moment.
@@ -189,19 +189,19 @@ When you run a video game, or any other application, it's very hard to know
 what data it can access. This is true even for phone apps, which are
 :term:`sandboxed <sandboxing>`, and thus limited in what they can do.
 
-This is made worse when a video game (or app) has internet access. Now,
+The issue is worse when a video game (or app) has internet access. Now,
 whatever information it has managed to access can travel outside of
 your computer and to someone else, without your consent, or, really, even
 without your knowledge. Given that people have more of their lives stored
-in their computers nowadays privacy is a much bigger concern now.
+in their computers nowadays, privacy is a much bigger concern now.
 
 There are a few different ways of addressing this problem, but Kate just
 picks the simplest one to explain: no cartridge in Kate has access to
 the internet, and no cartridge in Kate has access to your device's storage.
 In essence, what this means is that the only data a cartridge can read
 is what you provide them with, and the only thing they can do with this
-data is process locally—they can never make any piece of data leave your device,
-unless you specifically give the cartridge more permissions.
+data is process locally—they can never make any piece of data leave your device
+by themselves—you, specifically, have to give the cartridge more permissions.
 
 
 Feeling safe by knowing what's happening
@@ -220,8 +220,8 @@ to use your phone, and when you should be rushing to find a power outlet
 to avoid losing your past 2 hours of work.
 
 Kate takes a very principled approach to these sorts of indicators. In Kate
-an indicator should exist to communicate everything potentially unsafe (or
-that requires more of your attention), and all such indicators should be
+an indicator should exist to communicate everything potentially unsafe or
+that requires more of your attention, and all such indicators should be
 impossible to mimic by any cartridge. You should be able to look at the
 indicator and immediately know that it's a Kate indicator, and not, possibly,
 an application trying to trick you with a very elaborate copy of what your
