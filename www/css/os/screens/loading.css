@@ -11,10 +11,14 @@
   flex-direction: column;
   justify-content: flex-end;
   align-items: flex-end;
-  padding: 25px;
+  padding: 17px;
   background: var(--color-black);
   color: var(--color-white);
   font-size: 24px;
   font-weight: 500;
-  animation: kate-os-fade-in 0.25s ease-in;
+  animation: kate-os-fade-in 0.25s ease-in forwards;
+}
+
+.kate-hud-load-screen.leaving {
+  animation: kate-os-fade-out 0.25s ease-out forwards;
 }

@@ -202,7 +202,8 @@ export class KateOS {
 
   hide_hud(scene: Scene) {
     this._active_hud = this._active_hud.filter((x) => x !== scene);
-    scene.detach();
+    scene.canvas.classList.add("leaving");
+    wait(250).then(() => scene.detach());
   }
 
   make_audio_server() {

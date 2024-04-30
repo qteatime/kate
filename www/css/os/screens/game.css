@@ -23,13 +23,15 @@
   right: 25px;
   transform: scale(var(--screen-scale));
   transform-origin: 100% 100%;
+  animation: kate-os-fade-out 0.25s ease-in forwards;
+  animation-delay: 0.5s;
 }
 
 .kate-os-game .kate-game-frame {
   position: relative;
   opacity: 0;
   animation: kate-os-fade-in 0.25s ease-in forwards;
-  animation-delay: 0.5s;
+  animation-delay: 0.25s;
 }
 
 .kate-os-game-cover {

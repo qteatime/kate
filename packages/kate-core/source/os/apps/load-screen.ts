@@ -13,6 +13,7 @@ export class HUD_LoadIndicator extends Scene {
 
   constructor(os: KateOS) {
     super(os, true);
+    this.canvas.classList.add("upscaled");
   }
 
   render() {
