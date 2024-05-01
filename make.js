@@ -443,7 +443,9 @@ w.task("www:bundle", ["licences:generate", "core:build", "glomp:build"], () => {
   const yy = String(date.getUTCFullYear()).slice(-2);
   const mm = String(date.getUTCMonth() + 1).padStart(2, "0");
   const dd = String(date.getUTCDate()).padStart(2, "0");
-  FS.writeFileSync("kate-buildinfo.json", JSON.stringify({ build: `r${yy}${mm}${dd}` }));
+  const hh = String(date.getUTCHours()).padStart(2, "0");
+  const mi = String(date.getUTCMinutes()).padStart(2, "0");
+  FS.writeFileSync("kate-buildinfo.json", JSON.stringify({ build: `r${yy}${mm}${dd}${hh}${mi}` }));
   glomp({
     entry: "packages/kate-core/build/index.js",
     out: `www/kate/kate-latest.js`,
