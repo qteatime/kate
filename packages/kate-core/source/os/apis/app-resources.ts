@@ -12,6 +12,7 @@ type WorkerMessage = { type: "refresh-cache" } | { type: "version" } | { type: "
 export class KateAppResources {
   private _listening_for_updates = false;
   private _has_update: string | null = null;
+  readonly CACHE_REFRESH_TIMEOUT = 1000 * 60 * 5; // 5 min
 
   constructor(readonly os: KateOS) {}
 
@@ -86,8 +87,14 @@ export class KateAppResources {
 
     const refresh = this.send({
       type: "refresh-cache",
+    }).then((result) => {
+      if (!result) {
+        throw new Error(`Failed to update the cache`);
+      }
     });
-    const timeout = sleep(60000).then((x) => Promise.reject(new Error("timeout")));
+    const timeout = sleep(this.CACHE_REFRESH_TIMEOUT).then((x) =>
+      Promise.reject(new Error("timeout"))
+    );
     await Promise.race([refresh, timeout]);
   }
 

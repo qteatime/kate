@@ -65,8 +65,7 @@ async function handle(data: any | null) {
   switch (data?.type) {
     case "refresh-cache": {
       await clear_cache();
-      await update_cache();
-      return null;
+      return await update_cache();
     }
 
     case "version": {
