@@ -24,9 +24,7 @@ async function update_cache() {
   const app_files: string[] = ["/"].concat(await (await fetch("/cache-manifest.json")).json());
   try {
     const cache = await caches.open(cache_name);
-    for (const entry of app_files) {
-      await cache.add(new Request(entry, { cache: "reload" }));
-    }
+    await cache.addAll(app_files.map((x) => new Request(x, { cache: "reload" })));
     console.debug(`[kate:worker] Updated cache to ${version}`);
     return true;
   } catch (e) {
