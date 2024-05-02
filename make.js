@@ -530,7 +530,7 @@ w.task("ecosystem:importer:build", [], () => {
   copy("packages/kate-appui/www/kate-appui.css", "ecosystem/importer/www/css/kate-appui.css");
 });
 
-w.task("ecosystem:importer:pack", ["ecosystem:publisher:build"], () => {
+w.task("ecosystem:importer:pack", ["ecosystem:importer:build"], () => {
   kart({
     config: "ecosystem/importer/kate.json",
     output: kart_name("ecosystem/importer", "kate-importer"),
@@ -545,7 +545,7 @@ w.task(
     "tools:build",
     "appui:build",
     "glomp:build",
-    "ecosystem:publisher:build",
+    "ecosystem:importer:build",
   ],
   () => {}
 );
