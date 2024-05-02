@@ -1375,7 +1375,7 @@ export namespace Accessibility_provision {
 
 
 
-export type Bridge = Bridge.Network_proxy | Bridge.Local_storage_proxy | Bridge.Input_proxy | Bridge.Preserve_WebGL_render | Bridge.Capture_canvas | Bridge.Pointer_input_proxy | Bridge.IndexedDB_proxy | Bridge.Renpy_web_tweaks | Bridge.External_URL_handler | Bridge.Keyboard_input_proxy_v2 | Bridge.Network_proxy_v2;
+export type Bridge = Bridge.Network_proxy | Bridge.Local_storage_proxy | Bridge.Input_proxy | Bridge.Preserve_WebGL_render | Bridge.Capture_canvas | Bridge.Pointer_input_proxy | Bridge.IndexedDB_proxy | Bridge.Renpy_web_tweaks | Bridge.External_URL_handler | Bridge.Keyboard_input_proxy_v2 | Bridge.Network_proxy_v2 | Bridge.Resize_canvas;
 
 export namespace Bridge {
  export const tag = 22;
@@ -1391,7 +1391,8 @@ export namespace Bridge {
     Renpy_web_tweaks = 7,
     External_URL_handler = 8,
     Keyboard_input_proxy_v2 = 9,
-    Network_proxy_v2 = 10
+    Network_proxy_v2 = 10,
+    Resize_canvas = 11
  }
 
  
@@ -1635,6 +1636,28 @@ export namespace Bridge {
    readonly '@variant': $Tags.Network_proxy_v2;
    readonly '@variant-name': 'Network-proxy-v2';
    readonly 'allow-sync-access': (string)[]
+ }
+
+
+  
+ export function Resize_canvas(x: {readonly 'selector': string}): Bridge {
+   return {
+     '@name': 'Bridge',
+     '@tag': 22,
+     '@version': 0,
+     '@variant': $Tags.Resize_canvas,
+     '@variant-name': 'Resize-canvas',
+     ...x
+   }
+ }
+
+ export interface Resize_canvas {
+   readonly '@name': 'Bridge';
+   readonly '@tag': 22;
+   readonly '@version': 0;
+   readonly '@variant': $Tags.Resize_canvas;
+   readonly '@variant-name': 'Resize-canvas';
+   readonly 'selector': string
  }
 
 }

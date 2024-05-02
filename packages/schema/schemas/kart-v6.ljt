@@ -226,6 +226,10 @@ union Bridge {
   type Network-proxy-v2 {
     field allow-sync-access: Text[];
   }
+
+  type Resize-canvas {
+    field selector: Text;
+  }
 }
 
 union Virtual-key {

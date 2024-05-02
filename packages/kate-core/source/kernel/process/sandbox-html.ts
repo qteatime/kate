@@ -241,6 +241,15 @@ async function apply_bridge(
       break;
     }
 
+    case "resize-canvas": {
+      const full_source = `
+        const SELECTOR = ${JSON.stringify(bridge.selector)};
+        ${bridges["resize-canvas.js"]}
+      `;
+      append_proxy(full_source);
+      break;
+    }
+
     default:
       throw unreachable(bridge, "kate bridge");
   }

@@ -83,6 +83,7 @@ export class BitsyImporter implements Importer {
               }),
             }),
             Cart.Bridge.Capture_canvas({ selector: "#game" }),
+            Cart.Bridge.Resize_canvas({ selector: "#game" }),
           ],
         }),
         files: files.map((x) => x.meta),
