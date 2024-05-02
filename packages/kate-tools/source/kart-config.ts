@@ -177,6 +177,10 @@ const bridges = T.tagged_choice<Bridge, Bridge["type"]>("type", {
   "external-url-handler": T.spec({
     type: T.constant("external-url-handler" as const),
   }),
+  "resize-canvas": T.spec({
+    type: T.constant("resize-canvas" as const),
+    selector: T.short_str(255),
+  }),
 });
 
 const recipe = T.tagged_choice<Recipe, Recipe["type"]>("type", {
@@ -379,7 +383,8 @@ export type Bridge =
   | { type: "pointer-input-proxy"; selector: string; hide_cursor: boolean }
   | { type: "indexeddb-proxy"; versioned: boolean }
   | { type: "renpy-web-tweaks"; version: { major: number; minor: number } }
-  | { type: "external-url-handler" };
+  | { type: "external-url-handler" }
+  | { type: "resize-canvas"; selector: string };
 
 export type Recipe =
   | { type: "identity" }
@@ -413,6 +418,7 @@ export function apply_recipe(json: ReturnType<typeof config>): ReturnType<typeof
           bridges: select_bridges([
             { type: "keyboard-input-proxy-v2", mapping: "kate", selector: "document" },
             { type: "capture-canvas", selector: "#game" },
+            { type: "resize-canvas", selector: "#game" },
             ...json.platform.bridges,
           ]),
         },
@@ -578,6 +584,7 @@ export function apply_recipe(json: ReturnType<typeof config>): ReturnType<typeof
             { type: "capture-canvas", selector: "#GameCanvas" },
             { type: "preserve-webgl-render" },
             { type: "local-storage-proxy" },
+            { type: "resize-canvas", selector: "#GameCanvas" },
             ...json.platform.bridges,
           ]),
         },
@@ -1059,6 +1066,10 @@ function make_bridge(x: Bridge): Cart.Bridge[] {
 
     case "external-url-handler": {
       return [Cart.Bridge.External_URL_handler({})];
+    }
+
+    case "resize-canvas": {
+      return [Cart.Bridge.Resize_canvas({ selector: x.selector })];
     }
 
     default:

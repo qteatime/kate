@@ -77,6 +77,12 @@ function bridge(x: Cart_v6.Bridge): Bridge {
         ),
       };
     }
+    case Cart_v6.Bridge.$Tags.Resize_canvas: {
+      return {
+        type: "resize-canvas",
+        selector: str(x.selector, 255),
+      };
+    }
     default:
       throw unreachable(x);
   }

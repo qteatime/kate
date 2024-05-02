@@ -212,6 +212,10 @@ function bridge(x: Cart.Bridge) {
       return `renpy-web-tweaks {version: ${cart_version(x.version)}}`;
     }
 
+    case t.$Tags.Resize_canvas: {
+      return `resize-canvas {selector: ${JSON.stringify(x.selector)}}`;
+    }
+
     default:
       throw unreachable(x);
   }

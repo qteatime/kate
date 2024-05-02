@@ -110,7 +110,8 @@ export type Bridge =
   | { type: "indexeddb-proxy"; versioned: boolean }
   | { type: "renpy-web-tweaks"; version: { major: number; minor: number } }
   | { type: "external-url-handler" }
-  | { type: "network-proxy-v2"; allow_sync_access: string[] };
+  | { type: "network-proxy-v2"; allow_sync_access: string[] }
+  | { type: "resize-canvas"; selector: string };
 
 export type KeyboardKey = {
   key: string;
