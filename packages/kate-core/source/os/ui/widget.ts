@@ -542,9 +542,11 @@ export function toggle_cell(
     on_label?: Widgetable;
     off_label?: Widgetable;
     on_changed?: (value: boolean) => void;
+    readonly?: boolean;
   }
 ) {
   const checked = Observable.from(x.value);
+  const readonly = x.readonly ?? false;
   const mutate = typeof x.value === "boolean" ? (v: boolean) => (checked.value = v) : () => {};
   const container = h("div", { class: "kate-ui-toggle-container" }, [
     h("div", { class: "kate-ui-toggle-view" }, [h("div", { class: "kate-ui-toggle-bullet" }, [])]),
@@ -559,7 +561,7 @@ export function toggle_cell(
 
   return interactive(
     os,
-    h("div", { class: "kate-ui-info-line" }, [
+    h("div", { class: "kate-ui-info-line", "data-readonly": readonly }, [
       h("div", { class: "kate-ui-info-line-label" }, [
         text_panel({ title: x.title, description: x.description }),
       ]),
@@ -571,6 +573,9 @@ export function toggle_cell(
         label: "Toggle",
         on_click: true,
         handler: () => {
+          if (readonly) {
+            return;
+          }
           const value = !checked.value;
           x.on_changed?.(value);
           mutate(value);
@@ -1243,4 +1248,46 @@ export function developer_profile_chip(profile: DeveloperProfile) {
     klass("kate-ui-developer-profile-domain", [profile.domain]),
     klass("kate-ui-developer-profile-fingerprint", [profile.fingerprint]),
   ]);
+}
+
+export function grid(x: {
+  layout: string[][];
+  column_sizes?: string[];
+  row_sizes?: string[];
+  gap?: string;
+  content: { [key: string]: Widgetable };
+}) {
+  return with_style(
+    {
+      "grid-template-areas": x.layout.map((l) => JSON.stringify(l.join(" "))).join(" "),
+      "grid-template-columns": x.column_sizes?.join(" "),
+      "grid-template-rows": x.row_sizes?.join(" "),
+      gap: x.gap,
+    },
+    klass("kate-ui-grid", [
+      ...Object.entries(x.content).map(([area, widget]) => {
+        return with_style(
+          { "grid-area": area, overflow: "hidden" },
+          klass("kate-ui-grid-cell", [widget])
+        );
+      }),
+    ])
+  );
+}
+
+export function with_style(
+  rules: { [key: string]: string | null | undefined },
+  child: HTMLElement
+) {
+  for (const [key, value] of Object.entries(rules)) {
+    if (value != null) {
+      child.style[key as any] = value;
+    }
+  }
+  return child;
+}
+
+export function with_class(klass: string, child: HTMLElement) {
+  child.className += ` ${klass}`;
+  return child;
 }

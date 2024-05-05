@@ -7,7 +7,7 @@ export class SemVer {
   ) {}
 
   static try_parse(version: string, default_build: string | null): SemVer | null {
-    const re = /^(\d+)\.(\d+)\.(\d+)(?:\-(.*))?/;
+    const re = /^(\d+)\.(\d+)(?:\.(\d+))?(?:\-(.*))?/;
     const matches = version.match(re);
     if (matches == null) {
       return null;
@@ -16,7 +16,7 @@ export class SemVer {
       return new SemVer(
         Number(major),
         Number(minor),
-        Number(patch),
+        Number(patch ?? "0"),
         build?.trim() || default_build
       );
     }
@@ -28,22 +28,22 @@ export class SemVer {
 
   gt(that: SemVer) {
     return (
-      that.major > this.major ||
-      (that.major === this.major && that.minor > this.minor) ||
-      (that.major === this.major && that.minor === this.minor && that.patch > this.patch)
+      this.major > that.major ||
+      (this.major === that.major && this.minor > that.minor) ||
+      (this.major === that.major && this.minor === that.minor && this.patch > that.patch)
     );
   }
 
   gte(that: SemVer) {
-    return that.gt(this) || that.equals(this);
+    return this.gt(that) || this.equals(that);
   }
 
   lt(that: SemVer) {
-    return !that.gt(this) && !that.equals(this);
+    return !this.gt(that) && !this.equals(that);
   }
 
   lte(that: SemVer) {
-    return !that.gt(this);
+    return !this.gt(that);
   }
 
   toString() {

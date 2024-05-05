@@ -625,3 +625,7 @@
   word-break: break-all;
   font-size: 0.8em;
 }
+
+.kate-ui-grid {
+  display: grid;
+}

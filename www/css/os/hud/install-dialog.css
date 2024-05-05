@@ -1,0 +1,41 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
+.kate-ui-install-confirmation .kate-ui-cartridge-thumbnail {
+  border: 1px solid var(--color-border);
+  padding: 1px;
+}
+
+.kate-ui-cartridge-info {
+  font-size: 0.9rem;
+}
+
+.kate-ui-cartridge-info-title {
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+.kate-ui-cartridge-info-id {
+  font-family: var(--font-family-mono);
+  font-size: 0.8rem;
+}
+
+.kate-ui-cartridge-info-publisher {
+  font-size: 0.8rem;
+  font-family: var(--font-family-mono);
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.kate-unverified {
+  color: var(--red);
+}
+
+.kate-ui-cartridge-info-publisher-status i {
+  padding: 0 0.25rem;
+}
