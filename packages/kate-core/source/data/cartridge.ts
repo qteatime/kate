@@ -27,6 +27,7 @@ export type CartMeta_v3 = {
   bucket_key: PersistentKey | null; // null for archived cartridges
   installed_at: Date;
   updated_at: Date;
+  signatures: Cart.Signature[];
   status: CartridgeStatus;
 };
 export const cart_meta_v3 = kate.table1<CartMeta_v3, "id">({
@@ -108,6 +109,7 @@ export class CartStore {
       installed_at: old_meta?.installed_at ?? now,
       updated_at: now,
       status: "active",
+      signatures: cart.signatures,
     });
   }
 

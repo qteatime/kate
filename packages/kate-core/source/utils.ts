@@ -30,4 +30,10 @@ export function lock<T>(name: string, fn: () => Promise<T>): Promise<T> {
   return navigator.locks.request(name, fn);
 }
 
+export function mut<T extends { [key: string]: any }>(
+  x: T
+): { -readonly [key in keyof T]: T[key] } {
+  return x as any;
+}
+
 export type OptionalRec<T> = T extends {} ? { [k in keyof T]?: OptionalRec<T[k]> } : T;

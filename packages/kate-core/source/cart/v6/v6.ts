@@ -6,7 +6,7 @@
 
 import * as Cart_v6 from "../../../../schema/build/kart-v6";
 import { DataCart, KateVersion } from "../cart-type";
-import { regex, str } from "../parser-utils";
+import { regex, str, bytes } from "../parser-utils";
 import * as Metadata from "./metadata";
 import * as Runtime from "./runtime";
 import * as Files from "./files";
@@ -64,7 +64,19 @@ export async function decode_metadata(file: Blob, header: Cart_v6.Header): Promi
     security: security,
     runtime: runtime,
     files: files,
+    signatures: cart.signature.map((x) => ({
+      signed_by: str(x["signed-by"], 255),
+      key_id: str(x["key-id"], 255),
+      signature: bytes(x.signature, 1024),
+      verified: false,
+    })),
   };
+}
+
+export async function read_raw_metadata(file: Blob, header: Cart_v6.Header): Promise<Uint8Array> {
+  const meta = await Cart_v6.decode_blob_metadata(file, header);
+  (meta as { -readonly [key in keyof Cart_v6.Metadata]: Cart_v6.Metadata[key] }).signature = [];
+  return Cart_v6.encode_metadata(meta);
 }
 
 export async function* decode_files(file: Blob, header: Cart_v6.Header, metadata: DataCart) {

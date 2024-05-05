@@ -20,6 +20,7 @@ export type Parser<T> = {
   minimum_version(header: T): SemVer;
   parse_header(x: Blob): Promise<T>;
   parse_meta(x: Blob, header: T): Promise<DataCart>;
+  raw_meta(x: Blob, header: T): Promise<Uint8Array>;
   parse_files(x: Blob, header: T, metadata: DataCart): AsyncGenerator<YieldFile, void, void>;
 };
 
@@ -29,6 +30,7 @@ const parsers: Parser<unknown>[] = [
     minimum_version: v6.minimum_version,
     parse_header: v6.decode_header,
     parse_meta: v6.decode_metadata,
+    raw_meta: v6.read_raw_metadata,
     parse_files: v6.decode_files,
   },
 ];

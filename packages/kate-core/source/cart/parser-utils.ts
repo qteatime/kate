@@ -14,6 +14,16 @@ export function str(x: unknown, size: number = Infinity): string {
   return x;
 }
 
+export function bytes(x: unknown, size: number = Infinity): Uint8Array {
+  if (!(x instanceof Uint8Array)) {
+    throw new Error(`Expected bytes`);
+  }
+  if (x.length > size) {
+    throw new Error(`Too many bytes (maximum: ${size})`);
+  }
+  return x;
+}
+
 export function regex(name: string, re: RegExp) {
   return (x: unknown) => {
     if (!re.test(str(x))) {

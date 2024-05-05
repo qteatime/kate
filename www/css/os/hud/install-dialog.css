@@ -36,6 +36,10 @@
   color: var(--red);
 }
 
+.kate-verified {
+  color: var(--green);
+}
+
 .kate-ui-cartridge-info-publisher-status i {
   padding: 0 0.25rem;
 }

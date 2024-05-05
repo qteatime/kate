@@ -15,6 +15,7 @@ import {
   gb,
   make_thumbnail_from_bytes,
   map,
+  mut,
   readable_stream_from_iterable,
   serialise_error,
   zip,
@@ -136,13 +137,14 @@ export class CartManager {
       const header = await parser.parse_header(file);
       await this.assert_minimum_version(file.name, header, parser);
       const metadata = await parser.parse_meta(file, header);
+      const raw_metadata = await parser.raw_meta(file, header);
       const files = parser.parse_files(file, header, metadata);
       const errors = await Cart.verify_pointers(metadata);
       if (errors.length !== 0) {
         console.error(`Corrupted cartridge ${metadata.id}`, errors);
         throw new Error(`Corrupted cartridge ${metadata.id}`);
       }
-      await this.install(metadata, files);
+      await this.install(metadata, raw_metadata, files);
     } catch (error) {
       console.error(`Failed to install ${file.name}:`, error);
       await this.os.audit_supervisor.log("kate:cart-manager", {
@@ -171,8 +173,14 @@ export class CartManager {
     }
   }
 
-  async ask_install_confirmation(cart: Cart.DataCart, old_meta: Db.CartMeta_v3 | null) {
+  async ask_install_confirmation(
+    cart: Cart.DataCart,
+    verified_signatures: Cart.Signature[],
+    old_meta: Db.CartMeta_v3 | null
+  ) {
     const [publisher, id] = cart.id.split("/");
+    const verified_publisher =
+      verified_signatures.find((x) => x.signed_by === publisher)?.verified ?? false;
 
     const risk_summary = Capability.summarise_from_cartridge(
       cart,
@@ -200,8 +208,10 @@ export class CartManager {
         ? `access to ${risks[0]}`
         : `access to ${risks.slice(0, -1).join(", ")}, and ${risks.at(-1)}`;
 
-    const verified_status = UI.with_class("kate-unverified", UI.fa_icon("triangle-exclamation"));
-    const verified_class = `kate-unverified`;
+    const verified_status = verified_publisher
+      ? UI.with_class("kate-verified", UI.fa_icon("circle-check"))
+      : UI.with_class("kate-unverified", UI.fa_icon("triangle-exclamation"));
+    const verified_class = verified_publisher ? `kate-verified` : `kate-unverified`;
 
     const content = UI.klass("kate-ui-install-confirmation", [
       UI.grid({
@@ -261,7 +271,11 @@ export class CartManager {
     });
   }
 
-  async install(cart: Cart.DataCart, files: AsyncIterable<{ index: number; data: Uint8Array }>) {
+  async install(
+    cart: Cart.DataCart,
+    raw_meta: Uint8Array,
+    files: AsyncIterable<{ index: number; data: Uint8Array }>
+  ) {
     if (this.os.kernel.console.options.mode === "single") {
       throw new Error(`Cartridge installation is not available in single mode.`);
     }
@@ -285,8 +299,17 @@ export class CartManager {
       }
     }
 
+    const [publisher, id] = cart.id.split("/");
+    const verified_signatures = await Promise.all(
+      cart.signatures.map(async (x) => {
+        const verified = (await this.os.key_manager.verify(x.signed_by, raw_meta, x.signature))
+          .verified;
+        return { ...x, verified };
+      })
+    );
     const should_install = await this.ask_install_confirmation(
       cart,
+      verified_signatures,
       old_meta?.status === "active" ? old_meta : null
     );
     if (!should_install) {
@@ -312,6 +335,7 @@ export class CartManager {
     try {
       cart_meta = {
         ...cart,
+        signatures: verified_signatures,
         files: {
           location: await cart_partition.persist(bucket, {
             type: "cartridge",
