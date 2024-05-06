@@ -307,7 +307,7 @@ export class CartManager {
         ? `Downgrade from ${old_meta!.version}`
         : "Re-install";
     return this.os.dialog.confirm("kate:cart-manager", {
-      title: `${install_button} cartridge`,
+      title: `${install_button} cartridge?`,
       message: content,
       ok: install_button,
       cancel: cancel_button,
