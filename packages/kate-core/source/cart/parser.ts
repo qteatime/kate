@@ -22,6 +22,12 @@ export type Parser<T> = {
   parse_meta(x: Blob, header: T): Promise<DataCart>;
   raw_meta(x: Blob, header: T): Promise<Uint8Array>;
   parse_files(x: Blob, header: T, metadata: DataCart): AsyncGenerator<YieldFile, void, void>;
+  read_file_with_path(
+    x: Blob,
+    metadata: DataCart,
+    path: string,
+    max_size_bytes: number | null
+  ): Promise<null | DataFile>;
 };
 
 const parsers: Parser<unknown>[] = [
@@ -32,6 +38,7 @@ const parsers: Parser<unknown>[] = [
     parse_meta: v6.decode_metadata,
     raw_meta: v6.read_raw_metadata,
     parse_files: v6.decode_files,
+    read_file_with_path: v6.read_file_with_path,
   },
 ];
 

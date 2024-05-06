@@ -15,6 +15,7 @@ import {
   gb,
   make_thumbnail_from_bytes,
   map,
+  mb,
   mut,
   readable_stream_from_iterable,
   serialise_error,
@@ -28,6 +29,7 @@ export class CartManager {
   readonly THUMBNAIL_HEIGHT = 700;
   readonly BANNER_WIDTH = 1280;
   readonly BANNER_HEIGHT = 200;
+  readonly MAX_THUMBNAIL_PREVIEW_SIZE = mb(10);
 
   constructor(readonly os: KateOS) {}
 
@@ -138,13 +140,14 @@ export class CartManager {
       await this.assert_minimum_version(file.name, header, parser);
       const metadata = await parser.parse_meta(file, header);
       const raw_metadata = await parser.raw_meta(file, header);
+      const thumbnail = await this.read_cartridge_thumbnail(file, parser, metadata);
       const files = parser.parse_files(file, header, metadata);
       const errors = await Cart.verify_pointers(metadata);
       if (errors.length !== 0) {
         console.error(`Corrupted cartridge ${metadata.id}`, errors);
         throw new Error(`Corrupted cartridge ${metadata.id}`);
       }
-      await this.install(metadata, raw_metadata, files);
+      await this.install(metadata, raw_metadata, thumbnail, files);
     } catch (error) {
       console.error(`Failed to install ${file.name}:`, error);
       await this.os.audit_supervisor.log("kate:cart-manager", {
@@ -173,9 +176,38 @@ export class CartManager {
     }
   }
 
-  async ask_install_confirmation(
+  private async read_cartridge_thumbnail(
+    blob: Blob,
+    parser: Cart.Parser<unknown>,
+    cart: Cart.DataCart
+  ) {
+    const path = cart.metadata.presentation.thumbnail_path;
+    if (path == null) {
+      return null;
+    }
+
+    const thumbnail = await parser.read_file_with_path(
+      blob,
+      cart,
+      path,
+      this.MAX_THUMBNAIL_PREVIEW_SIZE
+    );
+    if (thumbnail == null) {
+      return null;
+    }
+
+    return make_thumbnail_from_bytes(
+      this.THUMBNAIL_WIDTH,
+      this.THUMBNAIL_HEIGHT,
+      thumbnail.mime,
+      thumbnail.data
+    );
+  }
+
+  private async ask_install_confirmation(
     cart: Cart.DataCart,
     verified_signatures: Cart.Signature[],
+    thumbnail_url: string | null,
     old_meta: Db.CartMeta_v3 | null
   ) {
     const [publisher, id] = cart.id.split("/");
@@ -230,7 +262,7 @@ export class CartManager {
         gap: "1rem",
         content: {
           thumb: UI.klass("kate-ui-cartridge-thumbnail", [
-            UI.no_thumbnail(),
+            thumbnail_url == null ? UI.no_thumbnail() : UI.h("img", { src: thumbnail_url }, []),
             UI.release_type(cart.metadata.presentation.release_type),
             UI.rating_icon(cart.metadata.classification.rating),
           ]),
@@ -285,6 +317,7 @@ export class CartManager {
   async install(
     cart: Cart.DataCart,
     raw_meta: Uint8Array,
+    thumbnail_url: string | null,
     files: AsyncIterable<{ index: number; data: Uint8Array }>
   ) {
     if (this.os.kernel.console.options.mode === "single") {
@@ -310,7 +343,6 @@ export class CartManager {
       }
     }
 
-    const [publisher, id] = cart.id.split("/");
     const verified_signatures = await Promise.all(
       cart.signatures.map(async (x) => {
         const verified = (await this.os.key_manager.verify(x.signed_by, raw_meta, x.signature))
@@ -321,6 +353,7 @@ export class CartManager {
     const should_install = await this.ask_install_confirmation(
       cart,
       verified_signatures,
+      thumbnail_url,
       old_meta?.status === "active" ? old_meta : null
     );
     if (!should_install) {

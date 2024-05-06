@@ -54,3 +54,8 @@
 .kate-verified {
   --badge-color: var(--green);
 }
+
+.kate-ui-cartridge-thumbnail img {
+  width: 100%;
+  display: block;
+}
