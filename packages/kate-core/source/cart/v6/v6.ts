@@ -5,13 +5,13 @@
  */
 
 import * as Cart_v6 from "../../../../schema/build/kart-v6";
-import { DataCart, KateVersion } from "../cart-type";
-import { regex, str } from "../parser-utils";
+import { DataCart, DataFile, KateVersion } from "../cart-type";
+import { regex, str, bytes } from "../parser-utils";
 import * as Metadata from "./metadata";
 import * as Runtime from "./runtime";
 import * as Files from "./files";
 import * as Security from "./security";
-import { SemVer } from "../../utils";
+import { Pathname, SemVer } from "../../utils";
 export { Cart_v6 };
 
 const MAGIC = Number(
@@ -64,11 +64,46 @@ export async function decode_metadata(file: Blob, header: Cart_v6.Header): Promi
     security: security,
     runtime: runtime,
     files: files,
+    signatures: cart.signature.map((x) => ({
+      signed_by: str(x["signed-by"], 255),
+      key_id: str(x["key-id"], 255),
+      signature: bytes(x.signature, 1024),
+      verified: false,
+    })),
   };
+}
+
+export async function read_raw_metadata(file: Blob, header: Cart_v6.Header): Promise<Uint8Array> {
+  const meta = await Cart_v6.decode_blob_metadata(file, header);
+  (meta as { -readonly [key in keyof Cart_v6.Metadata]: Cart_v6.Metadata[key] }).signature = [];
+  return Cart_v6.encode_metadata(meta);
 }
 
 export async function* decode_files(file: Blob, header: Cart_v6.Header, metadata: DataCart) {
   yield* Cart_v6.decode_blob_files(file, header, metadata.files);
+}
+
+export async function read_file(file: Blob, location: Cart_v6.FileLocation): Promise<Uint8Array> {
+  return Cart_v6.decode_blob_file(file, location);
+}
+
+export async function read_file_with_path(
+  file: Blob,
+  metadata: DataCart,
+  path: string,
+  max_size_bytes: number | null
+): Promise<null | DataFile> {
+  const filename = Pathname.from_string(path).make_absolute().as_string();
+  const location = metadata.files.find((x) => x.path === filename);
+  if (location == null || (max_size_bytes != null && location.size > max_size_bytes)) {
+    return null;
+  }
+
+  const data = await read_file(file, location as Cart_v6.FileLocation);
+  return {
+    ...location,
+    data,
+  };
 }
 
 function check_header(x: Uint8Array): boolean {

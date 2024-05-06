@@ -13,22 +13,37 @@ import type {
   SerialisedCapability,
 } from "../data/capability";
 import { from_bytes, gb, mb } from "../utils";
-import type { RiskCategory } from "./risk";
+import { combine_risk, type RiskCategory } from "./risk";
 
 export type AnyCapability = Capability<CapabilityType>;
 export type AnySwitchCapability = SwitchCapability<CapabilityType>;
 export type AnyStorageSpaceCapability = StorageSpaceCapability<CapabilityType>;
 
+export type CategorySummary = {
+  category: string;
+  description: string;
+  combine(that: AnyCapability): AnyCapability;
+};
+
 export abstract class Capability<T extends CapabilityType> {
   abstract type: T;
+  abstract cart_id: string;
+  // Presentation metadata
   abstract title: string;
   abstract description: string;
+  abstract base_risk: RiskCategory;
+  abstract risk_category(): RiskCategory;
+  // Grant configuration
   abstract grant_type: GrantType["type"];
   abstract grant_configuration: GrantType["value"];
-  abstract cart_id: string;
   abstract serialise(): SerialisedCapability;
+  // Testing
   abstract is_allowed(configuration: GrantConfiguration[T]): boolean;
-  abstract risk_category(): RiskCategory;
+  get is_contextual() {
+    return this.summary == null;
+  }
+  // Summaries
+  abstract summary: null | CategorySummary;
 }
 
 export abstract class SwitchCapability<T extends CapabilityType> extends Capability<T> {
@@ -106,9 +121,12 @@ export class OpenURLs extends SwitchCapability<"open-urls"> {
     this._grant_configuration = grant;
   }
 
+  base_risk = "low" as const;
   risk_category(): RiskCategory {
     return this.grant_configuration ? "low" : "none";
   }
+
+  summary = null;
 }
 
 export class RequestDeviceFiles extends SwitchCapability<"request-device-files"> {
@@ -147,9 +165,12 @@ export class RequestDeviceFiles extends SwitchCapability<"request-device-files">
     this._grant_configuration = grant;
   }
 
+  base_risk = "high" as const;
   risk_category(): RiskCategory {
     return this.grant_configuration ? "high" : "none";
   }
+
+  summary = null;
 }
 
 export class InstallCartridges extends SwitchCapability<"install-cartridges"> {
@@ -188,9 +209,12 @@ export class InstallCartridges extends SwitchCapability<"install-cartridges"> {
     this._grant_configuration = grant;
   }
 
+  base_risk = "critical" as const;
   risk_category(): RiskCategory {
     return this.grant_configuration ? "critical" : "none";
   }
+
+  summary = null;
 }
 
 export class DownloadFiles extends SwitchCapability<"download-files"> {
@@ -229,9 +253,12 @@ export class DownloadFiles extends SwitchCapability<"download-files"> {
     this._grant_configuration = grant;
   }
 
+  base_risk = "critical" as const;
   risk_category(): RiskCategory {
     return this.grant_configuration ? "critical" : "none";
   }
+
+  summary = null;
 }
 
 export class ShowDialogs extends SwitchCapability<"show-dialogs"> {
@@ -270,9 +297,12 @@ export class ShowDialogs extends SwitchCapability<"show-dialogs"> {
     this._grant_configuration = grant;
   }
 
+  base_risk = "low" as const;
   risk_category(): RiskCategory {
     return this.grant_configuration ? "low" : "none";
   }
+
+  summary = null;
 }
 
 export class StoreTemporaryFiles extends StorageSpaceCapability<"store-temporary-files"> {
@@ -322,9 +352,18 @@ export class StoreTemporaryFiles extends StorageSpaceCapability<"store-temporary
     this._grant_configuration = grant;
   }
 
+  base_risk = "low" as const;
   risk_category(): RiskCategory {
     return this.grant_configuration ? "low" : "none";
   }
+
+  summary = {
+    category: "file-access",
+    description: "access temporary files",
+    combine(that: AnyCapability) {
+      return that;
+    },
+  };
 }
 
 export class SignDigitally extends SwitchCapability<"sign-digitally"> {
@@ -364,9 +403,12 @@ export class SignDigitally extends SwitchCapability<"sign-digitally"> {
     this._grant_configuration = grant;
   }
 
+  base_risk = "medium" as const;
   risk_category(): RiskCategory {
     return this.grant_configuration ? "medium" : "none";
   }
+
+  summary = null;
 }
 
 export class ViewDeveloperProfile extends SwitchCapability<"view-developer-profile"> {
@@ -406,7 +448,10 @@ export class ViewDeveloperProfile extends SwitchCapability<"view-developer-profi
     this._grant_configuration = grant;
   }
 
+  base_risk = "medium" as const;
   risk_category(): RiskCategory {
     return this.grant_configuration ? "medium" : "none";
   }
+
+  summary = null;
 }

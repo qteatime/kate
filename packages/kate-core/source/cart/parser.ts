@@ -20,7 +20,14 @@ export type Parser<T> = {
   minimum_version(header: T): SemVer;
   parse_header(x: Blob): Promise<T>;
   parse_meta(x: Blob, header: T): Promise<DataCart>;
+  raw_meta(x: Blob, header: T): Promise<Uint8Array>;
   parse_files(x: Blob, header: T, metadata: DataCart): AsyncGenerator<YieldFile, void, void>;
+  read_file_with_path(
+    x: Blob,
+    metadata: DataCart,
+    path: string,
+    max_size_bytes: number | null
+  ): Promise<null | DataFile>;
 };
 
 const parsers: Parser<unknown>[] = [
@@ -29,7 +36,9 @@ const parsers: Parser<unknown>[] = [
     minimum_version: v6.minimum_version,
     parse_header: v6.decode_header,
     parse_meta: v6.decode_metadata,
+    raw_meta: v6.read_raw_metadata,
     parse_files: v6.decode_files,
+    read_file_with_path: v6.read_file_with_path,
   },
 ];
 

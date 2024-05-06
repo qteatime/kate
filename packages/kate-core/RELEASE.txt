@@ -1,5 +1,5 @@
 =======================================================================
-Kate v0.25  (April 2024)
+Kate v0.25  (Spring 2024)
 =======================================================================
 
 The v0.25 is the Spring experimental release of Kate. This release
@@ -148,3 +148,6 @@ Minor fixes and improvements
 
 * Added a "process log" which shows messages output by each process to
   standard outputs (#43);
+
+* Added a confirmation dialog before installing cartridges to notify players
+  of the risks they're taking (#45);

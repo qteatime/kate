@@ -5,14 +5,21 @@
  */
 
 import * as LJT from "../../ljt-vm/build";
+import { unreachable } from "../../util/source/assert";
 const source = require("./generated/kart-v6.json");
 import * as Cart from "./generated/kart-v6";
-import { concat_all } from "./util";
+import { byte_equals, concat_all } from "./util";
 export * from "./generated/kart-v6";
 
 export const schema = LJT.parse(source);
 
 export type File = { index: number; data: Uint8Array };
+export type FileLocation = {
+  offset: number;
+  size: number;
+  integrity_hash: Uint8Array;
+  integrity_hash_algorithm: "SHA-512" | "SHA-256";
+};
 
 export function size_of(id: number) {
   const size = schema.max_size_of(id);
@@ -63,6 +70,18 @@ export async function* decode_blob_files(
     const data = await decoder.bytes(size);
     yield { index: i, data: data };
   }
+}
+
+export async function decode_blob_file(blob: Blob, location: FileLocation) {
+  const data_slice = blob.slice(location.offset, location.offset + location.size);
+  const data = new Uint8Array(await data_slice.arrayBuffer());
+  const data_hash = new Uint8Array(
+    await crypto.subtle.digest({ name: location.integrity_hash_algorithm }, data)
+  );
+  if (!byte_equals(data_hash, location.integrity_hash)) {
+    throw new Error(`Failed to read file, cartridge may be corrupted`);
+  }
+  return data;
 }
 
 // == Record decoding

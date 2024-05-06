@@ -8,11 +8,15 @@ import * as Cart from "../../cart";
 import * as Capability from "../../capabilities";
 import type { KateOS } from "../os";
 import * as Db from "../../data";
+import * as UI from "../ui";
 import {
+  SemVer,
   from_bytes,
   gb,
   make_thumbnail_from_bytes,
   map,
+  mb,
+  mut,
   readable_stream_from_iterable,
   serialise_error,
   zip,
@@ -25,6 +29,7 @@ export class CartManager {
   readonly THUMBNAIL_HEIGHT = 700;
   readonly BANNER_WIDTH = 1280;
   readonly BANNER_HEIGHT = 200;
+  readonly MAX_THUMBNAIL_PREVIEW_SIZE = mb(10);
 
   constructor(readonly os: KateOS) {}
 
@@ -134,13 +139,15 @@ export class CartManager {
       const header = await parser.parse_header(file);
       await this.assert_minimum_version(file.name, header, parser);
       const metadata = await parser.parse_meta(file, header);
+      const raw_metadata = await parser.raw_meta(file, header);
+      const thumbnail = await this.read_cartridge_thumbnail(file, parser, metadata);
       const files = parser.parse_files(file, header, metadata);
       const errors = await Cart.verify_pointers(metadata);
       if (errors.length !== 0) {
         console.error(`Corrupted cartridge ${metadata.id}`, errors);
         throw new Error(`Corrupted cartridge ${metadata.id}`);
       }
-      await this.install(metadata, files);
+      await this.install(metadata, raw_metadata, thumbnail, files);
     } catch (error) {
       console.error(`Failed to install ${file.name}:`, error);
       await this.os.audit_supervisor.log("kate:cart-manager", {
@@ -169,7 +176,150 @@ export class CartManager {
     }
   }
 
-  async install(cart: Cart.DataCart, files: AsyncIterable<{ index: number; data: Uint8Array }>) {
+  private async read_cartridge_thumbnail(
+    blob: Blob,
+    parser: Cart.Parser<unknown>,
+    cart: Cart.DataCart
+  ) {
+    const path = cart.metadata.presentation.thumbnail_path;
+    if (path == null) {
+      return null;
+    }
+
+    const thumbnail = await parser.read_file_with_path(
+      blob,
+      cart,
+      path,
+      this.MAX_THUMBNAIL_PREVIEW_SIZE
+    );
+    if (thumbnail == null) {
+      return null;
+    }
+
+    return make_thumbnail_from_bytes(
+      this.THUMBNAIL_WIDTH,
+      this.THUMBNAIL_HEIGHT,
+      thumbnail.mime,
+      thumbnail.data
+    );
+  }
+
+  private async ask_install_confirmation(
+    cart: Cart.DataCart,
+    verified_signatures: Cart.Signature[],
+    thumbnail_url: string | null,
+    old_meta: Db.CartMeta_v3 | null
+  ) {
+    const [publisher, id] = cart.id.split("/");
+    const verified_publisher =
+      verified_signatures.find((x) => x.signed_by === publisher)?.verified ?? false;
+
+    const risk_summary = Capability.summarise_from_cartridge(
+      cart,
+      this.os.settings.get("security").prompt_for
+    );
+
+    const optional = new Map(
+      cart.security.passive_capabilities.map((x) => [
+        x.capability.type as Db.CapabilityType,
+        x.optional,
+      ])
+    );
+
+    const additional_risk =
+      risk_summary.to_review.length === 0
+        ? []
+        : [`${risk_summary.to_review.length} high-risk permissions`];
+    const acceptable_risk =
+      risk_summary.acceptable.length === 0 ? [] : risk_summary.acceptable.map((x) => x.description);
+    const risks = [...acceptable_risk, ...additional_risk];
+    const summary_msg =
+      risks.length === 0
+        ? `no passive permissions`
+        : risks.length === 1
+        ? `access to ${risks[0]}`
+        : `access to ${risks.slice(0, -1).join(", ")}, and ${risks.at(-1)}`;
+
+    const verified_status = verified_publisher
+      ? UI.klass("kate-ui-verification-badge kate-verified", [
+          UI.fa_icon("circle-check"),
+          " verified",
+        ])
+      : UI.klass("kate-ui-verification-badge kate-unverified", [
+          UI.fa_icon("triangle-exclamation"),
+          " unverified",
+        ]);
+    const verified_class = verified_publisher ? `kate-verified` : `kate-unverified`;
+
+    const content = UI.klass("kate-ui-install-confirmation", [
+      UI.grid({
+        layout: [
+          ["thumb", "meta"],
+          ["thumb", "cap"],
+        ],
+        column_sizes: ["100px", "1fr"],
+        row_sizes: ["min-content", "1fr"],
+        gap: "1rem",
+        content: {
+          thumb: UI.klass("kate-ui-cartridge-thumbnail", [
+            thumbnail_url == null ? UI.no_thumbnail() : UI.h("img", { src: thumbnail_url }, []),
+            UI.release_type(cart.metadata.presentation.release_type),
+            UI.rating_icon(cart.metadata.classification.rating),
+          ]),
+          meta: UI.klass("kate-ui-cartridge-info", [
+            UI.klass("kate-ui-cartridge-info-title", [cart.metadata.presentation.title]),
+            UI.klass("kate-ui-cartridge-info-id", [id, ` v${cart.version}`]),
+            UI.klass(`kate-ui-cartridge-info-publisher ${verified_class}`, [
+              UI.fa_icon("user"),
+              UI.klass(`kate-ui-cartridge-info-publisher-status ${verified_class}`, [publisher]),
+              verified_status,
+            ]),
+          ]),
+          cap: UI.vbox(0.5, [
+            UI.meta_text([`This cartridge requires ${summary_msg}.`]),
+            UI.with_style(
+              { padding: "0.5rem" },
+              UI.scroll([
+                ...risk_summary.to_review.map((x) => {
+                  const is_optional = optional.get(x.type) ?? true;
+                  return UI.toggle_cell(this.os, {
+                    title: x.title,
+                    description: "",
+                    value: !is_optional,
+                    readonly: !is_optional,
+                  });
+                }),
+              ])
+            ),
+          ]),
+        },
+      }),
+    ]);
+    const prev_version = old_meta?.version ? SemVer.try_parse(old_meta.version, null) : null;
+    const new_version = SemVer.try_parse(cart.version, null)!;
+    const cancel_button = old_meta == null ? "Cancel" : "Keep current";
+    const install_button =
+      prev_version == null
+        ? "Install"
+        : new_version.gt(prev_version)
+        ? `Upgrade from ${old_meta!.version}`
+        : new_version.lt(prev_version)
+        ? `Downgrade from ${old_meta!.version}`
+        : "Re-install";
+    return this.os.dialog.confirm("kate:cart-manager", {
+      title: `${install_button} cartridge?`,
+      message: content,
+      ok: install_button,
+      cancel: cancel_button,
+    });
+  }
+
+  async install(
+    cart: Cart.DataCart,
+    raw_meta: Uint8Array,
+    thumbnail_url: string | null,
+    files: AsyncIterable<{ index: number; data: Uint8Array }>
+  ) {
     if (this.os.kernel.console.options.mode === "single") {
       throw new Error(`Cartridge installation is not available in single mode.`);
     }
@@ -178,30 +328,36 @@ export class CartManager {
     if (old_meta != null) {
       const version = cart.version;
       const title = cart.metadata.presentation.title;
-      const old_title = old_meta.metadata.presentation.title;
       const old_version = old_meta.version;
-      if (old_meta.status === "active") {
-        if (old_version === version && !this.os.settings.get("developer").allow_version_overwrite) {
-          await this.os.notifications.push_transient(
-            "kate:cart-manager",
-            `Cartridge not installed`,
-            `${title} (${cart.id}) is already installed at version v${old_version}`
-          );
-          return false;
-        } else {
-          const should_update = await this.os.dialog.confirm("kate:installer", {
-            title: `Update ${old_title}?`,
-            message: `A cartridge already exists for ${cart.id} (${old_title} v${old_version}).
-                      Update it to ${title} v${version}?`,
-            ok: "Update",
-            cancel: "Keep old version",
-            dangerous: true,
-          });
-          if (!should_update) {
-            return false;
-          }
-        }
+      if (
+        old_meta.status === "active" &&
+        old_version === version &&
+        !this.os.settings.get("developer").allow_version_overwrite
+      ) {
+        await this.os.notifications.push_transient(
+          "kate:cart-manager",
+          `Cartridge not installed`,
+          `${title} (${cart.id}) is already installed at version v${old_version}`
+        );
+        return false;
       }
+    }
+
+    const verified_signatures = await Promise.all(
+      cart.signatures.map(async (x) => {
+        const verified = (await this.os.key_manager.verify(x.signed_by, raw_meta, x.signature))
+          .verified;
+        return { ...x, verified };
+      })
+    );
+    const should_install = await this.ask_install_confirmation(
+      cart,
+      verified_signatures,
+      thumbnail_url,
+      old_meta?.status === "active" ? old_meta : null
+    );
+    if (!should_install) {
+      return;
     }
 
     const cart_partition = await this.os.file_store.get_partition("cartridge");
@@ -223,6 +379,7 @@ export class CartManager {
     try {
       cart_meta = {
         ...cart,
+        signatures: verified_signatures,
         files: {
           location: await cart_partition.persist(bucket, {
             type: "cartridge",

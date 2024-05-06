@@ -77,6 +77,7 @@ kate.data_migration({
           const { key, nodes } = buckets.get(cartridge.id)!;
           await cv3.add({
             ...cartridge,
+            signatures: [],
             minimum_kate_version: { major: 0, minor: 24, patch: 2 },
             bucket_key: key,
             files: cartridge.files.map((x) => {
@@ -100,6 +101,7 @@ kate.data_migration({
             minimum_kate_version: { major: 0, minor: 24, patch: 2 },
             bucket_key: null,
             files: [],
+            signatures: [],
           });
         }
       }

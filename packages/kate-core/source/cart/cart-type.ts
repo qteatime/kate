@@ -177,6 +177,14 @@ export type CartMeta = {
   metadata: Metadata;
   runtime: Runtime;
   security: Security;
+  signatures: Signature[];
+};
+
+export type Signature = {
+  signed_by: string;
+  key_id: string;
+  signature: Uint8Array;
+  verified: boolean;
 };
 
 export type DataCart = CartMeta & {
