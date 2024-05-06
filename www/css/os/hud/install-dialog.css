@@ -7,6 +7,7 @@
 .kate-ui-install-confirmation .kate-ui-cartridge-thumbnail {
   border: 1px solid var(--color-border);
   padding: 1px;
+  position: relative;
 }
 
 .kate-ui-cartridge-info {
@@ -30,16 +31,26 @@
   display: flex;
   align-items: baseline;
   gap: 0.5rem;
+  color: var(--badge-color);
+}
+
+.kate-ui-verification-badge {
+  display: inline-block;
+  border: 1px solid var(--badge-color);
+  color: var(--badge-color);
+  border-radius: 1em;
+  padding: 0.2rem 1rem;
+  font-family: var(--font-family-sans);
+  display: flex;
+  flex-direction: row;
+  gap: 0.2rem;
+  align-items: baseline;
 }
 
 .kate-unverified {
-  color: var(--red);
+  --badge-color: var(--red);
 }
 
 .kate-verified {
-  color: var(--green);
-}
-
-.kate-ui-cartridge-info-publisher-status i {
-  padding: 0 0.25rem;
+  --badge-color: var(--green);
 }

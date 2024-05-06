@@ -209,8 +209,14 @@ export class CartManager {
         : `access to ${risks.slice(0, -1).join(", ")}, and ${risks.at(-1)}`;
 
     const verified_status = verified_publisher
-      ? UI.with_class("kate-verified", UI.fa_icon("circle-check"))
-      : UI.with_class("kate-unverified", UI.fa_icon("triangle-exclamation"));
+      ? UI.klass("kate-ui-verification-badge kate-verified", [
+          UI.fa_icon("circle-check"),
+          " verified",
+        ])
+      : UI.klass("kate-ui-verification-badge kate-unverified", [
+          UI.fa_icon("triangle-exclamation"),
+          " unverified",
+        ]);
     const verified_class = verified_publisher ? `kate-verified` : `kate-unverified`;
 
     const content = UI.klass("kate-ui-install-confirmation", [
@@ -223,13 +229,18 @@ export class CartManager {
         row_sizes: ["min-content", "1fr"],
         gap: "1rem",
         content: {
-          thumb: UI.klass("kate-ui-cartridge-thumbnail", [UI.no_thumbnail()]),
+          thumb: UI.klass("kate-ui-cartridge-thumbnail", [
+            UI.no_thumbnail(),
+            UI.release_type(cart.metadata.presentation.release_type),
+            UI.rating_icon(cart.metadata.classification.rating),
+          ]),
           meta: UI.klass("kate-ui-cartridge-info", [
             UI.klass("kate-ui-cartridge-info-title", [cart.metadata.presentation.title]),
             UI.klass("kate-ui-cartridge-info-id", [id, ` v${cart.version}`]),
             UI.klass(`kate-ui-cartridge-info-publisher ${verified_class}`, [
               UI.fa_icon("user"),
-              UI.klass("kate-ui-cartridge-info-publisher-status", [publisher, verified_status]),
+              UI.klass(`kate-ui-cartridge-info-publisher-status ${verified_class}`, [publisher]),
+              verified_status,
             ]),
           ]),
           cap: UI.vbox(0.5, [

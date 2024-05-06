@@ -8,7 +8,7 @@ import { capabilities } from "../..";
 import * as Cart from "../../cart";
 import type { DeveloperProfile } from "../../data";
 import type { KateButton } from "../../kernel";
-import { EventStream, Observable, load_image_from_bytes } from "../../utils";
+import { EventStream, Observable, load_image_from_bytes, unreachable } from "../../utils";
 import type { InteractionHandler } from "../apis";
 import type { KateOS } from "../os";
 
@@ -1250,6 +1250,28 @@ export function developer_profile_chip(profile: DeveloperProfile) {
   ]);
 }
 
+export function release_type(x: Cart.ReleaseType) {
+  return h(
+    "div",
+    {
+      class: "kate-os-carts-release-type",
+      "data-release-type": x,
+    },
+    [pretty_release_type(x)]
+  );
+}
+
+export function rating_icon(x: Cart.ContentRating) {
+  return h(
+    "div",
+    {
+      class: "kate-os-carts-rating",
+      "data-rating": x,
+    },
+    [pretty_rating_icon(x)]
+  );
+}
+
 export function grid(x: {
   layout: string[][];
   column_sizes?: string[];
@@ -1290,4 +1312,40 @@ export function with_style(
 export function with_class(klass: string, child: HTMLElement) {
   child.className += ` ${klass}`;
   return child;
+}
+
+function pretty_release_type(x: Cart.ReleaseType) {
+  switch (x) {
+    case "beta":
+      return "Beta";
+    case "demo":
+      return "Demo";
+    case "early-access":
+      return "Dev.";
+    case "prototype":
+      return "PoC";
+    case "regular":
+      return "Full";
+    case "unofficial":
+      return "Unofficial";
+    default:
+      throw unreachable(x, "release type");
+  }
+}
+
+function pretty_rating_icon(x: Cart.ContentRating) {
+  switch (x) {
+    case "general":
+      return "G";
+    case "teen-and-up":
+      return "T";
+    case "mature":
+      return "M";
+    case "explicit":
+      return "E";
+    case "unknown":
+      return "—";
+    default:
+      throw unreachable(x, "content rating");
+  }
 }
