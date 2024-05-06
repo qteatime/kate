@@ -442,10 +442,7 @@ w.task("www:bundle", ["licences:generate", "core:build", "glomp:build"], () => {
   const date = new Date();
   const yy = String(date.getUTCFullYear()).slice(-2);
   const mm = String(date.getUTCMonth() + 1).padStart(2, "0");
-  const dd = String(date.getUTCDate()).padStart(2, "0");
-  const hh = String(date.getUTCHours()).padStart(2, "0");
-  const mi = String(date.getUTCMinutes()).padStart(2, "0");
-  FS.writeFileSync("kate-buildinfo.json", JSON.stringify({ build: `r${yy}${mm}${dd}${hh}${mi}` }));
+  FS.writeFileSync("kate-buildinfo.json", JSON.stringify({ build: `r${yy}${mm}` }));
   glomp({
     entry: "packages/kate-core/build/index.js",
     out: `www/kate/kate-latest.js`,
@@ -458,7 +455,7 @@ w.task("www:bundle", ["licences:generate", "core:build", "glomp:build"], () => {
   });
   const version = require("./package.json").version;
   const worker0 = FS.readFileSync("packages/kate-core/build/worker.js", "utf-8");
-  const worker = worker0.replace(/{{VERSION}}/, `${version}-r${yy}${mm}${dd}`);
+  const worker = worker0.replace(/{{VERSION}}/, `${version}-r${yy}${mm}`);
   FS.writeFileSync("www/worker.js", worker);
   console.log("-> Wrote versioned www/worker.js");
   copy("packages/kate-core/RELEASE.txt", `www/kate/RELEASE-latest.txt`);
