@@ -59,3 +59,17 @@
   width: 100%;
   display: block;
 }
+
+.kate-ui-install-dialog-capability .kate-ui-link-card {
+  padding: 0.3rem 0.5rem;
+}
+
+.kate-ui-install-dialog-capability .kate-ui-link-card-description:empty {
+  display: none;
+}
+
+.kate-ui-install-dialog-capability .kate-ui-link-card-arrow {
+  justify-content: right;
+  font-size: 0.7rem;
+  color: var(--blue);
+}

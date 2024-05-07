@@ -281,13 +281,19 @@ export class CartManager {
               { padding: "0.5rem" },
               UI.scroll([
                 ...risk_summary.to_review.map((x) => {
-                  const is_optional = optional.get(x.type) ?? true;
-                  return UI.toggle_cell(this.os, {
-                    title: x.title,
-                    description: "",
-                    value: !is_optional,
-                    readonly: !is_optional,
-                  });
+                  return UI.with_class(
+                    "kate-ui-install-dialog-capability",
+                    UI.link_card(this.os, {
+                      title: x.title,
+                      arrow: "circle-info",
+                      on_click: async () => {
+                        await this.os.dialog.message("kate:cart-manager", {
+                          title: x.title,
+                          message: x.description,
+                        });
+                      },
+                    })
+                  );
                 }),
               ])
             ),
