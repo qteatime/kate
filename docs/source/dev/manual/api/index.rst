@@ -1,8 +1,8 @@
-========
-Kate API
-========
+================
+Kate Runtime API
+================
 
-The Kate API provides a way for a cartridge to interact with the
+The Kate Runtime API provides a way for a cartridge to interact with the
 Kate Kernel in order to do more than just rendering things on the
 screen. All APIs that Kate provides are accessible from the cartridge using
 the global ``KateAPI`` object.

@@ -85,8 +85,8 @@ Processes start their lifecycle by being spawned — the kernel will allocate
 an isolated frame for them to run, and then load the application's startup
 code in this frame.
 
-Application code is linked to the Kate API (and potentially any bridges)
-before being loaded in the frame. And it is up to the Kate API to set up
+Application code is linked to the Kate Runtime API (and potentially any bridges)
+before being loaded in the frame. And it is up to the Kate Runtime API to set up
 the application side of the IPC.
 
 This is also the point where we decide which files the process will have
@@ -206,7 +206,7 @@ so we can only run one copy of the application at any given time.
 
 We then set up the runtime code that will be run in the sandboxed frame.
 This includes a uniquely generated secret, whose only purpose is to
-make it more likely that it is the Kate API that is establishing the
+make it more likely that it is the Kate Runtime API that is establishing the
 connection; note that in case the pairing is hijacked and other application
 code establishes the connection that has no bearing on the security guarantees
 we provide, as we treat all code in the frame with the same untrusted level.
@@ -378,17 +378,17 @@ Kate's perspectives.
   players, and shift the burden of finding a safe/Kate-friendly way forward to
   application developers instead.
 
-**Cartridge code pairing instead of Kate API code**:
+**Cartridge code pairing instead of Kate Runtime API code**:
   Because the cartridge code starts running before the pairing process has
   finished, it's technically possible (but improbable) that the cartridge
   code wins the race to provide a pairing channel to the kernel code. In that
   case the kernel would be communicating directly with the cartridge code
-  instead of the injected Kate API code.
+  instead of the injected Kate Runtime API code.
 
   We mitigate this by requiring a secret shared between the kernel and the
-  Kate API code when pairing, however, since the kernel treats the whole
+  Kate Runtime API code when pairing, however, since the kernel treats the whole
   cartridge process as untrusted, this impacts only the cartridge developers,
-  in the sense that the Kate API and bridges would not do any of the
+  in the sense that the Kate Runtime API and bridges would not do any of the
   dynamic emulation work, and developers would be responsible for re-implementing
   that code using the IPC port directly.
 
@@ -405,7 +405,7 @@ Kate's perspectives.
 
 **Buffered messages due to long pairing**:
   Because the cartridge may start running code that sends messages to the
-  kernel process before pairing is complete, the Kate API code will buffer
+  kernel process before pairing is complete, the Kate Runtime API code will buffer
   those messages and send them later, this might cause increased memory usage.
 
   We mitigate this by placing a heuristic limit on the buffer size, such that

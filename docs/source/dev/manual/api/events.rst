@@ -4,7 +4,7 @@
 .. py:module:: KateAPI.events
   :synopsis: Provides basic supports for event streams.
 
-Some Kate APIs are event-driven, where data is pushed to you rather than
+Some Kate Runtime APIs are event-driven, where data is pushed to you rather than
 pulled from your code. The ``events`` API provides the basic support
 for Kate events and exposes events that are sent from the Kernel process.
 

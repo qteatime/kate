@@ -161,7 +161,7 @@ licensed under the [GNU General Public License v2.0][gpl-2] (or later).
 Other applications that are part of the Kate project are released under
 the [Mozilla Public Licence v2.0][mpl-2] or more permissive licenses.
 
-The [Licence FAQ](./LICENCE-FAQ.md) provides answers to common questions
+The [Licence FAQ](./LICENSING-FAQ.md) provides answers to common questions
 you might have (including "why so many licences?"), but the short version is:
 
 - `packages/kate-core` (the operating system),

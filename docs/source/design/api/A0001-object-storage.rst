@@ -224,7 +224,7 @@ to the security properties established in this document.
 Because the Kernel (which includes the ObjectStore) and each cartridge run
 in different processes, cartridges cannot interact with the ObjectStore
 directly. Instead, a proxy object is injected in the cartridge's process
-as one of the client Kate APIs, and this proxy sends requests to the Kernel
+as one of the client Kate Runtime APIs, and this proxy sends requests to the Kernel
 process in order to operate on the object store on the cartridge's behalf
 
 In the Kernel process, such messages are handled by first identifying the
@@ -235,7 +235,7 @@ This guarantees that the Kernel only hands partitions that the sender of the
 message rightfully possesses a right to access.
 
 Any result of the operation is sent back to the cartridge process as a
-separate message. The client Kate API takes care of matching the Kernel
+separate message. The client Kate Runtime API takes care of matching the Kernel
 reply with the original request through the message identifier it generated
 to make the request. This implies that all operations in the object storage
 are inherently asynchronous.
@@ -481,7 +481,8 @@ Surface API
 
 The surface API is a high-level TypeScript API built on top of the Core
 Language semantics specified above. We only cover the client part of it,
-which is exposed to the cartridge under the Kate APIs. It's defined as follows:
+which is exposed to the cartridge under the Kate Runtime APIs. It's defined
+as follows:
 
 .. code-block:: typescript
 

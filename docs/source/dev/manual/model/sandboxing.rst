@@ -28,7 +28,8 @@ the Kate cartridge file API:
    img.src = URL.createObjectURL(blob);
 
 The same is true for any other web api besides Canvas and Web Audio: rather
-than being used directly, you need to use the equivalent Kate API instead.
+than being used directly, you need to use the equivalent Kate Runtime API
+instead.
 
 
 Reading files

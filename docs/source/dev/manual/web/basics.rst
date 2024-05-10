@@ -74,7 +74,7 @@ Static code translation
 When Kate loads the web page described by the cartridge as the game's
 entry point it needs to do two things:
 
-* Make sure the page has access to all :doc:`Kate APIs </dev/manual/api/index>`. If we don't do
+* Make sure the page has access to all :doc:`Kate Runtime APIs </dev/manual/api/index>`. If we don't do
   this then players wouldn't even be able to interact with the game, because
   the cartridge's screen never gets "real" focus.
 
@@ -86,9 +86,9 @@ Both of these are handled by performing a static code translation. That is,
 Kate will read the page's code, and then modify that code before loading
 it. The intent of this code modification is to get rid of any external
 references that exist in the code (by pointing it to data in the cartridge
-instead), and to load the Kate APIs code in the cartridge process.
+instead), and to load the Kate Runtime APIs code in the cartridge process.
 
-The Kate APIs are injected at the very beginning of the page, so they're
+The Kate Runtime APIs are injected at the very beginning of the page, so they're
 always loaded before any other code. Along with the APIs there is some
 code that is needed to establish the communication between the cartridge
 process and the Kernel process, and to describe to the cartridge which

@@ -205,4 +205,4 @@ cartridge. It consists of two configurations:
 * ``html``: The starting web page that should be loaded and sandboxed by Kate.
 
 * ``bridges``: Which code needs to be injected in the cartridge process
-  to emulate web APIs that the cartridge uses, using the Kate APIs.
+  to emulate web APIs that the cartridge uses, using the Kate Runtime APIs.

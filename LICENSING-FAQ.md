@@ -68,9 +68,9 @@ Earlier in the project we've experimented with the [Mozilla Public Licence v2.0]
 
 ## Can I release a cartridge under a proprietary licence?
 
-For the vast majority of cartridges: yes. There's a special provision to exempt cartridges linking against the Kate API from being subject to the GPLv3, so for any regular cartridge (which will likely include all video games), you don't have to worry about the licence---it is whatever you choose, as long as it's compatible with the software you're distributing yourself.
+For the vast majority of cartridges: yes. There's a special provision to exempt cartridges linking against the Kate Runtime API from being subject to the GPLv3, so for any regular cartridge (which will likely include all video games), you don't have to worry about the licence---it is whatever you choose, as long as it's compatible with the software you're distributing yourself.
 
-Cartridges that only link with the Kate API have their security and privacy characteristics enforced by the Kate OS, thus there's less of a need for users to audit them. The risks users are taking with running the cartridge are already communicated in the form of capabilities, and we can get meaningful consent by having users review the capabilities the cartridge requires.
+Cartridges that only link with the Kate Runtime API have their security and privacy characteristics enforced by the Kate OS, thus there's less of a need for users to audit them. The risks users are taking with running the cartridge are already communicated in the form of capabilities, and we can get meaningful consent by having users review the capabilities the cartridge requires.
 
 Cartridges that are meant to be extensions or modifications to the Kate operating system itself (e.g.: an OS driver that adds support to new gamepads, a visual theme, a widget that summarises play habits data, etc.), and thus change core OS behaviour by linking to the (as of yet unreleased) Kate Kernel API, will need to comply with the GPLv3. This is in line with the explanation in the answer above regarding auditing of the security guarantees in Kate.
 

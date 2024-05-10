@@ -1,7 +1,7 @@
 {
   "name": "@qteatime/kate-api-types",
   "version": "0.2.0",
-  "description": "Typescript definitions for the injected Kate API.",
+  "description": "Typescript definitions for the injected Kate Runtime API.",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/qteatime/kate.git"
