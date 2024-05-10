@@ -1,6 +1,6 @@
 {
   "private": true,
-  "version": "0.25.5",
+  "version": "0.26.0",
   "scripts": {
     "test": "node make test:all"
   },

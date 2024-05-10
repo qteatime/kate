@@ -7,10 +7,7 @@
 export class LiveNode {
   constructor(readonly node: HTMLElement) {}
 
-  async animate(
-    keyframes: Keyframe[],
-    options: number | KeyframeAnimationOptions
-  ) {
+  async animate(keyframes: Keyframe[], options: number | KeyframeAnimationOptions) {
     const animation = this.node.animate(keyframes, options);
     return new Promise<void>((resolve, reject) => {
       animation.onfinish = () => resolve();
@@ -26,19 +23,12 @@ export class LiveNode {
 export class LiveNodeSet {
   constructor(readonly nodes: HTMLElement[]) {}
 
-  async animate(
-    keyframes: Keyframe[],
-    options: number | KeyframeAnimationOptions
-  ) {
-    return Promise.all(
-      this.nodes.map((x) => new LiveNode(x).animate(keyframes, options))
-    );
+  async animate(keyframes: Keyframe[], options: number | KeyframeAnimationOptions) {
+    return Promise.all(this.nodes.map((x) => new LiveNode(x).animate(keyframes, options)));
   }
 
   select(query: string) {
-    const items = this.nodes.flatMap(
-      (x) => new LiveNode(x).select(query).nodes
-    );
+    const items = this.nodes.flatMap((x) => new LiveNode(x).select(query).nodes);
     return new LiveNodeSet(items);
   }
 }

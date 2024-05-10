@@ -1,0 +1,57 @@
+The Kate App UI library is dual licensed under the Mozilla Public Licence v2.0
+or GPL v2 (or later).
+
+Font files and image files remain in their own licence, which includes:
+
+Font Awesome 6 Free (c) 2023 Fonticons, Inc. (https://fontawesome.com)
+Licensed under the SIL Open Font License (font files),
+Creative Commons 4.0 Attribution International license (icons), and
+MIT (CSS source code).
+
+---
+
+Poppins (c) 2020 The Poppins Project Authors
+(https://github.com/itfoundry/Poppins)
+Licensed under the SIL Open Font License.
+
+---
+
+Roboto and Roboto Mono (c) Google
+(https://fonts.google.com/specimen/Roboto/about)
+Licensed under the Apache License 2.0.
+
+---
+
+Image files (from `assets/img` in this distribution) are licensed to you
+under the terms of the Creative Commons 4.0 Attribution International,
+however attribution is not required.
+
+---
+
+The verbatim text of each licence is copied below for offline distribution
+convenience:
+
+
+## Mozilla Public Licence version 2.0
+
+{{support/licences/MPL2.txt}}
+
+
+## GNU General Publice Licence version 2
+
+{{support/licences/GPL2.txt}}
+
+
+## SIL Open Font Licence
+
+{{support/licences/SIL.txt}}
+
+
+## Creative Commons 4.0 Attribution International
+
+{{support/licences/CC4-BY.txt}}
+
+
+## Apache Licence 2.0
+
+{{support/licences/Apache2.txt}}

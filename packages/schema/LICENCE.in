@@ -1,9 +1,12 @@
-Copyright (c) 2023, Niini
-
-The Kate binary schemas are released under the MPL v2.0.
+The Kate binary schemas are dual licensed under the MPL v2 or GPL v2 (or later).
 
 _______________________________________________________________________________
 
 ## Mozilla Public Licence Version 2.0
 
 {{support/licences/MPL2.txt}}
+
+
+## GNU General Public Licence version 2
+
+{{support/licences/GPL2.txt}}

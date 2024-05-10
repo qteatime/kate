@@ -1,7 +1,18 @@
 /*
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ * Copyright (c) 2023-2024 The Kate Project Authors
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, see <https://www.gnu.org/licenses>.
  */
 
 const { copy, copy_tree, make, pack } = require("./utils");
@@ -34,10 +45,7 @@ async function gen_unsigned_zip(platform, arch) {
     "packages/kate-desktop/electron-package.json",
     Path.join(dest, "resources/app/package.json")
   );
-  FS.renameSync(
-    Path.join(dest, "LICENSE"),
-    Path.join(dest, "LICENSE.electron.txt")
-  );
+  FS.renameSync(Path.join(dest, "LICENSE"), Path.join(dest, "LICENSE.electron.txt"));
   copy("README.md", Path.join(dest, "README.md"));
   copy("LICENCE.txt", Path.join(dest, "LICENCE.kate.txt"));
 

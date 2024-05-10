@@ -1,0 +1,42 @@
+Copyright (c) 2023-2024 The Kate Project Authors
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, see <https://www.gnu.org/licenses>.
+
+Linking the Kate operating system or any of its components statically
+or dynamically with other modules is making a combined work based on
+the Kate operating system. Thus, the terms and conditions of the
+GNU General Public License cover the whole combination.
+
+Kate programs are generally distributed in the form of cartridge files that
+are linked dynamically to the Kate operating system to function.
+As a special exception, the copyright holders of the Kate operating system
+give you permission to combine the Kate operating system with any cartridge
+that communicates with the Kate operating system solely through the
+Kate Runtime API. This combination does not by itself cause the resulting
+cartridge to be covered by the GNU General Public License. This exception
+however does not invalidate any other reasons why the cartridge file might
+be covered by the GNU General Public License.
+
+Note that people who make modified versions of the Kate operating system
+are not obligated to grant this special exception for their modified versions;
+it is their choice whether to do so. The GNU General Public License gives
+permission to release a modified version without this exception; this
+exception also makes it possible to release a modified version which
+carries forward this exception. If you modify the Kate Runtime API,
+this exception does not apply to your modified version of the
+Kate operating system, and you must remove this exception when
+you distribute your modified version.
+
+This exception is an additional permission under section 7 of the
+GNU General Public License, version 3 (“GPLv3”), if such version is used.

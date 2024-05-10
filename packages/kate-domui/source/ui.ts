@@ -12,10 +12,7 @@ export class KateUI {
   private focus_target: Set<Widget> = new Set();
   private current_focus: Widget | null = null;
 
-  private constructor(
-    readonly docroot: HTMLElement,
-    readonly root: HTMLElement
-  ) {}
+  private constructor(readonly docroot: HTMLElement, readonly root: HTMLElement) {}
 
   static from_root(root: HTMLElement) {
     const ui_root = document.createElement("div");

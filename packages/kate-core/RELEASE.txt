@@ -1,11 +1,31 @@
 =======================================================================
-Kate v0.25  (Spring 2024)
+Kate v0.26  (Spring 2024)
 =======================================================================
 
-The v0.25 is the Spring experimental release of Kate. This release
+The v0.26 is the Spring experimental release of Kate. This release
 focuses on improving Kate's stability, making it easier for players
 to play a game across multiple devices, and making it easier for
 developers to publish games for Kate.
+
+
+!!BREAKING CHANGE!!
+Moving Kate to GPL
+------------------
+
+Distribution of any Kate before v0.26 was subject to a different licence.
+v0.26 is made available to you under the terms of the GNU GPL v2.0
+(or at your choice any later version). Kate cartridges are however not
+covered by the GPL and can be released under any licence its authors
+choose --- unless they link against the (upcoming) Kate Kernel API,
+which applies to cartridges that provide direct extensions to the
+Kate operating system (not possible today).
+
+In all cases, the Publisher will tell you whether your cartridge falls
+under the GPL or not, but just like before, this change should not
+affect any existing user (or most users), and the point of the exception
+above is to keep the same intent of the licence we had so far, while also
+making sure that changes to the core security/privacy guarantees of the
+Kate operating system itself can be audited by users.
 
 
 New input proxy bridge
