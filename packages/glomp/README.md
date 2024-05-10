@@ -72,5 +72,5 @@ Glomp currently transforms JavaScript and CSS using regular expressions. This is
 
 ## Licence
 
-Glomp is (c) Niini and released under the Mozilla Public License v2.0.
-See `LICENCE` for details.
+Glomp is (c) The Kate Project Authors and released under the GNU General
+Public Licence version 2 (or later). See `LICENCE.txt` for details.

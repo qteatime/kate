@@ -1,4 +1,4 @@
-Copyright (c) 2023 Q.
+Copyright (c) 2023-2024 Niini
 
 "A certain autumn evening."'s source code is distributed under the terms of
 the MIT licence. The usage policy for original images is described in
@@ -27,7 +27,7 @@ thirdy-parties, speficied below.
 
 ## Images:
 
-- Q.
+- Niini
   (Creative Commons 4.0 BY --- https://creativecommons.org/licenses/by/4.0/)
   (additional recommendations: https://qteati.me/usage-policy/)
 

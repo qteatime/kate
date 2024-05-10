@@ -1,7 +1,21 @@
 /*
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ * Copyright (c) 2023-2024 The Kate Project Authors
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, see <https://www.gnu.org/licenses>.
+ *
+ * This file is part of the cartridge linking exception as described
+ * in COPYING.
  */
 
 declare var VERSIONED: boolean;
@@ -61,10 +75,7 @@ void (function () {
       return result.promise;
     }
 
-    submit_request<A>(
-      req: KDBRequest<A>,
-      job: (_: KDBRequest<A>) => Promise<A>
-    ) {
+    submit_request<A>(req: KDBRequest<A>, job: (_: KDBRequest<A>) => Promise<A>) {
       return request(req, async (req) => {
         return this.submit(async () => {
           return job(req);
@@ -164,10 +175,7 @@ void (function () {
     return cursor.req;
   }
 
-  function request<A>(
-    req: KDBRequest<A>,
-    fn: (req: KDBRequest<A>) => Promise<A>
-  ) {
+  function request<A>(req: KDBRequest<A>, fn: (req: KDBRequest<A>) => Promise<A>) {
     fn(req).then(
       (value) => req.do_success(value),
       (error) => req.do_error(error)
@@ -237,9 +245,7 @@ void (function () {
       return queue.submit(async () => {
         const meta = await partition().ensure_bucket(DB_META_KEY);
         const db_keys = await meta.list();
-        const dbs = (await Promise.all(
-          db_keys.map((x) => meta.read_data(x.key))
-        )) as DBMeta[];
+        const dbs = (await Promise.all(db_keys.map((x) => meta.read_data(x.key)))) as DBMeta[];
         return dbs.map((x) => x.name);
       });
     }
@@ -267,10 +273,7 @@ void (function () {
       options?: { keyPath?: string | string[]; autoIncrement?: boolean }
     ) {
       if (this._meta.stores.find((x) => x.name === name)) {
-        throw new DOMException(
-          `Duplicate object store ${name}`,
-          "ContraintError"
-        );
+        throw new DOMException(`Duplicate object store ${name}`, "ContraintError");
       }
       const key_path0 = options?.keyPath ?? [];
       const key_path = Array.isArray(key_path0) ? key_path0 : [key_path0];
@@ -302,9 +305,7 @@ void (function () {
     // The IDBBridge is **NOT** transactional!!!
     transaction(stores0: string | string[]) {
       const stores1 = Array.isArray(stores0) ? stores0 : [stores0];
-      const stores = stores1.map((n) =>
-        this._meta.stores.find((x) => x.name === n)
-      );
+      const stores = stores1.map((n) => this._meta.stores.find((x) => x.name === n));
       if (!stores.every((x) => x != null)) {
         throw new DOMException(`Some stores not found`, "NotFoundError");
       }
@@ -427,12 +428,7 @@ void (function () {
         .sort((a, b) => cmp(a.key, b.key))
         .map((x) => ({ key: x.key, primaryKey: x.key, value: x.value }));
       return cursor_request(
-        new KDBCursor(
-          new KDBRequest(),
-          records,
-          direction as any,
-          (x) => x.value
-        )
+        new KDBCursor(new KDBRequest(), records, direction as any, (x) => x.value)
       );
     }
 
@@ -445,21 +441,12 @@ void (function () {
       );
     }
 
-    createIndex(
-      name: string,
-      key_path: any,
-      options?: { unique?: boolean; multiEntry?: boolean }
-    ) {
+    createIndex(name: string, key_path: any, options?: { unique?: boolean; multiEntry?: boolean }) {
       if (this._meta.indexes.find((x) => x.name === name)) {
-        throw new DOMException(
-          `Duplicate index name ${name}`,
-          "ConstraintError"
-        );
+        throw new DOMException(`Duplicate index name ${name}`, "ConstraintError");
       }
       if (options?.multiEntry) {
-        throw new Error(
-          `[Kate][IDBBridge] multiEntry indexes are not supported`
-        );
+        throw new Error(`[Kate][IDBBridge] multiEntry indexes are not supported`);
       }
 
       const meta = {
@@ -552,20 +539,14 @@ void (function () {
     }
 
     getAll(query: any, count: number = 2 ** 32 - 1) {
-      const items = [...linear_search(query, this._make_index())].slice(
-        0,
-        count
-      );
+      const items = [...linear_search(query, this._make_index())].slice(0, count);
       return queue.submit_request(new KDBRequest(), async (req) => {
         return items.map((x) => x.value);
       });
     }
 
     getAllKeys(query: any, count: number = 2 ** 32 - 1) {
-      const items = [...linear_search(query, this._make_index())].slice(
-        0,
-        count
-      );
+      const items = [...linear_search(query, this._make_index())].slice(0, count);
       return queue.submit_request(new KDBRequest(), async (req) => {
         return items.map((x) => x.key);
       });
@@ -579,22 +560,17 @@ void (function () {
     }
 
     openCursor(query: any = null, direction: string = "next") {
-      const records = [...linear_search(query, this._make_index())].sort(
-        (a, b) => cmp(a.key, b.key)
+      const records = [...linear_search(query, this._make_index())].sort((a, b) =>
+        cmp(a.key, b.key)
       );
       return cursor_request(
-        new KDBCursor(
-          new KDBRequest(),
-          records,
-          direction as any,
-          (x) => x.value
-        )
+        new KDBCursor(new KDBRequest(), records, direction as any, (x) => x.value)
       );
     }
 
     openKeyCursor(query: any = null, direction: string = "next") {
-      const records = [...linear_search(query, this._make_index())].sort(
-        (a, b) => cmp(a.key, b.key)
+      const records = [...linear_search(query, this._make_index())].sort((a, b) =>
+        cmp(a.key, b.key)
       );
       return cursor_request(
         new KDBCursor(new KDBRequest(), records, direction as any, (x) => x.key)
@@ -691,10 +667,7 @@ void (function () {
     }
   }
 
-  function* linear_search(
-    query0: any,
-    items: Iterable<{ key: any; primaryKey: any; value: any }>
-  ) {
+  function* linear_search(query0: any, items: Iterable<{ key: any; primaryKey: any; value: any }>) {
     const query = lift_query(query0);
     for (const { key, primaryKey, value } of items) {
       if (match(query, key)) {
@@ -747,9 +720,7 @@ void (function () {
         return;
       }
       this.resolved = true;
-      console.warn(
-        `[Kate][IDBBridge] Kate's IndexedDB bridge is not transactional!`
-      );
+      console.warn(`[Kate][IDBBridge] Kate's IndexedDB bridge is not transactional!`);
     }
 
     commit() {
@@ -770,18 +741,13 @@ void (function () {
     }
 
     set onabort(fn: any) {
-      console.warn(
-        `[Kate][IDBBridge] Kate's IndexedDB bridge is not transactional!`
-      );
+      console.warn(`[Kate][IDBBridge] Kate's IndexedDB bridge is not transactional!`);
     }
 
     objectStore(name: string) {
       const store = this._stores.find((x) => x.name === name);
       if (store == null) {
-        throw new DOMException(
-          `Store not in this transaction ${name}`,
-          "NotFoundError"
-        );
+        throw new DOMException(`Store not in this transaction ${name}`, "NotFoundError");
       }
       return store;
     }

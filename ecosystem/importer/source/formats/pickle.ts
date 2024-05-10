@@ -1,8 +1,20 @@
 /*
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ * Copyright (c) 2023-2024 The Kate Project Authors
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, see <https://www.gnu.org/licenses>.
  */
+
 import { unreachable } from "../deps/utils";
 
 // Note: This is based on the docs in cpython's `pickletools.py`.
@@ -258,17 +270,11 @@ class Program {
 
   read_bytes(offset: number, length: number) {
     this.assert_not_eof(offset + length);
-    return this.data.slice(
-      this._offset + offset,
-      this._offset + offset + length
-    );
+    return this.data.slice(this._offset + offset, this._offset + offset + length);
   }
 
   maybe_read_bytes(offset: number, length: number) {
-    return this.data.slice(
-      this._offset + offset,
-      this._offset + offset + length
-    );
+    return this.data.slice(this._offset + offset, this._offset + offset + length);
   }
 }
 
@@ -701,10 +707,7 @@ function step(frame: Frame, program: Program) {
     }
 
     default:
-      throw unreachable(
-        opcode,
-        `Unsupported opcode ${opcode} (at ${program.offset}`
-      );
+      throw unreachable(opcode, `Unsupported opcode ${opcode} (at ${program.offset}`);
   }
 }
 

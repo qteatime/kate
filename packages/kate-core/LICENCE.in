@@ -1,24 +1,32 @@
-Copyright (c) 2023, Niini
+Copyright (c) 2023-2024, The Kate Project Authors
 
-Kate is made possible thanks to the amazing work of other people
-shared under permissive licenses. The software and assets that
-make up Kate are listed here.
+The Kate operating system and its components is made possible thanks to the
+amazing work of other people shared under permissive licenses. The software
+and assets that make up the Kate operating system are listed here.
 
 -------------------------------------------------------------------------------
 
-## Kate's licence and your rights
+## The Kate project licence and your rights
 
-Kate is released under the terms of the Mozilla Public Licence, v2.0. 
-A copy of the MPL is included in this file, but you can also obtain
-one at https://mozilla.org/MPL/2.0/.
+The Kate operating system is released under the terms of the
+GNU General Public Licence version 2 or (at your option) any later version.
+A copy of the GPL text is included in this file, but you can also
+obtain one at https://www.gnu.org/licenses.
 
-You may get a copy of the source code at https://github.com/qteatime/kate.
-Information on how to build Kate from the source code is also
-included there. Official releases will always be distributed at
-https://github.com/qteatime/kate, and you're encouraged to audit any
-modifications if you've got your copy of Kate elsewhere.
+A special exception is made for cartridges that link to Kate exclusively
+through the Kate Runtime API. Such cartridges don't modify core behaviour
+of the operating system and cannot change the security and privacy guarantees
+the project provides, therefore they can be released under any terms, and
+there's no obligation to release the source code of such cartridges. This
+exception text is also included at the end of this document.
 
-There are other components that make up the Kate Importer project and which
+You may get a copy of the Kate operating system's source code at
+https://github.com/qteatime/kate. Information on how to build the the project
+from the source code is also included there. Official releases will always
+be distributed at https://github.com/qteatime/kate, and you're encouraged
+to audit any modifications if you've got your copy elsewhere.
+
+There are other components that make up  project and which
 are available under different terms. Full text for all relevant licences is
 included here, after attributions, in the goal of making them offline-friendly.
 
@@ -79,6 +87,36 @@ _______________________________________________________________________________
 
 -------------------------------------------------------------------------------
 
-## Mozilla Public Licence Version 2.0
+## GNU General Public Licence version 2
 
-{{support/licences/MPL2.txt}}
+{{support/licences/GPL2.txt}}
+
+## Kate Runtime API linking exception
+
+Linking the Kate operating system or any of its components statically
+or dynamically with other modules is making a combined work based on
+the Kate operating system. Thus, the terms and conditions of the
+GNU General Public License cover the whole combination.
+
+Kate programs are generally distributed in the form of cartridge files that
+are linked dynamically to the Kate operating system to function.
+As a special exception, the copyright holders of the Kate operating system
+give you permission to combine the Kate operating system with any cartridge
+that communicates with the Kate operating system solely through the
+Kate Runtime API. This combination does not by itself cause the resulting
+cartridge to be covered by the GNU General Public License. This exception
+however does not invalidate any other reasons why the cartridge file might
+be covered by the GNU General Public License.
+
+Note that people who make modified versions of the Kate operating system
+are not obligated to grant this special exception for their modified versions;
+it is their choice whether to do so. The GNU General Public License gives
+permission to release a modified version without this exception; this
+exception also makes it possible to release a modified version which
+carries forward this exception. If you modify the Kate Runtime API,
+this exception does not apply to your modified version of the
+Kate operating system, and you must remove this exception when
+you distribute your modified version.
+
+This exception is an additional permission under section 7 of the
+GNU General Public License, version 3 (“GPLv3”), if such version is used.

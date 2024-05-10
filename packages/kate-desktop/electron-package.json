@@ -1,10 +1,10 @@
 {
   "name": "@qteatime/kate-desktop",
-  "version": "0.25.5",
+  "version": "0.26.0",
   "description": "A fantasy handheld console for small visual novels, 2d RPGs, and other story-rich games!",
   "author": "Niini",
   "main": "index.js",
-  "license": "MIT",
+  "license": "GPL-2.0-or-later",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/qteatime/kate.git"

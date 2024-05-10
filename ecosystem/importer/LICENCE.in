@@ -1,8 +1,11 @@
-Copyright (c) 2023 Niini
+Copyright (c) 2023-2024 The Kate Project Authors
 
-The Kate Importer is released under the terms of the Mozilla Public Licence,
-v. 2.0. A copy of the MPL is included in this file, but you can also obtain
-one at https://mozilla.org/MPL/2.0/.
+The Kate Importer is released under the terms of the GNU General Public
+Licence version 2 or (at your option) any later version. A copy of the
+GPL text is included in this file, but you can also obtain
+one at https://www.gnu.org/licenses. Note that since this application
+cannot create any distributable program, the GPL does not extend to
+any game you import---the GPL only applies when you distribute things.
 
 You may get a copy of the source code at https://github.com/qteatime/kate.
 Information on how to build the Kate Importer from the source code is also
@@ -108,6 +111,12 @@ _______________________________________________________________________________
 ## Python licence
 
 {{support/licences/Python.txt}}
+
+_______________________________________________________________________________
+
+## GNU General Public Licence version 2
+
+{{support/licences/GPL2.txt}}
 
 _______________________________________________________________________________
 

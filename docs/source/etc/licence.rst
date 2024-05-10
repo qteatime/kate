@@ -4,38 +4,76 @@ Terms of use
 
 Kate is made possible thanks to the amazing work of other people
 shared under permissive licences. The software and assets that
-make up Kate are listed here.
+make up the entirety of the Kate project are listed here.
 
 
-Kate's licence and your rights
-------------------------------
+The Kate project licence and your rights
+----------------------------------------
 
-Up until version 0.23.8, Kate was released under the MIT licence.
-But from 0.23.10 onwards, Kate is released under the terms of the
-Mozilla Public Licence, v2.0.  A copy of the MPL is included in this file,
-but you can also obtain one at https://mozilla.org/MPL/2.0/.
+The primary goal of the Kate project is to provide you, the user, with a
+platform that is secure and respects your privacy, and for which you can
+always verify if the guarantees say you get are truly what you expect,
+rather than just trusting the authors. To this end, we rely on specific
+software licences to guarantee this right of verifying your copy of Kate.
 
-You can read the reasoning of this change in the
-`GitHub patch that introduced it <https://github.com/qteatime/kate/pull/22>`_,
-but the short version is that releasing it under the MPL allows better
-transparency (and consequently security and auditability) for players
-using modified versions of Kate.
+In essence, the Kate project is divided into layers, and each layer has
+more strict or more lax licensing depending on how important it is to
+the security and privacy guarantees we provide to you. The layers are:
 
-You may get a copy of the source code at https://github.com/qteatime/kate.
-Information on how to build Kate from the source code is also
-included there. Official releases will always be distributed at
-https://github.com/qteatime/kate, and you're encouraged to audit any
-modifications if you've got your copy of Kate elsewhere.
+- **The Kate operating system and its components**, what is made available to
+  you either online (e.g.: on <https://kate.qteati.me>), or through a native
+  application/kernel distribution. This is always licensed to you under
+  the GNU General Public License version 2 (or, at your choice, a later
+  version). This guarantees that you'll always be able to verify the
+  security and privacy guarantees of your copy of Kate.
 
-There are other components that make up the Kate Importer project and which
-are available under different terms. Full text for all relevant licences is
-included here, after attributions, in the goal of making them offline-friendly.
+- **The Kate Importer and Kate Publisher cartridges**, as well as the Kate
+  command line tools, are also licensed to you under the GNU General
+  Publice License version 2 (or, at your choice, a later version).
+  This is done so cartridge authors can make sure the tool is not *changing*
+  their game/app code in any way they don't expect to, which indirectly
+  impacts the security/privacy guarantees a thirdy-party author provides to
+  you.
+
+- **The Kate documentation (these books)** are released under a
+  Creative Commons 4.0 No-Derivatives licence. They're free to copy and
+  share, but you can't modify them without the Kate project authors' approval.
+  If we allowed any unvetted modification we would open up the possibility of
+  copies of the documentation existing with misleading or incorrect statements
+  about the security guarantees and privacy you get. This is particularly true
+  with translations, as even when translators have no intention of misleading,
+  their choice of phrasing might still cause confusion among readers.
+
+- **Any thirdy-party cartridge released for Kate** is bound to the licence the
+  authors of that cartridge have chosen (and communicated to you). This
+  licence can be read from within Kate. Thirdy-party cartridges that don't
+  extend or modify the Kate operating system are not subject to the GPL
+  (there's a special exception for them) because they cannot subvert any of
+  the security and privacy guarantees the Kate operating system communicates
+  to you, thus there's no real need to verify the cartridge's code.
+
+- Other components of the Kate project such as images and thirdy-party
+  dependencies are subject to their own licences. Such cases are specified
+  later in this document.
+
+In order to allow you to verify the security and privacy guarantees that
+the Kate project gives you, you should have received a copy of the source
+code for Kate program you're running. The original source code by the
+Kate project authors can always be found at https://github.com/qteatime/kate,
+but if you've received a modified copy, the person who shared the copy with
+you must tell you where to get the exact source code for their modified version.
+
+Official binary releases by the Kate project authors will always be
+distributed at https://github.com/qteatime/kate. You're encouraged to audit
+and verify any modifications if you've got your copy from elsewhere.
+
+---
 
 This software contains portions of code, fonts, images, and sounds by
 third-parties, specified below.
 
-Full text for all relevant licences are included here after
-attributions, in the goal of making them offline-friendly.
+Full text for all relevant licences is included here, after attributions,
+in the goal of making them offline-friendly.
 
 
 Fonts
@@ -112,6 +150,25 @@ http://scripts.sil.org/OFL
 
 .. include:: ../../../support/licences/SIL.txt
    :literal:
+
+
+GNU General Public Licence version 2
+''''''''''''''''''''''''''''''''''''
+
+.. include:: ../../../support/licences/GPL2.txt
+  :literal:
+
+
+Linking exception for cartridges
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Note that in the case of the Kate operating system, we provide a special
+exception to this licence such that cartridge authors can release their
+cartridge under any licence, without being bound to the GPL for linking
+to the Kate Runtime API. This exception is reproduced below:
+
+.. include:: ../../../COPYING
+  :literal:
 
 
 Apache License 2.0

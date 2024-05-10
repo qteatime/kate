@@ -1,13 +1,13 @@
-# Kate
+# The Kate Project
 
 > **NOTE:**  
-> Kate is an experimental proof-of-concept currently, its security properties are not proven, and it may break randomly. Cartridge format is not final, you might need to re-package your game for newer versions.
+> The Kate project is an experimental proof-of-concept currently, its security properties are not proven, and it may break randomly. Cartridge format is not final, you might need to re-package your game for newer versions.
 
-Kate is a small fantasy console for small 2d games, particularly story-rich ones, like visual novels and RPGs. It looks like a handheld from the 2000s, but runs right in your browser (or natively on a Raspberry Pi).
+A small fantasy console for small 2d games, particularly story-rich ones, like visual novels and RPGs. It looks like a handheld from the 2000s, but runs right in your browser (or natively on a Raspberry Pi).
 
 ![](./docs/kate.png)
 
-Kate is built to be secure, respect your privacy, and give you agency on how you play your games. It has a [modern take on application security][sandboxing] which keeps your device and data safe even if you happen to run a buggy or malicious cartridge!
+We built it to be secure, respect your privacy, and give you agency on how you play your games. It has a [modern take on application security][sandboxing] which keeps your device and data safe even if you happen to run a buggy or malicious cartridge!
 
 What's more? The console specifications are based on real, reasonably-priced, off-the-shelf hardware so if you like tinkering with crafts and electronics you can actually [put together your very own physical console][diy]. The "Build Your Own Console" guide is still a work in progress, though. You can expect more news on this, along with open-source models for 3d printing, in the later part of 2024.
 
@@ -49,6 +49,9 @@ cartridges by running `node make ecosystem:all`.
 
 - [**Kate Importer**](ecosystem/importer/): A tool that allows installing and
   running games made for other platforms in Kate, using emulation.
+
+- [**Kate Publisher**](ecosystem/publisher/): A tool that allows creating
+  and signing cartridges for Kate from your game or app's code and data.
 
 - [**Kate Command-line Tools**](packages/kate-tools/): A set of command-line
   tools for making and publishing Kate cartridges.
@@ -152,37 +155,51 @@ We aim to support all reasonable web-exports of common game engines. The list be
 
 ## Licence
 
-Unless otherwise specified, Kate, its constituing packages, tools, and
-ecosystem cartridges are all released under the
-[Mozilla Public License v2.0][mpl]. The following header should be present in
-the relevant files:
+The Kate operating system and other core parts of the Kate project that
+impact the security and privacy guarantees we can provide to users are
+licensed under the [GNU General Public License v2.0][gpl-2] (or later).
+Other applications that are part of the Kate project are released under
+the [Mozilla Public Licence v2.0][mpl-2] or more permissive licenses.
 
-```
-This Source Code Form is subject to the terms of the Mozilla Public
-License, v. 2.0. If a copy of the MPL was not distributed with this
-file, You can obtain one at https://mozilla.org/MPL/2.0/.
-```
+The [Licence FAQ](./LICENCE-FAQ.md) provides answers to common questions
+you might have (including "why so many licences?"), but the short version is:
 
-Where dependencies are used, they remain under their specific licences.
-If a package includes more specific licence, it'll have its own `LICENCE.txt`
-file. Otherwise `LICENCE.txt` at the root of this repository applies.
-See those files for all details and legally-binding texts, this section is
-merely informational.
+- `packages/kate-core` (the operating system),
+  `packages/kate-desktop` (the native application),
+  `packages/kate-tools` (the command line tools),
+  `packages/glomp` (the build system for Kate code),
+  `packages/db-schema` (the database layer for Kate),
+  `ecosystem/importer` (the Kate importer),
+  `ecosystem/publisher` (the Kate publisher),
+  `support/*` and `make.js` (the Kate build system)
+  are all released under the GPL v2. Modifying or linking to
+  them requires your work to also be released under the GPL.
 
-Kate is [free software][free] under a [copyleft][] licence. You'll
-always be able to obtain the source code for it, and you'll always be able to
-audit what you're running. If you modify Kate _and distribute
-your modified version to others_, you'll need to make available the
-source code for those modifications and the build instructions as well.
-The recipients of your modified copy should continue to have the same rights.
+- `packages/kate-api` (the Kate Runtime API) and `packages/kate-bridges`
+  (the bridge extensions of the Kate Runtime API) are also released under
+  GPL v2, but with an exception clause such that Kate cartridges using them
+  don't become covered by the GPL --- in essence, Kate cartridges can be
+  proprietary or have any other licence you choose, no need to release
+  the source code (the Kate operating system packages above already provide
+  all necessary security and privacy guarantees to Kate users).
 
-Note that the MPL does not grant you trademark, logo, and similar rights. It
-also does not require you to release source code for things you make with
-MPL-licenced code---only changes to specifically MPL-licenced code. See
-[Mozilla's FAQ on MPL][faq].
+- `packages/kate-appui` (the App UI library),
+  `packages/kate-domui` (the DOM UI library),
+  `packages/ljt-vm` (the implementation of the LJT serialisation format),
+  `packages/schema` (the LJT schemas for Kate cartridges), and
+  `packages/util` (misc. utilities used by all Kate components)
+  are all released under the MPL v2. You have to release the source code
+  of any modification you make to files in those packages, but you can
+  combine them with proprietary code just fine (the MPL will not apply
+  to the portion in another licence if it's in a separate file).
 
-[mpl]: https://www.mozilla.org/en-US/MPL/
-[free]: https://en.wikipedia.org/wiki/Free_software
-[cc4]: https://creativecommons.org/licenses/by/4.0/
-[copyleft]: https://en.wikipedia.org/wiki/Copyleft
-[faq]: https://www.mozilla.org/en-US/MPL/2.0/FAQ/
+- `test/*` is always released to the public domain (CC0).
+
+- `examples/*` have their code under public domain (CC0) or the MIT licence.
+  Images and other resources are generally under CC4-BY. You'll need to check
+  each example separately, but you can always use the code from them without
+  attribution (although not things like images and story).
+
+[gpl-2]: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+[mpl-2]: https://www.mozilla.org/en-US/MPL/
+[spdx]: https://spdx.dev/learn/handling-license-info/

@@ -1,6 +1,6 @@
 {
   "name": "@qteatime/kate-tools",
-  "version": "0.25.5",
+  "version": "0.26.0",
   "description": "Command line tools for interacting with Kate cartridges.",
   "main": "build/index.js",
   "bin": {
@@ -13,7 +13,7 @@
     "url": "git+https://github.com/qteatime/kate.git"
   },
   "author": "Niini",
-  "license": "MPL-2.0",
+  "license": "GPL-2.0-or-later",
   "bugs": {
     "url": "https://github.com/qteatime/kate/issues"
   },

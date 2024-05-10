@@ -1,8 +1,20 @@
 /*
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ * Copyright (c) 2023-2024 The Kate Project Authors
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, see <https://www.gnu.org/licenses>.
  */
+
 import { unpickle } from "./pickle";
 import { Pathname, binary } from "../deps/utils";
 
@@ -21,10 +33,7 @@ export async function unpack_archive(path: Pathname, bytes: Uint8Array) {
 }
 
 export class RPAv3 {
-  private constructor(
-    readonly data: Uint8Array,
-    readonly index: Map<string, IndexEntry[]>
-  ) {}
+  private constructor(readonly data: Uint8Array, readonly index: Map<string, IndexEntry[]>) {}
 
   async get_file(path: string) {
     const entries = this.index.get(path);
@@ -77,9 +86,7 @@ export class RPAv3 {
     const offset = read_int_string(data, 8, 16);
     const key = read_int_string(data, 25, 8);
     const serialised_index = await deflate(data.slice(offset));
-    const index0: Map<string, AnyIndexEntry[]> = unpickle(
-      serialised_index
-    ) as any;
+    const index0: Map<string, AnyIndexEntry[]> = unpickle(serialised_index) as any;
     if (!(index0 instanceof Map)) {
       throw new Error(`Invalid RPA index`);
     }
@@ -95,19 +102,14 @@ export class RPAv3 {
       if (v[0].length === 2) {
         index.set(k, [
           ...v.map(
-            ([offset, length]) =>
-              [offset ^ key, length ^ key, new Uint8Array()] as IndexEntry
+            ([offset, length]) => [offset ^ key, length ^ key, new Uint8Array()] as IndexEntry
           ),
         ]);
       } else if (v[0].length === 3) {
         index.set(k, [
           ...v.map(
             ([offset, length, maybe_bytes]) =>
-              [
-                offset ^ key,
-                length ^ key,
-                ensure_uint8array(maybe_bytes),
-              ] as IndexEntry
+              [offset ^ key, length ^ key, ensure_uint8array(maybe_bytes)] as IndexEntry
           ),
         ]);
       }
