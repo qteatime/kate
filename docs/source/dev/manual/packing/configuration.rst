@@ -264,6 +264,8 @@ warnings *(recommended)*
   to other medical emergencies such as epileptic seizures.
 
 
+.. _legal build configuration:
+
 Legal
 '''''
 

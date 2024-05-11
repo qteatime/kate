@@ -80,8 +80,8 @@ you can build, all based on the same Cats x Sweets x Strawberry theme.
 
   3D models for the cases along with detailed build instructions are planned
   to be added to this document over the course of 2024, but they're not
-  currently available. If you plan to build one of the consoles listed below
-  you'll also have to do your own 3D modelling for the cases.
+  currently available. Also note that since the designs below are not final
+  yet they are not available under any open licence.
 
 
 The Cheesecake Vending Meow-chine

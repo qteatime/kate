@@ -12,16 +12,16 @@ The Kate project licence and your rights
 
 The primary goal of the Kate project is to provide you, the user, with a
 platform that is secure and respects your privacy, and for which you can
-always verify if the guarantees say you get are truly what you expect,
-rather than just trusting the authors. To this end, we rely on specific
-software licences to guarantee this right of verifying your copy of Kate.
+always verify these security and privacy guarantees, rather than just trust
+the authors. To this end, we rely on specific software licences to
+ensure that you *can* verify the software you're running.
 
 In essence, the Kate project is divided into layers, and each layer has
 more strict or more lax licensing depending on how important it is to
 the security and privacy guarantees we provide to you. The layers are:
 
 - **The Kate operating system and its components**, what is made available to
-  you either online (e.g.: on <https://kate.qteati.me>), or through a native
+  you either online (e.g.: on https://kate.qteati.me), or through a native
   application/kernel distribution. This is always licensed to you under
   the GNU General Public License version 2 (or, at your choice, a later
   version). This guarantees that you'll always be able to verify the
@@ -42,7 +42,9 @@ the security and privacy guarantees we provide to you. The layers are:
   copies of the documentation existing with misleading or incorrect statements
   about the security guarantees and privacy you get. This is particularly true
   with translations, as even when translators have no intention of misleading,
-  their choice of phrasing might still cause confusion among readers.
+  their choice of phrasing might still cause confusion among readers. Note
+  that illustrations and designs contained in the books might have different
+  licences (this will be noted where it's the case).
 
 - **Any thirdy-party cartridge released for Kate** is bound to the licence the
   authors of that cartridge have chosen (and communicated to you). This
@@ -67,7 +69,11 @@ Official binary releases by the Kate project authors will always be
 distributed at https://github.com/qteatime/kate. You're encouraged to audit
 and verify any modifications if you've got your copy from elsewhere.
 
----
+For more details and clarifications on these licences and how they affect
+you, see the :doc:`licence-faq`.
+
+
+--------------------------------------------------------------------------------
 
 This software contains portions of code, fonts, images, and sounds by
 third-parties, specified below.

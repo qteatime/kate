@@ -78,6 +78,10 @@ as the terms of use for different components of the project.
 :doc:`Licence <etc/licence>`
    Licence terms for Kate and all projects it uses can be read here.
 
+:doc:`Licensing FAQ <etc/licence-faq>`
+   Common answers to things you may wonder about Kate's licences and how
+   they affect you as a player, developer, or modder.
+
 
 Indices and tables
 ==================
@@ -118,6 +122,7 @@ Indices and tables
 
   etc/releases/index
   etc/licence
+  etc/licence-faq
 
 .. toctree::
   :caption: Indices and Tables
