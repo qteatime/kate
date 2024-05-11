@@ -23,13 +23,13 @@ the security and privacy guarantees we provide to you. The layers are:
 - **The Kate operating system and its components**, what is made available to
   you either online (e.g.: on https://kate.qteati.me), or through a native
   application/kernel distribution. This is always licensed to you under
-  the GNU General Public License version 2 (or, at your choice, a later
+  the GPL version 2 (or, at your choice, a later
   version). This guarantees that you'll always be able to verify the
   security and privacy guarantees of your copy of Kate.
 
 - **The Kate Importer and Kate Publisher cartridges**, as well as the Kate
-  command line tools, are also licensed to you under the GNU General
-  Publice License version 2 (or, at your choice, a later version).
+  command line tools, are also licensed to you under the GPL
+  version 2 (or, at your choice, a later version).
   This is done so cartridge authors can make sure the tool is not *changing*
   their game/app code in any way they don't expect to, which indirectly
   impacts the security/privacy guarantees a thirdy-party author provides to
