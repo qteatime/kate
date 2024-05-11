@@ -168,11 +168,6 @@ GNU General Public Licence version 2
 Linking exception for cartridges
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Note that in the case of the Kate operating system, we provide a special
-exception to this licence such that cartridge authors can release their
-cartridge under any licence, without being bound to the GPL for linking
-to the Kate Runtime API. This exception is reproduced below:
-
 .. include:: ../../../COPYING
   :literal:
 

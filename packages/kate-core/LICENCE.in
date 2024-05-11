@@ -91,32 +91,40 @@ _______________________________________________________________________________
 
 {{support/licences/GPL2.txt}}
 
-## Kate Runtime API linking exception
 
-Linking the Kate operating system or any of its components statically
-or dynamically with other modules is making a combined work based on
-the Kate operating system. Thus, the terms and conditions of the
-GNU General Public License cover the whole combination.
+## Kate linking exception for cartridges
 
-Kate programs are generally distributed in the form of cartridge files that
-are linked dynamically to the Kate operating system to function.
-As a special exception, the copyright holders of the Kate operating system
-give you permission to combine the Kate operating system with any cartridge
-that communicates with the Kate operating system solely through the
-Kate Runtime API. This combination does not by itself cause the resulting
-cartridge to be covered by the GNU General Public License. This exception
-however does not invalidate any other reasons why the cartridge file might
-be covered by the GNU General Public License.
+                     The Kate Project Licence
+                       Version 1, May 2024
 
-Note that people who make modified versions of the Kate operating system
-are not obligated to grant this special exception for their modified versions;
+The Kate operating system and other core components are provided under
+the terms of the GNU General Public Licence (GPL) version 2, or
+(at your choice) any later version, along with the following exceptions:
+
+  1. Programs distributed as Kate cartridges and linked to the Kate
+     operating system solely through the Kate Runtime API do not
+     constitute a modified or derivative work. This linking does not
+     cause the cartridge to be covered by the GPL, and does not require
+     the author to provide source code for the cartridge.
+     
+     Note that this exception does not invalidate any other reasons why
+     the cartridge might be covered by the GPL, such as linking to other
+     GPL-licensed code.
+
+  2. Data included with programs distributed as cartridges (e.g.: images,
+     fonts, sound files, etc.) which do not alter the function of the
+     cartridge's code, even when linked with such code, should only be
+     classified as part of an aggregate work, and thus not under the
+     scope of the GPL. 
+
+Note that the people who make modified versions of the Kate operating system
+are not obligated to grant these exceptions for their modified versions;
 it is their choice whether to do so. The GNU General Public License gives
-permission to release a modified version without this exception; this
-exception also makes it possible to release a modified version which
-carries forward this exception. If you modify the Kate Runtime API,
-this exception does not apply to your modified version of the
-Kate operating system, and you must remove this exception when
-you distribute your modified version.
+permission to release a modified version without these exceptions; and
+these exceptions also make it possible to release a modified version which
+carry these exceptions forward.
 
-This exception is an additional permission under section 7 of the
-GNU General Public License, version 3 (“GPLv3”), if such version is used.
+If you modify the Kate Runtime API, or modify the Kate operating system in
+a way that causes a change in the Kate Runtime API, these exceptions do not
+apply to your modified version of the Kate operating system, and you must
+remove these exceptions when you distribute your modified version.
