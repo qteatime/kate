@@ -185,9 +185,9 @@ fulfill this intention for two reasons:
   is quite unfortunate that it was missed in the previous licence assessment.
 
 * We want to allow extensions to the OS in the form of cartridges you can
-install the normal way in the future. These would change core OS behaviour
-while not being changes to specific MPL-marked files; thus there would
-be no requirement for them to be auditable.
+  install the normal way in the future. These would change core OS behaviour
+  while not being changes to specific MPL-marked files; thus there would
+  be no requirement for them to be auditable.
 
   The GPL provides good provisions to make these extensions covered as well
   since it takes any form of linking into consideration. We provide a special
